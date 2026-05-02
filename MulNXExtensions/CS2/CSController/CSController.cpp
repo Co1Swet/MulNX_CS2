@@ -9,9 +9,6 @@
 #include <unordered_set>
 
 bool CSController::Window(MulNX::UINode* node) {
-    if (this->ESPDraw.load(std::memory_order_acquire)) {
-        this->ESP();
-    }
     auto w = MulNX::UI::RAIIWindow("快捷操作", this->ShowWindow);
     if (!w)return true;
     MulNX::TransInfo info;

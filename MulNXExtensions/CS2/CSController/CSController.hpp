@@ -53,7 +53,6 @@ private:
     // 视角控制钩子
     std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo = nullptr;
 
-    void ESP();
     bool Window(MulNX::UINode* node);
 
     void HandleOverrideView(CS2::CViewSetup* viewSetup);
@@ -65,7 +64,6 @@ private:
 public:
     std::vector<std::function<bool(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*)>>handlesControlPlayer{};
     CS2::Modules Modules{};
-    std::atomic<bool> ESPDraw = false;
     // 获取控制台变量系统
     C_ConVarSystem& GetCvarSystem() { return this->CvarSystem; }
     

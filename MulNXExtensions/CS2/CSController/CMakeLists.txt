@@ -1,7 +1,6 @@
 add_library(CSController
     "CSController.cpp"
     "InterfaceImpl.cpp"
-    "Draw/DrawImpl.cpp"
 
     "FreeCameraController/FreeCameraController.cpp"
     "AdvancedViewController/AdvancedViewController.cpp"

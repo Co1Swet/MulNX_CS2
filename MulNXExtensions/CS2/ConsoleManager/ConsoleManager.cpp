@@ -18,6 +18,7 @@ bool ConsoleManager::UINodeFunc(MulNX::UINode* node) {
     MulNX::UI::Checkbox("玩家信息管理窗口", this->Core->ModuleManager()->FindModule("PlayerHub")->ShowWindow);
     MulNX::UI::Checkbox("投掷物追踪器窗口", this->Core->ModuleManager()->FindModule("ProjectileTracker")->ShowWindow);
     MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->Core->ModuleManager()->FindModule("DeathMsgController")->ShowWindow);
+    MulNX::UI::Checkbox("ESP", this->Core->ModuleManager()->FindModule("ESPController")->ShowWindow);
 
     if (ImGui::CollapsingHeader("CS2控制台")) {
         if (ImGui::Button("解限所有CS2控制台变量")) {
@@ -44,10 +45,6 @@ bool ConsoleManager::UINodeFunc(MulNX::UINode* node) {
             }
             this->ISys().LogLine();
         }
-    }
-
-    if (ImGui::CollapsingHeader("渲染增强")) {
-        MulNX::UI::Checkbox("方框透视", this->CS2()->ESPDraw);
     }
     return true;
 }

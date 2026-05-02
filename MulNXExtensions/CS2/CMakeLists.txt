@@ -3,6 +3,8 @@ add_library(MulNXCS2Ext
     CSClasses/GlobalVars/GlobalVars.cpp
     CSClasses/tree/tree.cpp
 
+    ViewController/ViewController.cpp
+    ESPController/ESPController.cpp
     PlayerFlashController/PlayerFlashController.cpp
     DeathMsgController/DeathMsgController.cpp
 

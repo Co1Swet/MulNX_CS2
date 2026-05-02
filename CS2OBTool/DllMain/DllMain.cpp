@@ -58,6 +58,8 @@ void MainDraw::Window(MulNX::UINode* node) {
     node->CallUINode("ProjectileTracker");
     node->CallUINode("DeathMsgController");
     node->CallUINode("MediaRemoter");
+    node->CallUINode("ESPController");
+    node->CallUINode("ViewController");
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
@@ -107,6 +109,7 @@ DWORD MulNX_CS2_Start(void*) {
         (*core->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             .BindAbstractLayer3D<CSController>("CSController")
+            .CreateModule<ViewController>("ViewController")
             .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
             .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
             .CreateModule<WebSocketManager>("WebSocketManager")
@@ -128,6 +131,7 @@ DWORD MulNX_CS2_Start(void*) {
             .CreateModule<ObserverController>("ObserverController")
             .CreateModule<ProjectileTracker>("ProjectileTracker")
             .CreateModule<DeathMsgController>("DeathMsgController")
+            .CreateModule<ESPController>("ESPController")
             // 较为上层
             .CreateModule<MiniMap>("MiniMap")
             .CreateModule<VirtualUser>("VirtualUser")
