@@ -1,16 +1,69 @@
+disclaimer: |
+  欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
+  在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
+  但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
+
+# 此部分归属UI系统，和主要的，公有的UI部分翻译
 ui:
-  main: 主窗口
+  main: 主窗口（按下 Insert 键隐藏所有绘制）
   camera_system: 摄像机系统
   game_settings: 游戏设置
   game_enhance: 游戏增强
   mulnx_control: MulNX控制
+  settings: UI个性配置
+  style:
+    info: 下方为ImGui官方提供的调整界面，您可以通过该界面调整UI风格
+    save: 点击此按钮保存到磁盘，下次打开可自动加载
+    save_succ: 成功保存UI风格文件到：{}
+    save_error_with: UI风格保存失败！错误：{}
+    save_error: UI风格保存失败！遇到未知问题！
+    load: 尝试加载UI风格文件：{}
+    load_succ: UI风格文件加载成功：{}
+    load_file_error: UI风格文件加载失败，可能是文件损坏：{}
   font:
     cfg:
       load: 尝试解析字体配置：{}
       load_succ: 字体配置解析成功！字体路径：{0}  字体大小：{1}
     load: 尝试加载字体：{}
     load_succ: 字体加载成功：{}
-    
+
+win32:
+  drag:
+    analisy:
+      error: 在解析拖拽列表时出现问题：{}
+      unk_error: 在解析拖拽列表时出现未知问题
+
+hook:
+  attached: 钩子部署成功！钩子名：{}
+
+graph:
+  shader:
+    compiling: 正在编译着色器！
+    compiled: 着色器编译完毕！
+    compile_fail: 着色器编译失败！
+  chroma_key:
+    enable: 启用绿幕分离
+    threshold: 设置阈值
+
+media:
+  obs:
+    connect:
+      please_try: |
+        当前尚未连接OBS，请尝试连接
+        关于OBS连接：
+          1.确保OBS已经运行
+          2.标题栏-工具（T）-WebSocket 服务器设置
+          3.开启 WebSocket 服务器
+          4.服务器端口号应保持OBS默认端口：4455
+          5.取消勾选 开启身份认证
+          6.应用，随后尝试连接
+      try: 尝试连接
+      succ: 成功连接OBS WebSocket接口！身份认证成功 (Identified)！
+      cant_again: OBS连接已创建，请勿重复连接！
+      error_empty: OBS连接未建立！请先建立OBS连接！
+    record:
+      start: 开始录制
+      stop: 停止录制
     
 text:
   entered: 已进入
@@ -51,25 +104,30 @@ math:
   camera_keyframe:
     fmt: "时间：{0}  坐标（XYZ）：{1}，{2}，{3}  FOV：{4}  角度： 俯仰：{5}  偏航：{6}  滚转：{7}  景深： 近模糊：{8}  近清晰：{9}  远清晰：{10}  远模糊：{11}"
 
+module:
+  inited: 初始化成功！
+  send_ui: 将UI节点注册信息推送到了消息系统
+  send_task: 将任务注册信息推送到了消息系统
+
 sys:
-  i18n_load_succ: 语言文件加载成功：{0}
-  version_is_testing: 当前版本是否为测试版：{0} 
-  version_is: 当前版本号：{0} 
-  build_stamp: 当前版本构建时间：{0} 
+  i18n_load_succ: 语言文件加载成功：{}
+  version_is_testing: 当前版本是否为测试版：{} 
+  version_is: 当前版本号：{} 
+  build_stamp: 当前版本构建时间：{} 
   started: 各模块初始化完毕，系统已启动
   shutdown_warning: 检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
 
 result:
-  create_succ: 创建成功：{0}
-  create_error: 创建失败：{0}
+  create_succ: 创建成功：{}
+  create_error: 创建失败：{}
   save_success: 保存成功
   error_empty_name: 不能使用空名称
-  error_no_file: 不存在的文件：{0}
-  error_no_path: 不存在的文件夹：{0}
-  cfg_load_succ: 配置加载成功：{0}
-  cfg_load_error: 配置加载失败：{0}
-  resource_load_succ: 资源加载成功：{0}
-  resource_load_error: 资源加载失败：{0}
+  error_no_file: 不存在的文件：{}
+  error_no_path: 不存在的文件夹：{}
+  cfg_load_succ: 配置加载成功：{}
+  cfg_load_error: 配置加载失败：{}
+  resource_load_succ: 资源加载成功：{}
+  resource_load_error: 资源加载失败：{}
 
 log:
   info: 提示
@@ -138,7 +196,7 @@ camsys:
     adjust_element_index: 要调整的本解决方案的元素
     element_info: "元素信息： 编号：{0}  元素名称：{1}  元素持续时间：{2}  元素偏移时间：{3}"
     offset_time: 偏移时间
-    invalid_index: "索引无效！请输入 0 到 {0} 之间的值"
+    invalid_index: "索引无效！请输入 0 到 {} 之间的值"
   
   proj:
     settings: 项目设置
@@ -148,7 +206,7 @@ camsys:
     list: 项目列表
     name_label: "|项目名称："
     debug_window: 项目调试
-    current: 当前项目：{0}
+    current: 当前项目：{}
     current_label: 当前操作项目：
     switch_to_current: 切换到当前项目
     unload_current: 卸载当前项目
@@ -160,8 +218,8 @@ camsys:
     close_debug_page: 关闭项目调试页面
 
   ws:
-    enter_status: 工作区状态:{0}
-    current_workspace: 当前工作区:{0}
+    enter_status: 工作区状态:{}
+    current_workspace: 当前工作区:{}
     current_null: 当前未打开任何工作区
     open_default: 打开默认工作区
     save: 保存工作区
@@ -171,3 +229,9 @@ free_campath:
   fmt: "编号： {0}  {1}\n" # {1}为关键帧参数
   fmt_edit: "正在调整的关键帧编号： {0}  {1}\n" # {1}为关键帧参数
   add: 添加关键帧
+
+dthmsg:
+  window:
+    name: 击杀信息控制
+    control: 击杀信息控制窗口
+  enable: 启用击杀控制

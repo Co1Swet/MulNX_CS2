@@ -31,25 +31,16 @@ ConfigManager& MulNXeCore::ConfigManager() {
 
 //系统初始化
 bool MulNXeCore::Init() {
-
-
     //IPCer初始化
     this->IPCer().Init(this);
-
-
     //ConfigManager初始化
     this->ConfigManager().Init(this);
-
     //加载配置文件
-    this->ConfigManager().Config_Load(this->IPCer().PathGet_Configs());
+    this->ConfigManager().Config_Load(this->IPCer().PathGet_Config());
     this->IPCer().SetCS2Path(this->ConfigManager().Config_GetCS2Path());
 
-
     //输出总成功信息
-
     this->IsRunning = true;
-
-
     return true;
 }
 

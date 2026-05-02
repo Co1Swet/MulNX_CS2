@@ -15,24 +15,15 @@ public:
         } MulNXConfig;
 
         struct S_DLLToCS {
-            std::filesystem::path Path;       // DLLToCS工具目录
+            std::filesystem::path Path;
             struct S_MulNXDLL_dll {
                 std::filesystem::path Path;
             }MulNXDLL_dll;
-        }DLLToCS;
+        }CS2OBTool;
 
-        struct S_Saves {
-            std::filesystem::path Path;       // Saves主目录
-            struct S_External {
-                std::filesystem::path Path;
-                struct S_Core {
-                    std::filesystem::path Path;
-                    struct S_Configs {
-                        std::filesystem::path Path;
-                    } Configs;
-                } Core;
-            } External;
-        } Saves;
+        struct S_Config {
+            std::filesystem::path Path;
+        } Config;
 
         struct S_MulNX_exe {
             std::filesystem::path Path;
@@ -94,13 +85,10 @@ public:
 
     std::filesystem::path PathGet_MulNX();
     std::filesystem::path PathGet_MulNXConfig();
-    std::filesystem::path PathGet_DLLToCS();
+    std::filesystem::path PathGet_CS2OBTool();
     std::filesystem::path PathGet_MulNXDLL_dll();
 
-    std::filesystem::path PathGet_Saves();
-    std::filesystem::path PathGet_External();
-    std::filesystem::path PathGet_Core();
-    std::filesystem::path PathGet_Configs();
+    std::filesystem::path PathGet_Config();
 
     std::filesystem::path PathGet_MulNX_exe();
 

@@ -43,8 +43,8 @@ add_subdirectory("CS2OBTool")
 add_subdirectory("CS2Injector")
 
 # 定义目标路径
-set(InjecterPath ${CMAKE_SOURCE_DIR}/bin/MulNX/MulNX)
-set(DllPath ${InjecterPath}/DLLToCS)
+set(InjecterPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
+set(DllPath ${InjecterPath}/CS2OBTool)
 
 # 处理 CS2Injector 目标
 set_target_properties(CS2Injector PROPERTIES

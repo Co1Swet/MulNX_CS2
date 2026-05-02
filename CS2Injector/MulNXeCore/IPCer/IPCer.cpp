@@ -41,13 +41,9 @@ bool IPCer::Init(MulNXeCore* Core) {
     // 获取MulNX目录
     this->Paths.MulNX.Path = this->PathGet_MulNX_exe().parent_path();
     this->Paths.MulNX.MulNXConfig.Path = this->PathGet_MulNX() / "MulNXConfig";
-    this->Paths.MulNX.DLLToCS.Path = this->PathGet_MulNX() / "DLLToCS";
-    this->Paths.MulNX.DLLToCS.MulNXDLL_dll.Path = this->PathGet_DLLToCS() / "CS2OBTool.dll";
-    this->Paths.MulNX.Saves.Path = this->PathGet_MulNX() / "Saves";
-    this->Paths.MulNX.Saves.External.Path = this->PathGet_Saves() / "External";
-    this->Paths.MulNX.Saves.External.Core.Path = this->PathGet_External() / "Core";
-    this->Paths.MulNX.Saves.External.Core.Configs.Path = this->PathGet_Core() / "Configs";
-
+    this->Paths.MulNX.CS2OBTool.Path = this->PathGet_MulNX() / "CS2OBTool";
+    this->Paths.MulNX.CS2OBTool.MulNXDLL_dll.Path = this->PathGet_CS2OBTool() / "CS2OBTool.dll";
+    this->Paths.MulNX.Config.Path = this->PathGet_MulNX() / "Config";
 
     this->Inited = true;
     return true;
@@ -59,23 +55,15 @@ std::filesystem::path IPCer::PathGet_MulNX() {
 std::filesystem::path IPCer::PathGet_MulNXConfig() {
     return this->Paths.MulNX.MulNXConfig.Path;
 }
-std::filesystem::path IPCer::PathGet_DLLToCS() {
-    return this->Paths.MulNX.DLLToCS.Path;
+std::filesystem::path IPCer::PathGet_CS2OBTool() {
+    return this->Paths.MulNX.CS2OBTool.Path;
 }
 std::filesystem::path IPCer::PathGet_MulNXDLL_dll() {
-    return this->Paths.MulNX.DLLToCS.MulNXDLL_dll.Path;
+    return this->Paths.MulNX.CS2OBTool.MulNXDLL_dll.Path;
 }
-std::filesystem::path IPCer::PathGet_Saves() {
-    return this->Paths.MulNX.Saves.Path;
-}
-std::filesystem::path IPCer::PathGet_External() {
-    return this->Paths.MulNX.Saves.External.Path;
-}
-std::filesystem::path IPCer::PathGet_Core() {
-    return this->Paths.MulNX.Saves.External.Core.Path;
-}
-std::filesystem::path IPCer::PathGet_Configs() {
-    return this->Paths.MulNX.Saves.External.Core.Configs.Path;
+
+std::filesystem::path IPCer::PathGet_Config() {
+    return this->Paths.MulNX.Config.Path;
 }
 std::filesystem::path IPCer::PathGet_MulNX_exe() {
     return this->Paths.MulNX.MulNX_exe.Path;
@@ -205,7 +193,7 @@ bool IPCer::OpenCS2() {
         return false;
     }
     this->Core->ConfigManager().Config_SetCS2Path(this->PathGet_cs2_exe());
-    this->Core->ConfigManager().Config_Save(this->PathGet_Configs());
+    this->Core->ConfigManager().Config_Save(this->PathGet_Config());
     //构建参数
     std::wstring parameters = L"-insecure -worldwide -windowed -novid -allow_third_party_software";
 
@@ -251,10 +239,10 @@ bool IPCer::TryCatchCS2() {
 }
 
 bool IPCer::Inject() {
-    if (this->Paths.MulNX.DLLToCS.MulNXDLL_dll.Path.empty()) {
+    if (this->Paths.MulNX.CS2OBTool.MulNXDLL_dll.Path.empty()) {
         return false;
     }
-    if (!std::filesystem::exists(this->Paths.MulNX.DLLToCS.MulNXDLL_dll.Path)) {
+    if (!std::filesystem::exists(this->Paths.MulNX.CS2OBTool.MulNXDLL_dll.Path)) {
         return false;
     }
     if (!this->CS2hProcess || this->CS2hProcess == INVALID_HANDLE_VALUE) {
@@ -265,7 +253,7 @@ bool IPCer::Inject() {
     LPVOID pRemoteMem = VirtualAllocEx(
         this->CS2hProcess,
         NULL,
-        (this->Paths.MulNX.DLLToCS.MulNXDLL_dll.Path.wstring().size() + 1) * sizeof(wchar_t),
+        (this->Paths.MulNX.CS2OBTool.MulNXDLL_dll.Path.wstring().size() + 1) * sizeof(wchar_t),
         MEM_COMMIT | MEM_RESERVE,
         PAGE_READWRITE
     );
@@ -278,8 +266,8 @@ bool IPCer::Inject() {
     if (!WriteProcessMemory(
         this->CS2hProcess,
         pRemoteMem,
-        this->Paths.MulNX.DLLToCS.MulNXDLL_dll.Path.c_str(),
-        (this->Paths.MulNX.DLLToCS.MulNXDLL_dll.Path.wstring().size() + 1) * sizeof(wchar_t),
+        this->Paths.MulNX.CS2OBTool.MulNXDLL_dll.Path.c_str(),
+        (this->Paths.MulNX.CS2OBTool.MulNXDLL_dll.Path.wstring().size() + 1) * sizeof(wchar_t),
         NULL
     )) {
         VirtualFreeEx(this->CS2hProcess, pRemoteMem, 0, MEM_RELEASE);
