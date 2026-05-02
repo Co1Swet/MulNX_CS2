@@ -5,6 +5,7 @@
 #include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
 #include <chrono>
+#include <shellapi.h>
 #pragma comment(lib, "d3d11.lib")
 
 using ResizeBuffers_t = HRESULT(__stdcall*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
@@ -51,7 +52,7 @@ void HookManager::ActiveSystem() {
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkClearDepthStencilView->Attach();
-    this->ISys().LogSucc("ClearDepthStencilView钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
 
     pTempContext->Release();
 
@@ -73,7 +74,7 @@ void HookManager::ActiveSystem() {
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkPresent->Attach();
-    this->ISys().LogSucc("Present钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "Present"));
 
     // ---- Hook ResizeBuffers (vtable index 13) ----
     this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTempSwapChain)->GetVFuncPtr(13),
@@ -82,7 +83,7 @@ void HookManager::ActiveSystem() {
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkResizeBuffers->Attach();
-    this->ISys().LogSucc("ResizeBuffers钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "ResizeBuffers"));
 
     pTempD3DDevice->Release();
     pTempSwapChain->Release();
@@ -110,15 +111,22 @@ void HookManager::d3dInit() {
     DXGI_SWAP_CHAIN_DESC sd;
     this->pGraphicsManager->pSwapChain->GetDesc(&sd);
     this->CS2hWnd = sd.OutputWindow;
-
+    // 文件拖拽钩子
+    HANDLE hProp = GetPropW(this->CS2hWnd, L"OleDropTargetInterface");
+    IDropTarget* pTarget = static_cast<IDropTarget*>(hProp);
+    this->hkDrop = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTarget)->GetVFuncPtr(6), 0, false,
+        [this](RegContext* ctx, MulNX::Hook* hk) {
+            this->HandleProcessDropFiles((IDataObject*)ctx->rdx);
+            return MulNX::Hook::Then::Continue;
+        }).value();
+    this->hkDrop->Attach();
     // 窗口过程钩子
     this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->CS2hWnd, GWLP_WNDPROC),
         0, false,[this](RegContext* ctx, MulNX::Hook* hk) {
-            return this->MyWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
+            return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
         }).value();
     this->hkWndProc->Attach();
-    this->ISys().LogSucc("窗口过程钩子已部署");
-
+    this->ISys().LogSucc(I18n("hook.attached", "WndProc"));
     // 交换链 RTV
     ID3D11Texture2D* buf = nullptr;
     this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buf);
@@ -134,7 +142,7 @@ void HookManager::d3dInit() {
     this->pGraphicsManager->CreateGreenScreenAssets();
 }
 
-MulNX::Hook::Then HookManager::MyWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg == WM_CLOSE)
         this->ISys().LogWarning(I18n("sys.shutdown_warning"));
     this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
@@ -143,4 +151,40 @@ MulNX::Hook::Then HookManager::MyWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LP
     if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) && MulNX::Win32::IsKeyboardMessage(uMsg))
         return MulNX::Hook::Then::Return;
     return MulNX::Hook::Then::Continue;
+}
+
+void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {
+    if (!pDataObj) return;
+    // 请求 CF_HDROP 格式
+    FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+    STGMEDIUM med{};
+    if (FAILED(pDataObj->GetData(&fmt, &med))) return;
+    // 锁住全局内存，拿到 HDROP
+    HDROP hDrop = static_cast<HDROP>(GlobalLock(med.hGlobal));
+    if (!hDrop) {
+        ReleaseStgMedium(&med);
+        return;
+    }
+    UINT numFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, nullptr, 0);
+    // try catch保证无论如何，占有的句柄必须释放回去
+    try {
+        for (UINT i = 0; i < numFiles; ++i) {
+            UINT len = DragQueryFileW(hDrop, i, nullptr, 0);  // 含 '\0'
+            if (len == 0) continue;
+            std::wstring buffer(len, L'\0');
+            if (!DragQueryFileW(hDrop, i, buffer.data(), len + 1))continue;
+            std::filesystem::path filePath{ buffer };
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Window/Drag/FileDrop"_hash);
+            rp->str1 = std::move(filePath.string());
+            this->ISys().PublishAsync(std::move(msg));
+        }
+    }
+    catch (const std::exception& e) {
+        this->ISys().LogError(I18n("win32.drag.analisy.error", e.what()));
+    }
+    catch (...) {
+        this->ISys().LogError(I18n("win32.drag.analisy.unk_error"));
+    }
+    GlobalUnlock(med.hGlobal);
+    ReleaseStgMedium(&med);
 }

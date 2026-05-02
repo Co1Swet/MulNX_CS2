@@ -88,7 +88,7 @@ bool GlowController::Init() {
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkSetGlowColor->Attach();
-    this->ISys().LogSucc("发光颜色设置钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "SetGlowColor"));
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         this->Menu(node);

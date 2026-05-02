@@ -6,6 +6,9 @@ add_library(MulNXCS2Ext
     PlayerFlashController/PlayerFlashController.cpp
     DeathMsgController/DeathMsgController.cpp
 
+    DemoSystem/DemoSystem.cpp
+    DemoSystem/DemoHelper/DemoHelper.cpp
+
     PlayerHub/PlayerHub.cpp
     PlayerHub/GlowController/GlowController.cpp
     PlayerHub/NameController/NameController.cpp
@@ -14,7 +17,6 @@ add_library(MulNXCS2Ext
     PlayerHub/ProjectileTracker/ProjectileTracker.cpp
 
     ConsoleManager/ConsoleManager.cpp
-    DemoHelper/DemoHelper.cpp
     GameCfgManager/GameCfgManager.cpp
     GameSettingsManager/GameSettingsManager.cpp
 

@@ -85,7 +85,7 @@ bool SmokeController::Init() {
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkSetSmokeProps->Attach();
-    this->ISys().LogSucc("烟雾属性设置钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "SetSmokeProps"));
 
     // 2. 注册 UI
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {

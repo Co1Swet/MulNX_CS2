@@ -46,7 +46,7 @@ bool NameController::Init() {
             return MulNX::Hook::Then::Continue; // 继续执行原始函数，获取装饰名并写入 pBuffer
         }).value();
     this->hkGetDecoratedPlayerName->Attach();
-    this->ISys().LogSucc("装饰玩家名称获取钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         this->Menu(node);
@@ -106,7 +106,7 @@ void NameController::HandleVHook(CS2::CCSPlayerController* pPlayerController) {
         }).value();
     this->hkGetPlayerName->Attach();
     this->bGetPlayerNameHooked = true;
-    this->ISys().LogSucc("玩家名称获取钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "GetPlayerName"));
 }
 
 bool NameController::SetReplace(Steam64UID uid, const std::string& newName) {

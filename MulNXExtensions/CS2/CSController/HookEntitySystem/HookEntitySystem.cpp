@@ -21,7 +21,7 @@ bool HookEntitySystem::Init() {
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkAddEntity->Attach();
-    this->ISys().LogSucc("实体添加钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "AddEntity"));
 
     auto pRemoveEntity = vtable[16];
     this->hkRemoveEntity = MulNX::Hook::Create(pRemoveEntity,
@@ -33,7 +33,7 @@ bool HookEntitySystem::Init() {
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkRemoveEntity->Attach();
-    this->ISys().LogSucc("实体移除钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "RemoveEntity"));
 
     return true;
 }

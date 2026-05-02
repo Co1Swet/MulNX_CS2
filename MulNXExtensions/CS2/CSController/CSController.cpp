@@ -126,7 +126,7 @@ bool CSController::Init() {
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkPosCallIsPlayingDemo->Attach();
-    this->ISys().LogSucc("视角调用演示钩子已部署");
+    this->ISys().LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
 
     this->controlView.dofs.pNearBlurry = this->CvarSystem.GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
     this->controlView.dofs.pNearCrisp = this->CvarSystem.GetCvar("r_dof_override_near_crisp")->GetPtr<float>();

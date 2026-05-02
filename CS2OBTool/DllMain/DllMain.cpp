@@ -133,6 +133,7 @@ DWORD MulNX_CS2_Start(void*) {
             .CreateModule<VirtualUser>("VirtualUser")
             .CreateModule<GameCfgManager>("GameCfgManager")
             .CreateModule<DemoHelper>("DemoHelper")
+            .CreateModule<DemoSystem>("DemoSystem")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
             .CreateModule<ConsoleManager>("ConsoleManager")
             .CreateModule<MediaRemoter>("MediaRemoter")
