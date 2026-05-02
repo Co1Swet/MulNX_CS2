@@ -75,7 +75,7 @@ namespace MulNX {
         MulNX::Memory::Asm::Code hookTargetRawCode{};
         MulNX::Memory::Asm::Code jumperAsmCode{};
 
-        size_t frameSize = 0;
+        
     private:
         static std::expected<MulNX::Memory::Asm::Code, std::string> FixRelativeInstructions(const MulNX::Memory::Asm::Code& raw_code,
             uintptr_t old_base, uintptr_t new_base);
@@ -86,6 +86,7 @@ namespace MulNX {
         uintptr_t jmpTarget0 = 0;
         uintptr_t jmpTarget1 = 0;
     public:
+        size_t frameSize = 0;
         uintptr_t pMaybeRawFunc = 0;// 可能的原函数地址（如果覆盖的指令是一个完整函数的开头）
         Hook() = default;
         ~Hook();

@@ -216,9 +216,17 @@ namespace CS2 {
     };
 
 
+    class EntitySpottedState_t {
+    public:
+        bool* m_bSpotted() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::EntitySpottedState_t::m_bSpotted); } // bool
+        using SpottedMask = uint32_t[2];
+        SpottedMask* m_bSpottedByMask() { return Schema<SpottedMask>(this, cs2_dumper::schemas::client_dll::EntitySpottedState_t::m_bSpottedByMask); }  // uint32[2]
+    };
+
     class C_CSPlayerPawn :public C_CSPlayerPawnBase {
     public:
-        DirectX::XMFLOAT3* angEyeAngles() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_angEyeAngles); }
+        DirectX::XMFLOAT3* angEyeAngles() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_angEyeAngles); }
+        EntitySpottedState_t* m_entitySpottedState() { return Schema<EntitySpottedState_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_entitySpottedState); }
     };
 
     class CBasePlayerController :public C_BaseEntity {

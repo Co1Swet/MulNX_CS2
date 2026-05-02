@@ -6,6 +6,7 @@
 #include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/PlayerHub/ProjectileTracker/ProjectileTracker.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
+#include <unordered_set>
 
 bool CSController::Window(MulNX::UINode* node) {
     if (this->ESPDraw.load(std::memory_order_acquire)) {
@@ -216,6 +217,7 @@ void CSController::Update() {
         for (const auto& handle : this->handlesControlPlayer) {
             handle(controller, pawn);
         }
+        //MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), true);
 
         if (playerNum <= 10) {
             auto& AL3DEntity = this->AL3DGameData.Players[playerNum];
