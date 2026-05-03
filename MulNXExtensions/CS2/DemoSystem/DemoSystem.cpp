@@ -26,18 +26,19 @@ bool DemoSystem::Window(MulNX::UINode* node) {
                 bool isSelected = (this->selectedDemoIndex == index);
                 if (ImGui::Selectable(fileName.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick)) {
                     this->selectedDemoIndex = index;
-                    // 双击直接播放
-                    if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                        std::string cmd = std::format("playdemo \"{}\"", fullPath);
-                        this->ISys().AsyncCommand(std::move(cmd));
-                    }
                 }
 
                 // 右键菜单（或在 Selectable 上悬浮右键）
                 if (ImGui::BeginPopupContextItem()) {
                     if (ImGui::MenuItem(I18n("demo.play").c_str())) {
-                        std::string cmd = std::format("playdemo \"{}\"", fullPath);
-                        this->ISys().AsyncCommand(std::move(cmd));
+                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
+                        rp->str1 = fullPath;
+                        this->ISys().PublishAsync(std::move(msg));
+                    }
+                    if (ImGui::MenuItem("demo.play_and_analize")) {
+                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
+                        rp->str1 = fullPath;
+                        this->ISys().PublishAsync(std::move(msg));
                     }
                     if (ImGui::MenuItem(I18n("demo.copy_path").c_str())) {
                         ImGui::SetClipboardText(fullPath.c_str());
@@ -72,8 +73,9 @@ bool DemoSystem::Window(MulNX::UINode* node) {
                     this->selectedDemoIndex < static_cast<int>(this->DemoFiles.size())) {
                     auto iter = this->DemoFiles.begin();
                     std::advance(iter, this->selectedDemoIndex);
-                    std::string cmd = std::format("playdemo \"{}\"", iter->string());
-                    this->ISys().AsyncCommand(std::move(cmd));
+                    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
+                    rp->str1 = iter->string();
+                    this->ISys().PublishAsync(std::move(msg));
                 }
             }
         }
@@ -84,12 +86,15 @@ bool DemoSystem::Window(MulNX::UINode* node) {
     ImGui::Text(I18n("demo.status.is_pausing", this->CS2()->IsDemoPaused()).c_str());
 
     ImGui::Separator();
+    node->CallUINode("DemoAnalyzer");
     node->CallUINode("DemoHelper");
     return true;
 }
 
 bool DemoSystem::Init() {
     this->ISys()
+        .SubscribeAsync("Demo/Play")
+        .SubscribeAsync("Demo/PlayAndAnalyze")
         .SubscribeAsync("Window/Drag/FileDrop");
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
@@ -113,6 +118,20 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         if (ext != ".dem")break;
         this->DemoFiles.insert(std::move(file));
         //this->ISys().AsyncCommand(std::format("playdemo \"{}\"", path));
+        break;
+    }
+    case "Demo/Play"_hash: {
+        auto& path = msg.asp.get<MulNX::NetExt>()->str1;
+        this->ISys().AsyncCommand(std::format("playdemo \"{}\"", path));
+        break;
+    }
+    case "Demo/PlayAndAnalyze"_hash: {
+        auto& path = msg.asp.get<MulNX::NetExt>()->str1;
+        // 发送重启分析消息
+        auto [msg_restart, rp_restart] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze/Restart"_hash);
+        this->ISys().PublishAsync(std::move(msg_restart));
+        // 然后播放演示
+        this->ISys().AsyncCommand(std::format("playdemo \"{}\"", path));
         break;
     }
     }

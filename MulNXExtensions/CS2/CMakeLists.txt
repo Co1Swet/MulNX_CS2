@@ -10,6 +10,8 @@ add_library(MulNXCS2Ext
 
     DemoSystem/DemoSystem.cpp
     DemoSystem/DemoHelper/DemoHelper.cpp
+    DemoSystem/DemoAnalyzer/DemoAnalyzer.cpp
+    DemoSystem/DemoRecorder/DemoRecorder.cpp
 
     PlayerHub/PlayerHub.cpp
     PlayerHub/GlowController/GlowController.cpp

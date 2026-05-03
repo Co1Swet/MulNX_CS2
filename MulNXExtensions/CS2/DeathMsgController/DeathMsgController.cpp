@@ -30,6 +30,7 @@ bool DeathMsgController::Init() {
 
     this->CSHashString(&this->attacker_hash, "attacker");
     this->CSHashString(&this->userid_hash, "userid");
+    this->CSHashString(&this->assister_hash, "assister");
 
     auto target = this->CS2()->Modules.client.GetTextRegion()
         .FindRegion(MulNX::CS2::Signatures::HandlePlayerDeath);
@@ -55,21 +56,41 @@ void DeathMsgController::ProcessMsg(MulNX::Message& msg) {
 }
 
 MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(void* event) {
-    if (!this->enable.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
-    CKV3MemberName key{ this->attacker_hash, -1, nullptr };
-
     auto GetPlayerController = IVClass::Assume(event)->GetVFunc<CS2::CCSPlayerController * (const CKV3MemberName&)>(16);
-    auto pController = GetPlayerController(key);
+ 
+    CKV3MemberName attacker{ this->attacker_hash, -1, nullptr };
+    CKV3MemberName userid{ this->userid_hash, -1, nullptr };
+    CKV3MemberName assister{ this->assister_hash, -1, nullptr };
+
+    auto pKillerController = GetPlayerController(attacker);
+    auto pBeKillerController = GetPlayerController(userid);
+    auto pAssisterController = GetPlayerController(assister);
 
     try {
-        auto steamid = MulNX::MRead(pController->m_steamID());
+        auto killerSteamID = MulNX::MRead(pKillerController->m_steamID());
+        auto beKillerSteamID = MulNX::MRead(pBeKillerController->m_steamID());
+        uint64_t assisterSteamID = 0;
+        if (pAssisterController) {
+            assisterSteamID=MulNX::MRead(pAssisterController->m_steamID());
+        }
+        auto eventTick = this->CS2()->GetDemoTick();
+
+        auto [msg, rp] = MulNX::Message::Create<KillEvent>("Game/KillEvent"_hash);
+        rp->DemoTick = eventTick;
+        rp->attackerSteamId = killerSteamID;
+        rp->victimSteamId = beKillerSteamID;
+        rp->assisterSteamId = assisterSteamID;
+        this->ISys().PublishAsync(std::move(msg));
+
+        if (!this->enable.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
+
         auto currentObservingPawn = this->CS2()->Modules.client.TryGetObservingPawn();
         if (!currentObservingPawn)return MulNX::Hook::Then::Return;
         auto hObservingCtrl = MulNX::MRead(currentObservingPawn->m_hController());
         auto pObservingCtrl = this->CS2()->Modules.client.GetBaseEntityFromHandle(hObservingCtrl)->As<CS2::CCSPlayerController>();
         if (!pObservingCtrl)return MulNX::Hook::Then::Return;
         auto currentObSteamID = MulNX::MRead(pObservingCtrl->m_steamID());
-        if (steamid != currentObSteamID)return MulNX::Hook::Then::Return;
+        if (killerSteamID != currentObSteamID)return MulNX::Hook::Then::Return;
     }
     catch (...) {
         return MulNX::Hook::Then::Return;

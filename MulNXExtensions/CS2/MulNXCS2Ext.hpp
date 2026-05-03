@@ -12,6 +12,8 @@
 
 #include "DemoSystem/DemoSystem.hpp"
 #include "DemoSystem/DemoHelper/DemoHelper.hpp"
+#include "DemoSystem/DemoAnalyzer/DemoAnalyzer.hpp"
+#include "DemoSystem/DemoRecorder/DemoRecorder.hpp"
 
 #include "PlayerHub/PlayerHub.hpp"
 #include "PlayerHub/NameController/NameController.hpp"

@@ -1,348 +1,1253 @@
 +----------新的日志片段----------+
 当游戏关闭时发生异常是可预见的，请忽略
 
-[2026-05-03 01:26:05.2960530][提示][ModuleManager]注意: AbstractLayer3D(3D抽象层)被绑定为CSController
-[2026-05-03 01:26:05.2960970][成功][ModuleManager]成功订阅消息：ModuleManager/ModuleInfo/Request
-[2026-05-03 01:26:05.2961080][提示][ModuleManager]module.send_task
-[2026-05-03 01:26:05.2961100][成功][ModuleManager]module.inited
-[2026-05-03 01:26:05.2961160][成功][HookManager]module.inited
-[2026-05-03 01:26:05.2964000][成功][IPCer]module.inited
-[2026-05-03 01:26:05.2967120][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Saves
-[2026-05-03 01:26:05.2967800][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
-[2026-05-03 01:26:05.2968540][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
-[2026-05-03 01:26:05.2968580][成功][PathManager]module.inited
-[2026-05-03 01:26:05.3074770][成功][I18nManager]语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\I18nManager\Language\lan.yaml
-[2026-05-03 01:26:05.3079080][成功][I18nManager]初始化成功！
-[2026-05-03 01:26:05.3079110][成功][MessageManager]初始化成功！
-[2026-05-03 01:26:05.3079260][成功][UISystem]成功订阅消息：UISystem/Start
-[2026-05-03 01:26:05.3079290][成功][UISystem]成功订阅消息：UISystem/ModulePush
-[2026-05-03 01:26:05.3079310][成功][UISystem]成功订阅消息：UISystem/SaveStyle
-[2026-05-03 01:26:05.3079510][提示][UISystem]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3079520][成功][UISystem]初始化成功！
-[2026-05-03 01:26:05.3090360][提示][Logger]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3090390][成功][Logger]初始化成功！
-[2026-05-03 01:26:05.3090700][提示][Debugger]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3090730][提示][Debugger]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3090800][成功][Debugger]成功订阅消息：Log/Info
-[2026-05-03 01:26:05.3090820][成功][Debugger]成功订阅消息：Log/Succ
-[2026-05-03 01:26:05.3090840][成功][Debugger]成功订阅消息：Log/Warning
-[2026-05-03 01:26:05.3090860][成功][Debugger]成功订阅消息：Log/Error
-[2026-05-03 01:26:05.3090930][成功][Debugger]成功订阅消息：Debugger/SetMaxInfoCount
-[2026-05-03 01:26:05.3090970][成功][Debugger]初始化成功！
-[2026-05-03 01:26:05.3091020][成功][HandleSystem]初始化成功！
-[2026-05-03 01:26:05.3091130][提示][InputSystem]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3091150][成功][InputSystem]初始化成功！
-[2026-05-03 01:26:05.3091250][提示][GlobalVars]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3091270][成功][GlobalVars]初始化成功！
-[2026-05-03 01:26:05.3091320][成功][TaskSystem]成功订阅消息：Task/Create
-[2026-05-03 01:26:05.3092380][成功][TaskSystem]成功创建工作者：Messaging
-[2026-05-03 01:26:05.3092500][成功][TaskSystem]成功将任务添加进入工作者：Messaging
-[2026-05-03 01:26:05.3095110][成功][TaskSystem]成功将任务添加进入工作者：Messaging
-[2026-05-03 01:26:05.3095170][成功][TaskSystem]初始化成功！
-[2026-05-03 01:26:05.3095350][成功][CSController]成功订阅消息：Core/ReHook
-[2026-05-03 01:26:05.3095380][成功][CSController]成功订阅消息：Game/Command
-[2026-05-03 01:26:05.3095570][提示][CSController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3584130][成功][CSController]钩子部署成功！钩子名：Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup
-[2026-05-03 01:26:05.3584470][提示][CSController]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3584530][成功][CSController]初始化成功！
-[2026-05-03 01:26:05.3584560][成功][ViewController]初始化成功！
-[2026-05-03 01:26:05.3584640][提示][ShaderCompiler]正在编译着色器！
-[2026-05-03 01:26:05.3615750][成功][ShaderCompiler]着色器编译完毕！
-[2026-05-03 01:26:05.3615800][成功][ShaderCompiler]初始化成功！
-[2026-05-03 01:26:05.3616100][提示][GraphicsManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3616130][成功][GraphicsManager]初始化成功！
-[2026-05-03 01:26:05.3616280][成功][WebSocketManager]成功订阅消息：WebSocketManager/Post
-[2026-05-03 01:26:05.3618010][提示][WebSocketManager]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3618040][提示][WebSocketManager]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3618060][成功][WebSocketManager]初始化成功！
-[2026-05-03 01:26:05.3619930][提示][CameraSystem]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3619980][成功][CameraSystem]成功订阅消息：Global/Save
-[2026-05-03 01:26:05.3620010][成功][CameraSystem]成功订阅消息：Global/Save/Strong
-[2026-05-03 01:26:05.3620030][成功][CameraSystem]成功订阅消息：Command/SpecPlayer
-[2026-05-03 01:26:05.3620050][成功][CameraSystem]成功订阅消息：Game/NewRound
-[2026-05-03 01:26:05.3620080][成功][CameraSystem]成功订阅消息：CameraSystem/Play/Shutdown
-[2026-05-03 01:26:05.3620140][成功][CameraSystem]初始化成功！
-[2026-05-03 01:26:05.3620310][提示][WorkspaceManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3620340][成功][WorkspaceManager]成功订阅消息：CamereSystem/Workspace/Set
-[2026-05-03 01:26:05.3620370][成功][WorkspaceManager]成功订阅消息：CameraSystem/Workspace/Save
-[2026-05-03 01:26:05.3620390][成功][WorkspaceManager]初始化成功！
-[2026-05-03 01:26:05.3620500][提示][ProjectManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3620540][提示][ProjectManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3620700][成功][ProjectManager]初始化成功！
-[2026-05-03 01:26:05.3620910][提示][SolutionManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3620940][提示][SolutionManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3621020][成功][SolutionManager]成功订阅消息：CameraSystem/Element/Deleted
-[2026-05-03 01:26:05.3621040][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Create
-[2026-05-03 01:26:05.3621060][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Delete
-[2026-05-03 01:26:05.3621090][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Play
-[2026-05-03 01:26:05.3621110][成功][SolutionManager]初始化成功！
-[2026-05-03 01:26:05.3621250][提示][ElementManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3621290][提示][ElementManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3621370][成功][ElementManager]成功订阅消息：Element/Create
-[2026-05-03 01:26:05.3621390][成功][ElementManager]成功订阅消息：Element/Delete
-[2026-05-03 01:26:05.3621410][成功][ElementManager]初始化成功！
-[2026-05-03 01:26:05.3622620][成功][HookEntitySystem]钩子部署成功！钩子名：AddEntity
-[2026-05-03 01:26:05.3623310][成功][HookEntitySystem]钩子部署成功！钩子名：RemoveEntity
-[2026-05-03 01:26:05.3623330][成功][HookEntitySystem]初始化成功！
-[2026-05-03 01:26:05.3623400][提示][AdvancedViewController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3623420][成功][AdvancedViewController]初始化成功！
-[2026-05-03 01:26:05.3623460][提示][FreeCameraController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3623470][成功][FreeCameraController]初始化成功！
-[2026-05-03 01:26:05.3623540][提示][PlayerHub]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3623550][成功][PlayerHub]初始化成功！
-[2026-05-03 01:26:05.3623640][提示][PlayerFlashController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3623700][成功][PlayerFlashController]初始化成功！
-[2026-05-03 01:26:05.3743550][成功][NameController]钩子部署成功！钩子名：GetDecoratedPlayerName
-[2026-05-03 01:26:05.3743720][提示][NameController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3743770][提示][NameController]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3743880][成功][NameController]成功订阅消息：Name/Player/Set
-[2026-05-03 01:26:05.3743900][成功][NameController]初始化成功！
-[2026-05-03 01:26:05.3886130][成功][GlowController]钩子部署成功！钩子名：SetGlowColor
-[2026-05-03 01:26:05.3886280][提示][GlowController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3886320][提示][GlowController]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3886420][成功][GlowController]成功订阅消息：Glow/Player/Set
-[2026-05-03 01:26:05.3886450][成功][GlowController]成功订阅消息：Glow/Player/Clear
-[2026-05-03 01:26:05.3886480][成功][GlowController]成功订阅消息：Glow/Player/ClearAll
-[2026-05-03 01:26:05.3886500][成功][GlowController]成功订阅消息：Glow/Team/Set
-[2026-05-03 01:26:05.3886520][成功][GlowController]成功订阅消息：Glow/Team/Clear
-[2026-05-03 01:26:05.3886560][成功][GlowController]成功订阅消息：Glow/Team/ClearAll
-[2026-05-03 01:26:05.3886590][成功][GlowController]成功订阅消息：Glow/ClearAll
-[2026-05-03 01:26:05.3886620][成功][GlowController]初始化成功！
-[2026-05-03 01:26:05.3984690][成功][SmokeController]钩子部署成功！钩子名：SetSmokeProps
-[2026-05-03 01:26:05.3984860][提示][SmokeController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3984900][提示][SmokeController]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3985000][成功][SmokeController]成功订阅消息：Smoke/Player/Set
-[2026-05-03 01:26:05.3985030][成功][SmokeController]成功订阅消息：Smoke/Player/Clear
-[2026-05-03 01:26:05.3985050][成功][SmokeController]成功订阅消息：Smoke/Player/ClearAll
-[2026-05-03 01:26:05.3985080][成功][SmokeController]成功订阅消息：Smoke/Team/Set
-[2026-05-03 01:26:05.3985100][成功][SmokeController]成功订阅消息：Smoke/Team/Clear
-[2026-05-03 01:26:05.3985120][成功][SmokeController]成功订阅消息：Smoke/Team/ClearAll
-[2026-05-03 01:26:05.3985150][成功][SmokeController]成功订阅消息：Smoke/ClearAll
-[2026-05-03 01:26:05.3985180][成功][SmokeController]初始化成功！
-[2026-05-03 01:26:05.3985220][成功][ObserverController]成功订阅消息：CameraSystem/Play/Started
-[2026-05-03 01:26:05.3985240][成功][ObserverController]成功订阅消息：CameraSystem/Play/Ended
-[2026-05-03 01:26:05.3985260][成功][ObserverController]成功订阅消息：spec_mode_changed_to
-[2026-05-03 01:26:05.3985400][提示][ObserverController]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3985420][成功][ObserverController]初始化成功！
-[2026-05-03 01:26:05.3985480][提示][ProjectileTracker]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.3985520][提示][ProjectileTracker]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.3985540][成功][ProjectileTracker]成功订阅消息：Game/Entity/Added
-[2026-05-03 01:26:05.3985570][成功][ProjectileTracker]成功订阅消息：Game/Entity/Removed
-[2026-05-03 01:26:05.3985590][成功][ProjectileTracker]初始化成功！
-[2026-05-03 01:26:05.5128250][成功][DeathMsgController]钩子部署成功！钩子名：UI::OnPlayerDeath
-[2026-05-03 01:26:05.5128400][提示][DeathMsgController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.5128440][提示][DeathMsgController]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.5128470][成功][DeathMsgController]初始化成功！
-[2026-05-03 01:26:05.5128530][提示][ESPController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.5128540][成功][ESPController]初始化成功！
-[2026-05-03 01:26:05.5128680][提示][MiniMap]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.5128740][提示][MiniMap]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.5128760][成功][MiniMap]初始化成功！
-[2026-05-03 01:26:05.5128890][成功][VirtualUser]成功订阅消息：Core/Tick30min
-[2026-05-03 01:26:05.5128920][成功][VirtualUser]成功订阅消息：Core/Tick60
-[2026-05-03 01:26:05.5128960][成功][VirtualUser]成功订阅消息：Command/SpecPlayer
-[2026-05-03 01:26:05.5128980][成功][VirtualUser]成功订阅消息：Game/NewRound
-[2026-05-03 01:26:05.5129050][提示][VirtualUser]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.5129080][提示][VirtualUser]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.5129090][成功][VirtualUser]初始化成功！
-[2026-05-03 01:26:05.5135270][成功][GameCfgManager]Cfg文件列表更新完成
-[2026-05-03 01:26:05.5135360][提示][GameCfgManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.5135380][成功][GameCfgManager]初始化成功！
-[2026-05-03 01:26:05.5135440][成功][DemoHelper]成功订阅消息：DemoHelper/MarkTime
-[2026-05-03 01:26:05.5135470][成功][DemoHelper]成功订阅消息：DemoHelper/JumpTIme
-[2026-05-03 01:26:05.5135580][提示][DemoHelper]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.5135620][提示][DemoHelper]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.5135640][成功][DemoHelper]初始化成功！
-[2026-05-03 01:26:05.5135690][成功][DemoSystem]成功订阅消息：Window/Drag/FileDrop
-[2026-05-03 01:26:05.6307280][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.5135760][提示][DemoSystem]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.6307960][成功][TaskSystem]成功创建工作者：MulNXMain
-[2026-05-03 01:26:05.6308040][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6308170][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6310060][成功][TaskSystem]成功创建工作者：Loging
-[2026-05-03 01:26:05.5135790][提示][DemoSystem]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.6311950][成功][TaskSystem]成功将任务添加进入工作者：Loging
-[2026-05-03 01:26:05.5135800][成功][DemoSystem]初始化成功！
-[2026-05-03 01:26:05.6312160][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6312350][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.5150000][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.6312490][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.5150020][成功][GameSettingsManager]初始化成功！
-[2026-05-03 01:26:05.6312950][成功][TaskSystem]成功创建工作者：InputSystem
-[2026-05-03 01:26:05.6315560][成功][TaskSystem]成功将任务添加进入工作者：InputSystem
-[2026-05-03 01:26:05.5150150][提示][ConsoleManager]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.6315770][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.5150170][成功][ConsoleManager]初始化成功！
-[2026-05-03 01:26:05.6315880][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6315970][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6316710][成功][TaskSystem]成功创建工作者：CSControl
-[2026-05-03 01:26:05.6316850][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-03 01:26:05.5150640][提示][MediaRemoter]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.6316970][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6320440][成功][TaskSystem]成功创建工作者：Web
-[2026-05-03 01:26:05.5150710][提示][MediaRemoter]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.6320600][成功][TaskSystem]成功将任务添加进入工作者：Web
-[2026-05-03 01:26:05.5150770][成功][MediaRemoter]成功订阅消息：Media/OBS/CreateConnect
-[2026-05-03 01:26:05.6320690][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.5150790][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Start
-[2026-05-03 01:26:05.6320750][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.5150820][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Stop
-[2026-05-03 01:26:05.6320980][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.5150830][成功][MediaRemoter]初始化成功！
-[2026-05-03 01:26:05.6321050][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-03 01:26:05.5150870][成功][MulNXController]成功订阅消息：ModuleManager/ModuleInfo/Response
-[2026-05-03 01:26:05.6321120][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6321180][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-03 01:26:05.5150960][提示][MulNXController]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.6321240][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6321280][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-03 01:26:05.6321340][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6321390][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-03 01:26:05.5150990][提示][MulNXController]将任务注册信息推送到了消息系统
-[2026-05-03 01:26:05.6321420][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.5151000][成功][MulNXController]初始化成功！
-[2026-05-03 01:26:05.6321460][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-03 01:26:05.6321510][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.5151050][提示][MainDraw]将UI节点注册信息推送到了消息系统
-[2026-05-03 01:26:05.6321550][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-03 01:26:05.5151070][成功][MainDraw]初始化成功！
-[2026-05-03 01:26:05.6321610][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6118670][成功][HookManager]钩子部署成功！钩子名：ClearDepthStencilView
-[2026-05-03 01:26:05.6321650][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6119810][成功][HookManager]钩子部署成功！钩子名：Present
-[2026-05-03 01:26:05.6321710][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6121010][成功][HookManager]钩子部署成功！钩子名：ResizeBuffers
-[2026-05-03 01:26:05.6321740][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6300250][成功][HookManager]各模块初始化完毕，系统已启动
-[2026-05-03 01:26:05.6321790][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6300420][警告][HookManager]当前版本是否为测试版：true
-[2026-05-03 01:26:05.6321830][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6300480][警告][HookManager]当前版本号：B0.2.0C0.19.0
-[2026-05-03 01:26:05.6321880][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6300530][警告][HookManager]当前版本构建时间：Built: May  2 2026 17:12:08
-[2026-05-03 01:26:05.6321930][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6300700][警告][HookManager]欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
-[2026-05-03 01:26:05.6300700][警告][HookManager]在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
-[2026-05-03 01:26:05.6300700][警告][HookManager]但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
-[2026-05-03 01:26:05.6322020][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6322050][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6322160][提示][TaskSystem]接收到一个任务！
-[2026-05-03 01:26:05.6303860][警告][HookManager]发送了UI启动指令！渲染即将开始！
-[2026-05-03 01:26:05.6322200][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-03 01:26:05.6321110][成功][HookManager]钩子部署成功！钩子名：WndProc
-[2026-05-03 01:26:05.6362480][成功][WebSocketManager]正在监听端口：55202
-[2026-05-03 01:26:05.6368660][成功][GraphicsManager]绿幕着色器资源创建成功
-[2026-05-03 01:26:05.6368990][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369100][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369160][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369300][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369430][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369520][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369630][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369720][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369870][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369920][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6369980][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370020][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370080][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370120][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370190][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370290][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370400][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370460][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370560][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370700][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370850][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370910][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6370940][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6371050][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6371150][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6372770][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6372840][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6372910][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6372940][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6372980][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6373020][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6373070][成功][UISystem]接收到一个UI节点
-[2026-05-03 01:26:05.6373110][警告][UISystem]接收到启动消息，UI系统开始启动
-[2026-05-03 01:26:05.6375140][提示][UISystem]尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ui.yaml
-[2026-05-03 01:26:05.6379950][成功][UISystem]字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16
-[2026-05-03 01:26:05.6380040][提示][UISystem]尝试加载字体：C:/Windows/Fonts/msyh.ttc
-[2026-05-03 01:26:05.6461510][成功][UISystem]字体加载成功：C:/Windows/Fonts/msyh.ttc
-[2026-05-03 01:26:05.6463670][提示][UISystem]尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
-[2026-05-03 01:26:05.6811030][成功][UISystem]UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
-[2026-05-03 01:26:07.2502230][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:26:07.2860630][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:26:07.2860700][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:26:07.2924780][成功][NameController]钩子部署成功！钩子名：GetPlayerName
-[2026-05-03 01:26:14.1242860][成功][GraphicsManager]颜色副本创建成功
-[2026-05-03 01:26:14.1243950][成功][GraphicsManager]深度副本创建成功
-[2026-05-03 01:26:31.3599980][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:26:31.6289910][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:26:31.9274680][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
-[2026-05-03 01:26:31.9299370][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
-[2026-05-03 01:26:31.9674720][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:26:31.9674780][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:26:31.9674860][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:26:31.9674920][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:26:37.9166570][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:26:37.9540500][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:26:37.9540580][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:02.4701300][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:02.4731110][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:02.5196240][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:02.5196310][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:02.5196380][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:02.5196440][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:05.6622840][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-05-03 01:27:25.6358490][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198450203947 
-[2026-05-03 01:27:26.4003080][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199152580870 
-[2026-05-03 01:27:36.0255300][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199152580870 
-[2026-05-03 01:27:37.0867650][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198450203947 
-[2026-05-03 01:27:38.7162240][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199152580870 
-[2026-05-03 01:27:42.7260180][警告][ProjectileTracker]在分析新增实体时发生异常：read error at: 0x13A8
-[2026-05-03 01:27:49.0477800][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:51.4476670][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:51.4501480][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:51.4988850][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:51.4988940][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:51.4989040][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:51.4989100][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:51.4989170][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:51.4989230][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:56.6400500][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:58.8602120][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:58.8627640][提示][VirtualUser]接收到新回合信息
-[2026-05-03 01:27:58.9103400][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:58.9103490][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:58.9103740][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:58.9103820][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:27:58.9103920][提示][ProjectManager]项目管理器正在处理消息！
-[2026-05-03 01:27:58.9104010][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-05-03 01:28:05.6623440][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-05-03 01:28:07.8010270][警告][HookManager]检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
-[2026-05-03 01:28:08.3223890][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3263210][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3293800][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3329240][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3371280][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3414280][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3455560][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3492490][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3527740][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3571650][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3617070][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3652760][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3687150][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3730520][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3770340][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3820530][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3859880][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3909760][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.3975140][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.4009520][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.4070910][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.4112820][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.4148670][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.4231630][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
-[2026-05-03 01:28:08.4301760][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFB6B1AC5D8
+[2026-05-03 07:05:10.3486280][提示][ModuleManager]注意: AbstractLayer3D(3D抽象层)被绑定为CSController
+[2026-05-03 07:05:10.3486720][成功][ModuleManager]成功订阅消息：ModuleManager/ModuleInfo/Request
+[2026-05-03 07:05:10.3486800][提示][ModuleManager]module.send_task
+[2026-05-03 07:05:10.3486820][成功][ModuleManager]module.inited
+[2026-05-03 07:05:10.3486910][成功][HookManager]module.inited
+[2026-05-03 07:05:10.3490180][成功][IPCer]module.inited
+[2026-05-03 07:05:10.3496010][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
+[2026-05-03 07:05:10.3496400][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
+[2026-05-03 07:05:10.3496440][成功][PathManager]module.inited
+[2026-05-03 07:05:10.3613890][成功][I18nManager]语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\I18nManager\Language\lan.yaml
+[2026-05-03 07:05:10.3618900][成功][I18nManager]初始化成功！
+[2026-05-03 07:05:10.3618940][成功][MessageManager]初始化成功！
+[2026-05-03 07:05:10.3619130][成功][UISystem]成功订阅消息：UISystem/Start
+[2026-05-03 07:05:10.3619150][成功][UISystem]成功订阅消息：UISystem/ModulePush
+[2026-05-03 07:05:10.3619170][成功][UISystem]成功订阅消息：UISystem/SaveStyle
+[2026-05-03 07:05:10.3619440][提示][UISystem]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.3619460][成功][UISystem]初始化成功！
+[2026-05-03 07:05:10.3624630][提示][Logger]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.3624660][成功][Logger]初始化成功！
+[2026-05-03 07:05:10.3624890][提示][Debugger]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.3624920][提示][Debugger]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.3624960][成功][Debugger]成功订阅消息：Log/Info
+[2026-05-03 07:05:10.3624980][成功][Debugger]成功订阅消息：Log/Succ
+[2026-05-03 07:05:10.3625010][成功][Debugger]成功订阅消息：Log/Warning
+[2026-05-03 07:05:10.3625030][成功][Debugger]成功订阅消息：Log/Error
+[2026-05-03 07:05:10.3625100][成功][Debugger]成功订阅消息：Debugger/SetMaxInfoCount
+[2026-05-03 07:05:10.3625180][成功][Debugger]初始化成功！
+[2026-05-03 07:05:10.3625220][成功][HandleSystem]初始化成功！
+[2026-05-03 07:05:10.3625340][提示][InputSystem]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.3625360][成功][InputSystem]初始化成功！
+[2026-05-03 07:05:10.3625460][提示][GlobalVars]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.3625480][成功][GlobalVars]初始化成功！
+[2026-05-03 07:05:10.3625540][成功][TaskSystem]成功订阅消息：Task/Create
+[2026-05-03 07:05:10.3626870][成功][TaskSystem]成功创建工作者：Messaging
+[2026-05-03 07:05:10.3627010][成功][TaskSystem]成功将任务添加进入工作者：Messaging
+[2026-05-03 07:05:10.3629820][成功][TaskSystem]成功将任务添加进入工作者：Messaging
+[2026-05-03 07:05:10.3629890][成功][TaskSystem]初始化成功！
+[2026-05-03 07:05:10.3630080][成功][CSController]成功订阅消息：Core/ReHook
+[2026-05-03 07:05:10.3630110][成功][CSController]成功订阅消息：Game/Command
+[2026-05-03 07:05:10.3630300][提示][CSController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4137400][成功][CSController]钩子部署成功！钩子名：Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup
+[2026-05-03 07:05:10.4137710][提示][CSController]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4137770][成功][CSController]初始化成功！
+[2026-05-03 07:05:10.4137810][成功][ViewController]初始化成功！
+[2026-05-03 07:05:10.4137860][提示][ShaderCompiler]正在编译着色器！
+[2026-05-03 07:05:10.4174410][成功][ShaderCompiler]着色器编译完毕！
+[2026-05-03 07:05:10.4174480][成功][ShaderCompiler]初始化成功！
+[2026-05-03 07:05:10.4174790][提示][GraphicsManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4174820][成功][GraphicsManager]初始化成功！
+[2026-05-03 07:05:10.4174960][成功][WebSocketManager]成功订阅消息：WebSocketManager/Post
+[2026-05-03 07:05:10.4177440][提示][WebSocketManager]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4177470][提示][WebSocketManager]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4177490][成功][WebSocketManager]初始化成功！
+[2026-05-03 07:05:10.4179630][提示][CameraSystem]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4179690][成功][CameraSystem]成功订阅消息：Global/Save
+[2026-05-03 07:05:10.4179730][成功][CameraSystem]成功订阅消息：Global/Save/Strong
+[2026-05-03 07:05:10.4179750][成功][CameraSystem]成功订阅消息：Command/SpecPlayer
+[2026-05-03 07:05:10.4179770][成功][CameraSystem]成功订阅消息：Game/NewRound
+[2026-05-03 07:05:10.4179800][成功][CameraSystem]成功订阅消息：CameraSystem/Play/Shutdown
+[2026-05-03 07:05:10.4179830][成功][CameraSystem]初始化成功！
+[2026-05-03 07:05:10.4180000][提示][WorkspaceManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4180030][成功][WorkspaceManager]成功订阅消息：CamereSystem/Workspace/Set
+[2026-05-03 07:05:10.4180070][成功][WorkspaceManager]成功订阅消息：CameraSystem/Workspace/Save
+[2026-05-03 07:05:10.4180080][成功][WorkspaceManager]初始化成功！
+[2026-05-03 07:05:10.4180220][提示][ProjectManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4180260][提示][ProjectManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4180450][成功][ProjectManager]初始化成功！
+[2026-05-03 07:05:10.4180620][提示][SolutionManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4180660][提示][SolutionManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4180740][成功][SolutionManager]成功订阅消息：CameraSystem/Element/Deleted
+[2026-05-03 07:05:10.4180770][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Create
+[2026-05-03 07:05:10.4180790][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Delete
+[2026-05-03 07:05:10.4180820][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Play
+[2026-05-03 07:05:10.4180840][成功][SolutionManager]初始化成功！
+[2026-05-03 07:05:10.4180980][提示][ElementManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4181010][提示][ElementManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4181100][成功][ElementManager]成功订阅消息：Element/Create
+[2026-05-03 07:05:10.4181120][成功][ElementManager]成功订阅消息：Element/Delete
+[2026-05-03 07:05:10.4181140][成功][ElementManager]初始化成功！
+[2026-05-03 07:05:10.4182480][成功][HookEntitySystem]钩子部署成功！钩子名：AddEntity
+[2026-05-03 07:05:10.4183150][成功][HookEntitySystem]钩子部署成功！钩子名：RemoveEntity
+[2026-05-03 07:05:10.4183170][成功][HookEntitySystem]初始化成功！
+[2026-05-03 07:05:10.4183240][提示][AdvancedViewController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4183260][成功][AdvancedViewController]初始化成功！
+[2026-05-03 07:05:10.4183300][提示][FreeCameraController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4183320][成功][FreeCameraController]初始化成功！
+[2026-05-03 07:05:10.4183390][提示][PlayerHub]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4183410][成功][PlayerHub]初始化成功！
+[2026-05-03 07:05:10.4183530][提示][PlayerFlashController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4183570][成功][PlayerFlashController]初始化成功！
+[2026-05-03 07:05:10.4306420][成功][NameController]钩子部署成功！钩子名：GetDecoratedPlayerName
+[2026-05-03 07:05:10.4306570][提示][NameController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4306620][提示][NameController]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4306730][成功][NameController]成功订阅消息：Name/Player/Set
+[2026-05-03 07:05:10.4306750][成功][NameController]初始化成功！
+[2026-05-03 07:05:10.4452040][成功][GlowController]钩子部署成功！钩子名：SetGlowColor
+[2026-05-03 07:05:10.4452250][提示][GlowController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4452310][提示][GlowController]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4452410][成功][GlowController]成功订阅消息：Glow/Player/Set
+[2026-05-03 07:05:10.4452440][成功][GlowController]成功订阅消息：Glow/Player/Clear
+[2026-05-03 07:05:10.4452470][成功][GlowController]成功订阅消息：Glow/Player/ClearAll
+[2026-05-03 07:05:10.4452500][成功][GlowController]成功订阅消息：Glow/Team/Set
+[2026-05-03 07:05:10.4452520][成功][GlowController]成功订阅消息：Glow/Team/Clear
+[2026-05-03 07:05:10.4452560][成功][GlowController]成功订阅消息：Glow/Team/ClearAll
+[2026-05-03 07:05:10.4452580][成功][GlowController]成功订阅消息：Glow/ClearAll
+[2026-05-03 07:05:10.4452640][成功][GlowController]初始化成功！
+[2026-05-03 07:05:10.4552710][成功][SmokeController]钩子部署成功！钩子名：SetSmokeProps
+[2026-05-03 07:05:10.4552870][提示][SmokeController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4552910][提示][SmokeController]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4553020][成功][SmokeController]成功订阅消息：Smoke/Player/Set
+[2026-05-03 07:05:10.4553050][成功][SmokeController]成功订阅消息：Smoke/Player/Clear
+[2026-05-03 07:05:10.4553070][成功][SmokeController]成功订阅消息：Smoke/Player/ClearAll
+[2026-05-03 07:05:10.4553090][成功][SmokeController]成功订阅消息：Smoke/Team/Set
+[2026-05-03 07:05:10.4553120][成功][SmokeController]成功订阅消息：Smoke/Team/Clear
+[2026-05-03 07:05:10.4553140][成功][SmokeController]成功订阅消息：Smoke/Team/ClearAll
+[2026-05-03 07:05:10.4553170][成功][SmokeController]成功订阅消息：Smoke/ClearAll
+[2026-05-03 07:05:10.4553200][成功][SmokeController]初始化成功！
+[2026-05-03 07:05:10.4553270][成功][ObserverController]成功订阅消息：CameraSystem/Play/Started
+[2026-05-03 07:05:10.4553300][成功][ObserverController]成功订阅消息：CameraSystem/Play/Ended
+[2026-05-03 07:05:10.4553320][成功][ObserverController]成功订阅消息：spec_mode_changed_to
+[2026-05-03 07:05:10.4553390][提示][ObserverController]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4553400][成功][ObserverController]初始化成功！
+[2026-05-03 07:05:10.4553490][提示][ProjectileTracker]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.4553530][提示][ProjectileTracker]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.4553560][成功][ProjectileTracker]成功订阅消息：Game/Entity/Added
+[2026-05-03 07:05:10.4553580][成功][ProjectileTracker]成功订阅消息：Game/Entity/Removed
+[2026-05-03 07:05:10.4553600][成功][ProjectileTracker]初始化成功！
+[2026-05-03 07:05:10.5706220][成功][DeathMsgController]钩子部署成功！钩子名：UI::OnPlayerDeath
+[2026-05-03 07:05:10.5706400][提示][DeathMsgController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5706450][提示][DeathMsgController]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5706480][成功][DeathMsgController]初始化成功！
+[2026-05-03 07:05:10.5706630][提示][ESPController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5706650][成功][ESPController]初始化成功！
+[2026-05-03 07:05:10.5706790][成功][DemoHelper]成功订阅消息：DemoHelper/MarkTime
+[2026-05-03 07:05:10.5706830][成功][DemoHelper]成功订阅消息：DemoHelper/JumpTIme
+[2026-05-03 07:05:10.5706920][提示][DemoHelper]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5706950][提示][DemoHelper]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5706970][成功][DemoHelper]初始化成功！
+[2026-05-03 07:05:10.5707000][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Restart
+[2026-05-03 07:05:10.5707030][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Dump
+[2026-05-03 07:05:10.5707050][成功][DemoAnalyzer]成功订阅消息：Game/KillEvent
+[2026-05-03 07:05:10.5707100][提示][DemoAnalyzer]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707140][提示][DemoAnalyzer]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707150][成功][DemoAnalyzer]初始化成功！
+[2026-05-03 07:05:10.5707170][成功][DemoRecorder]初始化成功！
+[2026-05-03 07:05:10.5707190][成功][DemoSystem]成功订阅消息：Demo/Play
+[2026-05-03 07:05:10.5707220][成功][DemoSystem]成功订阅消息：Demo/PlayAndAnalyze
+[2026-05-03 07:05:10.5707240][成功][DemoSystem]成功订阅消息：Window/Drag/FileDrop
+[2026-05-03 07:05:10.5707280][提示][DemoSystem]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707300][提示][DemoSystem]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707310][成功][DemoSystem]初始化成功！
+[2026-05-03 07:05:10.5707430][提示][MiniMap]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707490][提示][MiniMap]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707500][成功][MiniMap]初始化成功！
+[2026-05-03 07:05:10.5707560][成功][VirtualUser]成功订阅消息：Core/Tick30min
+[2026-05-03 07:05:10.5707580][成功][VirtualUser]成功订阅消息：Core/Tick60
+[2026-05-03 07:05:10.5707660][成功][VirtualUser]成功订阅消息：Command/SpecPlayer
+[2026-05-03 07:05:10.5707680][成功][VirtualUser]成功订阅消息：Game/NewRound
+[2026-05-03 07:05:10.5707770][提示][VirtualUser]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707790][提示][VirtualUser]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5707810][成功][VirtualUser]初始化成功！
+[2026-05-03 07:05:10.5714690][成功][GameCfgManager]Cfg文件列表更新完成
+[2026-05-03 07:05:10.5714780][提示][GameCfgManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5714800][成功][GameCfgManager]初始化成功！
+[2026-05-03 07:05:10.5725880][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5725910][成功][GameSettingsManager]初始化成功！
+[2026-05-03 07:05:10.5725990][提示][ConsoleManager]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5726010][成功][ConsoleManager]初始化成功！
+[2026-05-03 07:05:10.5726980][提示][MediaRemoter]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5727060][提示][MediaRemoter]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5727130][成功][MediaRemoter]成功订阅消息：Media/OBS/CreateConnect
+[2026-05-03 07:05:10.5727160][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Start
+[2026-05-03 07:05:10.5727190][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Stop
+[2026-05-03 07:05:10.5727220][成功][MediaRemoter]初始化成功！
+[2026-05-03 07:05:10.5727260][成功][MulNXController]成功订阅消息：ModuleManager/ModuleInfo/Response
+[2026-05-03 07:05:10.5727330][提示][MulNXController]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5727360][提示][MulNXController]将任务注册信息推送到了消息系统
+[2026-05-03 07:05:10.5727370][成功][MulNXController]初始化成功！
+[2026-05-03 07:05:10.5727420][提示][MainDraw]将UI节点注册信息推送到了消息系统
+[2026-05-03 07:05:10.5727440][成功][MainDraw]初始化成功！
+[2026-05-03 07:05:10.6830210][成功][HookManager]钩子部署成功！钩子名：ClearDepthStencilView
+[2026-05-03 07:05:10.6831430][成功][HookManager]钩子部署成功！钩子名：Present
+[2026-05-03 07:05:10.6832940][成功][HookManager]钩子部署成功！钩子名：ResizeBuffers
+[2026-05-03 07:05:10.7018280][成功][HookManager]各模块初始化完毕，系统已启动
+[2026-05-03 07:05:10.7018450][警告][HookManager]当前版本是否为测试版：true
+[2026-05-03 07:05:10.7018620][警告][HookManager]当前版本号：B0.2.0C0.20.0
+[2026-05-03 07:05:10.7018660][警告][HookManager]当前版本构建时间：Built: May  3 2026 10:29:58
+[2026-05-03 07:05:10.7018720][警告][HookManager]欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
+[2026-05-03 07:05:10.7018720][警告][HookManager]在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
+[2026-05-03 07:05:10.7018720][警告][HookManager]但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
+[2026-05-03 07:05:10.7019250][警告][HookManager]发送了UI启动指令！渲染即将开始！
+[2026-05-03 07:05:10.7030780][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7031400][成功][TaskSystem]成功创建工作者：MulNXMain
+[2026-05-03 07:05:10.7033060][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7033240][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7033710][成功][TaskSystem]成功创建工作者：Loging
+[2026-05-03 07:05:10.7033770][成功][TaskSystem]成功将任务添加进入工作者：Loging
+[2026-05-03 07:05:10.7033820][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7035200][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7035280][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7035620][成功][TaskSystem]成功创建工作者：InputSystem
+[2026-05-03 07:05:10.7035680][成功][TaskSystem]成功将任务添加进入工作者：InputSystem
+[2026-05-03 07:05:10.7037400][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7037500][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7037580][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7038110][成功][TaskSystem]成功创建工作者：CSControl
+[2026-05-03 07:05:10.7038170][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-03 07:05:10.7039610][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7040250][成功][TaskSystem]成功创建工作者：Web
+[2026-05-03 07:05:10.7041690][成功][TaskSystem]成功将任务添加进入工作者：Web
+[2026-05-03 07:05:10.7041790][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7041880][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7042080][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042140][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-03 07:05:10.7042190][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042240][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-03 07:05:10.7042300][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042340][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-03 07:05:10.7042400][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042450][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-03 07:05:10.7042480][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042530][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-03 07:05:10.7042620][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042660][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-03 07:05:10.7042710][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042750][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7042790][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042830][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7042890][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7042930][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7042970][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7043010][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7043060][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7043100][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7043210][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7043270][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7043330][提示][TaskSystem]接收到一个任务！
+[2026-05-03 07:05:10.7043380][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-03 07:05:10.7058240][成功][HookManager]钩子部署成功！钩子名：WndProc
+[2026-05-03 07:05:10.7087800][成功][WebSocketManager]正在监听端口：55202
+[2026-05-03 07:05:10.7097370][成功][GraphicsManager]绿幕着色器资源创建成功
+[2026-05-03 07:05:10.7097760][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7097920][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098050][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098150][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098270][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098380][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098500][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098610][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098800][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7098940][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099080][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099190][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099300][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099460][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099590][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099690][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099830][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7099950][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7100090][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7100350][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7100480][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7100550][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7100670][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7100810][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7100920][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7101030][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7101140][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7101250][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7101380][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7101490][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7101610][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7103340][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7103440][成功][UISystem]接收到一个UI节点
+[2026-05-03 07:05:10.7103520][警告][UISystem]接收到启动消息，UI系统开始启动
+[2026-05-03 07:05:10.7105740][提示][UISystem]尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ui.yaml
+[2026-05-03 07:05:10.7111110][成功][UISystem]字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16
+[2026-05-03 07:05:10.7111210][提示][UISystem]尝试加载字体：C:/Windows/Fonts/msyh.ttc
+[2026-05-03 07:05:10.7207350][成功][UISystem]字体加载成功：C:/Windows/Fonts/msyh.ttc
+[2026-05-03 07:05:10.7209230][提示][UISystem]尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
+[2026-05-03 07:05:15.6648480][成功][UISystem]UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
+[2026-05-03 07:05:17.3181490][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:05:17.3231620][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:05:17.3792850][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:05:17.3792940][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:05:17.3793030][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:05:17.3793090][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:05:17.3862590][成功][NameController]钩子部署成功！钩子名：GetPlayerName
+[2026-05-03 07:05:36.3253910][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:05:36.4047340][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:05:40.6276070][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:05:41.5246840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:41.5330010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:41.5423520][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:41.5505410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:41.5596730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:43.3053670][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:05:43.3263150][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:05:43.3263220][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:05:44.3528790][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:05:45.4089630][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:05:46.1734540][警告][ProjectileTracker]在分析新增实体时发生异常：read error at: 0x13A8
+[2026-05-03 07:05:46.5482840][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:05:46.5661840][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:05:46.5661920][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:05:47.1886720][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:05:47.3503880][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:47.3981810][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:05:47.4929330][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:47.5848240][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:05:47.6040600][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:05:47.6999720][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:05:47.7436470][警告][ProjectileTracker]添加：在分析实体消息以分流时发生异常
+[2026-05-03 07:05:47.7886810][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:05:47.8519230][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:05:47.9329980][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:47.9845990][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:48.0477040][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:48.0515030][警告][ProjectileTracker]在分析新增实体时发生异常：read error at: 0x13A8
+[2026-05-03 07:05:48.0950920][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:05:48.3828650][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:05:48.6968520][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:05:49.2673730][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:05:49.3708190][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:05:49.9117830][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:05:49.9954670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0057500][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0161310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0276390][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0392810][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0511670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0630620][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0749930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0848990][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.0949640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1049810][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1153310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1251680][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1337800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1427760][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1513560][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1598550][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1696300][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1783500][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1874690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.1958920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2051690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2140430][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2234470][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2343610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2433120][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2522490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2607970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2699600][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2798520][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2887780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.2968540][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3047320][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3127960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3226040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3310630][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3401340][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3492510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3586210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3672900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3773150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3866460][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.3961230][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4054900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4139460][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4233080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4317550][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4395930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4477600][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4562980][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4639010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4730810][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:50.4809530][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:05:51.6021650][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:05:51.6271840][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:05:51.6271910][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:05:52.2370820][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:52.2482150][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:05:52.4740560][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:52.5460400][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:05:52.5630550][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:52.5811200][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:05:52.7777310][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:52.8118490][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:05:53.1156340][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:05:53.1724470][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:53.4378480][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:05:53.6746750][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:05:53.9818590][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:05:54.1740850][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:05:54.3820980][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:57.3416670][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:05:58.4750250][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:05:58.4933790][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:05:58.4933850][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:05:59.1154150][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:59.2985820][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:59.3621000][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:59.5761220][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:05:59.5846540][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:05:59.6302740][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:59.7346950][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:05:59.7957350][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:05:59.7988020][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:05:59.8218600][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:59.8828180][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:05:59.9089050][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:05:59.9407200][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:00.0942310][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:00.1763340][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:00.2587720][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:00.7360990][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:00.7391300][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:00.8838400][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:00.9803390][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:01.6147390][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:03.1882150][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:03.6725040][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:03.6940870][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:03.6940930][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:04.3007450][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:04.5319790][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:04.6493580][警告][ProjectileTracker]在分析新增实体时发生异常：read error at: 0x13A8
+[2026-05-03 07:06:04.7307010][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:04.7660590][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:04.8898260][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:04.9128350][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:05.1437500][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:05.4037390][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:05.6109530][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:05.7272580][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:05.9964070][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.0086440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.0222840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.0413180][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.0567070][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.0741310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.0885100][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.1038930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.1177760][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.1356560][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.1502530][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.1660880][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.1778870][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.1900690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2012740][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2118850][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2228970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2334320][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2441530][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2532680][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2627640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2728560][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2826780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.2924080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3019900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3112980][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3207640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3304110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3405010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3490740][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3588730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3672290][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3764340][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3854080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.3941400][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4025040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4104780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4188920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4272290][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4352970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4441750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4542660][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4684460][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4794660][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.4907930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5007610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5100340][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5187070][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5276410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5361370][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5445780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5523250][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5601820][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5683900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5760520][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5836410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5913720][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.5988790][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.6062310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.6223070][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:06.8998350][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:08.6179970][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:08.6408440][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:08.6408510][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:09.2618530][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:09.2618720][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:09.4492550][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:09.4773700][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:09.6847030][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:09.8671240][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:09.9372950][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:09.9757150][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:10.1093740][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:10.1460790][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:10.3193490][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:10.3684210][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:10.6387690][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:10.7217460][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:10.7426480][提示][VirtualUser]已触发自动保存（频率：每分钟）
+[2026-05-03 07:06:11.4227510][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:12.9619590][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:12.9822880][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:12.9822940][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:13.5965970][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:13.7647100][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:13.7938960][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:13.8817400][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:14.0240990][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:14.0300960][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:14.2942520][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:14.3632480][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:14.4660200][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:14.4690660][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:14.7161000][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:14.8954380][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:14.8984370][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:14.9049520][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:14.9217490][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:15.0232620][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:15.1647630][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:15.2368920][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:15.3408500][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:15.4720000][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:15.4917690][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:15.6402380][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:15.7954770][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:15.8791870][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:16.1437620][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:16.1467380][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:16.4463550][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.4667080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.4815080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.4953140][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.5061760][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.5170480][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.5333510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.5464180][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.5612700][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.5797660][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.5975980][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.6090400][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:16.8723030][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:16.8950910][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:16.8950980][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:17.5173010][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:17.6949140][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:17.7059330][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:17.8227850][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:17.8228030][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:17.8686510][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:17.8778080][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:17.9198950][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:17.9373480][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:18.0599660][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:18.0599830][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:18.1386830][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:18.1917580][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:18.1917820][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:18.2590680][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:18.4719560][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:18.4864900][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:18.5120290][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:18.7865950][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:18.9347260][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:18.9458560][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:18.9778530][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:19.6755870][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:20.0636920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:20.0760490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:20.0892190][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:20.1036000][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:20.1238280][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:20.1406920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:20.1589340][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:20.1739420][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:21.5346470][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:21.5555560][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:21.5555630][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:22.2807610][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:22.3491800][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:22.4267120][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:22.4617130][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:22.5190940][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:22.6851550][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:22.7006910][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:22.7758180][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:22.8034520][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:23.0041170][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:23.1690240][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:23.6062840][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:23.6319260][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.6443000][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.6550250][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.6663510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.6769820][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.6875080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.6975010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.7072220][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.7166310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.7263190][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.7366090][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.7476870][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:23.7577420][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:24.6428640][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:25.5430330][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:25.9460530][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:25.9533960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:25.9608950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:25.9685220][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:25.9750750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:25.9896560][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:25.9996120][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0077960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0156960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0261880][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0353090][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0445500][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0547720][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0625880][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0699550][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0773480][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0837660][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0909180][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.0981260][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.1054480][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.1114820][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.1185290][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.1252510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.1320740][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:26.7325160][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:26.7536210][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:26.7536280][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:27.4686550][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:27.4977830][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:27.6093470][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:27.6816740][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:27.6990240][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:27.7616890][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:27.7965600][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:27.9088900][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:27.9317540][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:28.0221210][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:28.0357690][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:28.1033300][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:28.1492610][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:28.1659650][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:28.4820140][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:28.9506660][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:29.3726490][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:30.5851460][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.5962490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6079930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6197810][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6316330][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6436420][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6558450][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6692770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6825010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.6966370][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.7103310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:30.7334720][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:31.2921650][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.2992220][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3053910][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3119260][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3195840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3270730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3340110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3406630][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3473620][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3540310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3603000][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3674800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3740020][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3806880][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3886260][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.3965150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4036320][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4100520][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4164970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4236110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4304020][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4375390][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4452420][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4534160][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4602700][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4672760][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4738620][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4808780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:31.4890830][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:31.5098360][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:31.5098420][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:32.1330500][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:32.3116880][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:32.4677930][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:32.4707860][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:32.5320830][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:32.5551340][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:32.6047930][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:32.6991630][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:32.7016180][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:32.7681550][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:33.0970380][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:33.1085580][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:33.1434700][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:33.2669570][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:33.2842520][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:33.2899320][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.3049840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.3198130][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.3350200][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.3516580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.3684830][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.3849860][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.4012490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.4215600][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.4434850][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.4618140][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.4838840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.5001980][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.5165020][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.5292870][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.5437180][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.5577900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.5760390][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.5910250][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6075980][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6206020][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6335830][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6447790][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6561350][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6674800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6781950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.6887680][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7043510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7168670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7301910][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7429900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7542410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7649430][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7747080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7840010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.7937690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:33.8031540][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0209210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0293630][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0370580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0440260][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0512910][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0591110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0666190][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.0866970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.1386370][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.1624580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.1729310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.1840630][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.1938240][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2031930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2114800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2203400][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2293390][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2375210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2456420][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2540700][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2627860][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2706640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2786480][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2861460][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.2945860][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.3017690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.3100610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.3181840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.3266910][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.3344830][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.3423800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:34.3545430][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:34.3761480][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:34.3761550][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:36.1874380][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:36.4458400][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:36.5560840][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:38.0844490][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:38.1037420][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:38.1037490][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:38.7108280][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:38.7259060][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:38.9631480][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:39.3379430][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:39.3748770][提示][ProjectileTracker]记录 projectile(decoy_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:39.5756810][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:39.6029450][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:40.1117270][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:41.3345800][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:41.3564510][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:41.3564600][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:41.9721050][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:06:42.2647390][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:42.2958610][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:42.3620600][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:42.3796000][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:42.3820960][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:42.4599730][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:42.5320290][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:42.5801770][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:42.9192930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:42.9325950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:42.9429590][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:42.9464950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:42.9590950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:42.9720910][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:42.9835440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:42.9961390][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0073900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0192130][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0315130][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0315240][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0401560][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:43.0437790][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0437890][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0551560][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0551690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0666400][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0666510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0776510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0776620][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0884970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.0885070][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1001090][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1001190][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1102470][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1102560][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1218130][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1218330][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1332580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1332710][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1444870][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1444970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1548770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1548860][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1660880][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1660990][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1764910][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1764980][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1866750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1866830][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1971100][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.1971210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2108920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2109000][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2238780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2238870][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2362200][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2362310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2465340][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2465430][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2573220][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2573290][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2680800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2680890][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2787370][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2787440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2882380][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2882460][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2981580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.2981670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3071770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3071850][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3160610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3160790][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3255950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3256040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3347900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3347970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3356820][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:43.3438890][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3439060][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3525170][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3525250][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3616670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3616750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3710930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3711000][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3805640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3805730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3920050][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.3920130][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4014880][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4014970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4177210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4177500][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4301490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4301650][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4433670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4433750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4526350][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4526440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4621930][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4622060][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4723100][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4810310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4888470][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.4965900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5050680][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5124410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5194160][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5262800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5333860][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5403410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5403520][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5474920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5475000][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5545730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5545840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5616890][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5616990][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5689750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5689840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5767350][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5767440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5843700][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5843820][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5935950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.5936040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6021740][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6021820][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6100890][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6100980][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6175220][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6175290][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6253580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6253670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6335410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6335510][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6416660][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6416750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6495670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6495770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6583040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6583150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6673210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6673290][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6763520][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6853140][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.6947730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.7030830][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.7109150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.7195030][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.7282760][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.7362410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.7448500][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:43.7565160][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:43.7765720][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:43.7765790][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:44.3985760][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:44.4110490][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:44.5693610][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:44.6307830][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:44.6308050][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:44.6760370][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:44.7265580][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:44.7841270][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:44.9028220][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:44.9855550][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:45.0195820][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:45.0621290][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:45.1418820][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:45.3072960][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:45.3298750][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:45.3991960][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:45.4816760][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:45.7428940][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.7578750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.7721640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.7874770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8019120][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8158860][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8288320][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8414890][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8549120][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8674610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8786780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.8898120][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9015790][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9131060][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9236790][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9352230][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9465960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9582400][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9699910][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9821040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:45.9941390][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.0068350][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.0193470][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.0336440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.0462620][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.0589470][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.0716640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.0898540][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1065080][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1248260][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1382040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1512950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1633100][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1752950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1864920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1865010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1974960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.1975050][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2081810][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2082280][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2188140][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2188580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2301610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2553490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2725360][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.2871270][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:46.2875020][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.3019550][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.3149170][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.3269490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.3391650][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.3525610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:46.5859110][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:47.6754720][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:47.6964260][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:47.6964320][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:48.3177890][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:48.4991300][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:48.5159620][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:48.7147730][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:48.7469450][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:48.7869440][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:48.8247220][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:48.8392210][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:48.8705820][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:48.9962810][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:49.1162900][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:49.1614450][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.1749900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.1955410][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.2107040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.2281010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.2419670][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.2561140][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.2690320][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.2819500][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.2928480][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:49.2940640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3061040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3181600][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3295990][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3410440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3525190][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3643160][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3756800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3870460][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.3975110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4088300][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4189890][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4300620][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4396610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4488560][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4582640][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4678770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4757520][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:49.4776040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4863880][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.4955840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5055120][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5140990][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5228010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5313200][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5396390][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5483130][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5569010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5656720][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5741720][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5824150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5906750][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.5993320][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6076150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6159600][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6241900][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6326310][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6411110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6493440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6576840][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6664690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6742180][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6824990][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6898810][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.6978570][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7073260][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7163530][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7251030][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7336110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7422270][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7501400][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7590510][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:49.7595040][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7705090][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7815000][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.7920160][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:49.8029650][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:06:50.1177840][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:50.8733660][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:51.7699530][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:51.8618290][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:52.7275910][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:52.7505490][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:52.7505560][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:53.3692490][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:53.5304390][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:53.5389290][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:53.6374860][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:53.6857500][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:53.7687290][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:53.7980020][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:53.8429150][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:53.8826480][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:53.8886580][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:54.0790120][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:54.0934450][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:54.1279640][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:54.2390240][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:54.5306920][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:54.5331910][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:54.5732310][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:54.6102690][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:54.6217660][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:54.7646620][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:54.9384850][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:55.1246930][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:55.2017450][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:56.3228320][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:56.8240290][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:57.3479060][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:57.6217400][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:58.5656030][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:06:58.5847890][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:06:58.5847950][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:06:59.1980070][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198226417000 
+[2026-05-03 07:06:59.3718490][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:06:59.4345770][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:06:59.4605880][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:59.5118540][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:59.5945300][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:59.6540800][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:59.7788950][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:06:59.8134880][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:59.8475390][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:59.8505370][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:06:59.8769300][警告][ProjectileTracker]在分析新增实体时发生异常：read error at: 0x13A8
+[2026-05-03 07:06:59.8795670][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199134952783 
+[2026-05-03 07:06:59.8966240][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:06:59.9286750][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:06:59.9519910][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561198389951659 
+[2026-05-03 07:06:59.9520080][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:07:00.0058090][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198883447730 
+[2026-05-03 07:07:00.0371980][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:07:00.4130140][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.4266490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.4403360][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.4530120][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.4627930][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199419104063 
+[2026-05-03 07:07:00.4656800][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.4782010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.4888940][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561198287460590 
+[2026-05-03 07:07:00.4911340][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5026730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5151210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5270210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5384300][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5500420][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5607710][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5731440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5836240][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.5951950][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6064770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6185960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6297610][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6411470][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6524960][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6651570][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6769740][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6887070][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.6999730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7109440][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7207370][提示][ProjectileTracker]记录 projectile(smokegrenade_projectile) -> 控制器 SteamID=76561199075811248 
+[2026-05-03 07:07:00.7231170][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7360580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7488790][提示][ProjectileTracker]记录 projectile(hegrenade_projectile) -> 控制器 SteamID=76561198888972723 
+[2026-05-03 07:07:00.7494850][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7617690][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7738330][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7858550][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.7943300][警告][ProjectileTracker]在分析新增实体时发生异常：read error at: 0x13A8
+[2026-05-03 07:07:00.7998970][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.8117210][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.8247600][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.8362420][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.8479150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.8610050][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.8743490][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.8881730][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9019190][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9149130][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9282160][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9416630][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9538450][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9661370][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9779990][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:00.9904770][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0037230][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0164150][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0299620][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0440580][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0580680][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0713010][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0843600][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.0965920][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.1089070][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.1209780][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.1323350][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.1443020][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.1555110][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.1666590][警告][SmokeController]未找到投掷者的控制器，无法应用烟雾颜色
+[2026-05-03 07:07:01.4632390][提示][ProjectileTracker]记录 projectile(molotov_projectile) -> 控制器 SteamID=76561199557188711 
+[2026-05-03 07:07:01.6032790][提示][ProjectileTracker]记录 projectile(flashbang_projectile) -> 控制器 SteamID=76561199560778677 
+[2026-05-03 07:07:03.4159920][提示][VirtualUser]接收到新回合信息
+[2026-05-03 07:07:03.4589620][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-03 07:07:03.4589690][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-03 07:07:10.7426470][提示][VirtualUser]已触发自动保存（频率：每分钟）
+[2026-05-03 07:08:10.7426530][提示][VirtualUser]已触发自动保存（频率：每分钟）

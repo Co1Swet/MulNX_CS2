@@ -98,7 +98,9 @@ DWORD MulNX_CS2_Start(void*) {
         starter->InitEndCall = [starter]() {
             starter->ISys().LogWarning(I18n("disclaimer"));
 #ifdef _DEBUG
-            starter->ISys().AsyncCommand("playdemo 111");
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
+            rp->str1 = "111";
+            starter->ISys().PublishAsync(std::move(msg));
             std::thread([]() {
                 MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
                 }).detach();
@@ -132,12 +134,15 @@ DWORD MulNX_CS2_Start(void*) {
             .CreateModule<ProjectileTracker>("ProjectileTracker")
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<ESPController>("ESPController")
+            // Demos
+            .CreateModule<DemoHelper>("DemoHelper")
+            .CreateModule<DemoAnalyzer>("DemoAnalyzer")
+            .CreateModule<DemoRecorder>("DemoRecorder")
+            .CreateModule<DemoSystem>("DemoSystem")
             // 较为上层
             .CreateModule<MiniMap>("MiniMap")
             .CreateModule<VirtualUser>("VirtualUser")
             .CreateModule<GameCfgManager>("GameCfgManager")
-            .CreateModule<DemoHelper>("DemoHelper")
-            .CreateModule<DemoSystem>("DemoSystem")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
             .CreateModule<ConsoleManager>("ConsoleManager")
             .CreateModule<MediaRemoter>("MediaRemoter")
