@@ -3,6 +3,7 @@ add_library(MulNXCS2Ext
     CSClasses/GlobalVars/GlobalVars.cpp
     CSClasses/tree/tree.cpp
 
+    ObserverController/ObserverController.cpp
     ViewController/ViewController.cpp
     ESPController/ESPController.cpp
     PlayerFlashController/PlayerFlashController.cpp
@@ -17,7 +18,6 @@ add_library(MulNXCS2Ext
     PlayerHub/GlowController/GlowController.cpp
     PlayerHub/NameController/NameController.cpp
     PlayerHub/SmokeController/SmokeController.cpp
-    PlayerHub/ObserverController/ObserverController.cpp
     PlayerHub/ProjectileTracker/ProjectileTracker.cpp
 
     ConsoleManager/ConsoleManager.cpp

@@ -21,7 +21,7 @@ namespace MulNX {
         MulNX::Core::Core* Core = nullptr;
 		MulNX::GlobalVars* GlobalVars = nullptr;
         // 线程运行状态
-        std::atomic<bool>MyThreadRunning = false;
+        std::atomic<bool>Running = false;
         // 线程执行间隔，默认以100Hz基准执行
         std::atomic<int> MyThreadDelta = 10;
 	public:

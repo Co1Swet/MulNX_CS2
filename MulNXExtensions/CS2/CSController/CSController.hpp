@@ -73,8 +73,8 @@ public:
     VExecutor<int()>GetDemoTick{};
     VExecutor<bool()>IsPlayingDemo{};
     VExecutor<bool()>IsDemoPaused{};
-    bool SpecHandle(CS2::CHandleBase handle);
     
+
     // AbstractLayer3D接口实现
     float* GetViewMatrix()override;
     MulNX::Math::View GetView()override;

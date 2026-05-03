@@ -5,6 +5,7 @@
 #include "CSController/CSController.hpp"
 #include "CSController/HookEntitySystem/HookEntitySystem.hpp"
 
+#include "ObserverController/ObserverController.hpp"
 #include "ViewController/ViewController.hpp"
 #include "ESPController/ESPController.hpp"
 #include "PlayerFlashController/PlayerFlashController.hpp"
@@ -19,7 +20,6 @@
 #include "PlayerHub/NameController/NameController.hpp"
 #include "PlayerHub/GlowController/GlowController.hpp"
 #include "PlayerHub/SmokeController/SmokeController.hpp"
-#include "PlayerHub/ObserverController/ObserverController.hpp"
 #include "PlayerHub/ProjectileTracker/ProjectileTracker.hpp"
 
 #include "ConsoleManager/ConsoleManager.hpp"

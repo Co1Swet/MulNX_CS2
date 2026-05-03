@@ -107,7 +107,7 @@ void CSController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
 bool CSController::Init() {
     this->ShowWindow = true;
     this->ISys()
-        .SubscribeAsync("Core/ReHook")
+        .SubscribeAsync("Demo/GotoTick")
         .SubscribeAsync("Game/Command");
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
@@ -170,18 +170,19 @@ void CSController::EnlistExecutors() {
         ("VEngineCvar007", nullptr);
 }
 
-void CSController::ProcessMsg(MulNX::Message& Msg) {
-    switch (Msg.type) {
-    case "Core/ReHook"_hash: {
-        this->ISys().LogSucc("已完成Hook重载！");
-        break;
-    }
+void CSController::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
     case "Game/Command"_hash: {
-        auto cmd = std::move(Msg.asp.get<MulNX::NetExt>()->str1);
+        auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
         this->executor(0, cmd.c_str(), 1);
         break;
     }
-
+    case "Demo/GotoTick"_hash: {
+        int tick = msg.p1.low<int>();
+        auto cmd = std::format("demo_gototick {}", tick);
+        this->executor(0, cmd.c_str(), 1);
+        break;
+    }
     }
 }
 
@@ -261,29 +262,6 @@ bool CSController::CameraSystemIOOverride(const CameraSystemIO* const IO) {
     this->HandleFreeCameraPath(IO);
 
     return true;
-}
-
-bool CSController::SpecHandle(CS2::CHandleBase handle) {
-    try {
-        auto* localPawn = this->Modules.client.GetLocalPlayerPawn();
-        if (!localPawn) {
-            this->ISys().LogWarning("尝试在无本地实体情况下设置观战？");
-            return false;
-        }
-        auto pObserverServices = MulNX::MRead(localPawn->pObserverServices());
-        auto* pTarget = pObserverServices->hObserverTarget();
-        MulNX::MWrite(&pTarget->handle, handle.handle);
-        MulNX::MWrite(pObserverServices->iObserverMode(), (uint8_t)2);
-        return true;
-    }
-    catch (const std::runtime_error& e) {
-        this->ISys().LogError(std::format("在设置观战目标时发生错误：{}", e.what()));
-        return false;
-    }
-    catch (...) {
-        this->ISys().LogError("在设置观战目标时发生未知错误");
-        return false;
-    }
 }
 
 // C_ConVar* m_yawPtr = nullptr;
