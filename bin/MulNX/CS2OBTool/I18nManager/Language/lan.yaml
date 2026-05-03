@@ -64,7 +64,19 @@ media:
     record:
       start: 开始录制
       stop: 停止录制
-    
+
+demo:
+  status:
+    is_playing: 当前是否处于Demo中：{}
+    is_pausing: 当前是否Demo处于暂停状态：{}
+
+  empty: 拖放 .dem 文件到此处以加载
+  play: 播放
+  copy_path: 复制路径
+  remove: 移除
+  clear_all: 清空列表
+  play_selected: 播放所选
+
 text:
   entered: 已进入
   unentered: 未进入

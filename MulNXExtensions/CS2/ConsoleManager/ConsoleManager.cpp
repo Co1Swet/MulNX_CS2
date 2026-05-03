@@ -14,7 +14,7 @@ bool ConsoleManager::UINodeFunc(MulNX::UINode* node) {
     MulNX::UI::Checkbox("小地图窗口", this->Core->ModuleManager()->FindModule("MiniMap")->ShowWindow);
     MulNX::UI::Checkbox("游戏配置管理器窗口", this->Core->ModuleManager()->FindModule("GameCfgManager")->ShowWindow);
     MulNX::UI::Checkbox("快捷操作窗口", this->Core->ModuleManager()->FindModule("CSController")->ShowWindow);
-    MulNX::UI::Checkbox("Demo辅助窗口", this->Core->ModuleManager()->FindModule("DemoHelper")->ShowWindow);
+    MulNX::UI::Checkbox("Demo", this->Core->ModuleManager()->FindModule("DemoSystem")->ShowWindow);
     MulNX::UI::Checkbox("玩家信息管理窗口", this->Core->ModuleManager()->FindModule("PlayerHub")->ShowWindow);
     MulNX::UI::Checkbox("投掷物追踪器窗口", this->Core->ModuleManager()->FindModule("ProjectileTracker")->ShowWindow);
     MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->Core->ModuleManager()->FindModule("DeathMsgController")->ShowWindow);

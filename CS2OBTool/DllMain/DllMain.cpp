@@ -53,7 +53,7 @@ void MainDraw::Window(MulNX::UINode* node) {
     node->CallUINode("ElementManager");
     node->CallUINode("SolutionManager");
     node->CallUINode("ProjectManager");
-    node->CallUINode("DemoHelper");
+    node->CallUINode("DemoSystem");
     node->CallUINode("PlayerHub");
     node->CallUINode("ProjectileTracker");
     node->CallUINode("DeathMsgController");

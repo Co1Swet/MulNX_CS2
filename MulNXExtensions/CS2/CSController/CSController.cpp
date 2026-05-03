@@ -161,6 +161,8 @@ void CSController::EnlistExecutors() {
     this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
     auto demo = this->GetDemo();
     this->GetDemoTick = IVClass::Assume(demo)->GetVFunc<int()>(3);
+    this->IsPlayingDemo = IVClass::Assume(demo)->GetVFunc<bool()>(11);
+    this->IsDemoPaused = IVClass::Assume(demo)->GetVFunc<bool()>(12);
 
     // 获取CvarSystem
     this->CvarSystem.Address =

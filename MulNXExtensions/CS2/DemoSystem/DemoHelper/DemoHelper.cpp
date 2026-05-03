@@ -4,8 +4,8 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("Demo辅助", this->ShowWindow);
-    if (!w)return true;
+    auto c = MulNX::UI::RAIIChild("Demo辅助");
+    if (!c)return true;
     std::shared_lock lock(this->smutex);
     if (ImGui::Button("标记当前时间")) {
         MulNX::Message msg("DemoHelper/MarkTime"_hash);
