@@ -63,7 +63,10 @@ private:
     void Update();
 public:
     std::vector<std::function<bool(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*)>>handlesControlPlayer{};
-    CS2::Modules Modules{};
+    
+    CS2::Module::Client client{};
+    CS2::Module::engine2 engine2{};
+    MulNX::Memory::DllModule tier0{};
     // 获取控制台变量系统
     C_ConVarSystem& GetCvarSystem() { return this->CvarSystem; }
     

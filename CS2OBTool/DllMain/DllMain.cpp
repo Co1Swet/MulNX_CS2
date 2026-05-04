@@ -68,7 +68,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         HANDLE hThread = CreateThread(NULL, 0, MulNX_CS2_Start, NULL, 0, NULL);
         // 这里不需要等待线程结束，因为它会在完成初始化后自动退出，然后等待进程结束时被操作系统清理
         break;
-    }     
+    }
     case DLL_THREAD_ATTACH: {
         // 本系统不考虑卸载，计划生命周期与游戏进程相同！
         break;
@@ -97,14 +97,14 @@ DWORD MulNX_CS2_Start(void*) {
         // 设置初始化完成回调
         starter->InitEndCall = [starter]() {
             starter->ISys().LogWarning(I18n("disclaimer"));
-#ifdef _DEBUG
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
-            rp->str1 = "111";
-            starter->ISys().PublishAsync(std::move(msg));
-            std::thread([]() {
-                MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
-                }).detach();
-#endif
+            if (MulNXInfo::IsDebugVersion) {
+                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
+                rp->str1 = "111";
+                starter->ISys().PublishAsync(std::move(msg));
+                std::thread([]() {
+                    MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
+                    }).detach();
+            }
             };
 
         // 注册所有模块
@@ -134,6 +134,7 @@ DWORD MulNX_CS2_Start(void*) {
             .CreateModule<ProjectileTracker>("ProjectileTracker")
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<ESPController>("ESPController")
+            .CreateModule<SkinController>("SkinController")
             // Demos
             .CreateModule<DemoHelper>("DemoHelper")
             .CreateModule<DemoAnalyzer>("DemoAnalyzer")

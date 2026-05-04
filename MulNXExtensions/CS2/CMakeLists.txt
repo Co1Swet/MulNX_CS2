@@ -8,6 +8,7 @@ add_library(MulNXCS2Ext
     ESPController/ESPController.cpp
     PlayerFlashController/PlayerFlashController.cpp
     DeathMsgController/DeathMsgController.cpp
+    SkinController/SkinController.cpp
 
     DemoSystem/DemoSystem.cpp
     DemoSystem/DemoHelper/DemoHelper.cpp

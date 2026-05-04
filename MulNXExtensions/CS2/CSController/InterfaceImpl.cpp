@@ -1,7 +1,7 @@
 #include "CSController.hpp"
 
 float* CSController::GetViewMatrix() {
-    return this->Modules.client.dwViewMatrix();
+    return this->client.dwViewMatrix();
 }
 MulNX::Math::View CSController::GetView() {
     MulNX::Math::View view;

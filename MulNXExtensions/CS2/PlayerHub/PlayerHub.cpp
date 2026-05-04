@@ -26,15 +26,15 @@ bool PlayerHub::Window(MulNX::UINode* node) {
         std::vector<PlayerInfo> ctPlayers;
         std::vector<PlayerInfo> tPlayers;
 
-        for (int i = 0; i <= std::min(this->CS2()->Modules.client.dwGameEntitySystem_highestEntityIndex(), showMax); ++i) {
-            auto* baseEntity = this->CS2()->Modules.client.GetBaseEntity(i);
+        for (int i = 0; i <= std::min(this->CS2()->client.dwGameEntitySystem_highestEntityIndex(), showMax); ++i) {
+            auto* baseEntity = this->CS2()->client.GetBaseEntity(i);
             if (!baseEntity) continue;
 
             auto* playerController = baseEntity->As<CS2::CCSPlayerController>();
             if (!playerController) continue;
 
             auto hPawn = MulNX::MRead(playerController->m_hPlayerPawn());
-            auto* pawn = this->CS2()->Modules.client.GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
+            auto* pawn = this->CS2()->client.GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
             if (!pawn) continue;
 
             uint64_t SteamID = MulNX::MRead(playerController->m_steamID());

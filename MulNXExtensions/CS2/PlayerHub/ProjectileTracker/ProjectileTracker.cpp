@@ -73,22 +73,22 @@ void ProjectileTracker::ProcessMsg(MulNX::Message& msg) {
 void ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile, std::string&& name) {
     try {
         auto hThrower = MulNX::MRead(pProjectile->m_hThrower());
-        auto* pPawn = this->CS2()->Modules.client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
+        auto* pPawn = this->CS2()->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
         auto hController = MulNX::MRead(pPawn->m_hController());
-        auto* pController = this->CS2()->Modules.client.GetBaseEntityFromHandle(hController)->As<CS2::CCSPlayerController>();
+        auto* pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CCSPlayerController>();
         if (!pController)return;
         std::unique_lock lock(this->smutex);
         this->ISys().LogInfo(std::format("记录 projectile({}) -> 控制器 SteamID={} ", name, MulNX::MRead(pController->m_steamID())));
 
-        auto* pLocalPlayerPawn = this->CS2()->Modules.client.GetLocalPlayerPawn();
+        auto* pLocalPlayerPawn = this->CS2()->client.GetLocalPlayerPawn();
         if (!pLocalPlayerPawn)return;
         auto* pObserverServices = MulNX::MRead(pLocalPlayerPawn->pObserverServices());
         if (!pObserverServices)return;
         auto hTargetObserverPawn = MulNX::MRead(pObserverServices->hObserverTarget());
-        auto* pTargetPawn = this->CS2()->Modules.client.GetBaseEntityFromHandle(hTargetObserverPawn)->As<CS2::C_CSPlayerPawn>();
+        auto* pTargetPawn = this->CS2()->client.GetBaseEntityFromHandle(hTargetObserverPawn)->As<CS2::C_CSPlayerPawn>();
         if (!pTargetPawn)return;
         auto hTargetController = MulNX::MRead(pTargetPawn->m_hController());
-        auto* pTargetController = this->CS2()->Modules.client.GetBaseEntityFromHandle(hTargetController);
+        auto* pTargetController = this->CS2()->client.GetBaseEntityFromHandle(hTargetController);
 
         if (pController == pTargetController) {
             this->pTargetWatchProjectile.store(pProjectile, std::memory_order_release);

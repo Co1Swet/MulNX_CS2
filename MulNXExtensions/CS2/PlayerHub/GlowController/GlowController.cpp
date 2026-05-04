@@ -81,7 +81,7 @@ void GlowController::MenuTeam(MulNX::UINode* node) {
 }
 
 bool GlowController::Init() {
-    auto region = this->CS2()->Modules.client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
+    auto region = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
     auto target = region.Data();
     this->hkSetGlowColor = MulNX::Hook::Create(target, 0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
         this->MySetGlowColor(*ctx->P1<CS2::CGlowProperty*>(), ctx->P2<uint32_t>());
@@ -173,11 +173,11 @@ void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t*
     }
     else {
         auto hOwnerEntity = *pBaseModelEntity->m_hOwnerEntity();
-        pPlayerPawn = this->CS2()->Modules.client.GetBaseEntityFromHandle(hOwnerEntity)->As<CS2::C_BaseEntity>()->As<CS2::C_CSPlayerPawn>();
+        pPlayerPawn = this->CS2()->client.GetBaseEntityFromHandle(hOwnerEntity)->As<CS2::C_BaseEntity>()->As<CS2::C_CSPlayerPawn>();
     }
     if (!pPlayerPawn)return;
     auto hController = *pPlayerPawn->As<CS2::C_BasePlayerPawn>()->m_hController();
-    auto pController = this->CS2()->Modules.client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
+    auto pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
 
     if (!pController)return;
     Steam64UID uid = *pController->m_steamID();

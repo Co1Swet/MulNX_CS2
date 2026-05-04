@@ -77,5 +77,9 @@ public:
     inline static constexpr const char TimeStamp[] = "Built: " __DATE__ " " __TIME__;
     inline static constexpr const char FullName[] = "Multiple Next eXtension";
     inline static constexpr const char DeveloperName[] = "Co1Swet";
+#ifdef _DEBUG
     inline static constexpr const bool IsDebugVersion = true;
+#else
+    inline static constexpr const bool IsDebugVersion = false;
+#endif
 };

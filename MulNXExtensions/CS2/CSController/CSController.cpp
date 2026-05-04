@@ -118,7 +118,7 @@ bool CSController::Init() {
     this->EnlistExecutors();
 
     const auto& pattern = MulNX::CS2::Signatures::CallIsPlayingDemo;
-    auto target = this->Modules.client.GetTextRegion().FindRegion(pattern);
+    auto target = this->client.GetTextRegion().FindRegion(pattern);
     this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), 0, true, [this](RegContext* ctx, MulNX::Hook* Hook) {
         this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
         return MulNX::Hook::Then::Continue;
@@ -149,13 +149,13 @@ bool CSController::Init() {
 }
 
 void CSController::EnlistExecutors() {
-    this->Modules.client = CS2::Module::Client(L"client.dll");
-    this->Modules.engine2 = CS2::Module::engine2(L"engine2.dll");
-    this->Modules.tier0 = MulNX::Memory::DllModule(L"tier0.dll");
+    this->client = CS2::Module::Client(L"client.dll");
+    this->engine2 = CS2::Module::engine2(L"engine2.dll");
+    this->tier0 = MulNX::Memory::DllModule(L"tier0.dll");
 
     // 加载来自Source2EngineToClient001的模块
     this->Source2EngineToClient001 =
-        this->Modules.engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
+        this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
         ("Source2EngineToClient001", nullptr);
     this->executor = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);
     this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
@@ -166,7 +166,7 @@ void CSController::EnlistExecutors() {
 
     // 获取CvarSystem
     this->CvarSystem.Address =
-        (uintptr_t)this->Modules.tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
+        (uintptr_t)this->tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
         ("VEngineCvar007", nullptr);
 }
 
@@ -188,9 +188,9 @@ void CSController::ProcessMsg(MulNX::Message& msg) {
 
 void CSController::Update() {
     // 获取CS2全局变量
-    this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->Modules.client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
+    this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
 
-    auto pGameRules = this->Modules.client.dwGameRules();
+    auto pGameRules = this->client.dwGameRules();
     if (!pGameRules) return;
 
     static int32_t OldRoundStartCount = 0;
@@ -203,11 +203,11 @@ void CSController::Update() {
     std::unique_lock lock(this->smutex);
     // 玩家控制器，地图上从1到10
     int playerNum = 0;
-    for (int i = 0; i < this->Modules.client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-        auto* controller = this->Modules.client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+    for (int i = 0; i < this->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
+        auto* controller = this->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
         if (!controller)continue;
         auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
-        auto* pawn = this->Modules.client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
+        auto* pawn = this->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
         if (!pawn)continue;
 
         auto team = MulNX::MRead(pawn->iTeamNum());

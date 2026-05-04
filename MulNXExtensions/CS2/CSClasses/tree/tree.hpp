@@ -9,6 +9,15 @@
 using GameTime_t = float;
 
 namespace CS2 {
+
+    template<typename T>
+    struct C_UtlVectorEmbeddedNetworkVar {
+        size_t m_nSize;
+        T* m_pData;
+        // 后面未知
+    };
+
+
     enum class ui8TeamNum :uint8_t {
         T = 2,
         CT = 3
@@ -154,9 +163,49 @@ namespace CS2 {
 
     };
 
-    class C_EconEntity :public C_BaseFlex {
+    class CEconItemAttribute {
+    public:
+        inline static constexpr size_t ofsize = 0x48;
+        
+        uint16_t* m_iAttributeDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_iAttributeDefinitionIndex); }
+        float* m_flValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flValue); }
+        float* m_flInitialValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flInitialValue); }
+        int32_t* m_nRefundableCurrency() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_nRefundableCurrency); }
+        bool* m_bSetBonus() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_bSetBonus); }
+    };
+
+    class CAttributeManager {
     public:
 
+    };
+
+    class CAttributeList {
+    public:
+        C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>* m_Attributes() { return Schema<C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_Attributes); }
+        CAttributeManager** m_pManager() { return Schema<CAttributeManager*>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_pManager); }
+    };
+    
+    class C_EconItemView {
+    public:
+        uint32_t* m_iItemIDHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemIDHigh); }
+
+        CAttributeList* m_AttributeList() { return Schema<CAttributeList>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_AttributeList); }
+    };
+
+    
+
+    class C_AttributeContainer :public CAttributeManager {
+    public:
+        C_EconItemView* m_Item() { return Schema<C_EconItemView>(this, cs2_dumper::schemas::client_dll::C_AttributeContainer::m_Item); }
+    };
+
+    class C_EconEntity :public C_BaseFlex {
+    public:
+        C_AttributeContainer* m_AttributeManager() { return Schema<C_AttributeContainer>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_AttributeManager); }
+        int32_t* m_nFallbackPaintKit() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackPaintKit); }
+        int32_t* m_nFallbackSeed() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackSeed); }
+        float* m_flFallbackWear() { return Schema<float>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_flFallbackWear); }
+        int32_t* m_nFallbackStatTrak() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackStatTrak); }
     };
 
     class CPlayerPawnComponent {

@@ -34,7 +34,7 @@ void NameController::Menu(MulNX::UINode* node) {
 }
 
 bool NameController::Init() {
-    auto FnGetDecoratedPlayerName = this->CS2()->Modules.client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
+    auto FnGetDecoratedPlayerName = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
     this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), 0, false,
         [this](RegContext* ctx, MulNX::Hook* hk) {
             // 这里注意，这里的名称获取，是需要进一步调用GetPlayerName的

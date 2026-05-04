@@ -70,7 +70,7 @@ void ObserverController::Main() {
 
 void ObserverController::UpdateObserverState() {
     try {
-        auto localPlayerPawn = this->CS2()->Modules.client.GetLocalPlayerPawn();
+        auto localPlayerPawn = this->CS2()->client.GetLocalPlayerPawn();
         if (!localPlayerPawn)return;
         auto pObserverServices = MulNX::MRead(localPlayerPawn->pObserverServices());
         if (!pObserverServices)return;
@@ -129,8 +129,8 @@ void ObserverController::OnSpecModeChanged(uint8_t newMode) {
 CS2::CCSPlayerController* ObserverController::FindControllerBySteam64UID(Steam64UID uid) {
     CS2::CCSPlayerController* pController = nullptr;
     try {
-        for (int i = 0; i < this->CS2()->Modules.client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-            auto* controller = this->CS2()->Modules.client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+        for (int i = 0; i < this->CS2()->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
+            auto* controller = this->CS2()->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
             if (!controller)continue;
             if (!controller->IsPlayerController())continue;
             auto steam64UID = MulNX::MRead(controller->m_steamID());
@@ -147,7 +147,7 @@ CS2::CCSPlayerController* ObserverController::FindControllerBySteam64UID(Steam64
 
 void ObserverController::SetSpecMode(uint8_t mode) {
     try {
-        auto* localPawn = this->CS2()->Modules.client.GetLocalPlayerPawn();
+        auto* localPawn = this->CS2()->client.GetLocalPlayerPawn();
         if (!localPawn) {
             this->ISys().LogWarning("尝试在无本地实体情况下设置观战？");
             return;
@@ -169,7 +169,7 @@ void ObserverController::SetSpecMode(uint8_t mode) {
 
 bool ObserverController::SpecHandle(CS2::CHandleBase handle) {
     try {
-        auto* localPawn = this->CS2()->Modules.client.GetLocalPlayerPawn();
+        auto* localPawn = this->CS2()->client.GetLocalPlayerPawn();
         if (!localPawn) {
             this->ISys().LogWarning("尝试在无本地实体情况下设置观战？");
             return false;

@@ -6,7 +6,7 @@ using AddEntity_t = void* (*)(void* , CS2::C_BaseEntity* , CS2::CHandleBase);
 using RemoveEntity_t = void* (*)(void* , CS2::C_BaseEntity* , CS2::CHandleBase);
 
 bool HookEntitySystem::Init() {
-    auto vtable = (uint8_t**)IVClass::Assume(this->CS2()->Modules.client.dwGameEntitySystem())->GetVTablePtr();
+    auto vtable = (uint8_t**)IVClass::Assume(this->CS2()->client.dwGameEntitySystem())->GetVTablePtr();
 
     auto pAddEntity = vtable[15];
     this->hkAddEntity = MulNX::Hook::Create(pAddEntity,

@@ -43,11 +43,4 @@ namespace CS2 {
             void** ppWindowWidth() { return Schema<void*>(this, cs2_dumper::offsets::engine2_dll::dwWindowWidth); }
         };
     }
-
-    class Modules {
-    public:
-        CS2::Module::Client client{};
-        CS2::Module::engine2 engine2{};
-        MulNX::Memory::DllModule tier0{};
-    };
 }

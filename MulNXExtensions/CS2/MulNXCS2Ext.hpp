@@ -10,6 +10,7 @@
 #include "ESPController/ESPController.hpp"
 #include "PlayerFlashController/PlayerFlashController.hpp"
 #include "DeathMsgController/DeathMsgController.hpp"
+#include "SkinController/SkinController.hpp"
 
 #include "DemoSystem/DemoSystem.hpp"
 #include "DemoSystem/DemoHelper/DemoHelper.hpp"
