@@ -2,8 +2,9 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
-class DemoHelper final :public MulNX::ModuleBase {
+class DemoHelper final :public CSModuleBase {
 private:
     std::vector<float>Marks{};
     std::atomic<MulNX::any_unique_ptr*>* ppUpdateData = nullptr;

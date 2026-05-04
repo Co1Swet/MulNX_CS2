@@ -92,7 +92,6 @@ bool WebSocketManager::Init() {
     this->server.set_message_handler(
         [this](websocketpp::connection_hdl hdl, Server::message_ptr msg) {
             try {
-                // this->AL3D->ExecuteCommand(msg->get_payload());
 
                 // 先假设发了一个json
                 auto json = nlohmann::json::parse(msg->get_payload());

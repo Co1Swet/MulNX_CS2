@@ -1,8 +1,8 @@
 #pragma once
 
-#include <MulNX/MulNX.hpp>
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
-class MiniMap final :public MulNX::ModuleBase {
+class MiniMap final :public CSModuleBase {
 private:
     // 可配置项：地图像素大小（正方形），世界->像素 缩放，中心玩家索引，是否自动适配
     float MapSize = 200.0f; // 默认 200x200

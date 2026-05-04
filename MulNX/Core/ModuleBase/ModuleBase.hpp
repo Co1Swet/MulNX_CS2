@@ -28,7 +28,6 @@ namespace MulNX {
         MulNX::InputSystem* pInputSystem = nullptr;
 		// 组件句柄
 		MulNXHandle HModule;
-        IAbstractLayer3D* AL3D = nullptr;
         Debugger* IDebugger = nullptr;
         MulNX::MessageChannel* MainMsgChannel = nullptr;
         // 用于指示UI不应该再发送消息

@@ -1,5 +1,6 @@
 #include "ElementManager.hpp"
 #include <MulNX/MulNX.hpp>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/SolutionManager/SolutionManager.hpp>
@@ -83,7 +84,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> eleme
 bool ElementManager::UINodeFunc(MulNX::UINode* node) {
     std::unique_lock lock(this->CamSys()->smutex);
     for (auto& [name, elem] : this->elements) {
-        elem->DrawBase(this->CamDrawer, this->AL3D->GetViewMatrix(), this->AL3D->GetWinWidth(), this->AL3D->GetWinHeight());
+        elem->DrawBase(this->CamDrawer, this->CS2()->GetViewMatrix(), this->CS2()->GetWinWidth(), this->CS2()->GetWinHeight());
     }
     if (this->needDrawCamera.load(std::memory_order_acquire)) {
         auto frame = this->drawCamera.Read();
@@ -154,13 +155,13 @@ void ElementManager::HandleUpdate() {
     this->EntryProcessMsg();
     if (this->OnPreview) {
         CameraSystemIO IO;
-        IO.ElementTime = this->AL3D->Time()->GetReal();
-        IO.FrameGameTime = this->AL3D->Time()->GetReal();
+        IO.ElementTime = this->CS2()->Time()->GetReal();
+        IO.FrameGameTime = this->CS2()->Time()->GetReal();
         if (this->Preview_Call(&IO)) {
             //自由摄像机轨道预览
             if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {
                 if (this->Config.PreviewOverride) {
-                    this->AL3D->CameraSystemIOOverride(&IO);
+                    this->CS2()->CameraSystemIOOverride(&IO);
                 }
                 if (this->Config.PreviewDraw) {
                     auto frame = this->drawCamera.Write();
@@ -354,7 +355,7 @@ void ElementManager::Preview_Enable() {
 }
 void ElementManager::Preview_Disable() {
     this->OnPreview = false;
-    this->AL3D->ClearViewOverride();
+    this->CS2()->ClearViewOverride();
     this->ISys().PublishAsync("CameraSystem/Preview/Ended"_hash);
     this->ISys().LogInfo("已关闭预览");
 }

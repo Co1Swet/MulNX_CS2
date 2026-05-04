@@ -1,6 +1,7 @@
 #include "SolutionManager.hpp"
 
 #include <MulNX/MulNX.hpp>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
@@ -428,8 +429,8 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 
     switch (this->Playing_pSolution->playmode) {
     case PlaybackMode::Orchestration:
-        this->Playing_pSolution->SetSolutionOffset(this->AL3D->Time()->GetReal());//偏移时间轴播放
-        this->ISys().LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->AL3D->Time()->GetReal()));
+        this->Playing_pSolution->SetSolutionOffset(this->CS2()->Time()->GetReal());//偏移时间轴播放
+        this->ISys().LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2()->Time()->GetReal()));
         break;
     case PlaybackMode::Activation:
         this->Playing_pSolution->SetSolutionOffset(0);
@@ -442,7 +443,7 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 }
 void SolutionManager::Playing_Disable() {
     this->Playing = false;
-    this->AL3D->ClearViewOverride();
+    this->CS2()->ClearViewOverride();
     this->ISys().PublishAsync("CameraSystem/Play/Ended"_hash);
     this->ISys().LogInfo("已关闭播放");
 }
@@ -458,12 +459,12 @@ void SolutionManager::Playing_Call() {
     }
     CameraSystemIO IO;
 
-    IO.SolutionTime = this->AL3D->Time()->Get();
-    IO.FrameGameTime = this->AL3D->Time()->GetReal();
+    IO.SolutionTime = this->CS2()->Time()->Get();
+    IO.FrameGameTime = this->CS2()->Time()->GetReal();
     IO.isPlaying = this->Playing;
 
     if (!this->Playing_pSolution->Call(&IO)) {
-        this->AL3D->ClearViewOverride();
+        this->CS2()->ClearViewOverride();
         // 这里不关闭播放，因为解决方案可能还有内容
         // 不应该由管理器因为仅仅没有结果就关闭
         if (IO.isPlaying == false) {
@@ -474,7 +475,7 @@ void SolutionManager::Playing_Call() {
         return;
     }
     if (this->Config.PlayingOverride) {
-        this->AL3D->CameraSystemIOOverride(&IO);
+        this->CS2()->CameraSystemIOOverride(&IO);
     }
     if (this->Config.PlayingDraw) {
         auto frame = this->drawCamera.Write();

@@ -15,8 +15,6 @@ namespace MulNX {
         // 模块管理器类，负责加载、卸载和管理各个模块
         class ModuleManager final :public MulNX::ModuleBase {
         private:
-            // 3D抽象层的名称
-            std::string AbstractLayer3DName{};
             // 存储从字符串到模块句柄的映射，便于按名称查找
             std::unordered_map<std::string, MulNXHandle> NameToHandleMap{};
             std::map<MulNXHandle, std::unique_ptr<MulNX::ModuleBase>>modules{};
@@ -38,15 +36,6 @@ namespace MulNX {
                 return *this;
             }
             ModuleManager& CreateSystemModules();
-            template<typename T>
-            ModuleManager& BindAbstractLayer3D(std::string&& Name) {
-                std::unique_ptr<T>AL3DImpl = std::make_unique<T>();
-                this->AbstractLayer3DName = Name;
-                AL3DImpl->SetName(std::move(Name));
-                this->RegisteModule(std::move(AL3DImpl));
-                return *this;
-            }
-            IAbstractLayer3D* FindAbstractLayer3D();
             // 根据名称获取模块指针
             MulNX::ModuleBase* FindModule(const std::string& Name);
             // 按类型查找模块

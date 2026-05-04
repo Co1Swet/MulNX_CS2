@@ -35,12 +35,12 @@ bool CSController::Window(MulNX::UINode* node) {
 
         if (ImGui::Button("启用时间虚拟化")) {
             this->ISys().AsyncCommand(std::format("host_timescale {}", gameTimeScale));
-            this->AL3D->Time()->RefreshVirtual(true, virtualTimeScale);
+            this->Time()->RefreshVirtual(true, virtualTimeScale);
         }
         ImGui::SameLine();
         if (ImGui::Button("解除时间虚拟化")) {
             this->ISys().AsyncCommand(std::format("host_timescale 1"));
-            this->AL3D->Time()->RefreshVirtual(false, 1.0f);
+            this->Time()->RefreshVirtual(false, 1.0f);
         }
     }
     node->CallUINode("PlayerFlashController");
@@ -220,14 +220,14 @@ void CSController::Update() {
         //MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), true);
 
         if (playerNum <= 10) {
-            auto& AL3DEntity = this->AL3DGameData.Players[playerNum];
-            AL3DEntity.Position = MulNX::MRead(pawn->vOldOrigin());
-            AL3DEntity.EyePosition = MulNX::MRead(pawn->vOldOrigin()) + MulNX::MRead(pawn->vecViewOffset());
-            AL3DEntity.Rotation = MulNX::MRead(pawn->angEyeAngles());
-            AL3DEntity.HP = MulNX::MRead(pawn->iHealth());
-            AL3DEntity.Team = static_cast<int>(team);
-            AL3DEntity.Alive = AL3DEntity.HP;
-            AL3DEntity.IndexInMap = playerNum;
+            auto& CS2EBEntity = this->CS2EBGameData.Players[playerNum];
+            CS2EBEntity.Position = MulNX::MRead(pawn->vOldOrigin());
+            CS2EBEntity.EyePosition = MulNX::MRead(pawn->vOldOrigin()) + MulNX::MRead(pawn->vecViewOffset());
+            CS2EBEntity.Rotation = MulNX::MRead(pawn->angEyeAngles());
+            CS2EBEntity.HP = MulNX::MRead(pawn->iHealth());
+            CS2EBEntity.Team = static_cast<int>(team);
+            CS2EBEntity.Alive = CS2EBEntity.HP;
+            CS2EBEntity.IndexInMap = playerNum;
         }
     }
     return;

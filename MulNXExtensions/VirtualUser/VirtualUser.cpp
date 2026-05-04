@@ -2,6 +2,7 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 bool VirtualUser::Init() {
     this->ISys()
@@ -55,7 +56,7 @@ void VirtualUser::ProcessMsg(MulNX::Message& Msg) {
     }
 #endif // _DEBUG
     case "Command/SpecPlayer"_hash: {
-        this->AL3D->SpecPlayer(Msg.p1.low<int>());
+        this->Core->ModuleManager()->FindModule<CSController>("CSController")->SpecPlayer(Msg.p1.low<int>());
         break;
     }
     default: {

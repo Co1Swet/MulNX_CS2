@@ -2,13 +2,7 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/MulNXCS2Ext.hpp>
-
-#include <algorithm>
-#include <string>
-#include <sstream>
-#include <cfloat>
-#include <Windows.h>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 bool MiniMap::Init() {
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
@@ -88,8 +82,8 @@ bool MiniMap::UINodeFunc(MulNX::UINode* ThisNode) {
 
     // 绘制玩家并处理点击
     for (int i = 1; i <= 10; ++i) {
-        std::shared_lock lk(this->AL3D->smutex);
-        D_Player& Player = this->AL3D->GetPlayerMsg(i);
+        std::shared_lock lk(this->CS2()->smutex);
+        D_Player& Player = this->CS2()->GetPlayerMsg(i);
         if (!Player.Alive)continue;
         ImVec2 PositionInMiniMap = ImVec2(centerScreen.x + Player.Position.x * worldToPixel, centerScreen.y - Player.Position.y * worldToPixel);
 

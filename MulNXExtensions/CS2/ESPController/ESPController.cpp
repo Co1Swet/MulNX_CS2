@@ -1,18 +1,19 @@
 #include "ESPController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 bool ESPController::Draw(MulNX::UINode* node) {
     if (this->ShowWindow.load(std::memory_order_acquire)) {
         for (int i = 1; i <= 10; ++i) {
-            if (!this->AL3D->GetPlayerMsg(i).Alive)continue;
-            const DirectX::XMFLOAT3 EyePos3D = this->AL3D->GetPlayerMsg(i).EyePosition;
-            const DirectX::XMFLOAT3 OriginPos3D = this->AL3D->GetPlayerMsg(i).Position;
+            if (!this->CS2()->GetPlayerMsg(i).Alive)continue;
+            const DirectX::XMFLOAT3 EyePos3D = this->CS2()->GetPlayerMsg(i).EyePosition;
+            const DirectX::XMFLOAT3 OriginPos3D = this->CS2()->GetPlayerMsg(i).Position;
 
             DirectX::XMFLOAT2 EyePos2D{};
             DirectX::XMFLOAT2 OriginPos2D{};
 
-            MulNX::Math::WorldToScreen(EyePos3D, EyePos2D, this->AL3D->GetViewMatrix(), this->AL3D->GetWinWidth(), this->AL3D->GetWinHeight());
-            MulNX::Math::WorldToScreen(OriginPos3D, OriginPos2D, this->AL3D->GetViewMatrix(), this->AL3D->GetWinWidth(), this->AL3D->GetWinHeight());
+            MulNX::Math::WorldToScreen(EyePos3D, EyePos2D, this->CS2()->GetViewMatrix(), this->CS2()->GetWinWidth(), this->CS2()->GetWinHeight());
+            MulNX::Math::WorldToScreen(OriginPos3D, OriginPos2D, this->CS2()->GetViewMatrix(), this->CS2()->GetWinWidth(), this->CS2()->GetWinHeight());
 
             const float hight{ ::abs(EyePos2D.y - OriginPos2D.y) * 1.25f };
             const float width{ hight / 2.f };

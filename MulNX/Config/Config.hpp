@@ -25,7 +25,6 @@ namespace MulNX {
     // 调试器接口
     class Debugger;
     // MulNX句柄系统
-    class IHandleSystem;
     class HandleSystem;
     // 跨进程信息接口
     class IPCer;
@@ -33,8 +32,6 @@ namespace MulNX {
     class InputSystem;
     // 全局变量
     class GlobalVars;
-    // 3D抽象层
-    class IAbstractLayer3D;
     // MulNX UI系统
     class UISystem;
     // MulNX消息

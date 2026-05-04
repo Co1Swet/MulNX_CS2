@@ -11,6 +11,6 @@ using Steam64UID = uint64_t;
 
 class CSModuleBase :public MulNX::ModuleBase {
 public:
-    CSController* CS2() { return reinterpret_cast<CSController*>(this->AL3D); }
+    CSController* CS2();
     PlayerHub* Hub();
 };

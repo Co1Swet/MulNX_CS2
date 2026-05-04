@@ -1,11 +1,10 @@
 #pragma once
 
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CS2/CSClasses/tree/tree.hpp>
-#include <chrono>
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 // 自由摄像机位置控制器（仅位置控制）
-class FreeCameraController final :public MulNX::ModuleBase {
+class FreeCameraController final :public CSModuleBase {
 public:
     DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f }; // 位置
     DirectX::XMFLOAT3 Rotation = { 0.0f, 0.0f, 0.0f }; // 旋转角度 (pitch, yaw, roll)

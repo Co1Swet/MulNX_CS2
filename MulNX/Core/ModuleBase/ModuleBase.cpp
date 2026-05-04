@@ -29,7 +29,6 @@ bool MulNX::ModuleBase::BaseInit(MulNX::Core::Core* core) {
         this->pMsgManager = moduleManager->FindModule<MulNX::MessageManager>("MessageManager");
         this->IDebugger = moduleManager->FindModule<MulNX::Debugger>("Debugger");
         this->GlobalVars = moduleManager->FindModule<MulNX::GlobalVars>("GlobalVars");
-        this->AL3D = moduleManager->FindAbstractLayer3D();
         this->pInputSystem = moduleManager->FindModule<MulNX::InputSystem>("InputSystem");
         this->pPathManager = moduleManager->FindModule<MulNX::PathManager>("PathManager");
         this->MainMsgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());

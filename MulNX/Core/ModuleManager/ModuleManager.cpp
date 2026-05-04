@@ -17,7 +17,9 @@
 using namespace MulNX::Core;
 
 bool ModuleManager::Init() {
-    // 后置消息订阅，参见 PackedInit
+    this->ISys()
+        .SubscribeAsync("ModuleManager/ModuleInfo/Request");
+    
     this->SendTask("MulNXMain", [this]()->bool {
         this->EntryProcessMsg();
         return true;
@@ -80,9 +82,6 @@ MulNX::ModuleBase* ModuleManager::FindModule(const std::string& Name) {
     }
     return it2->second.get();
 }
-MulNX::IAbstractLayer3D* ModuleManager::FindAbstractLayer3D() {
-    return this->FindModule<MulNX::IAbstractLayer3D>(this->AbstractLayer3DName);
-}
 
 bool ModuleManager::ModulesBaseInit() {
     std::shared_lock lock(this->smutex);
@@ -92,12 +91,6 @@ bool ModuleManager::ModulesBaseInit() {
             return false;
         }
     }
-    this->ISys().LogInfo("注意: AbstractLayer3D(3D抽象层)被绑定为" + this->AbstractLayer3DName);
-
-    // 进行后置消息订阅
-    this->ISys()
-        .SubscribeAsync("ModuleManager/ModuleInfo/Request");
-    // 完成初始化
     return true;
 }
 

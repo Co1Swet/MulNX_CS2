@@ -2,6 +2,7 @@
 #include "CamSysExt.hpp"
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 CameraSystem* CamSysModule::CamSys() {
     static auto pCamSys = this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem");
@@ -143,7 +144,7 @@ void CameraSystem::HandleUpdate() {
     if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'P',1 })) {
         this->ISys().PublishAsync("CameraSystem/Play/Shutdown"_hash);
     }
-    this->CamDrawer.Update(this->AL3D->GetViewMatrix(), this->AL3D->GetWinWidth(), this->AL3D->GetWinHeight());
+    this->CamDrawer.Update(this->CS2()->GetViewMatrix(), this->CS2()->GetWinWidth(), this->CS2()->GetWinHeight());
     this->EManager->HandleUpdate();
     this->SManager->HandleUpdate();
     this->PManager->HandleUpdate();

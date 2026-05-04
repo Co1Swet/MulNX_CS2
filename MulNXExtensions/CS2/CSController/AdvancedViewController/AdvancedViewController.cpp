@@ -88,8 +88,8 @@ void AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup) {
     // 如果启用了高级视角控制，尝试更新视角数据，注意这里只是更新，不涉及具体的视角控制逻辑，视角控制逻辑在后面根据状态分流执行
     if (this->Enable.load(std::memory_order_acquire)) {
         // 通过时间桥判断是否需要更新视角，防止抖动
-        static auto lastTime = this->AL3D->Time()->GetReal();
-        auto currentTime = this->AL3D->Time()->GetReal();
+        static auto lastTime = this->CS2()->Time()->GetReal();
+        auto currentTime = this->CS2()->Time()->GetReal();
         if (currentTime > lastTime || lastTime - currentTime > 0.015f || this->AlwaysCaulate.load(std::memory_order_acquire)) {
             auto result = this->HandleSelfViewUpdate(viewSetup);
             if (result.has_value()) {

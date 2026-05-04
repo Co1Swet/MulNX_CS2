@@ -17,7 +17,6 @@ add_library(MulNX
     "Core/ModuleBase/ISys/ISys.cpp"
     "Core/ModuleManager/ModuleManager.cpp"
 
-    "Systems/AbstractLayer3D/IAbstractLayer3D.cpp"
     "Systems/Debugger/Debugger.cpp"
     "Systems/HandleSystem/HandleSystem.cpp"
     "Systems/IPCer/IPCer.cpp"

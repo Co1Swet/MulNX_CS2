@@ -1,9 +1,8 @@
 #include "FreeCameraPath.hpp"
 
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
-#include <fstream>
-#include <format>
 
 std::string FreeCameraPath::GetPrivateMsg()const {
     std::ostringstream oss;
@@ -28,11 +27,11 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
                 auto pos = keyframe.GetPosition();
                 auto rot = keyframe.GetRotationEuler();
                 auto dof = keyframe.GetDOF();
-                auto* al3d = EManager->AL3D;
-                al3d->spec_goto_ex(pos, rot);
-                al3d->SetDOF(dof);
-                if (al3d->pInputSystem->IsKeyPressed(VK_MENU)) {
-                    al3d->Time()->JumpReal(keyframe.time);
+                auto* pCS2 = EManager->CS2();
+                pCS2->spec_goto_ex(pos, rot);
+                pCS2->SetDOF(dof);
+                if (pCS2->pInputSystem->IsKeyPressed(VK_MENU)) {
+                    pCS2->Time()->JumpReal(keyframe.time);
                 }
             }
         }
@@ -42,8 +41,8 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
 
     if (ImGui::Button(I18n("free_campath.add").c_str()) || EManager->pInputSystem->CheckComboClick('F', 1)) {
         MulNX::Math::CameraKeyframe keyframe;
-        keyframe.time = EManager->AL3D->Time()->GetReal();
-        auto view = EManager->AL3D->GetView();
+        keyframe.time = EManager->CS2()->Time()->GetReal();
+        auto view = EManager->CS2()->GetView();
         keyframe.PositionAndFOV = view.ToPositionAndFOV();
         keyframe.RotationQuat = view.ToRotationQuat();
         keyframe.dof = view.ToDOFPack();
@@ -60,7 +59,7 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
 
     if (ImGui::Button(I18n("text.preview").c_str())) {
         EManager->Preview_SetElement(this->Name);
-        EManager->Preview_SetPreviewSchema(EManager->AL3D->Time()->GetReal());
+        EManager->Preview_SetPreviewSchema(EManager->CS2()->Time()->GetReal());
         EManager->Preview_Enable();
     }
 

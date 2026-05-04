@@ -10,6 +10,5 @@
 #include "Systems/UISystem/UISystem.hpp"
 #include "Systems/PathManager/PathManager.hpp"
 #include "Systems/InputSystem/InputSystem.hpp"
-#include "Systems/AbstractLayer3D/IAbstractLayer3D.hpp"
 #include "Systems/IPCer/IPCer.hpp"
 #include "Systems/GlobalVars/GlobalVars.hpp"

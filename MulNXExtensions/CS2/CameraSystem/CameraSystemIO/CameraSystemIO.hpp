@@ -1,6 +1,7 @@
 #pragma once
 
 #include <MulNX/MulNX.hpp>
+#include <MulNX/Base/Math/Math.hpp>
 
 // 播放模式：激活模式与编排模式
 enum class PlaybackMode {

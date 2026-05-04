@@ -15,7 +15,55 @@
 #include "FreeCameraController/FreeCameraController.hpp"
 #include "AdvancedViewController/AdvancedViewController.hpp"
 
-class Dofs{
+//1到10为玩家，0为本地
+class D_Player {
+public:
+    DirectX::XMFLOAT3 Position;
+    DirectX::XMFLOAT3 EyePosition;
+    DirectX::XMFLOAT3 Rotation;
+    int HP;
+    int Team;
+    bool Alive;
+    int IndexInEntityList;
+    int IndexInMap;
+};
+
+class D_GameData {
+public:
+    D_Player Players[11];
+
+};
+
+namespace MulNX {
+    class TimeBridge {
+        // 指向抽象层的指针，用于调用抽象层的时间函数
+        CSController* pCS2;
+        //是否在虚拟时间轴播放（偏移时间轴播放）
+        bool virtualTimePlaying = false;
+        // MulNX时间参考点
+        std::chrono::steady_clock::time_point startTime;
+        // 用于计算虚拟时间的缓冲变量
+        float refreshTime = 0.0f;
+        // 比例，用于控制虚拟时间的流速，默认为1.0f（与真实时间相同）
+        float scale = 1.0f;
+        // 上一次获取的真实时间，用于检测时间回跳等异常情况
+        float lastRealTime = 0.0f;
+        // 内部更新函数
+        void update();
+    public:
+        TimeBridge() = delete;
+        TimeBridge(CSController* pCS2);
+
+        bool RefreshVirtual(bool virtualTimePlaying, float scale);
+        float GetReal();
+        bool JumpReal(float time);
+        bool JumpRealRel(float time);
+        float GetVirtual();
+        float Get();
+    };
+}
+
+class Dofs {
 public:
     float* pNearBlurry = nullptr;
     float* pNearCrisp = nullptr;
@@ -36,7 +84,11 @@ public:
     Dofs dofs{};
 };
 
-class CSController final :public MulNX::IAbstractLayer3D {
+class CSController final :public MulNX::ModuleBase {
+private:
+    MulNX::TimeBridge timeBridge{ this };
+protected:
+    D_GameData CS2EBGameData{};
 private:
     ControlView controlView{};
 
@@ -77,19 +129,19 @@ public:
     VExecutor<bool()>IsPlayingDemo{};
     VExecutor<bool()>IsDemoPaused{};
     
-
-    // AbstractLayer3D接口实现
-    float* GetViewMatrix()override;
-    MulNX::Math::View GetView()override;
-    float GetTime()override;
-    bool JumpTime(const float time)override;
-    float GetWinWidth()const override;
-    float GetWinHeight()const override;
-    bool SpecPlayer(int IndexInMap)override;
-    D_Player& GetPlayerMsg(int Index)override;
-    void spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot)override;
-    void ClearViewOverride()override;
-    void SetDOF(const MulNX::Math::DOFParam& dof)override;
+    // 返回时间源，由实现创建独占指针，这里返回原始指针
+    MulNX::TimeBridge* Time();
+    float* GetViewMatrix();
+    MulNX::Math::View GetView();
+    float GetTime();
+    bool JumpTime(const float time);
+    float GetWinWidth()const;
+    float GetWinHeight()const;
+    bool SpecPlayer(int IndexInMap);
+    D_Player& GetPlayerMsg(int Index);
+    void spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot);
+    void ClearViewOverride();
+    void SetDOF(const MulNX::Math::DOFParam& dof);
     void HandleFreeCameraPath(const CameraSystemIO* const IO);
-    bool CameraSystemIOOverride(const CameraSystemIO* const IO)override;
+    bool CameraSystemIOOverride(const CameraSystemIO* const IO);
 };

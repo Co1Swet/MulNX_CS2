@@ -1,6 +1,6 @@
 #include "FreeCameraController.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 void FreeCameraController::Menu(MulNX::UINode* node) {
     // 自由摄像机控制
@@ -9,7 +9,7 @@ void FreeCameraController::Menu(MulNX::UINode* node) {
         bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
         if (ImGui::Checkbox("启用自由摄像机位置控制", &currentEnable)) {
             if (currentEnable && !this->EnableControl.load(std::memory_order_acquire)) {
-                auto view = this->AL3D->GetView();
+                auto view = this->CS2()->GetView();
                 // 从未启用到启用：读取当前游戏位置和角度
                 this->Position = view.position;
                 this->Rotation = view.rotation;

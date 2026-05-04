@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <MulNX/MulNX.hpp>
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 #include "CameraDrawer/CameraDrawer.hpp"
 
@@ -29,7 +29,7 @@ class ProjectManager;
 class WorkspaceManager;
 
 // 摄像机系统
-class CameraSystem final :public MulNX::ModuleBase {
+class CameraSystem final :public CSModuleBase {
 private:
     // 四大管理器
     ElementManager* EManager = nullptr;
@@ -44,7 +44,7 @@ public:
     void HandleUpdate();
 };
 
-class CamSysModule :public MulNX::ModuleBase {
+class CamSysModule :public CSModuleBase {
 public:
     CameraSystem* CamSys();
 };

@@ -1,7 +1,6 @@
 +----------新的日志片段----------+
 当游戏关闭时发生异常是可预见的，请忽略
 
-[2026-05-03 05:58:57.3506560][提示][ModuleManager]注意: AbstractLayer3D(3D抽象层)被绑定为CSController
 [2026-05-03 05:58:57.3507010][成功][ModuleManager]成功订阅消息：ModuleManager/ModuleInfo/Request
 [2026-05-03 05:58:57.3507100][提示][ModuleManager]module.send_task
 [2026-05-03 05:58:57.3507120][成功][ModuleManager]module.inited
