@@ -1,7 +1,7 @@
 #include "FreeCameraPath.hpp"
 
-#include <MulNXExtensions/CameraSystem/CameraDrawer/CameraDrawer.hpp>
-#include <MulNXExtensions/CameraSystem/ElementManager/ElementManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
 #include <fstream>
 #include <format>
 

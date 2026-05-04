@@ -1,9 +1,9 @@
 #include "WorkspaceManager.hpp"
 
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CameraSystem/ElementManager/ElementManager.hpp>
-#include <MulNXExtensions/CameraSystem/SolutionManager/SolutionManager.hpp>
-#include <MulNXExtensions/CameraSystem/ProjectManager/ProjectManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/SolutionManager/SolutionManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ProjectManager/ProjectManager.hpp>
 
 #include <MulNXThirdParty/All_pugixml.hpp>
 

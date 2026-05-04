@@ -2,8 +2,8 @@
 
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Base/Math/Translate/Translate.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/PlayerHub/ProjectileTracker/ProjectileTracker.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 #include <unordered_set>

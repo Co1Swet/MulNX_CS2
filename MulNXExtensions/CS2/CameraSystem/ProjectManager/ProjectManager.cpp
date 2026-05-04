@@ -2,8 +2,8 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CameraSystem/ElementManager/ElementManager.hpp>
-#include <MulNXExtensions/CameraSystem/SolutionManager/SolutionManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/SolutionManager/SolutionManager.hpp>
 
 bool ProjectManager::MenuProject(MulNX::UINode* node) {
     // 项目总设置

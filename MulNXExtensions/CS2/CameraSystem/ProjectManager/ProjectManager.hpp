@@ -2,8 +2,8 @@
 
 #include "ProjectConfig.hpp"
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/Project/Project.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/Project/Project.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 
 //项目管理器，用于管理项目
 class ProjectManager final :public CamSysModule {

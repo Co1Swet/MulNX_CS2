@@ -1,8 +1,8 @@
 #pragma once
 
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/Workspace/Workspace.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/Workspace/Workspace.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 
 class WorkspaceManager final :public CamSysModule {
 private:

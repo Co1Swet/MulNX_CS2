@@ -1,8 +1,8 @@
 #pragma once
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/Elements/Elements.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/Elements/Elements.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include "ElementConfig.hpp"
 
 //元素管理器，用于管理元素

@@ -1,10 +1,10 @@
 #include "SolutionManager.hpp"
 
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
-#include <MulNXExtensions/CameraSystem/CameraDrawer/CameraDrawer.hpp>
-#include <MulNXExtensions/CameraSystem/ElementManager/ElementManager.hpp>
-#include <MulNXExtensions/CameraSystem/ProjectManager/ProjectManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ProjectManager/ProjectManager.hpp>
 
 bool SolutionManager::MenuSolution(MulNX::UINode* node) {
     ImGui::Text(I18n(

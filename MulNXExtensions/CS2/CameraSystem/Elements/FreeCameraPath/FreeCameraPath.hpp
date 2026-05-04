@@ -1,6 +1,6 @@
 #pragma once
 
-#include <MulNXExtensions/CameraSystem/Elements/ElementBase.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/Elements/ElementBase.hpp>
 
 class ElementManager;
 

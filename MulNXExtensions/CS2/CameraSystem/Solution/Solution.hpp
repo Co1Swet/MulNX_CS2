@@ -1,7 +1,7 @@
 #pragma once
 
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/Elements/Elements.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/Elements/Elements.hpp>
 
 class ElementWithOffset {
 public:

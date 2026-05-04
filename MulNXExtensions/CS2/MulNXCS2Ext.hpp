@@ -26,3 +26,5 @@
 #include "ConsoleManager/ConsoleManager.hpp"
 #include "GameCfgManager/GameCfgManager.hpp"
 #include "GameSettingsManager/GameSettingsManager.hpp"
+
+#include "MiniMap/MiniMap.hpp"

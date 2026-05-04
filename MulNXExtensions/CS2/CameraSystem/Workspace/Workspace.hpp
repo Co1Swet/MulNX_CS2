@@ -1,8 +1,8 @@
 #pragma once
 
-#include <MulNXExtensions/CameraSystem/ElementManager/ElementConfig.hpp>
-#include <MulNXExtensions/CameraSystem/SolutionManager/SolutionConfig.hpp>
-#include <MulNXExtensions/CameraSystem/ProjectManager/ProjectConfig.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementConfig.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/SolutionManager/SolutionConfig.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ProjectManager/ProjectConfig.hpp>
 
 #include <string>
 #include <filesystem>

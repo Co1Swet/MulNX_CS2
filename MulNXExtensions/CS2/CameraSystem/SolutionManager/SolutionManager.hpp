@@ -3,8 +3,8 @@
 #include "SolutionConfig.hpp"
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/Solution/Solution.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/Solution/Solution.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 
 //解决方案管理器，用于管理解决方案
 class SolutionManager final :public CamSysModule {

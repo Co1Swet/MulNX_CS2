@@ -25,12 +25,15 @@ add_library(MulNXCS2Ext
     GameCfgManager/GameCfgManager.cpp
     GameSettingsManager/GameSettingsManager.cpp
 
+    MiniMap/MiniMap.cpp
+
     HookManager/HookManager.cpp
 
     CSModuleBase.cpp
 )
 
 add_subdirectory("CSController")
+add_subdirectory("CameraSystem")
 
 target_link_libraries(MulNXCS2Ext PUBLIC
     MulNX

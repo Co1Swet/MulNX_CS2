@@ -1,7 +1,7 @@
 #pragma once
 
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 #include <yaml-cpp/yaml.h>
 #include <string>
 #include <filesystem>

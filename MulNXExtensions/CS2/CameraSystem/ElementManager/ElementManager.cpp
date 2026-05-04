@@ -1,9 +1,9 @@
 #include "ElementManager.hpp"
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CameraSystem/CameraSystem.hpp>
-#include <MulNXExtensions/CameraSystem/CameraDrawer/CameraDrawer.hpp>
-#include <MulNXExtensions/CameraSystem/SolutionManager/SolutionManager.hpp>
-#include <MulNXExtensions/CameraSystem/ProjectManager/ProjectManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/SolutionManager/SolutionManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ProjectManager/ProjectManager.hpp>
 
 bool ElementManager::MenuElement(MulNX::UINode* node) {
     // 展示预览功能相关状态

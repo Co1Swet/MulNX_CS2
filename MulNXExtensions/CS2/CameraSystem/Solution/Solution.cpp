@@ -1,5 +1,5 @@
 #include "Solution.hpp"
-#include <MulNXExtensions/CameraSystem/ElementManager/ElementManager.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
