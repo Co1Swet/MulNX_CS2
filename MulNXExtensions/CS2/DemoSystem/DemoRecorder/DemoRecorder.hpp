@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 
+#include <MulNX/Common/coroutine.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 class DemoRecorder final : public CSModuleBase {
@@ -17,30 +18,23 @@ public:
     int postRecordTicks = 256;
 
 private:
-    struct RecordTask {
+    struct RecordToDo {
         Steam64UID uid = 0;
         int tick = 0;
     };
 
-    enum class State {
-        Idle,
-        Preparing,
-        Recording
-    };
 
-    std::deque<RecordTask> recordTaskBufferQueue;
-    std::optional<RecordTask> currentWindow;
+    std::deque<RecordToDo> recordTaskBufferQueue;
+    std::optional<RecordToDo> currentWindow;
 
-    State state = State::Idle;
     int windowStartTick = 0;
     int windowEndTick = 0;
 
     bool moduleActive = true;
-    mutable std::mutex mtx;
 
-    bool PeekQueue(RecordTask& task);   // 调用者需持有 mtx
+    bool PeekQueue(RecordToDo& task);   // 调用者需持有 mtx
 
-    void Main();
-    void StartRecording(const RecordTask& task);
+    Task currentCoro{};
+    Task Main();
     void StopRecording();
 };
