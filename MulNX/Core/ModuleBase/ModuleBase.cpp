@@ -69,10 +69,34 @@ bool MulNX::ModuleBase::EntryInit() {
     return true;
 }
 void MulNX::ModuleBase::EntryProcessMsg() {
+    std::vector<std::coroutine_handle<>> toResume;
+    for (auto it = this->conditionWaiters.begin(); it != this->conditionWaiters.end(); ) {
+        if (it->condition()) {
+            toResume.push_back(it->handle);
+            it = this->conditionWaiters.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+    for (auto& h : toResume) {
+        h.resume();
+    }
     MulNX::MessageChannel* Channel = this->MainMsgChannel;
-    MulNX::Message Msg{};
-    while (Channel->PullMessage(Msg)) {
-        this->ProcessMsg(Msg);
+    MulNX::Message msg{};
+    // 注意这里，msg掌握潜在的asp对象，直到协程使用asp，仍保持有效，直到离开作用域，msg析构引起asp析构
+    while (Channel->PullMessage(msg)) {
+        this->ProcessMsg(msg);// 高优先级
+        auto it = this->msgWaiters.find(msg.type);
+        if (it != this->msgWaiters.end()) {
+            auto waiters = std::move(it->second);
+            this->msgWaiters.erase(it);
+            for (auto& w : waiters) {
+                w.result = &msg;
+                w.handle.resume();//  由于模块代码内聚，这里应当是不出现已经处理的情况
+            }
+        }
+        continue;
     }
     this->UIBusy.store(false, std::memory_order_release);
     return;

@@ -13,23 +13,11 @@ bool DemoRecorder::Init() {
         .SubscribeAsync("Demo/Record/Start")
         .SubscribeAsync("Demo/Record/Stop");
 
+    currentCoro = Main();
+    currentCoro.resume();
+
     this->SendTask("DemoRecorder", [this]()->bool {
         this->EntryProcessMsg();
-
-        // 如果有协程正在运行，推它一把
-        if (currentCoro.handle && !currentCoro.done()) {
-            currentCoro.resume();
-            return true;
-        }
-        else {
-            // 启动新协程
-            currentCoro = Main();
-            // 因为 initial_suspend 是 suspend_always，需要第一次 resume
-            if (!currentCoro.done()) {
-                currentCoro.resume();
-            }
-        }
-
         return true;
         });
 
@@ -92,63 +80,66 @@ bool DemoRecorder::PeekQueue(RecordToDo& task) {
     return true;
 }
 
-Task DemoRecorder::Main() {
-    // 1. 等待模块激活
-    co_await AwaitCondition([this] { return this->moduleActive; });
+MulNX::CoTask DemoRecorder::Main() {
+    while (true) {
+        // 等待模块激活
+        co_await WaitUntil([this]()->bool { return this->moduleActive; });
 
-    // 2. 等待队列中有任务
-    RecordToDo task;
-    co_await AwaitCondition([&] { return PeekQueue(task); });
+        // 等待队列中有任务
+        RecordToDo task;
+        co_await WaitUntil([&]()->bool { return PeekQueue(task); });
 
-    currentWindow = task;
-    windowStartTick = task.tick - preRecordTicks;
-    windowEndTick = task.tick + postRecordTicks;
+        currentWindow = task;
+        windowStartTick = task.tick - preRecordTicks;
+        windowEndTick = task.tick + postRecordTicks;
 
-    if (windowStartTick < 0) {
-        this->ISys().LogWarning("Window start tick adjusted from "
-            + std::to_string(windowStartTick) + " to 0.");
-        windowStartTick = 0;
+        if (windowStartTick < 0) {
+            this->ISys().LogWarning("Window start tick adjusted from "
+                + std::to_string(windowStartTick) + " to 0.");
+            windowStartTick = 0;
+        }
+
+        // 发送跳转
+        MulNX::Message gotoMsg("Demo/GotoTick"_hash);
+        gotoMsg.p1.low<int>() = windowStartTick;
+        this->ISys().PublishAsync(std::move(gotoMsg));
+
+        // 等待跳转完成
+        co_await WaitUntil([this] {
+            return std::abs(this->CS2()->GetDemoTick() - windowStartTick) <= 10;
+            });
+
+        // 固定等待 3 秒（后面换成异步）
+        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+
+        // 设置观察目标
+        MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
+        specMsg.p1.as<Steam64UID>() = task.uid;
+        this->ISys().PublishAsync(std::move(specMsg));
+
+        this->ISys().LogInfo("Jumped to tick " + std::to_string(windowStartTick)
+            + ", observing UID=" + std::to_string(task.uid));
+
+        // 开始录制
+        MulNX::Message startMsg("Media/OBS/Record/Start"_hash);
+        this->ISys().PublishAsync(std::move(startMsg));
+        this->ISys().LogSucc("Recording started for UID="
+            + std::to_string(currentWindow->uid)
+            + " from tick " + std::to_string(windowStartTick)
+            + " to " + std::to_string(windowEndTick));
+
+        // 等待录制结束 tick
+        co_await WaitUntil([this] {
+            return this->CS2()->GetDemoTick() >= windowEndTick;
+            });
+
+        // 停止录制
+        StopRecording();
+        this->ISys().LogSucc("Recording finished for UID="
+            + std::to_string(currentWindow->uid));
+        currentWindow.reset();
     }
-
-    // 3. 发送跳转
-    MulNX::Message gotoMsg("Demo/GotoTick"_hash);
-    gotoMsg.p1.low<int>() = windowStartTick;
-    this->ISys().PublishAsync(std::move(gotoMsg));
-
-    // 4. 等待跳转完成
-    co_await AwaitCondition([this] {
-        return std::abs(this->CS2()->GetDemoTick() - windowStartTick) <= 10;
-        });
-
-    // 5. 固定等待 3 秒（后面换成异步）
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-
-    // 6. 设置观察目标
-    MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
-    specMsg.p1.as<Steam64UID>() = task.uid;
-    this->ISys().PublishAsync(std::move(specMsg));
-
-    this->ISys().LogInfo("Jumped to tick " + std::to_string(windowStartTick)
-        + ", observing UID=" + std::to_string(task.uid));
-
-    // 7. 开始录制
-    MulNX::Message startMsg("Media/OBS/Record/Start"_hash);
-    this->ISys().PublishAsync(std::move(startMsg));
-    this->ISys().LogSucc("Recording started for UID="
-        + std::to_string(currentWindow->uid)
-        + " from tick " + std::to_string(windowStartTick)
-        + " to " + std::to_string(windowEndTick));
-
-    // 8. 等待录制结束 tick
-    co_await AwaitCondition([this] {
-        return this->CS2()->GetDemoTick() >= windowEndTick;
-        });
-
-    // 9. 停止录制
-    StopRecording();
-    this->ISys().LogSucc("Recording finished for UID="
-        + std::to_string(currentWindow->uid));
-    currentWindow.reset();
+    co_return;
 }
 
 void DemoRecorder::StopRecording() {

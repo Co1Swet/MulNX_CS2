@@ -34,7 +34,7 @@ private:
 
     bool PeekQueue(RecordToDo& task);   // 调用者需持有 mtx
 
-    Task currentCoro{};
-    Task Main();
+    MulNX::CoTask currentCoro{};
+    MulNX::CoTask Main();
     void StopRecording();
 };
