@@ -15,19 +15,17 @@
 #include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
 #include <MulNX/Systems/TaskSystem/TaskSystem.hpp>
 
-using namespace MulNX::Core;
-
-bool ModuleManager::Init() {
+bool MulNX::Core::ModuleManager::Init() {
     this->ISys()
         .SubscribeAsync("ModuleManager/ModuleInfo/Request");
-    
+
     this->SendTask("MulNXMain", [this]()->bool {
         this->EntryProcessMsg();
         return true;
         });
     return true;
 }
-void ModuleManager::ProcessMsg(MulNX::Message& Msg) {
+void MulNX::Core::ModuleManager::ProcessMsg(MulNX::Message& Msg) {
     std::unique_lock lock(this->smutex);
     switch (Msg.type) {
     case "ModuleManager/ModuleInfo/Request"_hash: {
@@ -42,15 +40,15 @@ void ModuleManager::ProcessMsg(MulNX::Message& Msg) {
     }
 }
 
-bool ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module) {
+bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module) {
     std::unique_lock lock(this->smutex);
     MulNXHandle hModule = MulNXHandle::CreateHandle();
-    Module->HModule = hModule;    
+    Module->HModule = hModule;
     this->NameToHandleMap[Module->GetName()] = hModule;
     this->modules[hModule] = std::move(Module);
     return true;
 }
-ModuleManager& ModuleManager::CreateSystemModules() {
+MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
     (*this)
         .CreateModule<MulNX::IPCer>("IPCer")// IPC模块
         .CreateModule<MulNX::PathManager>("PathManager")// 路径管理器模块
@@ -69,7 +67,7 @@ ModuleManager& ModuleManager::CreateSystemModules() {
 
     return *this;
 }
-MulNX::ModuleBase* ModuleManager::FindModule(const std::string& Name) {
+MulNX::ModuleBase* MulNX::Core::ModuleManager::FindModule(const std::string& Name) {
     std::shared_lock lock(this->smutex);
     auto it = this->NameToHandleMap.find(Name);
     if (it == this->NameToHandleMap.end()) {
@@ -85,9 +83,9 @@ MulNX::ModuleBase* ModuleManager::FindModule(const std::string& Name) {
     return it2->second.get();
 }
 
-bool ModuleManager::ModulesBaseInit() {
+bool MulNX::Core::ModuleManager::ModulesBaseInit() {
     std::shared_lock lock(this->smutex);
-    for (auto& [hModule,pModule] : this->modules) {
+    for (auto& [hModule, pModule] : this->modules) {
         if (!pModule->BaseInit(this->Core)) {
             MulNX::ErrorTerminate("在模块初始化时出现错误，模块名：" + pModule->GetName());
             return false;
@@ -96,7 +94,7 @@ bool ModuleManager::ModulesBaseInit() {
     return true;
 }
 
-bool ModuleManager::ModulesInit() {
+bool MulNX::Core::ModuleManager::ModulesInit() {
     std::shared_lock lock(this->smutex);
     // 通过有序的初始化任务列表进行初始化，尽管Modules是无序的
     for (auto& [hModule, pModule] : this->modules) {
@@ -105,5 +103,6 @@ bool ModuleManager::ModulesInit() {
             return false;
         }
     }
+    this->ISys().LogSucc(I18n("sys.inited_info", this->modules.size() + 2)); // 模块管理器自身和核心启动器
     return true;
 }

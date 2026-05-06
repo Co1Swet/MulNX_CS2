@@ -109,8 +109,11 @@ MulNX::CoTask DemoRecorder::Main() {
             return std::abs(this->CS2()->GetDemoTick() - windowStartTick) <= 10;
             });
 
-        // 固定等待 3 秒（后面换成异步）
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+        // 等待加载
+        auto current = this->CS2()->GetDemoTick();
+        co_await this->WaitUntil([&] {
+            return this->CS2()->GetDemoTick() - current > 128;
+            });
 
         // 设置观察目标
         MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);

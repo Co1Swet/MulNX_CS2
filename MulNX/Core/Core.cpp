@@ -3,6 +3,7 @@
 #include "ModuleManager/ModuleManager.hpp"
 
 MulNX::Core::Core::Core(std::string&& Name) :
+    createTime(std::chrono::steady_clock::now()),
     CoreName(Name) {
     // 创建模块管理器
     this->pModuleManager = std::make_unique<MulNX::Core::ModuleManager>();
@@ -21,9 +22,9 @@ MulNX::Core::ModuleManager* MulNX::Core::Core::ModuleManager() {
 
 // 专用初始化函数
 void MulNX::Core::Core::Init() {
-	// 通过核心启动器进行系统初始化
-	this->pCoreStarter->SystemInit(this);
-	return;
+    // 通过核心启动器进行系统初始化
+    this->pCoreStarter->SystemInit(this);
+    return;
 }
 
 std::string MulNX::Core::Core::GetName() {

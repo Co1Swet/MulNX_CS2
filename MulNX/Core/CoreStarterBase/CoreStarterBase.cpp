@@ -33,6 +33,11 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->InitEndCall();
     // 通过MainDraw字符串发送UI启动命令
     this->CreateMainDraw();
+    // 记录结束时间
+    auto end = std::chrono::steady_clock::now();
+    // 输出总时间
+    auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->createTime);
+    this->ISys().LogWarning(I18n("sys.inited_time_sum", cost.count()));
     return true;
 }
 

@@ -8,8 +8,6 @@
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaRemoter/MediaRemoter.hpp>
 
-#include <Windows.h>
-
 // 这是MulNX_CS2项目的入口文件，也是MulNX项目的示例模块
 // 本文件展示了如何使用MulNX核心系统创建一个功能完整的注入式DLL工具。
 

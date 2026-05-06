@@ -125,6 +125,8 @@ module:
   send_task: 将任务注册信息推送到了消息系统
 
 sys:
+  inited_info: 所有模块初始化成功，模块总量：{}
+  inited_time_sum: 初始化完成，自核心分配内存并创建开始，共耗时：{}（微秒）
   i18n_load_succ: 语言文件加载成功：{}
   version_is_testing: 当前版本是否为测试版：{} 
   version_is: 当前版本号：{} 

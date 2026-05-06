@@ -1,13 +1,13 @@
 #pragma once
-// 整个系统的核心，负责所有子模块的生命周期管理，初始化，主循环调用等
-// 同时提供各子模块的接口访问
+
 #include <MulNX/Config/Config.hpp>
 #include <Memory>
+#include <chrono>
 
 namespace MulNX {
     namespace Core {
         class Core {
-            friend class MulNX::ModuleBase;
+            friend class MulNX::Core::CoreStarterBase;
         private:
             // 自身指针
             std::unique_ptr<Core> pMyself = nullptr;
@@ -17,6 +17,8 @@ namespace MulNX {
             std::unique_ptr<ModuleManager> pModuleManager;
 			// 核心启动器指针
             std::unique_ptr<MulNX::Core::CoreStarterBase> pCoreStarter = nullptr;
+            // 核心创建时间
+            std::chrono::steady_clock::time_point createTime;
 
             Core() = delete;
             Core(const Core&) = delete;

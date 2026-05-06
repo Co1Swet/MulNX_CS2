@@ -22,9 +22,8 @@ namespace MulNX {
             bool Init()override;
             void ProcessMsg(MulNX::Message& Msg)override;
 
-            // 注册模块，需要传入模块指针和名称，以及优先级，从1开始，数字越小优先级越高
+            // 注册模块，需要传入模块指针和名称
             bool RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module);
-            // 记录模块，需要传入
 
             // 创建模块
             template<typename T>
