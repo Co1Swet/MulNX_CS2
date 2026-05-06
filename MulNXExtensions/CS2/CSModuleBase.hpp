@@ -6,11 +6,13 @@
 
 class CSController;
 class PlayerHub;
+class ViewController;
 
 using Steam64UID = uint64_t;
 
 class CSModuleBase :public MulNX::ModuleBase {
 public:
     CSController* CS2();
+    ViewController* CS2View();
     PlayerHub* Hub();
 };

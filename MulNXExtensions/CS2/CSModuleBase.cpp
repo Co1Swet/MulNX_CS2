@@ -6,6 +6,11 @@ CSController* CSModuleBase::CS2() {
     return pCSController;
 }
 
+ViewController* CSModuleBase::CS2View() {
+    static ViewController* pViewController = this->Core->ModuleManager()->FindModule<ViewController>("ViewController");
+    return pViewController;
+}
+
 PlayerHub* CSModuleBase::Hub() {
     static PlayerHub* playerHub = this->Core->ModuleManager()->FindModule<PlayerHub>("PlayerHub");
     return playerHub;

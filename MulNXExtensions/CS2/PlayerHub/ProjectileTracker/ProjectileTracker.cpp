@@ -2,6 +2,7 @@
 
 #include <MulNX/Base/Math/Translate/Translate.hpp>
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController) {
     if (!pController) return "未知玩家";

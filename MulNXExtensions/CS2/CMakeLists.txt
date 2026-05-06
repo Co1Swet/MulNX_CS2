@@ -5,8 +5,11 @@ add_library(MulNXCS2Ext
 
     CSModuleBase.cpp
 
-    ObserverController/ObserverController.cpp
+    AdvancedViewController/AdvancedViewController.cpp
+    FreeCameraController/FreeCameraController.cpp
     ViewController/ViewController.cpp
+
+    ObserverController/ObserverController.cpp
     ESPController/ESPController.cpp
     PlayerFlashController/PlayerFlashController.cpp
     DeathMsgController/DeathMsgController.cpp

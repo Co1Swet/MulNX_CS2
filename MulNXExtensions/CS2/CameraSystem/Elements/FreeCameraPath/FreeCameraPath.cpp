@@ -1,6 +1,6 @@
 #include "FreeCameraPath.hpp"
-
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
 
@@ -27,11 +27,10 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
                 auto pos = keyframe.GetPosition();
                 auto rot = keyframe.GetRotationEuler();
                 auto dof = keyframe.GetDOF();
-                auto* pCS2 = EManager->CS2();
-                pCS2->spec_goto_ex(pos, rot);
-                pCS2->SetDOF(dof);
-                if (pCS2->pInputSystem->IsKeyPressed(VK_MENU)) {
-                    pCS2->Time()->JumpReal(keyframe.time);
+                EManager->CS2View()->spec_goto_ex(pos, rot);
+                EManager->CS2View()->SetDOF(dof);
+                if (EManager->pInputSystem->IsKeyPressed(VK_MENU)) {
+                    EManager->CS2()->Time()->JumpReal(keyframe.time);
                 }
             }
         }
@@ -42,7 +41,7 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
     if (ImGui::Button(I18n("free_campath.add").c_str()) || EManager->pInputSystem->CheckComboClick('F', 1)) {
         MulNX::Math::CameraKeyframe keyframe;
         keyframe.time = EManager->CS2()->Time()->GetReal();
-        auto view = EManager->CS2()->GetView();
+        auto view = EManager->CS2View()->GetView();
         keyframe.PositionAndFOV = view.ToPositionAndFOV();
         keyframe.RotationQuat = view.ToRotationQuat();
         keyframe.dof = view.ToDOFPack();

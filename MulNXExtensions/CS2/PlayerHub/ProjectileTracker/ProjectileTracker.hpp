@@ -1,11 +1,7 @@
 #pragma once
 
-#include <shared_mutex>
-#include <memory>
-#include <atomic>
+#include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
-#include <MulNXExtensions/WinExt/WinExt.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 class ProjectileTracker final : public CSModuleBase {
     std::atomic<bool>Enable = false;

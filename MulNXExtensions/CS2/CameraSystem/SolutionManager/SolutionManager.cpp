@@ -2,6 +2,7 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/ElementManager/ElementManager.hpp>
@@ -443,7 +444,7 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 }
 void SolutionManager::Playing_Disable() {
     this->Playing = false;
-    this->CS2()->ClearViewOverride();
+    this->CS2View()->ClearViewOverride();
     this->ISys().PublishAsync("CameraSystem/Play/Ended"_hash);
     this->ISys().LogInfo("已关闭播放");
 }
@@ -464,7 +465,7 @@ void SolutionManager::Playing_Call() {
     IO.isPlaying = this->Playing;
 
     if (!this->Playing_pSolution->Call(&IO)) {
-        this->CS2()->ClearViewOverride();
+        this->CS2View()->ClearViewOverride();
         // 这里不关闭播放，因为解决方案可能还有内容
         // 不应该由管理器因为仅仅没有结果就关闭
         if (IO.isPlaying == false) {
@@ -475,7 +476,7 @@ void SolutionManager::Playing_Call() {
         return;
     }
     if (this->Config.PlayingOverride) {
-        this->CS2()->CameraSystemIOOverride(&IO);
+        this->CS2View()->CameraSystemIOOverride(&IO);
     }
     if (this->Config.PlayingDraw) {
         auto frame = this->drawCamera.Write();

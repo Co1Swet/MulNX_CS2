@@ -2,8 +2,6 @@
 
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Base/Math/Translate/Translate.hpp>
-#include <MulNXExtensions/CS2/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
-#include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/PlayerHub/ProjectileTracker/ProjectileTracker.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 #include <unordered_set>
@@ -11,21 +9,11 @@
 bool CSController::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("快捷操作", this->ShowWindow);
     if (!w)return true;
-    MulNX::TransInfo info;
-    info.pMatrix = this->GetViewMatrix();
-    info.windowHeight = this->GetWinHeight();
-    info.windowWidth = this->GetWinWidth();
 
     auto tick = this->GetDemoTick();
     ImGui::Text("当前demotick：%d", tick);
 
-    MulNX::UI::SliderFloat("roll调整", this->controlView.InputRoll, -179.99f, 179.99f);
-    auto* pGlobalFOV = this->CvarSystem.GetCvar("fov_cs_debug")->GetPtr<float>();
-    ImGui::SliderFloat("fov调整", pGlobalFOV, 0, 179.99f);
-    if (ImGui::Button("一键归正")) {
-        this->controlView.InputRoll.store(0, std::memory_order_release);
-        *pGlobalFOV = 0;
-    }
+    node->CallUINode("ViewController");
 
     if (ImGui::CollapsingHeader("时间控制")) {
         static float gameTimeScale = 1.0f;
@@ -50,60 +38,6 @@ bool CSController::Window(MulNX::UINode* node) {
     return true;
 }
 
-void CSController::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
-    // 加载来自摄像机系统的View
-    if (this->controlView.hasViewToGame.load(std::memory_order_acquire)) {
-        auto view = this->controlView.ViewToGame.Read();
-        *viewSetup->pViewOrigin() = view->position;
-        *viewSetup->pViewAngles() = view->rotation;
-
-        if (view->FOV > 0.01f) {
-            *viewSetup->pFov() = view->FOV;
-        }
-    }
-}
-void CSController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
-    if (this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
-        this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem")->HandleUpdate();
-    }
-    static auto* pProjectileTracker = this->Core->ModuleManager()->FindModule<ProjectileTracker>("ProjectileTracker");
-    auto trckerView = pProjectileTracker->GetView();
-    if (trckerView.has_value()) {
-        *viewSetup->pViewOrigin() = trckerView.value().position;
-        *viewSetup->pViewAngles() = trckerView.value().rotation;
-    }
-
-    // 同步窗口尺寸到ControlView
-    this->controlView.WindowWidth.store(*viewSetup->pWidth(), std::memory_order_relaxed);
-    this->controlView.WindowHeight.store(*viewSetup->pHeight(), std::memory_order_relaxed);
-
-    // 执行roll覆盖，这是优先级最低的覆盖，保证运镜至少优先于此，且不影响于此
-    viewSetup->pViewAngles()->z = this->controlView.InputRoll.load(std::memory_order_acquire);
-    this->pAdvancedViewController->HandleUpdate(viewSetup);
-
-    // 根据状态调用不同的视角控制逻辑
-    // 自由摄像机优先级最高，其次是高级视角控制，最后是普通摄像机系统控制
-    if (this->pFreeCameraController->HandleUpdate(viewSetup)) {
-        this->pFreeCameraController->HandleOverrideView(viewSetup);
-    }
-    else if (this->pAdvancedViewController->HandleOverrideView(viewSetup)) {
-
-    }
-    else {
-        this->HandleCameraSystemPlay(viewSetup);
-    }
-
-    // 记录视角数据
-    {
-        auto currentView = this->controlView.currentView.Write();
-
-        currentView->position = *viewSetup->pViewOrigin();
-        currentView->rotation = *viewSetup->pViewAngles();
-
-        currentView->FOV = *viewSetup->pFov();
-    }
-}
-
 bool CSController::Init() {
     this->ShowWindow = true;
     this->ISys()
@@ -112,24 +46,7 @@ bool CSController::Init() {
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
-    this->pAdvancedViewController = this->Core->ModuleManager()->FindModule<AdvancedViewController>("AdvancedViewController");
-    this->pFreeCameraController = this->Core->ModuleManager()->FindModule<FreeCameraController>("FreeCameraController");
-
     this->EnlistExecutors();
-
-    const auto& pattern = MulNX::CS2::Signatures::CallIsPlayingDemo;
-    auto target = this->client.GetTextRegion().FindRegion(pattern);
-    this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), 0, true, [this](RegContext* ctx, MulNX::Hook* Hook) {
-        this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
-        return MulNX::Hook::Then::Continue;
-        }).value();
-    this->hkPosCallIsPlayingDemo->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
-
-    this->controlView.dofs.pNearBlurry = this->CvarSystem.GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
-    this->controlView.dofs.pNearCrisp = this->CvarSystem.GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
-    this->controlView.dofs.pFarCrisp = this->CvarSystem.GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
-    this->controlView.dofs.pFarBlurry = this->CvarSystem.GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
 
     this->SendTask("CSControl", [this]()->bool {
         try {
@@ -233,37 +150,6 @@ void CSController::Update() {
     return;
 }
 
-void CSController::HandleFreeCameraPath(const CameraSystemIO* const IO) {
-    const auto& pos = IO->Frame.view.position;
-    const auto& fov = IO->Frame.view.FOV;
-    const auto& rot = IO->Frame.view.rotation;
-    const auto& dof = IO->Frame.view.dof;
-
-    {
-        auto view = this->controlView.ViewToGame.Write();
-        view->position = pos;
-        view->FOV = fov;
-        view->rotation = rot;
-    }
-    *this->controlView.dofs.pNearBlurry = dof.NearBlurry;
-    *this->controlView.dofs.pNearCrisp = dof.NearCrisp;
-    *this->controlView.dofs.pFarCrisp = dof.FarCrisp;
-    *this->controlView.dofs.pFarBlurry = dof.FarBlurry;
-
-    this->controlView.hasViewToGame.store(true, std::memory_order_release);
-}
-bool CSController::CameraSystemIOOverride(const CameraSystemIO* const IO) {
-    static float LastCallTime = IO->FrameGameTime;
-    if (LastCallTime == IO->FrameGameTime) {
-        return true;
-    }
-    LastCallTime = IO->FrameGameTime;
-
-    this->HandleFreeCameraPath(IO);
-
-    return true;
-}
-
 // C_ConVar* m_yawPtr = nullptr;
 // m_yawPtr = this->CvarSystem.GetCvar("m_yaw");
 // std::vector<int> schemas;
@@ -282,3 +168,91 @@ bool CSController::CameraSystemIOOverride(const CameraSystemIO* const IO) {
 //         schemas.push_back(schema);
 //     }
 // }
+float CSController::GetTime() {
+    try {
+        float time = MulNX::MRead(this->CSGlobalVars->fCurrentTime());
+        // float timereal = MulNX::MRead(this->CSGlobalVars->fRealTime());
+        // auto iTime2 = MulNX::MRead(this->CSGlobalVars->iTickCount());
+        // auto fTime2 = static_cast<float>(iTime2) / 64.0f;
+        // 经过验证，fCurrentTime更稳定一点
+        return time;
+    }
+    catch (const std::runtime_error& e) {
+        this->ISys().LogError("读取游戏时间失败");
+        return 0;
+    }
+
+}
+bool CSController::JumpTime(const float time) {
+    int currentGameTick = this->Time()->GetReal() * 64;
+    int currentDemoTick = this->GetDemoTick();
+
+    int targetGameTick = static_cast<int>(time * 64);
+    int deltaTick = currentGameTick - currentDemoTick;
+    int tick = targetGameTick - deltaTick;
+
+    std::string command = std::format("demo_gototick {}", tick);
+    this->ISys().AsyncCommand(std::move(command));
+    return true;
+}
+bool CSController::SpecPlayer(int IndexInMap) {
+    this->ISys().AsyncCommand("spec_mode 2;spec_player " + std::to_string(this->CS2EBGameData.Players[IndexInMap].IndexInMap));
+    return true;
+}
+D_Player& CSController::GetPlayerMsg(int Index) {
+    //std::shared_lock lock(this->GetMtx());
+    return this->CS2EBGameData.Players[Index];
+}
+
+MulNX::TimeBridge::TimeBridge(CSController* pCS2) : pCS2(pCS2) {
+    this->startTime = std::chrono::steady_clock::now();
+}
+
+void MulNX::TimeBridge::update() {
+    float time = this->pCS2->GetTime();
+    if (time > this->lastRealTime) {
+        this->lastRealTime = time;
+    }
+    else if (this->lastRealTime - time > 0.025f) {
+        this->lastRealTime = time;
+    }
+    return;
+}
+
+bool MulNX::TimeBridge::RefreshVirtual(bool virtualTimePlaying, float scale) {
+    this->update();
+    this->refreshTime = this->lastRealTime;
+    this->startTime = std::chrono::steady_clock::now();
+    this->scale = scale;
+    this->virtualTimePlaying = virtualTimePlaying;
+    return true;
+}
+
+float MulNX::TimeBridge::GetReal() {
+    this->update();
+    return this->lastRealTime;
+}
+
+bool MulNX::TimeBridge::JumpReal(float time) {
+    return this->pCS2->JumpTime(time);
+}
+
+bool MulNX::TimeBridge::JumpRealRel(float time) {
+    return this->JumpReal(time + this->GetReal());
+}
+
+float MulNX::TimeBridge::GetVirtual() {
+    // 这里不需要更新，因为虚拟时间的更新是由RefreshVirtual控制的，GetVirtual只负责计算当前的虚拟时间
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration<float>(now - this->startTime).count();
+    return this->refreshTime + elapsed * this->scale;
+}
+
+float MulNX::TimeBridge::Get() {
+    return this->virtualTimePlaying ? this->GetVirtual() : this->GetReal();
+}
+
+
+MulNX::TimeBridge* CSController::Time() {
+    return &this->timeBridge;
+}

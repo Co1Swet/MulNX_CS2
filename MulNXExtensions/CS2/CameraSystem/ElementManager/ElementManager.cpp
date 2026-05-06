@@ -1,6 +1,7 @@
 #include "ElementManager.hpp"
 #include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/SolutionManager/SolutionManager.hpp>
@@ -84,7 +85,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> eleme
 bool ElementManager::UINodeFunc(MulNX::UINode* node) {
     std::unique_lock lock(this->CamSys()->smutex);
     for (auto& [name, elem] : this->elements) {
-        elem->DrawBase(this->CamDrawer, this->CS2()->GetViewMatrix(), this->CS2()->GetWinWidth(), this->CS2()->GetWinHeight());
+        elem->DrawBase(this->CamDrawer, this->CS2View()->GetViewMatrix(), this->CS2View()->GetWinWidth(), this->CS2View()->GetWinHeight());
     }
     if (this->needDrawCamera.load(std::memory_order_acquire)) {
         auto frame = this->drawCamera.Read();
@@ -161,7 +162,7 @@ void ElementManager::HandleUpdate() {
             //自由摄像机轨道预览
             if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {
                 if (this->Config.PreviewOverride) {
-                    this->CS2()->CameraSystemIOOverride(&IO);
+                    this->CS2View()->CameraSystemIOOverride(&IO);
                 }
                 if (this->Config.PreviewDraw) {
                     auto frame = this->drawCamera.Write();
@@ -355,7 +356,7 @@ void ElementManager::Preview_Enable() {
 }
 void ElementManager::Preview_Disable() {
     this->OnPreview = false;
-    this->CS2()->ClearViewOverride();
+    this->CS2View()->ClearViewOverride();
     this->ISys().PublishAsync("CameraSystem/Preview/Ended"_hash);
     this->ISys().LogInfo("已关闭预览");
 }

@@ -1,7 +1,7 @@
 #include "AdvancedViewController.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
 bool AdvancedViewController::Menu(MulNX::UINode* node) {
     if (ImGui::CollapsingHeader("高级视角控制")) {
@@ -45,9 +45,9 @@ bool AdvancedViewController::Menu(MulNX::UINode* node) {
         if (this->hasAxisInfo.load(std::memory_order_acquire)) {
             auto read = this->currentAxisInfo.Read();
             MulNX::TransInfo info;
-            info.pMatrix = this->CS2()->GetViewMatrix();
-            info.windowHeight = this->CS2()->GetWinHeight();
-            info.windowWidth = this->CS2()->GetWinWidth();
+            info.pMatrix = this->CS2View()->GetViewMatrix();
+            info.windowHeight = this->CS2View()->GetWinHeight();
+            info.windowWidth = this->CS2View()->GetWinWidth();
 
             // 分两部分绘制：原始骨骼点 与 坐标轴
             if (this->ShowOriginalBones.load(std::memory_order_acquire)) {

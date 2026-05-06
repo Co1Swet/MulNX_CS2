@@ -1,6 +1,7 @@
 #include "ESPController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
 bool ESPController::Draw(MulNX::UINode* node) {
     if (this->ShowWindow.load(std::memory_order_acquire)) {
@@ -12,8 +13,8 @@ bool ESPController::Draw(MulNX::UINode* node) {
             DirectX::XMFLOAT2 EyePos2D{};
             DirectX::XMFLOAT2 OriginPos2D{};
 
-            MulNX::Math::WorldToScreen(EyePos3D, EyePos2D, this->CS2()->GetViewMatrix(), this->CS2()->GetWinWidth(), this->CS2()->GetWinHeight());
-            MulNX::Math::WorldToScreen(OriginPos3D, OriginPos2D, this->CS2()->GetViewMatrix(), this->CS2()->GetWinWidth(), this->CS2()->GetWinHeight());
+            MulNX::Math::WorldToScreen(EyePos3D, EyePos2D, this->CS2View()->GetViewMatrix(), this->CS2View()->GetWinWidth(), this->CS2View()->GetWinHeight());
+            MulNX::Math::WorldToScreen(OriginPos3D, OriginPos2D, this->CS2View()->GetViewMatrix(), this->CS2View()->GetWinWidth(), this->CS2View()->GetWinHeight());
 
             const float hight{ ::abs(EyePos2D.y - OriginPos2D.y) * 1.25f };
             const float width{ hight / 2.f };

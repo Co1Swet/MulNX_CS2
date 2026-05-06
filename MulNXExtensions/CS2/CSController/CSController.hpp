@@ -2,18 +2,14 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/Math/Math.hpp>
-#include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <MulNXExtensions/WinExt/WinExt.hpp>
 #include <MulNXExtensions/CS2/Signatures.hpp>
-
 #include <MulNXExtensions/CS2/CSClasses/tree/tree.hpp>
 #include <MulNXExtensions/CS2/CSClasses/GlobalVars/GlobalVars.hpp>
 #include <MulNXExtensions/CS2/CSClasses/CSDll/CSDll.hpp>
 #include <MulNXExtensions/CS2/CSClasses/C_CSGameRules/C_CSGameRules.hpp>
 
 #include "ConVarSystem/ConVarSystem.hpp"
-#include "FreeCameraController/FreeCameraController.hpp"
-#include "AdvancedViewController/AdvancedViewController.hpp"
 
 //1到10为玩家，0为本地
 class D_Player {
@@ -33,6 +29,8 @@ public:
     D_Player Players[11];
 
 };
+
+class CSController;
 
 namespace MulNX {
     class TimeBridge {
@@ -63,38 +61,12 @@ namespace MulNX {
     };
 }
 
-class Dofs {
-public:
-    float* pNearBlurry = nullptr;
-    float* pNearCrisp = nullptr;
-    float* pFarCrisp = nullptr;
-    float* pFarBlurry = nullptr;
-};
-
-class ControlView {
-public:
-    std::atomic<bool> hasViewToGame = false;
-    MulNX::NewestBuffer<MulNX::Math::View> ViewToGame{};
-    MulNX::NewestBuffer<MulNX::Math::View> currentView{};
-    std::atomic<float> InputRoll = 0;
-    std::atomic<bool> CameraMode = false;
-    std::atomic<int> WindowWidth = 1920;
-    std::atomic<int> WindowHeight = 1080;
-    
-    Dofs dofs{};
-};
-
 class CSController final :public MulNX::ModuleBase {
 private:
     MulNX::TimeBridge timeBridge{ this };
 protected:
     D_GameData CS2EBGameData{};
 private:
-    ControlView controlView{};
-
-    FreeCameraController* pFreeCameraController{};
-    AdvancedViewController* pAdvancedViewController = nullptr;
-
     void* Source2EngineToClient001 = nullptr;
     // 控制台指令执行器
     VExecutor<void(int, const char*, int)> executor{};
@@ -102,13 +74,8 @@ private:
     C_ConVarSystem CvarSystem{};
     // CS2全局变量
     C_GlobalVars* CSGlobalVars{};
-    // 视角控制钩子
-    std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo = nullptr;
 
     bool Window(MulNX::UINode* node);
-
-    void HandleOverrideView(CS2::CViewSetup* viewSetup);
-    void HandleCameraSystemPlay(CS2::CViewSetup* viewSetup);
 
     void EnlistExecutors();
     void ProcessMsg(MulNX::Message& Msg)override;
@@ -131,17 +98,8 @@ public:
     
     // 返回时间源，由实现创建独占指针，这里返回原始指针
     MulNX::TimeBridge* Time();
-    float* GetViewMatrix();
-    MulNX::Math::View GetView();
     float GetTime();
     bool JumpTime(const float time);
-    float GetWinWidth()const;
-    float GetWinHeight()const;
     bool SpecPlayer(int IndexInMap);
     D_Player& GetPlayerMsg(int Index);
-    void spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot);
-    void ClearViewOverride();
-    void SetDOF(const MulNX::Math::DOFParam& dof);
-    void HandleFreeCameraPath(const CameraSystemIO* const IO);
-    bool CameraSystemIOOverride(const CameraSystemIO* const IO);
 };
