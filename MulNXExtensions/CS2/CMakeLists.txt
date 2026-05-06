@@ -3,12 +3,15 @@ add_library(MulNXCS2Ext
     CSClasses/GlobalVars/GlobalVars.cpp
     CSClasses/tree/tree.cpp
 
+    CSModuleBase.cpp
+
     ObserverController/ObserverController.cpp
     ViewController/ViewController.cpp
     ESPController/ESPController.cpp
     PlayerFlashController/PlayerFlashController.cpp
     DeathMsgController/DeathMsgController.cpp
     SkinController/SkinController.cpp
+    POVFixer/POVFixer.cpp
 
     DemoSystem/DemoSystem.cpp
     DemoSystem/DemoHelper/DemoHelper.cpp
@@ -21,15 +24,13 @@ add_library(MulNXCS2Ext
     PlayerHub/SmokeController/SmokeController.cpp
     PlayerHub/ProjectileTracker/ProjectileTracker.cpp
 
+    MiniMap/MiniMap.cpp
+
     ConsoleManager/ConsoleManager.cpp
     GameCfgManager/GameCfgManager.cpp
     GameSettingsManager/GameSettingsManager.cpp
 
-    MiniMap/MiniMap.cpp
-
     HookManager/HookManager.cpp
-
-    CSModuleBase.cpp
 )
 
 add_subdirectory("CSController")

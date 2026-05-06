@@ -20,6 +20,7 @@ add_library(MulNX
     "Systems/Debugger/Debugger.cpp"
     "Systems/HandleSystem/HandleSystem.cpp"
     "Systems/IPCer/IPCer.cpp"
+    "Systems/CrashDumper/CrashDumper.cpp"
     "Systems/InputSystem/Key/Key.cpp"
     "Systems/InputSystem/InputSystem.cpp"
     "Systems/MessageManager/MessageChannel/MessageChannel.cpp"

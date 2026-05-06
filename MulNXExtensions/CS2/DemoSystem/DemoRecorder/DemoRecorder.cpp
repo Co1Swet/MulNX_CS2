@@ -83,11 +83,11 @@ bool DemoRecorder::PeekQueue(RecordToDo& task) {
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
         // 等待模块激活
-        co_await WaitUntil([this]()->bool { return this->moduleActive; });
+        co_await this->WaitUntil([this]()->bool { return this->moduleActive; });
 
         // 等待队列中有任务
         RecordToDo task;
-        co_await WaitUntil([&]()->bool { return PeekQueue(task); });
+        co_await this->WaitUntil([&]()->bool { return PeekQueue(task); });
 
         currentWindow = task;
         windowStartTick = task.tick - preRecordTicks;
@@ -105,7 +105,7 @@ MulNX::CoTask DemoRecorder::Main() {
         this->ISys().PublishAsync(std::move(gotoMsg));
 
         // 等待跳转完成
-        co_await WaitUntil([this] {
+        co_await this->WaitUntil([this] {
             return std::abs(this->CS2()->GetDemoTick() - windowStartTick) <= 10;
             });
 
@@ -129,7 +129,7 @@ MulNX::CoTask DemoRecorder::Main() {
             + " to " + std::to_string(windowEndTick));
 
         // 等待录制结束 tick
-        co_await WaitUntil([this] {
+        co_await this->WaitUntil([this] {
             return this->CS2()->GetDemoTick() >= windowEndTick;
             });
 

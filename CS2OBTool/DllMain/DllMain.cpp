@@ -134,6 +134,7 @@ DWORD MulNX_CS2_Start(void*) {
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<ESPController>("ESPController")
             .CreateModule<SkinController>("SkinController")
+            .CreateModule<POVFixer>("POVFixer")
             // Demos
             .CreateModule<DemoHelper>("DemoHelper")
             .CreateModule<DemoAnalyzer>("DemoAnalyzer")

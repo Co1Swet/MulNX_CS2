@@ -27,6 +27,12 @@ add_compile_options(/utf-8)
 add_compile_options(/EHsc)
 add_compile_options(/Zc:__cplusplus) # 让MSVC标注正确的cpp版本
 
+# 控制 PDB 文件
+string(APPEND CMAKE_SHARED_LINKER_FLAGS_RELEASE " /DEBUG /OPT:REF /OPT:ICF /INCREMENTAL:NO")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_RELEASE " /DEBUG /OPT:REF /OPT:ICF /INCREMENTAL:NO")
+string(APPEND CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL " /DEBUG /OPT:REF /OPT:ICF /INCREMENTAL:NO")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_MINSIZEREL " /DEBUG /OPT:REF /OPT:ICF /INCREMENTAL:NO")
+
 # 定义全局宏
 add_compile_definitions(NOMINMAX) # 防止windows的min max宏破坏程序
 add_compile_definitions(WIN32_LEAN_AND_MEAN) # 至少能让它少引入点东西
