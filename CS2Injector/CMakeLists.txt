@@ -13,11 +13,10 @@ if(WIN32)
 endif()
 
 add_executable(CS2Injector WIN32
-    "Include/Charsets/Charsets.cpp"
-    "Main/Main.cpp"
-    "MulNXeCore/MulNXeCore.cpp"
-    "MulNXeCore/ConfigManager/ConfigManager.cpp"
-    "MulNXeCore/IPCer/IPCer.cpp"
+    Main/Main.cpp
+    MulNXeCore/MulNXeCore.cpp
+    MulNXeCore/ConfigManager/ConfigManager.cpp
+    MulNXeCore/IPCer/IPCer.cpp
 )
 
 target_link_libraries(CS2Injector PUBLIC

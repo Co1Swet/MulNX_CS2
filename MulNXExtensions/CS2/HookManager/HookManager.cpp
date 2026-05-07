@@ -114,15 +114,15 @@ void HookManager::d3dInit() {
     // 文件拖拽钩子
     HANDLE hProp = GetPropW(this->CS2hWnd, L"OleDropTargetInterface");
     IDropTarget* pTarget = static_cast<IDropTarget*>(hProp);
-    this->hkDrop = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTarget)->GetVFuncPtr(6), 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hk) {
+    this->hkDrop = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTarget)->GetVFuncPtr(6),
+        0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
             this->HandleProcessDropFiles((IDataObject*)ctx->rdx);
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkDrop->Attach();
     // 窗口过程钩子
     this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->CS2hWnd, GWLP_WNDPROC),
-        0, false,[this](RegContext* ctx, MulNX::Hook* hk) {
+        0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
             return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
         }).value();
     this->hkWndProc->Attach();
