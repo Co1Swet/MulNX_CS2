@@ -1,89 +1,10 @@
-#include "DllMain.hpp"
-
-#include <MulNX/Base/UI/UI.hpp>
+#include <CS2OBTool/UIDocker/UIDocker.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CamSysExt.hpp>
 #include <MulNXExtensions/CS2/MulNXCS2Ext.hpp>
 #include <MulNXExtensions/VirtualUser/VirtualUser.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaRemoter/MediaRemoter.hpp>
-
-// 这是MulNX_CS2项目的入口文件，也是MulNX项目的示例模块
-// 本文件展示了如何使用MulNX核心系统创建一个功能完整的注入式DLL工具。
-
-bool MainDraw::Init() {
-    this->SendUINode("MainDraw", [this](MulNX::UINode* node) {this->Window(node);});
-    return true;
-}
-
-void MainDraw::Window(MulNX::UINode* node) {
-    // 1. 创建铺满整个游戏窗口的 DockSpace（背景板）
-    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID, 0,ImGuiDockNodeFlags_PassthruCentralNode);
-
-    ImGui::Begin(I18n("ui.main").c_str());
-    if (ImGui::BeginTabBar("TabBar")) {
-        if (ImGui::BeginTabItem(I18n("ui.camera_system").c_str())) {
-            node->CallUINode("CameraSystem");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem(I18n("ui.game_settings").c_str())) {
-            node->CallUINode("GameSettingsManager");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem(I18n("ui.game_enhance").c_str())) {
-            node->CallUINode("ConsoleManager");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem(I18n("ui.mulnx_control").c_str())) {
-            node->CallUINode("VirtualUser");
-            node->CallUINode("MulNXController");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem(I18n("ui.settings").c_str())) {
-            node->CallUINode("UISystem");
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
-    }
-    ImGui::End();
-    node->CallUINode("Debugger");
-    node->CallUINode("GameCfgManager");
-    node->CallUINode("MiniMap");
-    node->CallUINode("CSController");
-    node->CallUINode("ElementManager");
-    node->CallUINode("SolutionManager");
-    node->CallUINode("ProjectManager");
-    node->CallUINode("DemoSystem");
-    node->CallUINode("PlayerHub");
-    node->CallUINode("ProjectileTracker");
-    node->CallUINode("DeathMsgController");
-    node->CallUINode("MediaRemoter");
-    node->CallUINode("ESPController");
-}
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
-    switch (ul_reason_for_call) {
-    case DLL_PROCESS_ATTACH: {
-        HANDLE hThread = CreateThread(NULL, 0, MulNX_CS2_Start, NULL, 0, NULL);
-        // 这里不需要等待线程结束，因为它会在完成初始化后自动退出，然后等待进程结束时被操作系统清理
-        break;
-    }
-    case DLL_THREAD_ATTACH: {
-        // 本系统不考虑卸载，计划生命周期与游戏进程相同！
-        break;
-    }
-    case DLL_THREAD_DETACH: {
-        break;
-    }
-    case DLL_PROCESS_DETACH: {
-        break;
-    }
-    default: {
-        break;
-    }
-    }
-    return TRUE;
-}
 
 DWORD MulNX_CS2_Start(void*) {
     try {
@@ -149,7 +70,7 @@ DWORD MulNX_CS2_Start(void*) {
             .CreateModule<MediaRemoter>("MediaRemoter")
             // 管理
             .CreateModule<MulNXController>("MulNXController")
-            .CreateModule<MainDraw>("MainDraw")
+            .CreateModule<UIDocker>("UIDocker")
             ;
 
         // 启动核心
@@ -162,4 +83,28 @@ DWORD MulNX_CS2_Start(void*) {
         MulNX::ErrorTerminate("在启动时发生未知异常！");
     }
     return 0;
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    switch (ul_reason_for_call) {
+    case DLL_PROCESS_ATTACH: {
+        HANDLE hThread = CreateThread(NULL, 0, MulNX_CS2_Start, NULL, 0, NULL);
+        // 这里不需要等待线程结束，因为它会在完成初始化后自动退出，然后等待进程结束时被操作系统清理
+        break;
+    }
+    case DLL_THREAD_ATTACH: {
+        // 本系统不考虑卸载，计划生命周期与游戏进程相同！
+        break;
+    }
+    case DLL_THREAD_DETACH: {
+        break;
+    }
+    case DLL_PROCESS_DETACH: {
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+    return TRUE;
 }

@@ -3,9 +3,13 @@ disclaimer: |
   在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
   但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
 
+homepage: |
+  欢迎使用MulNX
+  使用 Insert 键开关UI系统
+
 # 此部分归属UI系统，和主要的，公有的UI部分翻译
 ui:
-  main: 主窗口（按下 Insert 键隐藏所有绘制）
+  main: 首页
   camera_system: 摄像机系统
   game_settings: 游戏设置
   game_enhance: 游戏增强
@@ -26,6 +30,11 @@ ui:
       load_succ: 字体配置解析成功！字体路径：{0}  字体大小：{1}
     load: 尝试加载字体：{}
     load_succ: 字体加载成功：{}
+  padding:
+    top: 上边距
+    bottom: 下边距
+    left: 左边距
+    right: 右边距
 
 win32:
   drag:

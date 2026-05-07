@@ -36,16 +36,6 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/Record/Reset"_hash: {
         recordTaskBufferQueue.clear();
-
-        // if (state != State::Idle) {
-        //     StopRecording();
-        //     state = State::Idle;
-        //     currentWindow.reset();
-        //     this->ISys().LogInfo("Reset: cleared queue and stopped current recording.");
-        // }
-        // else {
-        //     this->ISys().LogInfo("Reset: queue cleared (no active recording).");
-        // }
         break;
     }
     case "Demo/Record/Start"_hash: {
@@ -55,16 +45,6 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/Record/Stop"_hash: {
         moduleActive = false;
-
-        // if (state != State::Idle) {
-        //     StopRecording();
-        //     state = State::Idle;
-        //     currentWindow.reset();
-        //     this->ISys().LogInfo("Module deactivated, stopped current recording.");
-        // }
-        // else {
-        //     this->ISys().LogInfo("Module deactivated.");
-        // }
         break;
     }
     default:

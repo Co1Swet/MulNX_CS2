@@ -1,338 +1,481 @@
 +----------新的日志片段----------+
 当游戏关闭时发生异常是可预见的，请忽略
 
-[2026-05-07 09:50:22.2686210][成功][ModuleManager]成功订阅消息：ModuleManager/ModuleInfo/Request
-[2026-05-07 09:50:22.2686280][提示][ModuleManager]module.send_task
-[2026-05-07 09:50:22.2686280][成功][ModuleManager]module.inited
-[2026-05-07 09:50:22.2686310][成功][HookManager]module.inited
-[2026-05-07 09:50:22.2687890][成功][IPCer]module.inited
-[2026-05-07 09:50:22.2689460][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
-[2026-05-07 09:50:22.2689750][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
-[2026-05-07 09:50:22.2689750][成功][PathManager]module.inited
-[2026-05-07 09:50:22.2690780][成功][CrashDumper]module.inited
-[2026-05-07 09:50:22.2700310][成功][I18nManager]语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\I18nManager\Language\lan.yaml
-[2026-05-07 09:50:22.2700750][成功][I18nManager]初始化成功！
-[2026-05-07 09:50:22.2700750][成功][MessageManager]初始化成功！
-[2026-05-07 09:50:22.2700780][成功][UISystem]成功订阅消息：UISystem/Start
-[2026-05-07 09:50:22.2700790][成功][UISystem]成功订阅消息：UISystem/ModulePush
-[2026-05-07 09:50:22.2700790][成功][UISystem]成功订阅消息：UISystem/SaveStyle
-[2026-05-07 09:50:22.2700820][提示][UISystem]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2700820][成功][UISystem]初始化成功！
-[2026-05-07 09:50:22.2704120][提示][Logger]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2704140][成功][Logger]初始化成功！
-[2026-05-07 09:50:22.2704270][提示][Debugger]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2704280][提示][Debugger]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2704280][成功][Debugger]成功订阅消息：Log/Info
-[2026-05-07 09:50:22.2704290][成功][Debugger]成功订阅消息：Log/Succ
-[2026-05-07 09:50:22.2704290][成功][Debugger]成功订阅消息：Log/Warning
-[2026-05-07 09:50:22.2704300][成功][Debugger]成功订阅消息：Log/Error
-[2026-05-07 09:50:22.2704330][成功][Debugger]成功订阅消息：Debugger/SetMaxInfoCount
-[2026-05-07 09:50:22.2704340][成功][Debugger]初始化成功！
-[2026-05-07 09:50:22.2704350][成功][HandleSystem]初始化成功！
-[2026-05-07 09:50:22.2704380][提示][InputSystem]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2704380][成功][InputSystem]初始化成功！
-[2026-05-07 09:50:22.2706730][提示][GlobalVars]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2706730][成功][GlobalVars]初始化成功！
-[2026-05-07 09:50:22.2706750][成功][TaskSystem]成功订阅消息：Task/Create
-[2026-05-07 09:50:22.2707050][成功][TaskSystem]成功创建工作者：Messaging
-[2026-05-07 09:50:22.2707110][成功][TaskSystem]成功将任务添加进入工作者：Messaging
-[2026-05-07 09:50:22.2707120][成功][TaskSystem]成功将任务添加进入工作者：Messaging
-[2026-05-07 09:50:22.2707120][成功][TaskSystem]初始化成功！
-[2026-05-07 09:50:22.2707130][成功][CSController]成功订阅消息：Demo/GotoTick
-[2026-05-07 09:50:22.2707130][成功][CSController]成功订阅消息：Game/Command
-[2026-05-07 09:50:22.2707140][提示][CSController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2707870][提示][CSController]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2707870][成功][CSController]初始化成功！
-[2026-05-07 09:50:22.2795260][成功][ViewController]钩子部署成功！钩子名：Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup
-[2026-05-07 09:50:22.2795280][提示][ViewController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2795290][成功][ViewController]初始化成功！
-[2026-05-07 09:50:22.2795340][提示][ShaderCompiler]正在编译着色器！
-[2026-05-07 09:50:22.2821950][成功][ShaderCompiler]着色器编译完毕！
-[2026-05-07 09:50:22.2821960][成功][ShaderCompiler]初始化成功！
-[2026-05-07 09:50:22.2822060][提示][GraphicsManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2822070][成功][GraphicsManager]初始化成功！
-[2026-05-07 09:50:22.2822140][成功][WebSocketManager]成功订阅消息：WebSocketManager/Post
-[2026-05-07 09:50:22.2822520][提示][WebSocketManager]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2822530][提示][WebSocketManager]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2822530][成功][WebSocketManager]初始化成功！
-[2026-05-07 09:50:22.2823750][提示][CameraSystem]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2823760][成功][CameraSystem]成功订阅消息：Global/Save
-[2026-05-07 09:50:22.2823760][成功][CameraSystem]成功订阅消息：Global/Save/Strong
-[2026-05-07 09:50:22.2823770][成功][CameraSystem]成功订阅消息：Command/SpecPlayer
-[2026-05-07 09:50:22.2823770][成功][CameraSystem]成功订阅消息：Game/NewRound
-[2026-05-07 09:50:22.2823770][成功][CameraSystem]成功订阅消息：CameraSystem/Play/Shutdown
-[2026-05-07 09:50:22.2823780][成功][CameraSystem]初始化成功！
-[2026-05-07 09:50:22.2823840][提示][WorkspaceManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2823850][成功][WorkspaceManager]成功订阅消息：CamereSystem/Workspace/Set
-[2026-05-07 09:50:22.2823850][成功][WorkspaceManager]成功订阅消息：CameraSystem/Workspace/Save
-[2026-05-07 09:50:22.2823860][成功][WorkspaceManager]初始化成功！
-[2026-05-07 09:50:22.2823890][提示][ProjectManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2823890][提示][ProjectManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2823920][成功][ProjectManager]初始化成功！
-[2026-05-07 09:50:22.2823990][提示][SolutionManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2824000][提示][SolutionManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2824010][成功][SolutionManager]成功订阅消息：CameraSystem/Element/Deleted
-[2026-05-07 09:50:22.2824020][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Create
-[2026-05-07 09:50:22.2824020][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Delete
-[2026-05-07 09:50:22.2824020][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Play
-[2026-05-07 09:50:22.2824030][成功][SolutionManager]初始化成功！
-[2026-05-07 09:50:22.2824060][提示][ElementManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2824060][提示][ElementManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2824090][成功][ElementManager]成功订阅消息：Element/Create
-[2026-05-07 09:50:22.2824090][成功][ElementManager]成功订阅消息：Element/Delete
-[2026-05-07 09:50:22.2824090][成功][ElementManager]初始化成功！
-[2026-05-07 09:50:22.2825100][成功][HookEntitySystem]钩子部署成功！钩子名：AddEntity
-[2026-05-07 09:50:22.2825280][成功][HookEntitySystem]钩子部署成功！钩子名：RemoveEntity
-[2026-05-07 09:50:22.2825290][成功][HookEntitySystem]初始化成功！
-[2026-05-07 09:50:22.2825320][提示][AdvancedViewController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2825320][成功][AdvancedViewController]初始化成功！
-[2026-05-07 09:50:22.2825330][提示][FreeCameraController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2825330][成功][FreeCameraController]初始化成功！
-[2026-05-07 09:50:22.2825370][提示][PlayerHub]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2825370][成功][PlayerHub]初始化成功！
-[2026-05-07 09:50:22.2825400][提示][PlayerFlashController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2825400][成功][PlayerFlashController]初始化成功！
-[2026-05-07 09:50:22.2858100][成功][NameController]钩子部署成功！钩子名：GetDecoratedPlayerName
-[2026-05-07 09:50:22.2858120][提示][NameController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2858200][提示][NameController]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2858210][成功][NameController]成功订阅消息：Name/Player/Set
-[2026-05-07 09:50:22.2858210][成功][NameController]初始化成功！
-[2026-05-07 09:50:22.2888960][成功][GlowController]钩子部署成功！钩子名：SetGlowColor
-[2026-05-07 09:50:22.2888970][提示][GlowController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2888980][提示][GlowController]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2888990][成功][GlowController]成功订阅消息：Glow/Player/Set
-[2026-05-07 09:50:22.2888990][成功][GlowController]成功订阅消息：Glow/Player/Clear
-[2026-05-07 09:50:22.2889000][成功][GlowController]成功订阅消息：Glow/Player/ClearAll
-[2026-05-07 09:50:22.2889000][成功][GlowController]成功订阅消息：Glow/Team/Set
-[2026-05-07 09:50:22.2889010][成功][GlowController]成功订阅消息：Glow/Team/Clear
-[2026-05-07 09:50:22.2889010][成功][GlowController]成功订阅消息：Glow/Team/ClearAll
-[2026-05-07 09:50:22.2889020][成功][GlowController]成功订阅消息：Glow/ClearAll
-[2026-05-07 09:50:22.2889020][成功][GlowController]初始化成功！
-[2026-05-07 09:50:22.2911040][成功][SmokeController]钩子部署成功！钩子名：SetSmokeProps
-[2026-05-07 09:50:22.2911050][提示][SmokeController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2911060][提示][SmokeController]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2911070][成功][SmokeController]成功订阅消息：Smoke/Player/Set
-[2026-05-07 09:50:22.2911070][成功][SmokeController]成功订阅消息：Smoke/Player/Clear
-[2026-05-07 09:50:22.2911080][成功][SmokeController]成功订阅消息：Smoke/Player/ClearAll
-[2026-05-07 09:50:22.2911080][成功][SmokeController]成功订阅消息：Smoke/Team/Set
-[2026-05-07 09:50:22.2911090][成功][SmokeController]成功订阅消息：Smoke/Team/Clear
-[2026-05-07 09:50:22.2911090][成功][SmokeController]成功订阅消息：Smoke/Team/ClearAll
-[2026-05-07 09:50:22.2911100][成功][SmokeController]成功订阅消息：Smoke/ClearAll
-[2026-05-07 09:50:22.2911100][成功][SmokeController]初始化成功！
-[2026-05-07 09:50:22.2911120][成功][ObserverController]成功订阅消息：CameraSystem/Play/Started
-[2026-05-07 09:50:22.2911120][成功][ObserverController]成功订阅消息：CameraSystem/Play/Ended
-[2026-05-07 09:50:22.2911130][成功][ObserverController]成功订阅消息：Observe/SpecSteam64UID
-[2026-05-07 09:50:22.2911130][成功][ObserverController]成功订阅消息：Observe/SpecHandle
-[2026-05-07 09:50:22.2911130][成功][ObserverController]成功订阅消息：spec_mode_changed_to
-[2026-05-07 09:50:22.2911140][提示][ObserverController]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2911140][成功][ObserverController]初始化成功！
-[2026-05-07 09:50:22.2911200][提示][ProjectileTracker]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.2911200][提示][ProjectileTracker]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.2911210][成功][ProjectileTracker]成功订阅消息：Game/Entity/Added
-[2026-05-07 09:50:22.2911210][成功][ProjectileTracker]成功订阅消息：Game/Entity/Removed
-[2026-05-07 09:50:22.2911210][成功][ProjectileTracker]初始化成功！
-[2026-05-07 09:50:22.3106290][成功][DeathMsgController]钩子部署成功！钩子名：UI::OnPlayerDeath
-[2026-05-07 09:50:22.3106330][提示][DeathMsgController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106340][提示][DeathMsgController]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106350][成功][DeathMsgController]初始化成功！
-[2026-05-07 09:50:22.3106360][提示][ESPController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106360][成功][ESPController]初始化成功！
-[2026-05-07 09:50:22.3106370][警告][SkinController]此模块处于禁用状态！因为其仅在调试版本开放！
-[2026-05-07 09:50:22.3106370][成功][SkinController]初始化成功！
-[2026-05-07 09:50:22.3106370][成功][POVFixer]初始化成功！
-[2026-05-07 09:50:22.3106390][成功][DemoHelper]成功订阅消息：DemoHelper/MarkTime
-[2026-05-07 09:50:22.3106400][成功][DemoHelper]成功订阅消息：DemoHelper/JumpTIme
-[2026-05-07 09:50:22.3106400][提示][DemoHelper]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106400][提示][DemoHelper]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106410][成功][DemoHelper]初始化成功！
-[2026-05-07 09:50:22.3106420][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Restart
-[2026-05-07 09:50:22.3106420][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Dump
-[2026-05-07 09:50:22.3106430][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Record
-[2026-05-07 09:50:22.3106500][成功][DemoAnalyzer]成功订阅消息：Game/KillEvent
-[2026-05-07 09:50:22.3106510][提示][DemoAnalyzer]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106510][提示][DemoAnalyzer]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106510][成功][DemoAnalyzer]初始化成功！
-[2026-05-07 09:50:22.3106520][成功][DemoRecorder]成功订阅消息：Demo/Record/Enqueue
-[2026-05-07 09:50:22.3106530][成功][DemoRecorder]成功订阅消息：Demo/Record/Reset
-[2026-05-07 09:50:22.3106540][成功][DemoRecorder]成功订阅消息：Demo/Record/Start
-[2026-05-07 09:50:22.3106540][成功][DemoRecorder]成功订阅消息：Demo/Record/Stop
-[2026-05-07 09:50:22.3106650][提示][DemoRecorder]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106660][成功][DemoRecorder]初始化成功！
-[2026-05-07 09:50:22.3106660][成功][DemoSystem]成功订阅消息：Demo/Play
-[2026-05-07 09:50:22.3106660][成功][DemoSystem]成功订阅消息：Demo/PlayAndAnalyze
-[2026-05-07 09:50:22.3106670][成功][DemoSystem]成功订阅消息：Window/Drag/FileDrop
-[2026-05-07 09:50:22.3106670][提示][DemoSystem]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106680][提示][DemoSystem]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106710][成功][DemoSystem]初始化成功！
-[2026-05-07 09:50:22.3106750][提示][MiniMap]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106760][提示][MiniMap]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106760][成功][MiniMap]初始化成功！
-[2026-05-07 09:50:22.3106840][成功][VirtualUser]成功订阅消息：Core/Tick60
-[2026-05-07 09:50:22.3106850][成功][VirtualUser]成功订阅消息：Command/SpecPlayer
-[2026-05-07 09:50:22.3106860][成功][VirtualUser]成功订阅消息：Game/NewRound
-[2026-05-07 09:50:22.3106860][提示][VirtualUser]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106870][提示][VirtualUser]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3106870][成功][VirtualUser]初始化成功！
-[2026-05-07 09:50:22.3112630][成功][GameCfgManager]Cfg文件列表更新完成
-[2026-05-07 09:50:22.3112770][提示][GameCfgManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3112860][成功][GameCfgManager]初始化成功！
-[2026-05-07 09:50:22.3122690][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3122690][成功][GameSettingsManager]初始化成功！
-[2026-05-07 09:50:22.3122700][提示][ConsoleManager]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3122710][成功][ConsoleManager]初始化成功！
-[2026-05-07 09:50:22.3122910][提示][MediaRemoter]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3122920][提示][MediaRemoter]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3122930][成功][MediaRemoter]成功订阅消息：Media/OBS/CreateConnect
-[2026-05-07 09:50:22.3122940][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Start
-[2026-05-07 09:50:22.3123010][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Stop
-[2026-05-07 09:50:22.3123010][成功][MediaRemoter]初始化成功！
-[2026-05-07 09:50:22.3123020][成功][MulNXController]成功订阅消息：ModuleManager/ModuleInfo/Response
-[2026-05-07 09:50:22.3123020][提示][MulNXController]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3123020][提示][MulNXController]将任务注册信息推送到了消息系统
-[2026-05-07 09:50:22.3123020][成功][MulNXController]初始化成功！
-[2026-05-07 09:50:22.3123030][提示][MainDraw]将UI节点注册信息推送到了消息系统
-[2026-05-07 09:50:22.3123030][成功][MainDraw]初始化成功！
-[2026-05-07 09:50:22.3123040][成功][ModuleManager]所有模块初始化成功，模块总量：50
-[2026-05-07 09:50:22.3908070][成功][HookManager]钩子部署成功！钩子名：ClearDepthStencilView
-[2026-05-07 09:50:22.3908230][成功][HookManager]钩子部署成功！钩子名：Present
-[2026-05-07 09:50:22.3908460][成功][HookManager]钩子部署成功！钩子名：ResizeBuffers
-[2026-05-07 09:50:22.4026140][成功][HookManager]各模块初始化完毕，系统已启动
-[2026-05-07 09:50:22.4026290][警告][HookManager]当前版本是否为测试版：false
-[2026-05-07 09:50:22.4026300][警告][HookManager]当前版本号：B0.2.0C0.21.0
-[2026-05-07 09:50:22.4026310][警告][HookManager]当前版本构建时间：Built: May  7 2026 17:31:40
-[2026-05-07 09:50:22.4026310][警告][HookManager]欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
-[2026-05-07 09:50:22.4026310][警告][HookManager]在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
-[2026-05-07 09:50:22.4026310][警告][HookManager]但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
-[2026-05-07 09:50:22.4026320][警告][HookManager]发送了UI启动指令！渲染即将开始！
-[2026-05-07 09:50:22.4026340][警告][HookManager]初始化完成，自核心分配内存并创建开始，共耗时：134146（微秒）
-[2026-05-07 09:50:22.4029440][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4029910][成功][TaskSystem]成功创建工作者：MulNXMain
-[2026-05-07 09:50:22.4029920][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4029950][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030120][成功][TaskSystem]成功创建工作者：Loging
-[2026-05-07 09:50:22.4030120][成功][TaskSystem]成功将任务添加进入工作者：Loging
-[2026-05-07 09:50:22.4030140][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030150][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4030270][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030400][成功][TaskSystem]成功创建工作者：InputSystem
-[2026-05-07 09:50:22.4030410][成功][TaskSystem]成功将任务添加进入工作者：InputSystem
-[2026-05-07 09:50:22.4030410][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030420][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4030420][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030580][成功][TaskSystem]成功创建工作者：CSControl
-[2026-05-07 09:50:22.4030590][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-07 09:50:22.4030600][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030730][成功][TaskSystem]成功创建工作者：Web
-[2026-05-07 09:50:22.4030730][成功][TaskSystem]成功将任务添加进入工作者：Web
-[2026-05-07 09:50:22.4030740][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030740][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4030770][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030780][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-07 09:50:22.4030780][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030800][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-07 09:50:22.4030810][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030810][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-07 09:50:22.4030820][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030830][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-07 09:50:22.4030830][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030840][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-07 09:50:22.4030850][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030850][成功][TaskSystem]成功将任务添加进入工作者：CSControl
-[2026-05-07 09:50:22.4030860][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030870][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4030880][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4030880][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4030880][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4031020][成功][TaskSystem]成功创建工作者：DemoRecorder
-[2026-05-07 09:50:22.4031020][成功][TaskSystem]成功将任务添加进入工作者：DemoRecorder
-[2026-05-07 09:50:22.4031030][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4031030][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4031040][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4031050][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4031050][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4031070][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4031130][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4031130][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4031140][提示][TaskSystem]接收到一个任务！
-[2026-05-07 09:50:22.4031150][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
-[2026-05-07 09:50:22.4032790][成功][HookManager]钩子部署成功！钩子名：WndProc
-[2026-05-07 09:50:22.4053450][成功][WebSocketManager]正在监听端口：55202
-[2026-05-07 09:50:22.4056560][成功][GraphicsManager]绿幕着色器资源创建成功
-[2026-05-07 09:50:22.4056660][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056670][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056680][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056680][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056690][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056690][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056700][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056710][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056720][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056730][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056730][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056740][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056740][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056750][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056760][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056770][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056770][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056780][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056790][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056800][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056800][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056810][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056810][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056820][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056820][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056830][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056830][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056840][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056840][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056850][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056860][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056860][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056870][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056870][成功][UISystem]接收到一个UI节点
-[2026-05-07 09:50:22.4056880][警告][UISystem]接收到启动消息，UI系统开始启动
-[2026-05-07 09:50:22.4058300][提示][UISystem]尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ui.yaml
-[2026-05-07 09:50:22.4059300][成功][UISystem]字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16
-[2026-05-07 09:50:22.4059310][提示][UISystem]尝试加载字体：C:/Windows/Fonts/msyh.ttc
-[2026-05-07 09:50:22.4131700][成功][UISystem]字体加载成功：C:/Windows/Fonts/msyh.ttc
-[2026-05-07 09:50:22.4133420][提示][UISystem]尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
-[2026-05-07 09:50:22.4147220][成功][UISystem]UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
-[2026-05-07 09:50:28.7684070][警告][HookManager]检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
-[2026-05-07 09:50:29.1444140][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1470620][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1501790][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1527280][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1555420][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1585990][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1618020][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1643360][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1670930][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1700900][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1728850][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1755710][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1786110][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1819300][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1841360][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1871800][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1906270][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1936630][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1965960][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.1995920][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2021010][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2051080][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2081190][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2116380][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2145970][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2177530][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2205950][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2231250][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2261140][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2286090][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2316470][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2341450][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2371430][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2401520][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2426510][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
-[2026-05-07 09:50:29.2456330][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FF8D1E8C5D8
+[2026-05-07 14:08:59.3005490][成功][ModuleManager]成功订阅消息：ModuleManager/ModuleInfo/Request
+[2026-05-07 14:08:59.3005780][提示][ModuleManager]module.send_task
+[2026-05-07 14:08:59.3005800][成功][ModuleManager]module.inited
+[2026-05-07 14:08:59.3005850][成功][HookManager]module.inited
+[2026-05-07 14:08:59.3008310][成功][IPCer]module.inited
+[2026-05-07 14:08:59.3010880][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
+[2026-05-07 14:08:59.3011230][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
+[2026-05-07 14:08:59.3011310][成功][PathManager]module.inited
+[2026-05-07 14:08:59.3012550][成功][CrashDumper]module.inited
+[2026-05-07 14:08:59.3109470][成功][I18nManager]语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\I18nManager\Language\lan.yaml
+[2026-05-07 14:08:59.3114130][成功][I18nManager]初始化成功！
+[2026-05-07 14:08:59.3114180][成功][MessageManager]初始化成功！
+[2026-05-07 14:08:59.3114310][成功][UISystem]成功订阅消息：UISystem/Start
+[2026-05-07 14:08:59.3114330][成功][UISystem]成功订阅消息：UISystem/ModulePush
+[2026-05-07 14:08:59.3114360][成功][UISystem]成功订阅消息：UISystem/SaveStyle
+[2026-05-07 14:08:59.3114510][提示][UISystem]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3114530][成功][UISystem]初始化成功！
+[2026-05-07 14:08:59.3119480][提示][Logger]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3119510][成功][Logger]初始化成功！
+[2026-05-07 14:08:59.3119690][提示][Debugger]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3119720][提示][Debugger]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3119770][成功][Debugger]成功订阅消息：Log/Info
+[2026-05-07 14:08:59.3119790][成功][Debugger]成功订阅消息：Log/Succ
+[2026-05-07 14:08:59.3119820][成功][Debugger]成功订阅消息：Log/Warning
+[2026-05-07 14:08:59.3119840][成功][Debugger]成功订阅消息：Log/Error
+[2026-05-07 14:08:59.3119900][成功][Debugger]成功订阅消息：Debugger/SetMaxInfoCount
+[2026-05-07 14:08:59.3119950][成功][Debugger]初始化成功！
+[2026-05-07 14:08:59.3119980][成功][HandleSystem]初始化成功！
+[2026-05-07 14:08:59.3120040][提示][InputSystem]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3120050][成功][InputSystem]初始化成功！
+[2026-05-07 14:08:59.3120370][提示][GlobalVars]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3120400][成功][GlobalVars]初始化成功！
+[2026-05-07 14:08:59.3120480][成功][TaskSystem]成功订阅消息：Task/Create
+[2026-05-07 14:08:59.3121380][成功][TaskSystem]成功创建工作者：Messaging
+[2026-05-07 14:08:59.3121500][成功][TaskSystem]成功将任务添加进入工作者：Messaging
+[2026-05-07 14:08:59.3124830][成功][TaskSystem]成功将任务添加进入工作者：Messaging
+[2026-05-07 14:08:59.3124860][成功][TaskSystem]初始化成功！
+[2026-05-07 14:08:59.3124920][成功][CSController]成功订阅消息：Demo/GotoTick
+[2026-05-07 14:08:59.3124980][成功][CSController]成功订阅消息：Game/Command
+[2026-05-07 14:08:59.3125080][提示][CSController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3126070][提示][CSController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3126080][成功][CSController]初始化成功！
+[2026-05-07 14:08:59.3592710][成功][ViewController]钩子部署成功！钩子名：Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup
+[2026-05-07 14:08:59.3592880][提示][ViewController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3592910][成功][ViewController]初始化成功！
+[2026-05-07 14:08:59.3592980][提示][ShaderCompiler]正在编译着色器！
+[2026-05-07 14:08:59.3619590][成功][ShaderCompiler]着色器编译完毕！
+[2026-05-07 14:08:59.3619650][成功][ShaderCompiler]初始化成功！
+[2026-05-07 14:08:59.3619820][提示][GraphicsManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3619840][成功][GraphicsManager]初始化成功！
+[2026-05-07 14:08:59.3619980][成功][WebSocketManager]成功订阅消息：WebSocketManager/Post
+[2026-05-07 14:08:59.3620950][提示][WebSocketManager]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3620980][提示][WebSocketManager]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3621000][成功][WebSocketManager]初始化成功！
+[2026-05-07 14:08:59.3622700][提示][CameraSystem]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3622740][成功][CameraSystem]成功订阅消息：Global/Save
+[2026-05-07 14:08:59.3622780][成功][CameraSystem]成功订阅消息：Global/Save/Strong
+[2026-05-07 14:08:59.3622800][成功][CameraSystem]成功订阅消息：Command/SpecPlayer
+[2026-05-07 14:08:59.3622830][成功][CameraSystem]成功订阅消息：Game/NewRound
+[2026-05-07 14:08:59.3622850][成功][CameraSystem]成功订阅消息：CameraSystem/Play/Shutdown
+[2026-05-07 14:08:59.3622880][成功][CameraSystem]初始化成功！
+[2026-05-07 14:08:59.3623020][提示][WorkspaceManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3623050][成功][WorkspaceManager]成功订阅消息：CamereSystem/Workspace/Set
+[2026-05-07 14:08:59.3623070][成功][WorkspaceManager]成功订阅消息：CameraSystem/Workspace/Save
+[2026-05-07 14:08:59.3623100][成功][WorkspaceManager]初始化成功！
+[2026-05-07 14:08:59.3623200][提示][ProjectManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3623250][提示][ProjectManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3623380][成功][ProjectManager]初始化成功！
+[2026-05-07 14:08:59.3623530][提示][SolutionManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3623560][提示][SolutionManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3623640][成功][SolutionManager]成功订阅消息：CameraSystem/Element/Deleted
+[2026-05-07 14:08:59.3623670][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Create
+[2026-05-07 14:08:59.3623690][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Delete
+[2026-05-07 14:08:59.3623720][成功][SolutionManager]成功订阅消息：CameraSystem/Solution/Play
+[2026-05-07 14:08:59.3623740][成功][SolutionManager]初始化成功！
+[2026-05-07 14:08:59.3623840][提示][ElementManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3623870][提示][ElementManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3623950][成功][ElementManager]成功订阅消息：Element/Create
+[2026-05-07 14:08:59.3623970][成功][ElementManager]成功订阅消息：Element/Delete
+[2026-05-07 14:08:59.3623980][成功][ElementManager]初始化成功！
+[2026-05-07 14:08:59.3625310][成功][HookEntitySystem]钩子部署成功！钩子名：AddEntity
+[2026-05-07 14:08:59.3626140][成功][HookEntitySystem]钩子部署成功！钩子名：RemoveEntity
+[2026-05-07 14:08:59.3626160][成功][HookEntitySystem]初始化成功！
+[2026-05-07 14:08:59.3626230][提示][AdvancedViewController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3626250][成功][AdvancedViewController]初始化成功！
+[2026-05-07 14:08:59.3626320][提示][FreeCameraController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3626340][成功][FreeCameraController]初始化成功！
+[2026-05-07 14:08:59.3626430][提示][PlayerHub]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3626450][成功][PlayerHub]初始化成功！
+[2026-05-07 14:08:59.3626530][提示][PlayerFlashController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3626560][成功][PlayerFlashController]初始化成功！
+[2026-05-07 14:08:59.3743040][成功][NameController]钩子部署成功！钩子名：GetDecoratedPlayerName
+[2026-05-07 14:08:59.3743200][提示][NameController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3743250][提示][NameController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3743340][成功][NameController]成功订阅消息：Name/Player/Set
+[2026-05-07 14:08:59.3743360][成功][NameController]初始化成功！
+[2026-05-07 14:08:59.3880600][成功][GlowController]钩子部署成功！钩子名：SetGlowColor
+[2026-05-07 14:08:59.3880770][提示][GlowController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3880830][提示][GlowController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3880940][成功][GlowController]成功订阅消息：Glow/Player/Set
+[2026-05-07 14:08:59.3880980][成功][GlowController]成功订阅消息：Glow/Player/Clear
+[2026-05-07 14:08:59.3881010][成功][GlowController]成功订阅消息：Glow/Player/ClearAll
+[2026-05-07 14:08:59.3881040][成功][GlowController]成功订阅消息：Glow/Team/Set
+[2026-05-07 14:08:59.3881060][成功][GlowController]成功订阅消息：Glow/Team/Clear
+[2026-05-07 14:08:59.3881090][成功][GlowController]成功订阅消息：Glow/Team/ClearAll
+[2026-05-07 14:08:59.3881110][成功][GlowController]成功订阅消息：Glow/ClearAll
+[2026-05-07 14:08:59.3881140][成功][GlowController]初始化成功！
+[2026-05-07 14:08:59.3971970][成功][SmokeController]钩子部署成功！钩子名：SetSmokeProps
+[2026-05-07 14:08:59.3972090][提示][SmokeController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3972140][提示][SmokeController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3972190][成功][SmokeController]成功订阅消息：Smoke/Player/Set
+[2026-05-07 14:08:59.3972220][成功][SmokeController]成功订阅消息：Smoke/Player/Clear
+[2026-05-07 14:08:59.3972240][成功][SmokeController]成功订阅消息：Smoke/Player/ClearAll
+[2026-05-07 14:08:59.3972270][成功][SmokeController]成功订阅消息：Smoke/Team/Set
+[2026-05-07 14:08:59.3972300][成功][SmokeController]成功订阅消息：Smoke/Team/Clear
+[2026-05-07 14:08:59.3972330][成功][SmokeController]成功订阅消息：Smoke/Team/ClearAll
+[2026-05-07 14:08:59.3972360][成功][SmokeController]成功订阅消息：Smoke/ClearAll
+[2026-05-07 14:08:59.3972390][成功][SmokeController]初始化成功！
+[2026-05-07 14:08:59.3972460][成功][ObserverController]成功订阅消息：CameraSystem/Play/Started
+[2026-05-07 14:08:59.3972480][成功][ObserverController]成功订阅消息：CameraSystem/Play/Ended
+[2026-05-07 14:08:59.3972530][成功][ObserverController]成功订阅消息：Observe/SpecSteam64UID
+[2026-05-07 14:08:59.3972560][成功][ObserverController]成功订阅消息：Observe/SpecHandle
+[2026-05-07 14:08:59.3972580][成功][ObserverController]成功订阅消息：spec_mode_changed_to
+[2026-05-07 14:08:59.3972620][提示][ObserverController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3972640][成功][ObserverController]初始化成功！
+[2026-05-07 14:08:59.3972680][提示][ProjectileTracker]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.3972730][提示][ProjectileTracker]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.3972760][成功][ProjectileTracker]成功订阅消息：Game/Entity/Added
+[2026-05-07 14:08:59.3972780][成功][ProjectileTracker]成功订阅消息：Game/Entity/Removed
+[2026-05-07 14:08:59.3972800][成功][ProjectileTracker]初始化成功！
+[2026-05-07 14:08:59.5066850][成功][DeathMsgController]钩子部署成功！钩子名：UI::OnPlayerDeath
+[2026-05-07 14:08:59.5067020][提示][DeathMsgController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5067070][提示][DeathMsgController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5067110][成功][DeathMsgController]初始化成功！
+[2026-05-07 14:08:59.5067160][提示][ESPController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5067180][成功][ESPController]初始化成功！
+[2026-05-07 14:08:59.5067280][提示][SkinController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5369190][成功][SkinController]初始化成功！
+[2026-05-07 14:08:59.5369260][成功][POVFixer]初始化成功！
+[2026-05-07 14:08:59.5369400][成功][DemoHelper]成功订阅消息：DemoHelper/MarkTime
+[2026-05-07 14:08:59.5369430][成功][DemoHelper]成功订阅消息：DemoHelper/JumpTIme
+[2026-05-07 14:08:59.5369650][提示][DemoHelper]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5369710][提示][DemoHelper]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5369730][成功][DemoHelper]初始化成功！
+[2026-05-07 14:08:59.5369780][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Restart
+[2026-05-07 14:08:59.5369810][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Dump
+[2026-05-07 14:08:59.5369840][成功][DemoAnalyzer]成功订阅消息：Demo/Analyze/Record
+[2026-05-07 14:08:59.5369870][成功][DemoAnalyzer]成功订阅消息：Game/KillEvent
+[2026-05-07 14:08:59.5369900][提示][DemoAnalyzer]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5369940][提示][DemoAnalyzer]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5369960][成功][DemoAnalyzer]初始化成功！
+[2026-05-07 14:08:59.5370020][成功][DemoRecorder]成功订阅消息：Demo/Record/Enqueue
+[2026-05-07 14:08:59.5370050][成功][DemoRecorder]成功订阅消息：Demo/Record/Reset
+[2026-05-07 14:08:59.5370070][成功][DemoRecorder]成功订阅消息：Demo/Record/Start
+[2026-05-07 14:08:59.5370090][成功][DemoRecorder]成功订阅消息：Demo/Record/Stop
+[2026-05-07 14:08:59.5370230][提示][DemoRecorder]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5370240][成功][DemoRecorder]初始化成功！
+[2026-05-07 14:08:59.5370290][成功][DemoSystem]成功订阅消息：Demo/Play
+[2026-05-07 14:08:59.5370310][成功][DemoSystem]成功订阅消息：Demo/PlayAndAnalyze
+[2026-05-07 14:08:59.5370340][成功][DemoSystem]成功订阅消息：Window/Drag/FileDrop
+[2026-05-07 14:08:59.5370380][提示][DemoSystem]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5370410][提示][DemoSystem]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5370430][成功][DemoSystem]初始化成功！
+[2026-05-07 14:08:59.5370510][提示][MiniMap]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5370550][提示][MiniMap]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5370560][成功][MiniMap]初始化成功！
+[2026-05-07 14:08:59.5370610][成功][VirtualUser]成功订阅消息：Core/Tick30min
+[2026-05-07 14:08:59.5370640][成功][VirtualUser]成功订阅消息：Core/Tick60
+[2026-05-07 14:08:59.5370670][成功][VirtualUser]成功订阅消息：Command/SpecPlayer
+[2026-05-07 14:08:59.5370690][成功][VirtualUser]成功订阅消息：Game/NewRound
+[2026-05-07 14:08:59.5370750][提示][VirtualUser]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5370770][提示][VirtualUser]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5370780][成功][VirtualUser]初始化成功！
+[2026-05-07 14:08:59.5377700][成功][GameCfgManager]Cfg文件列表更新完成
+[2026-05-07 14:08:59.5377800][提示][GameCfgManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5377830][成功][GameCfgManager]初始化成功！
+[2026-05-07 14:08:59.5387790][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5387810][成功][GameSettingsManager]初始化成功！
+[2026-05-07 14:08:59.5388110][提示][ConsoleManager]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5388150][成功][ConsoleManager]初始化成功！
+[2026-05-07 14:08:59.5388600][提示][MediaRemoter]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5388670][提示][MediaRemoter]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5388720][成功][MediaRemoter]成功订阅消息：Media/OBS/CreateConnect
+[2026-05-07 14:08:59.5388890][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Start
+[2026-05-07 14:08:59.5388920][成功][MediaRemoter]成功订阅消息：Media/OBS/Record/Stop
+[2026-05-07 14:08:59.5388940][成功][MediaRemoter]初始化成功！
+[2026-05-07 14:08:59.5388980][成功][MulNXController]成功订阅消息：ModuleManager/ModuleInfo/Response
+[2026-05-07 14:08:59.5389030][提示][MulNXController]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5389060][提示][MulNXController]将任务注册信息推送到了消息系统
+[2026-05-07 14:08:59.5389070][成功][MulNXController]初始化成功！
+[2026-05-07 14:08:59.5389150][提示][UIDocker]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5389180][提示][UIDocker]将UI节点注册信息推送到了消息系统
+[2026-05-07 14:08:59.5389200][成功][UIDocker]初始化成功！
+[2026-05-07 14:08:59.5389350][成功][ModuleManager]所有模块初始化成功，模块总量：50
+[2026-05-07 14:08:59.6125210][成功][HookManager]钩子部署成功！钩子名：ClearDepthStencilView
+[2026-05-07 14:08:59.6125830][成功][HookManager]钩子部署成功！钩子名：Present
+[2026-05-07 14:08:59.6126400][成功][HookManager]钩子部署成功！钩子名：ResizeBuffers
+[2026-05-07 14:08:59.6269770][成功][HookManager]各模块初始化完毕，系统已启动
+[2026-05-07 14:08:59.6270020][警告][HookManager]当前版本是否为测试版：true
+[2026-05-07 14:08:59.6270110][警告][HookManager]当前版本号：B0.2.0C0.21.0
+[2026-05-07 14:08:59.6270150][警告][HookManager]当前版本构建时间：Built: May  7 2026 18:23:21
+[2026-05-07 14:08:59.6270210][警告][HookManager]欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
+[2026-05-07 14:08:59.6270210][警告][HookManager]在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
+[2026-05-07 14:08:59.6270210][警告][HookManager]但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
+[2026-05-07 14:08:59.6270750][警告][HookManager]发送了UI启动指令！渲染即将开始！
+[2026-05-07 14:08:59.6272960][警告][HookManager]初始化完成，自核心分配内存并创建开始，共耗时：327773（微秒）
+[2026-05-07 14:08:59.6280680][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6281360][成功][TaskSystem]成功创建工作者：MulNXMain
+[2026-05-07 14:08:59.6282950][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6283410][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6283950][成功][TaskSystem]成功创建工作者：Loging
+[2026-05-07 14:08:59.6285420][成功][TaskSystem]成功将任务添加进入工作者：Loging
+[2026-05-07 14:08:59.6285610][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6285760][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6285900][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6286380][成功][TaskSystem]成功创建工作者：InputSystem
+[2026-05-07 14:08:59.6286440][成功][TaskSystem]成功将任务添加进入工作者：InputSystem
+[2026-05-07 14:08:59.6287890][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6287990][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6288120][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6288610][成功][TaskSystem]成功创建工作者：CSControl
+[2026-05-07 14:08:59.6288670][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6290040][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6290470][成功][TaskSystem]成功创建工作者：Web
+[2026-05-07 14:08:59.6290530][成功][TaskSystem]成功将任务添加进入工作者：Web
+[2026-05-07 14:08:59.6291950][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6291990][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6292350][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6292400][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6292470][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6292510][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6292620][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6292660][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6292770][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6294280][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6294420][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6294510][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6294610][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6294650][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6294710][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6294760][成功][TaskSystem]成功将任务添加进入工作者：CSControl
+[2026-05-07 14:08:59.6294830][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6294870][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6294940][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6294980][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6295060][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6295510][成功][TaskSystem]成功创建工作者：DemoRecorder
+[2026-05-07 14:08:59.6295560][成功][TaskSystem]成功将任务添加进入工作者：DemoRecorder
+[2026-05-07 14:08:59.6295640][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6297350][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6297580][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6297660][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6297740][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6297780][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6297880][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6297920][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6298000][提示][TaskSystem]接收到一个任务！
+[2026-05-07 14:08:59.6298040][成功][TaskSystem]成功将任务添加进入工作者：MulNXMain
+[2026-05-07 14:08:59.6305840][成功][HookManager]钩子部署成功！钩子名：WndProc
+[2026-05-07 14:08:59.6343220][成功][GraphicsManager]绿幕着色器资源创建成功
+[2026-05-07 14:08:59.6343900][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6344140][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6344410][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6344580][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6344720][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6344960][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6345220][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6345410][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6345720][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6345900][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6346110][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6346290][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6346490][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6346620][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6346810][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6346980][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6347180][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6347320][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6347430][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6347620][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6347770][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6347980][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6348210][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6348370][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6348650][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6348800][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6348980][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6349150][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6349460][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6349700][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6349900][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6350050][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6350280][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6350640][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6350950][成功][UISystem]接收到一个UI节点
+[2026-05-07 14:08:59.6351140][警告][UISystem]接收到启动消息，UI系统开始启动
+[2026-05-07 14:08:59.6362040][提示][UISystem]尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ui.yaml
+[2026-05-07 14:08:59.6368380][成功][WebSocketManager]正在监听端口：55202
+[2026-05-07 14:08:59.6376570][成功][UISystem]字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16
+[2026-05-07 14:08:59.6376660][提示][UISystem]尝试加载字体：C:/Windows/Fonts/msyh.ttc
+[2026-05-07 14:08:59.6459200][成功][UISystem]字体加载成功：C:/Windows/Fonts/msyh.ttc
+[2026-05-07 14:08:59.6462160][提示][UISystem]尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
+[2026-05-07 14:08:59.7624790][成功][UISystem]UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ImStyle.yaml
+[2026-05-07 14:09:01.4557810][提示][VirtualUser]接收到新回合信息
+[2026-05-07 14:09:01.4613250][提示][VirtualUser]接收到新回合信息
+[2026-05-07 14:09:01.5127540][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-07 14:09:01.5127740][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-07 14:09:01.5127950][提示][ProjectManager]项目管理器正在处理消息！
+[2026-05-07 14:09:01.5128080][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-05-07 14:09:01.5213210][成功][NameController]钩子部署成功！钩子名：GetPlayerName
+[2026-05-07 14:09:04.1441200][警告][ElementManager]当前没有任何元素，跳过清空操作！
+[2026-05-07 14:09:04.1441490][提示][SolutionManager]已关闭播放
+[2026-05-07 14:09:04.1441670][警告][SolutionManager]当前没有任何解决方案，跳过清空操作！
+[2026-05-07 14:09:04.1444100][成功][CameraSystem]成功设置工作区路径为：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace
+[2026-05-07 14:09:04.1445440][提示][WorkspaceManager]尝试加载配置文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\WorkspaceConfig.yaml
+[2026-05-07 14:09:04.1453360][提示][ObserverController]收到运镜结束消息
+[2026-05-07 14:09:04.1478230][成功][WorkspaceManager]配置加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\WorkspaceConfig.yaml
+[2026-05-07 14:09:04.1487310][提示][ProjectManager]尝试从文件加载项目，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Mtp.yaml
+[2026-05-07 14:09:04.1519800][成功][ProjectManager]成功从文件加载项目：Mtp
+[2026-05-07 14:09:05.4678050][提示][SolutionManager]已关闭播放
+[2026-05-07 14:09:05.4678190][警告][SolutionManager]当前没有任何解决方案，跳过清空操作！
+[2026-05-07 14:09:05.4678320][警告][ElementManager]当前没有任何元素，跳过清空操作！
+[2026-05-07 14:09:05.4680200][成功][ProjectManager]成功设置项目路径为：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp
+[2026-05-07 14:09:05.4680680][成功][SolutionManager]成功设置解决方案路径为：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Solutions
+[2026-05-07 14:09:05.4681210][成功][ElementManager]成功设置元素路径为：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements
+[2026-05-07 14:09:05.4690310][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\15+.yaml
+[2026-05-07 14:09:05.4696350][提示][ObserverController]收到运镜结束消息
+[2026-05-07 14:09:05.5006470][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\15+.yaml
+[2026-05-07 14:09:05.5006750][成功][ElementManager]成功创建元素！  元素名：15+
+[2026-05-07 14:09:05.5161040][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：15+
+[2026-05-07 14:09:05.5201070][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\32.yaml
+[2026-05-07 14:09:05.5373310][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\32.yaml
+[2026-05-07 14:09:05.5373460][成功][ElementManager]成功创建元素！  元素名：32
+[2026-05-07 14:09:05.5468980][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：32
+[2026-05-07 14:09:05.5501320][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\666.yaml
+[2026-05-07 14:09:05.5573590][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\666.yaml
+[2026-05-07 14:09:05.5573950][成功][ElementManager]成功创建元素！  元素名：666
+[2026-05-07 14:09:05.5603500][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：666
+[2026-05-07 14:09:05.5615150][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\bad_player_t.yaml
+[2026-05-07 14:09:05.5672040][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\bad_player_t.yaml
+[2026-05-07 14:09:05.5672330][成功][ElementManager]成功创建元素！  元素名：bad_player_t
+[2026-05-07 14:09:05.5685300][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：bad_player_t
+[2026-05-07 14:09:05.5694550][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\CT_Begin_1.yaml
+[2026-05-07 14:09:05.5887460][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\CT_Begin_1.yaml
+[2026-05-07 14:09:05.5887790][成功][ElementManager]成功创建元素！  元素名：CT_Begin_1
+[2026-05-07 14:09:05.6001390][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：CT_Begin_1
+[2026-05-07 14:09:05.6038010][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\CT_Begin_2.yaml
+[2026-05-07 14:09:05.6121110][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\CT_Begin_2.yaml
+[2026-05-07 14:09:05.6121470][成功][ElementManager]成功创建元素！  元素名：CT_Begin_2
+[2026-05-07 14:09:05.6158010][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：CT_Begin_2
+[2026-05-07 14:09:05.6171970][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_round.yaml
+[2026-05-07 14:09:05.6261360][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_round.yaml
+[2026-05-07 14:09:05.6261700][成功][ElementManager]成功创建元素！  元素名：ct_round
+[2026-05-07 14:09:05.6286690][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：ct_round
+[2026-05-07 14:09:05.6304660][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_b.yaml
+[2026-05-07 14:09:05.6444550][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_b.yaml
+[2026-05-07 14:09:05.6444760][成功][ElementManager]成功创建元素！  元素名：ct_to_b
+[2026-05-07 14:09:05.6482170][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：ct_to_b
+[2026-05-07 14:09:05.6502850][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_b_2.yaml
+[2026-05-07 14:09:05.6603370][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_b_2.yaml
+[2026-05-07 14:09:05.6603640][成功][ElementManager]成功创建元素！  元素名：ct_to_b_2
+[2026-05-07 14:09:05.6631830][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：ct_to_b_2
+[2026-05-07 14:09:05.6646750][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_long.yaml
+[2026-05-07 14:09:05.6802610][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_long.yaml
+[2026-05-07 14:09:05.6802920][成功][ElementManager]成功创建元素！  元素名：ct_to_long
+[2026-05-07 14:09:05.6848520][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：ct_to_long
+[2026-05-07 14:09:05.6869720][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_long2.yaml
+[2026-05-07 14:09:05.6978910][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_long2.yaml
+[2026-05-07 14:09:05.6979260][成功][ElementManager]成功创建元素！  元素名：ct_to_long2
+[2026-05-07 14:09:05.7009430][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：ct_to_long2
+[2026-05-07 14:09:05.7027360][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_short.yaml
+[2026-05-07 14:09:05.7098030][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ct_to_short.yaml
+[2026-05-07 14:09:05.7098330][成功][ElementManager]成功创建元素！  元素名：ct_to_short
+[2026-05-07 14:09:05.7116440][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：ct_to_short
+[2026-05-07 14:09:05.7127480][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\fovtest.yaml
+[2026-05-07 14:09:05.7183720][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\fovtest.yaml
+[2026-05-07 14:09:05.7184020][成功][ElementManager]成功创建元素！  元素名：fovtest
+[2026-05-07 14:09:05.7204990][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：fovtest
+[2026-05-07 14:09:05.7216920][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\kadun.yaml
+[2026-05-07 14:09:05.7448040][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\kadun.yaml
+[2026-05-07 14:09:05.7448430][成功][ElementManager]成功创建元素！  元素名：kadun
+[2026-05-07 14:09:05.7502610][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：kadun
+[2026-05-07 14:09:05.7533150][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\Mte.yaml
+[2026-05-07 14:09:05.7667520][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\Mte.yaml
+[2026-05-07 14:09:05.7667780][成功][ElementManager]成功创建元素！  元素名：Mte
+[2026-05-07 14:09:05.7733370][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：Mte
+[2026-05-07 14:09:05.7752840][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\nnn.yaml
+[2026-05-07 14:09:05.7854160][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\nnn.yaml
+[2026-05-07 14:09:05.7854740][成功][ElementManager]成功创建元素！  元素名：nnn
+[2026-05-07 14:09:05.7894860][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：nnn
+[2026-05-07 14:09:05.7911320][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\roll.yaml
+[2026-05-07 14:09:05.7980540][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\roll.yaml
+[2026-05-07 14:09:05.7980800][成功][ElementManager]成功创建元素！  元素名：roll
+[2026-05-07 14:09:05.8007880][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：roll
+[2026-05-07 14:09:05.8015830][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ttt.yaml
+[2026-05-07 14:09:05.8096730][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\ttt.yaml
+[2026-05-07 14:09:05.8097110][成功][ElementManager]成功创建元素！  元素名：ttt
+[2026-05-07 14:09:05.8132340][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：ttt
+[2026-05-07 14:09:05.8143310][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\T_Begin_1.yaml
+[2026-05-07 14:09:05.8265230][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\T_Begin_1.yaml
+[2026-05-07 14:09:05.8265860][成功][ElementManager]成功创建元素！  元素名：T_Begin_1
+[2026-05-07 14:09:05.8319140][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：T_Begin_1
+[2026-05-07 14:09:05.8336460][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_b.yaml
+[2026-05-07 14:09:05.8552910][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_b.yaml
+[2026-05-07 14:09:05.8553200][成功][ElementManager]成功创建元素！  元素名：t_to_b
+[2026-05-07 14:09:05.8620850][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：t_to_b
+[2026-05-07 14:09:05.8654880][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_long.yaml
+[2026-05-07 14:09:05.8813170][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_long.yaml
+[2026-05-07 14:09:05.8813630][成功][ElementManager]成功创建元素！  元素名：t_to_long
+[2026-05-07 14:09:05.8863750][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：t_to_long
+[2026-05-07 14:09:05.8886980][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_mid.yaml
+[2026-05-07 14:09:05.9030000][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_mid.yaml
+[2026-05-07 14:09:05.9030260][成功][ElementManager]成功创建元素！  元素名：t_to_mid
+[2026-05-07 14:09:05.9065620][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：t_to_mid
+[2026-05-07 14:09:05.9087260][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_mid2.yaml
+[2026-05-07 14:09:05.9194090][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\t_to_mid2.yaml
+[2026-05-07 14:09:05.9194460][成功][ElementManager]成功创建元素！  元素名：t_to_mid2
+[2026-05-07 14:09:05.9224490][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：t_to_mid2
+[2026-05-07 14:09:05.9240090][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\xyz.yaml
+[2026-05-07 14:09:05.9298430][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\xyz.yaml
+[2026-05-07 14:09:05.9298850][成功][ElementManager]成功创建元素！  元素名：xyz
+[2026-05-07 14:09:05.9312500][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：xyz
+[2026-05-07 14:09:05.9320030][提示][ElementManager]尝试从磁盘文件加载元素，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\zuixin.yaml
+[2026-05-07 14:09:05.9459950][提示][ElementManager]尝试进行分发，元素类型为 FreeCameraPath ，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Elements\zuixin.yaml
+[2026-05-07 14:09:05.9460360][成功][ElementManager]成功创建元素！  元素名：zuixin
+[2026-05-07 14:09:05.9501150][成功][ElementManager]成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：zuixin
+[2026-05-07 14:09:05.9526090][提示][SolutionManager]尝试从yaml文件加载解决方案，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Solutions\begin.yaml
+[2026-05-07 14:09:05.9580540][成功][SolutionManager]解决方案加载成功
+[2026-05-07 14:09:05.9580970][提示][SolutionManager]+------------------------------------------------+
+[2026-05-07 14:09:05.9588440][提示][SolutionManager]尝试从yaml文件加载解决方案，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Solutions\Mts.yaml
+[2026-05-07 14:09:05.9645360][成功][SolutionManager]解决方案加载成功
+[2026-05-07 14:09:05.9646080][提示][SolutionManager]+------------------------------------------------+
+[2026-05-07 14:09:05.9652960][提示][SolutionManager]尝试从yaml文件加载解决方案，文件路径：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\CameraSystem\Workspaces\DefaultWorkspace\Mtp\Solutions\test.yaml
+[2026-05-07 14:09:05.9705950][成功][SolutionManager]解决方案加载成功
+[2026-05-07 14:09:05.9706110][提示][SolutionManager]+------------------------------------------------+
+[2026-05-07 14:09:05.9711170][成功][ProjectManager]已切换至项目Mtp
+[2026-05-07 14:09:05.9711400][成功][ProjectManager]尝试加载元素总数：25
+[2026-05-07 14:09:05.9711660][成功][ProjectManager]尝试加载解决方案总数：3
+[2026-05-07 14:09:05.9711960][成功][ProjectManager]成功加载元素总数：25
+[2026-05-07 14:09:05.9712210][成功][ProjectManager]成功加载解决方案总数：3
+[2026-05-07 14:09:06.6677330][提示][SolutionManager]偏移时间轴播放，偏移时间设置为：86.87833
+[2026-05-07 14:09:06.6677540][提示][SolutionManager]播放解决方案：begin
+[2026-05-07 14:09:06.6681640][提示][ObserverController]收到运镜开始消息
+[2026-05-07 14:09:06.6681910][提示][ObserverController]运镜开始时当前模式非 spec_mode 4，切换
+[2026-05-07 14:09:28.0409660][警告][CameraSystem]接收到播放停止消息
+[2026-05-07 14:09:28.0409820][提示][ElementManager]已关闭预览
+[2026-05-07 14:09:28.0409940][提示][SolutionManager]已关闭播放
+[2026-05-07 14:09:28.0422540][提示][ObserverController]收到运镜结束消息
+[2026-05-07 14:09:28.0422730][提示][ObserverController]运镜结束后恢复 spec_mode 2。
+[2026-05-07 14:09:29.1928230][警告][HookManager]检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
+[2026-05-07 14:09:29.6558760][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6591080][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6631240][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6671320][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6706560][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6746240][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6784010][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6825240][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6854360][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6895480][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6947070][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.6979960][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7019310][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7084940][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7129830][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7163530][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7222690][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7296920][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7352280][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7391380][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7427150][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7474500][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7514310][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7553070][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7629900][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7682170][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7740890][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
+[2026-05-07 14:09:29.7855150][警告][CSController]在更新数据时捕获到异常：read error at: 0x7FFC5EEAC5D8
