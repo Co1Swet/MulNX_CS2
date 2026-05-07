@@ -17,6 +17,9 @@ bool MainDraw::Init() {
 }
 
 void MainDraw::Window(MulNX::UINode* node) {
+    // 1. 创建铺满整个游戏窗口的 DockSpace（背景板）
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport()->ID, 0,ImGuiDockNodeFlags_PassthruCentralNode);
+
     ImGui::Begin(I18n("ui.main").c_str());
     if (ImGui::BeginTabBar("TabBar")) {
         if (ImGui::BeginTabItem(I18n("ui.camera_system").c_str())) {
@@ -56,7 +59,6 @@ void MainDraw::Window(MulNX::UINode* node) {
     node->CallUINode("DeathMsgController");
     node->CallUINode("MediaRemoter");
     node->CallUINode("ESPController");
-    node->CallUINode("ViewController");
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {

@@ -51,6 +51,7 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
         io.IniFilename = this->strImguiIniPath.c_str();
         this->LoadFont();
         this->LoadStyle();
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         break;
     }
     case "UISystem/ModulePush"_hash: {
