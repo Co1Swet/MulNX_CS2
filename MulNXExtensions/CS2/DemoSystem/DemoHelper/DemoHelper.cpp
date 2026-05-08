@@ -20,7 +20,7 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
 
     if (ImGui::Button("标记当前时间")) {
         MulNX::Message msg("DemoHelper/MarkTime"_hash);
-        node->PublishAsync(std::move(msg));
+        this->ISys().PublishAsync(std::move(msg));
     }
     ImGui::Text("时间列表:");
     for (auto time : this->TimeMarks) {
@@ -30,7 +30,7 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
         if (ImGui::Button(str.c_str())) {
             MulNX::Message Msg("DemoHelper/JumpTIme"_hash);
             Msg.p1.low<float>() = time;
-            node->PublishAsync(std::move(Msg));
+            this->ISys().PublishAsync(std::move(Msg));
         }
     }
     ImGui::SeparatorText("快捷时间");

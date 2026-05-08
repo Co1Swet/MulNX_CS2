@@ -20,12 +20,13 @@ namespace MulNX {
         // 提示级别
         void LogLine();
 
-        // 自动订阅消息类型
-        C_ISys& SubscribeAsync(const std::string& MsgType);
-        // 自动发送消息
-        void PublishAsync(MulNX::Message&& Msg);
-        // 根据类型自动构建消息并发送
-        void PublishAsync(MulNX::MsgType MsgType);
+        C_ISys& SubscribeAsync(const std::string& msgType);
+        void PublishAsync(MulNX::Message&& msg);
+        void PublishAsync(MulNX::MsgType msgType);
+
+        C_ISys& SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle);
+        void PublishSync(MulNX::Message&& msg);
+        void PublishSync(MulNX::MsgType msgType);
 
         void AsyncCommand(std::string&& cmd);
 

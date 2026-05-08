@@ -20,7 +20,6 @@ namespace MulNX {
         // 跨线程数据
 
         bool Active = true;
-        std::atomic<bool>* buzy = nullptr;
 
         MulNX::UIContext* MainContext = nullptr;
 
@@ -34,7 +33,6 @@ namespace MulNX {
 
         bool CallUINode(std::string&& Name);
         bool SetNextUINode(std::string&& Name);
-        bool PublishAsync(MulNX::Message&& Msg);
 
         static MulNX::UINode Create(MulNX::ModuleBase* MB);
     };

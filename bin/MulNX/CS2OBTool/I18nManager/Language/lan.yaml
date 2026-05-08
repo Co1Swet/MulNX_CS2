@@ -143,6 +143,12 @@ sys:
   started: 各模块初始化完毕，系统已启动
   shutdown_warning: 检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
 
+  msg:
+    sync:
+      subed{}: 同步消息订阅：{}
+    async:
+      subed{}: 异步消息订阅：{}
+
 result:
   create_succ: 创建成功：{}
   create_error: 创建失败：{}

@@ -1,5 +1,6 @@
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 #include <MulNX/Systems/PathManager/PathManager.hpp>
+#include <MulNX/Systems/I18nManager/I18nManager.hpp>
 
 MulNX::C_ISys MulNX::ModuleBase::ISys() {
     return C_ISys(this);
@@ -37,18 +38,30 @@ void MulNX::C_ISys::LogError(const std::string& Msg) {
 void MulNX::C_ISys::LogLine() {
     this->LogInfo("+------------------------------------------------+");
 }
+// 异步消息
 
-MulNX::C_ISys& MulNX::C_ISys::SubscribeAsync(const std::string& MsgType) {
-    this->pModuleBase->MainMsgChannel->Subscribe(MsgType);
-    this->LogSucc("成功订阅消息：" + MsgType);
+MulNX::C_ISys& MulNX::C_ISys::SubscribeAsync(const std::string& msgType) {
+    this->pModuleBase->MainMsgChannel->SubscribeAsync(msgType);
+    this->LogSucc(I18n("sys.msg.async.subed{}", msgType));
     return *this;
 }
-void MulNX::C_ISys::PublishAsync(MulNX::Message&& Msg) {
-    this->pModuleBase->pMsgManager->Publish(std::move(Msg));
+void MulNX::C_ISys::PublishAsync(MulNX::Message&& msg) {
+    this->pModuleBase->pMsgManager->PublishAsync(std::move(msg));
 }
-void MulNX::C_ISys::PublishAsync(MulNX::MsgType Msg) {
-    this->pModuleBase->pMsgManager->Publish(MulNX::Message(Msg));
+void MulNX::C_ISys::PublishAsync(MulNX::MsgType msg) {
+    this->pModuleBase->pMsgManager->PublishAsync(MulNX::Message(msg));
 }
+// 同步消息
+MulNX::C_ISys& MulNX::C_ISys::SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle) {
+    this->pModuleBase->pMsgManager->SubscribeSync(msgType, std::move(handle));
+    this->LogSucc(I18n("sys.msg.sync.subed{}", msgType));
+    return *this;
+}
+void MulNX::C_ISys::PublishSync(MulNX::Message&& msg) {
+}
+void MulNX::C_ISys::PublishSync(MulNX::MsgType msg) {
+}
+
 void MulNX::C_ISys::AsyncCommand(std::string&& cmd) {
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command"_hash);
     rp->str1 = std::move(cmd);

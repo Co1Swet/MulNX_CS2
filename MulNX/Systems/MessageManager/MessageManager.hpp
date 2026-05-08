@@ -12,32 +12,33 @@
 namespace MulNX {
     class MsgMeta {
     public:
-        std::vector<MessageChannel*>Subscribers;
         std::string RawString;
     };
     class MessageManager final :public MulNX::ModuleBase {
         friend MessageChannel;
     private:
-        // 存储类
-        std::unordered_map<MulNX::MsgType, MsgMeta>MsgMap{};
-        std::unordered_map<MulNXHandle, std::unique_ptr<MessageChannel>>Channels;
-        moodycamel::ConcurrentQueue<MulNX::Message>sharedBuffer;
-    public:
-        bool Init()override;
-        // 返回true表示正在处理消息，false表示没有消息可处理
-        bool NextMsg();
+        // 元数据
+        std::unordered_map<MulNX::MsgType, MsgMeta>msgInfo{};
+        // 异步
+        std::unordered_map<MulNX::MsgType, std::vector<MessageChannel*>>asyncMap{};
+        std::unordered_map<MulNXHandle, std::unique_ptr<MessageChannel>>asyncChannels;
+        moodycamel::ConcurrentQueue<MulNX::Message>asyncMsgBuffer;
+        // 同步
+        std::unordered_map<MulNX::MsgType, std::vector<SyncMsgCallback>>syncMap{};
 
-        // 接口实现：
+        bool AddMsgMeta(const std::string& type, size_t hashed);
+    public:
+        bool Init()override;        
 
         // 创建私有消息队列（但是生命周期仍然委托给消息管理器）
         MulNXHandle CreateMessageChannel();
-        // 获取消息管道
         MessageChannel* GetMessageChannel(const MulNXHandle& hChannel);
-        // 需要在堆中构建消息，消息的创建由发送者负责，消息的销毁由消息总线负责
-        bool Publish(Message&& Msg);
-
-        bool Subscribe(MessageChannel* const pChannel, const std::string& Type);
-
+        bool SubscribeAsync(MessageChannel* const pChannel, const std::string& type);
+        bool PublishAsync(Message&& msg);
+        bool DispathAsyncMsg();
         void HandleDispatch();
+
+        bool SubscribeSync(const std::string& type, SyncMsgCallback&& handle);
+        bool PublishSync(MulNX::Message& msg);
     };
 }

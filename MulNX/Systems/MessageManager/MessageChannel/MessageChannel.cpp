@@ -4,9 +4,9 @@
 MulNX::MessageChannel::MessageChannel(MessageManager* MsgManager) {
 	this->MsgManager = MsgManager;
 }
-MulNX::MessageChannel& MulNX::MessageChannel::Subscribe(const std::string& MsgType) {
+MulNX::MessageChannel& MulNX::MessageChannel::SubscribeAsync(const std::string& MsgType) {
 	std::unique_lock lock(this->MsgManager->smutex);
-    this->MsgManager->Subscribe(this, MsgType);
+    this->MsgManager->SubscribeAsync(this, MsgType);
 	return *this;
 }
 bool MulNX::MessageChannel::PullMessage(Message& OutMsg) {

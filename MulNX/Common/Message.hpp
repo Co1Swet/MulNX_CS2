@@ -2,7 +2,7 @@
 
 #include <MulNX/Common/Common.hpp>
 #include <MulNX/Base/any_smart_ptr/any_smart_ptr.hpp>
-#include <MulNX/Config/Config.hpp>
+#include <functional>
 #include <cstdint>
 
 namespace MulNX {
@@ -48,4 +48,6 @@ namespace MulNX {
             return std::make_pair(std::move(msg), rp);
         }
     };
+
+    using SyncMsgCallback = std::function<void(MulNX::Message& msg)>;
 }

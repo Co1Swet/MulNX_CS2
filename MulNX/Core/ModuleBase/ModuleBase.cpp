@@ -98,7 +98,6 @@ void MulNX::ModuleBase::EntryProcessMsg() {
         }
         continue;
     }
-    this->UIBusy.store(false, std::memory_order_release);
     return;
 }
 

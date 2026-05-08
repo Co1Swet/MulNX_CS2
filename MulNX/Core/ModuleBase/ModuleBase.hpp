@@ -87,8 +87,6 @@ namespace MulNX {
         MulNXHandle HModule;
         Debugger* IDebugger = nullptr;
         MulNX::MessageChannel* MainMsgChannel = nullptr;
-        // 用于指示UI不应该再发送消息
-        std::atomic<bool> UIBusy = false;
         std::shared_mutex smutex;
     public:
         // 删除不需要的构造函数
