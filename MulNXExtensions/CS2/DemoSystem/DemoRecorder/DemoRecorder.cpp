@@ -13,7 +13,7 @@ bool DemoRecorder::Init() {
         .SubscribeAsync("Demo/Record/Start")
         .SubscribeAsync("Demo/Record/Stop");
 
-    currentCoro = Main();
+    auto currentCoro = Main();
     currentCoro.resume();
 
     this->SendTask("DemoRecorder", [this]()->bool {
