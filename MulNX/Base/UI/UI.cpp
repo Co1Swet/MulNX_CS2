@@ -24,7 +24,10 @@ bool MulNX::UI::Checkbox(const char* label, std::atomic<bool>& av) {
     }
     return changed;
 }
-
+MulNX::UI::RAIIWindow::RAIIWindow(const char* name) {
+    this->showed = true;
+    ImGui::Begin(name);
+}
 MulNX::UI::RAIIWindow::RAIIWindow(const char* name, std::atomic<bool>& showWindow) {
     this->showed = showWindow.load(std::memory_order_acquire);
     if (this->showed) {

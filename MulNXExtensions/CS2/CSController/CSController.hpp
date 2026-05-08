@@ -30,43 +30,10 @@ public:
 
 };
 
-class CSController;
-
-namespace MulNX {
-    class TimeBridge {
-        // 指向抽象层的指针，用于调用抽象层的时间函数
-        CSController* pCS2;
-        //是否在虚拟时间轴播放（偏移时间轴播放）
-        bool virtualTimePlaying = false;
-        // MulNX时间参考点
-        std::chrono::steady_clock::time_point startTime;
-        // 用于计算虚拟时间的缓冲变量
-        float refreshTime = 0.0f;
-        // 比例，用于控制虚拟时间的流速，默认为1.0f（与真实时间相同）
-        float scale = 1.0f;
-        // 上一次获取的真实时间，用于检测时间回跳等异常情况
-        float lastRealTime = 0.0f;
-        // 内部更新函数
-        void update();
-    public:
-        TimeBridge() = delete;
-        TimeBridge(CSController* pCS2);
-
-        bool RefreshVirtual(bool virtualTimePlaying, float scale);
-        float GetReal();
-        bool JumpReal(float time);
-        bool JumpRealRel(float time);
-        float GetVirtual();
-        float Get();
-    };
-}
-
 class CSController final :public MulNX::ModuleBase {
 private:
-    MulNX::TimeBridge timeBridge{ this };
-protected:
+
     D_GameData CS2EBGameData{};
-private:
     void* Source2EngineToClient001 = nullptr;
     // 控制台指令执行器
     VExecutor<void(int, const char*, int)> executor{};
@@ -76,8 +43,6 @@ private:
     C_GlobalVars* CSGlobalVars{};
 
     bool Window(MulNX::UINode* node);
-
-    void EnlistExecutors();
     void ProcessMsg(MulNX::Message& Msg)override;
     void Update();
 public:
@@ -92,14 +57,7 @@ public:
     bool Init()override;
     
     VExecutor<void* ()> GetDemo{};
-    VExecutor<int()>GetDemoTick{};
-    VExecutor<bool()>IsPlayingDemo{};
-    VExecutor<bool()>IsDemoPaused{};
     
-    // 返回时间源，由实现创建独占指针，这里返回原始指针
-    MulNX::TimeBridge* Time();
-    float GetTime();
-    bool JumpTime(const float time);
     bool SpecPlayer(int IndexInMap);
     D_Player& GetPlayerMsg(int Index);
 };

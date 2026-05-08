@@ -11,6 +11,11 @@ ViewController* CSModuleBase::CS2View() {
     return pViewController;
 }
 
+TimeController* CSModuleBase::CS2Time() {
+    static TimeController* pTimeController = this->Core->ModuleManager()->FindModule<TimeController>("TimeController");
+    return pTimeController;
+}
+
 PlayerHub* CSModuleBase::Hub() {
     static PlayerHub* playerHub = this->Core->ModuleManager()->FindModule<PlayerHub>("PlayerHub");
     return playerHub;

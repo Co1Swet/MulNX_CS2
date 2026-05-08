@@ -1,6 +1,6 @@
 #include "ElementManager.hpp"
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
@@ -156,8 +156,8 @@ void ElementManager::HandleUpdate() {
     this->EntryProcessMsg();
     if (this->OnPreview) {
         CameraSystemIO IO;
-        IO.ElementTime = this->CS2()->Time()->GetReal();
-        IO.FrameGameTime = this->CS2()->Time()->GetReal();
+        IO.ElementTime = this->CS2Time()->GetReal();
+        IO.FrameGameTime = this->CS2Time()->GetReal();
         if (this->Preview_Call(&IO)) {
             //自由摄像机轨道预览
             if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {

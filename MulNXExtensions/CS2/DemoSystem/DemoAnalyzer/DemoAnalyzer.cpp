@@ -3,8 +3,7 @@
 #include <format>
 
 bool DemoAnalyzer::Window(MulNX::UINode* node) {
-    auto c = MulNX::UI::RAIIChild("Demo分析");
-    if (!c)return true;
+    auto w = MulNX::UI::RAIIWindow("Demo分析");
     if (ImGui::Button(I18n("demo.analyze.dump").c_str())) {
         this->ISys().PublishAsync("Demo/Analyze/Dump"_hash);
     }
@@ -31,7 +30,6 @@ bool DemoAnalyzer::Window(MulNX::UINode* node) {
 }
 
 bool DemoAnalyzer::Init() {
-
     this->ISys()
         .SubscribeAsync("Demo/Analyze/Restart")
         .SubscribeAsync("Demo/Analyze/Dump")

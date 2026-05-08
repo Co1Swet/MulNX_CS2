@@ -7,6 +7,7 @@
 
 #include "ObserverController/ObserverController.hpp"
 #include "ViewController/ViewController.hpp"
+#include "TimeController/TimeController.hpp"
 #include "ESPController/ESPController.hpp"
 #include "PlayerFlashController/PlayerFlashController.hpp"
 #include "DeathMsgController/DeathMsgController.hpp"

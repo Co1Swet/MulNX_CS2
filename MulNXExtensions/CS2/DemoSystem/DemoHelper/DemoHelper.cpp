@@ -2,11 +2,22 @@
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
-    auto c = MulNX::UI::RAIIChild("Demo辅助");
-    if (!c)return true;
+    auto w = MulNX::UI::RAIIWindow("Demo辅助");
     std::shared_lock lock(this->smutex);
+
+    auto tick = this->CS2Time()->GetDemoTick();
+    ImGui::Text("当前demotick：%d", tick);
+
+    int totalSeconds = tick / 64;               // 总秒数（整数）
+    int minutes = totalSeconds / 60;            // 分钟
+    int secs = totalSeconds % 60;               // 秒
+    int subTick = tick % 64;                    // 秒内偏移，范围 0 ~ 63
+
+    ImGui::Text("时间：%d:%02d -- %02d", minutes, secs, subTick);
+
     if (ImGui::Button("标记当前时间")) {
         MulNX::Message msg("DemoHelper/MarkTime"_hash);
         node->PublishAsync(std::move(msg));
@@ -24,29 +35,29 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
     }
     ImGui::SeparatorText("快捷时间");
     if (ImGui::Button("五秒前")) {
-        this->CS2()->Time()->JumpRealRel(-5.0f);
+        this->CS2Time()->JumpRealRel(-5.0f);
     }
     ImGui::SameLine();
     if (ImGui::Button("一秒前")) {
-        this->CS2()->Time()->JumpRealRel(-1.0f);
+        this->CS2Time()->JumpRealRel(-1.0f);
     }
     ImGui::SameLine();
     if (ImGui::Button("一秒后")) {
-        this->CS2()->Time()->JumpRealRel(1.0f);
+        this->CS2Time()->JumpRealRel(1.0f);
     }
     ImGui::SameLine();
     if (ImGui::Button("五秒后")) {
-        this->CS2()->Time()->JumpRealRel(5.0f);
+        this->CS2Time()->JumpRealRel(5.0f);
     }
     ImGui::Separator();
     static float delta = 0.5f;
     ImGui::SliderFloat("自定义时间差", &delta, 0.0f, 60.0f);
     if (ImGui::Button("前跳")) {
-        this->CS2()->Time()->JumpRealRel(-delta);
+        this->CS2Time()->JumpRealRel(-delta);
     }
     ImGui::SameLine();
     if (ImGui::Button("后跳")) {
-        this->CS2()->Time()->JumpRealRel(delta);
+        this->CS2Time()->JumpRealRel(delta);
     }
 
     return true;
@@ -76,7 +87,7 @@ void DemoHelper::ProcessMsg(MulNX::Message& msg) {
         float data = msg.p1.low<float>();
         std::string str = "跳转到" + std::to_string(data);
         this->ISys().LogInfo(str);
-        this->CS2()->Time()->JumpReal(data);
+        this->CS2Time()->JumpReal(data);
         break;
     }
     }
@@ -88,7 +99,7 @@ void DemoHelper::Main() {
 
 bool DemoHelper::MarkTime() {
     std::unique_lock lock(this->smutex);
-    this->Marks.push_back(this->CS2()->Time()->GetReal());
+    this->Marks.push_back(this->CS2Time()->GetReal());
 
     return true;
 }

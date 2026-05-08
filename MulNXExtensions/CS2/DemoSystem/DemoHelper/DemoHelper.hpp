@@ -17,7 +17,6 @@ public:
     void Main();
     void ProcessMsg(MulNX::Message& msg)override;
     bool UINodeFunc(MulNX::UINode* node);
-    //void HandleUICommand(MulNXMessage* Msg);
 
     bool MarkTime();
     bool JumpMark(size_t Index);

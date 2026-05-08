@@ -1,6 +1,7 @@
 #include "DeathMsgController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 using GetPlayerController_t = void* (__fastcall*)(void* event, uint32_t keyHash);
 struct CKV3MemberName {
@@ -73,7 +74,7 @@ MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(void* event) {
         if (pAssisterController) {
             assisterSteamID=MulNX::MRead(pAssisterController->m_steamID());
         }
-        auto eventTick = this->CS2()->GetDemoTick();
+        auto eventTick = this->CS2Time()->GetDemoTick();
 
         auto [msg, rp] = MulNX::Message::Create<KillEvent>("Game/KillEvent"_hash);
         rp->DemoTick = eventTick;

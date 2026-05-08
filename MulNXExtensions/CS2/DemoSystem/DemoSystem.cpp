@@ -1,6 +1,6 @@
 #include "DemoSystem.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 bool DemoSystem::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("Demo", this->ShowWindow);
@@ -82,10 +82,11 @@ bool DemoSystem::Window(MulNX::UINode* node) {
     }
     ImGui::Separator();
 
-    ImGui::Text(I18n("demo.status.is_playing", this->CS2()->IsPlayingDemo()).c_str());
-    ImGui::Text(I18n("demo.status.is_pausing", this->CS2()->IsDemoPaused()).c_str());
+    ImGui::Text(I18n("demo.status.is_playing", this->CS2Time()->IsPlayingDemo()).c_str());
+    ImGui::Text(I18n("demo.status.is_pausing", this->CS2Time()->IsDemoPaused()).c_str());
 
     ImGui::Separator();
+    
     node->CallUINode("DemoAnalyzer");
     node->CallUINode("DemoHelper");
     return true;

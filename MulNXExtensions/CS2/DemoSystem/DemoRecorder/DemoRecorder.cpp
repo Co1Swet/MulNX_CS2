@@ -1,9 +1,5 @@
 #include "DemoRecorder.hpp"
-
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
-
-#include <string>
-#include <utility>
+#include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 // ========== 初始化 ==========
 bool DemoRecorder::Init() {
@@ -86,13 +82,13 @@ MulNX::CoTask DemoRecorder::Main() {
 
         // 等待跳转完成
         co_await this->WaitUntil([this] {
-            return std::abs(this->CS2()->GetDemoTick() - windowStartTick) <= 10;
+            return std::abs(this->CS2Time()->GetDemoTick() - windowStartTick) <= 10;
             });
 
         // 等待加载
-        auto current = this->CS2()->GetDemoTick();
+        auto current = this->CS2Time()->GetDemoTick();
         co_await this->WaitUntil([&] {
-            return this->CS2()->GetDemoTick() - current > 128;
+            return this->CS2Time()->GetDemoTick() - current > 128;
             });
 
         // 设置观察目标
@@ -113,7 +109,7 @@ MulNX::CoTask DemoRecorder::Main() {
 
         // 等待录制结束 tick
         co_await this->WaitUntil([this] {
-            return this->CS2()->GetDemoTick() >= windowEndTick;
+            return this->CS2Time()->GetDemoTick() >= windowEndTick;
             });
 
         // 停止录制

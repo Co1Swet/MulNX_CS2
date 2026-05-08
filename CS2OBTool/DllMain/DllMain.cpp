@@ -31,6 +31,7 @@ DWORD MulNX_CS2_Start(void*) {
         (*core->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             .CreateModule<CSController>("CSController")
+            .CreateModule<TimeController>("TimeController")
             .CreateModule<ViewController>("ViewController")
             .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
             .CreateModule<MulNX::GraphicsManager>("GraphicsManager")

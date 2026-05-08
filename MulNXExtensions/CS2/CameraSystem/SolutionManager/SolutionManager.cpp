@@ -1,7 +1,7 @@
 #include "SolutionManager.hpp"
 
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraDrawer/CameraDrawer.hpp>
@@ -430,8 +430,8 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 
     switch (this->Playing_pSolution->playmode) {
     case PlaybackMode::Orchestration:
-        this->Playing_pSolution->SetSolutionOffset(this->CS2()->Time()->GetReal());//偏移时间轴播放
-        this->ISys().LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2()->Time()->GetReal()));
+        this->Playing_pSolution->SetSolutionOffset(this->CS2Time()->GetReal());//偏移时间轴播放
+        this->ISys().LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2Time()->GetReal()));
         break;
     case PlaybackMode::Activation:
         this->Playing_pSolution->SetSolutionOffset(0);
@@ -460,8 +460,8 @@ void SolutionManager::Playing_Call() {
     }
     CameraSystemIO IO;
 
-    IO.SolutionTime = this->CS2()->Time()->Get();
-    IO.FrameGameTime = this->CS2()->Time()->GetReal();
+    IO.SolutionTime = this->CS2Time()->GetReal();
+    IO.FrameGameTime = this->CS2Time()->GetReal();
     IO.isPlaying = this->Playing;
 
     if (!this->Playing_pSolution->Call(&IO)) {
