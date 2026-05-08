@@ -23,14 +23,15 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
-      # 运行你的 Python 辅助脚本（可选）
+      # 运行 Python 打包脚本
       - name: Run Python helper scripts
         run: |
           python bin/Pack.py
         continue-on-error: true
 
-      # 上传构建产物到 GitHub Actions 的 Artifacts（方便后续下载）
+      # 上传构建产物到 GitHub Actions 的 Artifacts（无论前一步是否成功）
       - name: Upload artifacts (always)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-outputs-${{ github.sha }}
@@ -40,6 +41,22 @@ jobs:
             bin/MulNX/
           if-no-files-found: warn
 
+      # 如果是标签推送，先提取标签消息并写入文件
+      - name: Get tag message
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          # 读取注解标签的消息内容（标签名加引号，防止特殊字符）
+          MSG=$(git tag -l --format='%(contents)' "${{ github.ref_name }}")
+
+          # 如果消息为空（轻量标签），使用默认说明
+          if [ -z "$MSG" ]; then
+            MSG="自动构建的 Release，版本：${{ github.ref_name }}"
+          fi
+
+          # 将消息写入文件，后续通过 body_path 安全传递给 Release 步骤
+          printf '%s\n' "$MSG" > tag_body.txt
+
       # 如果是标签推送，则创建 GitHub Release 并上传文件
       - name: Create GitHub Release (only for tags)
         if: github.ref_type == 'tag'
@@ -47,8 +64,8 @@ jobs:
         with:
           # 使用标签名作为 Release 标题
           name: Release ${{ github.ref_name }}
-          # 可以在此处写静态说明，或通过 body_path 从文件读取（如 CHANGELOG.md）
-          body: "自动构建的 Release，版本：${{ github.ref_name }}"
+          # 从文件读取 Release 说明，避免多行文本的特殊字符问题
+          body_path: tag_body.txt
           # 要上传的文件列表（支持通配符）
           files: |
             bin/MulNX.zip
