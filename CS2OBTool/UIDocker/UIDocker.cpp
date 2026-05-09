@@ -91,6 +91,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     ImGui::End();
 
     ImGui::Begin(I18n("ui.game_enhance").c_str());
+    node->CallUINode("POVFixer");
     node->CallUINode("ConsoleManager");
     ImGui::End();
 
@@ -98,7 +99,6 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     node->CallUINode("VirtualUser");
     node->CallUINode("MulNXController");
     ImGui::End();
-
 
     node->CallUINode("UIDocker");
     node->CallUINode("Debugger");

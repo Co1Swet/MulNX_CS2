@@ -85,6 +85,8 @@ void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
         this->HandleCameraSystemPlay(viewSetup);
     }
 
+    this->ISys().PublishSync("Call/BeforeDraw"_hash);
+
     // 记录视角数据
     {
         auto currentView = this->controlView.currentView.Write();

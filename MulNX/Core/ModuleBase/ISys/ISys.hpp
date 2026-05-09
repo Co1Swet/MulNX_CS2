@@ -25,7 +25,7 @@ namespace MulNX {
         void PublishAsync(MulNX::MsgType msgType);
 
         C_ISys& SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle);
-        void PublishSync(MulNX::Message&& msg);
+        void PublishSync(MulNX::Message& msg);
         void PublishSync(MulNX::MsgType msgType);
 
         void AsyncCommand(std::string&& cmd);

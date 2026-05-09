@@ -15,7 +15,8 @@ bool MulNX::I18nManager::Init() {
     YAML::Node root = YAML::LoadFile(filePath.string());
     this->LoadYaml(root, {});
     
-    this->ISys().LogSucc(I18n("sys.i18n_load_succ", filePath.string()));
+    this->ISys().LogSucc(I18n("sys.i18n.load_succ", filePath.string()));
+    this->ISys().LogSucc(I18n("sys.i18n.load_nums", this->strings.size()));
     return true;
 }
 

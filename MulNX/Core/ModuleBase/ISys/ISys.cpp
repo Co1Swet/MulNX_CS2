@@ -57,9 +57,12 @@ MulNX::C_ISys& MulNX::C_ISys::SubscribeSync(const std::string& msgType, MulNX::S
     this->LogSucc(I18n("sys.msg.sync.subed{}", msgType));
     return *this;
 }
-void MulNX::C_ISys::PublishSync(MulNX::Message&& msg) {
+void MulNX::C_ISys::PublishSync(MulNX::Message& msg) {
+    this->pModuleBase->pMsgManager->PublishSync(msg);
 }
 void MulNX::C_ISys::PublishSync(MulNX::MsgType msg) {
+    auto m = MulNX::Message(msg);
+    this->pModuleBase->pMsgManager->PublishSync(m);
 }
 
 void MulNX::C_ISys::AsyncCommand(std::string&& cmd) {

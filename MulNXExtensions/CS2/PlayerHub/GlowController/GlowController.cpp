@@ -166,6 +166,15 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
 void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t* color) {
     std::shared_lock lock(this->Hub()->smutex);
 
+    auto msg = MulNX::Message("Call/OnSetGlow"_hash);
+    bool needErase = false;
+    msg.p2.as<bool*>() = &needErase;
+    this->ISys().PublishSync(msg);
+    if (needErase) {
+        *color = 0;
+        return;
+    }
+
     auto pBaseModelEntity = pGlowProperty->GetOwner();
     CS2::C_CSPlayerPawn* pPlayerPawn = nullptr;
     if (pBaseModelEntity->IsPlayerPawn()) {
@@ -176,6 +185,7 @@ void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t*
         pPlayerPawn = this->CS2()->client.GetBaseEntityFromHandle(hOwnerEntity)->As<CS2::C_BaseEntity>()->As<CS2::C_CSPlayerPawn>();
     }
     if (!pPlayerPawn)return;
+
     auto hController = *pPlayerPawn->As<CS2::C_BasePlayerPawn>()->m_hController();
     auto pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
 

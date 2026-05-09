@@ -136,12 +136,15 @@ module:
 sys:
   inited_info: 所有模块初始化成功，模块总量：{}
   inited_time_sum: 初始化完成，自核心分配内存并创建开始，共耗时：{}（微秒）
-  i18n_load_succ: 语言文件加载成功：{}
   version_is_testing: 当前版本是否为测试版：{} 
   version_is: 当前版本号：{} 
   build_stamp: 当前版本构建时间：{} 
   started: 各模块初始化完毕，系统已启动
   shutdown_warning: 检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
+
+  i18n:
+    load_succ: 语言文件加载成功：{}
+    load_nums: 共加载键值对：{}
 
   msg:
     sync:
@@ -267,3 +270,7 @@ dthmsg:
     name: 击杀信息控制
     control: 击杀信息控制窗口
   enable: 启用击杀控制
+
+pov:
+  enable: 启用POV修复
+  disable: 禁用POV修复
