@@ -274,3 +274,9 @@ dthmsg:
 pov:
   enable: 启用POV修复
   disable: 禁用POV修复
+
+skin:
+  changer: 换肤器
+  apply: 应用皮肤设置
+  target:
+    index: 目标皮肤索引

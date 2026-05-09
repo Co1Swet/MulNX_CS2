@@ -75,6 +75,12 @@ namespace CS2 {
         bool* bDebugAbsOriginChanges() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_bDebugAbsOriginChanges); }
     };
 
+    class CModelState {
+    public:
+        uint64_t* m_MeshGroupMask() { return Schema<uint64_t>(this, cs2_dumper::schemas::client_dll::CModelState::m_MeshGroupMask); }
+
+    };
+
     class BoneArray {
         constexpr static int32_t unkSize = 32;
     public:
@@ -84,7 +90,8 @@ namespace CS2 {
     class CSkeletonInstance :public CGameSceneNode {
         constexpr static uintptr_t unkSchema = 0x80;
     public:
-        BoneArray** unkBoneArray() { return reinterpret_cast<BoneArray**>(reinterpret_cast<uintptr_t>(this) + cs2_dumper::schemas::client_dll::CSkeletonInstance::m_modelState + unkSchema); }
+        CModelState* m_modelState() { return Schema<CModelState>(this, cs2_dumper::schemas::client_dll::CSkeletonInstance::m_modelState); }
+        BoneArray** unkBoneArray() { return Schema<BoneArray*>(this, cs2_dumper::schemas::client_dll::CSkeletonInstance::m_modelState + unkSchema); }
     };
 
     class C_BaseEntity :public IVClass {
@@ -166,7 +173,7 @@ namespace CS2 {
     class CEconItemAttribute {
     public:
         inline static constexpr size_t ofsize = 0x48;
-        
+
         uint16_t* m_iAttributeDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_iAttributeDefinitionIndex); }
         float* m_flValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flValue); }
         float* m_flInitialValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flInitialValue); }
@@ -184,7 +191,7 @@ namespace CS2 {
         C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>* m_Attributes() { return Schema<C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_Attributes); }
         CAttributeManager** m_pManager() { return Schema<CAttributeManager*>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_pManager); }
     };
-    
+
     class C_EconItemView {
     public:
         uint32_t* m_iItemIDHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemIDHigh); }
@@ -192,7 +199,7 @@ namespace CS2 {
         CAttributeList* m_AttributeList() { return Schema<CAttributeList>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_AttributeList); }
     };
 
-    
+
 
     class C_AttributeContainer :public CAttributeManager {
     public:

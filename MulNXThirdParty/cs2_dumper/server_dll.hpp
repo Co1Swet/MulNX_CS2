@@ -4029,7 +4029,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_AttributeManager = 0x958; // CAttributeContainer
                 constexpr std::ptrdiff_t m_OriginalOwnerXuidLow = 0xC50; // uint32
                 constexpr std::ptrdiff_t m_OriginalOwnerXuidHigh = 0xC54; // uint32
-                constexpr std::ptrdiff_t m_nFallbackPaintKit = 0xC58; // int32
+                constexpr std::ptrdiff_t m_nFallback = 0xC58; // int32
                 constexpr std::ptrdiff_t m_nFallbackSeed = 0xC5C; // int32
                 constexpr std::ptrdiff_t m_flFallbackWear = 0xC60; // float32
                 constexpr std::ptrdiff_t m_nFallbackStatTrak = 0xC64; // int32

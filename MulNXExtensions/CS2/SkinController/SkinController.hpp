@@ -3,9 +3,13 @@
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 class SkinController final :public CSModuleBase {
-    void Main();
-    using rebuild = void(*)(void*);
-    rebuild re = nullptr;
+    using RegenerateWeaponSkins = void(*)(void*);
+    RegenerateWeaponSkins regenerateWeaponSkins = nullptr;
+    void Window(MulNX::UINode* node);
+    void Apply();
+    std::atomic<int> targetIndex = 1;
+    std::atomic<bool> legacyModel = false;
 public:
     bool Init()override;
+    void ProcessMsg(MulNX::Message& msg)override;
 };
