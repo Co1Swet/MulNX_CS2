@@ -43,8 +43,7 @@ bool CSController::Init() {
     this->SendTask("CSControl", [this]()->bool {
         try {
             this->Update();
-            this->Update();
-            
+            this->Main();
         }
         catch (const std::runtime_error& e) {
             this->ISys().LogWarning("在更新数据时捕获到异常：" + std::string(e.what()));
@@ -73,7 +72,7 @@ void CSController::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void CSController::Update() {
+void CSController::Main() {
     // 获取CS2全局变量
     this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
 

@@ -22,7 +22,7 @@ DWORD MulNX_CS2_Start(void*) {
             if (MulNXInfo::IsDebugVersion) {
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
                 rp->str1 = "111";
-                //starter->ISys().PublishAsync(std::move(msg));
+                starter->ISys().PublishAsync(std::move(msg));
                 std::thread([]() {
                     MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
                     }).detach();

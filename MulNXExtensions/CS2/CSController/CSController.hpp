@@ -44,7 +44,7 @@ private:
 
     bool Window(MulNX::UINode* node);
     void ProcessMsg(MulNX::Message& Msg)override;
-    void Update();
+    void Main();
 public:
     std::vector<std::function<bool(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*)>>handlesControlPlayer{};
     

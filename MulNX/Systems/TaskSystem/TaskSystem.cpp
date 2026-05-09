@@ -3,6 +3,7 @@
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
+#include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
 
 void MulNX::Task::Worker::Start() {
     this->t = std::jthread([this](std::stop_token stoken) {
@@ -35,8 +36,10 @@ bool MulNX::TaskSystem::Init() {
     auto [msg2, rp2] = MulNX::Message::Create<MulNX::Task::RegistrationPacket>("Task/Create"_hash);
     rp2->targetWorker = "Messaging";
     auto pMessageManager = this->Core->ModuleManager()->FindModule<MessageManager>("MessageManager");
-    rp2->task = std::move([pMessageManager]()->bool {
-        pMessageManager->HandleDispatch();
+    rp2->task = std::move([this, pMessageManager]()->bool {
+        if (this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
+            pMessageManager->HandleDispatch();
+        }
         return true;
         });
     this->HandleAddTask(msg2);
@@ -72,7 +75,7 @@ void MulNX::TaskSystem::HandleAddTask(MulNX::Message& msg) {
 void MulNX::TaskSystem::Deinit() {
     for (auto& [name, worker] : this->workers) {
         if (name == "Messaging")continue;
-        worker->t.request_stop(); // 如果 t 是 jthread
+        worker->t.request_stop();
     }
     for (auto& [name, worker] : this->workers) {
         if (name == "Messaging")continue;

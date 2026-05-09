@@ -26,8 +26,6 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->Core->ModuleManager()->ModulesInit();
     // 开启系统
     this->ActiveSystem();
-    // 设置系统标志位
-    this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(true, std::memory_order_release);
     // 输出启动信息
     this->ISys().LogSucc(I18n("sys.started"));
     this->ISys().LogWarning(I18n("sys.version_is_testing", MulNXInfo::IsDebugVersion));
@@ -35,6 +33,8 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->ISys().LogWarning(I18n("sys.build_stamp", MulNXInfo::TimeStamp));
     // 执行启动器回调
     this->InitEndCall();
+    // 设置系统标志位
+    this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(true, std::memory_order_release);
     // 通过MainDraw字符串发送UI启动命令
     this->CreateMainDraw();
     // 记录结束时间
