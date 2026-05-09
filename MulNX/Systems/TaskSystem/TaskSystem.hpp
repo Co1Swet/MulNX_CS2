@@ -7,7 +7,7 @@ namespace MulNX {
     namespace Task {
         class Worker {
         public:
-            std::thread t;
+            std::jthread t;
             std::vector<std::function<bool()>>tasks;
             moodycamel::ConcurrentQueue<std::function<bool()>>queue;
             void Start();
@@ -25,5 +25,6 @@ namespace MulNX {
     public:
         bool Init()override;
         void ProcessMsg(MulNX::Message& msg)override;
+        void Deinit()override;
     };
 }

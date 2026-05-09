@@ -95,7 +95,7 @@ bool SmokeController::Init() {
 
     // 3. 消息处理线程
     this->SendTask("CSControl", [this]() {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

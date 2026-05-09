@@ -16,4 +16,5 @@ public:
     bool Init()override;
     void ProcessMsg(MulNX::Message& Msg)override;
     void Main();
+    void Deinit()override;
 };

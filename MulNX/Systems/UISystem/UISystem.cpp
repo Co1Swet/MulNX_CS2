@@ -70,7 +70,7 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
 // ImGui窗口处理函数导入
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int MulNX::UISystem::Render() {
-    this->EntryProcessMsg();
+    this->Update();
     if (!this->UISystemRunning) {
         return 0;
     }

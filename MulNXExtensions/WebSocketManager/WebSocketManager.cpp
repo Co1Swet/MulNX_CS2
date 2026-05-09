@@ -119,8 +119,9 @@ bool WebSocketManager::Init() {
 
     this->SendTask("Web", [this]()->bool {
         try {
-            while (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
+            if (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                return true;
             }
             this->server.listen(this->port);
             this->server.start_accept();
@@ -140,8 +141,12 @@ bool WebSocketManager::Init() {
     return true;
 }
 
+void WebSocketManager::Deinit() {
+    this->server.stop();
+}
+
 void WebSocketManager::Main() {
-    this->EntryProcessMsg();
+    this->Update();
 }
 
 void WebSocketManager::ProcessMsg(MulNX::Message& Msg) {

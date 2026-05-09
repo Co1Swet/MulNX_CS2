@@ -16,6 +16,8 @@ namespace MulNX {
             std::function<void()>InitEndCall = nullptr;
             // 激活系统，以开始工作
             virtual void ActiveSystem() = 0;
+
+            void CloseSystem();
         };
     }
 }

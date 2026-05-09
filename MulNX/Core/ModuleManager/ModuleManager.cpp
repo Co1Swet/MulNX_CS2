@@ -20,7 +20,7 @@ bool MulNX::Core::ModuleManager::Init() {
         .SubscribeAsync("ModuleManager/ModuleInfo/Request");
 
     this->SendTask("MulNXMain", [this]()->bool {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
     return true;
@@ -105,4 +105,20 @@ bool MulNX::Core::ModuleManager::ModulesInit() {
     }
     this->ISys().LogSucc(I18n("sys.inited_info", this->modules.size() + 2)); // 模块管理器自身和核心启动器
     return true;
+}
+
+void MulNX::Core::ModuleManager::DeinitModules() {
+    std::unique_lock lock(this->smutex);
+    for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
+        if (it->second->GetName() == "TaskSystem")continue;
+        it->second->Deinit();
+    }
+}
+
+void MulNX::Core::ModuleManager::Deinit() {
+    std::unique_lock lock(this->smutex);
+    for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
+        if (it->second->GetName() == "TaskSystem")continue;
+        it->second = nullptr;
+    }
 }

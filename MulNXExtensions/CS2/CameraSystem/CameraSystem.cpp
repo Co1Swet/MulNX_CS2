@@ -141,7 +141,7 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
 }
 
 void CameraSystem::HandleUpdate() {
-    this->EntryProcessMsg();
+    this->Update();
     if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'P',1 })) {
         this->ISys().PublishAsync("CameraSystem/Play/Shutdown"_hash);
     }

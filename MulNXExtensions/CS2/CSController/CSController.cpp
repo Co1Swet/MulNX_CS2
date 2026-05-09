@@ -43,7 +43,7 @@ bool CSController::Init() {
     this->SendTask("CSControl", [this]()->bool {
         try {
             this->Update();
-            this->EntryProcessMsg();
+            this->Update();
             
         }
         catch (const std::runtime_error& e) {

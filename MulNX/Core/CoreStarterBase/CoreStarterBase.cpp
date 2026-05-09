@@ -5,6 +5,7 @@
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 #include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
+#include <MulNX/Systems/TaskSystem/TaskSystem.hpp>
 
 bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     // 一阶段初始化核心启动器
@@ -46,4 +47,17 @@ void MulNX::Core::CoreStarterBase::CreateMainDraw() {
     auto [msg2, rp] = MulNX::Message::Create<std::string>("UISystem/Start"_hash, "MainDraw");
     this->ISys().PublishAsync(std::move(msg2));
     this->ISys().LogWarning("发送了UI启动指令！渲染即将开始！");
+}
+
+void MulNX::Core::CoreStarterBase::CloseSystem() {
+    // 设置系统标志位
+    this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(false, std::memory_order_release);
+    // 通知所有模块，以清理资源，包括线程停止
+    this->Core->ModuleManager()->DeinitModules();
+    // 任务系统汇合
+    this->Core->ModuleManager()->FindModule<MulNX::TaskSystem>("TaskSystem")->Deinit();
+    // 析构所有模块
+    this->Core->ModuleManager()->Deinit();
+    // 清理自身资源
+    this->Deinit();
 }

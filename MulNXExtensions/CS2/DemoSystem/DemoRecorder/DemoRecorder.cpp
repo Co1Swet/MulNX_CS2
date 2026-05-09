@@ -13,7 +13,7 @@ bool DemoRecorder::Init() {
     currentCoro.resume();
 
     this->SendTask("DemoRecorder", [this]()->bool {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

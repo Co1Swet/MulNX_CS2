@@ -94,7 +94,7 @@ void DemoHelper::ProcessMsg(MulNX::Message& msg) {
 }
 
 void DemoHelper::Main() {
-    this->EntryProcessMsg();
+    this->Update();
 }
 
 bool DemoHelper::MarkTime() {

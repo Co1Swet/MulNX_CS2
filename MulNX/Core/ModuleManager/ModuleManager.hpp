@@ -46,6 +46,9 @@ namespace MulNX {
             // 初始化最后部分使用
             bool ModulesBaseInit();
             bool ModulesInit();
+
+            void DeinitModules();
+            void Deinit()override;
         };
     }
 

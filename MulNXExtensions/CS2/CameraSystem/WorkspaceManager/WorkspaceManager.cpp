@@ -89,7 +89,7 @@ void WorkspaceManager::ProcessMsg(MulNX::Message& msg) {
 }
 
 void WorkspaceManager::HandleUpdate() {
-    this->EntryProcessMsg();
+    this->Update();
 }
 
 bool WorkspaceManager::Workspace_Save() {

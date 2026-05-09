@@ -54,7 +54,7 @@ bool NameController::Init() {
         });
 
     this->SendTask("CSControl", [this]() {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

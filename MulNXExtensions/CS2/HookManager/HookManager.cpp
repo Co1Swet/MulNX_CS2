@@ -141,14 +141,24 @@ void HookManager::d3dInit() {
 }
 
 MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (uMsg == WM_CLOSE)
-        this->ISys().LogWarning(I18n("sys.shutdown_warning"));
     this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
     if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
         return MulNX::Hook::Then::Return;
     if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) && MulNX::Win32::IsKeyboardMessage(uMsg))
         return MulNX::Hook::Then::Return;
+    if (uMsg == WM_CLOSE) {
+        this->ISys().LogWarning(I18n("sys.shutdown_warning"));
+        this->CloseSystem();
+    }
     return MulNX::Hook::Then::Continue;
+}
+
+void HookManager::Deinit() {
+    this->hkClearDepthStencilView->Detach();
+    this->hkDrop->Detach();
+    this->hkPresent->Detach();
+    this->hkResizeBuffers->Detach();
+    this->hkWndProc->Detach();
 }
 
 void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {

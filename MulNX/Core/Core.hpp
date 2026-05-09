@@ -34,6 +34,7 @@ namespace MulNX {
 
             // 初始化
             void Init();
+            void Close();
 
             // 获取模块的接口
             ModuleManager* ModuleManager();

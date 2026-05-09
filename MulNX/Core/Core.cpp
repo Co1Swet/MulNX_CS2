@@ -23,6 +23,10 @@ void MulNX::Core::Core::Init() {
     this->pCoreStarter->SystemInit(this);
     return;
 }
+void MulNX::Core::Core::Close() {
+    this->pMyself = nullptr;
+    return;
+}
 std::string MulNX::Core::Core::GetName() {
     return this->CoreName;
 }

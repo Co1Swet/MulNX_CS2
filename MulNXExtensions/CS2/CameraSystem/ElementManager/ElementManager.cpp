@@ -153,7 +153,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
 }
 
 void ElementManager::HandleUpdate() {
-    this->EntryProcessMsg();
+    this->Update();
     if (this->OnPreview) {
         CameraSystemIO IO;
         IO.ElementTime = this->CS2Time()->GetReal();

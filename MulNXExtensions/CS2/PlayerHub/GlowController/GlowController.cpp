@@ -97,7 +97,7 @@ bool GlowController::Init() {
 
 
     this->SendTask("CSControl", [this]() {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

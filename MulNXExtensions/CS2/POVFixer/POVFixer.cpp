@@ -39,7 +39,7 @@ void POVFixer::ProcessMsg(MulNX::Message& msg) {
 }
 
 void POVFixer::BeforeDraw() {
-    this->EntryProcessMsg();
+    this->Update();
     if (!this->enable)return;
 
     try {

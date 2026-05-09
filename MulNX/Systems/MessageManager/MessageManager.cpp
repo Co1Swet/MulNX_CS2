@@ -72,8 +72,9 @@ bool MulNX::MessageManager::DispathAsyncMsg() {
 }
 
 void MulNX::MessageManager::HandleDispatch() {
-    while (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
+    if (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        return;
     }
     // this->ISys().LogInfo("消息派发开始！");
     if (this->DispathAsyncMsg()) {

@@ -24,7 +24,7 @@ bool VirtualUser::Init() {
     return true;
 }
 void VirtualUser::Main() {
-    this->EntryProcessMsg();
+    this->Update();
     if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'T',1 })) {
         bool AutoRunning = this->Enabled.load(std::memory_order_acquire);
         this->Enabled.store(!AutoRunning, std::memory_order_release);

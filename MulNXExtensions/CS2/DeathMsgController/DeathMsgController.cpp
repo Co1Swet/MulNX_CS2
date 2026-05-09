@@ -45,7 +45,7 @@ bool DeathMsgController::Init() {
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
     this->SendTask("CSControl", [this]()->bool {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

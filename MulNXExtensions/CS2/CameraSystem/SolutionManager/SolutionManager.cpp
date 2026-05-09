@@ -264,7 +264,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
 }
 
 void SolutionManager::HandleUpdate() {
-    this->EntryProcessMsg();
+    this->Update();
     
     if (this->CurrentSolution) {
         this->CurrentSolution->Refresh();//刷新当前调试的解决方案确保操作反馈及时（当前播放的解决方案由Playing_Call负责更新）

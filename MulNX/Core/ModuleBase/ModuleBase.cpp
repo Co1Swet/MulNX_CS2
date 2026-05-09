@@ -68,7 +68,7 @@ bool MulNX::ModuleBase::EntryInit() {
     this->ISys().LogSucc(I18n("module.inited"));
     return true;
 }
-void MulNX::ModuleBase::EntryProcessMsg() {
+void MulNX::ModuleBase::Update() {
     std::vector<std::coroutine_handle<>> toResume;
     for (auto it = this->conditionWaiters.begin(); it != this->conditionWaiters.end(); ) {
         if (it->condition()) {
@@ -99,11 +99,4 @@ void MulNX::ModuleBase::EntryProcessMsg() {
         continue;
     }
     return;
-}
-
-void MulNX::ModuleBase::SetParent(MulNXHandle hModule) {
-    this->hParent = hModule;
-}
-bool MulNX::ModuleBase::HasParent() {
-    return this->hParent.IsValid();
 }

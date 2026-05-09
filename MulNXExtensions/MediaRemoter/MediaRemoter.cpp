@@ -29,7 +29,7 @@ bool MediaRemoter::Init() {
         });
 
     this->SendTask("MulNXMain", [this]()->bool {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

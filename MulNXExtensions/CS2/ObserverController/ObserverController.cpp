@@ -65,7 +65,7 @@ void ObserverController::ProcessMsg(MulNX::Message& msg) {
 
 void ObserverController::Main() {
     this->UpdateObserverState();  // 轮询检测模式变化，并发布事件
-    this->EntryProcessMsg();      // 处理消息队列（包括 spec_mode_changed_to）
+    this->Update();      // 处理消息队列（包括 spec_mode_changed_to）
 }
 
 void ObserverController::UpdateObserverState() {

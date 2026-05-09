@@ -103,7 +103,7 @@ bool DemoSystem::Init() {
         });
     
     this->SendTask("MulNXMain", [this]() {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

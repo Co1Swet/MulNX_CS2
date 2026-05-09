@@ -6,12 +6,14 @@
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaRemoter/MediaRemoter.hpp>
 
+MulNX::Core::Core* pCore = nullptr;
+
 DWORD MulNX_CS2_Start(void*) {
     try {
         // 创建核心
-        auto* core = MulNX::Core::Core::Create("CS2OBTool");
+        pCore = MulNX::Core::Core::Create("CS2OBTool");
         // 创建核心启动器
-        auto* starter = core->CreateCoreStarter<HookManager>();
+        auto* starter = pCore->CreateCoreStarter<HookManager>();
         // 手动创建的模块需要手动设置名称
         starter->SetName("HookManager");
         // 设置初始化完成回调
@@ -28,7 +30,7 @@ DWORD MulNX_CS2_Start(void*) {
             };
 
         // 注册所有模块
-        (*core->ModuleManager())
+        (*pCore->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             .CreateModule<CSController>("CSController")
             .CreateModule<TimeController>("TimeController")
@@ -75,7 +77,7 @@ DWORD MulNX_CS2_Start(void*) {
             ;
 
         // 启动核心
-        core->Init();
+        pCore->Init();
     }
     catch (std::exception& e) {
         MulNX::ErrorTerminate("在启动时发生异常！异常描述：" + std::string(e.what()));
@@ -94,13 +96,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         break;
     }
     case DLL_THREAD_ATTACH: {
-        // 本系统不考虑卸载，计划生命周期与游戏进程相同！
         break;
     }
     case DLL_THREAD_DETACH: {
         break;
     }
     case DLL_PROCESS_DETACH: {
+        pCore->Close();
         break;
     }
     default: {

@@ -5,8 +5,8 @@
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 
 void MulNX::Task::Worker::Start() {
-    this->t = std::thread([this]() {
-        for (;;) {
+    this->t = std::jthread([this](std::stop_token stoken) {
+        while (!stoken.stop_requested()) {
             std::function<bool()> task;
             while (queue.try_dequeue(task)) {
                 tasks.push_back(std::move(task));
@@ -15,6 +15,7 @@ void MulNX::Task::Worker::Start() {
                 task();
             }
         }
+        return;
         });
     return;
 }
@@ -26,7 +27,7 @@ bool MulNX::TaskSystem::Init() {
     auto [msg, rp] = MulNX::Message::Create<MulNX::Task::RegistrationPacket>("Task/Create"_hash);
     rp->targetWorker = "Messaging";
     rp->task = std::move([this]()->bool {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
     this->HandleAddTask(msg);
@@ -66,4 +67,19 @@ void MulNX::TaskSystem::HandleAddTask(MulNX::Message& msg) {
     }
     this->workers[RegistrationPacket.targetWorker]->queue.enqueue(std::move(RegistrationPacket.task));
     this->ISys().LogSucc(std::format("成功将任务添加进入工作者：{}", RegistrationPacket.targetWorker));
+}
+
+void MulNX::TaskSystem::Deinit() {
+    for (auto& [name, worker] : this->workers) {
+        if (name == "Messaging")continue;
+        worker->t.request_stop(); // 如果 t 是 jthread
+    }
+    for (auto& [name, worker] : this->workers) {
+        if (name == "Messaging")continue;
+        worker->t.join();
+        worker.reset();
+    }
+    auto worker = std::move(this->workers["Messaging"]);
+    worker->t.request_stop();
+    worker->t.join();
 }

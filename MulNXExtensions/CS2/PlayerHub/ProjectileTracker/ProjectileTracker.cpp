@@ -28,7 +28,7 @@ void ProjectileTracker::Menu(MulNX::UINode* node) {
 
 bool ProjectileTracker::Init() {
     this->SendTask("CSControl", [this]() {
-        this->EntryProcessMsg();
+        this->Update();
         this->Update();
         return true;
         });

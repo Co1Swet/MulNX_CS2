@@ -27,6 +27,7 @@ private:
 
     void d3dInit();
 public:
-    bool Init() override;
-    void ActiveSystem() override;
+    bool Init()override;
+    void ActiveSystem()override;
+    void Deinit()override;
 };

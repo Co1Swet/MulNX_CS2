@@ -64,5 +64,5 @@ void MulNXController::ProcessMsg(MulNX::Message& Msg) {
     }
 }
 void MulNXController::Main() {
-    this->EntryProcessMsg();
+    this->Update();
 }

@@ -37,7 +37,7 @@ bool DemoAnalyzer::Init() {
         .SubscribeAsync("Game/KillEvent");
 
     this->SendTask("MulNXMain", [this]()->bool {
-        this->EntryProcessMsg();
+        this->Update();
         return true;
         });
 

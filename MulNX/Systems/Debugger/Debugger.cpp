@@ -118,7 +118,7 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
     }
 }
 void MulNX::Debugger::Main() {
-    this->EntryProcessMsg();
+    this->Update();
 }
 
 void MulNX::Debugger::ResetMaxMsgCount(const int Max) {
