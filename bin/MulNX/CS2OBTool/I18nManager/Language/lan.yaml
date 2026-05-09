@@ -132,15 +132,17 @@ module:
   inited: 初始化成功！
   send_ui: 将UI节点注册信息推送到了消息系统
   send_task: 将任务注册信息推送到了消息系统
+  deinited: 已关闭模块：{}
 
 sys:
   inited_info: 所有模块初始化成功，模块总量：{}
   inited_time_sum: 初始化完成，自核心分配内存并创建开始，共耗时：{}（微秒）
+  bye: 日志模块即将下线，收尾析构等工作将由剩余子系统完成，MulNX期待与您下次再见
   version_is_testing: 当前版本是否为测试版：{} 
   version_is: 当前版本号：{} 
   build_stamp: 当前版本构建时间：{} 
   started: 各模块初始化完毕，系统已启动
-  shutdown_warning: 检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
+  shutdown_warning: 检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态
 
   i18n:
     load_succ: 语言文件加载成功：{}
@@ -172,7 +174,7 @@ log:
   fmt: "[{0}][{1}][{2}]{3}" # 0~3代表：时间、级别、模块、消息
   new: |
     +----------新的日志片段----------+
-    当游戏关闭时发生异常是可预见的，请忽略
+    日志系统已上线，欢迎使用MulNX
 # 摄像机系统
 camsys:
   tab_proj: 项目

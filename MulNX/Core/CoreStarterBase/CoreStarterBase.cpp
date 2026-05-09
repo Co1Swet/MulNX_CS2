@@ -6,6 +6,9 @@
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 #include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
 #include <MulNX/Systems/TaskSystem/TaskSystem.hpp>
+#include <MulNX/Systems/MessageManager/MessageManager.hpp>
+#include <MulNX/Systems/Debugger/Debugger.hpp>
+#include <MulNX/Systems/Logger/Logger.hpp>
 
 bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     // 一阶段初始化核心启动器
@@ -56,6 +59,10 @@ void MulNX::Core::CoreStarterBase::CloseSystem() {
     this->Core->ModuleManager()->DeinitModules();
     // 任务系统汇合
     this->Core->ModuleManager()->FindModule<MulNX::TaskSystem>("TaskSystem")->Deinit();
+    // 让日志最后一次打印
+    this->Core->ModuleManager()->FindModule<MulNX::MessageManager>("MessageManager")->HandleDispatch();
+    this->Core->ModuleManager()->FindModule<MulNX::Debugger>("Debugger")->Update();
+    this->Core->ModuleManager()->FindModule<MulNX::Logger>("Logger")->Log();
     // 析构所有模块
     this->Core->ModuleManager()->Deinit();
     // 清理自身资源

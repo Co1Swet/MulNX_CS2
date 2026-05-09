@@ -112,7 +112,9 @@ void MulNX::Core::ModuleManager::DeinitModules() {
     for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
         if (it->second->GetName() == "TaskSystem")continue;
         it->second->Deinit();
+        this->ISys().LogInfo(I18n("module.deinited", it->second->GetName()));
     }
+    this->ISys().LogSucc(I18n("sys.bye"));
 }
 
 void MulNX::Core::ModuleManager::Deinit() {

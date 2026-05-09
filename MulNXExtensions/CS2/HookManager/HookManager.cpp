@@ -15,6 +15,19 @@ bool HookManager::Init() {
 }
 
 void HookManager::ActiveSystem() {
+    // 注册并创建隐藏窗口
+    WNDCLASSEXW wc = {};
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.lpfnWndProc = DefWindowProc;
+    wc.hInstance = GetModuleHandle(nullptr);
+    wc.lpszClassName = (LPCWSTR)L"MulNXTemp";
+    RegisterClassExW(&wc);
+
+    HWND tempHWnd = CreateWindowExW(
+        0, wc.lpszClassName, L"", WS_POPUP,
+        0, 0, 0, 0, nullptr, nullptr, wc.hInstance, nullptr
+    );
+
     // 临时 D3D11 设备/交换链
     ID3D11Device* pTempD3DDevice = nullptr;
     IDXGISwapChain* pTempSwapChain = nullptr;
@@ -24,7 +37,7 @@ void HookManager::ActiveSystem() {
     sd.BufferCount = 1;
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = GetForegroundWindow();
+    sd.OutputWindow = tempHWnd;
     sd.SampleDesc.Count = 1;
     sd.Windowed = true;
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -85,6 +98,10 @@ void HookManager::ActiveSystem() {
 
     pTempD3DDevice->Release();
     pTempSwapChain->Release();
+
+    // 销毁窗口
+    DestroyWindow(tempHWnd);
+    UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
     this->pUISystem->FrameBefore = [this]() {
         ImGui_ImplDX11_NewFrame();

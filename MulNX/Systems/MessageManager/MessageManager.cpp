@@ -72,18 +72,8 @@ bool MulNX::MessageManager::DispathAsyncMsg() {
 }
 
 void MulNX::MessageManager::HandleDispatch() {
-    if (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        return;
-    }
-    // this->ISys().LogInfo("消息派发开始！");
-    if (this->DispathAsyncMsg()) {
-        // 有消息在处理,快速轮询
-        this->SetMyThreadDelta(0);
-    }
-    else {
-        // 没有消息在处理，降低轮询频率
-        this->SetMyThreadDelta(10);
+    while (this->DispathAsyncMsg()) {
+        continue;
     }
 }
 

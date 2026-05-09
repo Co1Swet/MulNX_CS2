@@ -12,6 +12,7 @@ namespace MulNX {
     class ModuleBase {
         friend MulNX::Core::Core;
         friend C_ISys;
+        friend MulNX::Core::CoreStarterBase;
     private:
         // 协程：状态
 
