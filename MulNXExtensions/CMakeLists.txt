@@ -9,6 +9,7 @@ add_subdirectory("WebSocketManager")
 add_subdirectory("GraphicsManager")
 add_subdirectory("MediaRemoter")
 add_subdirectory("ShortcutManager")
+add_subdirectory("Win32Starter")
 
 target_link_libraries(MulNXExtensions INTERFACE
     MulNX
@@ -21,4 +22,5 @@ target_link_libraries(MulNXExtensions INTERFACE
     GraphicsManager
     MediaRemoter
     ShortcutManager
+    Win32Starter
 )
