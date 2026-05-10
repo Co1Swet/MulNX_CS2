@@ -70,13 +70,12 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
 // ImGui窗口处理函数导入
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int MulNX::UISystem::Render() {
-    this->Update();
-    if (!this->UISystemRunning) {
-        return 0;
-    }
     MulNX::Win32::Msg4 msg4;
     while (this->winMsgs.try_dequeue(msg4)) {
         ImGui_ImplWin32_WndProcHandler(msg4.hWnd, msg4.uMsg, msg4.wParam, msg4.lParam);
+    }
+    if (!this->UISystemRunning) {
+        return 0;
     }
     ImGuiIO& io = ImGui::GetIO();
     if (this->WantCaptureMouse.load(std::memory_order_acquire)!= io.WantCaptureMouse) {
@@ -86,7 +85,7 @@ int MulNX::UISystem::Render() {
         this->WantTextInput.store(io.WantTextInput, std::memory_order_release);
     }
 
-    this->FrameBefore();
+    if (!this->FrameBefore())return 0;
     if (this->pInputSystem->CheckComboClick(VK_INSERT, 1)) {
         this->UIContext.Active = !this->UIContext.Active;
     }

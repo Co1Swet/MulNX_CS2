@@ -15,14 +15,15 @@ bool MiniMap::Init() {
 
 void MiniMap::Main() {
     if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'M',1 })) {
-        this->ShowWindow = !this->ShowWindow;
+        this->showWindow = !this->showWindow;
     }
 
     return;
 }
 
 bool MiniMap::UINodeFunc(MulNX::UINode* ThisNode) {
-    if (!this->ShowWindow) return true;
+    auto w = MulNX::UI::RAIIWindow("小地图窗口", this->showWindow);
+    if (!w)return true;
 
     // 保存当前样式
     ImGuiStyle& style = ImGui::GetStyle();
@@ -35,17 +36,11 @@ bool MiniMap::UINodeFunc(MulNX::UINode* ThisNode) {
     style.Colors[ImGuiCol_ChildBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);  // 完全透明子窗口背景
     style.Colors[ImGuiCol_Border] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);   // 透明边框
 
-    static bool op;
-    op = this->ShowWindow;
-    ImGui::Begin("小地图窗口", &op);
-    this->ShowWindow = op;
-
     if (false) {
         // 恢复样式
         style.Colors[ImGuiCol_WindowBg] = oldWindowBg;
         style.Colors[ImGuiCol_ChildBg] = oldChildBg;
         style.Colors[ImGuiCol_Border] = oldBorder;
-        ImGui::End();
         return true;
     }
     // 计算地图绘制区域：如果随窗口联动则使用剩余内容区域的正方形
@@ -134,7 +129,6 @@ bool MiniMap::UINodeFunc(MulNX::UINode* ThisNode) {
 
     ImGui::EndChild();
 
-    ImGui::End();
     // 恢复原始样式
     style.Colors[ImGuiCol_WindowBg] = oldWindowBg;
     style.Colors[ImGuiCol_ChildBg] = oldChildBg;

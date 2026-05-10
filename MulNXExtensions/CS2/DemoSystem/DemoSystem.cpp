@@ -3,7 +3,7 @@
 #include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 bool DemoSystem::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("Demo", this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow("Demo", this->showWindow);
     if (!w) return true;
     {
         std::unique_lock lock(this->smutex);

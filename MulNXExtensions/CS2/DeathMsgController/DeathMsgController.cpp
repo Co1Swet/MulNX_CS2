@@ -11,7 +11,7 @@ struct CKV3MemberName {
 };
 
 bool DeathMsgController::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);
     if (!w)return true;
     MulNX::UI::Checkbox(I18n("dthmsg.enable").c_str(), this->enable);
     return true;

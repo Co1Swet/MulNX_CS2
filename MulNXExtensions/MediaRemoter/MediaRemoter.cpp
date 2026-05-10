@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 void MediaRemoter::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("OBS", this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow("OBS", this->showWindow);
     if (!this->OBSConnected.load(std::memory_order_acquire)) {
         ImGui::Text(I18n("media.obs.connect.please_try").c_str());
         if (ImGui::Button(I18n("media.obs.connect.try").c_str())) {
@@ -19,7 +19,7 @@ void MediaRemoter::Window(MulNX::UINode* node) {
 }
 
 bool MediaRemoter::Init() {
-    this->ShowWindow = true;
+    this->showWindow = true;
     // 关闭不需要的日志
     this->client.clear_access_channels(websocketpp::log::alevel::all);
     this->client.init_asio();

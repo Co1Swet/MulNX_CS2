@@ -35,14 +35,14 @@ bool ProjectManager::MenuProject(MulNX::UINode* node) {
             ImGui::SameLine();
             if (ImGui::Button(project->Name.c_str())) {
                 this->ControllingProject = project;
-                this->ShowWindow.store(true, std::memory_order_release);
+                this->showWindow.store(true, std::memory_order_release);
             }
         }
     }
     return true;
 }
 bool ProjectManager::UINodeFunc(MulNX::UINode* node) {
-    if (this->ShowWindow.load(std::memory_order_acquire)) {
+    if (this->showWindow.load(std::memory_order_acquire)) {
         //项目调试窗口
         this->Project_DebugWindow();
         if (this->OpenProjectKCPackDebugWindow) {
@@ -55,7 +55,7 @@ bool ProjectManager::UINodeFunc(MulNX::UINode* node) {
     return true;
 }
 void ProjectManager::Project_DebugWindow() {
-    auto w = MulNX::UI::RAIIWindow(I18n("camsys.proj.debug_window").c_str(), this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow(I18n("camsys.proj.debug_window").c_str(), this->showWindow);
     if (!w)return;
     // 检查当前操作项目
     if (!this->ControllingProject) {
@@ -70,7 +70,7 @@ void ProjectManager::Project_DebugWindow() {
     }
     if (ImGui::Button(I18n("camsys.proj.unload_current").c_str())) {
         this->Project_Delete(this->ControllingProject->Name);
-        this->ShowWindow.store(false, std::memory_order_release);
+        this->showWindow.store(false, std::memory_order_release);
         return;
     }
     if (ImGui::Button(I18n("camsys.proj.modify_keybind").c_str())) {

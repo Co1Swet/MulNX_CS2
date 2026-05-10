@@ -1,5 +1,6 @@
-add_executable(MulNXInjector WIN32
+add_executable(MulNXInjector
     Main/Main.cpp
+    UIDocker/UIDocker.cpp
 )
 
 target_link_libraries(MulNXInjector PUBLIC

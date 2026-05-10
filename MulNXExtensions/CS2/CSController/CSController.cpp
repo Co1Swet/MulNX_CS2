@@ -7,7 +7,7 @@
 #include <unordered_set>
 
 bool CSController::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("快捷操作", this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow("快捷操作", this->showWindow);
     if (!w)return true;
 
     node->CallUINode("ViewController");
@@ -19,7 +19,7 @@ bool CSController::Window(MulNX::UINode* node) {
 }
 
 bool CSController::Init() {
-    this->ShowWindow = true;
+    this->showWindow = true;
     this->ISys()
         .SubscribeAsync("Demo/GotoTick")
         .SubscribeAsync("Game/Command");

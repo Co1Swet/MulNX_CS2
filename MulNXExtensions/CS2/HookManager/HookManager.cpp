@@ -80,6 +80,7 @@ void HookManager::ActiveSystem() {
                 this->pGraphicsManager->BuildNew();
                 this->pGraphicsManager->OnPresent();
                 // UI 系统渲染
+                this->pUISystem->Update();
                 this->pUISystem->Render();
             }
             return MulNX::Hook::Then::Continue;
@@ -107,6 +108,7 @@ void HookManager::ActiveSystem() {
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+        return true;
         };
     this->pUISystem->FrameBehind = [this]() {
         ImGui::EndFrame();

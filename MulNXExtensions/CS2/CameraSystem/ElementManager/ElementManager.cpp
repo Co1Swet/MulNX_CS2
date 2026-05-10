@@ -60,7 +60,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> eleme
     if (ImGui::Selectable(element->Name.data(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
         if (ImGui::IsMouseDoubleClicked(0)) {
             this->CurrentElement.store(element, std::memory_order_release);
-            this->ShowWindow.store(true, std::memory_order_release);
+            this->showWindow.store(true, std::memory_order_release);
         }
     }
 
@@ -91,7 +91,7 @@ bool ElementManager::UINodeFunc(MulNX::UINode* node) {
         auto frame = this->drawCamera.Read();
         this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.elem.preview_draw_label").c_str());
     }
-    auto w = MulNX::UI::RAIIWindow("元素调试", this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow("元素调试", this->showWindow);
     if (!w)return true;
     // 检查当前是否有操作元素
     auto current = this->CurrentElement.load(std::memory_order_acquire);

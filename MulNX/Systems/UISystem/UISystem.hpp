@@ -22,7 +22,7 @@ namespace MulNX {
         std::atomic<bool>WantCaptureMouse{ false };
         std::atomic<bool>WantTextInput{ false };
         moodycamel::ConcurrentQueue<MulNX::Win32::Msg4>winMsgs{};
-        std::function<void(void)>FrameBefore = nullptr;
+        std::function<bool(void)>FrameBefore = nullptr;
         std::function<void(void)>FrameBehind = nullptr;
 
         bool Init()override;

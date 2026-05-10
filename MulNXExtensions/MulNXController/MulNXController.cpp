@@ -9,7 +9,7 @@ bool MulNXController::UINodeFunc(MulNX::UINode* ThisNode) {
     if (ImGui::Checkbox("调试模式（Debug Mode），提供更多功能，但可能影响性能和稳定性", &debugMode)) {
         this->GlobalVars->DebugMode = debugMode;
     }
-    MulNX::UI::Checkbox("调试器窗口", this->IDebugger->ShowWindow);
+    MulNX::UI::Checkbox("调试器窗口", this->IDebugger->showWindow);
     ImGui::Checkbox("当有错误信息时弹出调试器", &this->IDebugger->ShowWhenError);
     ImGui::Checkbox("自动滚动到最新消息", &this->IDebugger->AutoScroll);
     static int MaxDebugMsgs = 1000;

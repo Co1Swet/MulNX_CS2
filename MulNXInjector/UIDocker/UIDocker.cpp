@@ -82,19 +82,6 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     ImGui::Text(I18n("homepage").c_str());
     ImGui::End();
 
-    ImGui::Begin(I18n("ui.camera_system").c_str());
-    node->CallUINode("CameraSystem");
-    ImGui::End();
-
-    ImGui::Begin(I18n("ui.game_settings").c_str());
-    node->CallUINode("GameSettingsManager");
-    ImGui::End();
-
-    ImGui::Begin(I18n("ui.game_enhance").c_str());
-    node->CallUINode("POVFixer");
-    node->CallUINode("ConsoleManager");
-    ImGui::End();
-
     ImGui::Begin(I18n("ui.mulnx_control").c_str());
     node->CallUINode("VirtualUser");
     node->CallUINode("MulNXController");
@@ -102,17 +89,4 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
 
     node->CallUINode("UIDocker");
     node->CallUINode("Debugger");
-    node->CallUINode("GameCfgManager");
-    node->CallUINode("MiniMap");
-    node->CallUINode("CSController");
-    node->CallUINode("ElementManager");
-    node->CallUINode("SolutionManager");
-    node->CallUINode("ProjectManager");
-    node->CallUINode("DemoSystem");
-    node->CallUINode("PlayerHub");
-    node->CallUINode("ProjectileTracker");
-    node->CallUINode("DeathMsgController");
-    node->CallUINode("MediaRemoter");
-    node->CallUINode("ESPController");
-    node->CallUINode("SkinController");
 }

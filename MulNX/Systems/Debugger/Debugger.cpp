@@ -7,7 +7,7 @@
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 
 bool MulNX::Debugger::Window(MulNX::UINode* ThisNode) {
-    auto w = MulNX::UI::RAIIWindow("调试器", this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow("调试器", this->showWindow);
     if (!w)return true;
     std::shared_lock lock(this->smutex);
 
@@ -109,7 +109,7 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
     case "Log/Error"_hash: {
         MulNX::NetExt ext = std::move(*msg.asp.get<MulNX::NetExt>());
         if (this->ShowWhenError) {
-            this->ShowWindow = true;
+            this->showWindow = true;
             this->IfShowStream = true;
         }
         this->PushBack(std::move(ext), this->kError);

@@ -41,9 +41,9 @@ namespace MulNX {
 
             // 设置启动器
             template<typename T>
-            CoreStarterBase* CreateCoreStarter() {
+            T* CreateCoreStarter() {
                 this->pCoreStarter = std::make_unique<T>();
-                return this->pCoreStarter.get();
+                return static_cast<T*>(this->pCoreStarter.get());
             }
 
             // 获取核心名

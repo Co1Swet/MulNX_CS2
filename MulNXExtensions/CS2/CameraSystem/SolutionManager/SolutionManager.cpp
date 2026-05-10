@@ -55,7 +55,7 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
     if (ImGui::Selectable(solution->name.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
         if (ImGui::IsMouseDoubleClicked(0)) {
             this->CurrentSolution = solution;
-            this->ShowWindow.store(true, std::memory_order_release);
+            this->showWindow.store(true, std::memory_order_release);
         }
     }
     if (ImGui::BeginPopupContextItem(("右键菜单" + solution->name).c_str())) {
@@ -96,7 +96,7 @@ bool SolutionManager::UINodeFunc(MulNX::UINode* node) {
         this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.sol.playing_draw_label").c_str());
     }
 
-    if (!this->ShowWindow.load(std::memory_order_acquire))return true;
+    if (!this->showWindow.load(std::memory_order_acquire))return true;
     this->Solution_DebugWindow();
     if (!this->CurrentSolution) {
         this->OpenSolutionKCPackDebugWindow = false;
@@ -114,7 +114,7 @@ bool SolutionManager::UINodeFunc(MulNX::UINode* node) {
     return true;
 }
 void SolutionManager::Solution_DebugWindow() {
-    auto w = MulNX::UI::RAIIWindow(I18n("camsys.sol.debug_window").c_str(), this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow(I18n("camsys.sol.debug_window").c_str(), this->showWindow);
     if (!w)return;
     // 检查当前是否操作解决方案
     if (!this->CurrentSolution) {

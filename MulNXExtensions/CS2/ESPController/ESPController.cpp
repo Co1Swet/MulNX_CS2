@@ -4,7 +4,7 @@
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
 bool ESPController::Draw(MulNX::UINode* node) {
-    if (this->ShowWindow.load(std::memory_order_acquire)) {
+    if (this->showWindow.load(std::memory_order_acquire)) {
         for (int i = 1; i <= 10; ++i) {
             if (!this->CS2()->GetPlayerMsg(i).Alive)continue;
             const DirectX::XMFLOAT3 EyePos3D = this->CS2()->GetPlayerMsg(i).EyePosition;

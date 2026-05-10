@@ -4,7 +4,7 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 bool PlayerHub::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("玩家信息管理", this->ShowWindow);
+    auto w = MulNX::UI::RAIIWindow("玩家信息管理", this->showWindow);
     if (!w) return false;
     try {
         std::shared_lock lock(this->smutex);

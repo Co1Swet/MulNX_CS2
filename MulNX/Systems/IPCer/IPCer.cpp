@@ -47,15 +47,16 @@ std::filesystem::path MulNX::IPCer::GetRoot() {
 
 bool MulNX::IPCer::Init() {
     //设置MulNX.exe路径
-    if (!this->GetWindowPathByName(L"Multiple Next Extension", this->Paths.MulNX.MulNX_exe.Path)) {
+    while (!this->GetWindowPathByName(L"Multiple Next Extension", this->Paths.MulNX.MulNX_exe.Path)) {
         //throw std::string("错误，找不到Multiple Next Extension窗口！");
-        return false;
+        //return false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     //获取MulNX目录
     this->Paths.MulNX.Path = this->Paths.MulNX.MulNX_exe.Path.parent_path();
     //设置cs2.exe路径
-    if (!this->GetWindowPathByName(L"Counter-Strike 2", this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path)) {
-        return false;
+    while(!this->GetWindowPathByName(L"Counter-Strike 2", this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     //获取CS目录
     this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path.parent_path();

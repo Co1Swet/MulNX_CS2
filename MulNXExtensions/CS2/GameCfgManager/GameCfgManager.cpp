@@ -4,11 +4,8 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 bool GameCfgManager::UINodeFunc(MulNX::UINode* ThisNode) {
-    if (!this->ShowWindow) return true;
-    static bool op;
-    op = this->ShowWindow;
-    ImGui::Begin("Cfg管理器", &op);
-    this->ShowWindow = op;
+    auto w = MulNX::UI::RAIIWindow("配置管理器", this->showWindow);
+    if (!w)return true;
     //顶部工具栏
     if (ImGui::Button("刷新列表")) {
         this->UpdateCfgList();
@@ -104,8 +101,6 @@ bool GameCfgManager::UINodeFunc(MulNX::UINode* ThisNode) {
     //底部信息栏
     ImGui::Separator();
     ImGui::TextDisabled("提示: 点击按钮在工具目录和游戏目录间移动文件");
-
-    ImGui::End();
     return true;
 }
 

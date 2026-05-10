@@ -62,7 +62,6 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
         .CreateModule<MulNX::InputSystem>("InputSystem")// 输入系统模块
         .CreateModule<MulNX::GlobalVars>("GlobalVars")// 全局变量模块
         .CreateModule<MulNX::TaskSystem>("TaskSystem")// 任务系统
-        // ID 100(最后一个模块)分配给3D抽象层
         ;
 
     return *this;

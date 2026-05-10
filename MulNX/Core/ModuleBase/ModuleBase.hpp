@@ -100,8 +100,6 @@ namespace MulNX {
         // 消息处理函数，只需处理即可，消息会由入口点释放
         virtual void ProcessMsg(MulNX::Message& Msg) {};
     protected:
-        // 消息处理入口
-        void Update();
         // 通过任意函数，发送一个UI节点
         bool SendUINode(std::string&& name, std::function<void(MulNX::UINode*)>&& func);
         void SendTask(std::string&& workerName, std::function<bool()>&& task);
@@ -116,13 +114,15 @@ namespace MulNX {
         bool BaseInit(MulNX::Core::Core* core);
         // 初始化入口
         bool EntryInit();
+        // 更新入口
+        void Update();
         // 设置模块名称
         bool SetName(std::string&& Name);
         std::string GetName()const;
         // 得到核心指针
         MulNX::Core::Core* GetCore()const { return this->Core; }
         // 便捷窗口显示标志
-        std::atomic<bool> ShowWindow = false;
+        std::atomic<bool> showWindow = false;
         // 模块时间控制接口
         void SetMyThreadDelta(int Delta);
 
