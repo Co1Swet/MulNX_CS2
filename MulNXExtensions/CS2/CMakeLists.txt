@@ -5,6 +5,11 @@ add_library(MulNXCS2Ext
 
     CSModuleBase.cpp
 
+    DemoSystem/DemoSystem.cpp
+    DemoSystem/DemoHelper/DemoHelper.cpp
+    DemoSystem/DemoAnalyzer/DemoAnalyzer.cpp
+    DemoSystem/DemoRecorder/DemoRecorder.cpp
+
     ViewController/ViewController.cpp
     TimeController/TimeController.cpp
     AdvancedViewController/AdvancedViewController.cpp
@@ -15,11 +20,7 @@ add_library(MulNXCS2Ext
     DeathMsgController/DeathMsgController.cpp
     SkinController/SkinController.cpp
     POVFixer/POVFixer.cpp
-
-    DemoSystem/DemoSystem.cpp
-    DemoSystem/DemoHelper/DemoHelper.cpp
-    DemoSystem/DemoAnalyzer/DemoAnalyzer.cpp
-    DemoSystem/DemoRecorder/DemoRecorder.cpp
+    TeamIDController/TeamIDController.cpp
 
     PlayerHub/PlayerHub.cpp
     PlayerHub/GlowController/GlowController.cpp

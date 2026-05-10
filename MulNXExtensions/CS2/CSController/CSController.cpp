@@ -27,6 +27,7 @@ bool CSController::Init() {
     this->client = CS2::Module::Client(L"client.dll");
     this->engine2 = CS2::Module::engine2(L"engine2.dll");
     this->tier0 = MulNX::Memory::DllModule(L"tier0.dll");
+    this->panorama = MulNX::Memory::DllModule(L"panorama.dll");
 
     // 加载来自Source2EngineToClient001的模块
     this->Source2EngineToClient001 =

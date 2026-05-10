@@ -13,6 +13,7 @@
 #include "DeathMsgController/DeathMsgController.hpp"
 #include "SkinController/SkinController.hpp"
 #include "POVFixer/POVFixer.hpp"
+#include "TeamIDController/TeamIDController.hpp"
 
 #include "DemoSystem/DemoSystem.hpp"
 #include "DemoSystem/DemoHelper/DemoHelper.hpp"

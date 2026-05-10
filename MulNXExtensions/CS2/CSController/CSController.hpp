@@ -51,6 +51,7 @@ public:
     CS2::Module::Client client{};
     CS2::Module::engine2 engine2{};
     MulNX::Memory::DllModule tier0{};
+    MulNX::Memory::DllModule panorama{};
     // 获取控制台变量系统
     C_ConVarSystem& GetCvarSystem() { return this->CvarSystem; }
     

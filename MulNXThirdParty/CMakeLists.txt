@@ -10,6 +10,8 @@ add_library(MulNXThirdParty
     imgui_d11/imgui_impl_win32.cpp
 
     pugixml/pugixml.cpp
+
+    hlae/binutils.cpp
 )
 
 add_subdirectory("yaml-cpp-master")
