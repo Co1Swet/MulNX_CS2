@@ -1,7 +1,7 @@
 #pragma once
 
 #include <yaml-cpp/yaml.h>
-#include <atomic>      // 为 std::atomic<bool> 添加头文件
+#include <atomic>
 
 namespace MulNX {
     // 按键绑定数据包：包含修饰键、主键码、连击数及有效性标志

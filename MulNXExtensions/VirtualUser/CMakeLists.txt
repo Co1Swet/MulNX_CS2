@@ -1,5 +1,5 @@
 add_library(VirtualUser
-    "VirtualUser.cpp"
+    VirtualUser.cpp
 )
 
 target_link_libraries(VirtualUser PUBLIC

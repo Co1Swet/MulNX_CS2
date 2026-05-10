@@ -8,6 +8,7 @@ add_subdirectory("MulNXController")
 add_subdirectory("WebSocketManager")
 add_subdirectory("GraphicsManager")
 add_subdirectory("MediaRemoter")
+add_subdirectory("ShortcutManager")
 
 target_link_libraries(MulNXExtensions INTERFACE
     MulNX
@@ -19,4 +20,5 @@ target_link_libraries(MulNXExtensions INTERFACE
     WebSocketManager
     GraphicsManager
     MediaRemoter
+    ShortcutManager
 )

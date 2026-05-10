@@ -142,9 +142,6 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
 
 void CameraSystem::HandleUpdate() {
     this->Update();
-    if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'P',1 })) {
-        this->ISys().PublishAsync("CameraSystem/Play/Shutdown"_hash);
-    }
     this->CamDrawer.Update(this->CS2View()->GetViewMatrix(), this->CS2View()->GetWinWidth(), this->CS2View()->GetWinHeight());
     this->EManager->HandleUpdate();
     this->SManager->HandleUpdate();

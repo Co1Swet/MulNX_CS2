@@ -62,7 +62,7 @@ void SkinController::Apply() {
     auto isLegacy = this->legacyModel.load(std::memory_order_acquire);
 
     // 1. 获取武器及关键字段
-    auto localPlayer = this->CS2()->client.GetLocalPlayerPawn();
+    auto localPlayer = this->CS2()->client.TryGetObservingPawn();
     auto weaponServe = MulNX::MRead(localPlayer->pWeaponServices());
     auto hWeapon = MulNX::MRead(weaponServe->hActiveWeapon());
     auto pWeapon = this->CS2()->client.GetBaseEntityFromHandle(hWeapon)->As<CS2::C_CSWeaponBase>();
@@ -113,7 +113,14 @@ void SkinController::Apply() {
     CS2::CEconItemAttribute* paintAttr = (CS2::CEconItemAttribute*)malloc(CS2::CEconItemAttribute::ofsize);
     MulNX::MWrite(paintAttr->m_iAttributeDefinitionIndex(), (uint16_t)6);
     MulNX::MWrite(paintAttr->m_flValue(), fTargetIndex);
-    MulNX::MWrite(paintAttr->m_flInitialValue() , fTargetIndex);
+    MulNX::MWrite(paintAttr->m_flInitialValue(), fTargetIndex);
+
+    // char buffer[200];
+    // memcpy(buffer, item->m_szCustomName(), 199);
+    // memcpy(buffer, item->m_szCustomNameOverride(), 199);
+    // memcpy(item->m_szCustomNameOverride(), "test test name", 15);
+    // memcpy(buffer, item->m_szCustomNameOverride(), 199);
+    //memcpy(item->m_szCustomNameOverride(), "test", 5);
 
     RestoreGuard guard{
         item, origItemIDHigh,

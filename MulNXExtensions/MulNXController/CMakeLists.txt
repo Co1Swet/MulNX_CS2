@@ -1,5 +1,5 @@
 add_library(MulNXController
-    "MulNXController.cpp"
+    MulNXController.cpp
 )
 
 target_link_libraries(MulNXController PUBLIC

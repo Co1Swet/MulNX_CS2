@@ -1,3 +1,4 @@
+#pragma once
 // CameraSystem.hpp
 // 摄像机系统
 // 工作流抽象：元素->解决方案->项目->工作区
@@ -16,11 +17,7 @@
 // 统一在边界（包括等于）返回false
 // Call系列函数返回false应当意味着没有可用Frame产出（保证有值产出时性能）
 // 具体的播放启停原理需要其它手段协助（允许启停的卡顿，当然也很微小，但还是要尽最大可能让有值可用时性能最高）
-
-#pragma once
-
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
-
 #include "CameraDrawer/CameraDrawer.hpp"
 
 class ElementManager;

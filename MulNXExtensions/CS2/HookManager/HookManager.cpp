@@ -161,8 +161,10 @@ MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
     this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
     if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
         return MulNX::Hook::Then::Return;
-    if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) && MulNX::Win32::IsKeyboardMessage(uMsg))
-        return MulNX::Hook::Then::Return;
+    if (MulNX::Win32::IsKeyboardMessage(uMsg)) {
+        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) || this->pInputSystem->IsKeyPressed(VK_MENU))
+            return MulNX::Hook::Then::Return; // 当alt按下时进行拦截，此时属于 MulNX 按键通道判定快捷键的时刻
+    }
     if (uMsg == WM_CLOSE) {
         this->ISys().LogWarning(I18n("sys.shutdown_warning"));
         this->CloseSystem();

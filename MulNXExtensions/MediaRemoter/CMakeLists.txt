@@ -1,5 +1,5 @@
 add_library(MediaRemoter
-    "MediaRemoter.cpp"
+    MediaRemoter.cpp
 )
 
 target_link_libraries(MediaRemoter PUBLIC

@@ -1,5 +1,5 @@
 add_library(WebSocketManager
-    "WebSocketManager.cpp"
+    WebSocketManager.cpp
 )
 
 target_link_libraries(WebSocketManager PUBLIC
