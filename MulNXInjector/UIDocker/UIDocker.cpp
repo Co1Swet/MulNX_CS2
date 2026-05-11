@@ -89,4 +89,5 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
 
     node->CallUINode("UIDocker");
     node->CallUINode("Debugger");
+    node->CallUINode("CS2BootLoader");
 }

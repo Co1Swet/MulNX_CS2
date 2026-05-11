@@ -8,11 +8,14 @@
 #include <MulNXExtensions/ShortcutManager/ShortcutManager.hpp>
 
 MulNX::Core::Core* pCore = nullptr;
+HMODULE hOriginModule = nullptr;
 
 DWORD MulNX_CS2_Start(void*) {
     try {
         // 创建核心
         pCore = MulNX::Core::Core::Create("CS2OBTool");
+        // 将DLL模块句柄传递给核心，以便后续使用
+        pCore->hMyOriginModule = hOriginModule;
         // 创建核心启动器
         auto* starter = pCore->CreateCoreStarter<HookManager>();
         // 手动创建的模块需要手动设置名称
@@ -94,6 +97,7 @@ DWORD MulNX_CS2_Start(void*) {
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH: {
+        hOriginModule = hModule;
         HANDLE hThread = CreateThread(NULL, 0, MulNX_CS2_Start, NULL, 0, NULL);
         // 这里不需要等待线程结束，因为它会在完成初始化后自动退出，然后等待进程结束时被操作系统清理
         break;

@@ -110,7 +110,7 @@ bool WebSocketManager::Init() {
 
                 this->ISys().PublishAsync(std::move(mmsg));
 
-                this->server.send(hdl, "已经执行控制台指令：" + msg->get_payload(), msg->get_opcode());
+                this->server.send(hdl, "已投入消息总线" + msg->get_payload(), msg->get_opcode());
             }
             catch (const websocketpp::exception& e) {
                 this->ISys().LogError("网络回调接口错误: " + *e.what());

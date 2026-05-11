@@ -52,6 +52,7 @@ add_subdirectory("MulNXInjector")
 # 定义目标路径
 set(InjecterPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
 set(DllPath ${InjecterPath}/CS2OBTool)
+set(MulNXInjectorPath ${InjecterPath}/MulNXInjector)
 
 # 处理 CS2Injector 目标
 set_target_properties(CS2Injector PROPERTIES
@@ -64,11 +65,11 @@ set_target_properties(CS2Injector PROPERTIES
 
 # 处理 MulNXInjector 目标
 set_target_properties(MulNXInjector PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${InjecterPath}"
+    RUNTIME_OUTPUT_DIRECTORY "${MulNXInjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${MulNXInjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${MulNXInjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${MulNXInjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${MulNXInjectorPath}"
 )
 
 # 处理 CS2OBTool 目标

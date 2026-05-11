@@ -1,10 +1,6 @@
 #include "CSController.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNX/Base/Math/Translate/Translate.hpp>
-#include <MulNXExtensions/CS2/PlayerHub/ProjectileTracker/ProjectileTracker.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
-#include <unordered_set>
 
 bool CSController::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("快捷操作", this->showWindow);

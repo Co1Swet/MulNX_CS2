@@ -47,24 +47,21 @@ std::filesystem::path MulNX::IPCer::GetRoot() {
 
 bool MulNX::IPCer::Init() {
     //设置MulNX.exe路径
-    while (!this->GetWindowPathByName(L"Multiple Next Extension", this->Paths.MulNX.MulNX_exe.Path)) {
-        //throw std::string("错误，找不到Multiple Next Extension窗口！");
-        //return false;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
+    WCHAR path[MAX_PATH] = { 0 };
+    GetModuleFileNameW(this->Core->hMyOriginModule, path, MAX_PATH);
+    this->Paths.MulNX.MulNX_exe.Path = path;
     //获取MulNX目录
-    this->Paths.MulNX.Path = this->Paths.MulNX.MulNX_exe.Path.parent_path();
+    this->Paths.MulNX.Path = this->Paths.MulNX.MulNX_exe.Path.parent_path().parent_path();
     //设置cs2.exe路径
-    while(!this->GetWindowPathByName(L"Counter-Strike 2", this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    if (this->GetWindowPathByName(L"Counter-Strike 2", this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path)) {
+        //获取CS目录
+        this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path.parent_path();
+        this->Paths.Counter_Strike_Global_Offensive.game.bin.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path.parent_path();
+        this->Paths.Counter_Strike_Global_Offensive.game.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.Path.parent_path();
+        this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path = this->Paths.Counter_Strike_Global_Offensive.game.Path / "csgo";
+        this->Paths.Counter_Strike_Global_Offensive.game.csgo.cfg.Path = this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path / "cfg";
     }
-    //获取CS目录
-    this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path.parent_path();
-    this->Paths.Counter_Strike_Global_Offensive.game.bin.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path.parent_path();
-    this->Paths.Counter_Strike_Global_Offensive.game.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.Path.parent_path();
-    this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path = this->Paths.Counter_Strike_Global_Offensive.game.Path / "csgo";
-    this->Paths.Counter_Strike_Global_Offensive.game.csgo.cfg.Path = this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path / "cfg";
-	return true;
+    return true;
 }
 
 
@@ -123,10 +120,10 @@ bool MulNX::IPCer::GetFileNames(std::vector<std::string>& FileNames, const std::
             std::string ExtensionName = FilePath.extension().string();
             if (std::find(Filter.begin(), Filter.end(), ExtensionName) != Filter.end()) {
                 if (Extension) {
-					FileNames.push_back(FilePath.filename().string());
+                    FileNames.push_back(FilePath.filename().string());
                 }
                 else {
-					FileNames.push_back(FilePath.stem().string());
+                    FileNames.push_back(FilePath.stem().string());
                 }
             }
         }

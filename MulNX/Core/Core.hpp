@@ -3,6 +3,7 @@
 #include <MulNX/Config/Config.hpp>
 #include <Memory>
 #include <chrono>
+#include <Windows.h>
 
 namespace MulNX {
     namespace Core {
@@ -24,6 +25,7 @@ namespace MulNX {
             Core(const Core&) = delete;
             Core& operator=(const Core&) = delete;
         public:
+            HMODULE hMyOriginModule = nullptr;   // 用于获取自身 DLL/EXE 的文件路径
             // 构造函数
             Core(std::string&& CoreName);
             // 析构函数
