@@ -32,10 +32,21 @@ bool HookManager::Init() {
         }).value();
     this->hkLoadLibraryExW->Attach();
 
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
+        auto t = std::thread([this]() {
+            while (!(GetAsyncKeyState(VK_INSERT)&0x8000)) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+            this->HookD3D11();
+        });
+        t.detach();
+
+        });
+
     return true;
 }
 
-void HookManager::ActiveSystem() {
+void HookManager::HookD3D11() {
     // 注册并创建隐藏窗口
     WNDCLASSEXW wc = {};
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -137,6 +148,8 @@ void HookManager::ActiveSystem() {
         this->pGraphicsManager->pd3dContext->OMSetRenderTargets(1, &this->pGraphicsManager->view, nullptr);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         };
+
+    this->ActiveSystem();
 }
 
 void HookManager::d3dInit() {
@@ -196,6 +209,7 @@ MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 }
 
 void HookManager::Deinit() {
+    this->hkLoadLibraryExW->Detach();
     this->hkClearDepthStencilView->Detach();
     this->hkDrop->Detach();
     this->hkPresent->Detach();

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.31)
 project("MulNX_CS2")
 
 # 版本定义
-add_compile_definitions(MulNXVersion="B0.2.0C0.24.0")
+add_compile_definitions(MulNXVersion="B0.2.0C0.25.0")
 
 # 启用 LTO（仅 Release 配置）
 include(CheckIPOSupported)
@@ -47,36 +47,25 @@ add_subdirectory("MulNX")
 add_subdirectory("MulNXExtensions")
 add_subdirectory("CS2OBTool")
 add_subdirectory("CS2Injector")
-add_subdirectory("MulNXInjector")
 
 # 定义目标路径
-set(InjecterPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
-set(DllPath ${InjecterPath}/CS2OBTool)
-set(MulNXInjectorPath ${InjecterPath}/MulNXInjector)
+set(MulNXPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
+set(CS2OBToolPath ${MulNXPath}/CS2OBTool)
+set(CS2InjectorPath ${MulNXPath}/CS2Injector)
 
 # 处理 CS2Injector 目标
 set_target_properties(CS2Injector PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${InjecterPath}"
-    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${InjecterPath}"
+    RUNTIME_OUTPUT_DIRECTORY "${CS2InjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CS2InjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CS2InjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CS2InjectorPath}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CS2InjectorPath}"
 )
-
-# 处理 MulNXInjector 目标
-set_target_properties(MulNXInjector PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${MulNXInjectorPath}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${MulNXInjectorPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${MulNXInjectorPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${MulNXInjectorPath}"
-    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${MulNXInjectorPath}"
-)
-
 # 处理 CS2OBTool 目标
 set_target_properties(CS2OBTool PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${DllPath}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${DllPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${DllPath}"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${DllPath}"
-    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${DllPath}"
+    RUNTIME_OUTPUT_DIRECTORY "${CS2OBToolPath}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CS2OBToolPath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CS2OBToolPath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CS2OBToolPath}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CS2OBToolPath}"
 )

@@ -34,6 +34,7 @@ private:
 
     bool PeekQueue(RecordToDo& task);   // 调用者需持有 mtx
 
+    MulNX::CoTask coTa;
     MulNX::CoTask Main();
     void StopRecording();
 };

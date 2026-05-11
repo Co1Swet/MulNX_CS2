@@ -3,9 +3,13 @@ disclaimer: |
   在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
   但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
 
+homepage: |
+  欢迎使用MulNX
+  使用 Insert 键开关UI系统
+
 # 此部分归属UI系统，和主要的，公有的UI部分翻译
 ui:
-  main: 主窗口（按下 Insert 键隐藏所有绘制）
+  main: 首页
   camera_system: 摄像机系统
   game_settings: 游戏设置
   game_enhance: 游戏增强
@@ -26,6 +30,11 @@ ui:
       load_succ: 字体配置解析成功！字体路径：{0}  字体大小：{1}
     load: 尝试加载字体：{}
     load_succ: 字体加载成功：{}
+  padding:
+    top: 上边距
+    bottom: 下边距
+    left: 左边距
+    right: 右边距
 
 win32:
   drag:
@@ -69,6 +78,8 @@ demo:
   status:
     is_playing: 当前是否处于Demo中：{}
     is_pausing: 当前是否Demo处于暂停状态：{}
+  analyze:
+    dump: 生成图谱
 
   empty: 拖放 .dem 文件到此处以加载
   play: 播放
@@ -121,14 +132,27 @@ module:
   inited: 初始化成功！
   send_ui: 将UI节点注册信息推送到了消息系统
   send_task: 将任务注册信息推送到了消息系统
+  deinited: 已关闭模块：{}
 
 sys:
-  i18n_load_succ: 语言文件加载成功：{}
+  inited_info: 所有模块初始化成功，模块总量：{}
+  inited_time_sum: 初始化完成，自核心分配内存并创建开始，共耗时：{}（微秒）
+  bye: 日志模块即将下线，收尾析构等工作将由剩余子系统完成，MulNX期待与您下次再见
   version_is_testing: 当前版本是否为测试版：{} 
   version_is: 当前版本号：{} 
   build_stamp: 当前版本构建时间：{} 
   started: 各模块初始化完毕，系统已启动
-  shutdown_warning: 检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态，后续日志请忽略
+  shutdown_warning: 检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态
+
+  i18n:
+    load_succ: 语言文件加载成功：{}
+    load_nums: 共加载键值对：{}
+
+  msg:
+    sync:
+      subed{}: 同步消息订阅：{}
+    async:
+      subed{}: 异步消息订阅：{}
 
 result:
   create_succ: 创建成功：{}
@@ -150,7 +174,7 @@ log:
   fmt: "[{0}][{1}][{2}]{3}" # 0~3代表：时间、级别、模块、消息
   new: |
     +----------新的日志片段----------+
-    当游戏关闭时发生异常是可预见的，请忽略
+    日志系统已上线，欢迎使用MulNX
 # 摄像机系统
 camsys:
   tab_proj: 项目
@@ -248,3 +272,13 @@ dthmsg:
     name: 击杀信息控制
     control: 击杀信息控制窗口
   enable: 启用击杀控制
+
+pov:
+  enable: 启用POV修复
+  disable: 禁用POV修复
+
+skin:
+  changer: 换肤器
+  apply: 应用皮肤设置
+  target:
+    index: 目标皮肤索引

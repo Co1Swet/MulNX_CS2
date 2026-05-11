@@ -3,10 +3,12 @@
 
 bool TimeController::Init() {
 
-    auto demo = this->CS2()->GetDemo();
-    this->GetDemoTick = IVClass::Assume(demo)->GetVFunc<int()>(3);
-    this->IsPlayingDemo = IVClass::Assume(demo)->GetVFunc<bool()>(11);
-    this->IsDemoPaused = IVClass::Assume(demo)->GetVFunc<bool()>(12);
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
+        auto demo = this->CS2()->GetDemo();
+        this->GetDemoTick = IVClass::Assume(demo)->GetVFunc<int()>(3);
+        this->IsPlayingDemo = IVClass::Assume(demo)->GetVFunc<bool()>(11);
+        this->IsDemoPaused = IVClass::Assume(demo)->GetVFunc<bool()>(12);
+        });
 
     return true;
 }

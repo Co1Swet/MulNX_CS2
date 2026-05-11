@@ -34,32 +34,37 @@ void NameController::Menu(MulNX::UINode* node) {
 }
 
 bool NameController::Init() {
-    auto FnGetDecoratedPlayerName = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
-    this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hk) {
-            // 这里注意，这里的名称获取，是需要进一步调用GetPlayerName的
-            // 我们借助这一个比较稳定的特征，创建延迟Hook
-            // 所以，这里同时不需要加锁，因为它已经满足上下文无关于我们的数据结构的访问了
-            // 这里也一定不能加锁，不然可能会被写锁请求打断，导致死锁！
-            auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
-            this->HandleVHook(playerController);
-            return MulNX::Hook::Then::Continue; // 继续执行原始函数，获取装饰名并写入 pBuffer
-        }).value();
-    this->hkGetDecoratedPlayerName->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
-
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        this->Menu(node);
-        return true;
-        });
-
-    this->SendTask("CSControl", [this]() {
-        this->Update();
-        return true;
-        });
-
     this->ISys()
         .SubscribeAsync("Name/Player/Set");
+
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+
+        auto FnGetDecoratedPlayerName = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
+        this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), 0, false,
+            [this](RegContext* ctx, MulNX::Hook* hk) {
+                // 这里注意，这里的名称获取，是需要进一步调用GetPlayerName的
+                // 我们借助这一个比较稳定的特征，创建延迟Hook
+                // 所以，这里同时不需要加锁，因为它已经满足上下文无关于我们的数据结构的访问了
+                // 这里也一定不能加锁，不然可能会被写锁请求打断，导致死锁！
+                auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
+                this->HandleVHook(playerController);
+                return MulNX::Hook::Then::Continue; // 继续执行原始函数，获取装饰名并写入 pBuffer
+            }).value();
+        this->hkGetDecoratedPlayerName->Attach();
+        this->ISys().LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
+
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+            this->Menu(node);
+            return true;
+            });
+
+        this->SendTask("CSControl", [this]() {
+            this->Update();
+            return true;
+            });
+
+        
+        });
 
     return true;
 }

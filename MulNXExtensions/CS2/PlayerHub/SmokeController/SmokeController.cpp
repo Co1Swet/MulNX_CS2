@@ -74,29 +74,32 @@ void SmokeController::MenuTeam(MulNX::UINode* node) {
 }
 
 bool SmokeController::Init() {
-    // 1. 定位并挂钩 SetSmokeProps
-    auto target = this->CS2()->client.GetTextRegion()
-        .FindRegion(MulNX::CS2::Signatures::SetSmokeProps).Data();
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
-    this->hkSetSmokeProps = MulNX::Hook::Create(target, 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hook) {
-            // 再应用自定义颜色
-            this->MySetSmokeProps(*ctx->P1<CS2::C_SmokeGrenadeProjectile*>());
-            return MulNX::Hook::Then::Continue;
-        }).value();
-    this->hkSetSmokeProps->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "SetSmokeProps"));
+        // 1. 定位并挂钩 SetSmokeProps
+        auto target = this->CS2()->client.GetTextRegion()
+            .FindRegion(MulNX::CS2::Signatures::SetSmokeProps).Data();
 
-    // 2. 注册 UI
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        this->Menu(node);
-        return true;
-        });
+        this->hkSetSmokeProps = MulNX::Hook::Create(target, 0, false,
+            [this](RegContext* ctx, MulNX::Hook* hook) {
+                // 再应用自定义颜色
+                this->MySetSmokeProps(*ctx->P1<CS2::C_SmokeGrenadeProjectile*>());
+                return MulNX::Hook::Then::Continue;
+            }).value();
+        this->hkSetSmokeProps->Attach();
+        this->ISys().LogSucc(I18n("hook.attached", "SetSmokeProps"));
 
-    // 3. 消息处理线程
-    this->SendTask("CSControl", [this]() {
-        this->Update();
-        return true;
+        // 2. 注册 UI
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+            this->Menu(node);
+            return true;
+            });
+
+        // 3. 消息处理线程
+        this->SendTask("CSControl", [this]() {
+            this->Update();
+            return true;
+            });
         });
 
     // 4. 订阅消息

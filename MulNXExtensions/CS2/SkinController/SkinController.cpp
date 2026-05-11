@@ -17,32 +17,33 @@ bool SkinController::Init() {
         .SubscribeAsync("Skin/Apply")
         ;
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+        auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::RegenerateWeaponSkins);
+        this->regenerateWeaponSkins = (RegenerateWeaponSkins)target.Data();
+        // static auto hkSkin = MulNX::Hook::Create(target.Data(), 0, false, [this](RegContext* ctx, MulNX::Hook* Hook) {
+        //     return MulNX::Hook::Then::Continue;
+        //     }).value();
+        // hkSkin->Attach();
 
-    auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::RegenerateWeaponSkins);
-    this->regenerateWeaponSkins = (RegenerateWeaponSkins)target.Data();
-    // static auto hkSkin = MulNX::Hook::Create(target.Data(), 0, false, [this](RegContext* ctx, MulNX::Hook* Hook) {
-    //     return MulNX::Hook::Then::Continue;
-    //     }).value();
-    // hkSkin->Attach();
+        // 计算总偏移：m_AttributeManager + m_Item + m_AttributeList + m_Attributes
+        uint16_t totalOffset = cs2_dumper::schemas::client_dll::C_EconEntity::m_AttributeManager
+            + cs2_dumper::schemas::client_dll::C_AttributeContainer::m_Item
+            + cs2_dumper::schemas::client_dll::C_EconItemView::m_AttributeList
+            + cs2_dumper::schemas::client_dll::CAttributeList::m_Attributes;
 
-    // 计算总偏移：m_AttributeManager + m_Item + m_AttributeList + m_Attributes
-    uint16_t totalOffset = cs2_dumper::schemas::client_dll::C_EconEntity::m_AttributeManager
-        + cs2_dumper::schemas::client_dll::C_AttributeContainer::m_Item
-        + cs2_dumper::schemas::client_dll::C_EconItemView::m_AttributeList
-        + cs2_dumper::schemas::client_dll::CAttributeList::m_Attributes;
+        // 在 + 0x52 处写入 totalOffset（2 字节）
+        uint8_t* patchAddr = (uint8_t*)this->regenerateWeaponSkins + 0x52;
 
-    // 在 + 0x52 处写入 totalOffset（2 字节）
-    uint8_t* patchAddr = (uint8_t*)this->regenerateWeaponSkins + 0x52;
-
-    DWORD oldProtect;
-    if (VirtualProtect(patchAddr, sizeof(uint16_t), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-        *(uint16_t*)patchAddr = totalOffset;
-        VirtualProtect(patchAddr, sizeof(uint16_t), oldProtect, &oldProtect);
-    }
-    else {
-        return false;
-    }
+        DWORD oldProtect;
+        if (VirtualProtect(patchAddr, sizeof(uint16_t), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+            *(uint16_t*)patchAddr = totalOffset;
+            VirtualProtect(patchAddr, sizeof(uint16_t), oldProtect, &oldProtect);
+        }
+        else {
+            MulNX::ErrorTerminate(I18n("skin.controller.hook.fail"));
+        }
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+        });
 
     return true;
 }

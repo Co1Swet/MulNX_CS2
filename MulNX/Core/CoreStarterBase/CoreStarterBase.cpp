@@ -24,8 +24,17 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->EntryInit();
     // 二阶段初始化注册模块
     this->Core->ModuleManager()->ModulesInit();
-    // 开启系统
-    this->ActiveSystem();
+    return true;
+}
+
+void MulNX::Core::CoreStarterBase::CreateMainDraw() {
+    // UI系统主界面初始化
+    auto [msg2, rp] = MulNX::Message::Create<std::string>("UISystem/Start"_hash, "MainDraw");
+    this->ISys().PublishAsync(std::move(msg2));
+    this->ISys().LogWarning("发送了UI启动指令！渲染即将开始！");
+}
+
+void MulNX::Core::CoreStarterBase::ActiveSystem() {
     // 输出启动信息
     this->ISys().LogSucc(I18n("sys.started"));
     this->ISys().LogWarning(I18n("sys.version_is_testing", MulNXInfo::IsDebugVersion));
@@ -42,14 +51,6 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     // 输出总时间
     auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->createTime);
     this->ISys().LogWarning(I18n("sys.inited_time_sum", cost.count()));
-    return true;
-}
-
-void MulNX::Core::CoreStarterBase::CreateMainDraw() {
-    // UI系统主界面初始化
-    auto [msg2, rp] = MulNX::Message::Create<std::string>("UISystem/Start"_hash, "MainDraw");
-    this->ISys().PublishAsync(std::move(msg2));
-    this->ISys().LogWarning("发送了UI启动指令！渲染即将开始！");
 }
 
 void MulNX::Core::CoreStarterBase::CloseSystem() {

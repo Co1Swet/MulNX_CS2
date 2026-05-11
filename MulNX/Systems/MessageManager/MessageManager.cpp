@@ -45,6 +45,7 @@ bool MulNX::MessageManager::PublishAsync(Message&& Msg) {
     return this->asyncMsgBuffer.enqueue(std::move(Msg));
 }
 bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const std::string& type) {
+    std::unique_lock lock(this->smutex);
     MulNX::MsgType hashed = MulNX::HashString(type);
     this->AddMsgMeta(type, hashed);
     this->asyncMap[hashed].push_back(pChannel);
@@ -52,6 +53,7 @@ bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const
 }
 
 bool MulNX::MessageManager::DispathAsyncMsg() {
+    std::shared_lock lock(this->smutex);
     MulNX::Message Msg;
     if (this->asyncMsgBuffer.try_dequeue(Msg)) {
         // 检查是否存在管道订阅者
@@ -78,6 +80,7 @@ void MulNX::MessageManager::HandleDispatch() {
 }
 
 bool MulNX::MessageManager::SubscribeSync(const std::string& type, SyncMsgCallback&& handle) {
+    std::unique_lock lock(this->smutex);
     MulNX::MsgType hashed = MulNX::HashString(type);
     this->AddMsgMeta(type, hashed);
     this->syncMap[hashed].push_back(std::move(handle));
@@ -85,6 +88,7 @@ bool MulNX::MessageManager::SubscribeSync(const std::string& type, SyncMsgCallba
 }
 
 bool MulNX::MessageManager::PublishSync(MulNX::Message& msg) {
+    std::shared_lock lock(this->smutex);
     auto it = this->syncMap.find(msg.type);
     if (it == this->syncMap.end())return false;
     auto& subscribers = it->second;

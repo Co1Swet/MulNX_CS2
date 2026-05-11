@@ -42,6 +42,9 @@ private:
     // CS2全局变量
     C_GlobalVars* CSGlobalVars{};
 
+    std::atomic<int> needToLoadModules = 4;
+    MulNX::CoTask currentCoro;
+    MulNX::CoTask InitTask();
     bool Window(MulNX::UINode* node);
     void ProcessMsg(MulNX::Message& Msg)override;
     void Main();

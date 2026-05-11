@@ -20,39 +20,62 @@ bool CSController::Init() {
         .SubscribeAsync("Demo/GotoTick")
         .SubscribeAsync("Game/Command");
 
-    this->client = CS2::Module::Client(L"client.dll");
-    this->engine2 = CS2::Module::engine2(L"engine2.dll");
-    this->tier0 = MulNX::Memory::DllModule(L"tier0.dll");
-    this->panorama = MulNX::Memory::DllModule(L"panorama.dll");
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {   
+        this->client = CS2::Module::Client(L"client.dll");
+        --this->needToLoadModules;
+        });
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
+        this->engine2 = CS2::Module::engine2(L"engine2.dll");
+        // 加载来自Source2EngineToClient001的模块
+        this->Source2EngineToClient001 =
+            this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
+            ("Source2EngineToClient001", nullptr);
+        this->executor = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);
+        this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
+        --this->needToLoadModules;
+        });
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {
+        this->tier0 = MulNX::Memory::DllModule(L"tier0.dll");
+        // 获取CvarSystem
+        this->CvarSystem.Address =
+            (uintptr_t)this->tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
+            ("VEngineCvar007", nullptr);
+        --this->needToLoadModules;
+        });
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {
+        this->panorama = MulNX::Memory::DllModule(L"panorama.dll");
+        --this->needToLoadModules;
+        });
 
-    // 加载来自Source2EngineToClient001的模块
-    this->Source2EngineToClient001 =
-        this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
-        ("Source2EngineToClient001", nullptr);
-    this->executor = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);
-    this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
+    this->currentCoro = InitTask();
+    this->currentCoro.resume();
 
-    // 获取CvarSystem
-    this->CvarSystem.Address =
-        (uintptr_t)this->tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
-        ("VEngineCvar007", nullptr);
+    this->SendTask("CSControl", [this]()->bool {
+        this->Update();
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        return true;
+        });
+
+    return true;
+}
+MulNX::CoTask CSController::InitTask() {
+    // 等待必要模块加载完成
+    co_await this->WaitUntil([this]()->bool {return this->needToLoadModules.load() == 0;});
 
     this->SendTask("CSControl", [this]()->bool {
         try {
-            this->Update();
             this->Main();
         }
         catch (const std::runtime_error& e) {
             this->ISys().LogWarning("在更新数据时捕获到异常：" + std::string(e.what()));
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         return true;
         });
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
-    return true;
+    co_return;
 }
+
 void CSController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Game/Command"_hash: {

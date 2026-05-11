@@ -29,4 +29,7 @@ void DLLLoadDispatcher::DispatchModuleLoadMessage(const std::filesystem::path& m
     if (modulePath.filename() == L"panorama.dll") {
         this->ISys().PublishSync("Hook/LoadLibraryExW/panorama.dll"_hash);
     }
+    if (modulePath.filename() == L"d3d11.dll") {
+        this->ISys().PublishSync("Hook/LoadLibraryExW/d3d11.dll"_hash);
+    }
 }

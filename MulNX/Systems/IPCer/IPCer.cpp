@@ -50,15 +50,25 @@ bool MulNX::IPCer::Init() {
     GetModuleFileNameW(this->Core->hMyOriginModule, path, MAX_PATH);
     auto filePath = std::filesystem::path(path);
     this->Paths.MulNX.Path = filePath.parent_path().parent_path();
-    //设置cs2.exe路径
-    if (this->GetWindowPathByName(L"Counter-Strike 2", this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path)) {
-        //获取CS目录
-        this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path.parent_path();
-        this->Paths.Counter_Strike_Global_Offensive.game.bin.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path.parent_path();
-        this->Paths.Counter_Strike_Global_Offensive.game.Path = this->Paths.Counter_Strike_Global_Offensive.game.bin.Path.parent_path();
-        this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path = this->Paths.Counter_Strike_Global_Offensive.game.Path / "csgo";
-        this->Paths.Counter_Strike_Global_Offensive.game.csgo.cfg.Path = this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path / "cfg";
-    }
+    auto coreName = this->Core->GetName();
+    if (coreName != "CS2OBTool")return true;
+
+    // 获取 cs2.exe 的完整路径（进程主模块）
+    WCHAR cs2Path[MAX_PATH] = { 0 };
+    GetModuleFileNameW(nullptr, cs2Path, MAX_PATH);
+    this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path = cs2Path;
+
+    // 逐级推导目录
+    this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path
+        = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path.parent_path();
+    this->Paths.Counter_Strike_Global_Offensive.game.bin.Path
+        = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path.parent_path();
+    this->Paths.Counter_Strike_Global_Offensive.game.Path
+        = this->Paths.Counter_Strike_Global_Offensive.game.bin.Path.parent_path();
+    this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path
+        = this->Paths.Counter_Strike_Global_Offensive.game.Path / "csgo";
+    this->Paths.Counter_Strike_Global_Offensive.game.csgo.cfg.Path
+        = this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path / "cfg";
     return true;
 }
 

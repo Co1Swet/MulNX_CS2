@@ -1,0 +1,22 @@
+name: "MulNX 官方快捷键配置"
+
+binds:
+  - desc: "触发全局保存（alt+S）"
+    msg: "Global/Save"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: true
+      vkCode: 83
+      comboClick: 1
+
+  - desc: "停止运镜（alt+P）"
+    msg: "CameraSystem/Play/Shutdown"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: true
+      vkCode: 80
+      comboClick: 1

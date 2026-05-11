@@ -87,39 +87,41 @@ bool GameSettingsManager::UINodeFunc(MulNX::UINode* ThisNode) {
 }
 
 bool GameSettingsManager::Init() {
-	C_ConVarSystem& CVarSystem = this->CS2()->GetCvarSystem();
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+        C_ConVarSystem& CVarSystem = this->CS2()->GetCvarSystem();
 
-    this->GameSettings.ScreenSettings.spec_show_xray = CVarSystem.GetCvar("spec_show_xray")->GetPtr<int>();
-    
-    this->dof.r_dof_override = CVarSystem.GetCvar("r_dof_override")->GetPtr<bool>();
-	this->dof.r_dof_override_far_blurry = CVarSystem.GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
-	this->dof.r_dof_override_far_crisp = CVarSystem.GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
-	this->dof.r_dof_override_near_blurry = CVarSystem.GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
-	this->dof.r_dof_override_near_crisp = CVarSystem.GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
-	this->dof.r_dof_override_tilt_to_ground = CVarSystem.GetCvar("r_dof_override_tilt_to_ground")->GetPtr<float>();
+        this->GameSettings.ScreenSettings.spec_show_xray = CVarSystem.GetCvar("spec_show_xray")->GetPtr<int>();
 
-	this->GameSettings.cl_drawhud = CVarSystem.GetCvar("cl_drawhud")->GetPtr<bool>();
-	this->GameSettings.cl_draw_only_deathnotices = CVarSystem.GetCvar("cl_draw_only_deathnotices")->GetPtr<bool>();
-	this->GameSettings.cl_drawhud_force_radar = CVarSystem.GetCvar("cl_drawhud_force_radar")->GetPtr<bool>();
-	this->GameSettings.cl_showfps = CVarSystem.GetCvar("cl_showfps")->GetPtr<int>();
-	this->GameSettings.cl_showtick = CVarSystem.GetCvar("cl_showtick")->GetPtr<int>();
-	this->GameSettings.cl_trueview_show_status = CVarSystem.GetCvar("cl_trueview_show_status")->GetPtr<int>();
-	this->GameSettings.host_timescale = CVarSystem.GetCvar("host_timescale")->GetPtr<float>();
-	this->GameSettings.fps_max = CVarSystem.GetCvar("fps_max")->GetPtr<int>();
+        this->dof.r_dof_override = CVarSystem.GetCvar("r_dof_override")->GetPtr<bool>();
+        this->dof.r_dof_override_far_blurry = CVarSystem.GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
+        this->dof.r_dof_override_far_crisp = CVarSystem.GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
+        this->dof.r_dof_override_near_blurry = CVarSystem.GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
+        this->dof.r_dof_override_near_crisp = CVarSystem.GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
+        this->dof.r_dof_override_tilt_to_ground = CVarSystem.GetCvar("r_dof_override_tilt_to_ground")->GetPtr<float>();
 
-    this->sv_cheats = CVarSystem.GetCvar("sv_cheats")->GetPtr<bool>();
+        this->GameSettings.cl_drawhud = CVarSystem.GetCvar("cl_drawhud")->GetPtr<bool>();
+        this->GameSettings.cl_draw_only_deathnotices = CVarSystem.GetCvar("cl_draw_only_deathnotices")->GetPtr<bool>();
+        this->GameSettings.cl_drawhud_force_radar = CVarSystem.GetCvar("cl_drawhud_force_radar")->GetPtr<bool>();
+        this->GameSettings.cl_showfps = CVarSystem.GetCvar("cl_showfps")->GetPtr<int>();
+        this->GameSettings.cl_showtick = CVarSystem.GetCvar("cl_showtick")->GetPtr<int>();
+        this->GameSettings.cl_trueview_show_status = CVarSystem.GetCvar("cl_trueview_show_status")->GetPtr<int>();
+        this->GameSettings.host_timescale = CVarSystem.GetCvar("host_timescale")->GetPtr<float>();
+        this->GameSettings.fps_max = CVarSystem.GetCvar("fps_max")->GetPtr<int>();
 
-    this->GameSettings.SoundSettings.snd_mute_losefocus = CVarSystem.GetCvar("snd_mute_losefocus")->GetPtr<bool>();
-    this->GameSettings.SoundSettings.snd_menumusic_volume = CVarSystem.GetCvar("snd_menumusic_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_roundstart_volume = CVarSystem.GetCvar("snd_roundstart_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_roundaction_volume = CVarSystem.GetCvar("snd_roundaction_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_roundend_volume = CVarSystem.GetCvar("snd_roundend_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_mvp_volume = CVarSystem.GetCvar("snd_mvp_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_mapobjective_volume = CVarSystem.GetCvar("snd_mapobjective_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_tensecondwarning_volume = CVarSystem.GetCvar("snd_tensecondwarning_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_deathcamera_volume = CVarSystem.GetCvar("snd_deathcamera_volume")->GetPtr<float>();
-    this->GameSettings.SoundSettings.snd_mute_mvp_music_live_players = CVarSystem.GetCvar("snd_mute_mvp_music_live_players")->GetPtr<bool>();
+        this->sv_cheats = CVarSystem.GetCvar("sv_cheats")->GetPtr<bool>();
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+        this->GameSettings.SoundSettings.snd_mute_losefocus = CVarSystem.GetCvar("snd_mute_losefocus")->GetPtr<bool>();
+        this->GameSettings.SoundSettings.snd_menumusic_volume = CVarSystem.GetCvar("snd_menumusic_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_roundstart_volume = CVarSystem.GetCvar("snd_roundstart_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_roundaction_volume = CVarSystem.GetCvar("snd_roundaction_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_roundend_volume = CVarSystem.GetCvar("snd_roundend_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_mvp_volume = CVarSystem.GetCvar("snd_mvp_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_mapobjective_volume = CVarSystem.GetCvar("snd_mapobjective_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_tensecondwarning_volume = CVarSystem.GetCvar("snd_tensecondwarning_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_deathcamera_volume = CVarSystem.GetCvar("snd_deathcamera_volume")->GetPtr<float>();
+        this->GameSettings.SoundSettings.snd_mute_mvp_music_live_players = CVarSystem.GetCvar("snd_mute_mvp_music_live_players")->GetPtr<bool>();
+
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+        });
     return true;
 }

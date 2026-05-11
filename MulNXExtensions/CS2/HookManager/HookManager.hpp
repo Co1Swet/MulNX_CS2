@@ -30,8 +30,8 @@ private:
     void HandleProcessDropFiles(IDataObject* pDataObj);
 
     void d3dInit();
+    void HookD3D11();
 public:
     bool Init()override;
-    void ActiveSystem()override;
     void Deinit()override;
 };

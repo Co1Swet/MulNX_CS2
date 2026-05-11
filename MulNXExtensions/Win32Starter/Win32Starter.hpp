@@ -32,7 +32,6 @@ class Win32Starter final :public MulNX::Core::CoreStarterBase {
 public:
     Win32Starter();
     bool Init()override;
-    void ActiveSystem()override;
     void Deinit()override;
 
     void Run();

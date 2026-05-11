@@ -72,7 +72,7 @@ void MulNX::ModuleBase::Update() {
     std::vector<std::coroutine_handle<>> toResume;
     for (auto it = this->conditionWaiters.begin(); it != this->conditionWaiters.end(); ) {
         if (it->condition()) {
-            toResume.push_back(it->handle);
+            toResume.push_back(std::move(it->handle));
             it = this->conditionWaiters.erase(it);
         }
         else {

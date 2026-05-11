@@ -14,7 +14,7 @@ class ProjectileTracker final : public CSModuleBase {
 
     void ProcessMsg(MulNX::Message& msg)override;
     void Menu(MulNX::UINode* node);
-    void Update();
+    void Main();
     MulNX::NewestBuffer<MulNX::Math::View> currentView{};
 public:
     bool Init()override;

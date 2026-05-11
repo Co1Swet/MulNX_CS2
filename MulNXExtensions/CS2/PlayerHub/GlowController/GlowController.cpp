@@ -81,24 +81,26 @@ void GlowController::MenuTeam(MulNX::UINode* node) {
 }
 
 bool GlowController::Init() {
-    auto region = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
-    auto target = region.Data();
-    this->hkSetGlowColor = MulNX::Hook::Create(target, 0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
-        this->MySetGlowColor(*ctx->P1<CS2::CGlowProperty*>(), ctx->P2<uint32_t>());
-        return MulNX::Hook::Then::Continue;
-        }).value();
-    this->hkSetGlowColor->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "SetGlowColor"));
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+        auto region = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
+        auto target = region.Data();
+        this->hkSetGlowColor = MulNX::Hook::Create(target, 0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
+            this->MySetGlowColor(*ctx->P1<CS2::CGlowProperty*>(), ctx->P2<uint32_t>());
+            return MulNX::Hook::Then::Continue;
+            }).value();
+        this->hkSetGlowColor->Attach();
+        this->ISys().LogSucc(I18n("hook.attached", "SetGlowColor"));
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        this->Menu(node);
-        return true;
-        });
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+            this->Menu(node);
+            return true;
+            });
 
 
-    this->SendTask("CSControl", [this]() {
-        this->Update();
-        return true;
+        this->SendTask("CSControl", [this]() {
+            this->Update();
+            return true;
+            });
         });
 
     this->ISys()

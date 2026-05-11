@@ -21,22 +21,23 @@ bool ViewController::Init() {
     this->pFreeCameraController = this->Core->ModuleManager()->FindModule<FreeCameraController>("FreeCameraController");
     this->pAdvancedViewController = this->Core->ModuleManager()->FindModule<AdvancedViewController>("AdvancedViewController");
 
-    this->controlView.dofs.pNearBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
-    this->controlView.dofs.pNearCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
-    this->controlView.dofs.pFarCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
-    this->controlView.dofs.pFarBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll",[this](MulNX::Message& msg) {
+        this->controlView.dofs.pNearBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
+        this->controlView.dofs.pNearCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
+        this->controlView.dofs.pFarCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
+        this->controlView.dofs.pFarBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
 
-    auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::CallIsPlayingDemo);
-    this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), 0, true,
-        [this](RegContext* ctx, MulNX::Hook* Hook) {
-            this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
-            return MulNX::Hook::Then::Continue;
-        }).value();
-    this->hkPosCallIsPlayingDemo->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
+        auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::CallIsPlayingDemo);
+        this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), 0, true,
+            [this](RegContext* ctx, MulNX::Hook* Hook) {
+                this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
+                return MulNX::Hook::Then::Continue;
+            }).value();
+        this->hkPosCallIsPlayingDemo->Attach();
+        this->ISys().LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
-
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+        });
 
     return true;
 }
@@ -55,9 +56,10 @@ void ViewController::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
 }
 
 void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
-    if (this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
-        this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem")->HandleUpdate();
+    if (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
+        return;
     }
+    this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem")->HandleUpdate();
     static auto* pProjectileTracker = this->Core->ModuleManager()->FindModule<ProjectileTracker>("ProjectileTracker");
     auto trckerView = pProjectileTracker->GetView();
     if (trckerView.has_value()) {

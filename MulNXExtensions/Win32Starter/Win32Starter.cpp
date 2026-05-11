@@ -78,12 +78,9 @@ bool Win32Starter::Init() {
         //HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync
         this->SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
         };
+    this->ActiveSystem();
 
     return true;
-}
-void Win32Starter::ActiveSystem() {
-
-    return;
 }
 void Win32Starter::Run() {
     bool running = true;

@@ -18,35 +18,37 @@ bool DeathMsgController::Window(MulNX::UINode* node) {
 }
 
 bool DeathMsgController::Init() {
-    auto pattern = MulNX::CS2::Signatures::CSHashString;
-    uint8_t* callSite = this->CS2()->client.GetTextRegion()
-        .FindRegion(pattern).Data();
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+        auto pattern = MulNX::CS2::Signatures::CSHashString;
+        uint8_t* callSite = this->CS2()->client.GetTextRegion()
+            .FindRegion(pattern).Data();
 
-    // call 指令位于 callSite + 12 (0x0C) 处
-    uint8_t* callAddr = callSite + 12;
-    // E8 后面 4 字节是相对偏移
-    int32_t relOffset = *reinterpret_cast<int32_t*>(callAddr + 1);
-    // 目标地址 = call 指令下一条指令地址 + relOffset
-    this->CSHashString = reinterpret_cast<HashFunc_t>(callAddr + 5 + relOffset);
+        // call 指令位于 callSite + 12 (0x0C) 处
+        uint8_t* callAddr = callSite + 12;
+        // E8 后面 4 字节是相对偏移
+        int32_t relOffset = *reinterpret_cast<int32_t*>(callAddr + 1);
+        // 目标地址 = call 指令下一条指令地址 + relOffset
+        this->CSHashString = reinterpret_cast<HashFunc_t>(callAddr + 5 + relOffset);
 
-    this->CSHashString(&this->attacker_hash, "attacker");
-    this->CSHashString(&this->userid_hash, "userid");
-    this->CSHashString(&this->assister_hash, "assister");
+        this->CSHashString(&this->attacker_hash, "attacker");
+        this->CSHashString(&this->userid_hash, "userid");
+        this->CSHashString(&this->assister_hash, "assister");
 
-    auto target = this->CS2()->client.GetTextRegion()
-        .FindRegion(MulNX::CS2::Signatures::HandlePlayerDeath);
-    this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hk) {
-            void* event = reinterpret_cast<void*>(ctx->rdx);
-            return this->HandleOnPlayerDeath(event);
-        }).value();
-    this->hkHandlePlayerDeath->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
+        auto target = this->CS2()->client.GetTextRegion()
+            .FindRegion(MulNX::CS2::Signatures::HandlePlayerDeath);
+        this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), 0, false,
+            [this](RegContext* ctx, MulNX::Hook* hk) {
+                void* event = reinterpret_cast<void*>(ctx->rdx);
+                return this->HandleOnPlayerDeath(event);
+            }).value();
+        this->hkHandlePlayerDeath->Attach();
+        this->ISys().LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
-    this->SendTask("CSControl", [this]()->bool {
-        this->Update();
-        return true;
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+        this->SendTask("CSControl", [this]()->bool {
+            this->Update();
+            return true;
+            });
         });
 
     return true;

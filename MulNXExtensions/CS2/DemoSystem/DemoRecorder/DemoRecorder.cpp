@@ -9,8 +9,8 @@ bool DemoRecorder::Init() {
         .SubscribeAsync("Demo/Record/Start")
         .SubscribeAsync("Demo/Record/Stop");
 
-    auto currentCoro = Main();
-    currentCoro.resume();
+    this->coTa = Main();
+    this->coTa.resume();
 
     this->SendTask("DemoRecorder", [this]()->bool {
         this->Update();

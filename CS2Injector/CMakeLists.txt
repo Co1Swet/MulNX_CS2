@@ -1,8 +1,6 @@
-add_executable(CS2Injector WIN32
+add_executable(CS2Injector
     Main/Main.cpp
-    MulNXeCore/MulNXeCore.cpp
-    MulNXeCore/ConfigManager/ConfigManager.cpp
-    MulNXeCore/IPCer/IPCer.cpp
+    UIDocker/UIDocker.cpp
 )
 
 target_link_libraries(CS2Injector PUBLIC
