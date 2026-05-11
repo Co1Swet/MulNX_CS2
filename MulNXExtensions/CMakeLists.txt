@@ -11,6 +11,7 @@ add_subdirectory("MediaRemoter")
 add_subdirectory("ShortcutManager")
 add_subdirectory("Win32Starter")
 add_subdirectory("CS2BootLoader")
+add_subdirectory("DLLLoadDispatcher")
 
 target_link_libraries(MulNXExtensions INTERFACE
     MulNX
@@ -25,4 +26,5 @@ target_link_libraries(MulNXExtensions INTERFACE
     ShortcutManager
     Win32Starter
     CS2BootLoader
+    DLLLoadDispatcher
 )

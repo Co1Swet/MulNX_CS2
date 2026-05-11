@@ -1,5 +1,6 @@
 #include "HookManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNX/Base/CharUtility/CharUtility.hpp>
 #include <MulNX/MulNX.hpp>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
@@ -11,6 +12,26 @@ using ResizeBuffers_t = HRESULT(__stdcall*)(IDXGISwapChain*, UINT, UINT, UINT, D
 bool HookManager::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+
+    this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, 0, false,
+        [this](RegContext* ctx, MulNX::Hook* hk) {
+            std::unique_lock lock(this->loadLibraryMutex);
+
+            LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
+            HANDLE hFile = (HANDLE)ctx->rdx;
+            DWORD dwFlags = (DWORD)ctx->r8;
+
+            auto result = reinterpret_cast<decltype(LoadLibraryExW)*>(hk->pMaybeRawFunc)(lpLibFileName, hFile, dwFlags);
+            ctx->rax = (uintptr_t)result;
+
+            MulNX::Message msg("Hook/LoadLibraryExW"_hash);
+            msg.p1.as<LPCWSTR>() = lpLibFileName;
+            this->ISys().PublishSync(msg);
+
+            return MulNX::Hook::Then::Return;
+        }).value();
+    this->hkLoadLibraryExW->Attach();
+
     return true;
 }
 

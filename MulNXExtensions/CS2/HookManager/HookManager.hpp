@@ -12,6 +12,10 @@ private:
     bool d3dInited = false;
     HWND CS2hWnd = nullptr;
 
+    // LoadLibrary 函数钩子（用于DLL注入检测）
+    std::recursive_mutex loadLibraryMutex;
+    std::unique_ptr<MulNX::Hook> hkLoadLibraryExW = nullptr;
+
     // ClearDepthStencilView 钩子（清空前偷深度）
     std::unique_ptr<MulNX::Hook> hkClearDepthStencilView = nullptr;
     // Present 钩子

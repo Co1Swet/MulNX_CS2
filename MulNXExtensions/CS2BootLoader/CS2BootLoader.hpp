@@ -7,9 +7,12 @@ class CS2BootLoader final : public MulNX::ModuleBase {
     std::filesystem::path dllPath;   // CS2OBTool.dll 路径
     std::vector<std::string> launchOptions;
 
+    FARPROC GetRemoteProcAddress(HANDLE hProcess, const std::wstring& moduleName, const char* funcName);
+
     bool LaunchAndInject();
     bool IsGameRunning();
-    bool InjectDll(HANDLE hProcess, const std::wstring& dllPath);
+    bool InjectDll(HANDLE hProcess);
+    bool InitDLL(HANDLE hProcess);
 
     bool Window(MulNX::UINode* node);
 public:
