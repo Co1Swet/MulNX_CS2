@@ -1,5 +1,5 @@
 #include "I18nManager.hpp"
-
+#include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <yaml-cpp/yaml.h>
 #include <stack>
 
@@ -8,7 +8,7 @@ MulNX::I18nManager::I18nManager() {
 }
 
 bool MulNX::I18nManager::Init() {
-    auto path = this->ISys().PathGet("Language");
+    auto path = this->ISys().PathManager()->PathGetForShared("Config");
     auto filePath = path / "lan.yaml";
 
     this->strings.clear();

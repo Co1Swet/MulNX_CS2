@@ -11,10 +11,6 @@ public:
     struct S_MulNX {
         std::filesystem::path Path;
 
-        struct S_MulNX_exe {
-            std::filesystem::path Path;
-        } MulNX_exe;
-
     } MulNX;
 
     struct S_Counter_Strike_Global_Offensive {

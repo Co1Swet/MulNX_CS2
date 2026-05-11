@@ -89,10 +89,11 @@ void Win32Starter::Run() {
     bool running = true;
     while (running) {
         MSG msg;
+        this->pUISystem->HandleUpdate();
+        this->pUISystem->Render();
         while (PeekMessageW(&msg, nullptr, 0U, 0U, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessageW(&msg);
-            this->pUISystem->Render();
             if (msg.message == WM_QUIT) {
                 running = false;
                 break;
@@ -174,7 +175,6 @@ LRESULT WINAPI Win32Starter::EntryWndProc(HWND hWnd, UINT msg, WPARAM wParam, LP
 }
 LRESULT WINAPI Win32Starter::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     this->pUISystem->winMsgs.enqueue({ hWnd,msg,wParam,lParam });
-    this->pUISystem->Update();
 
     if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(msg))
         return 0;

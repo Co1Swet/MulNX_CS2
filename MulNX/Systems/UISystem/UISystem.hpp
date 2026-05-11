@@ -27,6 +27,7 @@ namespace MulNX {
 
         bool Init()override;
         void ProcessMsg(MulNX::Message& Msg)override;
+        void HandleUpdate();
         int Render();
 
         MulNX::UIContext* GetUIContext() { return &this->UIContext; }

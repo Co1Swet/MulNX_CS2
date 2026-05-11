@@ -7,7 +7,7 @@ bool CS2BootLoader::Window(MulNX::UINode* node) {
     if (!w)return true;
 
     // 显示当前游戏路径
-    ImGui::Text(std::format("Game Path: {}", gamePath.string()).c_str());
+    ImGui::Text(I18n("Game Path: {}", gamePath.string()).c_str());
 
     if (ImGui::Button("Launch CS2")) {
         if (LaunchAndInject()) {
@@ -27,6 +27,14 @@ bool CS2BootLoader::Init() {
 
     for (const auto& option : config["launchOptions"]) {
         this->launchOptions.push_back(option.as<std::string>());
+    }
+
+    auto pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
+    auto rootPath = pIPCer->GetRoot();
+    this->dllPath = rootPath / "CS2OBTool" / "CS2OBTool.dll";
+
+    if(!std::filesystem::exists(this->dllPath)) {
+        this->ISys().LogError(std::format("CS2OBTool.dll not found at expected path: {}", this->dllPath.string()));
     }
 
     this->showWindow = true;
@@ -55,6 +63,7 @@ bool CS2BootLoader::LaunchAndInject() {
 
     // 4. 构建命令行参数
     std::wstring cmdLine = L"\"" + gamePath.wstring() + L"\"";
+    cmdLine += L" -insecure";// 强制insecure
     for (const auto& option : this->launchOptions) {
         cmdLine += L" " + std::wstring(option.begin(), option.end());
     }

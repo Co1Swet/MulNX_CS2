@@ -46,12 +46,10 @@ std::filesystem::path MulNX::IPCer::GetRoot() {
 }
 
 bool MulNX::IPCer::Init() {
-    //设置MulNX.exe路径
     WCHAR path[MAX_PATH] = { 0 };
     GetModuleFileNameW(this->Core->hMyOriginModule, path, MAX_PATH);
-    this->Paths.MulNX.MulNX_exe.Path = path;
-    //获取MulNX目录
-    this->Paths.MulNX.Path = this->Paths.MulNX.MulNX_exe.Path.parent_path().parent_path();
+    auto filePath = std::filesystem::path(path);
+    this->Paths.MulNX.Path = filePath.parent_path().parent_path();
     //设置cs2.exe路径
     if (this->GetWindowPathByName(L"Counter-Strike 2", this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path)) {
         //获取CS目录

@@ -80,7 +80,7 @@ void HookManager::ActiveSystem() {
                 this->pGraphicsManager->BuildNew();
                 this->pGraphicsManager->OnPresent();
                 // UI 系统渲染
-                this->pUISystem->Update();
+                this->pUISystem->HandleUpdate();
                 this->pUISystem->Render();
             }
             return MulNX::Hook::Then::Continue;

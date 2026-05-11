@@ -4,7 +4,7 @@
 
 class CS2BootLoader final : public MulNX::ModuleBase {
     std::filesystem::path gamePath;
-    std::string dllPath;   // CS2OBTool.dll 路径
+    std::filesystem::path dllPath;   // CS2OBTool.dll 路径
     std::vector<std::string> launchOptions;
 
     bool LaunchAndInject();

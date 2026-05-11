@@ -67,6 +67,13 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     }
 }
 
+void MulNX::UISystem::HandleUpdate() {
+    this->Update();
+    if (this->pInputSystem->CheckComboClick(VK_INSERT, 1)) {
+        this->UIContext.Active = !this->UIContext.Active;
+    }
+}
+
 // ImGui窗口处理函数导入
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int MulNX::UISystem::Render() {
@@ -86,9 +93,6 @@ int MulNX::UISystem::Render() {
     }
 
     if (!this->FrameBefore())return 0;
-    if (this->pInputSystem->CheckComboClick(VK_INSERT, 1)) {
-        this->UIContext.Active = !this->UIContext.Active;
-    }
     if (this->UIContext.Active) {
         this->UIContext.Draw();
     }

@@ -109,13 +109,13 @@ namespace MulNX {
         auto WaitMsg(MulNX::MsgType type) {
             return AwaitMessage(this, type);
         }
+        // 更新入口
+        void Update();
     public:
         // 基础初始化
         bool BaseInit(MulNX::Core::Core* core);
         // 初始化入口
         bool EntryInit();
-        // 更新入口
-        void Update();
         // 设置模块名称
         bool SetName(std::string&& Name);
         std::string GetName()const;
