@@ -83,7 +83,7 @@ bool SmokeController::Init() {
         this->hkSetSmokeProps = MulNX::Hook::Create(target, 0, false,
             [this](RegContext* ctx, MulNX::Hook* hook) {
                 // 再应用自定义颜色
-                this->MySetSmokeProps(*ctx->P1<CS2::C_SmokeGrenadeProjectile*>());
+                this->MySetSmokeProps((CS2::C_SmokeGrenadeProjectile*)(ctx->rcx));
                 return MulNX::Hook::Then::Continue;
             }).value();
         this->hkSetSmokeProps->Attach();

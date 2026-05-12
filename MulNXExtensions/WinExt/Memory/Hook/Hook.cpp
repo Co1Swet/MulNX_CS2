@@ -1,26 +1,24 @@
 #include "Hook.hpp"
-
 #include <Windows.h>
-#include <atomic>
-#include <algorithm>
+#include <thread>
 #include <format>
 
-uintptr_t MulNX::Hook::Dispatch(Hook* pHookInstance, RegContext* ctx) {
-    pHookInstance->threadNumInAsm.fetch_add(1, std::memory_order_release);
-    auto then = pHookInstance->callback(ctx, pHookInstance);
+uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
+    this->threadNumInAsm.fetch_add(1, std::memory_order_release);
+    auto then = this->callback(ctx, this);
     uint64_t target;
     switch (then) {
     case MulNX::Hook::Then::Return:
-        target = pHookInstance->jmpTarget0;
+        target = this->jmpForReturn;
         break;
     case MulNX::Hook::Then::Continue:
-        target = pHookInstance->jmpTarget1;
+        target = this->jmpForContinue;
         break;
     default: 
-        target = pHookInstance->jmpTarget1;
+        target = this->jmpForContinue;
         break;
     }
-    pHookInstance->threadNumInAsm.fetch_sub(1, std::memory_order_release);
+    this->threadNumInAsm.fetch_sub(1, std::memory_order_release);
     return target;
 }
 
@@ -40,11 +38,8 @@ void* TryAlloc(uintptr_t target, size_t size) {
     uintptr_t startAddr = (target > range) ? (target - range) : 0x10000; // 避免低 64KB
     uintptr_t endAddr = target + range;
 
-#ifdef _WIN64
     const uintptr_t maxUser = 0x7FFFFFFF0000ULL; // 64 位用户空间上限示例
-#else
-    const uintptr_t maxUser = 0x7FFEFFFF;        // 32 位用户空间典型上限
-#endif
+
     if (endAddr > maxUser) endAddr = maxUser;
 
     // 步长取分配粒度与 1MB 中较大者
@@ -148,7 +143,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         Asm
             .mov(RCX, (uintptr_t)HookInstance.get())// 此参数对应 Hook，是第一个参数
             .mov(RDX, RSP)// 此参数对应 RegContext，是第二个参数
-            .mov(RAX, (uintptr_t)&MulNX::Hook::Dispatch)// 绑定分发函数
+            .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::Dispatch))// 绑定分发函数
             .sub(RSP, 32)// 分配影子空间
             .call(RAX)// 调用函数，进入CPP语言空间
             .add(RSP, 32)// 回收影子空间
@@ -156,7 +151,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         HookInstance->dispatcherAsmCode = Asm.Release();
 
         // 分支0
-        HookInstance->jmpTarget0 = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+        HookInstance->jmpForReturn = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
         // 恢复区
         Asm
             .mov(RAX, Mem(RSP, offsetof(RegContext, rax)))
@@ -182,7 +177,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
         // 分支1
-        HookInstance->jmpTarget1 = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+        HookInstance->jmpForContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
         // 恢复区
         Asm
             .mov(RAX, Mem(RSP, offsetof(RegContext, rax)))

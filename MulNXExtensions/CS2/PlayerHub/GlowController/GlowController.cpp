@@ -85,7 +85,7 @@ bool GlowController::Init() {
         auto region = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
         auto target = region.Data();
         this->hkSetGlowColor = MulNX::Hook::Create(target, 0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
-            this->MySetGlowColor(*ctx->P1<CS2::CGlowProperty*>(), ctx->P2<uint32_t>());
+            this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)&(ctx->rdx));
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkSetGlowColor->Attach();

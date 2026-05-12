@@ -12,6 +12,30 @@
 MulNX::Core::Core* pCore = nullptr;
 HMODULE hOriginModule = nullptr;
 
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    switch (ul_reason_for_call) {
+    case DLL_PROCESS_ATTACH: {
+        hOriginModule = hModule;
+        break;
+    }
+    case DLL_THREAD_ATTACH: {
+        break;
+    }
+    case DLL_THREAD_DETACH: {
+        break;
+    }
+    case DLL_PROCESS_DETACH: {
+        if (pCore)
+            pCore->Close();
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+    return TRUE;
+}
+
 DWORD WINAPI MulNX_CS2_Start(void*) {
     try {
         // 创建核心
@@ -95,28 +119,4 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
         MulNX::ErrorTerminate("在启动时发生未知异常！");
     }
     return 0;
-}
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
-    switch (ul_reason_for_call) {
-    case DLL_PROCESS_ATTACH: {
-        hOriginModule = hModule;
-        break;
-    }
-    case DLL_THREAD_ATTACH: {
-        break;
-    }
-    case DLL_THREAD_DETACH: {
-        break;
-    }
-    case DLL_PROCESS_DETACH: {
-        if (pCore)
-            pCore->Close();
-        break;
-    }
-    default: {
-        break;
-    }
-    }
-    return TRUE;
 }

@@ -1,34 +1,16 @@
 #pragma once
 
 #include <MulNXExtensions/WinExt/Memory/Assembler/Assembler.hpp>
-
-#include <cstdint>
 #include <functional>
-#include <vector>
-#include <shared_mutex>
 #include <expected>
+#include <atomic>
+#include <memory>
+#include <string>
 
 class RegContext {
 public:
     uint64_t rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi;
     uint64_t r8, r9, r10, r11, r12, r13, r14, r15;
-
-    template<typename T>
-    T* P1() {
-        return reinterpret_cast<T*>(&this->rcx);
-    }
-    template<typename T>
-    T* P2() {
-        return reinterpret_cast<T*>(&this->rdx);
-    }
-    template<typename T>
-    T* P3() {
-        return reinterpret_cast<T*>(&this->r8);
-    }
-    template<typename T>
-    T* P4() {
-        return reinterpret_cast<T*>(&this->r9);
-    }
 };
 
 namespace MulNX {
@@ -43,7 +25,7 @@ namespace MulNX {
         std::vector<AsmCmdInfo>Cmds;
     };
 
-    class Hook {
+    class Hook final {
     public:
         enum class Result :uint8_t {
             Attached,
@@ -75,16 +57,16 @@ namespace MulNX {
         MulNX::Memory::Asm::Code hookTargetRawCode{};
         MulNX::Memory::Asm::Code jumperAsmCode{};
 
-        
+
     private:
         static std::expected<MulNX::Memory::Asm::Code, std::string> FixRelativeInstructions(const MulNX::Memory::Asm::Code& raw_code,
             uintptr_t old_base, uintptr_t new_base);
-        static uintptr_t Dispatch(Hook* pHookInstance, RegContext* ctx);
+        uintptr_t Dispatch(RegContext* ctx);
         // 这个函数要求，至少它分析的确实是一个汇编指令的开头
         static HookTargetInfo AnalyseTarget(uint8_t* target);
 
-        uintptr_t jmpTarget0 = 0;
-        uintptr_t jmpTarget1 = 0;
+        uintptr_t jmpForReturn = 0;
+        uintptr_t jmpForContinue = 0;
     public:
         size_t frameSize = 0;
         uintptr_t pMaybeRawFunc = 0;// 可能的原函数地址（如果覆盖的指令是一个完整函数的开头）
