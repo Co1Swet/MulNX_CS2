@@ -1,7 +1,2 @@
-path: "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Counter-Strike Global Offensive\\game\\bin\\win64\\cs2.exe"
-launchOptions:
-  - "-insecure"
-  - "-windowed"
-  - "-novid"
-  - "-allow_third_party_software"
-  - "-worldwide"
+path: C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\bin\win64\cs2.exe
+launchOptions: -insecure -novid -allow_third_party_software -worldwide

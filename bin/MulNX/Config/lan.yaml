@@ -42,6 +42,14 @@ win32:
       error: 在解析拖拽列表时出现问题：{}
       unk_error: 在解析拖拽列表时出现未知问题
 
+boot:
+  launch: 启动CS2
+  save: 保存所有设置到磁盘
+  launch_options: 启动选项（无论是否添加-insecure启动项，程序都会强制在开头附带一个）
+  game_path:
+    show: 游戏路径：{}
+    select: 选择CS2.exe路径
+
 hook:
   attached: 钩子部署成功！钩子名：{}
 

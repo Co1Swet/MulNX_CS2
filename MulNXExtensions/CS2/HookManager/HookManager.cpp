@@ -106,6 +106,10 @@ void HookManager::BeforeActiveSystem() {
                 this->pUISystem->HandleUpdate();
                 this->pUISystem->Render();
             }
+            else {
+                // 设置系统标志位
+                this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(true, std::memory_order_release);
+            }
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkPresent->Attach();

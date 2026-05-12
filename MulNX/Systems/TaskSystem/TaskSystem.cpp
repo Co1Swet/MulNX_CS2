@@ -10,10 +10,12 @@ void MulNX::Task::Worker::Start() {
         while (!stoken.stop_requested()) {
             std::function<bool()> task;
             while (queue.try_dequeue(task)) {
-                tasks.push_back(std::move(task));
+                this->tasks.push_back(std::move(task));
             }
-            for (const auto& task : this->tasks) {
-                task();
+            for (auto it = this->tasks.begin();it != this->tasks.end();) {
+                auto keep = (*it)();
+                if (keep)++it;
+                else it = this->tasks.erase(it);
             }
         }
         return;

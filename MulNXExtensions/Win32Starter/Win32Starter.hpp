@@ -29,6 +29,8 @@ class Win32Starter final :public MulNX::Core::CoreStarterBase {
     static LRESULT WINAPI EntryWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     inline static Win32Starter* pThis = nullptr;
+
+    void BehindActiveSystem()override;
 public:
     Win32Starter();
     bool Init()override;

@@ -80,13 +80,13 @@ void CSController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Game/Command"_hash: {
         auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
-        //this->executor(0, cmd.c_str(), 1);
+        this->executor(0, cmd.c_str(), 1);
         break;
     }
     case "Demo/GotoTick"_hash: {
         int tick = msg.p1.low<int>();
         auto cmd = std::format("demo_gototick {}", tick);
-        //this->executor(0, cmd.c_str(), 1);
+        this->executor(0, cmd.c_str(), 1);
         break;
     }
     }

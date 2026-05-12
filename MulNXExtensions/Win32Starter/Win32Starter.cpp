@@ -103,6 +103,11 @@ void Win32Starter::Run() {
     return;
 }
 
+void Win32Starter::BehindActiveSystem() {
+    // 设置系统标志位
+    this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(true, std::memory_order_release);
+}
+
 void Win32Starter::Deinit() {
     // UISystem 已析构，而该指针指向其所有的缓冲区，这里手动置空，防止UB
     ImGui::GetIO().IniFilename = nullptr;

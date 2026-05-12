@@ -53,7 +53,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<SolutionManager>("SolutionManager")
             .CreateModule<ElementManager>("ElementManager")
             // CS2
-            //.CreateModule<HookEntitySystem>("HookEntitySystem")
+            .CreateModule<HookEntitySystem>("HookEntitySystem")
             .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<FreeCameraController>("FreeCameraController")
             .CreateModule<PlayerHub>("PlayerHub")

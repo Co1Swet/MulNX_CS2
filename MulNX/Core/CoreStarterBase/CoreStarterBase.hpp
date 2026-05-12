@@ -14,6 +14,7 @@ namespace MulNX {
             void CreateMainDraw();
 
             virtual void BeforeActiveSystem() {}
+            virtual void BehindActiveSystem() {}
             // 核心完全初始化后回调
             std::function<void()>InitEndCall = nullptr;
             // 激活系统，以开始工作
