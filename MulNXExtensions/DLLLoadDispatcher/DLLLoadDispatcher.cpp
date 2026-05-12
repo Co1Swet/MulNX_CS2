@@ -32,4 +32,7 @@ void DLLLoadDispatcher::DispatchModuleLoadMessage(const std::filesystem::path& m
     if (modulePath.filename() == L"d3d11.dll") {
         this->ISys().PublishSync("Hook/LoadLibraryExW/d3d11.dll"_hash);
     }
+    if (modulePath.filename() == L"dxgi.dll") {
+        this->ISys().PublishSync("Hook/LoadLibraryExW/dxgi.dll"_hash);
+    }
 }

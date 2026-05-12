@@ -16,6 +16,8 @@ private:
     std::recursive_mutex loadLibraryMutex;
     std::unique_ptr<MulNX::Hook> hkLoadLibraryExW = nullptr;
 
+
+    std::unique_ptr<MulNX::Hook> hkD3D11CreateDevice = nullptr;
     // ClearDepthStencilView 钩子（清空前偷深度）
     std::unique_ptr<MulNX::Hook> hkClearDepthStencilView = nullptr;
     // Present 钩子
@@ -30,7 +32,7 @@ private:
     void HandleProcessDropFiles(IDataObject* pDataObj);
 
     void d3dInit();
-    void HookD3D11();
+    void BeforeActiveSystem()override;
 public:
     bool Init()override;
     void Deinit()override;

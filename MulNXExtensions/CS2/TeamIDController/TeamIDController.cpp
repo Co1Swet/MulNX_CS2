@@ -2,81 +2,88 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXThirdParty/hlae/binutils.h>  // 假定你已集成了 HLAE 的 binutils
 
+using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);
+
 bool TeamIDController::Init() {
-    auto& panorama = this->CS2()->panorama;
-    auto textRegion = panorama.GetTextRegion();
-    auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄（需确保你的 CS2 类型有此方法）
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {
+        auto& panorama = this->CS2()->panorama;
+        auto textRegion = panorama.GetTextRegion();
+        auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄（需确保你的 CS2 类型有此方法）
 
-    // 1. Hook CLayoutFile::LoadFromFile
-    auto lflAddr = textRegion.FindRegion(
-        MulNX::CS2::Signatures::CLayoutFile_LoadFromFile
-    );
-    if (!lflAddr.IsValid()) return false;
+        // 1. Hook CLayoutFile::LoadFromFile
+        auto lflAddr = textRegion.FindRegion(
+            MulNX::CS2::Signatures::CLayoutFile_LoadFromFile
+        );
+        if (!lflAddr.IsValid()) return;
 
-    hkLoadFromFile_ = MulNX::Hook::Create(lflAddr.Data(), 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
-            // __fastcall: RCX=this, RDX=filePath, R8=unk
-            const char* filePath = reinterpret_cast<const char*>(ctx->rdx);
-            if (filePath && strstr(filePath, "hudreticle.xml")) {
-                inHudReticle_ = true;
-                //hk->CallOriginal();      // 内部会触发 Parse / Clone
-                inHudReticle_ = false;
-                //return MulNX::Hook::Then::Skip; // 已手动调用原始，跳过默认执行
+        hkLoadFromFile_ = MulNX::Hook::Create(lflAddr.Data(), 0, false,
+            [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
+                // __fastcall: RCX=this, RDX=filePath, R8=unk
+                const char* filePath = reinterpret_cast<const char*>(ctx->rdx);
+                if (filePath && strstr(filePath, "hudreticle.xml")) {
+                    inHudReticle_ = true;
+                    auto result = reinterpret_cast<CLayoutFile_LoadFromFile_t>(hk->pMaybeRawFunc)((void*)ctx->rcx, filePath, ctx->r8);
+                    *reinterpret_cast<int*>(&ctx->rax) = result;
+                    inHudReticle_ = false;
+                    return MulNX::Hook::Then::Return;
+                }
+                return MulNX::Hook::Then::Continue;
             }
-            return MulNX::Hook::Then::Continue;
-        }
-    ).value();
-    hkLoadFromFile_->Attach();
+        ).value();
+        hkLoadFromFile_->Attach();
 
-    // 2. 获取 CStylePropertyWashColor 的虚表
-    void** vtable = (void**)Afx::BinUtils::FindClassVtable(
-        (HMODULE)hMod,
-        ".?AVCStylePropertyWashColor@panorama@@",
-        0, 0
-    );
-    if (!vtable) return false;
+        // 2. 获取 CStylePropertyWashColor 的虚表
+        void** vtable = (void**)Afx::BinUtils::FindClassVtable(
+            (HMODULE)hMod,
+            ".?AVCStylePropertyWashColor@panorama@@",
+            0, 0
+        );
+        if (!vtable) return;
 
-    // 3. 从虚表取出 Parse（vtable[6]）和 Clone（vtable[1]）
-    auto parseFunc = (void(__fastcall*)(void*, void*, const char*))(vtable[6]);
-    auto cloneFunc = (void(__fastcall*)(void*, void*))(vtable[1]);
+        // 3. 从虚表取出 Parse（vtable[6]）和 Clone（vtable[1]）
+        auto parseFunc = (void(__fastcall*)(void*, void*, const char*))(vtable[6]);
+        auto cloneFunc = (void(__fastcall*)(void*, void*))(vtable[1]);
 
-    // 4. Hook Parse
-    hkWashColorParse_ = MulNX::Hook::Create((uint8_t*)parseFunc, 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
-            if (!inHudReticle_) return MulNX::Hook::Then::Continue;
+        // 4. Hook Parse
+        hkWashColorParse_ = MulNX::Hook::Create((uint8_t*)parseFunc, 0, false,
+            [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
+                if (!inHudReticle_) return MulNX::Hook::Then::Continue;
 
-            const char* colorStr = reinterpret_cast<const char*>(ctx->r8);
-            uintptr_t objPtr = ctx->rcx;
+                const char* colorStr = reinterpret_cast<const char*>(ctx->r8);
+                uintptr_t objPtr = ctx->rcx;
 
-            if (colorStr && strcmp(colorStr, "#eabe54") == 0) {
-                tWashColors_.insert(objPtr);
+                if (colorStr && strcmp(colorStr, "#eabe54") == 0) {
+                    tWashColors_.insert(objPtr);
+                }
+                else if (colorStr && strcmp(colorStr, "rgb(150, 200, 250)") == 0) {
+                    ctWashColors_.insert(objPtr);
+                }
+                return MulNX::Hook::Then::Continue;
             }
-            else if (colorStr && strcmp(colorStr, "rgb(150, 200, 250)") == 0) {
-                ctWashColors_.insert(objPtr);
+        ).value();
+        hkWashColorParse_->Attach();
+
+        // 5. Hook Clone
+        hkWashColorClone_ = MulNX::Hook::Create((uint8_t*)cloneFunc, 0, false,
+            [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
+                if (!inHudReticle_) return MulNX::Hook::Then::Continue;
+
+                uintptr_t src = ctx->rcx;
+                uintptr_t dst = ctx->rdx;   // __fastcall 第二个参数通过 RDX
+
+                if (tWashColors_.count(src)) tWashColors_.insert(dst);
+                if (ctWashColors_.count(src)) ctWashColors_.insert(dst);
+                return MulNX::Hook::Then::Continue;
             }
-            return MulNX::Hook::Then::Continue;
-        }
-    ).value();
-    hkWashColorParse_->Attach();
+        ).value();
+        hkWashColorClone_->Attach();
+        });
 
-    // 5. Hook Clone
-    hkWashColorClone_ = MulNX::Hook::Create((uint8_t*)cloneFunc, 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
-            if (!inHudReticle_) return MulNX::Hook::Then::Continue;
+    this->ISys().SubscribeSync("Debug/TeamID", [this](MulNX::Message& msg) {
+        this->SetCTColor(0, 255, 0, 255);
+        this->SetTColor(255, 0, 0, 255);
+        });
 
-            uintptr_t src = ctx->rcx;
-            uintptr_t dst = ctx->rdx;   // __fastcall 第二个参数通过 RDX
-
-            if (tWashColors_.count(src)) tWashColors_.insert(dst);
-            if (ctWashColors_.count(src)) ctWashColors_.insert(dst);
-            return MulNX::Hook::Then::Continue;
-        }
-    ).value();
-    hkWashColorClone_->Attach();
-
-    // 6. 若为后期注入，强制触发一次 HUD 重新加载以捕获对象
-    // 可根据需要启用，例如：
-    // this->CS2()->ExecuteClientCmd("cl_reload_hud");
 
     return true;
 }

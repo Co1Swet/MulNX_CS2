@@ -30,6 +30,7 @@ bool MulNXController::UINodeFunc(MulNX::UINode* ThisNode) {
     ImGui::InputText("手动注入消息", &msg);
     if (ImGui::Button("注入到框架")) {
         this->ISys().PublishAsync(MulNX::HashString(msg));
+        this->ISys().PublishSync(MulNX::HashString(msg));
         msg.clear();
     }
     ImGui::SameLine();

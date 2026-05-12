@@ -80,13 +80,13 @@ void CSController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Game/Command"_hash: {
         auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
-        this->executor(0, cmd.c_str(), 1);
+        //this->executor(0, cmd.c_str(), 1);
         break;
     }
     case "Demo/GotoTick"_hash: {
         int tick = msg.p1.low<int>();
         auto cmd = std::format("demo_gototick {}", tick);
-        this->executor(0, cmd.c_str(), 1);
+        //this->executor(0, cmd.c_str(), 1);
         break;
     }
     }
@@ -110,8 +110,10 @@ void CSController::Main() {
     // 玩家控制器，地图上从1到10
     int playerNum = 0;
     for (int i = 0; i < this->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-        auto* controller = this->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
-        if (!controller)continue;
+        auto* entity = this->client.GetBaseEntity(i);
+        if (!entity)continue;
+
+        auto* controller = entity->As<CS2::CCSPlayerController>();
         auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
         auto* pawn = this->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
         if (!pawn)continue;
@@ -135,6 +137,8 @@ void CSController::Main() {
             CS2EBEntity.Alive = CS2EBEntity.HP;
             CS2EBEntity.IndexInMap = playerNum;
         }
+
+        
     }
     return;
 }

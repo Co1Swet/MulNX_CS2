@@ -24,6 +24,9 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->EntryInit();
     // 二阶段初始化注册模块
     this->Core->ModuleManager()->ModulesInit();
+    // 激活系统
+    this->BeforeActiveSystem();
+    this->ActiveSystem();
     return true;
 }
 

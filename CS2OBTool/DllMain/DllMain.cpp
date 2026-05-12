@@ -66,7 +66,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<ESPController>("ESPController")
             .CreateModule<SkinController>("SkinController")
-            // //.CreateModule<TeamIDController>("TeamIDController")
+            .CreateModule<TeamIDController>("TeamIDController")
             .CreateModule<POVFixer>("POVFixer")
             // Demos
             .CreateModule<DemoHelper>("DemoHelper")
@@ -110,7 +110,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         break;
     }
     case DLL_PROCESS_DETACH: {
-        pCore->Close();
+        if (pCore)
+            pCore->Close();
         break;
     }
     default: {

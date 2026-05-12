@@ -150,6 +150,16 @@ namespace CS2 {
         DirectX::XMFLOAT3* vecViewOffset() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + cs2_dumper::schemas::client_dll::C_BaseModelEntity::m_vecViewOffset); }
     };
 
+    class C_BaseClientUIEntity :public C_BaseModelEntity {
+    public:
+        bool m_bEnabled() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::C_BaseClientUIEntity::m_bEnabled); }
+    };
+
+    class C_PointClientUIHUD :public C_BaseClientUIEntity {
+    public:
+
+    };
+
     class CBaseAnimGraph :public C_BaseModelEntity {
     public:
 

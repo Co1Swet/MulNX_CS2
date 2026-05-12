@@ -7,6 +7,8 @@
 #include <shellapi.h>
 #pragma comment(lib, "d3d11.lib")
 
+// 获取 D3D11CreateDevice 地址
+using D3D11CreateDevice_t = HRESULT(WINAPI*)(IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT, const D3D_FEATURE_LEVEL*, UINT, UINT, ID3D11Device**, D3D_FEATURE_LEVEL*, ID3D11DeviceContext**);
 using ResizeBuffers_t = HRESULT(__stdcall*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
 
 bool HookManager::Init() {
@@ -32,21 +34,10 @@ bool HookManager::Init() {
         }).value();
     this->hkLoadLibraryExW->Attach();
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
-        auto t = std::thread([this]() {
-            while (!(GetAsyncKeyState(VK_INSERT)&0x8000)) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            }
-            this->HookD3D11();
-        });
-        t.detach();
-
-        });
-
     return true;
 }
 
-void HookManager::HookD3D11() {
+void HookManager::BeforeActiveSystem() {
     // 注册并创建隐藏窗口
     WNDCLASSEXW wc = {};
     wc.cbSize = sizeof(WNDCLASSEX);
@@ -148,8 +139,6 @@ void HookManager::HookD3D11() {
         this->pGraphicsManager->pd3dContext->OMSetRenderTargets(1, &this->pGraphicsManager->view, nullptr);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         };
-
-    this->ActiveSystem();
 }
 
 void HookManager::d3dInit() {
@@ -195,10 +184,14 @@ void HookManager::d3dInit() {
 
 MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
-    if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
-        return MulNX::Hook::Then::Return;
+    if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire)) {
+        if (MulNX::Win32::IsMouseMessage(uMsg) ||
+            uMsg == WM_KEYDOWN && wParam == VK_TAB)
+            return MulNX::Hook::Then::Return;
+    }
     if (MulNX::Win32::IsKeyboardMessage(uMsg)) {
-        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) || this->pInputSystem->IsKeyPressed(VK_MENU))
+        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) ||
+            this->pInputSystem->IsKeyPressed(VK_MENU))
             return MulNX::Hook::Then::Return; // 当alt按下时进行拦截，此时属于 MulNX 按键通道判定快捷键的时刻
     }
     if (uMsg == WM_CLOSE) {
