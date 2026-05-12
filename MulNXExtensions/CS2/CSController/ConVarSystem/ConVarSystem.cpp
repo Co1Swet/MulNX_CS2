@@ -62,11 +62,6 @@ void C_ConVarSystem::LockAllCvars(int& Count)const {
 }
 
 C_ConVar* C_ConVarSystem::GetCvar(const std::string& CvarName){
-	std::unique_lock lock(this->ConVarSystemMutex);
-	auto it = this->CvarMap.find(CvarName);
-	if (it != CvarMap.end()) {
-		return it->second;
-	}
 	C_ConVar* pCvar = this->GetCVarByName(CvarName.c_str());
 	if (pCvar) {
 		this->CvarMap[CvarName] = pCvar;

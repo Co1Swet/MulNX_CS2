@@ -61,14 +61,9 @@ public:
 class GameSettingsManager final :public CSModuleBase {
 private:
     C_GameSettings GameSettings{};
-
     dof dof{};
     bool* sv_cheats = nullptr;
-
-    MulNXHandle hContext{};
+    bool Menu(MulNX::UINode* node);
 public:
-    //基类接口实现
-
     bool Init()override;
-    bool UINodeFunc(MulNX::UINode* node);
 };

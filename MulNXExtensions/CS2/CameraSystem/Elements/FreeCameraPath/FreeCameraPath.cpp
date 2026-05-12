@@ -150,6 +150,7 @@ void FreeCameraPath::Refresh() {
     return;
 }
 void FreeCameraPath::TimeNormalize() {
+    if (this->CameraKeyframes.empty())return;
     if (this->CameraKeyframes.front().time == 0)return;
     size_t Size = this->CameraKeyframes.size();
     if (!Size)return;

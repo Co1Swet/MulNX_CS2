@@ -1,10 +1,8 @@
 #include "GameSettingsManager.hpp"
-
-#include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
-bool GameSettingsManager::UINodeFunc(MulNX::UINode* ThisNode) {
+bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {
     ImGui::Checkbox("作弊模式", this->sv_cheats);
 
     ImGui::SliderFloat("游戏速度", this->GameSettings.host_timescale, 0.001f, 10.000f);
@@ -87,10 +85,13 @@ bool GameSettingsManager::UINodeFunc(MulNX::UINode* ThisNode) {
 }
 
 bool GameSettingsManager::Init() {
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SendTask("CSControl", [this]() {
         C_ConVarSystem& CVarSystem = this->CS2()->GetCvarSystem();
 
-        this->GameSettings.ScreenSettings.spec_show_xray = CVarSystem.GetCvar("spec_show_xray")->GetPtr<int>();
+        auto spec_show_xray = CVarSystem.GetCvar("spec_show_xray");
+        if (!spec_show_xray)return true;
+
+        this->GameSettings.ScreenSettings.spec_show_xray = spec_show_xray->GetPtr<int>();
 
         this->dof.r_dof_override = CVarSystem.GetCvar("r_dof_override")->GetPtr<bool>();
         this->dof.r_dof_override_far_blurry = CVarSystem.GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
@@ -121,7 +122,10 @@ bool GameSettingsManager::Init() {
         this->GameSettings.SoundSettings.snd_deathcamera_volume = CVarSystem.GetCvar("snd_deathcamera_volume")->GetPtr<float>();
         this->GameSettings.SoundSettings.snd_mute_mvp_music_live_players = CVarSystem.GetCvar("snd_mute_mvp_music_live_players")->GetPtr<bool>();
 
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+        *this->GameSettings.cl_trueview_show_status = 0;
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+        return false;
         });
+
     return true;
 }
