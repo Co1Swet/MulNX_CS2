@@ -1,45 +1,7 @@
 #include "CS2BootLoader.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/WinExt/Remote/Remote.hpp>
 #include <yaml-cpp/yaml.h>
-#include <psapi.h>
-
-HMODULE GetRemoteModuleHandle(HANDLE hProcess, const std::wstring& moduleName) {
-    HMODULE hMods[1024];
-    DWORD cbNeeded;
-    if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
-        for (unsigned i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
-            wchar_t szModName[MAX_PATH];
-            if (GetModuleBaseNameW(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(wchar_t))) {
-                if (_wcsicmp(szModName, moduleName.c_str()) == 0) {
-                    return hMods[i];
-                }
-            }
-        }
-    }
-    return nullptr;
-}
-
-FARPROC CS2BootLoader::GetRemoteProcAddress(HANDLE hProcess, const std::wstring& moduleName, const char* funcName) {
-    // 1. 获取远程模块基址
-    HMODULE hRemoteModule = GetRemoteModuleHandle(hProcess, moduleName);
-    if (!hRemoteModule) return nullptr;
-
-    // 2. 本地获取同样 DLL 的基址和函数地址（依赖本地已加载同一个 DLL）
-    HMODULE hLocalModule = GetModuleHandleW(moduleName.c_str());
-    if (!hLocalModule) {
-        // 如果本地还没加载，可以主动加载一下，但注意不要在 DllMain 中做
-        hLocalModule = LoadLibraryW(this->dllPath.wstring().c_str());
-        if (!hLocalModule) return nullptr;
-    }
-    FARPROC pLocalFunc = GetProcAddress(hLocalModule, funcName);
-    if (!pLocalFunc) return nullptr;
-
-    // 3. 计算 RVA
-    uintptr_t rva = (uintptr_t)pLocalFunc - (uintptr_t)hLocalModule;
-
-    // 4. 远程函数地址 = 远程基址 + RVA
-    return (FARPROC)((uintptr_t)hRemoteModule + rva);
-}
 
 bool CS2BootLoader::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("CS2 Boot Loader", this->showWindow);
@@ -71,6 +33,7 @@ bool CS2BootLoader::Init() {
     auto pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
     auto rootPath = pIPCer->GetRoot();
     this->dllPath = rootPath / "CS2OBTool" / "CS2OBTool.dll";
+    LoadLibraryW(this->dllPath.wstring().c_str());
 
     if(!std::filesystem::exists(this->dllPath)) {
         this->ISys().LogError(std::format("CS2OBTool.dll not found at expected path: {}", this->dllPath.string()));

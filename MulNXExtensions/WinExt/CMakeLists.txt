@@ -1,6 +1,7 @@
 add_library(WinExt STATIC
     WIN32Msg/WIN32Msg.cpp
     vtable/vtable.cpp
+    Remote/Remote.cpp
 
     Memory/Assembler/Assembler.cpp
     Memory/Assembler/Help/Help.cpp
