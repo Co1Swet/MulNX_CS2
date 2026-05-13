@@ -12,7 +12,6 @@ ui:
   main: 首页
   camera_system: 摄像机系统
   game_settings: 游戏设置
-  game_enhance: 游戏增强
   mulnx_control: MulNX控制
   settings: UI个性配置
   style:

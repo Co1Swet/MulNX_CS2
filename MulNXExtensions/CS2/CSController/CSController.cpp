@@ -2,18 +2,6 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
-bool CSController::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("快捷操作", this->showWindow);
-    if (!w)return true;
-
-    node->CallUINode("ViewController");
-    node->CallUINode("PlayerFlashController");
-    node->CallUINode("AdvancedViewController");
-    node->CallUINode("FreeCameraController");
-
-    return true;
-}
-
 bool CSController::Init() {
     this->showWindow = true;
     this->ISys()
@@ -71,7 +59,6 @@ MulNX::CoTask CSController::InitTask() {
         }
         return true;
         });
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     co_return;
 }

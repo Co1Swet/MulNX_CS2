@@ -25,7 +25,6 @@ add_library(MulNXCS2Ext
 
     MiniMap/MiniMap.cpp
 
-    ConsoleManager/ConsoleManager.cpp
     GameCfgManager/GameCfgManager.cpp
     GameSettingsManager/GameSettingsManager.cpp
 

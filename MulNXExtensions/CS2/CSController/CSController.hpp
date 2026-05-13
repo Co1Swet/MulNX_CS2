@@ -45,7 +45,6 @@ private:
     std::atomic<int> needToLoadModules = 4;
     MulNX::CoTask currentCoro;
     MulNX::CoTask InitTask();
-    bool Window(MulNX::UINode* node);
     void ProcessMsg(MulNX::Message& Msg)override;
     void Main();
 public:

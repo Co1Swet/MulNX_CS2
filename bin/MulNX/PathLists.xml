@@ -3,6 +3,7 @@
     <Shared>
         <Path Name="Config"/>
         <Path Name="Log"/>
+        <Path Name="Demos"/>
     </Shared>
 
     <Subdirectory>

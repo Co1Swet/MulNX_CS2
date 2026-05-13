@@ -124,9 +124,6 @@ private:
     //缓存已获取的Cvar
     std::unordered_map<std::string, C_ConVar*> CvarMap;
 public:
-    //游戏内Cvar系统接口地址
-    uintptr_t Address;
-private:
     //控制台变量定位获取
 
     //得到第一个Cvar的迭代器
@@ -137,7 +134,9 @@ private:
     C_ConVar* GetCVarByIndex(uint64_t index)const;
     //通过名称获取Cvar
     C_ConVar* GetCVarByName(const char* var_name)const;
-public:
+
+    //游戏内Cvar系统接口地址
+    uintptr_t Address;
     void UnlockHiddenCVars(int& Count)const;
     void LockAllCvars(int& Count)const;
 

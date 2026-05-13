@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 
 bool DemoJSONReader::Init() {
-    this->outputDir = this->ISys().PathManager()->PathGetForShared("Tools") / "Output";
+    this->dirDemos = this->ISys().PathManager()->PathGetForShared("Demos");
     this->ISys().SubscribeAsync("debug/read");
 
     this->SendTask("DemoSys", [this]()->bool {
@@ -17,7 +17,7 @@ void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "debug/read"_hash: {
         std::string filename = "111.json";
-        std::filesystem::path filePath = this->outputDir / filename;
+        std::filesystem::path filePath = this->dirDemos / filename;
         if (!std::filesystem::exists(filePath)) {
             this->ISys().LogError("文件不存在: " + filePath.string());
             break;

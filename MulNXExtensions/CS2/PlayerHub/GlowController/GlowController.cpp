@@ -1,5 +1,4 @@
 #include "GlowController.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
@@ -86,7 +85,7 @@ bool GlowController::Init() {
         auto target = region.Data();
         this->hkSetGlowColor = MulNX::Hook::Create(target, 0, false,
             [this](MulNX::Hook* hk,RegContext* ctx) {
-                this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)(ctx->rdx));
+                this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)&(ctx->rdx));
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkSetGlowColor->Attach();

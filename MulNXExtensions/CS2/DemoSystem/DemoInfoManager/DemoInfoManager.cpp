@@ -4,7 +4,7 @@
 bool DemoInfoManager::Init() {
     auto toolsPath = this->ISys().PathManager()->PathGetForShared("Tools");
     this->csdaPath = toolsPath / "csda.exe";
-    this->outputDir = toolsPath / "Output";
+    this->dirDemos = this->ISys().PathManager()->PathGetForShared("Demos");
 
     this->ISys().SubscribeAsync("Demo/Analyze");
 
@@ -36,7 +36,7 @@ void DemoInfoManager::AnalyzeDemoWithCSDA() {
     std::ostringstream cmdLine;
     cmdLine << "\"" << this->csdaPath.string() << "\" "
         << "-demo-path=" << this->currentDemoPath << " "
-        << "-output=\"" << this->outputDir.string() << "\" "
+        << "-output=\"" << this->dirDemos.string() << "\" "
         << "-format=json";   // 可根据需要加 -positions 等
 
     std::string cmdStr = cmdLine.str();
@@ -87,7 +87,7 @@ void DemoInfoManager::AnalyzeDemoWithCSDA() {
     else {
         this->ISys().LogInfo("Demo analysis completed successfully.");
         // 可选：解析输出 JSON 文件
-        // std::filesystem::path jsonFile = this->outputDir / "111.json";
+        // std::filesystem::path jsonFile = this->dirDemos / "111.json";
         // ...
     }
 

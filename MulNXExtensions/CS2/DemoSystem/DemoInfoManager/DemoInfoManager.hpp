@@ -5,7 +5,7 @@
 class DemoInfoManager final : public CSModuleBase {
     std::filesystem::path currentDemoPath;
     std::filesystem::path csdaPath;
-    std::filesystem::path outputDir;
+    std::filesystem::path dirDemos;
     void AnalyzeDemoWithCSDA();
 public:
     bool Init()override;

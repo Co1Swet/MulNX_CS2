@@ -4,28 +4,24 @@
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
 void FreeCameraController::Menu(MulNX::UINode* node) {
-    // 自由摄像机控制
-    if (ImGui::CollapsingHeader("自由摄像机控制")) {
-
-        bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
-        if (ImGui::Checkbox("启用自由摄像机位置控制", &currentEnable)) {
-            if (currentEnable && !this->EnableControl.load(std::memory_order_acquire)) {
-                auto view = this->CS2View()->GetView();
-                // 从未启用到启用：读取当前游戏位置和角度
-                this->Position = view.position;
-                this->Rotation = view.rotation;
-                // 重置自由摄像机独立时钟，避免禁用后再次启用导致时间突变
-                this->LastUpdateTime = std::chrono::steady_clock::now();
-            }
-            this->EnableControl.store(currentEnable, std::memory_order_release);
+    bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
+    if (ImGui::Checkbox("启用自由摄像机位置控制", &currentEnable)) {
+        if (currentEnable && !this->EnableControl.load(std::memory_order_acquire)) {
+            auto view = this->CS2View()->GetView();
+            // 从未启用到启用：读取当前游戏位置和角度
+            this->Position = view.position;
+            this->Rotation = view.rotation;
+            // 重置自由摄像机独立时钟，避免禁用后再次启用导致时间突变
+            this->LastUpdateTime = std::chrono::steady_clock::now();
         }
+        this->EnableControl.store(currentEnable, std::memory_order_release);
+    }
 
-        if (currentEnable) {
-            ImGui::Text("当前位置: X=%.2f, Y=%.2f, Z=%.2f",
-                this->Position.x, this->Position.y, this->Position.z);
+    if (currentEnable) {
+        ImGui::Text("当前位置: X=%.2f, Y=%.2f, Z=%.2f",
+            this->Position.x, this->Position.y, this->Position.z);
 
-            MulNX::UI::SliderFloat("移动速度", this->MoveSpeed, 10.0f, 1000.0f);
-        }
+        MulNX::UI::SliderFloat("移动速度", this->MoveSpeed, 10.0f, 1000.0f);
     }
 }
 

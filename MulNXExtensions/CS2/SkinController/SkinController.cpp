@@ -3,7 +3,7 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 void SkinController::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow(I18n("skin.changer").c_str());
+    ImGui::SeparatorText(I18n("skin.changer").c_str());
     MulNX::UI::SliderInt(I18n("skin.target.index").c_str(), this->targetIndex, 0, 10000);
     MulNX::UI::Checkbox(I18n("skin.target.legacy").c_str(), this->legacyModel);
     if (ImGui::Button(I18n("skin.apply").c_str())) {

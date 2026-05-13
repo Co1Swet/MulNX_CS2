@@ -3,10 +3,7 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 bool PlayerFlashController::Menu(MulNX::UINode* node) {
-    if (ImGui::CollapsingHeader("闪光效果控制")) {
-        MulNX::UI::Checkbox("强制移除闪光效果", this->bForceNoFlash);
-    }
-
+    MulNX::UI::Checkbox("强制移除闪光效果", this->bForceNoFlash);
     return true;
 }
 

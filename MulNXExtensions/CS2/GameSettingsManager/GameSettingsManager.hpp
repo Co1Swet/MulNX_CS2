@@ -64,6 +64,9 @@ private:
     dof dof{};
     bool* sv_cheats = nullptr;
     bool Menu(MulNX::UINode* node);
+    bool SoundMenu(MulNX::UINode* node);
+    bool DofMenu(MulNX::UINode* node);
+    bool GameHudMenu(MulNX::UINode* node);
 public:
     bool Init()override;
 };

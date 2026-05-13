@@ -28,7 +28,6 @@
 #include "PlayerHub/SmokeController/SmokeController.hpp"
 #include "PlayerHub/ProjectileTracker/ProjectileTracker.hpp"
 
-#include "ConsoleManager/ConsoleManager.hpp"
 #include "GameCfgManager/GameCfgManager.hpp"
 #include "GameSettingsManager/GameSettingsManager.hpp"
 
