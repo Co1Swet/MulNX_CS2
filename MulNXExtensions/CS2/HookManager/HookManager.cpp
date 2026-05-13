@@ -16,7 +16,7 @@ bool HookManager::Init() {
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
     this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, 0, false,
-        [this](RegContext* ctx, MulNX::Hook* hk) {
+        [this](MulNX::Hook* hk, RegContext* ctx) {
             std::unique_lock lock(this->loadLibraryMutex);
 
             LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
@@ -76,7 +76,7 @@ void HookManager::BeforeActiveSystem() {
 
     // ---- Hook ClearDepthStencilView (vtable index 53) ----
     this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTempContext)->GetVFuncPtr(53),
-        0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
+        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
             ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
             ID3D11DepthStencilView* pDSV = (ID3D11DepthStencilView*)ctx->rdx;
             UINT ClearFlags = (UINT)ctx->r8;
@@ -96,7 +96,7 @@ void HookManager::BeforeActiveSystem() {
     // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
     this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTempSwapChain)->GetVFuncPtr(8) + 5,
-        0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
+        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
                 this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
                 this->d3dInit();
@@ -117,7 +117,7 @@ void HookManager::BeforeActiveSystem() {
 
     // ---- Hook ResizeBuffers (vtable index 13) ----
     this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTempSwapChain)->GetVFuncPtr(13),
-        0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
+        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
             this->pGraphicsManager->ReleaseOld();
             return MulNX::Hook::Then::Continue;
         }).value();
@@ -159,14 +159,14 @@ void HookManager::d3dInit() {
     HANDLE hProp = GetPropW(this->CS2hWnd, L"OleDropTargetInterface");
     IDropTarget* pTarget = static_cast<IDropTarget*>(hProp);
     this->hkDrop = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTarget)->GetVFuncPtr(6),
-        0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
+        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
             this->HandleProcessDropFiles((IDataObject*)ctx->rdx);
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkDrop->Attach();
     // 窗口过程钩子
     this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->CS2hWnd, GWLP_WNDPROC),
-        0, false, [this](RegContext* ctx, MulNX::Hook* hk) {
+        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
         }).value();
     this->hkWndProc->Attach();
@@ -204,7 +204,6 @@ MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
     }
     return MulNX::Hook::Then::Continue;
 }
-
 void HookManager::Deinit() {
     this->hkLoadLibraryExW->Detach();
     this->hkClearDepthStencilView->Detach();
@@ -213,7 +212,6 @@ void HookManager::Deinit() {
     this->hkResizeBuffers->Detach();
     this->hkWndProc->Detach();
 }
-
 void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {
     if (!pDataObj) return;
     // 请求 CF_HDROP 格式

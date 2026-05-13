@@ -45,7 +45,7 @@ namespace MulNX {
         const static size_t allocSize = 1000;
 
         bool attached = false;
-        std::function<Then(RegContext*, Hook*)> callback;
+        std::function<Then(Hook*, RegContext*)> callback;
         std::atomic<size_t> threadNumInAsm = 0;
 
         void* pAsmDispatcher = nullptr;
@@ -77,7 +77,7 @@ namespace MulNX {
         void* GetRawStackAddr(RegContext* ctx);
 
         // 关于栈调整参数，当其为false时，模拟原始栈状态进行回调；当其为true时，则认为栈状态非16字节对齐，内部进行对齐操作（常常是函数中间Hook）
-        static std::expected<std::unique_ptr<Hook>, std::string> Create(uint8_t* Target, int Len, bool extraStackAdjust, std::function<Then(RegContext*, Hook*)>&& callback);
+        static std::expected<std::unique_ptr<Hook>, std::string> Create(uint8_t* target, int len, bool extraStackAdjust, std::function<Then(Hook*, RegContext*)>&& callback);
         Result Attach();
         Result Detach();
     };

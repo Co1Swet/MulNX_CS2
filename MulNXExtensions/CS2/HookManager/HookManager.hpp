@@ -13,11 +13,8 @@ private:
     HWND CS2hWnd = nullptr;
 
     // LoadLibrary 函数钩子（用于DLL注入检测）
-    std::recursive_mutex loadLibraryMutex;
     std::unique_ptr<MulNX::Hook> hkLoadLibraryExW = nullptr;
-
-
-    std::unique_ptr<MulNX::Hook> hkD3D11CreateDevice = nullptr;
+    std::recursive_mutex loadLibraryMutex;
     // ClearDepthStencilView 钩子（清空前偷深度）
     std::unique_ptr<MulNX::Hook> hkClearDepthStencilView = nullptr;
     // Present 钩子

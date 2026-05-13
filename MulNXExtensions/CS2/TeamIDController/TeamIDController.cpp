@@ -17,7 +17,7 @@ bool TeamIDController::Init() {
         if (!lflAddr.IsValid()) return;
 
         hkLoadFromFile_ = MulNX::Hook::Create(lflAddr.Data(), 0, false,
-            [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
+            [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
                 // __fastcall: RCX=this, RDX=filePath, R8=unk
                 const char* filePath = reinterpret_cast<const char*>(ctx->rdx);
                 if (filePath && strstr(filePath, "hudreticle.xml")) {
@@ -46,7 +46,7 @@ bool TeamIDController::Init() {
 
         // 4. Hook Parse
         hkWashColorParse_ = MulNX::Hook::Create((uint8_t*)parseFunc, 0, false,
-            [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
+            [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
                 if (!inHudReticle_) return MulNX::Hook::Then::Continue;
 
                 const char* colorStr = reinterpret_cast<const char*>(ctx->r8);
@@ -65,7 +65,7 @@ bool TeamIDController::Init() {
 
         // 5. Hook Clone
         hkWashColorClone_ = MulNX::Hook::Create((uint8_t*)cloneFunc, 0, false,
-            [this](RegContext* ctx, MulNX::Hook* hk) -> MulNX::Hook::Then {
+            [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
                 if (!inHudReticle_) return MulNX::Hook::Then::Continue;
 
                 uintptr_t src = ctx->rcx;

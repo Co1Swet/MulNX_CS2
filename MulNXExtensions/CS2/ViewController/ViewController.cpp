@@ -29,7 +29,7 @@ bool ViewController::Init() {
 
         auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::CallIsPlayingDemo);
         this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), 0, true,
-            [this](RegContext* ctx, MulNX::Hook* Hook) {
+            [this](MulNX::Hook* Hook, RegContext* ctx) {
                 this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
                 return MulNX::Hook::Then::Continue;
             }).value();

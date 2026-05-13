@@ -81,7 +81,7 @@ bool SmokeController::Init() {
             .FindRegion(MulNX::CS2::Signatures::SetSmokeProps).Data();
 
         this->hkSetSmokeProps = MulNX::Hook::Create(target, 0, false,
-            [this](RegContext* ctx, MulNX::Hook* hook) {
+            [this](MulNX::Hook* hook, RegContext* ctx) {
                 // 再应用自定义颜色
                 this->MySetSmokeProps((CS2::C_SmokeGrenadeProjectile*)(ctx->rcx));
                 return MulNX::Hook::Then::Continue;

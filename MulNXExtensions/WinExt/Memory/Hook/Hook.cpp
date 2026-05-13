@@ -5,7 +5,7 @@
 
 uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     this->threadNumInAsm.fetch_add(1, std::memory_order_release);
-    auto then = this->callback(ctx, this);
+    auto then = this->callback(this, ctx);
     uint64_t target;
     switch (then) {
     case MulNX::Hook::Then::Return:
@@ -75,35 +75,35 @@ void* TryAlloc(uintptr_t target, size_t size) {
     return nullptr;
 }
 
-std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* Target, int Len, bool extraStackAdjust, std::function<MulNX::Hook::Then(RegContext*, Hook*)>&& callback) {
-    if (0 < Len && Len < 5) {
-        return std::unexpected(std::format("参数指定的长度是：{}  ，这个长度怎么可能放得下一个jmp rel32？？", Len));
+std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, int len, bool extraStackAdjust, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback) {
+    if (0 < len && len < 5) {
+        return std::unexpected(std::format("参数指定的长度是：{}  ，这个长度怎么可能放得下一个jmp rel32？？", len));
     }
-    if (Len == 0) {
+    if (len == 0) {
         // 自动分析法，info至少提供20个空间
-        auto info = MulNX::Hook::AnalyseTarget(Target);
-        for (int i = 0;Len < 5;++i) {
-            Len += info.Cmds.at(i).size;
+        auto info = MulNX::Hook::AnalyseTarget(target);
+        for (int i = 0;len < 5;++i) {
+            len += info.Cmds.at(i).size;
         }
     }
 
     // 创建Hook实例
     auto HookInstance = std::make_unique<Hook>();
-    HookInstance->hookTarget = Target;
+    HookInstance->hookTarget = target;
     HookInstance->callback = std::move(callback);
-    HookInstance->overrideSize = Len;
+    HookInstance->overrideSize = len;
     // 复制覆盖处指令
-    HookInstance->hookTargetRawCode = MulNX::Memory::Asm::Code(Target, Target + HookInstance->overrideSize);
+    HookInstance->hookTargetRawCode = MulNX::Memory::Asm::Code(target, target + HookInstance->overrideSize);
 
     // 为调度器汇编部分分配空间    
-    auto* alloced = TryAlloc((uintptr_t)Target, 4096);
+    auto* alloced = TryAlloc((uintptr_t)target, 4096);
     if (!alloced) {
         return std::unexpected("windows内存分配失败！无法找到空间");
     }
     // 进行raii绑定，防止内存泄露
     HookInstance->pAsmDispatcher = alloced;
     if (std::abs(static_cast<long long>(reinterpret_cast<uintptr_t>(alloced) -
-        reinterpret_cast<uintptr_t>(Target))) > 1024ULL * 1024 * 1024) {
+        reinterpret_cast<uintptr_t>(target))) > 1024ULL * 1024 * 1024) {
         return std::unexpected("windows内存分配失败！分配空间不合适");
     }
     
@@ -217,7 +217,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         HookInstance->dispatcherAsmCode.append_range(std::move(fixed));
 
         // 跳转到原处
-        Asm.jmp64((uintptr_t)Target + HookInstance->overrideSize);
+        Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
         
         HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
@@ -227,7 +227,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
             HookInstance->dispatcherAsmCode.size());
         
         // 生成用于覆盖原位置的代码
-        Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)Target - 5);
+        Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)target - 5);
         //Asm.jmp64((uintptr_t)HookInstance->pAsmDispatcher);
         for (int i = 5;i < HookInstance->overrideSize;++i) {
             Asm.nop();

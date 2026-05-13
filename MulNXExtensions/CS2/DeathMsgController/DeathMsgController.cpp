@@ -37,7 +37,7 @@ bool DeathMsgController::Init() {
         auto target = this->CS2()->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::HandlePlayerDeath);
         this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), 0, false,
-            [this](RegContext* ctx, MulNX::Hook* hk) {
+            [this](MulNX::Hook* hk, RegContext* ctx) {
                 void* event = reinterpret_cast<void*>(ctx->rdx);
                 return this->HandleOnPlayerDeath(event);
             }).value();
@@ -55,12 +55,12 @@ bool DeathMsgController::Init() {
 }
 
 void DeathMsgController::ProcessMsg(MulNX::Message& msg) {
-    
+
 }
 
 MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(void* event) {
     auto GetPlayerController = IVClass::Assume(event)->GetVFunc<CS2::CCSPlayerController * (const CKV3MemberName&)>(16);
- 
+
     CKV3MemberName attacker{ this->attacker_hash, -1, nullptr };
     CKV3MemberName userid{ this->userid_hash, -1, nullptr };
     CKV3MemberName assister{ this->assister_hash, -1, nullptr };
@@ -74,7 +74,7 @@ MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(void* event) {
         auto beKillerSteamID = MulNX::MRead(pBeKillerController->m_steamID());
         uint64_t assisterSteamID = 0;
         if (pAssisterController) {
-            assisterSteamID=MulNX::MRead(pAssisterController->m_steamID());
+            assisterSteamID = MulNX::MRead(pAssisterController->m_steamID());
         }
         auto eventTick = this->CS2Time()->GetDemoTick();
 
