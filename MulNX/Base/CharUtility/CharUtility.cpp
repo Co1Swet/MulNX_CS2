@@ -2,14 +2,14 @@
 
 #include <Windows.h>
 
-std::string MulNX::Base::CharUtility::FilePathToString(const std::filesystem::path& path) {
+std::string MulNX::CharUtility::FilePathToString(const std::filesystem::path& path) {
 	std::u8string u8path = path.u8string();
 	std::string utf8Path(u8path.begin(), u8path.end());
 	std::replace(utf8Path.begin(), utf8Path.end(), '\\', '/');
 	return utf8Path;
 }
 
-std::wstring MulNX::Base::CharUtility::U8ToW(const std::string& u8String) {
+std::wstring MulNX::CharUtility::U8ToW(const std::string& u8String) {
     if (u8String.empty()) return {};
 
     int wStringLen = MultiByteToWideChar(CP_UTF8, 0,
@@ -22,7 +22,7 @@ std::wstring MulNX::Base::CharUtility::U8ToW(const std::string& u8String) {
         wString.data(), wStringLen);
     return wString;
 }
-std::string MulNX::Base::CharUtility::WToU8(const std::wstring& wString) {
+std::string MulNX::CharUtility::WToU8(const std::wstring& wString) {
     if (wString.empty()) return {};
 
     int u8StringLen = WideCharToMultiByte(CP_UTF8, 0,

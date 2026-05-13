@@ -1,10 +1,5 @@
 #include "WebSocketManager.hpp"
-
 #include <nlohmann/json.hpp>
-
-#include <string>
-#include <vector>
-#include <cstdint>
 
 // 简易 Base64 解码（RFC 4648）
 static const std::string base64_chars =

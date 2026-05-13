@@ -93,10 +93,12 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<TeamIDController>("TeamIDController")
             .CreateModule<POVFixer>("POVFixer")
             // Demos
+            .CreateModule<DemoSystem>("DemoSystem")
             .CreateModule<DemoHelper>("DemoHelper")
+            .CreateModule<DemoInfoManager>("DemoInfoManager")
+            .CreateModule<DemoJSONReader>("DemoJSONReader")
             .CreateModule<DemoAnalyzer>("DemoAnalyzer")
             .CreateModule<DemoRecorder>("DemoRecorder")
-            .CreateModule<DemoSystem>("DemoSystem")
             // 较为上层
             .CreateModule<MiniMap>("MiniMap")
             .CreateModule<VirtualUser>("VirtualUser")

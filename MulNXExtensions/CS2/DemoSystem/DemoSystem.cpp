@@ -35,7 +35,12 @@ bool DemoSystem::Window(MulNX::UINode* node) {
                         rp->str1 = fullPath;
                         this->ISys().PublishAsync(std::move(msg));
                     }
-                    if (ImGui::MenuItem("demo.play_and_analize")) {
+                    if (ImGui::MenuItem(I18n("demo.analyze").c_str())) {
+                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
+                        rp->str1 = fullPath;
+                        this->ISys().PublishAsync(std::move(msg));
+                    }
+                    if (ImGui::MenuItem(I18n("demo.play_and_analyze").c_str())) {
                         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
                         rp->str1 = fullPath;
                         this->ISys().PublishAsync(std::move(msg));
@@ -102,7 +107,7 @@ bool DemoSystem::Init() {
         return this->Window(node);
         });
     
-    this->SendTask("MulNXMain", [this]() {
+    this->SendTask("DemoSys", [this]() {
         this->Update();
         return true;
         });

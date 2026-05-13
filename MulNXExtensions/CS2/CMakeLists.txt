@@ -5,11 +5,6 @@ add_library(MulNXCS2Ext
 
     CSModuleBase.cpp
 
-    DemoSystem/DemoSystem.cpp
-    DemoSystem/DemoHelper/DemoHelper.cpp
-    DemoSystem/DemoAnalyzer/DemoAnalyzer.cpp
-    DemoSystem/DemoRecorder/DemoRecorder.cpp
-
     ViewController/ViewController.cpp
     TimeController/TimeController.cpp
     AdvancedViewController/AdvancedViewController.cpp
@@ -39,9 +34,11 @@ add_library(MulNXCS2Ext
 
 add_subdirectory("CSController")
 add_subdirectory("CameraSystem")
+add_subdirectory("DemoSystem")
 
 target_link_libraries(MulNXCS2Ext PUBLIC
     MulNX
     WinExt
     CSController
+    DemoSystem
 )

@@ -12,7 +12,7 @@ bool DemoRecorder::Init() {
     this->coTa = Main();
     this->coTa.resume();
 
-    this->SendTask("DemoRecorder", [this]()->bool {
+    this->SendTask("DemoSys", [this]()->bool {
         this->Update();
         return true;
         });
