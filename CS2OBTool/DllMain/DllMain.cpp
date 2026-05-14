@@ -1,6 +1,7 @@
 #include "DllMain.hpp"
 #include <CS2OBTool/UIDocker/UIDocker.hpp>
 #include <MulNXExtensions/DLLLoadDispatcher/DLLLoadDispatcher.hpp>
+#include <MulNXExtensions/FileRedirector/FileRedirector.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CamSysExt.hpp>
 #include <MulNXExtensions/CS2/MulNXCS2Ext.hpp>
 #include <MulNXExtensions/VirtualUser/VirtualUser.hpp>
@@ -63,6 +64,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
         (*pCore->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
+            .CreateModule<FileRedirector>("FileRedirector")
             .CreateModule<CSController>("CSController")
             .CreateModule<TimeController>("TimeController")
             .CreateModule<ViewController>("ViewController")

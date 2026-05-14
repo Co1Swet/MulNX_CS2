@@ -4,5 +4,4 @@ build/*
 bin/**/*.pdb
 bin/**/*.exe
 bin/**/*.dll
-bin/**/*.ini
 bin/**/*.zip

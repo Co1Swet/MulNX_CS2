@@ -12,6 +12,7 @@ add_subdirectory("ShortcutManager")
 add_subdirectory("Win32Starter")
 add_subdirectory("CS2BootLoader")
 add_subdirectory("DLLLoadDispatcher")
+add_subdirectory("FileRedirector")
 
 target_link_libraries(MulNXExtensions INTERFACE
     MulNX
@@ -27,4 +28,5 @@ target_link_libraries(MulNXExtensions INTERFACE
     Win32Starter
     CS2BootLoader
     DLLLoadDispatcher
+    FileRedirector
 )

@@ -29,10 +29,15 @@ void POVFixer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "POVFix/Enable"_hash: {
         this->enable = true;
+        this->ISys().AsyncCommand("cl_radar_show_all_players_when_spectating false");
+        this->ISys().AsyncCommand("cl_radar_square_always false");
+        this->ISys().AsyncCommand("cl_radar_square_when_spectating false");
         break;
     }
     case "POVFix/Disable"_hash: {
         this->enable = false;
+        this->ISys().AsyncCommand("cl_radar_show_all_players_when_spectating true");
+        this->ISys().AsyncCommand("cl_radar_square_when_spectating true");
         break;
     }
     }
