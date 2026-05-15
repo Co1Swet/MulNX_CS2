@@ -1,5 +1,15 @@
 name: "MulNX 官方快捷键配置"
 
+buttons:
+  - name: "place camera" # 放置关键帧
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: true
+      vkCode: 90
+      comboClick: 1
+
 binds:
   - desc: "触发全局保存（alt+S）"
     msg: "Global/Save"
