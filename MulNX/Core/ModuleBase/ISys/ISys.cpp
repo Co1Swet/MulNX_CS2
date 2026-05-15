@@ -1,6 +1,7 @@
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 #include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
+#include <MulNX/Systems/ShortcutManager/ShortcutManager.hpp>
 
 MulNX::C_ISys MulNX::ModuleBase::ISys() {
     return C_ISys(this);
@@ -77,4 +78,8 @@ std::filesystem::path MulNX::C_ISys::PathGet(const std::string& Target) {
 
 MulNX::PathManager* MulNX::C_ISys::PathManager() {
     return this->pModuleBase->pPathManager;
+}
+
+std::optional<MulNX::KeyCheckPack> MulNX::C_ISys::GetButton(const std::string& name) {
+    return this->pModuleBase->pShortcutManager->GetButton(name);
 }

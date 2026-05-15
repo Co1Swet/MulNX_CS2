@@ -14,6 +14,7 @@
 #include <MulNX/Systems/InputSystem/InputSystem.hpp>
 #include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
 #include <MulNX/Systems/TaskSystem/TaskSystem.hpp>
+#include <MulNX/Systems/ShortcutManager/ShortcutManager.hpp>
 
 bool MulNX::Core::ModuleManager::Init() {
     this->ISys()
@@ -60,6 +61,7 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
         .CreateModule<MulNX::Debugger>("Debugger")// 调试器模块
         .CreateModule<MulNX::HandleSystem>("HandleSystem")// 句柄系统模块
         .CreateModule<MulNX::InputSystem>("InputSystem")// 输入系统模块
+        .CreateModule<ShortcutManager>("ShortcutManager")// 快捷键管理器模块
         .CreateModule<MulNX::GlobalVars>("GlobalVars")// 全局变量模块
         .CreateModule<MulNX::TaskSystem>("TaskSystem")// 任务系统
         ;

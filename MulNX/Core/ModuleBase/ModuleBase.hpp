@@ -71,9 +71,9 @@ namespace MulNX {
 
         MulNX::MessageManager* pMsgManager = nullptr;
         MulNX::PathManager* pPathManager = nullptr;
-        // 模块名称，唯一标识
         std::string ModuleName{};
         MulNX::MessageChannel* MainMsgChannel = nullptr;
+        MulNX::ShortcutManager* pShortcutManager = nullptr;
     protected:
         MulNX::Core::Core* Core = nullptr;
         MulNX::GlobalVars* GlobalVars = nullptr;

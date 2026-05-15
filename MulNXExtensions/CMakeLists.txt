@@ -8,7 +8,6 @@ add_subdirectory("MulNXController")
 add_subdirectory("WebSocketManager")
 add_subdirectory("GraphicsManager")
 add_subdirectory("MediaRemoter")
-add_subdirectory("ShortcutManager")
 add_subdirectory("Win32Starter")
 add_subdirectory("CS2BootLoader")
 add_subdirectory("DLLLoadDispatcher")
@@ -24,7 +23,6 @@ target_link_libraries(MulNXExtensions INTERFACE
     WebSocketManager
     GraphicsManager
     MediaRemoter
-    ShortcutManager
     Win32Starter
     CS2BootLoader
     DLLLoadDispatcher

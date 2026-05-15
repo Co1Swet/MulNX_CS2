@@ -34,6 +34,7 @@ add_library(MulNX
     Systems/TaskSystem/TaskSystem.cpp
     Systems/I18nManager/I18nManager.cpp
     Systems/Logger/Logger.cpp
+    Systems/ShortcutManager/ShortcutManager.cpp
 )
 target_link_libraries(MulNX PUBLIC
     MulNXThirdParty

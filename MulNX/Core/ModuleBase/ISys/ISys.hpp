@@ -1,6 +1,7 @@
 #pragma once
 
 #include <MulNX/Config/Config.hpp>
+#include <MulNX/Systems/InputSystem/Key/Key.hpp>
 #include <filesystem>
 
 namespace MulNX {
@@ -32,5 +33,7 @@ namespace MulNX {
 
         std::filesystem::path PathGet(const std::string& Target);
         MulNX::PathManager* PathManager();
+
+        std::optional<MulNX::KeyCheckPack> GetButton(const std::string& name);
     };
 }

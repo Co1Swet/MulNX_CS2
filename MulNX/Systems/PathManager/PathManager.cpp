@@ -1,9 +1,7 @@
 #include "PathManager.hpp"
-
-#include "../../Core/Core.hpp"
-#include "../../Core/ModuleManager/ModuleManager.hpp"
-#include "../IPCer/IPCer.hpp"
-
+#include <MulNX/Core/Core.hpp>
+#include <MulNX/Core/ModuleManager/ModuleManager.hpp>
+#include <MulNX/Systems/IPCer/IPCer.hpp>
 #include <MulNXThirdParty/All_pugixml.hpp>
 
 bool MulNX::PathManager::Init() {

@@ -8,7 +8,6 @@
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaRemoter/MediaRemoter.hpp>
-#include <MulNXExtensions/ShortcutManager/ShortcutManager.hpp>
 
 MulNX::Core::Core* pCore = nullptr;
 HMODULE hOriginModule = nullptr;
@@ -71,7 +70,6 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
             .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
             .CreateModule<WebSocketManager>("WebSocketManager")
-            .CreateModule<ShortcutManager>("ShortcutManager")
             // 摄像机系统
             .CreateModule<CameraSystem>("CameraSystem")
             .CreateModule<WorkspaceManager>("WorkspaceManager")
