@@ -31,6 +31,7 @@ bool MulNX::ModuleBase::BaseInit(MulNX::Core::Core* core) {
         this->GlobalVars = moduleManager->FindModule<MulNX::GlobalVars>("GlobalVars");
         this->pInputSystem = moduleManager->FindModule<MulNX::InputSystem>("InputSystem");
         this->pPathManager = moduleManager->FindModule<MulNX::PathManager>("PathManager");
+        this->pShortcutManager = moduleManager->FindModule<MulNX::ShortcutManager>("ShortcutManager");
         this->MainMsgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());
     }
     catch (...) {

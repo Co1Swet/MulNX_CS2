@@ -10,12 +10,19 @@ bool MulNX::ShortcutManager::Init() {
     std::string configName = config["name"].as<std::string>();
     this->ISys().LogInfo("配置文件名称: " + configName);
 
+    // 遍历 buttons 列表
+    for (const auto& cButton : config["buttons"]) {
+        auto name = cButton["name"].as<std::string>();
+        auto KCP = cButton["KCP"].as<MulNX::KeyCheckPack>();
+        this->buttons[name] = KCP;
+    }
+
     // 遍历 binds 列表
-    for (const auto& cbind : config["binds"]) {
+    for (const auto& cBind : config["binds"]) {
         Bind bind;
-        bind.desc = cbind["desc"].as<std::string>();
-        bind.msg = cbind["msg"].as<std::string>();
-        bind.KCP = cbind["KCP"].as<MulNX::KeyCheckPack>();
+        bind.desc = cBind["desc"].as<std::string>();
+        bind.msg = cBind["msg"].as<std::string>();
+        bind.KCP = cBind["KCP"].as<MulNX::KeyCheckPack>();
         this->binds.push_back(std::move(bind));
     }
 

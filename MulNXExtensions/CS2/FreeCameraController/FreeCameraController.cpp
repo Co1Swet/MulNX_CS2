@@ -5,16 +5,10 @@
 
 void FreeCameraController::Menu(MulNX::UINode* node) {
     bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
-    if (ImGui::Checkbox("启用自由摄像机位置控制", &currentEnable)) {
-        if (currentEnable && !this->EnableControl.load(std::memory_order_acquire)) {
-            auto view = this->CS2View()->GetView();
-            // 从未启用到启用：读取当前游戏位置和角度
-            this->Position = view.position;
-            this->Rotation = view.rotation;
-            // 重置自由摄像机独立时钟，避免禁用后再次启用导致时间突变
-            this->LastUpdateTime = std::chrono::steady_clock::now();
-        }
-        this->EnableControl.store(currentEnable, std::memory_order_release);
+    ImGui::Text(I18n("freCamCon.status", currentEnable ? "ON" : "OFF").c_str());
+
+    if (ImGui::Button(I18n("freCamCon.change").c_str())) {
+        this->ISys().PublishAsync("FreeCamCtrl/Toggle"_hash);
     }
 
     if (currentEnable) {
@@ -26,11 +20,33 @@ void FreeCameraController::Menu(MulNX::UINode* node) {
 }
 
 bool FreeCameraController::Init() {
+    this->kMovUp = this->ISys().GetButton("CamMovUp").value();
+    this->kMovDown = this->ISys().GetButton("CamMovDown").value();
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->ISys().SubscribeAsync("FreeCamCtrl/Toggle");
     return true;
 }
 
+void FreeCameraController::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "FreeCamCtrl/Toggle"_hash: {
+        bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
+        if (currentEnable == false) {
+            auto view = this->CS2View()->GetView();
+            // 从未启用到启用：读取当前游戏位置和角度
+            this->Position = view.position;
+            this->Rotation = view.rotation;
+            // 重置自由摄像机独立时钟，避免禁用后再次启用导致时间突变
+            this->LastUpdateTime = std::chrono::steady_clock::now();
+        }
+        this->EnableControl.store(!currentEnable, std::memory_order_release);
+        break;
+    }
+    }
+}
+
 bool FreeCameraController::HandleUpdate(CS2::CViewSetup* viewSetup) {
+    this->Update();
     if (!this->EnableControl.load(std::memory_order_acquire)) return false;
     this->Rotation = *viewSetup->pViewAngles();
 
@@ -45,8 +61,8 @@ bool FreeCameraController::HandleUpdate(CS2::CViewSetup* viewSetup) {
     if (this->pInputSystem->IsKeyPressed('S')) moveDir.x -= 1.0f;  // 后退
     if (this->pInputSystem->IsKeyPressed('A')) moveDir.y += 1.0f;  // 左移
     if (this->pInputSystem->IsKeyPressed('D')) moveDir.y -= 1.0f;  // 右移
-    if (this->pInputSystem->IsKeyPressed('R')) moveDir.z += 1.0f;  // 上移
-    if (this->pInputSystem->IsKeyPressed('V')) moveDir.z -= 1.0f;  // 下移
+    if (this->pInputSystem->IsKeyPackPressed(this->kMovUp)) moveDir.z += 1.0f;  // 上移
+    if (this->pInputSystem->IsKeyPackPressed(this->kMovDown)) moveDir.z -= 1.0f;  // 下移
 
     // 归一化移动方向
     float moveLength = sqrtf(moveDir.x * moveDir.x + moveDir.y * moveDir.y + moveDir.z * moveDir.z);

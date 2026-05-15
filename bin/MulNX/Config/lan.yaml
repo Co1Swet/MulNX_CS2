@@ -269,6 +269,10 @@ camsys:
     save: 保存工作区
     target_name: 工作区名：
 
+freCamCon:
+  status: 当前是否处于自由摄像机控制：{}
+  change: 切换自由摄像机控制状态
+
 free_campath:
   fmt: "编号： {0}  {1}\n" # {1}为关键帧参数
   fmt_edit: "正在调整的关键帧编号： {0}  {1}\n" # {1}为关键帧参数

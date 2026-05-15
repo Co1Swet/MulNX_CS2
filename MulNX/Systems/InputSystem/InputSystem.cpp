@@ -47,7 +47,31 @@ bool MulNX::InputSystem::UpdateKeysState() {
 }
 
 bool MulNX::InputSystem::IsKeyPressed(const unsigned char vkCode)const {
-    return KeysState[vkCode].Current;//返回指定键的当前状态
+    auto state = this->KeysState[vkCode].Current.load(std::memory_order_acquire);
+    return state;//返回指定键的当前状态
+}
+bool MulNX::InputSystem::IsKeyPackPressed(const KeyCheckPack& Pack)const {
+    if (!Pack.Usable)return false;
+    // 检查Ctrl状态必须完全匹配
+    bool ctrlPressed = this->IsKeyPressed(VK_CONTROL) ||
+        this->IsKeyPressed(VK_LCONTROL) ||
+        this->IsKeyPressed(VK_RCONTROL);
+    if (Pack.Ctrl != ctrlPressed) return false;
+
+    // 检查Shift状态必须完全匹配
+    bool shiftPressed = this->IsKeyPressed(VK_SHIFT) ||
+        this->IsKeyPressed(VK_LSHIFT) ||
+        this->IsKeyPressed(VK_RSHIFT);
+    if (Pack.Shift != shiftPressed) return false;
+
+    // 检查Alt状态必须完全匹配
+    bool altPressed = this->IsKeyPressed(VK_MENU) ||
+        this->IsKeyPressed(VK_LMENU) ||
+        this->IsKeyPressed(VK_RMENU);
+    if (Pack.Alt != altPressed) return false;
+
+    auto state = this->IsKeyPressed(Pack.vkCode);
+    return state;
 }
 
 bool MulNX::InputSystem::CheckComboClick(const unsigned char vkCode, unsigned char TargetCombo) {

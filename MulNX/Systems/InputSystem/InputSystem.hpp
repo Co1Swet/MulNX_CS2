@@ -28,8 +28,9 @@ namespace MulNX {
 		bool Init()override;
 
 		bool UpdateKeysState();//更新
-		bool IsKeyPressed(const unsigned char vkCode)const;//读取是否被按下
-		bool CheckComboClick(const unsigned char vkCode, const unsigned char TargetCombo);//读取并移除连击缓冲
+        bool IsKeyPressed(const unsigned char vkCode)const;//读取是否被按下
+        bool IsKeyPackPressed(const KeyCheckPack& Pack)const;//读取是否被按下（带修饰键和连击）
+        bool CheckComboClick(const unsigned char vkCode, const unsigned char TargetCombo);//读取并移除连击缓冲
 		bool CheckWithPack(const KeyCheckPack& Pack);//读取并移除连击缓冲
 		unsigned char CheckComboClickUnremove(const unsigned char vkCode)const;//读取连击（非缓冲）
 		void ResetThreshold(const unsigned int Threshold);//重新设置阈值

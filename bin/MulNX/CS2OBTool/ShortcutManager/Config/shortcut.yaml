@@ -10,6 +10,24 @@ buttons:
       vkCode: 90
       comboClick: 1
 
+  - name: "CamMovUp" # 摄像机上升，默认R
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: false
+      vkCode: 82
+      comboClick: 1
+
+  - name: "CamMovDown" # 摄像机下降，默认F
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: false
+      vkCode: 70
+      comboClick: 1
+
 binds:
   - desc: "触发全局保存（alt+S）"
     msg: "Global/Save"
@@ -29,4 +47,14 @@ binds:
       shift: false
       alt: true
       vkCode: 80
+      comboClick: 1
+
+  - desc: "切换自由摄像机模式（T）"
+    msg: "FreeCamCtrl/Toggle"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: false
+      vkCode: 84
       comboClick: 1
