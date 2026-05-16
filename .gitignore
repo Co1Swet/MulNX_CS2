@@ -2,8 +2,6 @@ build/*
 !build/.gitkeep
 
 bin/**/*.pdb
-bin/**/*.exe
-bin/**/*.dll
 bin/**/*.zip
 bin/**/*.json
 bin/**/*.dem
