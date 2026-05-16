@@ -47,7 +47,7 @@ add_subdirectory("MulNX")
 add_subdirectory("MulNXExtensions")
 add_subdirectory("CS2OBTool")
 add_subdirectory("CS2Injector")
-add_subdirectory("Tests")
+add_subdirectory("2_tests")
 
 # 定义目标路径
 set(MulNXPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
