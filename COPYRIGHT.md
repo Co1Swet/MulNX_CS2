@@ -10,6 +10,7 @@ This project is provided under a choice of the following licenses:
 You may use, modify, and distribute this software under the terms of
 **any one** of the above licenses, at your option.
 
-Unless you explicitly state otherwise, any contribution intentionally
-submitted for inclusion in this project shall be dual-licensed as above,
-without any additional terms or conditions.
+Any contribution intentionally submitted for inclusion in this project
+requires acceptance of the [Contributor License Agreement](CLA.md).
+By submitting a contribution, you confirm that you have read and agree
+to its terms.

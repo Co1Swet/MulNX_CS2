@@ -16,7 +16,7 @@
 → **English**：[User Guide](1_docs/readmes/en/user.md)
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue)](LICENSE.txt)
-[![License: MulNX 2.0](https://img.shields.io/badge/License-MulNX%201.0-blue)](LICENSE_MulNX.txt)
+[![License: MulNX 2.0](https://img.shields.io/badge/License-MulNX%202.0-blue)](LICENSE_MulNX.txt)
 
 ---
 
