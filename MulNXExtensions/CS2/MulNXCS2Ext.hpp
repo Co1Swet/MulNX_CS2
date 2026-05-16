@@ -16,7 +16,6 @@
 #include "TeamIDController/TeamIDController.hpp"
 
 #include "DemoSystem/DemoSystem.hpp"
-#include "DemoSystem/DemoInfoManager/DemoInfoManager.hpp"
 #include "DemoSystem/DemoJSONReader/DemoJSONReader.hpp"
 #include "DemoSystem/DemoHelper/DemoHelper.hpp"
 #include "DemoSystem/DemoAnalyzer/DemoAnalyzer.hpp"

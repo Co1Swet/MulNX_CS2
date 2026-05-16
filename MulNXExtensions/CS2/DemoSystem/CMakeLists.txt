@@ -3,7 +3,6 @@ add_library(DemoSystem
     DemoHelper/DemoHelper.cpp
     DemoAnalyzer/DemoAnalyzer.cpp
     DemoRecorder/DemoRecorder.cpp
-    DemoInfoManager/DemoInfoManager.cpp
     DemoJSONReader/DemoJSONReader.cpp
 )
 

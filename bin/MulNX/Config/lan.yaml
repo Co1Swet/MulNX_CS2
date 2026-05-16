@@ -95,6 +95,8 @@ demo:
   remove: 移除
   clear_all: 清空列表
   play_selected: 播放所选
+  refresh: 刷新列表
+  copy_failed: 在复制Demo文件时发生错误：{}
 
 text:
   entered: 已进入

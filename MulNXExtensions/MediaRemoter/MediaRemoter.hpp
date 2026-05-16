@@ -32,9 +32,12 @@ class MediaRemoter final : public MulNX::ModuleBase {
     bool CheckIsConnected();    
     void StartRecording();
     void StopRecording();
+    void PauseRecording();
+    void ResumeRecording();
 
     void Window(MulNX::UINode* node);
 public:
     bool Init() override;
+    void Deinit()override;
     void ProcessMsg(MulNX::Message& msg)override;
 };

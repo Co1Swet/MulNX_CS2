@@ -8,7 +8,11 @@ bool DemoSystem::Window(MulNX::UINode* node) {
     {
         std::unique_lock lock(this->smutex);
 
-        if (this->DemoFiles.empty()) {
+        if (ImGui::Button(I18n("demo.refresh").c_str())) {
+            this->ISys().PublishAsync("Demo/Refresh"_hash);
+        }
+
+        if (this->demoFiles.empty()) {
             ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", I18n("demo.empty").c_str());
         }
         else {
@@ -17,7 +21,7 @@ bool DemoSystem::Window(MulNX::UINode* node) {
 
             int index = 0;
             // 遍历文件集合（set 自动按路径排序）
-            for (auto it = this->DemoFiles.begin(); it != this->DemoFiles.end(); ) {
+            for (auto it = this->demoFiles.begin(); it != this->demoFiles.end(); ) {
                 const auto& filePath = *it;
                 std::string fileName = filePath.filename().string(); // 只显示文件名
                 std::string fullPath = filePath.string();
@@ -51,10 +55,10 @@ bool DemoSystem::Window(MulNX::UINode* node) {
                     ImGui::Separator();
                     if (ImGui::MenuItem(I18n("demo.remove").c_str())) {
                         // 从集合中移除，并安全递增迭代器
-                        it = this->DemoFiles.erase(it);
+                        it = this->demoFiles.erase(it);
                         // 调整选中索引
-                        if (this->selectedDemoIndex >= static_cast<int>(this->DemoFiles.size()))
-                            this->selectedDemoIndex = std::max(0, static_cast<int>(this->DemoFiles.size()) - 1);
+                        if (this->selectedDemoIndex >= static_cast<int>(this->demoFiles.size()))
+                            this->selectedDemoIndex = std::max(0, static_cast<int>(this->demoFiles.size()) - 1);
                         ImGui::EndPopup();
                         continue; // 跳过 ++it
                     }
@@ -69,14 +73,14 @@ bool DemoSystem::Window(MulNX::UINode* node) {
 
             // 底部操作按钮
             if (ImGui::Button(I18n("demo.clear_all").c_str())) {
-                this->DemoFiles.clear();
+                this->demoFiles.clear();
                 this->selectedDemoIndex = -1;
             }
             ImGui::SameLine();
             if (ImGui::Button(I18n("demo.play_selected").c_str())) {
                 if (this->selectedDemoIndex >= 0 &&
-                    this->selectedDemoIndex < static_cast<int>(this->DemoFiles.size())) {
-                    auto iter = this->DemoFiles.begin();
+                    this->selectedDemoIndex < static_cast<int>(this->demoFiles.size())) {
+                    auto iter = this->demoFiles.begin();
                     std::advance(iter, this->selectedDemoIndex);
                     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
                     rp->str1 = iter->string();
@@ -91,26 +95,32 @@ bool DemoSystem::Window(MulNX::UINode* node) {
     ImGui::Text(I18n("demo.status.is_pausing", this->CS2Time()->IsDemoPaused()).c_str());
 
     ImGui::Separator();
-    
-    node->CallUINode("DemoAnalyzer");
+
+    node->CallUINode("DemoJSONReader");
     node->CallUINode("DemoHelper");
+    node->CallUINode("DemoRecorder");
     return true;
 }
 
 bool DemoSystem::Init() {
+    this->pathDemos = this->ISys().PathManager()->PathGetForShared("Demos");
+
     this->ISys()
         .SubscribeAsync("Demo/Play")
         .SubscribeAsync("Demo/PlayAndAnalyze")
+        .SubscribeAsync("Demo/Refresh")
         .SubscribeAsync("Window/Drag/FileDrop");
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
-    
+
     this->SendTask("DemoSys", [this]() {
         this->Update();
         return true;
         });
+
+    this->ISys().PublishAsync("Demo/Refresh"_hash);
 
     return true;
 }
@@ -122,8 +132,23 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         std::filesystem::path file = path;
         auto ext = file.extension();
         if (ext != ".dem")break;
-        this->DemoFiles.insert(std::move(file));
-        //this->ISys().AsyncCommand(std::format("playdemo \"{}\"", path));
+        try {
+            std::filesystem::copy(file, this->pathDemos / file.filename(), std::filesystem::copy_options::overwrite_existing);
+        }
+        catch (const std::filesystem::filesystem_error& e) {
+            this->ISys().LogError(I18n("demo.copy_failed", e.what()).c_str());
+        }
+        this->ISys().PublishAsync("Demo/Refresh"_hash);
+        break;
+    }
+    case "Demo/Refresh"_hash: {
+        std::unique_lock lock(this->smutex);
+        this->demoFiles.clear();
+        for (const auto& entry : std::filesystem::directory_iterator(this->pathDemos)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".dem") {
+                this->demoFiles.insert(entry.path());
+            }
+        }
         break;
     }
     case "Demo/Play"_hash: {
@@ -141,5 +166,5 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     }
-    
+
 }

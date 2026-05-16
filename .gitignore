@@ -5,3 +5,5 @@ bin/**/*.pdb
 bin/**/*.exe
 bin/**/*.dll
 bin/**/*.zip
+bin/**/*.json
+bin/**/*.dem

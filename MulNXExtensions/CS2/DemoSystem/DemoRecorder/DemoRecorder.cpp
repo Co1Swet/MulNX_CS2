@@ -1,5 +1,17 @@
 #include "DemoRecorder.hpp"
+#include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
+
+bool DemoRecorder::Window(MulNX::UINode* node) {
+    auto w = MulNX::UI::RAIIWindow("Demo Recorder", this->showWindow);
+    if (!w) return true;
+
+    if (ImGui::Button("启动")) {
+        this->ISys().PublishAsync("Demo/Record/Start"_hash);
+    }
+
+    return true;
+}
 
 // ========== 初始化 ==========
 bool DemoRecorder::Init() {
@@ -17,6 +29,11 @@ bool DemoRecorder::Init() {
         return true;
         });
 
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+        return this->Window(node);
+        });
+    this->showWindow.store(true, std::memory_order_release);
+
     return true;
 }
 
@@ -26,21 +43,23 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     case "Demo/Record/Enqueue"_hash: {
         Steam64UID uid = msg.p1.as<Steam64UID>();
         int tick = msg.p2.low<int>();
-
-        recordTaskBufferQueue.push_back({ uid, tick });
+        this->recordTaskBufferQueue.push_back({ uid, tick });
+        this->isEmpty.store(false, std::memory_order_release);
         break;
     }
     case "Demo/Record/Reset"_hash: {
-        recordTaskBufferQueue.clear();
+        this->recordTaskBufferQueue.clear();
+        this->isEmpty.store(true, std::memory_order_release);
         break;
     }
     case "Demo/Record/Start"_hash: {
-        moduleActive = true;
+        this->moduleActive = true;
+        this->newStart.store(true, std::memory_order_release);
         this->ISys().LogInfo("Module activated.");
         break;
     }
     case "Demo/Record/Stop"_hash: {
-        moduleActive = false;
+        this->moduleActive.store(false, std::memory_order_release);
         break;
     }
     default:
@@ -53,13 +72,20 @@ bool DemoRecorder::PeekQueue(RecordToDo& task) {
     if (recordTaskBufferQueue.empty()) return false;
     task = recordTaskBufferQueue.front();
     recordTaskBufferQueue.pop_front();
+    if (this->recordTaskBufferQueue.empty()) {
+        this->isEmpty.store(true, std::memory_order_release);
+        this->moduleActive.store(false, std::memory_order_release);
+    }
+    else {
+        this->isEmpty.store(false, std::memory_order_release);
+    }
     return true;
 }
 
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
         // 等待模块激活
-        co_await this->WaitUntil([this]()->bool { return this->moduleActive; });
+        co_await this->WaitUntil([this]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
 
         // 等待队列中有任务
         RecordToDo task;
@@ -75,20 +101,22 @@ MulNX::CoTask DemoRecorder::Main() {
             windowStartTick = 0;
         }
 
-        // 发送跳转
+        // 暂停并跳转
+        this->ISys().AsyncCommand("demo_pause");
         MulNX::Message gotoMsg("Demo/GotoTick"_hash);
         gotoMsg.p1.low<int>() = windowStartTick;
         this->ISys().PublishAsync(std::move(gotoMsg));
 
         // 等待跳转完成
         co_await this->WaitUntil([this] {
-            return std::abs(this->CS2Time()->GetDemoTick() - windowStartTick) <= 10;
+            return std::abs(this->CS2Time()->GetDemoTick() - windowStartTick) <= 5;
             });
 
         // 等待加载
         auto current = this->CS2Time()->GetDemoTick();
+        this->ISys().AsyncCommand("demo_resume");
         co_await this->WaitUntil([&] {
-            return this->CS2Time()->GetDemoTick() - current > 128;
+            return this->CS2Time()->GetDemoTick() > current + 10;
             });
 
         // 设置观察目标
@@ -100,8 +128,13 @@ MulNX::CoTask DemoRecorder::Main() {
             + ", observing UID=" + std::to_string(task.uid));
 
         // 开始录制
-        MulNX::Message startMsg("Media/OBS/Record/Start"_hash);
-        this->ISys().PublishAsync(std::move(startMsg));
+        if (this->newStart.load(std::memory_order_acquire)) {
+            this->ISys().PublishAsync("Media/Record/Start"_hash);
+            this->newStart.store(false, std::memory_order_release);
+        }
+        else {
+            this->ISys().PublishAsync("Media/Record/Resume"_hash);
+        }
         this->ISys().LogSucc("Recording started for UID="
             + std::to_string(currentWindow->uid)
             + " from tick " + std::to_string(windowStartTick)
@@ -112,18 +145,18 @@ MulNX::CoTask DemoRecorder::Main() {
             return this->CS2Time()->GetDemoTick() >= windowEndTick;
             });
 
-        // 停止录制
-        StopRecording();
+        // 暂停或停止录制
+        if (this->isEmpty.load(std::memory_order_acquire)) {
+            this->ISys().PublishAsync("Media/Record/Stop"_hash);
+        }
+        else {
+            this->ISys().PublishAsync("Media/Record/Pause"_hash);
+        }
+
+        this->ISys().LogInfo("Sent OBS stop command.");
         this->ISys().LogSucc("Recording finished for UID="
             + std::to_string(currentWindow->uid));
         currentWindow.reset();
     }
     co_return;
-}
-
-void DemoRecorder::StopRecording() {
-    MulNX::Message stopMsg("Media/OBS/Record/Stop"_hash);
-    this->ISys().PublishAsync(std::move(stopMsg));
-
-    this->ISys().LogInfo("Sent OBS stop command.");
 }

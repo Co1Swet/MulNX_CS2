@@ -6,15 +6,23 @@ void MediaRemoter::Window(MulNX::UINode* node) {
     if (!this->OBSConnected.load(std::memory_order_acquire)) {
         ImGui::Text(I18n("media.obs.connect.please_try").c_str());
         if (ImGui::Button(I18n("media.obs.connect.try").c_str())) {
-            this->ISys().PublishAsync("Media/OBS/CreateConnect"_hash);
+            this->ISys().PublishAsync("Media/CreateConnect"_hash);
         }
         return;
     }
     if (ImGui::Button(I18n("media.obs.record.start").c_str())) {
-        this->ISys().PublishAsync("Media/OBS/Record/Start"_hash);
+        this->ISys().PublishAsync("Media/Record/Start"_hash);
     }
+    ImGui::SameLine();
     if (ImGui::Button(I18n("media.obs.record.stop").c_str())) {
-        this->ISys().PublishAsync("Media/OBS/Record/Stop"_hash);
+        this->ISys().PublishAsync("Media/Record/Stop"_hash);
+    }
+    if (ImGui::Button(I18n("media.obs.record.pause").c_str())) {
+        this->ISys().PublishAsync("Media/Record/Pause"_hash);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(I18n("media.obs.record.resume").c_str())) {
+        this->ISys().PublishAsync("Media/Record/Resume"_hash);
     }
 }
 
@@ -38,24 +46,40 @@ bool MediaRemoter::Init() {
         });
 
     this->ISys()
-        .SubscribeAsync("Media/OBS/CreateConnect")
-        .SubscribeAsync("Media/OBS/Record/Start")
-        .SubscribeAsync("Media/OBS/Record/Stop");
+        .SubscribeAsync("Media/CreateConnect")
+        .SubscribeAsync("Media/Record/Start")
+        .SubscribeAsync("Media/Record/Pause")
+        .SubscribeAsync("Media/Record/Resume")
+        .SubscribeAsync("Media/Record/Stop");
 
     return true;
 }
 
+void MediaRemoter::Deinit() {
+    if (this->OBSConnected.load(std::memory_order_acquire)) {
+        this->client.stop();
+    }
+}
+
 void MediaRemoter::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Media/OBS/CreateConnect"_hash: {
+    case "Media/CreateConnect"_hash: {
         this->CreateConnect();
         break;
     }
-    case "Media/OBS/Record/Start"_hash: {
+    case "Media/Record/Start"_hash: {
         this->StartRecording();
         break;
     }
-    case "Media/OBS/Record/Stop"_hash: {
+    case "Media/Record/Pause"_hash: {
+        this->PauseRecording();
+        break;
+    }
+    case "Media/Record/Resume"_hash: {
+        this->ResumeRecording();
+        break;
+    }
+    case "Media/Record/Stop"_hash: {
         this->StopRecording();
         break;
     }
@@ -116,6 +140,14 @@ void MediaRemoter::StartRecording() {
 void MediaRemoter::StopRecording() {
     if (!this->CheckIsConnected())return;
     this->client.get_io_service().post([this]() {this->send_request("StopRecord");});
+}
+void MediaRemoter::PauseRecording() {
+    if (!this->CheckIsConnected())return;
+    this->client.get_io_service().post([this]() {this->send_request("PauseRecord");});
+}
+void MediaRemoter::ResumeRecording() {
+    if (!this->CheckIsConnected())return;
+    this->client.get_io_service().post([this]() {this->send_request("ResumeRecord");});
 }
 
 void MediaRemoter::handle_hello(const nlohmann::json& hello) {

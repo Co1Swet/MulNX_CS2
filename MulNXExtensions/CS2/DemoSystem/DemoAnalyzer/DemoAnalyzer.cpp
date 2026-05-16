@@ -1,48 +1,16 @@
 #include "DemoAnalyzer.hpp"
-#include <MulNX/Base/UI/UI.hpp>
-#include <format>
-
-bool DemoAnalyzer::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("Demo分析");
-    if (ImGui::Button(I18n("demo.analyze.dump").c_str())) {
-        this->ISys().PublishAsync("Demo/Analyze/Dump"_hash);
-    }
-
-    ImGui::InputText("Attacker ID", &this->m_selectedAttackerIdRaw);
-    ImGui::SameLine();
-    if (ImGui::Button("Record by Attacker ID")) {
-        try {
-            uint64_t attackerId = std::stoull(this->m_selectedAttackerIdRaw, nullptr, 0);
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze/Record"_hash);
-            msg.p1.as<uint64_t>() = attackerId;
-            this->ISys().PublishAsync(std::move(msg));
-        }
-        catch (const std::exception&) {
-            this->ISys().LogWarning("无效的攻击者 ID，请输入十进制或 0x 十六进制数值。");
-        }
-    }
-
-    if (!this->bufferPlayersKillInfo.empty()) {
-        ImGui::Text("记录的攻击者数量：%zu", this->bufferPlayersKillInfo.size());
-    }
-
-    return true;
-}
+#include <MulNX/Base/CharUtility/CharUtility.hpp>
 
 bool DemoAnalyzer::Init() {
-    this->ISys()
-        .SubscribeAsync("Demo/Analyze/Restart")
-        .SubscribeAsync("Demo/Analyze/Dump")
-        .SubscribeAsync("Demo/Analyze/Record")
-        .SubscribeAsync("Game/KillEvent");
+    auto toolsPath = this->ISys().PathManager()->PathGetForShared("Tools");
+    this->csdaPath = toolsPath / "csda.exe";
+    this->dirDemos = this->ISys().PathManager()->PathGetForShared("Demos");
 
-    this->SendTask("DemoSys", [this]()->bool {
+    this->ISys().SubscribeAsync("Demo/Analyze");
+
+    this->SendTask("DemoSys", [this]() {
         this->Update();
         return true;
-        });
-
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        this->Window(node);
         });
 
     return true;
@@ -50,48 +18,80 @@ bool DemoAnalyzer::Init() {
 
 void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Demo/Analyze/Restart"_hash: {
-        this->bufferKillEvents.clear();
-        this->bufferPlayersKillInfo.clear();
-        this->ISys().PublishAsync("Demo/Record/Reset"_hash);
+    case "Demo/Analyze"_hash: {
+        std::string demoPath = msg.asp.get<MulNX::NetExt>()->str1;
+        this->ISys().LogInfo("Received demo path: " + demoPath);
+        this->currentDemoPath = demoPath;
+        this->AnalyzeDemoWithCSDA();
         break;
     }
-    case "Demo/Analyze/Dump"_hash: {
-        this->TransformKillEventsByAttacker();
+    default:
         break;
-    }
-    case "Demo/Analyze/Record"_hash: {
-        uint64_t attackerId = msg.p1.as<uint64_t>();
-        this->PublishRecordWindows(attackerId);
-        break;
-    }
-    case "Game/KillEvent"_hash: {
-        auto pKillEvent = msg.asp.get<KillEvent>();
-        this->bufferKillEvents.push_back(*pKillEvent);
-        break;
-    }
     }
 }
 
-void DemoAnalyzer::TransformKillEventsByAttacker() {
-    this->bufferPlayersKillInfo.clear();
-    for (const auto& ev : this->bufferKillEvents) {
-        this->bufferPlayersKillInfo[ev.attackerSteamId][ev.DemoTick].push_back(ev);
-    }
-}
+void DemoAnalyzer::AnalyzeDemoWithCSDA() {
+    // ---------- 调用 csda.exe ----------
+    // 1. 构建命令行字符串，注意路径带引号，以防空格
+    std::ostringstream cmdLine;
+    cmdLine << "\"" << this->csdaPath.string() << "\" "
+        << "-demo-path=" << this->currentDemoPath << " "
+        << "-output=\"" << this->dirDemos.string() << "\" "
+        << "-format=json";   // 可根据需要加 -positions 等
 
-void DemoAnalyzer::PublishRecordWindows(uint64_t attackerId) {
-    auto it = this->bufferPlayersKillInfo.find(attackerId);
-    if (it == this->bufferPlayersKillInfo.end()) {
-        this->ISys().LogError(std::format("攻击者 {} 未找到，请先执行 Dump。", attackerId));
+    std::string cmdStr = cmdLine.str();
+    this->ISys().LogInfo("Executing: " + cmdStr);
+
+    // 2. 准备 STARTUPINFO 和 PROCESS_INFORMATION
+    STARTUPINFOW si;
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    ZeroMemory(&pi, sizeof(pi));
+
+    // 使用 CREATE_NO_WINDOW 避免弹出黑窗口
+    DWORD creationFlags = CREATE_NO_WINDOW;
+
+    // 注意：需要将 cmdStr 复制到可修改的缓冲区，因为 CreateProcess 可能会修改它
+    auto cmdBuffer = MulNX::CharUtility::U8ToW(cmdStr);
+
+    // 3. 创建进程
+    BOOL success = CreateProcessW(
+        nullptr,               // 应用程序名
+        cmdBuffer.data(),      // 命令行（注意是可修改的）
+        nullptr,
+        nullptr,
+        FALSE,
+        creationFlags,
+        nullptr,
+        nullptr,
+        &si,
+        &pi
+    );
+
+    if (!success) {
+        DWORD err = GetLastError();
+        this->ISys().LogError("Failed to create process, error code: " + std::to_string(err));
         return;
     }
 
-    for (const auto& [tick, events] : it->second) {
+    // 4. 等待进程结束（可设置超时，这里无限等待）
+    WaitForSingleObject(pi.hProcess, INFINITE);
 
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Enqueue"_hash);
-        msg.p1.as<Steam64UID>() = it->first;
-        msg.p2.low<int>() = tick;
-        this->ISys().PublishAsync(std::move(msg));
+    // 5. 获取退出码并检查
+    DWORD exitCode = 0;
+    GetExitCodeProcess(pi.hProcess, &exitCode);
+    if (exitCode != 0) {
+        this->ISys().LogError("csda.exe exited with code: " + std::to_string(exitCode));
     }
+    else {
+        this->ISys().LogInfo("Demo analysis completed successfully.");
+        // 可选：解析输出 JSON 文件
+        // std::filesystem::path jsonFile = this->dirDemos / "111.json";
+        // ...
+    }
+
+    // 6. 清理句柄
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
 }

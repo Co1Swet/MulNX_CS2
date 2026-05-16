@@ -202,7 +202,7 @@
 [2026-05-13 08:34:06.8037120][提示][MediaRemoter]将UI节点注册信息推送到了消息系统
 [2026-05-13 08:34:06.8037250][成功][MediaRemoter]异步消息订阅：Media/OBS/CreateConnect
 [2026-05-13 08:34:06.8037400][成功][MediaRemoter]异步消息订阅：Media/OBS/Record/Start
-[2026-05-13 08:34:06.8037530][成功][MediaRemoter]异步消息订阅：Media/OBS/Record/Stop
+[2026-05-13 08:34:06.8037530][成功][MediaRemoter]异步消息订阅：Media/Record/Stop
 [2026-05-13 08:34:06.8037590][成功][MediaRemoter]初始化成功！
 [2026-05-13 08:34:06.8037730][成功][MulNXController]异步消息订阅：ModuleManager/ModuleInfo/Response
 [2026-05-13 08:34:06.8037840][提示][MulNXController]将UI节点注册信息推送到了消息系统
