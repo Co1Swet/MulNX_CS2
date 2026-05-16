@@ -1,7 +1,21 @@
 #include "DemoJSONReader.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/DemoSystem/DemoRecorder/DemoRecorder.hpp>
 #include <fstream>
 #include <nlohmann/json.hpp>
+
+class NomalRecordTask :public IRecordTask {
+public:
+    std::string desc;
+    Steam64UID uid;
+    int tick;
+
+    ~NomalRecordTask() = default;
+
+    Steam64UID GetTargetSteam64UID()override { return this->uid; }
+    int GetTargetTick()override { return this->tick; }
+    std::string& GetDesc()override { return this->desc; }
+};
 
 bool DemoJSONReader::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("Demo JSON Reader", this->showWindow);
@@ -100,13 +114,16 @@ bool DemoJSONReader::Window(MulNX::UINode* node) {
 
                 // 第一列：录制按钮（需要唯一 ID）
                 ImGui::TableSetColumnIndex(0);
-                std::string btnLabel = std::string("录制##") + std::to_string(steamID) + "_" + std::to_string(ev.tick);
+                std::string btnLabel = std::string("录制##") + std::to_string(ev.victimSteamId) + "_" + std::to_string(ev.tick);
                 if (ImGui::Button(btnLabel.c_str())) {
-                    MulNX::Message enqueueMsg("Demo/Record/Enqueue"_hash);
-                    // 事件属于该玩家（杀手），使用玩家 Steam64UID 作为观察目标
-                    enqueueMsg.p1.as<Steam64UID>() = steamID;
-                    enqueueMsg.p2.low<int>() = ev.tick;
-                    this->ISys().PublishAsync(std::move(enqueueMsg));
+                    auto [msg, rp] = MulNX::Message::Create<std::unique_ptr<NomalRecordTask>>("Demo/Record/Enqueue"_hash);
+                    auto desc = this->demoInfo.GetPlayerName(ev.killerSteamId) + "  killed  " + this->demoInfo.GetPlayerName(ev.victimSteamId);
+                    auto& task = *rp;
+                    task = std::make_unique<NomalRecordTask>();
+                    task->desc = std::move(desc);
+                    task->uid = ev.killerSteamId;
+                    task->tick = ev.tick;
+                    this->ISys().PublishAsync(std::move(msg));
                 }
 
                 // 后续各列：击杀事件的具体字段
@@ -134,7 +151,7 @@ bool DemoJSONReader::Window(MulNX::UINode* node) {
 
 bool DemoJSONReader::Init() {
     this->dirDemos = this->ISys().PathManager()->PathGetForShared("Demos");
-    this->ISys().SubscribeAsync("debug/read");
+    this->ISys().SubscribeAsync("Demo/JSON/Load");
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
@@ -152,9 +169,11 @@ bool DemoJSONReader::Init() {
 
 void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "debug/read"_hash: {
+    case "Demo/JSON/Load"_hash: {
+        auto* pNetExt = msg.asp.get<MulNX::NetExt>();
+        std::string filename = pNetExt->str1 + ".json";
+
         std::unique_lock lock(this->smutex);
-        std::string filename = "111.json";
         std::filesystem::path filePath = this->dirDemos / filename;
         if (!std::filesystem::exists(filePath)) {
             this->ISys().LogError("文件不存在: " + filePath.string());

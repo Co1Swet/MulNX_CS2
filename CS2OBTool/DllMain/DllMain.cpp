@@ -50,7 +50,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
         starter->InitEndCall = [starter]() {
             starter->ISys().LogWarning(I18n("disclaimer"));
             if (MulNXInfo::IsDebugVersion) {
-                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
+                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
                 rp->str1 = "111";
                 starter->ISys().PublishAsync(std::move(msg));
                 std::thread([]() {

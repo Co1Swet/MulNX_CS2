@@ -23,14 +23,20 @@ bool DemoSystem::Window(MulNX::UINode* node) {
             // 遍历文件集合（set 自动按路径排序）
             for (auto it = this->demoFiles.begin(); it != this->demoFiles.end(); ) {
                 const auto& filePath = *it;
-                std::string fileName = filePath.filename().string(); // 只显示文件名
                 std::string fullPath = filePath.string();
+
+                bool anylized = false;
+                if (std::filesystem::exists(filePath.parent_path() / (filePath.stem().string() + ".json"))) {
+                    anylized = true;
+                }
 
                 // 用 Selectable 展示条目，支持高亮
                 bool isSelected = (this->selectedDemoIndex == index);
+                std::string fileName = filePath.filename().string() + "      " + (anylized ? "已分析" : "未分析");
                 if (ImGui::Selectable(fileName.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick)) {
                     this->selectedDemoIndex = index;
                 }
+                ImGui::SameLine();
 
                 // 右键菜单（或在 Selectable 上悬浮右键）
                 if (ImGui::BeginPopupContextItem()) {
@@ -44,9 +50,9 @@ bool DemoSystem::Window(MulNX::UINode* node) {
                         rp->str1 = fullPath;
                         this->ISys().PublishAsync(std::move(msg));
                     }
-                    if (ImGui::MenuItem(I18n("demo.play_and_analyze").c_str())) {
-                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/PlayAndAnalyze"_hash);
-                        rp->str1 = fullPath;
+                    if (ImGui::MenuItem(I18n("demo.load").c_str())) {
+                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
+                        rp->str1 = filePath.stem().string();
                         this->ISys().PublishAsync(std::move(msg));
                     }
                     if (ImGui::MenuItem(I18n("demo.copy_path").c_str())) {
@@ -107,7 +113,6 @@ bool DemoSystem::Init() {
 
     this->ISys()
         .SubscribeAsync("Demo/Play")
-        .SubscribeAsync("Demo/PlayAndAnalyze")
         .SubscribeAsync("Demo/Refresh")
         .SubscribeAsync("Window/Drag/FileDrop");
 
@@ -153,15 +158,6 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/Play"_hash: {
         auto& path = msg.asp.get<MulNX::NetExt>()->str1;
-        this->ISys().AsyncCommand(std::format("playdemo \"{}\"", path));
-        break;
-    }
-    case "Demo/PlayAndAnalyze"_hash: {
-        auto& path = msg.asp.get<MulNX::NetExt>()->str1;
-        // 发送重启分析消息
-        auto [msg_restart, rp_restart] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze/Restart"_hash);
-        this->ISys().PublishAsync(std::move(msg_restart));
-        // 然后播放演示
         this->ISys().AsyncCommand(std::format("playdemo \"{}\"", path));
         break;
     }

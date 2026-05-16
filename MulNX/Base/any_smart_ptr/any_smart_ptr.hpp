@@ -228,6 +228,14 @@ namespace MulNX {
             auto* derived = static_cast<detail::any_derived<T>*>(control_->ptr_);
             return &derived->get();
         }
+
+        template<typename T>
+        T* reinterpret_cast_get() {
+            if (!control_)return nullptr;
+            if (!control_->ptr_) return nullptr;
+            auto* derived = static_cast<detail::any_derived<T>*>(control_->ptr_);
+            return &derived->get();
+        }
     };
 
     // class any_weak_ptr {

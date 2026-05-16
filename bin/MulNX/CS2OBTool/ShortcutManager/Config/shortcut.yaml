@@ -1,13 +1,15 @@
 name: "MulNX 官方快捷键配置"
 
+# vkCode 是Windows平台的虚拟键码，请查阅相关文档，以十进制的形式修改！
+
 buttons:
   - name: "place camera" # 放置关键帧
     KCP:
       usable: true
       ctrl: false
       shift: false
-      alt: true
-      vkCode: 90
+      alt: false
+      vkCode: 20 # 大写锁定键
       comboClick: 1
 
   - name: "CamMovUp" # 摄像机上升，默认R

@@ -3,21 +3,26 @@
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 #include <deque>
 
-struct RecordToDo {
-    Steam64UID uid = 0;
-    int tick = 0;
+class IRecordTask {
+public:
+    virtual ~IRecordTask() = default;
+    virtual Steam64UID GetTargetSteam64UID() = 0;
+    virtual int GetTargetTick() = 0;
+    virtual std::string& GetDesc() = 0;
 };
 
+class DemoJSONReader;
 class DemoRecorder final : public CSModuleBase {
-    std::deque<RecordToDo> recordTaskBufferQueue;
-    std::optional<RecordToDo> currentWindow;
+    DemoJSONReader* pJSON;
 
-    int windowStartTick = 0;
-    int windowEndTick = 0;
+    std::deque<std::unique_ptr<IRecordTask>> recordTaskBufferQueue;
+    std::optional<std::unique_ptr<IRecordTask>> currentRecordTask;
+    int currentRecordTaskStartTick = 0;
+    int currentRecordTaskEndTick = 0;
 
     std::atomic<bool> moduleActive = false;
 
-    bool PeekQueue(RecordToDo& task);   // 调用者需持有 mtx
+    bool PeekQueue(std::unique_ptr<IRecordTask>& task);   // 调用者需持有 mtx
 
     MulNX::CoTask coTa;
     MulNX::CoTask Main();

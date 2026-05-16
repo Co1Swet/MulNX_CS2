@@ -38,7 +38,8 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
         ImGui::Text(I18n("free_campath.fmt", i, keyframe.GetMsg()).c_str());
     }
 
-    if (ImGui::Button(I18n("free_campath.add").c_str()) || EManager->pInputSystem->CheckComboClick('F', 1)) {
+    static auto kAdd = EManager->ISys().GetButton("place camera").value();
+    if (ImGui::Button(I18n("free_campath.add").c_str()) || EManager->pInputSystem->CheckWithPack(kAdd)) {
         MulNX::Math::CameraKeyframe keyframe;
         keyframe.time = EManager->CS2Time()->GetReal();
         auto view = EManager->CS2View()->GetView();
