@@ -9,9 +9,11 @@ private:
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
 
-    bool d3dInited = false;
     HWND CS2hWnd = nullptr;
 
+    std::unique_ptr<MulNX::Hook> hkD3D11CreateDevice = nullptr;
+    std::unique_ptr<MulNX::Hook> hkCreateDXGIFactory1 = nullptr;
+    std::unique_ptr<MulNX::Hook> hkCreateSwapChain = nullptr;
     // LoadLibrary 函数钩子（用于DLL注入检测）
     std::unique_ptr<MulNX::Hook> hkLoadLibraryExW = nullptr;
     std::recursive_mutex loadLibraryMutex;
@@ -28,8 +30,9 @@ private:
     std::unique_ptr<MulNX::Hook> hkDrop = nullptr;
     void HandleProcessDropFiles(IDataObject* pDataObj);
 
-    void d3dInit();
+    void D3D11AndImGuiInit();
     void BeforeActiveSystem()override;
+    void DoSwapChainHooks(IDXGISwapChain* pSwapChain);
 public:
     bool Init()override;
     void Deinit()override;

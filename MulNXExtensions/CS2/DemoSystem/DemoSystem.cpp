@@ -73,6 +73,8 @@ bool DemoSystem::Window(MulNX::UINode* node) {
 
                 ++it;
                 ++index;
+
+                ImGui::NewLine();
             }
 
             ImGui::EndChild();

@@ -32,6 +32,8 @@ void POVFixer::ProcessMsg(MulNX::Message& msg) {
         this->ISys().AsyncCommand("cl_radar_show_all_players_when_spectating false");
         this->ISys().AsyncCommand("cl_radar_square_always false");
         this->ISys().AsyncCommand("cl_radar_square_when_spectating false");
+        this->ISys().AsyncCommand("cl_demo_predict 0");
+        this->ISys().AsyncCommand("cl_spec_show_bindings false");
         break;
     }
     case "POVFix/Disable"_hash: {

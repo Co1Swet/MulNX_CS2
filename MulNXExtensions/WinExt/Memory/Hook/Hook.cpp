@@ -239,9 +239,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 }
 
 void* MulNX::Hook::GetRawStackAddr(RegContext* ctx) {
-    auto currentRsp = ctx->rsp;
-    auto rawStackAddr = currentRsp + (this->frameSize - sizeof(RegContext));
-    return reinterpret_cast<void*>(rawStackAddr);
+    return reinterpret_cast<void*>(ctx->rsp + this->frameSize);
 }
 
 MulNX::Hook::Result MulNX::Hook::Attach() {
