@@ -19,19 +19,18 @@ bool CSController::Init() {
             this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
             ("Source2EngineToClient001", nullptr);
         this->executor = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);
-        static auto hkExecuteCmd = MulNX::Hook::Create((uint8_t*)this->executor.GetRawFuncPtr(), 0, false,
-            [](MulNX::Hook* hk, RegContext* ctx) {
-                static std::mutex mtx;
-                std::lock_guard lock(mtx);
-                // 这里加锁防止游戏和MulNX竞态访问控制台命令执行函数，导致崩溃。性能影响应该很小，因为正常情况下命令执行频率不会太高。
-                auto* pThis = (void*)ctx->rcx;
-                auto unk1 = *(int*)&(ctx->rdx);
-                auto* cmdStr = reinterpret_cast<const char*>(ctx->r8);
-                auto unk2 = *(int*)&(ctx->r9);
-                // 手动调用原函数执行命令，保持游戏正常运行
-                reinterpret_cast<void(*)(void*, int, const char*, int)>(hk->pMaybeRawFunc)(pThis, unk1, cmdStr, unk2);
-                // 强制执行流返回对应的调用点，谨防二次调用
-                return MulNX::Hook::Then::Return;
+        static auto hkExecuteCmd = MulNX::Hook::Create((uint8_t*)this->executor.GetRawFuncPtr(), [](MulNX::Hook* hk, RegContext* ctx) {
+            static std::mutex mtx;
+            std::lock_guard lock(mtx);
+            // 这里加锁防止游戏和MulNX竞态访问控制台命令执行函数，导致崩溃。性能影响应该很小，因为正常情况下命令执行频率不会太高。
+            auto* pThis = (void*)ctx->rcx;
+            auto unk1 = *(int*)&(ctx->rdx);
+            auto* cmdStr = reinterpret_cast<const char*>(ctx->r8);
+            auto unk2 = *(int*)&(ctx->r9);
+            // 手动调用原函数执行命令，保持游戏正常运行
+            reinterpret_cast<void(*)(void*, int, const char*, int)>(hk->pMaybeRawFunc)(pThis, unk1, cmdStr, unk2);
+            // 强制执行流返回对应的调用点，谨防二次调用
+            return MulNX::Hook::Then::Return;
             }).value();
         hkExecuteCmd->Attach();
         this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);

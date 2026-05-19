@@ -7,6 +7,7 @@
 #include <shellapi.h>
 #pragma comment(lib, "d3d11.lib")
 
+using CreateDXGIFactory1_t = HRESULT(WINAPI*)(void* riid, void** ppFactory);
 using D3D11CreateDevice_t = HRESULT(WINAPI*)(IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT, const D3D_FEATURE_LEVEL*, UINT, UINT, ID3D11Device**, D3D_FEATURE_LEVEL*, ID3D11DeviceContext**);
 using CreateSwapChain_t = HRESULT(STDMETHODCALLTYPE*)(IDXGIFactory* pFactory, IUnknown* pDevice, DXGI_SWAP_CHAIN_DESC* pDesc, IDXGISwapChain** ppSwapChain);
 using ResizeBuffers_t = HRESULT(__stdcall*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
@@ -15,89 +16,32 @@ bool HookManager::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
-    this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, 0, false,
-        [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, [this](MulNX::Hook* hk, RegContext* ctx) {
 
-            LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
-            HANDLE hFile = (HANDLE)ctx->rdx;
-            DWORD dwFlags = (DWORD)ctx->r8;
+        LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
+        HANDLE hFile = (HANDLE)ctx->rdx;
+        DWORD dwFlags = *reinterpret_cast<DWORD*>(&ctx->r8);
 
-            auto result = reinterpret_cast<decltype(LoadLibraryExW)*>(hk->pMaybeRawFunc)(lpLibFileName, hFile, dwFlags);
-            ctx->rax = (uintptr_t)result;
+        auto result = reinterpret_cast<decltype(LoadLibraryExW)*>(hk->pMaybeRawFunc)(lpLibFileName, hFile, dwFlags);
+        *reinterpret_cast<HMODULE*>(&ctx->rax) = result;
 
-            MulNX::Message msg("Hook/LoadLibraryExW"_hash);
-            msg.p1.as<LPCWSTR>() = lpLibFileName;
-            this->ISys().PublishSync(msg);
+        MulNX::Message msg("Hook/LoadLibraryExW"_hash);
+        msg.p1.as<LPCWSTR>() = lpLibFileName;
+        this->ISys().PublishSync(msg);
 
-            return MulNX::Hook::Then::Return;
+        return MulNX::Hook::Then::Return;
         }).value();
     this->hkLoadLibraryExW->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "LoadLibraryExW"));
 
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
-        auto pD3D11CreateDevice = (uint8_t*)GetProcAddress(GetModuleHandleW(L"d3d11.dll"), "D3D11CreateDevice");
-
-        this->hkD3D11CreateDevice = MulNX::Hook::Create(pD3D11CreateDevice, 0, false,
-            [this](MulNX::Hook* hk, RegContext* ctx) {
-                auto pAdapter = reinterpret_cast<IDXGIAdapter*>(ctx->rcx);
-                auto DriverType = *reinterpret_cast<D3D_DRIVER_TYPE*>(&ctx->rdx);
-                auto Software = reinterpret_cast<HMODULE>(ctx->r8);
-                auto Flags = *reinterpret_cast<UINT*>(&ctx->r9);
-                auto pFeatureLevels = hk->GetStackParam<const D3D_FEATURE_LEVEL*>(ctx, 4);
-                auto FeatureLevels = hk->GetStackParam<UINT>(ctx, 5);
-                auto SDKVersion = hk->GetStackParam<UINT>(ctx, 6);
-                auto ppDevice = hk->GetStackParam<ID3D11Device**>(ctx, 7);
-                auto pFeatureLevel = hk->GetStackParam<D3D_FEATURE_LEVEL*>(ctx, 8);
-                auto ppImmediateContext = hk->GetStackParam<ID3D11DeviceContext**>(ctx, 9);
-
-                auto pRawCreateDevice = reinterpret_cast<D3D11CreateDevice_t>(hk->pMaybeRawFunc);
-                ctx->rax = pRawCreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
-
-                // ---- Hook ClearDepthStencilView (vtable index 53) ----
-                this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(*ppImmediateContext)->GetVFuncPtr(53),
-                    0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
-                        ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
-                        ID3D11DepthStencilView* pDSV = (ID3D11DepthStencilView*)ctx->rdx;
-                        UINT ClearFlags = (UINT)ctx->r8;
-                        this->pGraphicsManager->OnClearDepthStencilView(pCtx, pDSV, ClearFlags);
-                        return MulNX::Hook::Then::Continue;
-                    }).value();
-                this->hkClearDepthStencilView->Attach();
-                this->ISys().LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
-
-                return MulNX::Hook::Then::Return;
-            }).value();
-        this->hkD3D11CreateDevice->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "D3D11CreateDevice"));
-
-        auto pCreateDXGIFactory1 = (uint8_t*)GetProcAddress(GetModuleHandleW(L"dxgi.dll"), "CreateDXGIFactory1");
-        this->hkCreateDXGIFactory1 = MulNX::Hook::Create(pCreateDXGIFactory1, 0, false,
-            [this](MulNX::Hook* hk, RegContext* ctx) {
-                const IID* riid = reinterpret_cast<const IID*>(ctx->rcx);
-                auto** ppFactory = reinterpret_cast<void**>(ctx->rdx);
-
-                ctx->rax = reinterpret_cast<decltype(CreateDXGIFactory1)*>(hk->pMaybeRawFunc)(*riid, ppFactory);
-
-                auto pCreateSwapChain = (uint8_t*)IVClass::Assume(*ppFactory)->GetVFuncPtr(10);
-
-                this->hkCreateSwapChain = MulNX::Hook::Create(pCreateSwapChain, 0, false,
-                    [this](MulNX::Hook* hk, RegContext* ctx) {
-                        auto pFactory = (IDXGIFactory*)(ctx->rcx);
-                        auto pDevice = (IUnknown*)(ctx->rdx);
-                        auto pDesc = (DXGI_SWAP_CHAIN_DESC*)(ctx->r8);
-                        auto ppSwapChain = (IDXGISwapChain**)(ctx->r9);
-
-                        ctx->rax = reinterpret_cast<CreateSwapChain_t>(hk->pMaybeRawFunc)(pFactory, pDevice, pDesc, ppSwapChain);
-                        this->DoSwapChainHooks(*ppSwapChain);
-
-                        return MulNX::Hook::Then::Return;
-                    }).value();
-                this->hkCreateSwapChain->Attach();
-
-                return MulNX::Hook::Then::Return;
-            }).value();
-        this->hkCreateDXGIFactory1->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "CreateDXGIFactory1"));
+        this->SendTask("MulNXMain", [this]() {
+            if (this->pInputSystem->IsKeyPressed(VK_INSERT)) {
+                this->CreateHook();
+                return false;
+            }
+            return true;
+            });
 
         return;
         });
@@ -105,46 +49,77 @@ bool HookManager::Init() {
     return true;
 }
 
-void HookManager::DoSwapChainHooks(IDXGISwapChain* pSwapChain) {
-    if (this->hkPresent)return;
+void HookManager::CreateHook() {
+    // 临时 D3D11 设备/交换链
+    ID3D11Device* pTempD3DDevice = nullptr;
+    IDXGISwapChain* pTempSwapChain = nullptr;
+    ID3D11DeviceContext* pTempContext = nullptr;
+
+    const unsigned level_count = 2;
+    D3D_FEATURE_LEVEL levels[level_count] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0 };
+    DXGI_SWAP_CHAIN_DESC sd{};
+    sd.BufferCount = 1;
+    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sd.OutputWindow = GetForegroundWindow();
+    sd.SampleDesc.Count = 1;
+    sd.Windowed = true;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    HRESULT hResult = D3D11CreateDeviceAndSwapChain(
+        nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0,
+        levels, level_count, D3D11_SDK_VERSION, &sd,
+        &pTempSwapChain, &pTempD3DDevice, nullptr, &pTempContext);
+    if (FAILED(hResult))
+        MulNX::ErrorTerminate("无法创建D3D11设备和交换链，错误代码: " + std::to_string(hResult));
+
+    // ---- Hook ClearDepthStencilView (vtable index 53) ----
+    this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTempContext)->GetVFuncPtr(53),
+        [this](MulNX::Hook* hk, RegContext* ctx) {
+            ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
+            ID3D11DepthStencilView* pDSV = (ID3D11DepthStencilView*)ctx->rdx;
+            UINT ClearFlags = (UINT)ctx->r8;
+            if (this->d3dInited) {
+                this->pGraphicsManager->OnClearDepthStencilView(pCtx, pDSV, ClearFlags);
+            }
+            return MulNX::Hook::Then::Continue;
+        }).value();
+    this->hkClearDepthStencilView->Attach();
+    this->ISys().LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
+
     // Hook Present函数
     // 函数开头：
     // 0~4：Steam钩子（OBS游戏捕获钩子会与其交互，进行画面捕获）
     // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
-    this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5,
-        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTempSwapChain)->GetVFuncPtr(8) + 5,
+        [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
                 this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
+                this->d3dInit();
                 this->pGraphicsManager->BuildNew();
                 this->pGraphicsManager->OnPresent();
                 // UI 系统渲染
                 this->pUISystem->HandleUpdate();
                 this->pUISystem->Render();
             }
-            else {
-                // 设置系统标志位
-                this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(true, std::memory_order_release);
-            }
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkPresent->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "Present"));
 
-    this->pGraphicsManager->pSwapChain = pSwapChain;
-    this->D3D11AndImGuiInit();
-
     // ---- Hook ResizeBuffers (vtable index 13) ----
-    this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(13),
-        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTempSwapChain)->GetVFuncPtr(13),
+        [this](MulNX::Hook* hk,RegContext* ctx) {
             this->pGraphicsManager->ReleaseOld();
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkResizeBuffers->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "ResizeBuffers"));
-}
 
-void HookManager::BeforeActiveSystem() {
+    pTempSwapChain->Release();
+    pTempContext->Release();
+    pTempD3DDevice->Release();
+    
     this->pUISystem->FrameBefore = [this]() {
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
@@ -159,7 +134,10 @@ void HookManager::BeforeActiveSystem() {
         };
 }
 
-void HookManager::D3D11AndImGuiInit() {
+void HookManager::d3dInit() {
+    if (this->d3dInited) return;
+    this->d3dInited = true;
+
     this->pGraphicsManager->pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&this->pGraphicsManager->pd3dDevice);
     this->pGraphicsManager->pd3dDevice->GetImmediateContext(&this->pGraphicsManager->pd3dContext);
 
@@ -170,14 +148,14 @@ void HookManager::D3D11AndImGuiInit() {
     HANDLE hProp = GetPropW(this->CS2hWnd, L"OleDropTargetInterface");
     IDropTarget* pTarget = static_cast<IDropTarget*>(hProp);
     this->hkDrop = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTarget)->GetVFuncPtr(6),
-        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
+        [this](MulNX::Hook* hk,RegContext* ctx) {
             this->HandleProcessDropFiles((IDataObject*)ctx->rdx);
             return MulNX::Hook::Then::Continue;
         }).value();
     this->hkDrop->Attach();
     // 窗口过程钩子
     this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->CS2hWnd, GWLP_WNDPROC),
-        0, false, [this](MulNX::Hook* hk, RegContext* ctx) {
+        [this](MulNX::Hook* hk,RegContext* ctx) {
             return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
         }).value();
     this->hkWndProc->Attach();
@@ -187,25 +165,24 @@ void HookManager::D3D11AndImGuiInit() {
     this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buf);
     this->pGraphicsManager->pd3dDevice->CreateRenderTargetView(buf, nullptr, &this->pGraphicsManager->view);
     buf->Release();
-    // 创建绿幕着色器资源
-    this->pGraphicsManager->CreateGreenScreenAssets();
 
     // ImGui 初始化
     ImGui::CreateContext();
     ImGui_ImplWin32_Init(this->CS2hWnd);
     ImGui_ImplDX11_Init(this->pGraphicsManager->pd3dDevice, this->pGraphicsManager->pd3dContext);
+
+    // 创建绿幕着色器资源
+    this->pGraphicsManager->CreateGreenScreenAssets();
+
+    this->CreateMainDraw();
 }
 
 MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
-    if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire)) {
-        if (MulNX::Win32::IsMouseMessage(uMsg) ||
-            uMsg == WM_KEYDOWN && wParam == VK_TAB)
-            return MulNX::Hook::Then::Return;
-    }
+    if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
+        return MulNX::Hook::Then::Return;
     if (MulNX::Win32::IsKeyboardMessage(uMsg)) {
-        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) ||
-            this->pInputSystem->IsKeyPressed(VK_MENU))
+        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) || this->pInputSystem->IsKeyPressed(VK_MENU))
             return MulNX::Hook::Then::Return; // 当alt按下时进行拦截，此时属于 MulNX 按键通道判定快捷键的时刻
     }
     if (uMsg == WM_CLOSE) {
@@ -214,6 +191,7 @@ MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
     }
     return MulNX::Hook::Then::Continue;
 }
+
 void HookManager::Deinit() {
     this->hkLoadLibraryExW->Detach();
     this->hkClearDepthStencilView->Detach();
@@ -222,6 +200,7 @@ void HookManager::Deinit() {
     this->hkResizeBuffers->Detach();
     this->hkWndProc->Detach();
 }
+
 void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {
     if (!pDataObj) return;
     // 请求 CF_HDROP 格式

@@ -21,18 +21,17 @@ bool ViewController::Init() {
     this->pFreeCameraController = this->Core->ModuleManager()->FindModule<FreeCameraController>("FreeCameraController");
     this->pAdvancedViewController = this->Core->ModuleManager()->FindModule<AdvancedViewController>("AdvancedViewController");
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll",[this](MulNX::Message& msg) {
+    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         this->controlView.dofs.pNearBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
         this->controlView.dofs.pNearCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
         this->controlView.dofs.pFarCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
         this->controlView.dofs.pFarBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
 
         auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::CallIsPlayingDemo);
-        this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), 0, true,
-            [this](MulNX::Hook* Hook, RegContext* ctx) {
-                this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
-                return MulNX::Hook::Then::Continue;
-            }).value();
+        this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* Hook, RegContext* ctx) {
+            this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
+            return MulNX::Hook::Then::Continue;
+            }, true).value();
         this->hkPosCallIsPlayingDemo->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
 

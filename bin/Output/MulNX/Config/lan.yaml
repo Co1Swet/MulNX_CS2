@@ -12,7 +12,6 @@ ui:
   main: 首页
   camera_system: 摄像机系统
   game_settings: 游戏设置
-  game_enhance: 游戏增强
   mulnx_control: MulNX控制
   settings: UI个性配置
   style:
@@ -86,16 +85,17 @@ demo:
   status:
     is_playing: 当前是否处于Demo中：{}
     is_pausing: 当前是否Demo处于暂停状态：{}
-  analyze:
-    dump: 生成图谱
 
+  analyze: 分析demo（会产生json文件）
+  load: 加载json文件，以可以编辑任务
   empty: 拖放 .dem 文件到此处以加载
   play: 播放
-  play_and_analize: 播放并分析（会清空旧分析）
   copy_path: 复制路径
   remove: 移除
   clear_all: 清空列表
   play_selected: 播放所选
+  refresh: 刷新列表
+  copy_failed: 在复制Demo文件时发生错误：{}
 
 text:
   entered: 已进入
@@ -269,6 +269,10 @@ camsys:
     open_default: 打开默认工作区
     save: 保存工作区
     target_name: 工作区名：
+
+freCamCon:
+  status: 当前是否处于自由摄像机控制：{}
+  change: 切换自由摄像机控制状态
 
 free_campath:
   fmt: "编号： {0}  {1}\n" # {1}为关键帧参数

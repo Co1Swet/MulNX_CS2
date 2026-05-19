@@ -41,6 +41,7 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
         std::string* pStr = Msg.asp.get<std::string>();
         this->UIContext.EntryDraw = std::move(*pStr);
         this->UISystemRunning = true;
+        this->UIContext.Active = true;
         this->ISys().LogWarning("接收到启动消息，UI系统开始启动");
 
         // 设置ini文件路径
@@ -69,6 +70,7 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
 
 void MulNX::UISystem::HandleUpdate() {
     this->Update();
+    if (!this->UISystemRunning)return;
     if (this->pInputSystem->CheckComboClick(VK_INSERT, 1)) {
         this->UIContext.Active = !this->UIContext.Active;
     }

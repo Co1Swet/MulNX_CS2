@@ -10,7 +10,7 @@ using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_
 using GetPlayerName_t = const char* (*)(CS2::CCSPlayerController*);
 
 void NameController::Menu(MulNX::UINode* node) {
-    if(this->Hub()->showView.load(std::memory_order_acquire) != PlayerHub::View::Player){
+    if (this->Hub()->showView.load(std::memory_order_acquire) != PlayerHub::View::Player) {
         ImGui::TextUnformatted("请切换到玩家视图以设置名称替换");
         return;
     }
@@ -40,15 +40,14 @@ bool NameController::Init() {
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
         auto FnGetDecoratedPlayerName = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
-        this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), 0, false,
-            [this](MulNX::Hook* hk, RegContext* ctx) {
-                // 这里注意，这里的名称获取，是需要进一步调用GetPlayerName的
-                // 我们借助这一个比较稳定的特征，创建延迟Hook
-                // 所以，这里同时不需要加锁，因为它已经满足上下文无关于我们的数据结构的访问了
-                // 这里也一定不能加锁，不然可能会被写锁请求打断，导致死锁！
-                auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
-                this->HandleVHook(playerController);
-                return MulNX::Hook::Then::Continue; // 继续执行原始函数，获取装饰名并写入 pBuffer
+        this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+            // 这里注意，这里的名称获取，是需要进一步调用GetPlayerName的
+            // 我们借助这一个比较稳定的特征，创建延迟Hook
+            // 所以，这里同时不需要加锁，因为它已经满足上下文无关于我们的数据结构的访问了
+            // 这里也一定不能加锁，不然可能会被写锁请求打断，导致死锁！
+            auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
+            this->HandleVHook(playerController);
+            return MulNX::Hook::Then::Continue; // 继续执行原始函数，获取装饰名并写入 pBuffer
             }).value();
         this->hkGetDecoratedPlayerName->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
@@ -63,7 +62,7 @@ bool NameController::Init() {
             return true;
             });
 
-        
+
         });
 
     return true;
@@ -85,29 +84,28 @@ void NameController::ProcessMsg(MulNX::Message& Msg) {
 
 void NameController::HandleVHook(CS2::CCSPlayerController* pPlayerController) {
     if (this->bGetPlayerNameHooked)return;
-    this->hkGetPlayerName = MulNX::Hook::Create(reinterpret_cast<uint8_t*>(pPlayerController->GetVFuncPtr(226)), 0, false,
-        [this](MulNX::Hook* hk, RegContext* ctx) {
-            // 而在这里，我们则需要加锁，因为我们要访问替换表了
-            std::shared_lock lock(this->Hub()->smutex);
+    this->hkGetPlayerName = MulNX::Hook::Create(reinterpret_cast<uint8_t*>(pPlayerController->GetVFuncPtr(226)), [this](MulNX::Hook* hk, RegContext* ctx) {
+        // 而在这里，我们则需要加锁，因为我们要访问替换表了
+        std::shared_lock lock(this->Hub()->smutex);
 
-            auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
+        auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
 
-            // 1. 调用原始函数获取原始名字
-            const char* originalName = reinterpret_cast<GetPlayerName_t>(hk->pMaybeRawFunc)(playerController);
+        // 1. 调用原始函数获取原始名字
+        const char* originalName = reinterpret_cast<GetPlayerName_t>(hk->pMaybeRawFunc)(playerController);
 
-            // 2. 获取 SteamID
-            uint64_t steamId = *playerController->m_steamID();
-            auto it = this->nameReplaceInfo.find(steamId);
+        // 2. 获取 SteamID
+        uint64_t steamId = *playerController->m_steamID();
+        auto it = this->nameReplaceInfo.find(steamId);
 
-            // 3. 根据映射表决定返回值
-            if (it != this->nameReplaceInfo.end()) {
-                ctx->rax = (uintptr_t)this->nameReplace[it->second];
-            }
-            else {
-                ctx->rax = (uintptr_t)originalName;
-            }
+        // 3. 根据映射表决定返回值
+        if (it != this->nameReplaceInfo.end()) {
+            ctx->rax = (uintptr_t)this->nameReplace[it->second];
+        }
+        else {
+            ctx->rax = (uintptr_t)originalName;
+        }
 
-            return MulNX::Hook::Then::Return; // 已调用原始函数，不再重复执行
+        return MulNX::Hook::Then::Return; // 已调用原始函数，不再重复执行
         }).value();
     this->hkGetPlayerName->Attach();
     this->bGetPlayerNameHooked = true;

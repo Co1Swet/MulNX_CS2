@@ -75,7 +75,7 @@ void* TryAlloc(uintptr_t target, size_t size) {
     return nullptr;
 }
 
-std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, int len, bool extraStackAdjust, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback) {
+std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback, bool extraStackAdjust, int len) {
     if (0 < len && len < 5) {
         return std::unexpected(std::format("参数指定的长度是：{}  ，这个长度怎么可能放得下一个jmp rel32？？", len));
     }

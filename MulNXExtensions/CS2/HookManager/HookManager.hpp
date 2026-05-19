@@ -31,8 +31,11 @@ private:
     void HandleProcessDropFiles(IDataObject* pDataObj);
 
     void D3D11AndImGuiInit();
-    void BeforeActiveSystem()override;
     void DoSwapChainHooks(IDXGISwapChain* pSwapChain);
+
+    void CreateHook();
+    void d3dInit();
+    bool d3dInited = false;
 public:
     bool Init()override;
     void Deinit()override;

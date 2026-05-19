@@ -83,8 +83,7 @@ bool GlowController::Init() {
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto region = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
         auto target = region.Data();
-        this->hkSetGlowColor = MulNX::Hook::Create(target, 0, false,
-            [this](MulNX::Hook* hk,RegContext* ctx) {
+        this->hkSetGlowColor = MulNX::Hook::Create(target, [this](MulNX::Hook* hk,RegContext* ctx) {
                 this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)&(ctx->rdx));
             return MulNX::Hook::Then::Continue;
             }).value();

@@ -36,10 +36,9 @@ bool DeathMsgController::Init() {
 
         auto target = this->CS2()->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::HandlePlayerDeath);
-        this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), 0, false,
-            [this](MulNX::Hook* hk, RegContext* ctx) {
-                void* event = reinterpret_cast<void*>(ctx->rdx);
-                return this->HandleOnPlayerDeath(event);
+        this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+            void* event = reinterpret_cast<void*>(ctx->rdx);
+            return this->HandleOnPlayerDeath(event);
             }).value();
         this->hkHandlePlayerDeath->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));

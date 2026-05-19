@@ -80,11 +80,10 @@ bool SmokeController::Init() {
         auto target = this->CS2()->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::SetSmokeProps).Data();
 
-        this->hkSetSmokeProps = MulNX::Hook::Create(target, 0, false,
-            [this](MulNX::Hook* hook, RegContext* ctx) {
-                // 再应用自定义颜色
-                this->MySetSmokeProps((CS2::C_SmokeGrenadeProjectile*)(ctx->rcx));
-                return MulNX::Hook::Then::Continue;
+        this->hkSetSmokeProps = MulNX::Hook::Create(target, [this](MulNX::Hook* hook, RegContext* ctx) {
+            // 再应用自定义颜色
+            this->MySetSmokeProps((CS2::C_SmokeGrenadeProjectile*)(ctx->rcx));
+            return MulNX::Hook::Then::Continue;
             }).value();
         this->hkSetSmokeProps->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "SetSmokeProps"));
@@ -175,7 +174,7 @@ void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
     auto hController = *pThrower->m_hController();
     auto pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
 
-    if(!pController) {
+    if (!pController) {
         this->ISys().LogWarning("未找到投掷者的控制器，无法应用烟雾颜色");
         return;
     }

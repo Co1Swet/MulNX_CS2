@@ -26,8 +26,20 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->Core->ModuleManager()->ModulesInit();
     // 激活系统
     this->BeforeActiveSystem();
-    this->ActiveSystem();
+    // 输出启动信息
+    this->ISys().LogSucc(I18n("sys.started"));
+    this->ISys().LogWarning(I18n("sys.version_is_testing", MulNXInfo::IsDebugVersion));
+    this->ISys().LogWarning(I18n("sys.version_is", MulNXInfo::Version));
+    this->ISys().LogWarning(I18n("sys.build_stamp", MulNXInfo::TimeStamp));
+    // 执行启动器回调
+    this->InitEndCall();
+    // 记录结束时间
+    auto end = std::chrono::steady_clock::now();
+    // 输出总时间
+    auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->createTime);
+    this->ISys().LogWarning(I18n("sys.inited_time_sum", cost.count()));
     this->BehindActiveSystem();
+    this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(true, std::memory_order_release);
     return true;
 }
 
@@ -36,23 +48,6 @@ void MulNX::Core::CoreStarterBase::CreateMainDraw() {
     auto [msg2, rp] = MulNX::Message::Create<std::string>("UISystem/Start"_hash, "MainDraw");
     this->ISys().PublishAsync(std::move(msg2));
     this->ISys().LogWarning("发送了UI启动指令！渲染即将开始！");
-}
-
-void MulNX::Core::CoreStarterBase::ActiveSystem() {
-    // 输出启动信息
-    this->ISys().LogSucc(I18n("sys.started"));
-    this->ISys().LogWarning(I18n("sys.version_is_testing", MulNXInfo::IsDebugVersion));
-    this->ISys().LogWarning(I18n("sys.version_is", MulNXInfo::Version));
-    this->ISys().LogWarning(I18n("sys.build_stamp", MulNXInfo::TimeStamp));
-    // 执行启动器回调
-    this->InitEndCall();
-    // 通过MainDraw字符串发送UI启动命令
-    this->CreateMainDraw();
-    // 记录结束时间
-    auto end = std::chrono::steady_clock::now();
-    // 输出总时间
-    auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->createTime);
-    this->ISys().LogWarning(I18n("sys.inited_time_sum", cost.count()));
 }
 
 void MulNX::Core::CoreStarterBase::CloseSystem() {

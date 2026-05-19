@@ -1,6 +1,6 @@
 #include <MulNXExtensions/WinExt/WinExt.hpp>
 int main() {
-    auto hkMessageBoxW = MulNX::Hook::Create((uint8_t*)&MessageBoxW, 0, false, [](MulNX::Hook* hk, RegContext* ctx) {
+    auto hkMessageBoxW = MulNX::Hook::Create((uint8_t*)&MessageBoxW, [](MulNX::Hook* hk, RegContext* ctx) {
         if (strstr((char*)(ctx->rdx), (char*)L"no show"))return MulNX::Hook::Then::Return;
         ctx->rdx = (uint64_t)(L"hacked");
         reinterpret_cast<decltype(MessageBoxW)*>(hk->pMaybeRawFunc)(NULL, L"callback", L"example", MB_OK);

@@ -16,18 +16,17 @@ bool TeamIDController::Init() {
         );
         if (!lflAddr.IsValid()) return;
 
-        hkLoadFromFile_ = MulNX::Hook::Create(lflAddr.Data(), 0, false,
-            [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
-                // __fastcall: RCX=this, RDX=filePath, R8=unk
-                const char* filePath = reinterpret_cast<const char*>(ctx->rdx);
-                if (filePath && strstr(filePath, "hudreticle.xml")) {
-                    inHudReticle_ = true;
-                    auto result = reinterpret_cast<CLayoutFile_LoadFromFile_t>(hk->pMaybeRawFunc)((void*)ctx->rcx, filePath, ctx->r8);
-                    *reinterpret_cast<int*>(&ctx->rax) = result;
-                    inHudReticle_ = false;
-                    return MulNX::Hook::Then::Return;
-                }
-                return MulNX::Hook::Then::Continue;
+        hkLoadFromFile_ = MulNX::Hook::Create(lflAddr.Data(), [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
+            // __fastcall: RCX=this, RDX=filePath, R8=unk
+            const char* filePath = reinterpret_cast<const char*>(ctx->rdx);
+            if (filePath && strstr(filePath, "hudreticle.xml")) {
+                inHudReticle_ = true;
+                auto result = reinterpret_cast<CLayoutFile_LoadFromFile_t>(hk->pMaybeRawFunc)((void*)ctx->rcx, filePath, ctx->r8);
+                *reinterpret_cast<int*>(&ctx->rax) = result;
+                inHudReticle_ = false;
+                return MulNX::Hook::Then::Return;
+            }
+            return MulNX::Hook::Then::Continue;
             }
         ).value();
         hkLoadFromFile_->Attach();
@@ -45,35 +44,33 @@ bool TeamIDController::Init() {
         auto cloneFunc = (void(__fastcall*)(void*, void*))(vtable[1]);
 
         // 4. Hook Parse
-        hkWashColorParse_ = MulNX::Hook::Create((uint8_t*)parseFunc, 0, false,
-            [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
-                if (!inHudReticle_) return MulNX::Hook::Then::Continue;
+        hkWashColorParse_ = MulNX::Hook::Create((uint8_t*)parseFunc, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
+            if (!inHudReticle_) return MulNX::Hook::Then::Continue;
 
-                const char* colorStr = reinterpret_cast<const char*>(ctx->r8);
-                uintptr_t objPtr = ctx->rcx;
+            const char* colorStr = reinterpret_cast<const char*>(ctx->r8);
+            uintptr_t objPtr = ctx->rcx;
 
-                if (colorStr && strcmp(colorStr, "#eabe54") == 0) {
-                    tWashColors_.insert(objPtr);
-                }
-                else if (colorStr && strcmp(colorStr, "rgb(150, 200, 250)") == 0) {
-                    ctWashColors_.insert(objPtr);
-                }
-                return MulNX::Hook::Then::Continue;
+            if (colorStr && strcmp(colorStr, "#eabe54") == 0) {
+                tWashColors_.insert(objPtr);
+            }
+            else if (colorStr && strcmp(colorStr, "rgb(150, 200, 250)") == 0) {
+                ctWashColors_.insert(objPtr);
+            }
+            return MulNX::Hook::Then::Continue;
             }
         ).value();
         hkWashColorParse_->Attach();
 
         // 5. Hook Clone
-        hkWashColorClone_ = MulNX::Hook::Create((uint8_t*)cloneFunc, 0, false,
-            [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
-                if (!inHudReticle_) return MulNX::Hook::Then::Continue;
+        hkWashColorClone_ = MulNX::Hook::Create((uint8_t*)cloneFunc, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
+            if (!inHudReticle_) return MulNX::Hook::Then::Continue;
 
-                uintptr_t src = ctx->rcx;
-                uintptr_t dst = ctx->rdx;   // __fastcall 第二个参数通过 RDX
+            uintptr_t src = ctx->rcx;
+            uintptr_t dst = ctx->rdx;   // __fastcall 第二个参数通过 RDX
 
-                if (tWashColors_.count(src)) tWashColors_.insert(dst);
-                if (ctWashColors_.count(src)) ctWashColors_.insert(dst);
-                return MulNX::Hook::Then::Continue;
+            if (tWashColors_.count(src)) tWashColors_.insert(dst);
+            if (ctWashColors_.count(src)) ctWashColors_.insert(dst);
+            return MulNX::Hook::Then::Continue;
             }
         ).value();
         hkWashColorClone_->Attach();

@@ -18,7 +18,6 @@ namespace MulNX {
             // 核心完全初始化后回调
             std::function<void()>InitEndCall = nullptr;
             // 激活系统，以开始工作
-            void ActiveSystem();
             void CloseSystem();
         };
     }

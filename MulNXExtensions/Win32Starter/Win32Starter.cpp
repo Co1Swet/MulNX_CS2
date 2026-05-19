@@ -78,7 +78,8 @@ bool Win32Starter::Init() {
         //HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync
         this->SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
         };
-    this->ActiveSystem();
+    // 通过MainDraw字符串发送UI启动命令
+    this->CreateMainDraw();
 
     return true;
 }
