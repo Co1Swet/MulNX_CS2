@@ -65,23 +65,27 @@ namespace MulNX {
         uintptr_t Dispatch(RegContext* ctx);
         // 这个函数要求，至少它分析的确实是一个汇编指令的开头
         static HookTargetInfo AnalyseTarget(uint8_t* target);
+        void CopyStack(size_t copySize, RegContext* ctx, uintptr_t pCurStack);
 
         uintptr_t jmpForReturn = 0;
         uintptr_t jmpForContinue = 0;
+
     public:
         size_t frameSize = 0;
         uintptr_t pMaybeRawFunc = 0;// 可能的原函数地址（如果覆盖的指令是一个完整函数的开头）
         Hook() = default;
         ~Hook();
+        uintptr_t pCallOrigin = 0;
+        uint64_t CallMaybeOrigin(size_t copyStackParamNum, RegContext* ctx);
 
         // 通过frameSize得到存在原始栈上的参数，而非被重新分配的栈上的参数
         void* GetRawStackAddr(RegContext* ctx);
         // 正确封装
         template<MulNX::PodSizeIn<0, 8> T>
-        T GetStackParam(RegContext* ctx, size_t num) {
+        T* GetStackParam(RegContext* ctx, size_t num) {
             auto stack = reinterpret_cast<uintptr_t>(this->GetRawStackAddr(ctx));
             // 第 num 个栈参数（num=0 是第0个参数）
-            T param = *reinterpret_cast<T*>(stack + 0x8 + num * 0x8);
+            T* param = reinterpret_cast<T*>(stack + 0x8 + num * 0x8);
             return param;
         }
 

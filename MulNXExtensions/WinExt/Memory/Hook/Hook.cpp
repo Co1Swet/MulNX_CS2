@@ -14,12 +14,23 @@ uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     case MulNX::Hook::Then::Continue:
         target = this->jmpForContinue;
         break;
-    default: 
+    default:
         target = this->jmpForContinue;
         break;
     }
     this->threadNumInAsm.fetch_sub(1, std::memory_order_release);
     return target;
+}
+
+void MulNX::Hook::CopyStack(size_t copySize, RegContext* ctx, uintptr_t pCurStack) {
+    const int* src = reinterpret_cast<int*>(ctx->rsp + this->frameSize + 0x28); // 0x28 == 0x20(影子空间) + 0x8(call压入的地址)
+    void* dst = reinterpret_cast<void*>(pCurStack - 0x8); // 这个0x8是极其特殊地算出来的，注意到进入Asm，首先call压入8，然后push两个压入16，然后注意到影子空间分配是0x28。此时可以分成8 16 8 0x20这样，也就是复制栈不是直接传递过来的rsp，而是再偏移后的8和0x20中间
+    memcpy(dst, src, copySize);
+}
+
+uint64_t MulNX::Hook::CallMaybeOrigin(size_t copyStackParamNum, RegContext* ctx) {
+    using RawCall = uint64_t(*)(MulNX::Hook*, size_t, RegContext*);
+    return reinterpret_cast<RawCall>(this->pCallOrigin)(this, (copyStackParamNum) * 8, ctx);
 }
 
 void* TryAlloc(uintptr_t target, size_t size) {
@@ -106,7 +117,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         reinterpret_cast<uintptr_t>(target))) > 1024ULL * 1024 * 1024) {
         return std::unexpected("windows内存分配失败！分配空间不合适");
     }
-    
+
     {
         // 创建编译器
         using enum MulNX::Memory::Asm::Reg;
@@ -209,23 +220,65 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
             (uintptr_t)HookInstance->hookTarget,
             (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size());
         if (!result.has_value())return std::unexpected(result.error());
-
-        MulNX::Memory::Asm::Code fixed = result.value();
-            
-
         // 追加原始指令
-        HookInstance->dispatcherAsmCode.append_range(std::move(fixed));
-
+        HookInstance->dispatcherAsmCode.append_range(std::move(result.value()));
         // 跳转到原处
         Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
-        
+        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+
+        HookInstance->pCallOrigin = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+
+        // rcx = hook*, rdx = stackCopySize, r8 = regctx*
+        Asm
+            // 序言
+            .push(R12)
+            .push(R13)
+            //.push(R12)
+
+            .mov(R12, RDX)
+            .mov(R13, R8)
+
+            // 环境恢复
+            .sub(RSP, R12) // 分配需要的栈空间供参数转移
+
+
+            // rcx == hook*, rdx == stackCopySize
+            .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::CopyStack)) // 定位栈拷贝函数
+            .mov(R9, RSP)
+            .sub(RSP, 0x28) // 分配影子空间
+            .call(RAX) // 执行栈拷贝
+
+            // 恢复寄存器环境
+            .mov(RCX, Mem(R13, offsetof(RegContext, rcx)))
+            .mov(RDX, Mem(R13, offsetof(RegContext, rdx)))
+            .mov(R8, Mem(R13, offsetof(RegContext, r8)))
+            .mov(R9, Mem(R13, offsetof(RegContext, r9)))
+
+            // 调用执行
+            .mov(RAX, HookInstance->pMaybeRawFunc) // 定位原始函数
+            .call(RAX) // 调用
+            .add(RSP, 0x28) // 回收影子空间
+
+            // 重新保存寄存器环境
+            .mov(Mem(R13, offsetof(RegContext, rcx)), RCX)
+            .mov(Mem(R13, offsetof(RegContext, rdx)), RDX)
+            .mov(Mem(R13, offsetof(RegContext, r8)), R8)
+            .mov(Mem(R13, offsetof(RegContext, r9)), R9)
+
+            .add(RSP, R12) // 回收拷贝栈空间
+
+            // 尾声
+            .pop(R13)
+            .pop(R12)
+            .ret();
+
         HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
         // 复制机器码到VirtualAlloc分配的内存
         memcpy(HookInstance->pAsmDispatcher,
             HookInstance->dispatcherAsmCode.data(),
             HookInstance->dispatcherAsmCode.size());
-        
+
         // 生成用于覆盖原位置的代码
         Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)target - 5);
         //Asm.jmp64((uintptr_t)HookInstance->pAsmDispatcher);

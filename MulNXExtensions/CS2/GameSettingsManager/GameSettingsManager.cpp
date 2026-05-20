@@ -102,6 +102,7 @@ bool GameSettingsManager::Init() {
     this->SendTask("CSControl", [this]() {
         C_ConVarSystem& CVarSystem = this->CS2()->GetCvarSystem();
 
+        if (!CVarSystem.Address)return true;
         auto spec_show_xray = CVarSystem.GetCvar("spec_show_xray");
         if (!spec_show_xray)return true;
 
