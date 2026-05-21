@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../Pattern/Pattern.hpp"
-#include "../Assembler/Assembler.hpp"
-
 #include <Windows.h>
 
 namespace MulNX {
@@ -27,6 +25,7 @@ namespace MulNX {
             const uint8_t* End()const { return reinterpret_cast<const uint8_t*>(Base + Size); }
             size_t GetSize() const { return this->Size; }
             uint8_t* Data() { return reinterpret_cast<uint8_t*>(Base); }
+            uint8_t* Rdata() { return reinterpret_cast<uint8_t*>(Base + Size); }
             bool IsValid() const { return Base != 0 && Size != 0; }
             DWORD protection() const { return Protection; }
             bool TryResize(size_t NewSize);

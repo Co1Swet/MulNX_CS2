@@ -2,6 +2,56 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
+void CSController::Window(MulNX::UINode* node) {
+    // auto w = MulNX::UI::RAIIWindow("实验性功能", this->showWindow);
+    // if (!w)return;
+    // MulNX::UI::Checkbox("Source2EngineToClient001 强制返回？", this->Source2EngineToClient001ForceReturn);
+    // MulNX::UI::Checkbox("Source2EngineToClient001 返回值", this->Source2EngineToClient001ForceReturnValue);
+
+    // MulNX::UI::Checkbox("IDemo 强制返回？", this->IDemoForceReturn);
+    // MulNX::UI::Checkbox("IDemo 返回值", this->IDemoForceReturnValue);
+
+    // std::unique_lock lock(this->ForceMutex);
+    // ImGui::SeparatorText("检测到的调用点");
+    // if (this->detected.empty()) {
+    //     ImGui::TextDisabled("（空）");
+    // }
+    // else {
+    //     for (const auto& call : this->detected) {
+    //         ImGui::Text("%llX", call);                      // 十六进制显示
+    //         ImGui::SameLine();
+    //         bool alreadyForced = (this->force.find(call) != this->force.end());
+    //         if (alreadyForced) {
+    //             ImGui::TextDisabled("已添加");
+    //         }
+    //         else {
+    //             // 使用 call 作为 ID 后缀，保证按钮唯一
+    //             if (ImGui::Button(("添加##" + std::to_string(call)).c_str())) {
+    //                 this->force.insert(call);
+    //             }
+    //         }
+    //     }
+    // }
+
+    // ImGui::SeparatorText("已强制返回的调用点");
+    // if (this->force.empty()) {
+    //     ImGui::TextDisabled("（空）");
+    // }
+    // else {
+    //     std::vector<uintptr_t> toRemove;
+    //     for (const auto& call : this->force) {
+    //         ImGui::Text("%llX", call);
+    //         ImGui::SameLine();
+    //         if (ImGui::Button(("移除##" + std::to_string(call)).c_str())) {
+    //             toRemove.push_back(call);
+    //         }
+    //     }
+    //     for (auto addr : toRemove) {
+    //         this->force.erase(addr);
+    //     }
+    // }
+}
+
 bool CSController::Init() {
     this->showWindow = true;
     this->ISys()
@@ -10,30 +60,47 @@ bool CSController::Init() {
 
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         this->client = CS2::Module::Client(L"client.dll");
+        auto back = this->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::ifShowSpeaker).Rdata();
+        this->retAddrForShowSpeaker = reinterpret_cast<uintptr_t>(back) - 4;
         --this->needToLoadModules;
         });
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
         this->engine2 = CS2::Module::engine2(L"engine2.dll");
-        // 加载来自Source2EngineToClient001的模块
-        this->Source2EngineToClient001 =
-            this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")
-            ("Source2EngineToClient001", nullptr);
+        this->Source2EngineToClient001 = this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2EngineToClient001", nullptr);
+        // demo
+        this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
+        // cmd
         this->executor = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);
-        static auto hkExecuteCmd = MulNX::Hook::Create((uint8_t*)this->executor.GetRawFuncPtr(), [](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkSource2EngineToClient001_ExecuteCmd = MulNX::Hook::Create((uint8_t*)this->executor.GetRawFuncPtr(), [](MulNX::Hook* hk, RegContext* ctx) {
             static std::mutex mtx;
             std::lock_guard lock(mtx);
-            // 这里加锁防止游戏和MulNX竞态访问控制台命令执行函数，导致崩溃。性能影响应该很小，因为正常情况下命令执行频率不会太高。
-            auto* pThis = (void*)ctx->rcx;
-            auto unk1 = *(int*)&(ctx->rdx);
-            auto* cmdStr = reinterpret_cast<const char*>(ctx->r8);
-            auto unk2 = *(int*)&(ctx->r9);
-            // 手动调用原函数执行命令，保持游戏正常运行
-            reinterpret_cast<void(*)(void*, int, const char*, int)>(hk->pMaybeRawFunc)(pThis, unk1, cmdStr, unk2);
-            // 强制执行流返回对应的调用点，谨防二次调用
+            hk->CallMaybeOrigin(0, ctx);
             return MulNX::Hook::Then::Return;
             }).value();
-        hkExecuteCmd->Attach();
-        this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
+        this->hkSource2EngineToClient001_ExecuteCmd->Attach();
+        this->ISys().LogSucc(I18n("hook.attached", "Source2EngineToClient001::ExecuteCmd"));
+
+        // for show speaker
+        this->hkSource2EngineToClient001_IsPlayingDemo = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->Source2EngineToClient001)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto returnAddress = *(uintptr_t*)hk->GetRawStackAddr(ctx);
+            using Source2EngineToClient001_IsPlayingDemo_t = bool(*)(void*);
+            *(bool*)(&ctx->rax) = reinterpret_cast<Source2EngineToClient001_IsPlayingDemo_t>(hk->pMaybeRawFunc)(reinterpret_cast<void*>(ctx->rcx));
+            if (returnAddress == this->retAddrForShowSpeaker) {
+                *(bool*)(&ctx->rax) = false;
+            }
+            // std::unique_lock lock(this->ForceMutex);
+            // this->detected.insert(callPos);
+            // if (this->force.find(callPos) != this->force.end()) {
+            //     if (this->Source2EngineToClient001ForceReturn) {
+            //         *(bool*)(&ctx->rax) = this->Source2EngineToClient001ForceReturnValue;
+            //     }
+            // }
+            
+            return MulNX::Hook::Then::Return;
+            }).value();
+        this->hkSource2EngineToClient001_IsPlayingDemo->Attach();
+        this->ISys().LogSucc(I18n("hook.attached", "Source2EngineToClient001::IsPlayingDemo"));
+
         --this->needToLoadModules;
         });
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {
@@ -73,6 +140,8 @@ MulNX::CoTask CSController::InitTask() {
         }
         return true;
         });
+
+    // this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     co_return;
 }

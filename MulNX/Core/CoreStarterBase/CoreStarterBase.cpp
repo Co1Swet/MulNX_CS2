@@ -24,8 +24,6 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->EntryInit();
     // 二阶段初始化注册模块
     this->Core->ModuleManager()->ModulesInit();
-    // 激活系统
-    this->BeforeActiveSystem();
     // 输出启动信息
     this->ISys().LogSucc(I18n("sys.started"));
     this->ISys().LogWarning(I18n("sys.version_is_testing", MulNXInfo::IsDebugVersion));
@@ -38,8 +36,6 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     // 输出总时间
     auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->createTime);
     this->ISys().LogWarning(I18n("sys.inited_time_sum", cost.count()));
-    this->BehindActiveSystem();
-    this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(true, std::memory_order_release);
     return true;
 }
 

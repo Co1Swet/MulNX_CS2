@@ -31,7 +31,9 @@ public:
 };
 
 class CSController final :public MulNX::ModuleBase {
-private:
+    std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
+    std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
+    uintptr_t retAddrForShowSpeaker = 0;
 
     D_GameData CS2EBGameData{};
     void* Source2EngineToClient001 = nullptr;
@@ -47,6 +49,17 @@ private:
     MulNX::CoTask InitTask();
     void ProcessMsg(MulNX::Message& Msg)override;
     void Main();
+
+    std::mutex ForceMutex;
+
+    std::set<uintptr_t>detected;
+    std::set<uintptr_t>force;
+
+    std::atomic<bool> Source2EngineToClient001ForceReturn = false;
+    std::atomic<bool> Source2EngineToClient001ForceReturnValue = true;
+    std::atomic<bool> IDemoForceReturn = false;
+    std::atomic<bool> IDemoForceReturnValue = true;
+    void Window(MulNX::UINode* node);
 public:
     std::vector<std::function<bool(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*)>>handlesControlPlayer{};
     
