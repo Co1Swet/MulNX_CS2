@@ -74,148 +74,6 @@ namespace ImGuiYaml {
         return false;
     }
 
-    // ---------- ImGuiCol ----------
-    // typedef int, we map to string names
-    inline YAML::Node EncodeImGuiCol(ImGuiCol col) {
-        static const std::unordered_map<int, std::string> map = {
-            {ImGuiCol_Text, "Text"},
-            {ImGuiCol_TextDisabled, "TextDisabled"},
-            {ImGuiCol_WindowBg, "WindowBg"},
-            {ImGuiCol_ChildBg, "ChildBg"},
-            {ImGuiCol_PopupBg, "PopupBg"},
-            {ImGuiCol_Border, "Border"},
-            {ImGuiCol_BorderShadow, "BorderShadow"},
-            {ImGuiCol_FrameBg, "FrameBg"},
-            {ImGuiCol_FrameBgHovered, "FrameBgHovered"},
-            {ImGuiCol_FrameBgActive, "FrameBgActive"},
-            {ImGuiCol_TitleBg, "TitleBg"},
-            {ImGuiCol_TitleBgActive, "TitleBgActive"},
-            {ImGuiCol_TitleBgCollapsed, "TitleBgCollapsed"},
-            {ImGuiCol_MenuBarBg, "MenuBarBg"},
-            {ImGuiCol_ScrollbarBg, "ScrollbarBg"},
-            {ImGuiCol_ScrollbarGrab, "ScrollbarGrab"},
-            {ImGuiCol_ScrollbarGrabHovered, "ScrollbarGrabHovered"},
-            {ImGuiCol_ScrollbarGrabActive, "ScrollbarGrabActive"},
-            {ImGuiCol_CheckMark, "CheckMark"},
-            {ImGuiCol_SliderGrab, "SliderGrab"},
-            {ImGuiCol_SliderGrabActive, "SliderGrabActive"},
-            {ImGuiCol_Button, "Button"},
-            {ImGuiCol_ButtonHovered, "ButtonHovered"},
-            {ImGuiCol_ButtonActive, "ButtonActive"},
-            {ImGuiCol_Header, "Header"},
-            {ImGuiCol_HeaderHovered, "HeaderHovered"},
-            {ImGuiCol_HeaderActive, "HeaderActive"},
-            {ImGuiCol_Separator, "Separator"},
-            {ImGuiCol_SeparatorHovered, "SeparatorHovered"},
-            {ImGuiCol_SeparatorActive, "SeparatorActive"},
-            {ImGuiCol_ResizeGrip, "ResizeGrip"},
-            {ImGuiCol_ResizeGripHovered, "ResizeGripHovered"},
-            {ImGuiCol_ResizeGripActive, "ResizeGripActive"},
-            {ImGuiCol_InputTextCursor, "InputTextCursor"},
-            {ImGuiCol_TabHovered, "TabHovered"},
-            {ImGuiCol_Tab, "Tab"},
-            {ImGuiCol_TabSelected, "TabSelected"},
-            {ImGuiCol_TabSelectedOverline, "TabSelectedOverline"},
-            {ImGuiCol_TabDimmed, "TabDimmed"},
-            {ImGuiCol_TabDimmedSelected, "TabDimmedSelected"},
-            {ImGuiCol_TabDimmedSelectedOverline, "TabDimmedSelectedOverline"},
-            {ImGuiCol_PlotLines, "PlotLines"},
-            {ImGuiCol_PlotLinesHovered, "PlotLinesHovered"},
-            {ImGuiCol_PlotHistogram, "PlotHistogram"},
-            {ImGuiCol_PlotHistogramHovered, "PlotHistogramHovered"},
-            {ImGuiCol_TableHeaderBg, "TableHeaderBg"},
-            {ImGuiCol_TableBorderStrong, "TableBorderStrong"},
-            {ImGuiCol_TableBorderLight, "TableBorderLight"},
-            {ImGuiCol_TableRowBg, "TableRowBg"},
-            {ImGuiCol_TableRowBgAlt, "TableRowBgAlt"},
-            {ImGuiCol_TextLink, "TextLink"},
-            {ImGuiCol_TextSelectedBg, "TextSelectedBg"},
-            {ImGuiCol_TreeLines, "TreeLines"},
-            {ImGuiCol_DragDropTarget, "DragDropTarget"},
-            {ImGuiCol_DragDropTargetBg, "DragDropTargetBg"},
-            {ImGuiCol_UnsavedMarker, "UnsavedMarker"},
-            {ImGuiCol_NavCursor, "NavCursor"},
-            {ImGuiCol_NavWindowingHighlight, "NavWindowingHighlight"},
-            {ImGuiCol_NavWindowingDimBg, "NavWindowingDimBg"},
-            {ImGuiCol_ModalWindowDimBg, "ModalWindowDimBg"},
-        };
-        auto it = map.find(static_cast<int>(col));
-        return YAML::Node(it != map.end() ? it->second : "Unknown");
-    }
-
-    inline bool DecodeImGuiCol(const YAML::Node& node, ImGuiCol& col) {
-        if (!node.IsScalar()) return false;
-        std::string str = node.Scalar();
-        static const std::unordered_map<std::string, int> map = {
-            {"Text", ImGuiCol_Text},
-            {"TextDisabled", ImGuiCol_TextDisabled},
-            {"WindowBg", ImGuiCol_WindowBg},
-            {"ChildBg", ImGuiCol_ChildBg},
-            {"PopupBg", ImGuiCol_PopupBg},
-            {"Border", ImGuiCol_Border},
-            {"BorderShadow", ImGuiCol_BorderShadow},
-            {"FrameBg", ImGuiCol_FrameBg},
-            {"FrameBgHovered", ImGuiCol_FrameBgHovered},
-            {"FrameBgActive", ImGuiCol_FrameBgActive},
-            {"TitleBg", ImGuiCol_TitleBg},
-            {"TitleBgActive", ImGuiCol_TitleBgActive},
-            {"TitleBgCollapsed", ImGuiCol_TitleBgCollapsed},
-            {"MenuBarBg", ImGuiCol_MenuBarBg},
-            {"ScrollbarBg", ImGuiCol_ScrollbarBg},
-            {"ScrollbarGrab", ImGuiCol_ScrollbarGrab},
-            {"ScrollbarGrabHovered", ImGuiCol_ScrollbarGrabHovered},
-            {"ScrollbarGrabActive", ImGuiCol_ScrollbarGrabActive},
-            {"CheckMark", ImGuiCol_CheckMark},
-            {"SliderGrab", ImGuiCol_SliderGrab},
-            {"SliderGrabActive", ImGuiCol_SliderGrabActive},
-            {"Button", ImGuiCol_Button},
-            {"ButtonHovered", ImGuiCol_ButtonHovered},
-            {"ButtonActive", ImGuiCol_ButtonActive},
-            {"Header", ImGuiCol_Header},
-            {"HeaderHovered", ImGuiCol_HeaderHovered},
-            {"HeaderActive", ImGuiCol_HeaderActive},
-            {"Separator", ImGuiCol_Separator},
-            {"SeparatorHovered", ImGuiCol_SeparatorHovered},
-            {"SeparatorActive", ImGuiCol_SeparatorActive},
-            {"ResizeGrip", ImGuiCol_ResizeGrip},
-            {"ResizeGripHovered", ImGuiCol_ResizeGripHovered},
-            {"ResizeGripActive", ImGuiCol_ResizeGripActive},
-            {"InputTextCursor", ImGuiCol_InputTextCursor},
-            {"TabHovered", ImGuiCol_TabHovered},
-            {"Tab", ImGuiCol_Tab},
-            {"TabSelected", ImGuiCol_TabSelected},
-            {"TabSelectedOverline", ImGuiCol_TabSelectedOverline},
-            {"TabDimmed", ImGuiCol_TabDimmed},
-            {"TabDimmedSelected", ImGuiCol_TabDimmedSelected},
-            {"TabDimmedSelectedOverline", ImGuiCol_TabDimmedSelectedOverline},
-            {"PlotLines", ImGuiCol_PlotLines},
-            {"PlotLinesHovered", ImGuiCol_PlotLinesHovered},
-            {"PlotHistogram", ImGuiCol_PlotHistogram},
-            {"PlotHistogramHovered", ImGuiCol_PlotHistogramHovered},
-            {"TableHeaderBg", ImGuiCol_TableHeaderBg},
-            {"TableBorderStrong", ImGuiCol_TableBorderStrong},
-            {"TableBorderLight", ImGuiCol_TableBorderLight},
-            {"TableRowBg", ImGuiCol_TableRowBg},
-            {"TableRowBgAlt", ImGuiCol_TableRowBgAlt},
-            {"TextLink", ImGuiCol_TextLink},
-            {"TextSelectedBg", ImGuiCol_TextSelectedBg},
-            {"TreeLines", ImGuiCol_TreeLines},
-            {"DragDropTarget", ImGuiCol_DragDropTarget},
-            {"DragDropTargetBg", ImGuiCol_DragDropTargetBg},
-            {"UnsavedMarker", ImGuiCol_UnsavedMarker},
-            {"NavCursor", ImGuiCol_NavCursor},
-            {"NavWindowingHighlight", ImGuiCol_NavWindowingHighlight},
-            {"NavWindowingDimBg", ImGuiCol_NavWindowingDimBg},
-            {"ModalWindowDimBg", ImGuiCol_ModalWindowDimBg},
-        };
-        auto it = map.find(str);
-        if (it != map.end()) {
-            col = static_cast<ImGuiCol>(it->second);
-            return true;
-        }
-        return false;
-    }
-
     // ---------- ImGuiTreeNodeFlags (bitmask) ----------
     inline YAML::Node EncodeImGuiTreeNodeFlags(ImGuiTreeNodeFlags flags) {
         return YAML::Node(static_cast<int>(flags));
@@ -356,9 +214,32 @@ namespace ImGuiYaml {
         YAML::Node colorsNode;
         for (int i = 0; i < ImGuiCol_COUNT; ++i) {
             ImGuiCol colEnum = static_cast<ImGuiCol>(i);
-            colorsNode[EncodeImGuiCol(colEnum)] = EncodeImVec4(style.Colors[i]);
+            const char* name = ImGui::GetStyleColorName(colEnum);
+            colorsNode[name] = EncodeImVec4(style.Colors[i]);
         }
         out["Colors"] = colorsNode;
+    }
+
+    // 将字符串颜色名或标量 YAML 节点转为 ImGuiCol 枚举
+    inline bool DecodeImGuiCol(const YAML::Node& node, ImGuiCol& col) {
+        if (!node.IsScalar()) return false;
+        std::string name = node.Scalar();
+
+        // 一次性构建字符串 -> 枚举的静态映射（利用 ImGui 的 API 确保版本兼容）
+        static std::unordered_map<std::string, ImGuiCol> map;
+        if (map.empty()) {
+            for (int i = 0; i < ImGuiCol_COUNT; ++i) {
+                ImGuiCol c = static_cast<ImGuiCol>(i);
+                map[ImGui::GetStyleColorName(c)] = c;
+            }
+        }
+
+        auto it = map.find(name);
+        if (it != map.end()) {
+            col = it->second;
+            return true;
+        }
+        return false;
     }
 
     inline bool YamlToStyle(const YAML::Node& node, ImGuiStyle& style) {

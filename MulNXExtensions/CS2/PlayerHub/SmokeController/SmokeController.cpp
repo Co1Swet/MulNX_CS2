@@ -165,44 +165,48 @@ void SmokeController::ProcessMsg(MulNX::Message& Msg) {
 
 void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
     std::shared_lock lock(this->Hub()->smutex);
+    try {
+        
+        // 获取投掷者实体
+        auto hThrower = MulNX::MRead(pSmoke->m_hThrower());
+        auto* pThrower = this->CS2()->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
 
-    // 获取投掷者实体
-    auto hThrower = *pSmoke->m_hThrower();
-    auto* pThrower = this->CS2()->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
+        // 获取控制器
+        auto hController = MulNX::MRead(pThrower->m_hController());
+        auto pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
 
-    // 获取控制器
-    auto hController = *pThrower->m_hController();
-    auto pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
+        if (!pController) {
+            return;
+        }
 
-    if (!pController) {
-        this->ISys().LogWarning("未找到投掷者的控制器，无法应用烟雾颜色");
-        return;
+        Steam64UID uid = MulNX::MRead(pController->m_steamID());
+
+        // 获取颜色向量指针
+        auto* pColorVec = pSmoke->vSmokeColor();
+
+        // 1. 优先玩家自定义颜色
+        auto itPlayer = this->playerColors.find(uid);
+        if (itPlayer != this->playerColors.end()) {
+            uint32_t c = itPlayer->second;
+            // ImGui 格式为 0xAABBGGRR，引擎期望 R、G、B 分量范围 0-255 的 float
+            pColorVec->x = (float)(c & 0xFF);                // R
+            pColorVec->y = (float)((c >> 8) & 0xFF);         // G
+            pColorVec->z = (float)((c >> 16) & 0xFF);        // B
+            return;
+        }
+
+        // 2. 队伍自定义颜色
+        auto team = *pThrower->iTeamNum();
+        auto itTeam = this->teamColors.find(team);
+        if (itTeam != this->teamColors.end()) {
+            uint32_t c = itTeam->second;
+            pColorVec->x = (float)(c & 0xFF);                // R
+            pColorVec->y = (float)((c >> 8) & 0xFF);         // G
+            pColorVec->z = (float)((c >> 16) & 0xFF);        // B
+            return;
+        }
     }
-
-    Steam64UID uid = *pController->m_steamID();
-
-    // 获取颜色向量指针
-    auto* pColorVec = pSmoke->vSmokeColor();
-
-    // 1. 优先玩家自定义颜色
-    auto itPlayer = this->playerColors.find(uid);
-    if (itPlayer != this->playerColors.end()) {
-        uint32_t c = itPlayer->second;
-        // ImGui 格式为 0xAABBGGRR，引擎期望 R、G、B 分量范围 0-255 的 float
-        pColorVec->x = (float)(c & 0xFF);                // R
-        pColorVec->y = (float)((c >> 8) & 0xFF);         // G
-        pColorVec->z = (float)((c >> 16) & 0xFF);        // B
-        return;
-    }
-
-    // 2. 队伍自定义颜色
-    auto team = *pThrower->iTeamNum();
-    auto itTeam = this->teamColors.find(team);
-    if (itTeam != this->teamColors.end()) {
-        uint32_t c = itTeam->second;
-        pColorVec->x = (float)(c & 0xFF);                // R
-        pColorVec->y = (float)((c >> 8) & 0xFF);         // G
-        pColorVec->z = (float)((c >> 16) & 0xFF);        // B
-        return;
+    catch (const std::exception& e) {
+        this->ISys().LogError(I18n("smoke.error", e.what()));
     }
 }

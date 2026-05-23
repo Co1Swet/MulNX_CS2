@@ -4,19 +4,6 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-class NomalRecordTask :public IRecordTask {
-public:
-    std::string desc;
-    Steam64UID uid;
-    int tick;
-
-    ~NomalRecordTask() = default;
-
-    Steam64UID GetTargetSteam64UID()override { return this->uid; }
-    int GetTargetTick()override { return this->tick; }
-    std::string& GetDesc()override { return this->desc; }
-};
-
 bool DemoJSONReader::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("Demo JSON Reader", this->showWindow);
     if (!w) return true;
@@ -116,13 +103,11 @@ bool DemoJSONReader::Window(MulNX::UINode* node) {
                 ImGui::TableSetColumnIndex(0);
                 std::string btnLabel = std::string("录制##") + std::to_string(ev.victimSteamId) + "_" + std::to_string(ev.tick);
                 if (ImGui::Button(btnLabel.c_str())) {
-                    auto [msg, rp] = MulNX::Message::Create<std::unique_ptr<NomalRecordTask>>("Demo/Record/Enqueue"_hash);
+                    auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
                     auto desc = this->demoInfo.GetPlayerName(ev.killerSteamId) + "  killed  " + this->demoInfo.GetPlayerName(ev.victimSteamId);
-                    auto& task = *rp;
-                    task = std::make_unique<NomalRecordTask>();
-                    task->desc = std::move(desc);
-                    task->uid = ev.killerSteamId;
-                    task->tick = ev.tick;
+                    rp->desc = std::move(desc);
+                    rp->uid = ev.killerSteamId;
+                    rp->tick = ev.tick;
                     this->ISys().PublishAsync(std::move(msg));
                 }
 

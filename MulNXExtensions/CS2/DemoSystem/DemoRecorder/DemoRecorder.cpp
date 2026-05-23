@@ -18,7 +18,7 @@ bool DemoRecorder::Window(MulNX::UINode* node) {
     ImGui::Text("当前队列：");
     std::shared_lock lock(this->smutex);
     for (const auto& recordTask : this->recordTaskBufferQueue) {
-        ImGui::Text(recordTask->GetDesc().c_str());
+        ImGui::Text(recordTask.desc.c_str());
     }
 
     return true;
@@ -53,7 +53,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Record/Enqueue"_hash: {
         std::unique_lock lock(this->smutex);
-        auto task = std::move(*msg.asp.reinterpret_cast_get<std::unique_ptr<IRecordTask>>());
+        auto task = std::move(*msg.asp.get<RecordTask>());
         this->recordTaskBufferQueue.push_back(std::move(task));
         this->isEmpty.store(false, std::memory_order_release);
         break;
@@ -79,7 +79,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool DemoRecorder::PeekQueue(std::unique_ptr<IRecordTask>& task) {
+bool DemoRecorder::PeekQueue(RecordTask& task) {
     std::unique_lock lock(this->smutex);
     if (this->recordTaskBufferQueue.empty()) return false;
     task = std::move(this->recordTaskBufferQueue.front());
@@ -100,12 +100,12 @@ MulNX::CoTask DemoRecorder::Main() {
         co_await this->WaitUntil([this]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
 
         // 等待队列中有任务
-        std::unique_ptr<IRecordTask> task = nullptr;
+        RecordTask task;
         co_await this->WaitUntil([&]()->bool { return this->PeekQueue(task); });
 
-        this->currentRecordTaskStartTick = task->GetTargetTick() - this->preRecordTicks;
-        this->currentRecordTaskEndTick = task->GetTargetTick() + postRecordTicks;
-        auto uid = task->GetTargetSteam64UID();
+        this->currentRecordTaskStartTick = task.tick - this->preRecordTicks;
+        this->currentRecordTaskEndTick = task.tick + postRecordTicks;
+        auto uid = task.uid;
         this->currentRecordTask = std::move(task);
 
 

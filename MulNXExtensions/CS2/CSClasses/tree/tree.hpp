@@ -36,20 +36,20 @@ namespace CS2 {
 
     class CHandleBase {
     public:
-        uint32_t handle;
-        CHandleBase(uint32_t handle) :handle(handle) {}
-        int GetIndexInEntityList() { return this->handle & 0x7FFF; }
-        bool Valid() { return this->handle != 0xFFFFFFFF; }
+        uint32_t value;
+        CHandleBase(uint32_t handle) :value(handle) {}
+        int GetIndexInEntityList() { return this->value & 0x7FFF; }
+        bool Valid() { return this->value != 0xFFFFFFFF; }
 
         bool operator<(const CHandleBase& rhs) const noexcept {
-            return this->handle < rhs.handle;
+            return this->value < rhs.value;
         }
 
         bool operator==(const CHandleBase& rhs) const noexcept {
-            return this->handle == rhs.handle;
+            return this->value == rhs.value;
         }
 
-        CHandleBase() :handle(0xFFFFFFFF) {}
+        CHandleBase() :value(0xFFFFFFFF) {}
     };
 
     template<typename T>

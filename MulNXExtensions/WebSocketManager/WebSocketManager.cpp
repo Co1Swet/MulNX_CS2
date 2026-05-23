@@ -127,7 +127,7 @@ bool WebSocketManager::Init() {
         catch (const std::exception& e) {
             MulNX::ErrorTerminate("网络功能启动失败！\n" + *e.what());
         }
-        return true;
+        return false;
         });
     this->SendTask("MulNXMain", [this]()->bool {
         this->Main();

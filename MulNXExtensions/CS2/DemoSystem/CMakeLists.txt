@@ -4,6 +4,7 @@ add_library(DemoSystem
     DemoAnalyzer/DemoAnalyzer.cpp
     DemoRecorder/DemoRecorder.cpp
     DemoJSONReader/DemoJSONReader.cpp
+    RecordTaskMaker/RecordTaskMaker.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

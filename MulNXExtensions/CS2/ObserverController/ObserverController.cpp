@@ -38,21 +38,8 @@ void ObserverController::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Observe/SpecSteam64UID"_hash: {
-        while (true) {
-            try {
-                Steam64UID uid = msg.p1.as<Steam64UID>();
-                auto* pController = this->FindControllerBySteam64UID(uid);
-                auto handle = MulNX::MRead(pController->m_hPlayerPawn());
-                MulNX::Message msg("Observe/SpecHandle"_hash);
-                msg.p1.low<CS2::CHandleBase>() = handle;
-                this->ISys().PublishAsync(std::move(msg));
-                break;
-            }
-            catch (...) {
-                continue;
-            }
-        }
-        
+        Steam64UID uid = msg.p1.as<Steam64UID>();
+        this->SpecSteam64UID(uid);
         break;
     }
     case "Observe/SpecHandle"_hash: {
@@ -129,7 +116,7 @@ void ObserverController::OnSpecModeChanged(uint8_t newMode) {
 CS2::CCSPlayerController* ObserverController::FindControllerBySteam64UID(Steam64UID uid) {
     CS2::CCSPlayerController* pController = nullptr;
     try {
-        for (int i = 0; i < this->CS2()->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
+        for (int i = 0; i < 32; ++i) {
             auto* controller = this->CS2()->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
             if (!controller)continue;
             if (!controller->IsPlayerController())continue;
@@ -140,31 +127,13 @@ CS2::CCSPlayerController* ObserverController::FindControllerBySteam64UID(Steam64
         }
     }
     catch (...) {
-        this->ISys().LogError("test");
+        this->ISys().LogError("FindControllerBySteam64UID 失败");
     }
     return pController;
 }
 
 void ObserverController::SetSpecMode(uint8_t mode) {
-    try {
-        auto* localPawn = this->CS2()->client.GetLocalPlayerPawn();
-        if (!localPawn) {
-            this->ISys().LogWarning("尝试在无本地实体情况下设置观战？");
-            return;
-        }
-        auto pObserverServices = MulNX::MRead(localPawn->pObserverServices());
-        auto* pTarget = pObserverServices->hObserverTarget();
-        MulNX::MWrite(pObserverServices->iObserverMode(), mode);
-        return;
-    }
-    catch (const std::runtime_error& e) {
-        this->ISys().LogError(std::format("在设置观战模式时发生错误：{}", e.what()));
-        return;
-    }
-    catch (...) {
-        this->ISys().LogError("在设置观战模式时发生未知错误");
-        return;
-    }
+    this->ISys().AsyncCommand(std::format("spec_mode {}", mode));
 }
 
 bool ObserverController::SpecHandle(CS2::CHandleBase handle) {
@@ -176,8 +145,8 @@ bool ObserverController::SpecHandle(CS2::CHandleBase handle) {
         }
         auto pObserverServices = MulNX::MRead(localPawn->pObserverServices());
         auto* pTarget = pObserverServices->hObserverTarget();
-        MulNX::MWrite(&pTarget->handle, handle.handle);
         MulNX::MWrite(pObserverServices->iObserverMode(), (uint8_t)2);
+        MulNX::MWrite(&(pTarget->value), handle.value);
         return true;
     }
     catch (const std::runtime_error& e) {
@@ -187,5 +156,27 @@ bool ObserverController::SpecHandle(CS2::CHandleBase handle) {
     catch (...) {
         this->ISys().LogError("在设置观战目标时发生未知错误");
         return false;
+    }
+}
+
+void ObserverController::SpecSteam64UID(Steam64UID uid) {
+    int counter = 0;
+    while (true) {
+        try {
+            auto* pController = this->FindControllerBySteam64UID(uid);
+            auto handle = MulNX::MRead(pController->m_hPlayerPawn());
+            MulNX::Message msg("Observe/SpecHandle"_hash);
+            msg.p1.low<CS2::CHandleBase>() = handle;
+            this->ISys().PublishAsync(std::move(msg));
+            break;
+        }
+        catch (const std::exception& e) {
+            this->ISys().LogError(I18n("ob.Spec64.error", e.what()));
+            ++counter;
+            if (counter == 10) {
+                return;
+            }
+            continue;
+        }
     }
 }

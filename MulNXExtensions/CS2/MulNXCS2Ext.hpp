@@ -20,6 +20,7 @@
 #include "DemoSystem/DemoHelper/DemoHelper.hpp"
 #include "DemoSystem/DemoAnalyzer/DemoAnalyzer.hpp"
 #include "DemoSystem/DemoRecorder/DemoRecorder.hpp"
+#include "DemoSystem/RecordTaskMaker/RecordTaskMaker.hpp"
 
 #include "PlayerHub/PlayerHub.hpp"
 #include "PlayerHub/NameController/NameController.hpp"

@@ -97,6 +97,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<DemoAnalyzer>("DemoAnalyzer")
             .CreateModule<DemoHelper>("DemoHelper")
             .CreateModule<DemoJSONReader>("DemoJSONReader")
+            .CreateModule<RecordTaskMaker>("RecordTaskMaker")
             .CreateModule<DemoRecorder>("DemoRecorder")
             // 较为上层
             .CreateModule<MiniMap>("MiniMap")

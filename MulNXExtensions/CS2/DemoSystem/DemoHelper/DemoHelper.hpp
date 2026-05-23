@@ -1,7 +1,5 @@
 #pragma once
 
-#include <MulNX/MulNX.hpp>
-#include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 class DemoHelper final :public CSModuleBase {

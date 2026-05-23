@@ -294,3 +294,10 @@ skin:
   apply: 应用皮肤设置
   target:
     index: 目标皮肤索引
+
+ob:
+  Spec64:
+    error: 在通过64位UID设置观战目标时发生错误：{}
+
+smoke:
+  error: 在设置颜色时遇到错误：{}
