@@ -91,13 +91,8 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
     this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
-        this->GlobalVars->SystemReady.store(true, std::memory_order_release);
-        this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
-        this->pGraphicsManager->BuildNew();
-        this->pGraphicsManager->OnPresent();
-        // UI 系统渲染
-        this->pUISystem->HandleUpdate();
-        this->pUISystem->Render();
+        this->GlobalVars->SystemReady.store(true);
+        hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11AndImGuiInit(hk, ctx);});
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkPresent->Attach();
@@ -130,17 +125,17 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
         }).value();
     this->hkWndProc->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "WndProc"));
+}
 
-    // 交换链 RTV
-    ID3D11Texture2D* buf = nullptr;
-    pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buf);
-    this->pGraphicsManager->pd3dDevice->CreateRenderTargetView(buf, nullptr, &this->pGraphicsManager->view);
-    buf->Release();
+MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx) {
+    hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnPresent(hk, ctx);});
 
     // ImGui 初始化
     ImGui::CreateContext();
     ImGui_ImplWin32_Init(this->CS2hWnd);
     ImGui_ImplDX11_Init(this->pGraphicsManager->pd3dDevice, this->pGraphicsManager->pd3dContext);
+
+    this->pGraphicsManager->ReleaseOld();
 
     // 创建绿幕着色器资源
     this->pGraphicsManager->CreateGreenScreenAssets();
@@ -159,6 +154,19 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
         };
 
     this->CreateMainDraw();
+
+    return MulNX::Hook::Then::Continue;
+}
+
+MulNX::Hook::Then HookManager::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
+    this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
+    this->pGraphicsManager->BuildNew();
+    this->pGraphicsManager->OnPresent();
+    // UI 系统渲染
+    this->pUISystem->HandleUpdate();
+    this->pUISystem->Render();
+
+    return MulNX::Hook::Then::Continue;
 }
 
 MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {

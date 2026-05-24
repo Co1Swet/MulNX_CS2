@@ -15,8 +15,19 @@ bool DemoRecorder::Window(MulNX::UINode* node) {
         this->ISys().PublishAsync("Demo/Record/Clear"_hash);
     }
 
-    ImGui::Text("当前队列：");
+
     std::shared_lock lock(this->smutex);
+
+    int ticksToRecord = 0;
+
+    for (const auto& recordTask : this->recordTaskBufferQueue) {
+        ticksToRecord += (recordTask.tickEnd - recordTask.tickStart);
+    }
+
+    ImGui::Text("待录制时间：");
+    MulNX::UI::ShowTime(ticksToRecord);
+    ImGui::SeparatorText("当前队列");
+
     for (const auto& recordTask : this->recordTaskBufferQueue) {
         ImGui::Text(recordTask.desc.c_str());
     }
@@ -103,8 +114,8 @@ MulNX::CoTask DemoRecorder::Main() {
         RecordTask task;
         co_await this->WaitUntil([&]()->bool { return this->PeekQueue(task); });
 
-        this->currentRecordTaskStartTick = task.tick - this->preRecordTicks;
-        this->currentRecordTaskEndTick = task.tick + postRecordTicks;
+        this->currentRecordTaskStartTick = task.tickStart;
+        this->currentRecordTaskEndTick = task.tickEnd;
         auto uid = task.uid;
         this->currentRecordTask = std::move(task);
 
@@ -155,8 +166,12 @@ MulNX::CoTask DemoRecorder::Main() {
             + " to " + std::to_string(this->currentRecordTaskEndTick));
 
         // 等待录制结束 tick
-        co_await this->WaitUntil([this] {
-            return this->CS2Time()->GetDemoTick() >= this->currentRecordTaskEndTick;
+        co_await this->WaitUntil([this, &task] {
+            auto curTick = this->CS2Time()->GetDemoTick();
+            if (task.onPlaying) {
+                task.onPlaying(curTick, &task);
+            }
+            return curTick >= this->currentRecordTaskEndTick;
             });
 
         // 暂停或停止录制

@@ -116,6 +116,11 @@ public:
     }
 };
 
+// class ICommandCallback {
+// public:
+//     virtual void CommandCallback(void* _unknown1_rdx_ptr, CCommand* pArgs) = 0;
+// };
+
 class C_ConVarSystem {
     friend class ConsoleManager;
 private:

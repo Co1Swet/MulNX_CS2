@@ -295,6 +295,10 @@ void* MulNX::Hook::GetRawStackAddr(RegContext* ctx) {
     return reinterpret_cast<void*>(ctx->rsp + this->frameSize);
 }
 
+void MulNX::Hook::ResetCallback(std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback) {
+    this->callback = std::move(callback);
+}
+
 MulNX::Hook::Result MulNX::Hook::Attach() {
     __try {
         if (this->attached)return MulNX::Hook::Result::Attached;

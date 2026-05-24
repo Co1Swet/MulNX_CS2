@@ -1,4 +1,5 @@
 #include "UI.hpp"
+#include <format>
 
 bool MulNX::UI::SliderFloat(const char* label, std::atomic<float>& av, float v_min, float v_max, const char* format, ImGuiSliderFlags flags) {
     float v = av.load(std::memory_order_acquire);
@@ -24,42 +25,6 @@ bool MulNX::UI::Checkbox(const char* label, std::atomic<bool>& av) {
     }
     return changed;
 }
-MulNX::UI::RAIIWindow::RAIIWindow(const char* name) {
-    this->showed = true;
-    ImGui::Begin(name);
-}
-MulNX::UI::RAIIWindow::RAIIWindow(const char* name, std::atomic<bool>& showWindow) {
-    this->showed = showWindow.load(std::memory_order_acquire);
-    if (this->showed) {
-        bool open = this->showed;
-        ImGui::Begin(name, &open);
-        showWindow.store(open, std::memory_order_release);
-    }
-}
-MulNX::UI::RAIIWindow::~RAIIWindow() {
-    if (this->showed) {
-        ImGui::End();
-    }   
-}
-MulNX::UI::RAIIWindow::operator bool()const {
-    return this->showed;
-}
-
-MulNX::UI::RAIIChild::RAIIChild(const char* str_id, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) {
-    this->showed = true;
-    if (this->showed) {
-        bool open = this->showed;
-        ImGui::BeginChild(str_id, size_arg, child_flags, window_flags);
-    }
-}
-MulNX::UI::RAIIChild::~RAIIChild() {
-    if (this->showed) {
-        ImGui::EndChild();
-    }
-}
-MulNX::UI::RAIIChild::operator bool()const {
-    return this->showed;
-}
 
 bool MulNX::UI::DrawWorldLine(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const TransInfo& info, ImU32 col, float thickness) {
     DirectX::XMFLOAT2 D21, D22;
@@ -75,9 +40,78 @@ bool MulNX::UI::DrawWorldPoint(const DirectX::XMFLOAT3& pos, const TransInfo& in
     DirectX::XMFLOAT2 D2;
     if (!MulNX::Math::WorldToScreen(pos, D2, info.pMatrix, info.windowWidth, info.windowHeight))return false;
     auto drawList = ImGui::GetBackgroundDrawList();
-    drawList->AddCircleFilled({D2.x,D2.y}, 3.0f, IM_COL32(0, 0, 0, 255));
+    drawList->AddCircleFilled({ D2.x,D2.y }, 3.0f, IM_COL32(0, 0, 0, 255));
     if (label) {
         drawList->AddText({ D2.x + 2,D2.y + 2 }, IM_COL32(0, 0, 0, 255), label);
     }
     return true;
+}
+
+void MulNX::UI::ShowTime(int tick) {
+    int totalSeconds = tick / 64;               // 总秒数（整数）
+    int minutes = totalSeconds / 60;            // 分钟
+    int secs = totalSeconds % 60;               // 秒
+    int subTick = tick % 64;                    // 秒内偏移，范围 0 ~ 63
+
+    ImGui::Text("时间：%d:%02d -- %02d", minutes, secs, subTick);
+}
+
+MulNX::UI::RAIIWindow::RAIIWindow(const char* name) {
+    this->showed = true;
+    ImGui::Begin(name);
+}
+MulNX::UI::RAIIWindow::RAIIWindow(const char* name, std::atomic<bool>& showWindow) {
+    this->showed = showWindow.load(std::memory_order_acquire);
+    if (this->showed) {
+        bool open = this->showed;
+        ImGui::Begin(name, &open);
+        showWindow.store(open, std::memory_order_release);
+    }
+}
+MulNX::UI::RAIIWindow::~RAIIWindow() {
+    if (this->showed) {
+        ImGui::End();
+        this->showed = false;
+    }
+}
+MulNX::UI::RAIIWindow::operator bool()const {
+    return this->showed;
+}
+
+MulNX::UI::RAIIChild::RAIIChild(const char* str_id, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) {
+    this->showed = true;
+    ImGui::BeginChild(str_id, size_arg, child_flags, window_flags);
+}
+MulNX::UI::RAIIChild::~RAIIChild() {
+    if (this->showed) {
+        ImGui::EndChild();
+        this->showed = false;
+    }
+}
+MulNX::UI::RAIIChild::operator bool()const {
+    return this->showed;
+}
+
+MulNX::UI::RAIITable::RAIITable(const char* str_id, const std::vector<std::string>& columns, ImGuiTableFlags flags, const ImVec2& outer_size, float inner_width) {
+    this->showed = ImGui::BeginTable(str_id, columns.size(), flags, outer_size, inner_width);
+    if (this->showed) {
+        for (const auto& column : columns) {
+            ImGui::TableSetupColumn(column.c_str());
+        }
+        ImGui::TableHeadersRow();
+    }
+}
+MulNX::UI::RAIITable::~RAIITable() {
+    if (this->showed) {
+        ImGui::EndTable();
+        this->showed = false;
+    }
+}
+MulNX::UI::RAIITable::operator bool()const {
+    return this->showed;
+}
+
+bool MulNX::UI::SmartButton::Next(const std::string& label, const ImVec2& size) {
+    ++this->counter;
+    return ImGui::Button(std::format("{}##{}", label, this->counter).c_str(), size);
 }

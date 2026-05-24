@@ -104,7 +104,8 @@ bool DemoSystem::Window(MulNX::UINode* node) {
 
     ImGui::Separator();
 
-    node->CallUINode("DemoJSONReader");
+    node->CallUINode("RecordTaskMaker");
+    node->CallUINode("RecordTaskConfiger");
     node->CallUINode("DemoHelper");
     node->CallUINode("DemoRecorder");
     return true;

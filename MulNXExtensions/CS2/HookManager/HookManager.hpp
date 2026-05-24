@@ -20,6 +20,8 @@ private:
     std::unique_ptr<MulNX::Hook> hkClearDepthStencilView = nullptr;
     // Present 钩子
     std::unique_ptr<MulNX::Hook> hkPresent = nullptr;
+    MulNX::Hook::Then D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx);
+    MulNX::Hook::Then HandleOnPresent(MulNX::Hook* hk, RegContext* ctx);
     // ResizeBuffers 钩子
     std::unique_ptr<MulNX::Hook> hkResizeBuffers = nullptr;
     // 窗口过程钩子

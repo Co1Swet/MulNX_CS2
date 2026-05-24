@@ -5,6 +5,16 @@
 #include <map>
 using Steam64UID = uint64_t;
 
+class RecordTask {
+public:
+    std::string desc;
+    Steam64UID uid;
+    int tickStart;
+    int tickEnd;
+    int tickMain;
+    std::function<bool(int curTick, RecordTask* pRTask)>onPlaying;
+};
+
 namespace Demo {
     struct Team {
         std::string name;
@@ -17,10 +27,16 @@ namespace Demo {
 
     struct KillEvent {
         int tick;
+        int roundNumber;
         Steam64UID killerSteamId;
         Steam64UID victimSteamId;
         Steam64UID assisterSteamId;
         std::string weaponName;
+    };
+
+    struct PlayerRoundInfo {
+        std::vector<KillEvent> killEvents;
+        std::optional<KillEvent> Bekilled;
     };
 
     struct Player {
@@ -32,10 +48,11 @@ namespace Demo {
         int deathCount;
         int assistCount;
 
-        std::vector<KillEvent> killEvents;
+        std::map<int, PlayerRoundInfo>roundInfo;
     };
 
     struct Info {
+        std::string demoFileName;
         std::string mapName;
         int tickCount;
         Team teamA;

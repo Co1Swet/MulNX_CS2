@@ -2,8 +2,9 @@
 
 #include <MulNXThirdParty/imgui_d11/imgui.h>
 #include <MulNXThirdParty/imgui_d11/imgui_stdlib.h>
-#include <atomic>
 #include <MulNX/Base/Math/Math.hpp>
+#include <atomic>
+#include <vector>
 
 namespace MulNX {
     class TransInfo {
@@ -20,6 +21,9 @@ namespace MulNX {
 
         bool DrawWorldPoint(const DirectX::XMFLOAT3& pos, const TransInfo& info, const char* label);
         bool DrawWorldLine(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const TransInfo& info, ImU32 col, float thickness = 1.0f);
+
+        void ShowTime(int tick);
+
         class RAIIWindow {
             bool showed;
         public:
@@ -37,6 +41,21 @@ namespace MulNX {
             RAIIChild(const char* str_id, const ImVec2& size = ImVec2(0, 0), ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0);
             ~RAIIChild();
             explicit operator bool() const;
+        };
+
+        class RAIITable {
+            bool showed;
+        public:
+            RAIITable() = delete;
+            RAIITable(const char* str_id, const std::vector<std::string>& columns, ImGuiTableFlags flags = 0, const ImVec2& outer_size = ImVec2(0.0f, 0.0f), float inner_width = 0.0f);
+            ~RAIITable();
+            explicit operator bool() const;
+        };
+
+        class SmartButton {
+            int counter = 0;
+        public:
+            bool Next(const std::string& label, const ImVec2& size = ImVec2(0, 0));
         };
     }
 }

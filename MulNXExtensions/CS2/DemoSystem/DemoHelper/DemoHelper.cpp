@@ -10,13 +10,7 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
 
     auto tick = this->CS2Time()->GetDemoTick();
     ImGui::Text("当前demotick：%d", tick);
-
-    int totalSeconds = tick / 64;               // 总秒数（整数）
-    int minutes = totalSeconds / 60;            // 分钟
-    int secs = totalSeconds % 60;               // 秒
-    int subTick = tick % 64;                    // 秒内偏移，范围 0 ~ 63
-
-    ImGui::Text("时间：%d:%02d -- %02d", minutes, secs, subTick);
+    MulNX::UI::ShowTime(tick);
 
     if (ImGui::Button("标记当前时间")) {
         MulNX::Message msg("DemoHelper/MarkTime"_hash);

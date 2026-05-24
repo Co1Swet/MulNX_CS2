@@ -1,14 +1,8 @@
 #pragma once
 
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
+#include <MulNXExtensions/CS2/DemoSystem/DemoStruct.hpp>
 #include <deque>
-
-class RecordTask {
-public:
-    std::string desc;
-    Steam64UID uid;
-    int tick;
-};
 
 class DemoJSONReader;
 class DemoRecorder final : public CSModuleBase {
@@ -31,8 +25,4 @@ class DemoRecorder final : public CSModuleBase {
 public:
     bool Init() override;
     void ProcessMsg(MulNX::Message& msg) override;
-
-    // 配置参数：录制窗口相对于事件 tick 的前后偏移（单位：tick）
-    int preRecordTicks = 300;
-    int postRecordTicks = 300;
 };
