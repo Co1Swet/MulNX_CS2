@@ -260,10 +260,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
             .add(RSP, 0x28) // 回收影子空间
 
             // 重新保存寄存器环境
-            .mov(Mem(R13, offsetof(RegContext, rcx)), RCX)
-            .mov(Mem(R13, offsetof(RegContext, rdx)), RDX)
-            .mov(Mem(R13, offsetof(RegContext, r8)), R8)
-            .mov(Mem(R13, offsetof(RegContext, r9)), R9)
+            .mov(Mem(R13, offsetof(RegContext, rax)), RAX)
 
             .add(RSP, R12) // 回收拷贝栈空间
 

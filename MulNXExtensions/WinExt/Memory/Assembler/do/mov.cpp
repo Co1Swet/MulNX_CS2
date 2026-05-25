@@ -45,7 +45,7 @@ Asm::Assembler& Asm::Assembler::mov(Mem mem, Reg src) {
 
     // 确定位移和 mod
     int disp_bytes;
-    int mod = get_mod_and_disp(mem.disp, disp_bytes);
+    int mod = get_mod_and_disp(mem.base, mem.disp, disp_bytes);
     bool need_sib = (base_info.code & 7) == 4;  // RSP 或 R12 编码低3位为100
 
     // 构建 REX 前缀
@@ -95,7 +95,7 @@ Asm::Assembler& Asm::Assembler::mov(Reg dst, Mem mem) {
     auto base_info = get_reg_info(mem.base);
 
     int disp_bytes;
-    int mod = get_mod_and_disp(mem.disp, disp_bytes);
+    int mod = get_mod_and_disp(dst, mem.disp, disp_bytes);
     bool need_sib = (base_info.code & 7) == 4;
 
     uint8_t rex = 0x48;

@@ -21,7 +21,7 @@ namespace MulNX {
 
 
             // 根据位移量确定 mod 字段和位移大小（返回 mod 值，并通过 bytes 输出位移字节数）
-            int get_mod_and_disp(int64_t disp, int& bytes);
+            int get_mod_and_disp(Reg base, int64_t disp, int& bytes);
             struct RegInfo {
                 uint8_t code;    // 硬件编码 (0-15)
                 bool is_ext;     // 是否扩展寄存器 (R8-R15)

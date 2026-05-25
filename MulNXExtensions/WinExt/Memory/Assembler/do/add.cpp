@@ -28,7 +28,7 @@ Asm::Assembler& Asm::Assembler::add(Reg dst, Mem src) {
     auto base_info = get_reg_info(src.base);
 
     int disp_bytes;
-    int mod = get_mod_and_disp(src.disp, disp_bytes);
+    int mod = get_mod_and_disp(dst, src.disp, disp_bytes);
     bool need_sib = (base_info.code & 7) == 4; // RSP/R12
 
     uint8_t rex = 0x48;
@@ -71,7 +71,7 @@ Asm::Assembler& Asm::Assembler::add(Mem dst, Reg src) {
     auto base_info = get_reg_info(dst.base);
 
     int disp_bytes;
-    int mod = get_mod_and_disp(dst.disp, disp_bytes);
+    int mod = get_mod_and_disp(src, dst.disp, disp_bytes);
     bool need_sib = (base_info.code & 7) == 4;
 
     uint8_t rex = 0x48;
@@ -142,7 +142,7 @@ Asm::Assembler& Asm::Assembler::add(Mem dst, int32_t imm) {
     bool use_imm8 = (imm >= -128 && imm <= 127);
 
     int disp_bytes;
-    int mod = get_mod_and_disp(dst.disp, disp_bytes);
+    int mod = get_mod_and_disp(dst.base, dst.disp, disp_bytes);
     bool need_sib = (base_info.code & 7) == 4;
 
     uint8_t rex = 0x48;

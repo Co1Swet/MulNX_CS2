@@ -1,11 +1,7 @@
 #pragma once
 
 #include <MulNX/MulNX.hpp>
-
-#include <unordered_map>
-#include <cstdint>
-#include <string>
-#include <shared_mutex>
+#include <MulNXExtensions/WinExt/vtable/vtable.hpp>
 
 // command to convars and concommands
 enum EConVarFlag : int {
@@ -116,34 +112,72 @@ public:
     }
 };
 
-// class ICommandCallback {
-// public:
-//     virtual void CommandCallback(void* _unknown1_rdx_ptr, CCommand* pArgs) = 0;
-// };
+class CCommand {
+public:
+    CCommand() = delete;
+    int unkSize;
+    char* pad;
+    char* pRawString;
+};
+
+class ICommandCallback {
+public:
+    virtual void CommandCallback(void* rdx, CCommand* pArgs) = 0;
+};
+
+// size: 8*8 Bytes
+class CCmd {
+public:
+    const char* m_pszName;
+    const char* m_pszHelpString;
+    int64_t            m_nFlags;
+    ICommandCallback* m_pCommandCallback;
+    size_t           _unknown_32 = 0x0101;
+    size_t           _unknown_40 = 0;
+    size_t           _unknown_48 = 0x01;
+    uint64_t     m_NextCommand = 0xFFFFFFFF;
+
+    CCmd(const char* pszName, const char* pszHelpString, int64_t nFlags, ICommandCallback* pCommandCallback) {
+        m_pszName = pszName;
+        m_pszHelpString = pszHelpString;
+        m_nFlags = nFlags;
+        m_pCommandCallback = pCommandCallback;
+    }
+};
+
+// 将自由函数转为 ICommandCallback 的适配器
+class MulNXCS2CmdCallback : public ICommandCallback {
+    std::function<void(CCommand*)> m_func;
+public:
+    MulNXCS2CmdCallback(std::function<void(CCommand*)>&& f) : m_func(std::move(f)) {}
+    void CommandCallback(void*, CCommand* args) override {
+        m_func(args);
+    }
+};
+
+inline void MulNXTest_impl(CCommand* args) {
+    MessageBoxW(nullptr, L"MulNXTest 命令已触发！", L"Hook测试", MB_OK | MB_ICONINFORMATION);
+}
+
 
 class C_ConVarSystem {
     friend class ConsoleManager;
-private:
-    //控制台变量系统线程锁
-    std::shared_mutex ConVarSystemMutex{};
-    //缓存已获取的Cvar
-    std::unordered_map<std::string, C_ConVar*> CvarMap;
 public:
     //控制台变量定位获取
 
     //得到第一个Cvar的迭代器
-    void* GetFirstCvarIterator(uint64_t& idx)const;
+    VExecutor<void* (uint64_t&)>GetFirstCvarIterator{};
     //得到下一个Cvar的迭代器
-    void* GetNextCvarIterator(uint64_t& idx)const;
+    VExecutor<void* (uint64_t&, uint64_t)>GetNextCvarIterator{};
     //通过迭代器ID获取Cvar
-    C_ConVar* GetCVarByIndex(uint64_t index)const;
+    VExecutor<C_ConVar* (uint64_t)>GetCVarByIndex{};
     //通过名称获取Cvar
     C_ConVar* GetCVarByName(const char* var_name)const;
 
-    //游戏内Cvar系统接口地址
-    uintptr_t Address;
     void UnlockHiddenCVars(int& Count)const;
     void LockAllCvars(int& Count)const;
+
+    bool Load(uintptr_t addr);
 
     //通过名称获取Cvar，使用缓存加速
     C_ConVar* GetCvar(const std::string& CvarName);

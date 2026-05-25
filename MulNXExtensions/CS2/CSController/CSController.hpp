@@ -31,12 +31,22 @@ public:
 };
 
 class CSController final :public MulNX::ModuleBase {
+    std::unique_ptr<MulNX::Hook>hkSource2Client002_Init = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
+    std::unique_ptr<MulNX::Hook>hkVEngineCvar007_RegisterConCommand = nullptr;
+    std::unique_ptr<MulNX::Hook>hkPlaydemo = nullptr;
+    class MulNXCmd {
+    public:
+        std::string name;
+        std::string help;
+        MulNXCS2CmdCallback callback;
+    };
+    std::vector<MulNXCmd> CS2Cmds{};
+    MulNX::Hook::Then HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx);
     uintptr_t retAddrForShowSpeaker = 0;
 
     D_GameData CS2EBGameData{};
-    void* Source2EngineToClient001 = nullptr;
     // 控制台指令执行器
     VExecutor<void(int, const char*, int)> executor{};
     // 控制台变量系统
@@ -60,6 +70,11 @@ class CSController final :public MulNX::ModuleBase {
     std::atomic<bool> IDemoForceReturn = false;
     std::atomic<bool> IDemoForceReturnValue = true;
     void Window(MulNX::UINode* node);
+
+    void OnClientLoad(MulNX::Message& msg);
+    void OnEngine2Load(MulNX::Message& msg);
+    void OnTier0Load(MulNX::Message& msg);
+    void OnPanoramaLoad(MulNX::Message& msg);
 public:
     std::vector<std::function<bool(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*)>>handlesControlPlayer{};
     
@@ -76,4 +91,6 @@ public:
     
     bool SpecPlayer(int IndexInMap);
     D_Player& GetPlayerMsg(int Index);
+
+    std::function<void(std::string&&, std::string&&, std::function<void(CCommand*)>&&)>RegisterCS2Cmd = nullptr;
 };

@@ -28,7 +28,7 @@ bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {
                 std::string Name = var->szName ? var->szName : "未知";
                 this->ISys().LogInfo("控制台命令：" + Name);
             }
-            this->CS2()->GetCvarSystem().GetNextCvarIterator(idx);
+            this->CS2()->GetCvarSystem().GetNextCvarIterator(idx, idx);
         }
         this->ISys().LogLine();
     }
@@ -99,12 +99,10 @@ bool GameSettingsManager::GameHudMenu(MulNX::UINode* node) {
 }
 
 bool GameSettingsManager::Init() {
-    this->SendTask("CSControl", [this]() {
+    this->ISys().SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
         C_ConVarSystem& CVarSystem = this->CS2()->GetCvarSystem();
 
-        if (!CVarSystem.Address)return true;
         auto spec_show_xray = CVarSystem.GetCvar("spec_show_xray");
-        if (!spec_show_xray)return true;
 
         this->GameSettings.ScreenSettings.spec_show_xray = spec_show_xray->GetPtr<int>();
 
