@@ -7,6 +7,7 @@
 #include <MulNXExtensions/VirtualUser/VirtualUser.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
+#include <MulNXExtensions/MediaResourceManager/MediaResourceManager.hpp>
 #include <MulNXExtensions/MediaRemoter/MediaRemoter.hpp>
 #include <MulNXExtensions/MediaProcesser/MediaProcesser.hpp>
 
@@ -95,6 +96,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<VirtualUser>("VirtualUser")
             .CreateModule<GameCfgManager>("GameCfgManager")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
+            .CreateModule<MediaResourceManager>("MediaResourceManager")
             .CreateModule<MediaRemoter>("MediaRemoter")
             .CreateModule<MediaProcesser>("MediaProcesser")
             // 管理
