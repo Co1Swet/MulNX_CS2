@@ -1,0 +1,137 @@
+# Based on https://habrahabr.ru/post/329264/
+# Additional GCC / clang versions:
+#   - https://docs.travis-ci.com/user/languages/cpp/
+#   - https://gist.github.com/nabijaczleweli/e53219d037c4ccb34f3c
+# Useful samples:
+#   - https://github.com/catchorg/Catch2/blob/master/.travis.yml
+#   - https://github.com/pinam45/dynamic_bitset/blob/master/.travis.yml
+#
+
+dist: focal
+
+language: cpp
+
+git:
+  #depth: 1
+  submodules: true
+
+cache:
+    apt: true
+
+addons:
+    #apt:
+        #sources: &apt_sources
+        #    - ubuntu-toolchain-r-test
+        #packages:
+        #    - meson
+        #    - g++-5
+
+    homebrew: &homebrew
+        packages:
+            - python
+            - ffmpeg
+            - meson
+
+# Is there any way to avoid duplication for combination of BUILD_CONFIGURATION and COMPILER?
+# in case, when non-default compiler is used?
+jobs:
+    include:
+        # GCC 10 / Debug
+        - os: linux
+          addons: &gcc10
+            apt:
+                #sources: *apt_sources
+                packages:
+                    - g++-10
+          compiler: gcc
+          env:
+            - MATRIX_EVAL="BUILD_TYPE=Debug && CC=gcc-10 && CXX=g++-10"
+
+        # GCC 10 / Release
+        - os: linux
+          addons: *gcc10
+          compiler: gcc
+          env:
+            - MATRIX_EVAL="BUILD_TYPE=Release && CC=gcc-10 && CXX=g++-10"
+
+        # GCC 7 / Debug
+        - os: linux
+          addons: &gcc7
+            apt:
+              #sources: *apt_sources
+              packages:
+                - g++-7
+          compiler: gcc
+          env:
+            - MATRIX_EVAL="BUILD_TYPE=Debug && CC=gcc-7 && CXX=g++-7"
+
+        # GCC 7 / Release
+        - os: linux
+          addons: *gcc7
+          compiler: gcc
+          env:
+            - MATRIX_EVAL="BUILD_TYPE=Release && CC=gcc-7 && CXX=g++-7"
+
+        # Xenial, GCC 5.4
+        - os: linux
+          dist: xenial
+          compiler: gcc
+          env:
+            - MATRIX_EVAL="BUILD_TYPE=Release && SKIP_MESON=yes"
+
+        - os: osx
+          osx_image: xcode11.3
+          compiler: clang
+          env:
+            - MATRIX_EVAL="BUILD_TYPE=Debug"
+
+        - os: osx
+          osx_image: xcode11.3
+          compiler: clang
+          env:
+            - MATRIX_EVAL="BUILD_TYPE=Release"
+
+#    exclude:
+        # exclude some elements from build matrix:
+#        - os:       osx
+#          compiler: gcc
+
+        #- compiler: gcc
+        #  env: BUILD_CONFIGURATION=Debug
+
+        #- compiler: gcc
+        #  env: BUILD_CONFIGURATION=Release
+
+#before_install:
+#    - eval "${MATRIX_EVAL}"
+
+install:
+    # setup env:
+    - eval "${MATRIX_EVAL}"
+    - source ci/travis/install-$TRAVIS_OS_NAME.sh
+
+script:
+    - eval "${MATRIX_EVAL}"
+    # build and test project with cmake:
+    - mkdir cmake-build
+    - cd cmake-build
+    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+    - cmake --build .
+    - ctest --output-on-failure
+    - cd ..
+    # build and test project with meson:
+    - source ci/travis/meson-build.sh
+
+#deploy:
+#    # push tagged-commits to GitHub Releases:
+#    provider:     releases
+#    file:         <package-file>
+#    skip_cleanup: true
+#    overwrite:    true
+#
+#    api_key:
+#        secure:   <encrypted-github-token>
+#
+#    on:
+#        tags:     true
+

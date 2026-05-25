@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+
+meson_build_type=release
+
+if [ "$BUILD_TYPE" = "Release" ]; then
+    meson_build_type=release
+elif [ "$BUILD_TYPE" = "Debug" ]; then
+    meson_build_type=debug
+fi
+
+meson_build() {
+    mkdir meson-build || return 1
+    cd meson-build || return 1
+    meson setup .. || return 1
+    meson configure --buildtype $meson_build_type || return 1
+    # Old Ubuntu Meson does not recognize -C ., OSX require it
+    if [ "$TRAVIS_OS_NAME" = "osx" -o "$OS_NAME" = "macos-latest" ]; then
+        meson compile -C . || return 1
+    else
+        meson compile || return 1
+    fi
+    meson test || return 1
+    cd ..
+}
+
+main() {
+    if [ -n "$SKIP_MESON" -a "$SKIP_MESON" != "false" ]; then
+        echo "Meson build skipped"
+        return 0
+    fi
+
+    meson_build
+    return $?
+}
+
+main

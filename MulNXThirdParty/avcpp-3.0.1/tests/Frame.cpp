@@ -1,0 +1,467 @@
+#include <catch2/catch_test_macros.hpp>
+
+#include <vector>
+
+#include "avcpp/frame.h"
+
+#ifdef _MSC_VER
+# pragma warning (disable : 4702) // Disable warning: unreachable code
+#endif
+
+
+using namespace std;
+
+namespace {
+
+vector<uint8_t> rgb24_raw_data;
+vector<uint8_t> i420_raw_data;
+vector<uint8_t> nv12_raw_data;
+
+constexpr av::PixelFormat rgb24_pixfmt{AV_PIX_FMT_RGB24};
+constexpr av::PixelFormat i420_pixfmt{AV_PIX_FMT_YUV420P};
+constexpr av::PixelFormat nv12_pixfmt{AV_PIX_FMT_NV12};
+
+constexpr int width = 640;
+constexpr int height = 480;
+constexpr int alignment = 1;
+
+}
+
+TEST_CASE("Core functionality", "[Frame]")
+{
+
+    SECTION("setPts/Dts") {
+        {
+            av::VideoFrame frame;
+            frame.setPts({1000, {10000, 1}});
+            CHECK(frame.raw()->pts == 1000);
+            CHECK(frame.timeBase() == av::Rational{10000, 1});
+        }
+        {
+            av::VideoFrame frame;
+            frame.setPts({1000, {10000, 1}});
+            CHECK(frame.raw()->pts == 1000);
+            CHECK(frame.timeBase() == av::Rational{10000, 1});
+            frame.setTimeBase({1000, 1});
+            CHECK(frame.raw()->pts == 10000);
+            CHECK(frame.timeBase() == av::Rational{1000, 1});
+        }
+    }
+
+    SECTION("Timebase Copy/Clone") {
+        const av::Rational tb{1000,1};
+        av::VideoFrame in_frame{AV_PIX_FMT_RGB24, 1920, 1080};
+        CHECK(in_frame.timeBase() == av::Rational());
+        in_frame.setTimeBase(tb);
+        CHECK(in_frame.timeBase() == tb);
+
+        // copy ctor
+        {
+            auto frame = in_frame;
+            CHECK(frame.timeBase() == tb);
+        }
+
+        // move ctor
+        {
+            auto tmp = in_frame;
+            CHECK(tmp.timeBase() == tb);
+            auto frame = std::move(tmp);
+            CHECK(frame.timeBase() == tb);
+        }
+
+        // copy operator
+        {
+            av::VideoFrame frame;
+            frame = in_frame;
+            CHECK(frame.timeBase() == tb);
+        }
+
+        // move operator
+        {
+            auto tmp = in_frame;
+            CHECK(tmp.timeBase() == tb);
+            av::VideoFrame frame;
+            frame = std::move(tmp);
+            CHECK(frame.timeBase() == tb);
+        }
+
+        // clone
+        {
+            auto frame = in_frame.clone();
+            CHECK(frame.timeBase() == tb);
+        }
+    }
+
+#if AVCPP_HAS_FRAME_SIDE_DATA
+    struct TestNullBufferDeleter {
+        static void free(void *opaque, uint8_t* data) {
+            if (opaque)
+                static_cast<TestNullBufferDeleter*>(opaque)->free(data);
+        }
+
+        void free(uint8_t* data) {
+            deleted = true;
+        }
+
+        bool deleted = false;
+    };
+
+    TestNullBufferDeleter _deleter;
+
+    SECTION("Frame side data")
+    {
+        const av::Rational tb{1000,1};
+        av::VideoFrame in_frame{AV_PIX_FMT_RGB24, 1920, 1080};
+        CHECK(in_frame.timeBase() == av::Rational());
+        in_frame.setTimeBase(tb);
+        CHECK(in_frame.timeBase() == tb);
+
+        {
+            auto sd = in_frame.sideData(AV_FRAME_DATA_ICC_PROFILE);
+            REQUIRE(sd.empty());
+        }
+
+        // Iterate on null frame
+        {
+            av::VideoFrame frame;
+            // its a hack to gen null for the nested m_raw
+            //auto ptr = frame.raw();
+            frame.reset();
+            REQUIRE(frame.raw() == nullptr);
+
+            int count{};
+            for (auto&& sd : frame.sideData()) {
+                ++count;
+            }
+            REQUIRE(count == 0);
+        }
+
+        const int view_id = 31337;
+        const int64_t gop_time = 11223344;
+
+        // Add side data
+        {
+            REQUIRE_NOTHROW(in_frame.addSideData(AV_FRAME_DATA_ICC_PROFILE, std::span{(const uint8_t*)&view_id, sizeof(view_id)}));
+            REQUIRE(in_frame.sideDataCount() == 1);
+        }
+
+        // non-const
+        {
+            auto sd = in_frame.sideData(AV_FRAME_DATA_ICC_PROFILE);
+            REQUIRE(!sd.empty());
+            REQUIRE(sd.span().size() == sizeof(view_id));
+
+            int view_id_read{};
+            memcpy(&view_id_read, sd.span().data(), sizeof(view_id_read));
+            REQUIRE(view_id_read == view_id);
+        }
+
+        // const
+        {
+            auto const& frame = in_frame;
+            auto sd = frame.sideData(AV_FRAME_DATA_ICC_PROFILE);
+            REQUIRE(!sd.empty());
+            REQUIRE(sd.span().size() == sizeof(view_id));
+
+            int view_id_read{};
+            memcpy(&view_id_read, sd.span().data(), sizeof(view_id_read));
+            REQUIRE(view_id_read == view_id);
+        }
+
+        // Add side data again :: BufferRef
+        {
+            av::BufferRef ref{(const uint8_t*)&gop_time, sizeof(gop_time), 0};
+            REQUIRE_NOTHROW(in_frame.addSideData(AV_FRAME_DATA_GOP_TIMECODE, ref));
+            REQUIRE(in_frame.sideDataCount() == 2);
+            in_frame.sideDataRemove(AV_FRAME_DATA_GOP_TIMECODE);
+            REQUIRE(in_frame.sideDataCount() == 1);
+        }
+
+        // Add side data again :: BufferRef
+        {
+            // just wrap existing data without copy and owning
+            _deleter.deleted = false;
+            av::BufferRef ref{(uint8_t*)&gop_time, sizeof(gop_time), TestNullBufferDeleter::free, &_deleter};
+            REQUIRE_NOTHROW(in_frame.addSideData(AV_FRAME_DATA_GOP_TIMECODE, std::move(ref)));
+            REQUIRE(in_frame.sideDataCount() == 2);
+
+            auto sd = in_frame.sideData(AV_FRAME_DATA_GOP_TIMECODE);
+            REQUIRE(!sd.empty());
+            REQUIRE(sd.span().data() == (const uint8_t*)&gop_time);
+
+            in_frame.sideDataRemove(AV_FRAME_DATA_GOP_TIMECODE);
+            REQUIRE(in_frame.sideDataCount() == 1);
+            REQUIRE(_deleter.deleted == true);
+        }
+
+
+        // enum
+        {
+            av::BufferRef ref{(uint8_t*)&gop_time, sizeof(gop_time), TestNullBufferDeleter::free, &_deleter};
+            REQUIRE_NOTHROW(in_frame.addSideData(AV_FRAME_DATA_GOP_TIMECODE, std::move(ref)));
+            REQUIRE(in_frame.sideDataCount() == 2);
+
+            int items = 0;
+            bool gop_timecode_found = false;
+            bool view_id_found = false;
+            for (auto&& sd : in_frame.sideData()) {
+                ++items;
+                if (sd.type() == AV_FRAME_DATA_GOP_TIMECODE)
+                    gop_timecode_found = true;
+                if (sd.type() == AV_FRAME_DATA_ICC_PROFILE)
+                    view_id_found = true;
+            }
+            REQUIRE(items == 2);
+            REQUIRE(gop_timecode_found);
+            REQUIRE(view_id_found);
+        }
+    }
+#endif
+}
+
+TEST_CASE("Copy from raw data storage", "[VideoFrame][VideoFrameContruct]")
+{
+    SECTION("Packed RGB24 :: 1 plane") {
+        // Prepare image
+        auto &raw_data = rgb24_raw_data;
+        auto pixfmt = rgb24_pixfmt;
+
+        raw_data.resize(av_image_get_buffer_size(pixfmt, width, height, alignment));
+        
+        for (size_t i = 0; i < raw_data.size(); ++i) {
+            rgb24_raw_data[i] = (i%3)+1;
+        }
+
+        av::VideoFrame frame;
+
+        //REQUIRE_NOTHROW([&frame]() mutable {
+        //    frame = av::VideoFrame{rgb24_raw_data.data(), rgb24_raw_data.size(), rgb24_pixfmt, width, height, alignment};
+        //});
+
+        frame = av::VideoFrame{raw_data.data(), raw_data.size(), pixfmt, width, height, alignment};
+
+        CHECK(frame.raw());
+
+        CHECK(frame.raw()->data[0] == frame.data(0));
+        CHECK(frame.raw()->data[1] == frame.data(1));
+        CHECK(frame.raw()->data[2] == frame.data(2));
+        CHECK(frame.raw()->data[3] == frame.data(3));
+
+        CHECK(frame.data(0));
+        CHECK(frame.data(1) == nullptr);
+
+        CHECK(frame.data(0)[0] == 1);
+        CHECK(frame.data(0)[1] == 2);
+        CHECK(frame.data(0)[2] == 3);
+
+        // Frame can use internal alignments and paddings
+        CHECK(frame.size() >= raw_data.size());
+
+        // Buffer size get actual bytes count to hold image relative needed alignment
+        CHECK(frame.bufferSize(alignment) == raw_data.size());
+
+        vector<uint8_t> out;
+        error_code ec;
+        auto status = frame.copyToBuffer(out, alignment, ec);
+        CHECK(!status == !!ec); // status must be correspond to error holding
+        CHECK(status);
+        CHECK(!ec);
+
+        REQUIRE(equal(raw_data.begin(), raw_data.end(), out.begin()));
+
+        //frame.dump();
+
+        std::cout << frame.raw()->linesize[0]
+                << ", " << frame.raw()->linesize[1]
+                << ", " << frame.raw()->linesize[2]
+                << endl;
+
+        // Cases below can fail and can pass on different platforms:
+        //REQUIRE(std::equal(begin(i420_raw_data), end(i420_raw_data), frame.raw()->data[0]));
+    }
+
+    SECTION("Planar I420 :: 3 planes") {
+        // Prepare image
+        auto &raw_data = i420_raw_data;
+        auto pixfmt = i420_pixfmt;
+
+        raw_data.resize(av_image_get_buffer_size(pixfmt, width, height, alignment));
+
+        const uint8_t * const plane_y = raw_data.data();
+        const uint8_t * const plane_u = plane_y + height*width;
+        const uint8_t * const plane_v = plane_u + height*width/4;
+        const uint8_t * const plane_end = plane_v + height*width/4;
+        
+        auto ptr = raw_data.data();
+        // Y plane
+        for (size_t i = 0; i < width*height; ++i) {
+            *ptr++ = 1;
+        }
+        
+        // U plane
+        for (size_t i = 0; i < width*height/4; ++i) {
+            *ptr++ = 2;
+        }
+
+        // V plane
+        for (size_t i = 0; i < width*height/4; ++i) {
+            *ptr++ = 3;
+        }
+
+        CHECK(plane_end == ptr);
+        CHECK(plane_end == raw_data.data() + raw_data.size());
+        CHECK(ptr - 1 == &raw_data.back());
+
+        av::VideoFrame frame;
+
+        //REQUIRE_NOTHROW([&frame]() mutable {
+        //    frame = av::VideoFrame{rgb24_raw_data.data(), rgb24_raw_data.size(), rgb24_pixfmt, width, height, alignment};
+        //});
+
+        frame = av::VideoFrame{raw_data.data(), raw_data.size(), pixfmt, width, height, alignment};
+
+        CHECK(frame.raw());
+
+        CHECK(frame.raw()->data[0] == frame.data(0));
+        CHECK(frame.raw()->data[1] == frame.data(1));
+        CHECK(frame.raw()->data[2] == frame.data(2));
+        CHECK(frame.raw()->data[3] == frame.data(3));
+
+        CHECK(frame.data(0));
+        CHECK(frame.data(1));
+        CHECK(frame.data(2));
+        CHECK(frame.data(3) == nullptr);
+
+        CHECK(*frame.data(0) == 1);
+        CHECK(*frame.data(1) == 2);
+        CHECK(*frame.data(2) == 3);
+
+        // Frame can use internal alignments and paddings
+        CHECK(frame.size() >= raw_data.size());
+
+        // Buffer size get actual bytes count to hold image relative needed alignment
+        CHECK(frame.bufferSize(alignment) == raw_data.size());
+
+        vector<uint8_t> out;
+        error_code ec;
+        auto status = frame.copyToBuffer(out, alignment, ec);
+        CHECK(!status == !!ec); // status must be correspond to error holding
+        CHECK(status);
+        CHECK(!ec);
+
+        REQUIRE(equal(raw_data.begin(), raw_data.end(), out.begin()));
+
+        //frame.dump();
+
+        std::cout << frame.raw()->linesize[0]
+                << ", " << frame.raw()->linesize[1]
+                << ", " << frame.raw()->linesize[2]
+                << endl;
+
+        // Cases below can fail and can pass on different platforms:
+        //CHECK(frame.raw()->data[1] - frame.raw()->data[0] == width*height);
+        //REQUIRE(std::equal(begin(i420_raw_data), end(i420_raw_data), frame.raw()->data[0]));
+    }
+
+    SECTION("Semi-Planar NV12 :: 2 planes") {
+        // Prepare image
+        auto &raw_data = nv12_raw_data;
+        auto pixfmt = nv12_pixfmt;
+
+        raw_data.resize(av_image_get_buffer_size(pixfmt, width, height, alignment));
+
+        const uint8_t * const plane_y = raw_data.data();
+        const uint8_t * const plane_uv = plane_y + height*width;
+        const uint8_t * const plane_end = plane_uv + height*width/2;
+
+        auto ptr = raw_data.data();
+        // Y plane
+        for (size_t i = 0; i < width*height; ++i) {
+            *ptr++ = 1;
+        }
+
+        // UV plane, yes, we divide on 4 to fill two bytes at once
+        for (size_t i = 0; i < width*height/4; ++i) {
+            *ptr++ = 2;
+            *ptr++ = 3;
+        }
+
+        CHECK(plane_end == ptr);
+        CHECK(plane_end == raw_data.data() + raw_data.size());
+        CHECK(ptr - 1 == &raw_data.back());
+
+        av::VideoFrame frame;
+
+        //REQUIRE_NOTHROW([&frame]() mutable {
+        //    frame = av::VideoFrame{rgb24_raw_data.data(), rgb24_raw_data.size(), rgb24_pixfmt, width, height, alignment};
+        //});
+
+        frame = av::VideoFrame{raw_data.data(), raw_data.size(), pixfmt, width, height, alignment};
+
+        CHECK(frame.raw());
+
+        CHECK(frame.raw()->data[0] == frame.data(0));
+        CHECK(frame.raw()->data[1] == frame.data(1));
+        CHECK(frame.raw()->data[2] == frame.data(2));
+        CHECK(frame.raw()->data[3] == frame.data(3));
+
+        CHECK(frame.data(0));
+        CHECK(frame.data(1));
+        CHECK(frame.data(2) == nullptr);
+
+        CHECK(*frame.data(0) == 1);
+        CHECK(*(frame.data(1) + 0) == 2);
+        CHECK(*(frame.data(1) + 1) == 3);
+
+        // Frame can use internal alignments and paddings
+        CHECK(frame.size() >= raw_data.size());
+
+        // Buffer size get actual bytes count to hold image relative needed alignment
+        CHECK(frame.bufferSize(alignment) == raw_data.size());
+
+        vector<uint8_t> out;
+        error_code ec;
+        auto status = frame.copyToBuffer(out, alignment, ec);
+        CHECK(!status == !!ec); // status must be correspond to error holding
+        CHECK(status);
+        CHECK(!ec);
+
+        REQUIRE(equal(raw_data.begin(), raw_data.end(), out.begin()));
+
+        //frame.dump();
+
+        std::cout << frame.raw()->linesize[0]
+                << ", " << frame.raw()->linesize[1]
+                << ", " << frame.raw()->linesize[2]
+                << endl;
+
+        // Cases below can fail and can pass on different platforms:
+        //CHECK(frame.raw()->data[1] - frame.raw()->data[0] == width*height);
+        //REQUIRE(std::equal(begin(i420_raw_data), end(i420_raw_data), frame.raw()->data[0]));
+    }
+
+    SECTION("AVFrame :: Copy/Destroy") {
+        using namespace av;
+        VideoFrame frame{PixelFormat(AV_PIX_FMT_RGB24), 1920, 1080};
+
+        auto raw = frame.raw();
+        CHECK(raw->buf[0]);
+        CHECK(raw->data[0]);
+        CHECK(raw->buf[0]->data == raw->data[0]);
+
+        auto buf_ref = raw->buf[0];
+        CHECK(buf_ref->size >= 1920*1080*3);
+        CHECK(av_buffer_get_ref_count(buf_ref) == 1);
+
+        // store
+        auto buf_ref_copy = *buf_ref;
+
+        {
+            auto clone = frame;
+            CHECK(av_buffer_get_ref_count(&buf_ref_copy) == 2);
+        }
+
+        // Scope exit, clone must reset
+        CHECK(av_buffer_get_ref_count(&buf_ref_copy) == 1);
+    }
+}

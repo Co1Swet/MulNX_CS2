@@ -8,6 +8,7 @@
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaRemoter/MediaRemoter.hpp>
+#include <MulNXExtensions/MediaProcesser/MediaProcesser.hpp>
 
 MulNX::Core::Core* pCore = nullptr;
 HMODULE hOriginModule = nullptr;
@@ -106,6 +107,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<GameCfgManager>("GameCfgManager")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
             .CreateModule<MediaRemoter>("MediaRemoter")
+            //.CreateModule<MediaProcesser>("MediaProcesser")
             // 管理
             .CreateModule<MulNXController>("MulNXController")
             .CreateModule<UIDocker>("UIDocker")

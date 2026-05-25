@@ -14,14 +14,20 @@ add_library(MulNXThirdParty
     hlae/binutils.cpp
 )
 
+# Hint the bundled FFmpeg distribution to avcpp so it can resolve headers and libraries.
+set(PC_FFMPEG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg-master-lgpl-shared/include")
+set(PC_FFMPEG_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg-master-lgpl-shared/lib")
+
 add_subdirectory("yaml-cpp-master")
 add_subdirectory("zydis")
 add_subdirectory("nlohmann_json")
+add_subdirectory("avcpp-3.0.1")
 
 target_link_libraries(MulNXThirdParty PUBLIC
     nlohmann_json::nlohmann_json
     yaml-cpp::yaml-cpp
     Zydis::Zydis
+    avcpp
 )
 
 target_include_directories(MulNXThirdParty PUBLIC
