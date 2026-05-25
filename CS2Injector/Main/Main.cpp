@@ -1,5 +1,6 @@
 #include <MulNXExtensions/Win32Starter/Win32Starter.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
+#include <MulNXExtensions/DLLInjectHelper/DLLInjectHelper.hpp>
 #include <MulNXExtensions/CS2BootLoader/CS2BootLoader.hpp>
 #include <CS2Injector/UIDocker/UIDocker.hpp>
 
@@ -25,6 +26,7 @@ int main(int, char**) {
         (*pCore->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             // 管理
+            .CreateModule<DLLInjectHelper>("DLLInjectHelper")
             .CreateModule<CS2BootLoader>("CS2BootLoader")
             .CreateModule<MulNXController>("MulNXController")
             .CreateModule<UIDocker>("UIDocker")

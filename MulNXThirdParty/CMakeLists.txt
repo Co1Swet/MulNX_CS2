@@ -21,6 +21,7 @@ set(PC_FFMPEG_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg-master-lgpl-share
 add_subdirectory("yaml-cpp-master")
 add_subdirectory("zydis")
 add_subdirectory("nlohmann_json")
+set(AV_ENABLE_SHARED OFF CACHE BOOL "Disable shared" FORCE)
 add_subdirectory("avcpp-3.0.1")
 
 target_link_libraries(MulNXThirdParty PUBLIC

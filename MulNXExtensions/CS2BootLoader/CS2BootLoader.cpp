@@ -1,6 +1,6 @@
 #include "CS2BootLoader.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/WinExt/Remote/Remote.hpp>
+#include <MulNXExtensions/DLLInjectHelper/DLLInjectHelper.hpp>
 #include <commdlg.h>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
@@ -45,20 +45,21 @@ bool CS2BootLoader::Window(MulNX::UINode* node) {
 }
 
 bool CS2BootLoader::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
     auto configPath = this->ISys().PathGet("Config");
     auto config = YAML::LoadFile((configPath / "config.yaml").string());
     this->gamePath = config["path"].as<std::string>();
     this->launchOptions= config["launchOptions"].as<std::string>();
 
+    this->pInjectHelper = this->Core->ModuleManager()->FindModule<DLLInjectHelper>("DLLInjectHelper");
     auto pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
     auto rootPath = pIPCer->GetRoot();
     this->dllPath = rootPath / "CS2OBTool" / "CS2OBTool.dll";
-    LoadLibraryW(this->dllPath.wstring().c_str());
 
-    if (!std::filesystem::exists(this->dllPath)) {
-        this->ISys().LogError(std::format("CS2OBTool.dll not found at expected path: {}", this->dllPath.string()));
-    }
+    this->helperPath = rootPath / "CS2InternalHelper" / "CS2InternalHelper.dll";
+    this->dirFfmpeg = this->ISys().PathManager()->PathGetForShared("Tools") / "ffmpeg";
+
+    LoadLibraryW(this->dllPath.wstring().c_str());
+    LoadLibraryW(this->helperPath.wstring().c_str());
 
     this->showWindow = true;
 
@@ -72,6 +73,8 @@ bool CS2BootLoader::Init() {
         this->Update();
         return true;
         });
+
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     return true;
 }
@@ -141,18 +144,16 @@ bool CS2BootLoader::LaunchAndInject() {
         this->ISys().LogError(std::format("Failed to create CS2 process. Error: {}", GetLastError()));
         return false;
     }
-
+ 
     // 注入 DLL
-    bool injected = InjectDll(pi.hProcess);
-    if (!injected) {
+    bool helperInjected = this->pInjectHelper->InjectDll(pi.hProcess, this->helperPath.wstring());
+    if (!helperInjected) {
         TerminateProcess(pi.hProcess, 0);  // 注入失败则终止进程
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         return false;
     }
-
-    // 调用初始化
-    if (!InitDLL(pi.hProcess)) {
+    if (!this->pInjectHelper->InitDLL(pi.hProcess, L"CS2InternalHelper.dll", "HelperInit")) {
         TerminateProcess(pi.hProcess, 0);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
@@ -173,78 +174,6 @@ bool CS2BootLoader::LaunchAndInject() {
 bool CS2BootLoader::IsGameRunning() {
     HWND hwnd = FindWindowW(nullptr, L"Counter-Strike 2");
     return hwnd != nullptr;
-}
-
-bool CS2BootLoader::InjectDll(HANDLE hProcess) {
-    auto path = this->dllPath.wstring();
-    // 在目标进程分配内存并写入 DLL 路径
-    size_t pathSize = (path.size() + 1) * sizeof(wchar_t);
-    LPVOID pRemoteMem = VirtualAllocEx(hProcess, nullptr, pathSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    if (!pRemoteMem) return false;
-
-    if (!WriteProcessMemory(hProcess, pRemoteMem, path.c_str(), pathSize, nullptr)) {
-        VirtualFreeEx(hProcess, pRemoteMem, 0, MEM_RELEASE);
-        return false;
-    }
-
-    // 获取 LoadLibraryW 地址
-    auto pLoadLibrary = GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "LoadLibraryW");
-    if (!pLoadLibrary) {
-        VirtualFreeEx(hProcess, pRemoteMem, 0, MEM_RELEASE);
-        return false;
-    }
-
-    // 远程线程执行 LoadLibraryW
-    HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
-        (LPTHREAD_START_ROUTINE)pLoadLibrary, pRemoteMem, 0, nullptr);
-    if (!hThread) {
-        VirtualFreeEx(hProcess, pRemoteMem, 0, MEM_RELEASE);
-        return false;
-    }
-
-    // 等待注入完成
-    WaitForSingleObject(hThread, INFINITE);
-
-    DWORD exitCode = 0;
-    GetExitCodeThread(hThread, &exitCode);
-
-    CloseHandle(hThread);
-    VirtualFreeEx(hProcess, pRemoteMem, 0, MEM_RELEASE);
-
-    return exitCode != 0;  // LoadLibrary 返回非零表示成功
-}
-
-bool CS2BootLoader::InitDLL(HANDLE hProcess) {
-    // 获取远程初始化函数地址
-    FARPROC pRemoteInit = GetRemoteProcAddress(hProcess, L"CS2OBTool.dll", "MulNX_CS2_Start");
-    if (!pRemoteInit) {
-        this->ISys().LogError("Failed to locate MulNX_CS2_Start in remote process");
-        return false;
-    }
-
-    // 创建远程线程执行初始化
-    HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
-        (LPTHREAD_START_ROUTINE)pRemoteInit, nullptr, 0, nullptr);
-    if (!hThread) {
-        this->ISys().LogError("Failed to create remote init thread");
-        return false;
-    }
-
-    // 等待初始化完成
-    WaitForSingleObject(hThread, INFINITE);
-
-    DWORD exitCode = 0;
-    GetExitCodeThread(hThread, &exitCode);
-    CloseHandle(hThread);
-
-    // 检查返回码：你的 MulNX_CS2_Start 成功时返回 0
-    if (exitCode != 0) {
-        this->ISys().LogError(std::format("Remote initialization failed with code: {}", exitCode));
-        return false;
-    }
-
-    this->ISys().LogInfo("Remote initialization completed successfully");
-    return true;
 }
 
 void CS2BootLoader::Deinit() {

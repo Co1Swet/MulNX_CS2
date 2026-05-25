@@ -47,13 +47,23 @@ add_subdirectory("MulNX")
 add_subdirectory("MulNXExtensions")
 add_subdirectory("CS2OBTool")
 add_subdirectory("CS2Injector")
+add_subdirectory("CS2InternalHelper")
 add_subdirectory("2_tests")
 
 # 定义目标路径
 set(MulNXPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
 set(CS2OBToolPath ${MulNXPath}/CS2OBTool)
 set(CS2InjectorPath ${MulNXPath}/CS2Injector)
+set(CS2InternalHelper ${MulNXPath}/CS2InternalHelper)
 
+# 处理 CS2InternalHelper 目标
+set_target_properties(CS2InternalHelper PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CS2InternalHelper}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CS2InternalHelper}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CS2InternalHelper}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CS2InternalHelper}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CS2InternalHelper}"
+)
 # 处理 CS2Injector 目标
 set_target_properties(CS2Injector PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CS2InjectorPath}"

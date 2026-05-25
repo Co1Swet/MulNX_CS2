@@ -8,10 +8,10 @@ add_subdirectory("MulNXController")
 add_subdirectory("WebSocketManager")
 add_subdirectory("GraphicsManager")
 add_subdirectory("MediaRemoter")
-# add_subdirectory("MediaProcesser")
+add_subdirectory("MediaProcesser")
 add_subdirectory("Win32Starter")
 add_subdirectory("CS2BootLoader")
-add_subdirectory("DLLInjector")
+add_subdirectory("DLLInjectHelper")
 add_subdirectory("DLLLoadDispatcher")
 add_subdirectory("FileRedirector")
 
@@ -25,10 +25,10 @@ target_link_libraries(MulNXExtensions INTERFACE
     WebSocketManager
     GraphicsManager
     MediaRemoter
-    # MediaProcesser
+    MediaProcesser
     Win32Starter
     CS2BootLoader
-    DLLInjector
+    DLLInjectHelper
     DLLLoadDispatcher
     FileRedirector
 )

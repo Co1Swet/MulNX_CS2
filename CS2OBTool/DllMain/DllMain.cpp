@@ -15,24 +15,13 @@ HMODULE hOriginModule = nullptr;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
-    case DLL_PROCESS_ATTACH: {
+    case DLL_PROCESS_ATTACH:
         hOriginModule = hModule;
         break;
-    }
-    case DLL_THREAD_ATTACH: {
-        break;
-    }
-    case DLL_THREAD_DETACH: {
-        break;
-    }
-    case DLL_PROCESS_DETACH: {
+    case DLL_PROCESS_DETACH:
         if (pCore)
             pCore->Close();
         break;
-    }
-    default: {
-        break;
-    }
     }
     return TRUE;
 }
@@ -107,7 +96,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<GameCfgManager>("GameCfgManager")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
             .CreateModule<MediaRemoter>("MediaRemoter")
-            //.CreateModule<MediaProcesser>("MediaProcesser")
+            .CreateModule<MediaProcesser>("MediaProcesser")
             // 管理
             .CreateModule<MulNXController>("MulNXController")
             .CreateModule<UIDocker>("UIDocker")
