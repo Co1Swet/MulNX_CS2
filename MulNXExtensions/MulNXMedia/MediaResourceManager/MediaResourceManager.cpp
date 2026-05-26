@@ -1,18 +1,7 @@
 #include "MediaResourceManager.hpp"
 #include <vector>
 
-static av::PixelFormat DXGIFormatToAvPixelFormat(DXGI_FORMAT format) {
-    switch (format) {
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
-        return AV_PIX_FMT_RGBA;
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
-        return AV_PIX_FMT_BGRA;
-    default:
-        return AV_PIX_FMT_NONE;
-    }
-}
+
 
 bool MediaResourceManager::Init() {
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
@@ -23,8 +12,8 @@ bool MediaResourceManager::Init() {
     this->ISys().LogSucc("FFmpeg 与 AvCpp 初始化成功！");
 
     this->ISys()
-        .SubscribeAsync("Media/Record/Begin")
-        .SubscribeAsync("Media/Record/End")
+        .SubscribeAsync("Media/Record/Start")
+        .SubscribeAsync("Media/Record/Stop")
         ;
 
     this->ISys().SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->HandleOnPresent();});
@@ -35,13 +24,12 @@ bool MediaResourceManager::Init() {
 
 void MediaResourceManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Media/Record/Begin"_hash: {
-        //std::filesystem::create_directories(this->dirVedios);
+    case "Media/Record/Start"_hash: {
         auto outFile = this->dirVedios / "record.mp4";
         this->StartRecording(outFile.string(), 1920, 1080);
         break;
     }
-    case "Media/Record/End"_hash: {
+    case "Media/Record/Stop"_hash: {
         this->StopRecording();
         break;
     }
@@ -64,10 +52,8 @@ void MediaResourceManager::ReleaseStagingTexture() {
 
 void MediaResourceManager::HandleOnPresent() {
     this->Update();
-    if (!this->isRecording) {
-        return;
-    }
-
+    if (!this->isRecording) return;
+    
     ID3D11Texture2D* backBuffer = nullptr;
     this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
     if (!backBuffer) {
@@ -109,10 +95,6 @@ void MediaResourceManager::HandleOnPresent() {
         this->srcPixelFormat = srcFormat;
     }
 
-    if (!this->pGraphicsManager->pd3dContext) {
-        return;
-    }
-
     // Copy back buffer into staging texture for CPU readback.
     if (desc.SampleDesc.Count > 1) {
         this->pGraphicsManager->pd3dContext->ResolveSubresource(this->pStagingTex, 0, backBuffer, 0, desc.Format);
@@ -142,9 +124,11 @@ void MediaResourceManager::HandleOnPresent() {
     av::VideoFrame srcFrame = av::VideoFrame::wrap(rawData.data(), rawData.size(), srcFormat, this->stagingWidth, this->stagingHeight);
     av::VideoFrame dstFrame(AV_PIX_FMT_YUV420P, this->width, this->height);
     if (!this->rescaler.isValid() || this->rescaler.srcWidth() != this->width || this->rescaler.srcHeight() != this->height || this->rescaler.srcPixelFormat() != srcFormat) {
-        this->rescaler = av::VideoRescaler(this->width, this->height, AV_PIX_FMT_YUV420P,
-                                           this->stagingWidth, this->stagingHeight, srcFormat,
-                                           av::SwsFlagFastBilinear);
+        this->rescaler = av::VideoRescaler(
+            this->width, this->height, AV_PIX_FMT_YUV420P,
+            this->stagingWidth, this->stagingHeight, srcFormat,
+            av::SwsFlagFastBilinear
+        );
     }
 
     try {
@@ -169,18 +153,11 @@ bool MediaResourceManager::StartRecording(const std::string& filename, int w, in
         return false;
     }
 
-    if (!this->pGraphicsManager || !this->pGraphicsManager->pd3dDevice) {
-        this->ISys().LogError("未找到 GraphicsManager 或 D3D11 设备，无法开始录制");
-        return false;
-    }
-
     try {
         this->ofctx.openOutput(filename);
 
-        av::Codec codec = av::findEncodingCodec("libx264");
-        if (!codec.canEncode()) {
-            codec = av::findEncodingCodec(AV_CODEC_ID_H264);
-        }
+        av::Codec codec = av::findEncodingCodec(AV_CODEC_ID_H264);
+
         if (!codec.canEncode()) {
             this->ISys().LogError("未找到可用的 H264 编码器");
             return false;

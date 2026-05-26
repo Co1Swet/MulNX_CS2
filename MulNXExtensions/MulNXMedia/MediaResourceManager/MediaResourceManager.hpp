@@ -2,15 +2,7 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
-#include <d3d11.h>
-#include <avcpp/av.h>
-#include <avcpp/format.h>
-#include <avcpp/codec.h>
-#include <avcpp/frame.h>
-#include <avcpp/packet.h>
-#include <avcpp/codeccontext.h>
-#include <avcpp/formatcontext.h>
-#include <avcpp/videorescaler.h>
+#include <MulNXExtensions/MulNXMedia/D3D11AV.hpp>
 
 class MediaResourceManager final :public MulNX::ModuleBase {
     void HandleOnPresent();

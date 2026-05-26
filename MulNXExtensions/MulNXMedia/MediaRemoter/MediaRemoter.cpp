@@ -62,6 +62,7 @@ void MediaRemoter::Deinit() {
 }
 
 void MediaRemoter::ProcessMsg(MulNX::Message& msg) {
+    return;
     switch (msg.type) {
     case "Media/CreateConnect"_hash: {
         this->CreateConnect();
