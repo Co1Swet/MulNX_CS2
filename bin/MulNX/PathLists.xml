@@ -4,6 +4,7 @@
         <Path Name="Config"/>
         <Path Name="Log"/>
         <Path Name="Demos"/>
+        <Path Name="Vedios"/>
     </Shared>
 
     <Subdirectory>

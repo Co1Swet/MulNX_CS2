@@ -5,11 +5,6 @@
 #include <shellapi.h>
 #pragma comment(lib, "d3d11.lib")
 
-using CreateDXGIFactory1_t = HRESULT(WINAPI*)(void* riid, void** ppFactory);
-using D3D11CreateDevice_t = HRESULT(WINAPI*)(IDXGIAdapter*, D3D_DRIVER_TYPE, HMODULE, UINT, const D3D_FEATURE_LEVEL*, UINT, UINT, ID3D11Device**, D3D_FEATURE_LEVEL*, ID3D11DeviceContext**);
-using CreateSwapChain_t = HRESULT(STDMETHODCALLTYPE*)(IDXGIFactory* pFactory, IUnknown* pDevice, DXGI_SWAP_CHAIN_DESC* pDesc, IDXGISwapChain** ppSwapChain);
-using ResizeBuffers_t = HRESULT(__stdcall*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
-
 bool HookManager::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
@@ -161,8 +156,10 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
 
 MulNX::Hook::Then HookManager::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
+    
     this->pGraphicsManager->BuildNew();
     this->pGraphicsManager->OnPresent();
+    this->ISys().PublishSync("Hook/BeforePresent"_hash);
     // UI 系统渲染
     this->pUISystem->HandleUpdate();
     this->pUISystem->Render();
