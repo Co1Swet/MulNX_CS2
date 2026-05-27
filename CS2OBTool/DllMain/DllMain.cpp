@@ -94,7 +94,8 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<VirtualUser>("VirtualUser")
             .CreateModule<GameCfgManager>("GameCfgManager")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
-            //.CreateModule<MediaResourceManager>("MediaResourceManager")
+            .CreateModule<MediaResourceManager>("MediaResourceManager")
+            .CreateModule<MediaRecorder>("MediaRecorder")
             .CreateModule<MediaRemoter>("MediaRemoter")
             .CreateModule<MediaProcesser>("MediaProcesser")
             // 管理
