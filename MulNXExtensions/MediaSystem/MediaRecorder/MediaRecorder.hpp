@@ -2,7 +2,7 @@
 
 #include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
-#include <MulNXExtensions/MulNXMedia/D3D11AV.hpp>
+#include <MulNXExtensions/MediaSystem/D3D11AV.hpp>
 
 class MediaRecorder final :public MulNX::ModuleBase {
     MulNX::GraphicsManager* pGraphicsManager = nullptr;

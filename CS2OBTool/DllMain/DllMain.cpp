@@ -7,7 +7,7 @@
 #include <MulNXExtensions/VirtualUser/VirtualUser.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
-#include <MulNXExtensions/MulNXMedia/MulNXMedia.hpp>
+#include <MulNXExtensions/MediaSystem/Media.hpp>
 
 MulNX::Core::Core* pCore = nullptr;
 HMODULE hOriginModule = nullptr;
@@ -94,7 +94,9 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<VirtualUser>("VirtualUser")
             .CreateModule<GameCfgManager>("GameCfgManager")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
-            .CreateModule<MediaResourceManager>("MediaResourceManager")
+            // 音视频
+            .CreateModule<MediaSystem>("MediaSystem")
+            .CreateModule<FrameCapturer>("FrameCapturer")
             .CreateModule<MediaRecorder>("MediaRecorder")
             .CreateModule<MediaRemoter>("MediaRemoter")
             .CreateModule<MediaProcesser>("MediaProcesser")

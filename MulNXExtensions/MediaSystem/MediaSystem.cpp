@@ -1,8 +1,8 @@
-#include "MediaResourceManager.hpp"
-#include <MulNXExtensions/MulNXMedia/MediaRecorder/MediaRecorder.hpp>
+#include "MediaSystem.hpp"
+#include <MulNXExtensions/MediaSystem/MediaRecorder/MediaRecorder.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-bool MediaResourceManager::Window(MulNX::UINode* node) {
+bool MediaSystem::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("音视频");
 
     if (ImGui::Button("开始录制")) {
@@ -15,7 +15,7 @@ bool MediaResourceManager::Window(MulNX::UINode* node) {
     return true;
 }
 
-bool MediaResourceManager::Init() {
+bool MediaSystem::Init() {
     av::init();
     av::set_logging_level(AV_LOG_WARNING);
 
