@@ -29,17 +29,8 @@ std::optional<av::VideoFrame> FrameCapturer::TryPop() {
     return std::nullopt;
 }
 
-void FrameCapturer::CheckCaptuer() {
+void FrameCapturer::Captuer() {
     this->Update();
-
-    static std::optional<std::chrono::steady_clock::time_point> lastCapture;
-    auto now = std::chrono::steady_clock::now();
-    constexpr std::chrono::duration<double> minInterval(1.0 / 60.0);
-
-    if (lastCapture.has_value() && (now - *lastCapture < minInterval)) {
-        return;
-    }
-    lastCapture = now;
 
     ID3D11Texture2D* backBuffer = nullptr;
     this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));

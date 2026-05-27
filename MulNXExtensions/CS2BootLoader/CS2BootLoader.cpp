@@ -69,7 +69,7 @@ bool CS2BootLoader::Init() {
         .SubscribeAsync("CS2BootLoader/Save")
         ;
 
-    this->SendTask("MulNXMain", [this]()->bool {
+    this->ISys().SendTask("Update", "MulNXMain", [this]()->bool {
         this->Update();
         return true;
         });

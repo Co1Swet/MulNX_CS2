@@ -4,6 +4,7 @@ add_library(MediaSystem
     MediaProcesser/MediaProcesser.cpp
     MediaRemoter/MediaRemoter.cpp
     FrameCapturer/FrameCapturer.cpp
+    AudioCapturer/AudioCapturer.cpp
 )
 
 target_link_libraries(MediaSystem PUBLIC

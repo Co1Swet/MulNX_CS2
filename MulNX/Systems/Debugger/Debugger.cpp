@@ -65,7 +65,7 @@ bool MulNX::Debugger::Init() {
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
-    this->SendTask("MulNXMain", [this]()->bool {
+    this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
         });

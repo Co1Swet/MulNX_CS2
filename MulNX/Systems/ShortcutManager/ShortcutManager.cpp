@@ -26,7 +26,7 @@ bool MulNX::ShortcutManager::Init() {
         this->binds.push_back(std::move(bind));
     }
 
-    this->SendTask("MulNXMain", [this]() {
+    this->ISys().SendTask("Check", "MulNXMain", [this]() {
         this->Check();
         return true;
         });

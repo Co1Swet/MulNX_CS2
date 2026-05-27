@@ -26,6 +26,7 @@ class MediaRecorder final :public MulNX::ModuleBase {
     std::filesystem::path dirVedios;
 
     void HandleOnPresent();
+    void Encode();
     void ProcessMsg(MulNX::Message& msg);
 public:
     bool Init()override;

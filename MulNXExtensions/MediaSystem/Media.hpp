@@ -5,3 +5,4 @@
 #include "MediaProcesser/MediaProcesser.hpp"
 #include "MediaRemoter/MediaRemoter.hpp"
 #include "FrameCapturer/FrameCapturer.hpp"
+#include "AudioCapturer/AudioCapturer.hpp"

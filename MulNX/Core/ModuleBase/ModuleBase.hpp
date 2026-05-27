@@ -2,6 +2,7 @@
 
 #include <MulNX/Common/coroutine.hpp>
 #include <MulNX/Common/Message.hpp>
+#include <MulNX/Common/Task.hpp>
 #include <MulNX/Base/MulNXHandle/MulNXHandle.hpp>
 #include "ISys/ISys.hpp"
 #include <shared_mutex>
@@ -11,7 +12,7 @@
 namespace MulNX {
     class ModuleBase {
         friend MulNX::Core::Core;
-        friend C_ISys;
+        friend ISys;
         friend MulNX::Core::CoreStarterBase;
     private:
         // 协程：状态
@@ -102,7 +103,6 @@ namespace MulNX {
     protected:
         // 通过任意函数，发送一个UI节点
         bool SendUINode(std::string&& name, std::function<void(MulNX::UINode*)>&& func);
-        void SendTask(std::string&& workerName, std::function<bool()>&& task);
         auto WaitUntil(std::function<bool()>&& condition) {
             return AwaitCondition(this, std::move(condition));
         }
@@ -127,6 +127,6 @@ namespace MulNX {
         void SetMyThreadDelta(int Delta);
 
         // 系统服务包装器(原则上是protected权限)
-        C_ISys ISys();
+        ISys ISys();
     };
 }

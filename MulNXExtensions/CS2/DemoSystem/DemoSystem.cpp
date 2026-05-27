@@ -132,7 +132,7 @@ bool DemoSystem::Init() {
         return this->Window(node);
         });
 
-    this->SendTask("DemoSys", [this]() {
+    this->ISys().SendTask("Update", "DemoSys", [this]() {
         this->Update();
         return true;
         });

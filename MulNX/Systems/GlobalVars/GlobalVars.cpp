@@ -4,7 +4,8 @@
 #include <chrono>
 
 bool MulNX::GlobalVars::Init() {
-    this->SendTask("MulNXMain", [this]()->bool {
+
+    this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
         });

@@ -36,7 +36,7 @@ bool MediaRemoter::Init() {
         this->HandleOBSMsg(hdl, msg);
         });
 
-    this->SendTask("MulNXMain", [this]()->bool {
+    this->ISys().SendTask("Update", "MulNXMain", [this]()->bool {
         this->Update();
         return true;
         });
@@ -104,7 +104,7 @@ void MediaRemoter::CreateConnect() {
     this->ISys().LogInfo("正在尝试连接 OBS WebSocket...");
 
     // 启动 OBS 事件循环（独立工作者线程）
-    this->SendTask("OBS", [this]() -> bool {
+    this->ISys().SendTask("client::run", "OBS", [this]() -> bool {
         this->client.run();
         return false;// 结束即卸载任务
         });

@@ -17,7 +17,7 @@ bool VirtualUser::Init() {
         MulNX::UI::Checkbox("启用自动化增强（Alt+T可快速切换）", this->Enabled);
         return true;
         });
-    this->SendTask("MulNXMain", [this]()->bool {
+    this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
         });

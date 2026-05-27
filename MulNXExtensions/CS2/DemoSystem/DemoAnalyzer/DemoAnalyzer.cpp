@@ -8,7 +8,7 @@ bool DemoAnalyzer::Init() {
 
     this->ISys().SubscribeAsync("Demo/Analyze");
 
-    this->SendTask("DemoSys", [this]() {
+    this->ISys().SendTask("Update", "DemoSys", [this]() {
         this->Update();
         return true;
         });

@@ -6,7 +6,7 @@
 #include <MulNX/Base/Math/Translate/Translate.hpp>
 
 bool MulNX::InputSystem::Init() {
-    this->SendTask("InputSystem", [this]()->bool {
+    this->ISys().SendTask("UpdateKeysState", "InputSystem", [this]()->bool {
         this->UpdateKeysState();
         std::this_thread::sleep_for(std::chrono::milliseconds(this->MyThreadDelta));
         return true;

@@ -27,8 +27,7 @@ void ProjectileTracker::Menu(MulNX::UINode* node) {
 }
 
 bool ProjectileTracker::Init() {
-    this->SendTask("CSControl", [this]() {
-        this->Update();
+    this->ISys().SendTask("Main", "CSControl", [this]() {
         this->Main();
         return true;
         });
@@ -103,6 +102,7 @@ void ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pPro
 }
 
 void ProjectileTracker::Main() {
+    this->Update();
     if (!this->Enable.load(std::memory_order_acquire))return;
     try {
         CS2::C_BaseCSGrenadeProjectile* pProjectile = this->pTargetWatchProjectile.load(std::memory_order_acquire);

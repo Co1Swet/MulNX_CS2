@@ -44,7 +44,7 @@ bool DeathMsgController::Init() {
         this->ISys().LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
 
         this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
-        this->SendTask("CSControl", [this]()->bool {
+        this->ISys().SendTask("Update", "CSControl", [this]()->bool {
             this->Update();
             return true;
             });

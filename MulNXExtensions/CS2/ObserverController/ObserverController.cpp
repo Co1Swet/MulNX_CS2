@@ -12,7 +12,7 @@ bool ObserverController::Init() {
         .SubscribeAsync("Observe/SpecHandle")
         .SubscribeAsync("spec_mode_changed_to");
 
-    this->SendTask("CSControl", [this]() -> bool {
+    this->ISys().SendTask("Main", "CSControl", [this]() -> bool {
         this->Main();
         return true;
         });

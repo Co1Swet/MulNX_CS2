@@ -67,7 +67,7 @@ bool CSController::Init() {
     this->currentCoro = InitTask();
     this->currentCoro.resume();
 
-    this->SendTask("CSControl", [this]()->bool {
+    this->ISys().SendTask("Update", "CSControl", [this]()->bool {
         this->Update();
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         return true;
@@ -79,7 +79,7 @@ MulNX::CoTask CSController::InitTask() {
     // 等待必要模块加载完成
     co_await this->WaitUntil([this]()->bool {return this->needToLoadModules.load() == 0;});
 
-    this->SendTask("CSControl", [this]()->bool {
+    this->ISys().SendTask("Main", "CSControl", [this]()->bool {
         try {
             this->Main();
         }

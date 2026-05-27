@@ -20,7 +20,7 @@ bool MulNX::Core::ModuleManager::Init() {
     this->ISys()
         .SubscribeAsync("ModuleManager/ModuleInfo/Request");
 
-    this->SendTask("MulNXMain", [this]()->bool {
+    this->ISys().SendTask("Update", "MulNXMain", [this]()->bool {
         this->Update();
         return true;
         });

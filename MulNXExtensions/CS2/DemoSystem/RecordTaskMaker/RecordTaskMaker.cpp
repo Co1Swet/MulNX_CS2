@@ -182,7 +182,7 @@ bool RecordTaskMaker::Init() {
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
-    this->SendTask("DemoSys", [this]()->bool {
+    this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
         return true;
         });

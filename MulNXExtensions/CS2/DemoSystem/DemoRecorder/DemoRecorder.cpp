@@ -47,7 +47,7 @@ bool DemoRecorder::Init() {
     this->coTa = Main();
     this->coTa.resume();
 
-    this->SendTask("DemoSys", [this]()->bool {
+    this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
         return true;
         });

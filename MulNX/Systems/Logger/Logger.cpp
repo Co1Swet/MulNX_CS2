@@ -11,7 +11,7 @@ bool MulNX::Logger::Init() {
         MulNX::ErrorTerminate("Cannot Wirte Log!");
     }
     this->target << I18n("log.new") << std::endl;
-    this->SendTask("Loging", [this]()->bool {
+    this->ISys().SendTask("Log", "Loging", [this]()->bool {
         this->Log();
         return true;
         });

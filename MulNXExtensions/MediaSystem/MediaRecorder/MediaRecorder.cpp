@@ -77,40 +77,16 @@ void MediaRecorder::HandleOnPresent() {
     this->Update();
     if (!this->isRecording) return;
 
-    this->pCapturer->CheckCaptuer();
+    static std::optional<std::chrono::steady_clock::time_point> lastCapture;
+    auto now = std::chrono::steady_clock::now();
+    constexpr std::chrono::duration<double> minInterval(1.0 / 60.0);
 
-    auto opFrame = this->pCapturer->TryPop();
-    if (!opFrame.has_value())return;
-    auto srcFrame = opFrame.value();
-
-    av::VideoFrame dstFrame(AV_PIX_FMT_YUV420P, this->width, this->height);
-    if (!this->rescaler.isValid() ||
-        this->rescaler.srcWidth() != this->width || this->rescaler.srcHeight() != this->height ||
-        this->rescaler.srcPixelFormat() != this->pCapturer->srcPixelFormat) {
-        this->rescaler = av::VideoRescaler(
-            this->width, this->height, AV_PIX_FMT_YUV420P,
-            this->pCapturer->stagingWidth, this->pCapturer->stagingHeight,
-            this->pCapturer->srcPixelFormat, av::SwsFlagFastBilinear
-        );
+    if (lastCapture.has_value() && (now - *lastCapture < minInterval)) {
+        return;
     }
+    lastCapture = now;
 
-    try {
-        this->rescaler.rescale(dstFrame, srcFrame);
-        dstFrame.setTimeBase(this->timeBase);
-        dstFrame.setPts(av::Timestamp(this->ptsCounter++, this->timeBase));
-        dstFrame.setStreamIndex(this->vstream.index());
-
-        av::Packet pkt = this->encoder.encode(dstFrame);
-        if (pkt && pkt.size() > 0) {
-            pkt.setStreamIndex(this->vstream.index());
-            pkt.setTimeBase(this->vstream.timeBase());
-            pkt.setDuration(1, this->vstream.timeBase());
-            this->ofctx.writePacket(pkt);
-        }
-    }
-    catch (const std::exception &e) {
-        this->ISys().LogError(std::string("录制帧写入失败: ") + e.what());
-    }
+    this->pCapturer->Captuer();
 }
 
 bool MediaRecorder::StopRecording() {
@@ -144,4 +120,39 @@ bool MediaRecorder::StopRecording() {
     
     this->ofctx.close();
     return true;
+}
+
+void MediaRecorder::Encode() {
+    auto opFrame = this->pCapturer->TryPop();
+    if (!opFrame.has_value())return;
+    auto srcFrame = opFrame.value();
+
+    av::VideoFrame dstFrame(AV_PIX_FMT_YUV420P, this->width, this->height);
+    if (!this->rescaler.isValid() ||
+        this->rescaler.srcWidth() != this->width || this->rescaler.srcHeight() != this->height ||
+        this->rescaler.srcPixelFormat() != this->pCapturer->srcPixelFormat) {
+        this->rescaler = av::VideoRescaler(
+            this->width, this->height, AV_PIX_FMT_YUV420P,
+            this->pCapturer->stagingWidth, this->pCapturer->stagingHeight,
+            this->pCapturer->srcPixelFormat, av::SwsFlagFastBilinear
+        );
+    }
+
+    try {
+        this->rescaler.rescale(dstFrame, srcFrame);
+        dstFrame.setTimeBase(this->timeBase);
+        dstFrame.setPts(av::Timestamp(this->ptsCounter++, this->timeBase));
+        dstFrame.setStreamIndex(this->vstream.index());
+
+        av::Packet pkt = this->encoder.encode(dstFrame);
+        if (pkt && pkt.size() > 0) {
+            pkt.setStreamIndex(this->vstream.index());
+            pkt.setTimeBase(this->vstream.timeBase());
+            pkt.setDuration(1, this->vstream.timeBase());
+            this->ofctx.writePacket(pkt);
+        }
+    }
+    catch (const std::exception& e) {
+        this->ISys().LogError(std::string("录制帧写入失败: ") + e.what());
+    }
 }

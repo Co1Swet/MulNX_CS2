@@ -64,7 +64,7 @@ bool DemoHelper::Init() {
         ;
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->SendTask("DemoSys", [this]()->bool {
+    this->ISys().SendTask("Main", "DemoSys", [this]()->bool {
         this->Main();
         return true;
         });

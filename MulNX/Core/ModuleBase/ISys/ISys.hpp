@@ -5,11 +5,12 @@
 #include <filesystem>
 
 namespace MulNX {
-    class C_ISys {
+    class Task;
+    class ISys {
         friend ModuleBase;
-        C_ISys() = delete;
+        ISys() = delete;
         ModuleBase* pModuleBase = nullptr;
-        C_ISys(ModuleBase* pModuleBase) {
+        ISys(ModuleBase* pModuleBase) {
             this->pModuleBase = pModuleBase;
         }
     public:
@@ -17,17 +18,17 @@ namespace MulNX {
         void LogSucc(const std::string& Msg);
         void LogWarning(const std::string& Msg);
         void LogError(const std::string& Msg);
+        void LogLine(); // 提示级别打印一条线
 
-        // 提示级别
-        void LogLine();
-
-        C_ISys& SubscribeAsync(const std::string& msgType);
+        ISys& SubscribeAsync(const std::string& msgType);
         void PublishAsync(MulNX::Message&& msg);
         void PublishAsync(MulNX::MsgType msgType);
 
-        C_ISys& SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle);
+        ISys& SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle);
         void PublishSync(MulNX::Message& msg);
         void PublishSync(MulNX::MsgType msgType);
+
+        void SendTask(std::string&& name, std::string&& targetWorker, std::function<bool()>&& Do);
 
         void AsyncCommand(std::string&& cmd);
 

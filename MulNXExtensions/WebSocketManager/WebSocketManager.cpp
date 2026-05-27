@@ -112,7 +112,7 @@ bool WebSocketManager::Init() {
             }
         });
 
-    this->SendTask("Web", [this]()->bool {
+    this->ISys().SendTask("server::run", "Web", [this]()->bool {
         try {
             if (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -129,7 +129,7 @@ bool WebSocketManager::Init() {
         }
         return false;
         });
-    this->SendTask("MulNXMain", [this]()->bool {
+    this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
         });

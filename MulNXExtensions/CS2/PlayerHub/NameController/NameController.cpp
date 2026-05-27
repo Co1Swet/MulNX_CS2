@@ -57,7 +57,7 @@ bool NameController::Init() {
             return true;
             });
 
-        this->SendTask("CSControl", [this]() {
+        this->ISys().SendTask("Update", "CSControl", [this]() {
             this->Update();
             return true;
             });

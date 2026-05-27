@@ -5,7 +5,6 @@
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 #include <MulNX/Systems/UISystem/UISystem.hpp>
-#include <MulNX/Systems/TaskSystem/TaskSystem.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 
 bool MulNX::ModuleBase::SetName(std::string&& Name) {
@@ -53,13 +52,6 @@ bool MulNX::ModuleBase::SendUINode(std::string&& name, std::function<void(MulNX:
     this->ISys().PublishAsync(std::move(msg));
     this->ISys().LogInfo(I18n("module.send_ui"));
     return true;
-}
-void MulNX::ModuleBase::SendTask(std::string&& workerName, std::function<bool()>&& task) {
-    auto [msg, rp] = MulNX::Message::Create<MulNX::Task::RegistrationPacket>("Task/Create"_hash);
-    rp->targetWorker = std::move(workerName);
-    rp->task = std::move(task);
-    this->ISys().PublishAsync(std::move(msg));
-    this->ISys().LogInfo(I18n("module.send_task"));
 }
 
 bool MulNX::ModuleBase::EntryInit() {

@@ -22,6 +22,6 @@ public:
     bool Init()override;
     void Reset();
 
-    void CheckCaptuer();
+    void Captuer();
     std::optional<av::VideoFrame> TryPop();
 };
