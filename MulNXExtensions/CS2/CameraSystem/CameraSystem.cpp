@@ -5,13 +5,6 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
-CamSysModule::CamSysModule() {
-    this->delayInits.push_back([this]()->bool {
-        this->CamSys = this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem");
-        return true;
-        });
-}
-
 bool CameraSystem::Menu(MulNX::UINode* node) {
     std::shared_lock lock(this->smutex);
     node->CallUINode("MenuWorkspace");

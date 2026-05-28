@@ -3,8 +3,9 @@
 #include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/WinExt/WinExt.hpp>
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
-class HookManager final : public MulNX::Core::CoreStarterBase {
+class HookManager final : public MulNX::Core::CoreStarterBase, public CSModuleMixin<HookManager> {
 private:
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;

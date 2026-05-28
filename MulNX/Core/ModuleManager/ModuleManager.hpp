@@ -2,9 +2,6 @@
 
 #include <MulNX/Core/ModuleBase/ModuleBase.hpp>
 
-#include <unordered_map>
-#include <map>
-
 class ModuleInfo {
 public:
     std::vector<std::pair<std::string, MulNXHandle>> Info;
@@ -26,8 +23,7 @@ namespace MulNX {
             bool RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module);
 
             // 创建模块
-            template<typename T>
-                requires std::derived_from<T, ModuleBase>
+            template<MulNX::Module T>
             ModuleManager& CreateModule(std::string&& Name) {
                 std::unique_ptr<T>Module = std::make_unique<T>();
                 Module->SetName(std::move(Name));
@@ -51,5 +47,4 @@ namespace MulNX {
             void Deinit()override;
         };
     }
-
 }

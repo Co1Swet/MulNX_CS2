@@ -1,5 +1,4 @@
 #include "ModuleBase.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>

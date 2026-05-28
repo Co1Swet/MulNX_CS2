@@ -3,8 +3,6 @@ add_library(MulNXCS2Ext
     CSClasses/GlobalVars/GlobalVars.cpp
     CSClasses/tree/tree.cpp
 
-    CSModuleBase.cpp
-
     ViewController/ViewController.cpp
     TimeController/TimeController.cpp
     AdvancedViewController/AdvancedViewController.cpp

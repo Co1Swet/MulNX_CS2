@@ -83,8 +83,6 @@ namespace MulNX {
         std::atomic<bool>Running = false;
         // 线程执行间隔，默认以100Hz基准执行
         std::atomic<int> MyThreadDelta = 10;
-        // 延迟初始化任务
-        std::vector<std::function<bool()>>delayInits{};
     public:
         // 组件句柄
         MulNXHandle HModule;
@@ -100,6 +98,9 @@ namespace MulNX {
         
         virtual ~ModuleBase() = default;
         virtual void Deinit() {};
+
+        // 延迟初始化任务
+        std::vector<std::function<bool()>>delayInits{};
     private:
         virtual bool Init() = 0;
         // 消息处理函数，只需处理即可，消息会由入口点释放
@@ -133,4 +134,7 @@ namespace MulNX {
         // 系统服务包装器(原则上是protected权限)
         ISys ISys();
     };
+
+    template <typename T>
+    concept Module = std::derived_from<T, MulNX::ModuleBase>;
 }

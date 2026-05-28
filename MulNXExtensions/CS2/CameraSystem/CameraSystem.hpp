@@ -41,9 +41,19 @@ public:
     void HandleUpdate();
 };
 
-class CamSysModule :public CSModuleBase {
-protected:
-    CamSysModule();
+template <typename T>
+class CamSysModuleMixin {
 public:
     CameraSystem* CamSys = nullptr;
+protected:
+    CamSysModuleMixin() {
+        static_assert(MulNX::Module<T>, "T must be a MulNX Module");
+        auto* mod = static_cast<MulNX::ModuleBase*>(static_cast<T*>(this));
+        mod->delayInits.push_back([this, mod]() -> bool {
+            this->CamSys = mod->GetCore()->ModuleManager()->FindModule<CameraSystem>("CameraSystem");
+            return true;
+            });
+    }
 };
+
+class CamSysModule :public CSModuleBase, public CamSysModuleMixin<CamSysModule> {};
