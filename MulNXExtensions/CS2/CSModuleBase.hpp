@@ -12,9 +12,11 @@ class TimeController;
 using Steam64UID = uint64_t;
 
 class CSModuleBase :public MulNX::ModuleBase {
+protected:
+    CSModuleBase();
 public:
-    CSController* CS2();
-    ViewController* CS2View();
-    TimeController* CS2Time();
-    PlayerHub* Hub();
+    CSController* CS2 = nullptr;
+    ViewController* CS2View = nullptr;
+    TimeController* CS2Time = nullptr;
+    PlayerHub* Hub = nullptr;
 };

@@ -1,22 +1,12 @@
 #include "CSModuleBase.hpp"
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
-CSController* CSModuleBase::CS2() {
-    static CSController* pCSController = this->Core->ModuleManager()->FindModule<CSController>("CSController");
-    return pCSController;
-}
-
-ViewController* CSModuleBase::CS2View() {
-    static ViewController* pViewController = this->Core->ModuleManager()->FindModule<ViewController>("ViewController");
-    return pViewController;
-}
-
-TimeController* CSModuleBase::CS2Time() {
-    static TimeController* pTimeController = this->Core->ModuleManager()->FindModule<TimeController>("TimeController");
-    return pTimeController;
-}
-
-PlayerHub* CSModuleBase::Hub() {
-    static PlayerHub* playerHub = this->Core->ModuleManager()->FindModule<PlayerHub>("PlayerHub");
-    return playerHub;
+CSModuleBase::CSModuleBase() {
+    this->delayInits.push_back([this]()->bool {
+        this->CS2 = this->Core->ModuleManager()->FindModule<CSController>("CSController");
+        this->CS2View = this->Core->ModuleManager()->FindModule<ViewController>("ViewController");
+        this->CS2Time = this->Core->ModuleManager()->FindModule<TimeController>("TimeController");
+        this->Hub = this->Core->ModuleManager()->FindModule<PlayerHub>("PlayerHub");
+        return true;
+        });
 }

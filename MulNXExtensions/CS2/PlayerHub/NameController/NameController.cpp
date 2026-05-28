@@ -10,11 +10,11 @@ using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_
 using GetPlayerName_t = const char* (*)(CS2::CCSPlayerController*);
 
 void NameController::Menu(MulNX::UINode* node) {
-    if (this->Hub()->showView.load(std::memory_order_acquire) != PlayerHub::View::Player) {
+    if (this->Hub->showView.load(std::memory_order_acquire) != PlayerHub::View::Player) {
         ImGui::TextUnformatted("请切换到玩家视图以设置名称替换");
         return;
     }
-    auto uid = this->Hub()->currentSteamId.load(std::memory_order_acquire);
+    auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
     auto it = this->nameReplaceInfo.find(uid);
     if (it != this->nameReplaceInfo.end()) {
         ImGui::TextUnformatted(std::format("替换名称: {}", this->nameReplace[it->second]).c_str());
@@ -39,7 +39,7 @@ bool NameController::Init() {
 
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
-        auto FnGetDecoratedPlayerName = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
+        auto FnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
         this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             // 这里注意，这里的名称获取，是需要进一步调用GetPlayerName的
             // 我们借助这一个比较稳定的特征，创建延迟Hook
@@ -73,7 +73,7 @@ void NameController::ProcessMsg(MulNX::Message& Msg) {
     case "Name/Player/Set"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
         auto newName = Msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->SetReplace(uid, newName);
         break;
     }
@@ -86,7 +86,7 @@ void NameController::HandleVHook(CS2::CCSPlayerController* pPlayerController) {
     if (this->bGetPlayerNameHooked)return;
     this->hkGetPlayerName = MulNX::Hook::Create(reinterpret_cast<uint8_t*>(pPlayerController->GetVFuncPtr(226)), [this](MulNX::Hook* hk, RegContext* ctx) {
         // 而在这里，我们则需要加锁，因为我们要访问替换表了
-        std::shared_lock lock(this->Hub()->smutex);
+        std::shared_lock lock(this->Hub->smutex);
 
         auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
 

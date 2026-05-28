@@ -4,7 +4,7 @@
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
 void SmokeController::Menu(MulNX::UINode* node) {
-    auto view = this->Hub()->showView.load(std::memory_order_acquire);
+    auto view = this->Hub->showView.load(std::memory_order_acquire);
     if (view == PlayerHub::View::Player) {
         this->MenuPlayer(node);
     }
@@ -14,7 +14,7 @@ void SmokeController::Menu(MulNX::UINode* node) {
 }
 
 void SmokeController::MenuPlayer(MulNX::UINode* node) {
-    auto uid = this->Hub()->currentSteamId.load(std::memory_order_acquire);
+    auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);
     auto it = this->playerColors.find(uid);
@@ -44,7 +44,7 @@ void SmokeController::MenuPlayer(MulNX::UINode* node) {
 }
 
 void SmokeController::MenuTeam(MulNX::UINode* node) {
-    auto team = this->Hub()->currentTeam.load(std::memory_order_acquire);
+    auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);
     auto it = this->teamColors.find(team);
@@ -77,7 +77,7 @@ bool SmokeController::Init() {
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
         // 1. 定位并挂钩 SetSmokeProps
-        auto target = this->CS2()->client.GetTextRegion()
+        auto target = this->CS2->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::SetSmokeProps).Data();
 
         this->hkSetSmokeProps = MulNX::Hook::Create(target, [this](MulNX::Hook* hook, RegContext* ctx) {
@@ -119,41 +119,41 @@ void SmokeController::ProcessMsg(MulNX::Message& Msg) {
     case "Smoke/Player/Set"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
         auto color = Msg.p2.low<uint32_t>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors[uid] = color;
         break;
     }
     case "Smoke/Player/Clear"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors.erase(uid);
         break;
     }
     case "Smoke/Player/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors.clear();
         break;
     }
     case "Smoke/Team/Set"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
         auto color = Msg.p1.low<uint32_t>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->teamColors[team] = color;
         break;
     }
     case "Smoke/Team/Clear"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->teamColors.erase(team);
         break;
     }
     case "Smoke/Team/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->teamColors.clear();
         break;
     }
     case "Smoke/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors.clear();
         this->teamColors.clear();
         break;
@@ -164,16 +164,16 @@ void SmokeController::ProcessMsg(MulNX::Message& Msg) {
 }
 
 void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
-    std::shared_lock lock(this->Hub()->smutex);
+    std::shared_lock lock(this->Hub->smutex);
     try {
         
         // 获取投掷者实体
         auto hThrower = MulNX::MRead(pSmoke->m_hThrower());
-        auto* pThrower = this->CS2()->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
+        auto* pThrower = this->CS2->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
 
         // 获取控制器
         auto hController = MulNX::MRead(pThrower->m_hController());
-        auto pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
+        auto pController = this->CS2->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
 
         if (!pController) {
             return;

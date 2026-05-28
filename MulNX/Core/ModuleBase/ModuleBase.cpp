@@ -55,6 +55,11 @@ bool MulNX::ModuleBase::SendUINode(std::string&& name, std::function<void(MulNX:
 }
 
 bool MulNX::ModuleBase::EntryInit() {
+    for (const auto& init : this->delayInits) {
+        if (!init())return false;
+    }
+    this->delayInits.clear();
+    this->delayInits.shrink_to_fit();
     if (!this->Init()) {
         return false;
     }

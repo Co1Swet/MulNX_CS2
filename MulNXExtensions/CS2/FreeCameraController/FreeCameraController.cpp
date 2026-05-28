@@ -32,7 +32,7 @@ void FreeCameraController::ProcessMsg(MulNX::Message& msg) {
     case "FreeCamCtrl/Toggle"_hash: {
         bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
         if (currentEnable == false) {
-            auto view = this->CS2View()->GetView();
+            auto view = this->CS2View->GetView();
             // 从未启用到启用：读取当前游戏位置和角度
             this->Position = view.position;
             this->Rotation = view.rotation;

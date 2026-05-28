@@ -8,7 +8,7 @@
 #include <MulNXThirdParty/All_pugixml.hpp>
 
 bool WorkspaceManager::MenuWorkspace(MulNX::UINode* node) {
-    std::shared_lock lock(this->CamSys()->smutex);
+    std::shared_lock lock(this->CamSys->smutex);
     // 顶部：工作区信息（始终显示）
     auto c = MulNX::UI::RAIIChild("工作区面板", ImVec2(0, 150), true);
     // 工作区状态
@@ -76,12 +76,12 @@ void WorkspaceManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "CamereSystem/Workspace/Set"_hash: {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys()->smutex);
+        std::unique_lock lock(this->CamSys->smutex);
         this->Workspace_Set(name);
         break;
     }
     case "CameraSystem/Workspace/Save"_hash: {
-        std::unique_lock lock(this->CamSys()->smutex);
+        std::unique_lock lock(this->CamSys->smutex);
         this->Workspace_Save();
         break;
     }

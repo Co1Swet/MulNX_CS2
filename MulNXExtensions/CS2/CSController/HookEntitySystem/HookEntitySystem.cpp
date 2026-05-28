@@ -8,7 +8,7 @@ using RemoveEntity_t = void* (*)(void*, CS2::C_BaseEntity*, CS2::CHandleBase);
 bool HookEntitySystem::Init() {
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         this->ISys().SendTask("DelayInit", "CSControl", [this]()->bool {
-            auto gameEntitySystem = this->CS2()->client.dwGameEntitySystem();
+            auto gameEntitySystem = this->CS2->client.dwGameEntitySystem();
             if (!gameEntitySystem)return true;// keep task
             auto vtable = (uint8_t**)IVClass::Assume(gameEntitySystem)->GetVTablePtr();
 

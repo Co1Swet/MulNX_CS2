@@ -134,14 +134,14 @@ MulNX::CoTask DemoRecorder::Main() {
 
         // 等待跳转完成
         co_await this->WaitUntil([this] {
-            return std::abs(this->CS2Time()->GetDemoTick() - this->currentRecordTaskStartTick) <= 5;
+            return std::abs(this->CS2Time->GetDemoTick() - this->currentRecordTaskStartTick) <= 5;
             });
 
         // 等待加载
-        auto current = this->CS2Time()->GetDemoTick();
+        auto current = this->CS2Time->GetDemoTick();
         this->ISys().AsyncCommand("demo_resume");
         co_await this->WaitUntil([&] {
-            return this->CS2Time()->GetDemoTick() > current + 10;
+            return this->CS2Time->GetDemoTick() > current + 10;
             });
 
         // 设置观察目标
@@ -167,7 +167,7 @@ MulNX::CoTask DemoRecorder::Main() {
 
         // 等待录制结束 tick
         co_await this->WaitUntil([this, &task] {
-            auto curTick = this->CS2Time()->GetDemoTick();
+            auto curTick = this->CS2Time->GetDemoTick();
             if (task.onPlaying) {
                 task.onPlaying(curTick, &task);
             }

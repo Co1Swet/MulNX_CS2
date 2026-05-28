@@ -83,17 +83,21 @@ namespace MulNX {
         std::atomic<bool>Running = false;
         // 线程执行间隔，默认以100Hz基准执行
         std::atomic<int> MyThreadDelta = 10;
+        // 延迟初始化任务
+        std::vector<std::function<bool()>>delayInits{};
     public:
         // 组件句柄
         MulNXHandle HModule;
         MulNX::InputSystem* pInputSystem = nullptr;
         std::shared_mutex smutex;
 
+        ModuleBase() = default;
+
         ModuleBase(const ModuleBase&) = delete;
         ModuleBase(ModuleBase&&) = delete;
         ModuleBase& operator=(const ModuleBase&) = delete;
         ModuleBase& operator=(ModuleBase&&) = delete;
-        ModuleBase() = default;
+        
         virtual ~ModuleBase() = default;
         virtual void Deinit() {};
     private:

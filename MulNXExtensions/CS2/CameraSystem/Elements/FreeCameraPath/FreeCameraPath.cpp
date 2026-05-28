@@ -27,10 +27,10 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
                 auto pos = keyframe.GetPosition();
                 auto rot = keyframe.GetRotationEuler();
                 auto dof = keyframe.GetDOF();
-                EManager->CS2View()->spec_goto_ex(pos, rot);
-                EManager->CS2View()->SetDOF(dof);
+                EManager->CS2View->spec_goto_ex(pos, rot);
+                EManager->CS2View->SetDOF(dof);
                 if (EManager->pInputSystem->IsKeyPressed(VK_MENU)) {
-                    EManager->CS2Time()->JumpReal(keyframe.time);
+                    EManager->CS2Time->JumpReal(keyframe.time);
                 }
             }
         }
@@ -41,8 +41,8 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
     static auto kAdd = EManager->ISys().GetButton("place camera").value();
     if (ImGui::Button(I18n("free_campath.add").c_str()) || EManager->pInputSystem->CheckWithPack(kAdd)) {
         MulNX::Math::CameraKeyframe keyframe;
-        keyframe.time = EManager->CS2Time()->GetReal();
-        auto view = EManager->CS2View()->GetView();
+        keyframe.time = EManager->CS2Time->GetReal();
+        auto view = EManager->CS2View->GetView();
         keyframe.PositionAndFOV = view.ToPositionAndFOV();
         keyframe.RotationQuat = view.ToRotationQuat();
         keyframe.dof = view.ToDOFPack();
@@ -59,7 +59,7 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
 
     if (ImGui::Button(I18n("text.preview").c_str())) {
         EManager->Preview_SetElement(this->Name);
-        EManager->Preview_SetPreviewSchema(EManager->CS2Time()->GetReal());
+        EManager->Preview_SetPreviewSchema(EManager->CS2Time->GetReal());
         EManager->Preview_Enable();
     }
 
@@ -87,7 +87,7 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
         ImGui::SliderFloat(I18n("math.roll").c_str(), &tempRotationEuler.z, -179.0, 179.0);
         ImGui::SliderFloat(I18n("math.fov").c_str(), &tempPositionAndFOV.w, 10, 170);
 
-        EManager->CamSys()->CamDrawer.DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
+        EManager->CamSys->CamDrawer.DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
         if (ImGui::Button(I18n("text.confirm_modify").c_str())) {
             // 构造临时摄像机关键帧
             MulNX::Math::CameraKeyframe tempKey;

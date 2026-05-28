@@ -115,7 +115,7 @@ bool RecordTaskMaker::Window(MulNX::UINode* node) {
                     rp->tickStart, rp->tickEnd);
                 rp->desc = std::move(desc);
 
-                float* pTimeScale = this->CS2()->GetCvarSystem().GetCvar("host_timescale")->GetPtr<float>();
+                float* pTimeScale = this->CS2->GetCvarSystem().GetCvar("host_timescale")->GetPtr<float>();
 
                 this->ISys().PublishAsync(std::move(msg));
             }

@@ -18,7 +18,7 @@ bool SkinController::Init() {
         ;
 
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::RegenerateWeaponSkins);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::RegenerateWeaponSkins);
         this->regenerateWeaponSkins = (RegenerateWeaponSkins)target.Data();
         // static auto hkSkin = MulNX::Hook::Create(target.Data(), 0, false, [this](RegContext* ctx, MulNX::Hook* Hook) {
         //     return MulNX::Hook::Then::Continue;
@@ -63,10 +63,10 @@ void SkinController::Apply() {
     auto isLegacy = this->legacyModel.load(std::memory_order_acquire);
 
     // 1. 获取武器及关键字段
-    auto localPlayer = this->CS2()->client.TryGetObservingPawn();
+    auto localPlayer = this->CS2->client.TryGetObservingPawn();
     auto weaponServe = MulNX::MRead(localPlayer->pWeaponServices());
     auto hWeapon = MulNX::MRead(weaponServe->hActiveWeapon());
-    auto pWeapon = this->CS2()->client.GetBaseEntityFromHandle(hWeapon)->As<CS2::C_CSWeaponBase>();
+    auto pWeapon = this->CS2->client.GetBaseEntityFromHandle(hWeapon)->As<CS2::C_CSWeaponBase>();
     auto pManager = pWeapon->m_AttributeManager();
     auto item = pManager->m_Item();
     auto list = item->m_AttributeList();

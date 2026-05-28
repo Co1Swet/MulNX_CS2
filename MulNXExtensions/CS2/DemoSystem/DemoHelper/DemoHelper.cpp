@@ -8,7 +8,7 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("Demo辅助");
     std::shared_lock lock(this->smutex);
 
-    auto tick = this->CS2Time()->GetDemoTick();
+    auto tick = this->CS2Time->GetDemoTick();
     ImGui::Text("当前demotick：%d", tick);
     MulNX::UI::ShowTime(tick);
 
@@ -29,29 +29,29 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
     }
     ImGui::SeparatorText("快捷时间");
     if (ImGui::Button("五秒前")) {
-        this->CS2Time()->JumpRealRel(-5.0f);
+        this->CS2Time->JumpRealRel(-5.0f);
     }
     ImGui::SameLine();
     if (ImGui::Button("一秒前")) {
-        this->CS2Time()->JumpRealRel(-1.0f);
+        this->CS2Time->JumpRealRel(-1.0f);
     }
     ImGui::SameLine();
     if (ImGui::Button("一秒后")) {
-        this->CS2Time()->JumpRealRel(1.0f);
+        this->CS2Time->JumpRealRel(1.0f);
     }
     ImGui::SameLine();
     if (ImGui::Button("五秒后")) {
-        this->CS2Time()->JumpRealRel(5.0f);
+        this->CS2Time->JumpRealRel(5.0f);
     }
     ImGui::Separator();
     static float delta = 0.5f;
     ImGui::SliderFloat("自定义时间差", &delta, 0.0f, 60.0f);
     if (ImGui::Button("前跳")) {
-        this->CS2Time()->JumpRealRel(-delta);
+        this->CS2Time->JumpRealRel(-delta);
     }
     ImGui::SameLine();
     if (ImGui::Button("后跳")) {
-        this->CS2Time()->JumpRealRel(delta);
+        this->CS2Time->JumpRealRel(delta);
     }
 
     return true;
@@ -81,7 +81,7 @@ void DemoHelper::ProcessMsg(MulNX::Message& msg) {
         float data = msg.p1.low<float>();
         std::string str = "跳转到" + std::to_string(data);
         this->ISys().LogInfo(str);
-        this->CS2Time()->JumpReal(data);
+        this->CS2Time->JumpReal(data);
         break;
     }
     }
@@ -93,7 +93,7 @@ void DemoHelper::Main() {
 
 bool DemoHelper::MarkTime() {
     std::unique_lock lock(this->smutex);
-    this->Marks.push_back(this->CS2Time()->GetReal());
+    this->Marks.push_back(this->CS2Time->GetReal());
 
     return true;
 }

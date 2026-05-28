@@ -50,16 +50,16 @@ void POVFixer::BeforeDraw() {
     if (!this->enable)return;
 
     try {
-        auto pObservingPawn = this->CS2()->client.TryGetObservingPawn();
+        auto pObservingPawn = this->CS2->client.TryGetObservingPawn();
         if (!pObservingPawn)return;
         auto currentTeam = MulNX::MRead(pObservingPawn->iTeamNum());
 
         int playerNum = 0;
-        for (int i = 0; i < this->CS2()->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-            auto* controller = this->CS2()->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+        for (int i = 0; i < this->CS2->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
+            auto* controller = this->CS2->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
             if (!controller)continue;
             auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
-            auto* pawn = this->CS2()->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
+            auto* pawn = this->CS2->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
             if (!pawn)continue;
 
             auto team = MulNX::MRead(pawn->iTeamNum());
@@ -89,7 +89,7 @@ void POVFixer::OnSetGlow(MulNX::Message& msg) {
     *msg.p2.as<bool*>() = true;
 
     // try {
-    //     auto pObservingPawn = this->CS2()->client.TryGetObservingPawn();
+    //     auto pObservingPawn = this->CS2->client.TryGetObservingPawn();
     //     if (!pObservingPawn)return;
     //     auto currentTeam = MulNX::MRead(pObservingPawn->iTeamNum());
     //     if (team != currentTeam) {

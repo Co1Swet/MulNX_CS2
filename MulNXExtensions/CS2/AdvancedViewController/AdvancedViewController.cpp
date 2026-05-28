@@ -46,9 +46,9 @@ bool AdvancedViewController::Menu(MulNX::UINode* node) {
         if (this->hasAxisInfo.load(std::memory_order_acquire)) {
             auto read = this->currentAxisInfo.Read();
             MulNX::TransInfo info;
-            info.pMatrix = this->CS2View()->GetViewMatrix();
-            info.windowHeight = this->CS2View()->GetWinHeight();
-            info.windowWidth = this->CS2View()->GetWinWidth();
+            info.pMatrix = this->CS2View->GetViewMatrix();
+            info.windowHeight = this->CS2View->GetWinHeight();
+            info.windowWidth = this->CS2View->GetWinWidth();
 
             // 分两部分绘制：原始骨骼点 与 坐标轴
             if (this->ShowOriginalBones.load(std::memory_order_acquire)) {
@@ -89,8 +89,8 @@ void AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup) {
     // 如果启用了高级视角控制，尝试更新视角数据，注意这里只是更新，不涉及具体的视角控制逻辑，视角控制逻辑在后面根据状态分流执行
     if (this->Enable.load(std::memory_order_acquire)) {
         // 通过时间桥判断是否需要更新视角，防止抖动
-        static auto lastTime = this->CS2Time()->GetReal();
-        auto currentTime = this->CS2Time()->GetReal();
+        static auto lastTime = this->CS2Time->GetReal();
+        auto currentTime = this->CS2Time->GetReal();
         if (currentTime > lastTime || lastTime - currentTime > 0.015f || this->AlwaysCaulate.load(std::memory_order_acquire)) {
             auto result = this->HandleSelfViewUpdate(viewSetup);
             if (result.has_value()) {
@@ -167,7 +167,7 @@ std::expected<MulNX::Math::Point3, int> AdvancedViewController::GetPoint3(CS2::C
         else {
             // 从武器读取骨骼
             auto hActiveWeapon = target->GetHandleActiveWeapon();
-            auto* pWeapon = this->CS2()->client.GetBaseEntityFromHandle(hActiveWeapon)->As<CS2::C_BasePlayerWeapon>();
+            auto* pWeapon = this->CS2->client.GetBaseEntityFromHandle(hActiveWeapon)->As<CS2::C_BasePlayerWeapon>();
             if (!pWeapon) return std::unexpected(4);
             point3.origin = pWeapon->GetBonePos(this->boneIndex1.load());
             point3.forward = pWeapon->GetBonePos(this->boneIndex2.load());
@@ -183,9 +183,9 @@ std::expected<MulNX::Math::Point3, int> AdvancedViewController::GetPoint3(CS2::C
 
 CS2::C_CSPlayerPawn* AdvancedViewController::GetSelfViewTargetPawn() {
     if (this->useLocalPawn.load(std::memory_order_acquire)) {
-        return this->CS2()->client.GetLocalPlayerPawn();
+        return this->CS2->client.GetLocalPlayerPawn();
     }
-    return this->CS2()->client.TryGetObservingPawn();
+    return this->CS2->client.TryGetObservingPawn();
 }
 
 std::expected<MulNX::Math::View, int> AdvancedViewController::HandleSelfViewUpdate(CS2::CViewSetup* viewSetup) {

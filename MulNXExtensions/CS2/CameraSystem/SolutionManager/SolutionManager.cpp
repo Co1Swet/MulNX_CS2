@@ -233,7 +233,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "CameraSystem/Solution/Create"_hash: {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys()->smutex);
+        std::unique_lock lock(this->CamSys->smutex);
         if (!this->Solution_Create(name)) {
             this->ISys().LogError(std::format("创建解决方案失败：{}", name));
         }
@@ -241,7 +241,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "CameraSystem/Solution/Delete"_hash: {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys()->smutex);
+        std::unique_lock lock(this->CamSys->smutex);
         if (!this->Solution_Delete(name)) {
             this->ISys().LogError(std::format("删除解决方案失败：{}", name));
         }
@@ -249,7 +249,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "CameraSystem/Solution/Play"_hash: {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys()->smutex);
+        std::unique_lock lock(this->CamSys->smutex);
         this->Playing_Solution(name);
         break;
     }
@@ -430,8 +430,8 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 
     switch (this->Playing_pSolution->playmode) {
     case PlaybackMode::Orchestration:
-        this->Playing_pSolution->SetSolutionOffset(this->CS2Time()->GetReal());//偏移时间轴播放
-        this->ISys().LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2Time()->GetReal()));
+        this->Playing_pSolution->SetSolutionOffset(this->CS2Time->GetReal());//偏移时间轴播放
+        this->ISys().LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2Time->GetReal()));
         break;
     case PlaybackMode::Activation:
         this->Playing_pSolution->SetSolutionOffset(0);
@@ -444,7 +444,7 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 }
 void SolutionManager::Playing_Disable() {
     this->Playing = false;
-    this->CS2View()->ClearViewOverride();
+    this->CS2View->ClearViewOverride();
     this->ISys().PublishAsync("CameraSystem/Play/Ended"_hash);
     this->ISys().LogInfo("已关闭播放");
 }
@@ -460,12 +460,12 @@ void SolutionManager::Playing_Call() {
     }
     CameraSystemIO IO;
 
-    IO.SolutionTime = this->CS2Time()->GetReal();
-    IO.FrameGameTime = this->CS2Time()->GetReal();
+    IO.SolutionTime = this->CS2Time->GetReal();
+    IO.FrameGameTime = this->CS2Time->GetReal();
     IO.isPlaying = this->Playing;
 
     if (!this->Playing_pSolution->Call(&IO)) {
-        this->CS2View()->ClearViewOverride();
+        this->CS2View->ClearViewOverride();
         // 这里不关闭播放，因为解决方案可能还有内容
         // 不应该由管理器因为仅仅没有结果就关闭
         if (IO.isPlaying == false) {
@@ -476,7 +476,7 @@ void SolutionManager::Playing_Call() {
         return;
     }
     if (this->Config.PlayingOverride) {
-        this->CS2View()->CameraSystemIOOverride(&IO);
+        this->CS2View->CameraSystemIOOverride(&IO);
     }
     if (this->Config.PlayingDraw) {
         auto frame = this->drawCamera.Write();

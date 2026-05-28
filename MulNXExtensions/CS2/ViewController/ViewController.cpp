@@ -8,7 +8,7 @@
 bool ViewController::Menu(MulNX::UINode* node) {
 
     MulNX::UI::SliderFloat("roll调整", this->controlView.InputRoll, -179.99f, 179.99f);
-    static auto* pGlobalFOV = this->CS2()->GetCvarSystem().GetCvar("fov_cs_debug")->GetPtr<float>();
+    static auto* pGlobalFOV = this->CS2->GetCvarSystem().GetCvar("fov_cs_debug")->GetPtr<float>();
     ImGui::SliderFloat("fov调整", pGlobalFOV, 0, 179.99f);
     if (ImGui::Button("一键归正")) {
         this->controlView.InputRoll.store(0, std::memory_order_release);
@@ -22,12 +22,12 @@ bool ViewController::Init() {
     this->pAdvancedViewController = this->Core->ModuleManager()->FindModule<AdvancedViewController>("AdvancedViewController");
 
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        this->controlView.dofs.pNearBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
-        this->controlView.dofs.pNearCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
-        this->controlView.dofs.pFarCrisp = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
-        this->controlView.dofs.pFarBlurry = this->CS2()->GetCvarSystem().GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
+        this->controlView.dofs.pNearBlurry = this->CS2->GetCvarSystem().GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
+        this->controlView.dofs.pNearCrisp = this->CS2->GetCvarSystem().GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
+        this->controlView.dofs.pFarCrisp = this->CS2->GetCvarSystem().GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
+        this->controlView.dofs.pFarBlurry = this->CS2->GetCvarSystem().GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
 
-        auto target = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::CallIsPlayingDemo);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::CallIsPlayingDemo);
         this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* Hook, RegContext* ctx) {
             this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
             return MulNX::Hook::Then::Continue;
@@ -126,7 +126,7 @@ float ViewController::GetWinHeight()const {
     return this->controlView.WindowHeight.load(std::memory_order_relaxed);
 }
 float* ViewController::GetViewMatrix() {
-    return this->CS2()->client.dwViewMatrix();
+    return this->CS2->client.dwViewMatrix();
 }
 MulNX::Math::View ViewController::GetView() {
     MulNX::Math::View view;

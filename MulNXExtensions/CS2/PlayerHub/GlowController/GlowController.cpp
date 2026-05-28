@@ -4,7 +4,7 @@
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
 void GlowController::Menu(MulNX::UINode* node) {
-    auto view = this->Hub()->showView.load(std::memory_order_acquire);
+    auto view = this->Hub->showView.load(std::memory_order_acquire);
     if (view == PlayerHub::View::Player) {
         this->MenuPlayer(node);
     }
@@ -13,7 +13,7 @@ void GlowController::Menu(MulNX::UINode* node) {
     }
 }
 void GlowController::MenuPlayer(MulNX::UINode* node) {
-    auto uid = this->Hub()->currentSteamId.load(std::memory_order_acquire);
+    auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
     // 1. 获取当前为该玩家设置的颜色（若存在），否则使用默认白色
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255); // 默认白色
@@ -49,7 +49,7 @@ void GlowController::MenuPlayer(MulNX::UINode* node) {
     }
 }
 void GlowController::MenuTeam(MulNX::UINode* node) {
-    auto team = this->Hub()->currentTeam.load(std::memory_order_acquire);
+    auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255); // 默认白色
     auto it = this->teamColors.find(team);
@@ -81,7 +81,7 @@ void GlowController::MenuTeam(MulNX::UINode* node) {
 
 bool GlowController::Init() {
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto region = this->CS2()->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
+        auto region = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
         auto target = region.Data();
         this->hkSetGlowColor = MulNX::Hook::Create(target, [this](MulNX::Hook* hk,RegContext* ctx) {
                 this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)&(ctx->rdx));
@@ -119,42 +119,42 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
     case "Glow/Player/Set"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
         auto color = Msg.p2.low<uint32_t>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors[uid] = color;
         break;
     }
     case "Glow/Player/Clear"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors.erase(uid);
         break;
     }
     case "Glow/Player/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors.clear();
         break;
     }
     case "Glow/Team/Set"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
         auto color = Msg.p1.low<uint32_t>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->teamColors[team] = color;
         break;
     }
     case "Glow/Team/Clear"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->teamColors.erase(team);
         break;
     }
     case "Glow/Team/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->teamColors.clear();
         break;
     }
 
     case "Glow/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub()->smutex);
+        std::unique_lock lock(this->Hub->smutex);
         this->playerColors.clear();
         this->teamColors.clear();
         break;
@@ -165,7 +165,7 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
 }
 
 void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t* color) {
-    std::shared_lock lock(this->Hub()->smutex);
+    std::shared_lock lock(this->Hub->smutex);
 
     auto msg = MulNX::Message("Call/OnSetGlow"_hash);
     bool needErase = false;
@@ -183,12 +183,12 @@ void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t*
     }
     else {
         auto hOwnerEntity = *pBaseModelEntity->m_hOwnerEntity();
-        pPlayerPawn = this->CS2()->client.GetBaseEntityFromHandle(hOwnerEntity)->As<CS2::C_BaseEntity>()->As<CS2::C_CSPlayerPawn>();
+        pPlayerPawn = this->CS2->client.GetBaseEntityFromHandle(hOwnerEntity)->As<CS2::C_BaseEntity>()->As<CS2::C_CSPlayerPawn>();
     }
     if (!pPlayerPawn)return;
 
     auto hController = *pPlayerPawn->As<CS2::C_BasePlayerPawn>()->m_hController();
-    auto pController = this->CS2()->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
+    auto pController = this->CS2->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
 
     if (!pController)return;
     Steam64UID uid = *pController->m_steamID();

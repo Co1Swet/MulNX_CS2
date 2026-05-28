@@ -5,9 +5,11 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
-CameraSystem* CamSysModule::CamSys() {
-    static auto pCamSys = this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem");
-    return pCamSys;
+CamSysModule::CamSysModule() {
+    this->delayInits.push_back([this]()->bool {
+        this->CamSys = this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem");
+        return true;
+        });
 }
 
 bool CameraSystem::Menu(MulNX::UINode* node) {
@@ -142,7 +144,7 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
 
 void CameraSystem::HandleUpdate() {
     this->Update();
-    this->CamDrawer.Update(this->CS2View()->GetViewMatrix(), this->CS2View()->GetWinWidth(), this->CS2View()->GetWinHeight());
+    this->CamDrawer.Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     this->EManager->HandleUpdate();
     this->SManager->HandleUpdate();
     this->PManager->HandleUpdate();

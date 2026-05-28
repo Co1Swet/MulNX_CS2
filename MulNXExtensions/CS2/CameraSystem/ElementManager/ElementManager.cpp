@@ -83,9 +83,9 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> eleme
 }
 
 bool ElementManager::UINodeFunc(MulNX::UINode* node) {
-    std::unique_lock lock(this->CamSys()->smutex);
+    std::unique_lock lock(this->CamSys->smutex);
     for (auto& [name, elem] : this->elements) {
-        elem->DrawBase(this->CamDrawer, this->CS2View()->GetViewMatrix(), this->CS2View()->GetWinWidth(), this->CS2View()->GetWinHeight());
+        elem->DrawBase(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     }
     if (this->needDrawCamera.load(std::memory_order_acquire)) {
         auto frame = this->drawCamera.Read();
@@ -135,7 +135,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Element/Create"_hash: {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys()->smutex);
+        std::unique_lock lock(this->CamSys->smutex);
         if (!this->Element_Create(ElementType::FreeCameraPath, name)) {
             this->ISys().LogError(std::format("元素创建失败：{}", name));
         }
@@ -143,7 +143,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "Element/Delete"_hash: {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys()->smutex);
+        std::unique_lock lock(this->CamSys->smutex);
         if (!this->Element_Delete(name)) {
             this->ISys().LogError(std::format("元素删除失败：{}", name));
         }
@@ -156,13 +156,13 @@ void ElementManager::HandleUpdate() {
     this->Update();
     if (this->OnPreview) {
         CameraSystemIO IO;
-        IO.ElementTime = this->CS2Time()->GetReal();
-        IO.FrameGameTime = this->CS2Time()->GetReal();
+        IO.ElementTime = this->CS2Time->GetReal();
+        IO.FrameGameTime = this->CS2Time->GetReal();
         if (this->Preview_Call(&IO)) {
             //自由摄像机轨道预览
             if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {
                 if (this->Config.PreviewOverride) {
-                    this->CS2View()->CameraSystemIOOverride(&IO);
+                    this->CS2View->CameraSystemIOOverride(&IO);
                 }
                 if (this->Config.PreviewDraw) {
                     auto frame = this->drawCamera.Write();
@@ -356,7 +356,7 @@ void ElementManager::Preview_Enable() {
 }
 void ElementManager::Preview_Disable() {
     this->OnPreview = false;
-    this->CS2View()->ClearViewOverride();
+    this->CS2View->ClearViewOverride();
     this->ISys().PublishAsync("CameraSystem/Preview/Ended"_hash);
     this->ISys().LogInfo("已关闭预览");
 }

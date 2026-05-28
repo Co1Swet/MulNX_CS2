@@ -42,6 +42,8 @@ public:
 };
 
 class CamSysModule :public CSModuleBase {
+protected:
+    CamSysModule();
 public:
-    CameraSystem* CamSys();
+    CameraSystem* CamSys = nullptr;
 };

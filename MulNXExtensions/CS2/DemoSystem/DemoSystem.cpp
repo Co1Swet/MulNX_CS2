@@ -100,8 +100,8 @@ bool DemoSystem::Window(MulNX::UINode* node) {
     }
     ImGui::Separator();
 
-    ImGui::Text(I18n("demo.status.is_playing", this->CS2Time()->IsPlayingDemo()).c_str());
-    ImGui::Text(I18n("demo.status.is_pausing", this->CS2Time()->IsDemoPaused()).c_str());
+    ImGui::Text(I18n("demo.status.is_playing", this->CS2Time->IsPlayingDemo()).c_str());
+    ImGui::Text(I18n("demo.status.is_pausing", this->CS2Time->IsDemoPaused()).c_str());
 
     ImGui::Separator();
 
@@ -122,7 +122,7 @@ bool DemoSystem::Init() {
         .SubscribeAsync("Demo/Refresh")
         .SubscribeAsync("Window/Drag/FileDrop")
         .SubscribeSync("Hook/RegisterConCommand/RegisterOurCmd", [this](MulNX::Message& msg) {
-        this->CS2()->RegisterCS2Cmd("cl_MulNX", "this is MulNX Cmd", [this](CCommand* a) {
+        this->CS2->RegisterCS2Cmd("cl_MulNX", "this is MulNX Cmd", [this](CCommand* a) {
             MessageBoxW(NULL, L"test", L"test", MB_OK);
             return;
             });
