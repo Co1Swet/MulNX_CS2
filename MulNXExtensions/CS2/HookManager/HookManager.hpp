@@ -16,7 +16,6 @@ private:
     std::unique_ptr<MulNX::Hook> hkCreateSwapChain = nullptr;
     // LoadLibrary 函数钩子（用于DLL注入检测）
     std::unique_ptr<MulNX::Hook> hkLoadLibraryExW = nullptr;
-    std::recursive_mutex loadLibraryMutex;
     // ClearDepthStencilView 钩子（清空前偷深度）
     std::unique_ptr<MulNX::Hook> hkClearDepthStencilView = nullptr;
     // Present 钩子
