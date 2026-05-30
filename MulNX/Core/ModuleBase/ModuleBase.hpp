@@ -76,15 +76,12 @@ namespace MulNX {
         MulNX::MessageChannel* MainMsgChannel = nullptr;
         MulNX::ShortcutManager* pShortcutManager = nullptr;
     protected:
-        MulNX::Core::Core* Core = nullptr;
         MulNX::GlobalVars* GlobalVars = nullptr;
-        Debugger* IDebugger = nullptr;
-        // 线程运行状态
-        std::atomic<bool>Running = false;
-        // 线程执行间隔，默认以100Hz基准执行
-        std::atomic<int> MyThreadDelta = 10;
+        Debugger* IDebugger = nullptr;        
     public:
-        // 组件句柄
+        MulNX::Core::Core* Core = nullptr;
+        std::atomic<bool>runFlag1 = false;
+        std::atomic<bool>runFlag2 = false;
         MulNXHandle HModule;
         MulNX::InputSystem* pInputSystem = nullptr;
         std::shared_mutex smutex;
@@ -128,8 +125,6 @@ namespace MulNX {
         MulNX::Core::Core* GetCore()const { return this->Core; }
         // 便捷窗口显示标志
         std::atomic<bool> showWindow = false;
-        // 模块时间控制接口
-        void SetMyThreadDelta(int Delta);
 
         // 系统服务包装器(原则上是protected权限)
         ISys ISys();

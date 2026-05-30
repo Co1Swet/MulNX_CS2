@@ -8,7 +8,7 @@
 bool MulNX::InputSystem::Init() {
     this->ISys().SendTask("UpdateKeysState", "InputSystem", [this]()->bool {
         this->UpdateKeysState();
-        std::this_thread::sleep_for(std::chrono::milliseconds(this->MyThreadDelta));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         return true;
         });
     return true;

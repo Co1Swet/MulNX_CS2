@@ -14,11 +14,6 @@ std::string MulNX::ModuleBase::GetName()const {
     return this->ModuleName;
 }
 
-// 模块自用
-void MulNX::ModuleBase::SetMyThreadDelta(int Delta) {
-    this->MyThreadDelta = Delta;
-}
-
 // 初始化
 bool MulNX::ModuleBase::BaseInit(MulNX::Core::Core* core) {
     this->Core = core;

@@ -87,7 +87,7 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
     this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
         this->GlobalVars->SystemReady.store(true);
-        //this->ISys().PublishSync("Hook/Present/Fisrt"_hash);
+        this->ISys().PublishSync("Hook/Present/Fisrt"_hash);
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11AndImGuiInit(hk, ctx);});
         return MulNX::Hook::Then::Continue;
         }).value();

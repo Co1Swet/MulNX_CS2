@@ -62,6 +62,15 @@ bool CSController::Init() {
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {return this->OnPanoramaLoad(msg);})
+        .SubscribeSync("Hook/RegisterConCommand/RegisterOurCmd",
+            [this](MulNX::Message& msg) {
+                this->RegisterCS2Cmd("mulnx_record_start", "this is MulNX Cmd", [this](CCommand* a) {
+                    return;
+                    });
+                this->RegisterCS2Cmd("mulnx_record_end", "this is MulNX Cmd", [this](CCommand* a) {
+                    return;
+                    });
+            });
         ;
 
     this->currentCoro = InitTask();
@@ -72,6 +81,7 @@ bool CSController::Init() {
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         return true;
         });
+    
 
     return true;
 }
