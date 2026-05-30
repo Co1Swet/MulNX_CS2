@@ -11,7 +11,7 @@ int main(int, char**) {
     try {
         // 创建核心
         pCore = MulNX::Core::Core::Create("CS2Injector");
-        // 将DLL模块句柄传递给核心，以便后续使用
+        // 将模块句柄传递给核心，以便后续使用
         pCore->hMyOriginModule = GetModuleHandleW(NULL);
         // 创建核心启动器
         auto* starter = pCore->CreateCoreStarter<Win32Starter>();

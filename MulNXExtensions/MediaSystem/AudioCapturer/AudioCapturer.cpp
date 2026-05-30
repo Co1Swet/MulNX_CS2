@@ -79,8 +79,11 @@ bool AudioCapturer::Init() {
 
         // Schedule Main via ISys task (no explicit thread)
         this->ISys().SendTask("Main", "AudioCapturer", [this]() {
-            this->Main();
-            return true;
+            while (this->runFlag1.load()) {
+                std::unique_lock lock(this->smutex);
+                this->Main();
+            }
+            return false;
             });
 
         });
@@ -220,6 +223,7 @@ void AudioCapturer::Main() {
 
 void AudioCapturer::Deinit() {
     this->capturing.store(false);
+    std::unique_lock lock(this->smutex);
     if (this->audioClient) {
         audioClient->Stop();
     }
