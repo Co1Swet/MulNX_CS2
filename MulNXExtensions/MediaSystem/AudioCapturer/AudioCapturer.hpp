@@ -19,4 +19,8 @@ public:
     void Deinit()override;
 
     std::optional<av::AudioSamples> TryPop();
+    // audio info accessors
+    WAVEFORMATEX* GetWfx() const { return wfx; }
+    int GetSampleRate() const { return wfx ? wfx->nSamplesPerSec : 0; }
+    int GetChannels() const { return wfx ? wfx->nChannels : 0; }
 };

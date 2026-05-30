@@ -4,6 +4,7 @@
 #include <avcpp/sampleformat.h>
 #include <avcpp/av.h>
 #include <avcpp/averror.h>
+#include <avcpp/audioresampler.h>
 #include <libavutil/channel_layout.h>
 #include <vector>
 #include <wrl/client.h>
@@ -151,7 +152,49 @@ void AudioCapturer::Main() {
                     }
                 }
 
-                this->buffer.enqueue(std::move(samples));
+                // perform normalization/resample/downmix here before enqueue
+                try {
+                    av::SampleFormat targetFmt(AV_SAMPLE_FMT_S16); // packed int16 (interleaved)
+                    uint64_t targetLayout = AV_CH_LAYOUT_STEREO;
+                    int targetRate = sampleRate;
+
+                    av::AudioSamples& captured = samples; // use local 'samples' filled above
+                    av::SampleFormat curFmt = useFmt;
+                    bool needNormalize = false;
+                    if (curFmt != targetFmt) needNormalize = true;
+                    if (captured.channelsCount() != 2) needNormalize = true;
+                    if (captured.channelsLayout() != targetLayout) needNormalize = true;
+
+                    if (!needNormalize) {
+                        this->buffer.enqueue(std::move(captured));
+                    }
+                    else {
+                        std::error_code rerr;
+                        av::AudioResampler tmpRes;
+                        bool ok = tmpRes.init(targetLayout, targetRate, targetFmt, chLayout, sampleRate, curFmt, rerr);
+                        if (ok) {
+                            tmpRes.push(captured);
+                            av::AudioSamples out = tmpRes.pop(0);
+                            if (out.isValid() && out.samplesCount() > 0) {
+                                this->buffer.enqueue(std::move(out));
+                            }
+                            else {
+                                // fallback to original if conversion produced no data
+                                this->buffer.enqueue(std::move(captured));
+                            }
+                        }
+                        else {
+                            this->ISys().LogWarning(std::string("AudioCapturer: resampler init failed: ") + (rerr ? rerr.message() : "unknown"));
+                            this->buffer.enqueue(std::move(captured));
+                        }
+                    }
+                }
+                catch (const std::exception& e) {
+                    this->ISys().LogWarning(std::string("AudioCapturer: normalization failed: ") + e.what());
+                    // best effort: if normalization fails, enqueue original raw data
+                    try { this->buffer.enqueue(std::move(samples)); }
+                    catch (...) {}
+                }
             }
             catch (const std::exception&) {
                 // swallow conversion errors for robustness; host can log if needed
