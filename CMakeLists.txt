@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.31)
 project("MulNX_CS2")
 
 # 版本定义
-add_compile_definitions(MulNXVersion="B0.2.0C0.29.1")
+add_compile_definitions(MulNXVersion="B0.2.0C0.30.0")
 
 # 启用 LTO（仅 Release 配置）
 include(CheckIPOSupported)
@@ -19,7 +19,8 @@ endif()
 # C++ 标准设置
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
+message(STATUS "CXX compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 
 # 添加编译选项
 add_compile_options(/MP)

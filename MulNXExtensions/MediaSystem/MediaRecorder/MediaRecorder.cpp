@@ -2,26 +2,29 @@
 #include <MulNXExtensions/MediaSystem/FrameCapturer/FrameCapturer.hpp>
 
 bool MediaRecorder::Init() {
-    this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
     this->pCapturer = this->Core->ModuleManager()->FindModule<FrameCapturer>("FrameCapturer");
     this->dirVedios = this->ISys().PathManager()->PathGetForShared("Vedios");
 
     this->ISys()
-        .SubscribeAsync("Media/Record/Start")
-        .SubscribeAsync("Media/Record/Stop")
-        .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->HandleOnPresent();});
-    
+        .SubscribeAsync("MulNX/Record/Start")
+        .SubscribeAsync("MulNX/Record/Stop");
+
+    this->ISys().SendTask("Main", "Media", [this]() {
+        this->Main();
+        return true;
+        });
+
     return true;
 }
 
 void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Media/Record/Start"_hash: {
+    case "MulNX/Record/Start"_hash: {
         auto outFile = this->dirVedios / "record.mp4";
         this->StartRecording(outFile.string(), 1920, 1080);
         break;
     }
-    case "Media/Record/Stop"_hash: {
+    case "MulNX/Record/Stop"_hash: {
         this->StopRecording();
         break;
     }
@@ -29,7 +32,7 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 }
 
 bool MediaRecorder::StartRecording(const std::string& filename, int w, int h) {
-    if (this->isRecording) {
+    if (this->runFlag1) {
         this->ISys().LogWarning("已在录制中，StartRecording 被忽略");
         return false;
     }
@@ -60,7 +63,7 @@ bool MediaRecorder::StartRecording(const std::string& filename, int w, int h) {
 
         this->width = w;
         this->height = h;
-        this->isRecording = true;
+        this->runFlag1 = true;
         this->ptsCounter = 0;
 
         this->ISys().LogSucc("已开始录制: " + filename);
@@ -73,24 +76,24 @@ bool MediaRecorder::StartRecording(const std::string& filename, int w, int h) {
     }
 }
 
-void MediaRecorder::HandleOnPresent() {
+void MediaRecorder::Main() {
     this->Update();
-    if (!this->isRecording) return;
+    if (!this->runFlag1) return;
 
     static std::optional<std::chrono::steady_clock::time_point> lastCapture;
     auto now = std::chrono::steady_clock::now();
     constexpr std::chrono::duration<double> minInterval(1.0 / 60.0);
 
-    if (lastCapture.has_value() && (now - *lastCapture < minInterval)) {
-        return;
+    if (!(lastCapture.has_value() && (now - *lastCapture < minInterval))) {
+        lastCapture = now;
+        this->pCapturer->runFlag2.store(true, std::memory_order_release);
     }
-    lastCapture = now;
-
-    this->pCapturer->Captuer();
+    
+    this->Encode();
 }
 
 bool MediaRecorder::StopRecording() {
-    if (!this->isRecording) {
+    if (!this->runFlag1) {
         return false;
     }
 
@@ -112,7 +115,7 @@ bool MediaRecorder::StopRecording() {
         this->ISys().LogError(std::string("录制停止失败: ") + e.what());
     }
 
-    this->isRecording = false;
+    this->runFlag1 = false;
     this->ptsCounter = 0;
     this->width = 0;
     this->height = 0;

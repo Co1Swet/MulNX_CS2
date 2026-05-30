@@ -1,8 +1,5 @@
 #pragma once
-
-#include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
-#include <MulNXExtensions/MediaSystem/D3D11AV.hpp>
+#include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
 class MediaSystem final :public MulNX::ModuleBase {
     bool Window(MulNX::UINode* node);

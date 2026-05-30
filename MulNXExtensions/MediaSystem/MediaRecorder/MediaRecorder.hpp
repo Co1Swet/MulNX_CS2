@@ -1,12 +1,8 @@
 #pragma once
-
-#include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
-#include <MulNXExtensions/MediaSystem/D3D11AV.hpp>
+#include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
 class FrameCapturer;
-class MediaRecorder final :public MulNX::ModuleBase {
-    MulNX::GraphicsManager* pGraphicsManager = nullptr;
+class MediaRecorder final :public MediaModuleBase {
     FrameCapturer* pCapturer = nullptr;
 
     // 录制相关
@@ -15,9 +11,8 @@ class MediaRecorder final :public MulNX::ModuleBase {
     av::VideoEncoderContext encoder;
     av::VideoRescaler   rescaler;
     
-    bool isRecording = false;
     int width = 0, height = 0;
-    AVRational timeBase = { 1, 30 };  // 30 fps
+    AVRational timeBase = { 1, 60 };  // 60 fps
     int64_t ptsCounter = 0;
 
     bool StartRecording(const std::string& filename, int w, int h);
@@ -25,9 +20,10 @@ class MediaRecorder final :public MulNX::ModuleBase {
 
     std::filesystem::path dirVedios;
 
-    void HandleOnPresent();
     void Encode();
     void ProcessMsg(MulNX::Message& msg);
+
+    void Main();
 public:
     bool Init()override;
 };

@@ -1,8 +1,7 @@
 #pragma once
+#include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-#include <MulNX/MulNX.hpp>
-
-class MediaProcesser final :public MulNX::ModuleBase {
+class MediaProcesser final :public MediaModuleBase {
 public:
     bool Init()override;
 

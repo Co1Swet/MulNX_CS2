@@ -1,7 +1,7 @@
 #include "FrameCapturer.hpp"
 
 bool FrameCapturer::Init() {
-    this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->ISys().SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->Captuer();});
 
     return true;
 }
@@ -32,19 +32,26 @@ std::optional<av::VideoFrame> FrameCapturer::TryPop() {
 void FrameCapturer::Captuer() {
     this->Update();
 
+    if (!this->runFlag2.load()) {
+        return;
+    }
+    this->runFlag2.store(false);
+
     ID3D11Texture2D* backBuffer = nullptr;
     this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
     if (!backBuffer) {
         return;
     }
+    scope_exit releaseBackBuffer([&backBuffer]() {
+        backBuffer->Release();});
 
     D3D11_TEXTURE2D_DESC desc;
     backBuffer->GetDesc(&desc);
+    
 
     av::PixelFormat srcFormat = DXGIFormatToAvPixelFormat(desc.Format);
     if (srcFormat == AV_PIX_FMT_NONE) {
         this->ISys().LogError("当前后备缓冲区格式不受支持，无法录制");
-        backBuffer->Release();
         return;
     }
 
@@ -65,7 +72,6 @@ void FrameCapturer::Captuer() {
         HRESULT hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&stagingDesc, nullptr, &this->pStagingTex);
         if (FAILED(hr)) {
             this->ISys().LogError("创建 D3D11 staging 纹理失败，录制中断");
-            backBuffer->Release();
             return;
         }
 
@@ -82,7 +88,6 @@ void FrameCapturer::Captuer() {
     else {
         this->pGraphicsManager->pd3dContext->CopyResource(this->pStagingTex, backBuffer);
     }
-    backBuffer->Release();
 
     D3D11_MAPPED_SUBRESOURCE mapped = {};
     HRESULT hr = this->pGraphicsManager->pd3dContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &mapped);

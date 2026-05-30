@@ -1,10 +1,7 @@
 #pragma once
+#include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-#include <MulNX/MulNX.hpp>
-#include <MulNXThirdParty/queue/concurrentqueue.h>
-#include <avcpp/frame.h>
-
-class AudioCapturer final :public MulNX::ModuleBase {
+class AudioCapturer final :public MediaModuleBase {
 public:
     bool Init()override;
     void Deinit()override;
