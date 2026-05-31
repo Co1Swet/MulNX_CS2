@@ -1,11 +1,11 @@
 #include "MediaRecorder.hpp"
-#include <MulNXExtensions/MediaSystem/FrameCapturer/FrameCapturer.hpp>
+#include <MulNXExtensions/MediaSystem/VideoCapturer/VideoCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 #include <deque>
 #include <cstring>
 
 bool MediaRecorder::Init() {
-    this->pCapturer = this->Core->ModuleManager()->FindModule<FrameCapturer>("FrameCapturer");
+    this->pVideoCapturer = this->Core->ModuleManager()->FindModule<VideoCapturer>("VideoCapturer");
     this->pAudioCapturer = this->Core->ModuleManager()->FindModule<AudioCapturer>("AudioCapturer");
     this->dirVedios = this->ISys().PathManager()->PathGetForShared("Vedios");
 
@@ -148,7 +148,7 @@ void MediaRecorder::Main() {
 
     if (!(lastCapture.has_value() && (now - *lastCapture < minInterval))) {
         lastCapture = now;
-        this->pCapturer->runFlag2.store(true, std::memory_order_release);
+        this->pVideoCapturer->runFlag2.store(true, std::memory_order_release);
     }
 
     this->Encode();
@@ -205,7 +205,7 @@ bool MediaRecorder::StopRecording() {
     this->ptsCounter = 0;
     this->width = 0;
     this->height = 0;
-    this->pCapturer->Reset();
+    this->pVideoCapturer->Reset();
     if (this->aencoder.isValid()) {
         this->aencoder.close();
     }
@@ -218,7 +218,7 @@ bool MediaRecorder::StopRecording() {
 
 void MediaRecorder::Encode() {
     // ---------- 视频编码 ----------
-    auto opFrame = this->pCapturer->TryPop();
+    auto opFrame = this->pVideoCapturer->TryPop();
     if (opFrame.has_value()) {
         auto srcFrame = opFrame.value();
         av::VideoFrame dstFrame(AV_PIX_FMT_YUV420P, this->width, this->height);
@@ -226,11 +226,11 @@ void MediaRecorder::Encode() {
         if (!this->rescaler.isValid() ||
             this->rescaler.srcWidth() != this->width ||
             this->rescaler.srcHeight() != this->height ||
-            this->rescaler.srcPixelFormat() != this->pCapturer->srcPixelFormat) {
+            this->rescaler.srcPixelFormat() != this->pVideoCapturer->srcPixelFormat) {
             this->rescaler = av::VideoRescaler(
                 this->width, this->height, AV_PIX_FMT_YUV420P,
-                this->pCapturer->stagingWidth, this->pCapturer->stagingHeight,
-                this->pCapturer->srcPixelFormat, av::SwsFlagFastBilinear
+                this->pVideoCapturer->stagingWidth, this->pVideoCapturer->stagingHeight,
+                this->pVideoCapturer->srcPixelFormat, av::SwsFlagFastBilinear
             );
         }
 

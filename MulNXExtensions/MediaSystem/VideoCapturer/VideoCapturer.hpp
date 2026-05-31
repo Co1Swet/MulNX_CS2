@@ -3,7 +3,7 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <MulNXThirdParty/queue/concurrentqueue.h>
 
-class FrameCapturer final :public MediaModuleBase {
+class VideoCapturer final :public MediaModuleBase {
     moodycamel::ConcurrentQueue<av::VideoFrame>buffer;
 
     void ReleaseStagingTexture();

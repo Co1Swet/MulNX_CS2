@@ -2,10 +2,8 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <avcpp/audioresampler.h>
 
-class FrameCapturer;
 class MediaRecorder final :public MediaModuleBase {
-    FrameCapturer* pCapturer = nullptr;
-    // audio capture
+    class VideoCapturer* pVideoCapturer = nullptr;
     class AudioCapturer* pAudioCapturer = nullptr;
 
     // 录制相关

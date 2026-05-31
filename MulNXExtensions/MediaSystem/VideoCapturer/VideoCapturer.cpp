@@ -1,12 +1,12 @@
-#include "FrameCapturer.hpp"
+#include "VideoCapturer.hpp"
 
-bool FrameCapturer::Init() {
+bool VideoCapturer::Init() {
     this->ISys().SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->Captuer();});
 
     return true;
 }
 
-void FrameCapturer::ReleaseStagingTexture() {
+void VideoCapturer::ReleaseStagingTexture() {
     if (this->pStagingTex) {
         this->pStagingTex->Release();
         this->pStagingTex = nullptr;
@@ -16,12 +16,12 @@ void FrameCapturer::ReleaseStagingTexture() {
     this->stagingFormat = DXGI_FORMAT_UNKNOWN;
 }
 
-void FrameCapturer::Reset() {
+void VideoCapturer::Reset() {
     this->srcPixelFormat = AV_PIX_FMT_NONE;
     this->ReleaseStagingTexture();
 }
 
-std::optional<av::VideoFrame> FrameCapturer::TryPop() {
+std::optional<av::VideoFrame> VideoCapturer::TryPop() {
     av::VideoFrame outFrame;
     if (this->buffer.try_dequeue(outFrame)) {
         return std::move(outFrame);
@@ -29,7 +29,7 @@ std::optional<av::VideoFrame> FrameCapturer::TryPop() {
     return std::nullopt;
 }
 
-void FrameCapturer::Captuer() {
+void VideoCapturer::Captuer() {
     this->Update();
 
     if (!this->runFlag2.load()) {
