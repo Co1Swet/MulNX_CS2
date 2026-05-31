@@ -3,14 +3,14 @@
 #include <avcpp/audioresampler.h>
 
 class MediaRecorder final :public MediaModuleBase {
+    class AEncodeHelper* pAEncodeHelper = nullptr;
+    class VEncodeHelper* pVEncodeHelper = nullptr;
     class VideoCapturer* pVideoCapturer = nullptr;
     class AudioCapturer* pAudioCapturer = nullptr;
 
     // 录制相关
     av::FormatContext   ofctx;
-    av::Stream          vstream;
-    av::VideoEncoderContext encoder;
-    av::VideoRescaler   rescaler;
+
     // audio encoder
     av::Stream          astream;
     av::AudioEncoderContext aencoder;
@@ -21,9 +21,8 @@ class MediaRecorder final :public MediaModuleBase {
 
     std::deque<av::AudioSamples> audioFifo;
 
-    int width = 0, height = 0;
     AVRational timeBase = { 1, 60 };  // 60 fps
-    int64_t ptsCounter = 0;
+    
     int64_t aptsCounter = 0;
 
     bool StartRecording(const std::string& filename, int w, int h);

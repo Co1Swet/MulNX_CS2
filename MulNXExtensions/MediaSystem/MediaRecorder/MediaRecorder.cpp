@@ -1,12 +1,17 @@
 #include "MediaRecorder.hpp"
 #include <MulNXExtensions/MediaSystem/VideoCapturer/VideoCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
+#include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
+#include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
 #include <deque>
 #include <cstring>
 
 bool MediaRecorder::Init() {
     this->pVideoCapturer = this->Core->ModuleManager()->FindModule<VideoCapturer>("VideoCapturer");
     this->pAudioCapturer = this->Core->ModuleManager()->FindModule<AudioCapturer>("AudioCapturer");
+    this->pVEncodeHelper = this->Core->ModuleManager()->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->pAEncodeHelper = this->Core->ModuleManager()->FindModule<AEncodeHelper>("AEncodeHelper");
+
     this->dirVedios = this->ISys().PathManager()->PathGetForShared("Vedios");
 
     this->ISys()
@@ -44,22 +49,8 @@ bool MediaRecorder::StartRecording(const std::string& filename, int w, int h) {
     try {
         this->ofctx.openOutput(filename);
 
-        // ---- 视频编码器初始化 ----
-        av::Codec vcodec = av::findEncodingCodec(AV_CODEC_ID_H264);
-        if (!vcodec.canEncode()) {
-            this->ISys().LogError("未找到可用的 H264 编码器");
-            return false;
-        }
-        this->encoder = av::VideoEncoderContext(vcodec);
-        this->encoder.setWidth(w);
-        this->encoder.setHeight(h);
-        this->encoder.setPixelFormat(AV_PIX_FMT_YUV420P);
-        this->encoder.setTimeBase(this->timeBase);
-        this->encoder.setBitRate(4000000);
-        this->encoder.open();
-        this->vstream = this->ofctx.addStream(this->encoder);
-        this->vstream.setTimeBase(this->timeBase);
-        this->vstream.setupEncodingParameters(this->encoder);
+        this->pVEncodeHelper->SetOn(&this->ofctx, w, h, this->timeBase);
+        
 
         // ---- 音频编码器初始化（动态选择最佳格式） ----
         if (this->pAudioCapturer) {
@@ -121,10 +112,8 @@ bool MediaRecorder::StartRecording(const std::string& filename, int w, int h) {
         }
         catch (...) {}
 
-        this->width = w;
-        this->height = h;
         this->runFlag1 = true;
-        this->ptsCounter = 0;
+        
         this->aptsCounter = 0;
         this->audioFifo.clear(); // 清空音频缓冲
 
@@ -158,14 +147,8 @@ bool MediaRecorder::StopRecording() {
     if (!this->runFlag1) return false;
 
     try {
-        // 刷新视频编码器
-        while (true) {
-            av::Packet pkt = this->encoder.encode();
-            if (!pkt || pkt.size() == 0) break;
-            pkt.setStreamIndex(this->vstream.index());
-            pkt.setTimeBase(this->vstream.timeBase());
-            pkt.setDuration(1, this->vstream.timeBase());
-            this->ofctx.writePacket(pkt);
+        while (auto pkt = this->pVEncodeHelper->TrySetOff()) {
+            this->ofctx.writePacket(*pkt);
         }
 
         // 刷新音频编码器（先清空内部缓冲）
@@ -202,9 +185,8 @@ bool MediaRecorder::StopRecording() {
     }
 
     this->runFlag1 = false;
-    this->ptsCounter = 0;
-    this->width = 0;
-    this->height = 0;
+    
+    
     this->pVideoCapturer->Reset();
     if (this->aencoder.isValid()) {
         this->aencoder.close();
@@ -221,36 +203,15 @@ void MediaRecorder::Encode() {
     auto opFrame = this->pVideoCapturer->TryPop();
     if (opFrame.has_value()) {
         auto srcFrame = opFrame.value();
-        av::VideoFrame dstFrame(AV_PIX_FMT_YUV420P, this->width, this->height);
+        
 
-        if (!this->rescaler.isValid() ||
-            this->rescaler.srcWidth() != this->width ||
-            this->rescaler.srcHeight() != this->height ||
-            this->rescaler.srcPixelFormat() != this->pVideoCapturer->srcPixelFormat) {
-            this->rescaler = av::VideoRescaler(
-                this->width, this->height, AV_PIX_FMT_YUV420P,
-                this->pVideoCapturer->stagingWidth, this->pVideoCapturer->stagingHeight,
-                this->pVideoCapturer->srcPixelFormat, av::SwsFlagFastBilinear
-            );
-        }
+        this->pVEncodeHelper->CheckRescaler(
+            this->pVideoCapturer->stagingWidth, this->pVideoCapturer->stagingHeight,
+            this->pVideoCapturer->srcPixelFormat);
+        
+        auto pkt = *this->pVEncodeHelper->Encode(std::move(srcFrame));
 
-        try {
-            this->rescaler.rescale(dstFrame, srcFrame);
-            dstFrame.setTimeBase(this->timeBase);
-            dstFrame.setPts(av::Timestamp(this->ptsCounter++, this->timeBase));
-            dstFrame.setStreamIndex(this->vstream.index());
-
-            av::Packet pkt = this->encoder.encode(dstFrame);
-            if (pkt && pkt.size() > 0) {
-                pkt.setStreamIndex(this->vstream.index());
-                pkt.setTimeBase(this->vstream.timeBase());
-                pkt.setDuration(1, this->vstream.timeBase());
-                this->ofctx.writePacket(pkt);
-            }
-        }
-        catch (const std::exception& e) {
-            this->ISys().LogError(std::string("视频帧写入失败: ") + e.what());
-        }
+        this->ofctx.writePacket(pkt);
     }
 
     // ---------- 音频编码 ----------
