@@ -14,6 +14,9 @@ uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     case MulNX::Hook::Then::Continue:
         target = this->jmpForContinue;
         break;
+    case MulNX::Hook::Then::SkipAndContinue:
+        target = this->jmpForSkipAndContinue;
+        break;
     default:
         target = this->jmpForContinue;
         break;
@@ -131,24 +134,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
         Asm
             .sub(RSP, HookInstance->frameSize) // 分配栈空间
-            // 保存所有寄存器到 [rsp + offset]
-            .mov(Mem(RSP, offsetof(RegContext, rax)), RAX)
-            .mov(Mem(RSP, offsetof(RegContext, rcx)), RCX)
-            .mov(Mem(RSP, offsetof(RegContext, rdx)), RDX)
-            .mov(Mem(RSP, offsetof(RegContext, rbx)), RBX)
-            .mov(Mem(RSP, offsetof(RegContext, rsp)), RSP) // 保存当前rsp（分配后的）
-            .mov(Mem(RSP, offsetof(RegContext, rbp)), RBP)
-            .mov(Mem(RSP, offsetof(RegContext, rsi)), RSI)
-            .mov(Mem(RSP, offsetof(RegContext, rdi)), RDI)
-            .mov(Mem(RSP, offsetof(RegContext, r8)), R8)
-            .mov(Mem(RSP, offsetof(RegContext, r9)), R9)
-            .mov(Mem(RSP, offsetof(RegContext, r10)), R10)
-            .mov(Mem(RSP, offsetof(RegContext, r11)), R11)
-            .mov(Mem(RSP, offsetof(RegContext, r12)), R12)
-            .mov(Mem(RSP, offsetof(RegContext, r13)), R13)
-            .mov(Mem(RSP, offsetof(RegContext, r14)), R14)
-            .mov(Mem(RSP, offsetof(RegContext, r15)), R15);
-
+            .SaveReg();
 
         // 指令执行区
         Asm
@@ -161,52 +147,20 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
             .jmp(RAX);// 某种意义上，这里是一个分支操作，但是这个分支实际上是由CPP语言层面决定的，因此我们在汇编层面上并不需要区分真假分支，直接让它无条件跳转到jmpTarget即可
         HookInstance->dispatcherAsmCode = Asm.Release();
 
-        // 分支0
+        // 执行完毕后强制返回被钩函数
         HookInstance->jmpForReturn = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-        // 恢复区
         Asm
-            .mov(RAX, Mem(RSP, offsetof(RegContext, rax)))
-            .mov(RCX, Mem(RSP, offsetof(RegContext, rcx)))
-            .mov(RDX, Mem(RSP, offsetof(RegContext, rdx)))
-            .mov(RBX, Mem(RSP, offsetof(RegContext, rbx)))
-            // 不恢复 rsp
-            .mov(RBP, Mem(RSP, offsetof(RegContext, rbp)))
-            .mov(RSI, Mem(RSP, offsetof(RegContext, rsi)))
-            .mov(RDI, Mem(RSP, offsetof(RegContext, rdi)))
-            .mov(R8, Mem(RSP, offsetof(RegContext, r8)))
-            .mov(R9, Mem(RSP, offsetof(RegContext, r9)))
-            .mov(R10, Mem(RSP, offsetof(RegContext, r10)))
-            .mov(R11, Mem(RSP, offsetof(RegContext, r11)))
-            .mov(R12, Mem(RSP, offsetof(RegContext, r12)))
-            .mov(R13, Mem(RSP, offsetof(RegContext, r13)))
-            .mov(R14, Mem(RSP, offsetof(RegContext, r14)))
-            .mov(R15, Mem(RSP, offsetof(RegContext, r15)))
+            .LoadReg()
             // 释放上下文空间
             .add(RSP, HookInstance->frameSize)
             .ret();// 从分发函数返回
 
         HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        // 分支1
+        // 执行完毕后执行被覆盖指令并继续执行
         HookInstance->jmpForContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-        // 恢复区
         Asm
-            .mov(RAX, Mem(RSP, offsetof(RegContext, rax)))
-            .mov(RCX, Mem(RSP, offsetof(RegContext, rcx)))
-            .mov(RDX, Mem(RSP, offsetof(RegContext, rdx)))
-            .mov(RBX, Mem(RSP, offsetof(RegContext, rbx)))
-            // 不恢复 rsp
-            .mov(RBP, Mem(RSP, offsetof(RegContext, rbp)))
-            .mov(RSI, Mem(RSP, offsetof(RegContext, rsi)))
-            .mov(RDI, Mem(RSP, offsetof(RegContext, rdi)))
-            .mov(R8, Mem(RSP, offsetof(RegContext, r8)))
-            .mov(R9, Mem(RSP, offsetof(RegContext, r9)))
-            .mov(R10, Mem(RSP, offsetof(RegContext, r10)))
-            .mov(R11, Mem(RSP, offsetof(RegContext, r11)))
-            .mov(R12, Mem(RSP, offsetof(RegContext, r12)))
-            .mov(R13, Mem(RSP, offsetof(RegContext, r13)))
-            .mov(R14, Mem(RSP, offsetof(RegContext, r14)))
-            .mov(R15, Mem(RSP, offsetof(RegContext, r15)))
+            .LoadReg()
             // 释放上下文空间
             .add(RSP, HookInstance->frameSize);
 
@@ -226,8 +180,17 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
         HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        HookInstance->pCallOrigin = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+        // 执行完毕后跳过被覆盖指令并继续执行
+        HookInstance->jmpForSkipAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+        Asm
+            .LoadReg()
+            // 释放上下文空间
+            .add(RSP, HookInstance->frameSize)
+            .jmp64((uintptr_t)target + HookInstance->overrideSize); // 跳转到原处
+        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
+        // 栈伪造以调用原函数
+        HookInstance->pCallOrigin = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
         // rcx = hook*, rdx = stackCopySize, r8 = regctx*
         Asm
             // 序言

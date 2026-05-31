@@ -8,12 +8,6 @@
 #include <memory>
 #include <string>
 
-class RegContext {
-public:
-    uint64_t rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi;
-    uint64_t r8, r9, r10, r11, r12, r13, r14, r15;
-};
-
 namespace MulNX {
     class AsmCmdInfo {
     public:
@@ -40,6 +34,7 @@ namespace MulNX {
 
         enum class Then {
             Continue,
+            SkipAndContinue,
             Return
         };
     private:
@@ -60,6 +55,7 @@ namespace MulNX {
 
         uintptr_t jmpForReturn = 0;
         uintptr_t jmpForContinue = 0;
+        uintptr_t jmpForSkipAndContinue = 0;
 
         size_t frameSize = 0;
         uintptr_t pCallOrigin = 0;

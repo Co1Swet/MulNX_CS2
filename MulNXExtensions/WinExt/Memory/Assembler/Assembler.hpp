@@ -3,6 +3,12 @@
 #include <vector>
 #include <cstdint>
 
+class RegContext {
+public:
+    uint64_t rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi;
+    uint64_t r8, r9, r10, r11, r12, r13, r14, r15;
+};
+
 namespace MulNX {
     namespace Memory {
         namespace Asm {
@@ -93,6 +99,9 @@ namespace MulNX {
                 Assembler& sub(Mem dst, Reg src);                // sub [dst], src
                 Assembler& sub(Reg dst, int32_t imm);            // sub dst, imm (符号扩展)
                 Assembler& sub(Mem dst, int32_t imm);            // sub [dst], imm (符号扩展)
+
+                Assembler& SaveReg();
+                Assembler& LoadReg();
 
                 Code Release();
             };
