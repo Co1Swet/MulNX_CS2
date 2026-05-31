@@ -34,7 +34,8 @@ namespace MulNX {
 
         enum class Then {
             Continue,
-            SkipAndContinue,
+            SkipAllAndContinue,
+            JmpUserSettedTarget,
             Return
         };
     private:
@@ -55,7 +56,8 @@ namespace MulNX {
 
         uintptr_t jmpForReturn = 0;
         uintptr_t jmpForContinue = 0;
-        uintptr_t jmpForSkipAndContinue = 0;
+        uintptr_t jmpForSkipAllAndContinue = 0;
+        uintptr_t jmpForUserSettedTarget = 0;
 
         size_t frameSize = 0;
         uintptr_t pCallOrigin = 0;
@@ -71,7 +73,8 @@ namespace MulNX {
         // 关于栈调整参数，当其为false时，模拟原始栈状态进行回调；当其为true时，则认为栈状态非16字节对齐，内部进行对齐操作（常常是函数中间Hook）
         static std::expected<std::unique_ptr<Hook>, std::string> Create(
             uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
-            bool extraStackAdjust = false, int len = 0);
+            bool extraStackAdjust = false, uintptr_t userJmpTarget = 0,int len = 0);
+
         Result Attach();
         Result Detach();
 

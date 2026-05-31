@@ -14,8 +14,11 @@ uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     case MulNX::Hook::Then::Continue:
         target = this->jmpForContinue;
         break;
-    case MulNX::Hook::Then::SkipAndContinue:
-        target = this->jmpForSkipAndContinue;
+    case MulNX::Hook::Then::SkipAllAndContinue:
+        target = this->jmpForSkipAllAndContinue;
+        break;
+    case MulNX::Hook::Then::JmpUserSettedTarget:
+        target = this->jmpForUserSettedTarget;
         break;
     default:
         target = this->jmpForContinue;
@@ -89,7 +92,8 @@ void* TryAlloc(uintptr_t target, size_t size) {
     return nullptr;
 }
 
-std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback, bool extraStackAdjust, int len) {
+std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
+    bool extraStackAdjust, uintptr_t userJmpTarget, int len) {
     if (0 < len && len < 5) {
         return std::unexpected(std::format("参数指定的长度是：{}  ，这个长度怎么可能放得下一个jmp rel32？？", len));
     }
@@ -180,13 +184,22 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
         HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        // 执行完毕后跳过被覆盖指令并继续执行
-        HookInstance->jmpForSkipAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+        // 执行完毕后跳过全部被覆盖指令并继续执行
+        HookInstance->jmpForSkipAllAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
         Asm
             .LoadReg()
             // 释放上下文空间
             .add(RSP, HookInstance->frameSize)
             .jmp64((uintptr_t)target + HookInstance->overrideSize); // 跳转到原处
+        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+
+        // 执行完毕后跳到用户指定的位置
+        HookInstance->jmpForUserSettedTarget = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+        Asm
+            .LoadReg()
+            // 释放上下文空间
+            .add(RSP, HookInstance->frameSize)
+            .jmp64(userJmpTarget); // 跳转到原处
         HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
         // 栈伪造以调用原函数
