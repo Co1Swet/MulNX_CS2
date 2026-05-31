@@ -12,6 +12,7 @@
 #include <avcpp/codeccontext.h>
 #include <avcpp/formatcontext.h>
 #include <avcpp/videorescaler.h>
+#include <avcpp/audioresampler.h>
 
 inline av::PixelFormat DXGIFormatToAvPixelFormat(DXGI_FORMAT format) {
     switch (format) {
