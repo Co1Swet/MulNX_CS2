@@ -3,7 +3,7 @@
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 class POVFixer final :public CSModuleBase {
-    bool enable = false;
+    MulNX::ModuleBase* pTeamIDController = nullptr;
     void BeforeDraw();
     void OnSetGlow(MulNX::Message& msg);
     void Draw(MulNX::UINode* node);

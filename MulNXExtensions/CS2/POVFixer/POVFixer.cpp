@@ -3,16 +3,21 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 void POVFixer::Draw(MulNX::UINode* node) {
-    if (ImGui::Button(I18n("pov.enable").c_str())) {
-        this->ISys().PublishAsync("POVFix/Enable"_hash);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button(I18n("pov.disable").c_str())) {
-        this->ISys().PublishAsync("POVFix/Disable"_hash);
+    if (ImGui::CollapsingHeader("POV Fix")) {
+        if (ImGui::Button(I18n("pov.enable").c_str())) {
+            this->ISys().PublishAsync("POVFix/Enable"_hash);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(I18n("pov.disable").c_str())) {
+            this->ISys().PublishAsync("POVFix/Disable"_hash);
+        }
+        MulNX::UI::Checkbox("Team ID隐藏敌方", this->pTeamIDController->runFlag1);
     }
 }
 
 bool POVFixer::Init() {
+    this->pTeamIDController = this->Core->ModuleManager()->FindModule("TeamIDController");
+
     this->ISys()
         .SubscribeSync("Call/BeforeDraw", [this](MulNX::Message& msg) {this->BeforeDraw();})
         .SubscribeSync("Call/OnSetGlow", [this](MulNX::Message& msg) {this->OnSetGlow(msg);})
@@ -28,7 +33,7 @@ bool POVFixer::Init() {
 void POVFixer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "POVFix/Enable"_hash: {
-        this->enable = true;
+        this->runFlag1.store(true);
         this->ISys().AsyncCommand("cl_radar_show_all_players_when_spectating false");
         this->ISys().AsyncCommand("cl_radar_square_always false");
         this->ISys().AsyncCommand("cl_radar_square_when_spectating false");
@@ -37,7 +42,7 @@ void POVFixer::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "POVFix/Disable"_hash: {
-        this->enable = false;
+        this->runFlag1.store(false);
         this->ISys().AsyncCommand("cl_radar_show_all_players_when_spectating true");
         this->ISys().AsyncCommand("cl_radar_square_when_spectating true");
         break;
@@ -47,7 +52,7 @@ void POVFixer::ProcessMsg(MulNX::Message& msg) {
 
 void POVFixer::BeforeDraw() {
     this->Update();
-    if (!this->enable)return;
+    if (!this->runFlag1.load())return;
 
     try {
         auto pObservingPawn = this->CS2->client.TryGetObservingPawn();
@@ -84,7 +89,7 @@ void POVFixer::BeforeDraw() {
 }
 
 void POVFixer::OnSetGlow(MulNX::Message& msg) {
-    if (!this->enable)return;
+    if (!this->runFlag1.load())return;
     auto team = msg.p1.low<CS2::ui8TeamNum>();
     *msg.p2.as<bool*>() = true;
 

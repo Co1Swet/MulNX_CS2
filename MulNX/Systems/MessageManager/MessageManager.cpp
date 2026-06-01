@@ -93,8 +93,13 @@ bool MulNX::MessageManager::PublishSync(MulNX::Message& msg) {
     auto it = this->syncMap.find(msg.type);
     if (it == this->syncMap.end())return false;
     auto& subscribers = it->second;
-    for (auto& subscriber : subscribers) {
-        subscriber(msg);
+    try {
+        for (auto& subscriber : subscribers) {
+            subscriber(msg);
+        }
+    }
+    catch (const std::exception& e) {
+        MulNX::ErrorTerminate(e.what());
     }
     return true;
 }
