@@ -7,7 +7,7 @@
 #include <atomic>
 #include <functional>
 
-class MediaRemoter final : public MulNX::ModuleBase {
+class OBSRemoter final : public MulNX::ModuleBase {
     using Client = websocketpp::client<websocketpp::config::asio>;
 
     Client client;

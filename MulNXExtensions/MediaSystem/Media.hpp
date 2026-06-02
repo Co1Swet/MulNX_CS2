@@ -3,7 +3,6 @@
 #include "MediaSystem.hpp"
 #include "MediaRecorder/MediaRecorder.hpp"
 #include "MediaProcesser/MediaProcesser.hpp"
-#include "MediaRemoter/MediaRemoter.hpp"
 
 #include "VideoCapturer/VideoCapturer.hpp"
 #include "VEncodeHelper/VEncodeHelper.hpp"

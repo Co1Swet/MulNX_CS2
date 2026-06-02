@@ -1,32 +1,32 @@
-#include "MediaRemoter.hpp"
+#include "OBSRemoter.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void MediaRemoter::Window(MulNX::UINode* node) {
+void OBSRemoter::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("OBS", this->showWindow);
     if (!this->OBSConnected.load(std::memory_order_acquire)) {
         ImGui::Text(I18n("media.obs.connect.please_try").c_str());
         if (ImGui::Button(I18n("media.obs.connect.try").c_str())) {
-            this->ISys().PublishAsync("Media/CreateConnect"_hash);
+            this->ISys().PublishAsync("OBS/CreateConnect"_hash);
         }
         return;
     }
     if (ImGui::Button(I18n("media.obs.record.start").c_str())) {
-        this->ISys().PublishAsync("Media/Record/Start"_hash);
+        this->ISys().PublishAsync("OBS/Record/Start"_hash);
     }
     ImGui::SameLine();
     if (ImGui::Button(I18n("media.obs.record.stop").c_str())) {
-        this->ISys().PublishAsync("Media/Record/Stop"_hash);
+        this->ISys().PublishAsync("OBS/Record/Stop"_hash);
     }
     if (ImGui::Button(I18n("media.obs.record.pause").c_str())) {
-        this->ISys().PublishAsync("Media/Record/Pause"_hash);
+        this->ISys().PublishAsync("OBS/Record/Pause"_hash);
     }
     ImGui::SameLine();
     if (ImGui::Button(I18n("media.obs.record.resume").c_str())) {
-        this->ISys().PublishAsync("Media/Record/Resume"_hash);
+        this->ISys().PublishAsync("OBS/Record/Resume"_hash);
     }
 }
 
-bool MediaRemoter::Init() {
+bool OBSRemoter::Init() {
     this->showWindow = true;
     // 关闭不需要的日志
     this->client.clear_access_channels(websocketpp::log::alevel::all);
@@ -46,41 +46,41 @@ bool MediaRemoter::Init() {
         });
 
     this->ISys()
-        .SubscribeAsync("Media/CreateConnect")
-        .SubscribeAsync("Media/Record/Start")
-        .SubscribeAsync("Media/Record/Pause")
-        .SubscribeAsync("Media/Record/Resume")
-        .SubscribeAsync("Media/Record/Stop");
+        .SubscribeAsync("OBS/CreateConnect")
+        .SubscribeAsync("OBS/Record/Start")
+        .SubscribeAsync("OBS/Record/Pause")
+        .SubscribeAsync("OBS/Record/Resume")
+        .SubscribeAsync("OBS/Record/Stop");
 
     return true;
 }
 
-void MediaRemoter::Deinit() {
+void OBSRemoter::Deinit() {
     if (this->OBSConnected.load(std::memory_order_acquire)) {
         this->client.stop();
     }
 }
 
-void MediaRemoter::ProcessMsg(MulNX::Message& msg) {
+void OBSRemoter::ProcessMsg(MulNX::Message& msg) {
     return;
     switch (msg.type) {
-    case "Media/CreateConnect"_hash: {
+    case "OBS/CreateConnect"_hash: {
         this->CreateConnect();
         break;
     }
-    case "Media/Record/Start"_hash: {
+    case "OBS/Record/Start"_hash: {
         this->StartRecording();
         break;
     }
-    case "Media/Record/Pause"_hash: {
+    case "OBS/Record/Pause"_hash: {
         this->PauseRecording();
         break;
     }
-    case "Media/Record/Resume"_hash: {
+    case "OBS/Record/Resume"_hash: {
         this->ResumeRecording();
         break;
     }
-    case "Media/Record/Stop"_hash: {
+    case "OBS/Record/Stop"_hash: {
         this->StopRecording();
         break;
     }
@@ -88,7 +88,7 @@ void MediaRemoter::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void MediaRemoter::CreateConnect() {
+void OBSRemoter::CreateConnect() {
     if (this->OBSConnected.load(std::memory_order_acquire)) {
         this->ISys().LogError(I18n("media.obs.connect.cant_again"));
         return;
@@ -110,7 +110,7 @@ void MediaRemoter::CreateConnect() {
         });
 }
 
-void MediaRemoter::send_json(const nlohmann::json& json) {
+void OBSRemoter::send_json(const nlohmann::json& json) {
     try {
         std::string msg = json.dump();
         this->client.send(this->hdl, msg, websocketpp::frame::opcode::text);
@@ -120,38 +120,38 @@ void MediaRemoter::send_json(const nlohmann::json& json) {
     }
 }
 
-void MediaRemoter::send_request(const std::string& requestType) {
+void OBSRemoter::send_request(const std::string& requestType) {
     nlohmann::json req;
     req["op"] = 6;
     req["d"]["requestType"] = requestType;
     req["d"]["requestId"] = "media_remoter";
     this->send_json(req);
 }
-bool MediaRemoter::CheckIsConnected() {
+bool OBSRemoter::CheckIsConnected() {
     if (this->OBSConnected.load())return true;
     this->ISys().LogError(I18n("media.obs.connect.error_empty"));
     return false;
 }
 
-void MediaRemoter::StartRecording() {
+void OBSRemoter::StartRecording() {
     if (!this->CheckIsConnected())return;
     this->client.get_io_service().post([this]() {this->send_request("StartRecord");});
 }
 
-void MediaRemoter::StopRecording() {
+void OBSRemoter::StopRecording() {
     if (!this->CheckIsConnected())return;
     this->client.get_io_service().post([this]() {this->send_request("StopRecord");});
 }
-void MediaRemoter::PauseRecording() {
+void OBSRemoter::PauseRecording() {
     if (!this->CheckIsConnected())return;
     this->client.get_io_service().post([this]() {this->send_request("PauseRecord");});
 }
-void MediaRemoter::ResumeRecording() {
+void OBSRemoter::ResumeRecording() {
     if (!this->CheckIsConnected())return;
     this->client.get_io_service().post([this]() {this->send_request("ResumeRecord");});
 }
 
-void MediaRemoter::handle_hello(const nlohmann::json& hello) {
+void OBSRemoter::handle_hello(const nlohmann::json& hello) {
     if (hello.contains("d") && hello["d"].contains("authentication")) {
         // TODO: 实现认证字符串生成
     }
@@ -161,7 +161,7 @@ void MediaRemoter::handle_hello(const nlohmann::json& hello) {
     this->send_json(identify);
 }
 
-void MediaRemoter::handle_response(const nlohmann::json& response) {
+void OBSRemoter::handle_response(const nlohmann::json& response) {
     std::string requestType = response["d"].value("requestType", "");
     if (requestType == "GetVersion") {
         std::string version = response["d"]["responseData"].value("obsVersion", "未知");
@@ -178,7 +178,7 @@ void MediaRemoter::handle_response(const nlohmann::json& response) {
     }
 }
 
-void MediaRemoter::HandleOBSMsg(websocketpp::connection_hdl hdl, Client::message_ptr msg) {
+void OBSRemoter::HandleOBSMsg(websocketpp::connection_hdl hdl, Client::message_ptr msg) {
     std::string payload = msg->get_payload();
     try {
         auto json = nlohmann::json::parse(payload);

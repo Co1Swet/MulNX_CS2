@@ -8,6 +8,7 @@
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaSystem/Media.hpp>
+#include <MulNXExtensions/OBSRemoter/OBSRemoter.hpp>
 
 MulNX::Core::Core* pCore = nullptr;
 HMODULE hOriginModule = nullptr;
@@ -101,7 +102,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<AEncodeHelper>("AEncodeHelper")
             .CreateModule<VEncodeHelper>("VEncodeHelper")
             .CreateModule<MediaRecorder>("MediaRecorder")
-            .CreateModule<MediaRemoter>("MediaRemoter")
+            .CreateModule<OBSRemoter>("OBSRemoter")
             .CreateModule<MediaProcesser>("MediaProcesser")
             // 管理
             .CreateModule<MulNXController>("MulNXController")
