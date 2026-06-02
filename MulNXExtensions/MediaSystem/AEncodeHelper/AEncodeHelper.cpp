@@ -58,19 +58,80 @@ void AEncodeHelper::SetOn(av::FormatContext* oCtx, int sampleRate) {
 }
 
 std::optional<av::Packet> AEncodeHelper::TrySetOff() {
-    // 刷新音频编码器（先清空内部缓冲）
     if (!this->aencoder.isOpened()) return std::nullopt;
-    // 如果有剩余未编码采样，先送入编码器
-    if (!this->audioFifo.empty()) {
-        // 补零达到 frameSize
-        int frameSize = this->aencoder.frameSize();
-        av::AudioSamples padSamples;
-        if (padSamples.init(this->aencoder.sampleFormat(), frameSize, this->aencoder.channelLayout(), this->aencoder.sampleRate()) >= 0) {
-            // 复制已有数据并补零
-            // 此处简化：直接将 audioFifo 数据拷贝过去，剩余填零
-            size_t have = this->audioFifo.size();
-            // 假设 audioFifo 中存储的是连续的样本（平面格式）
-            // 省略复杂拷贝，为避免代码膨胀，这里直接清空并刷新编码器，残留少量静音不影响
+
+    int frameSize = this->aencoder.frameSize();
+    if (frameSize > 0 && !this->audioFifo.empty()) {
+        av::AudioSamples frame;
+        if (frame.init(this->aencoder.sampleFormat(), frameSize, this->aencoder.channelLayout(), this->aencoder.sampleRate()) >= 0) {
+            // 默认初始化后的样本为静音
+            int copied = 0;
+            while (copied < frameSize && !this->audioFifo.empty()) {
+                auto &front = this->audioFifo.front();
+                int need = frameSize - copied;
+                int available = front.samplesCount();
+                int take = std::min(need, available);
+
+                if (!front.isPlanar()) {
+                    int bps = front.sampleFormat().bytesPerSample();
+                    int ch = front.channelsCount();
+                    memcpy(reinterpret_cast<uint8_t*>(frame.data(0)) + static_cast<size_t>(copied) * ch * bps,
+                        front.data(0), static_cast<size_t>(take) * ch * bps);
+                }
+                else {
+                    int bps = front.sampleFormat().bytesPerSample();
+                    for (int c = 0; c < front.channelsCount(); ++c) {
+                        memcpy(reinterpret_cast<uint8_t*>(frame.data(c)) + static_cast<size_t>(copied) * bps,
+                            front.data(c), static_cast<size_t>(take) * bps);
+                    }
+                }
+
+                copied += take;
+                if (take == available) {
+                    this->audioFifo.pop_front();
+                }
+                else {
+                    int remain = available - take;
+                    av::AudioSamples remaining;
+                    if (remaining.init(front.sampleFormat(), remain, front.channelsLayout(), front.sampleRate()) >= 0) {
+                        if (!front.isPlanar()) {
+                            int bps = front.sampleFormat().bytesPerSample();
+                            int ch = front.channelsCount();
+                            memcpy(remaining.data(0),
+                                reinterpret_cast<const uint8_t*>(front.data(0)) + static_cast<size_t>(take) * ch * bps,
+                                static_cast<size_t>(remain) * ch * bps);
+                        }
+                        else {
+                            int bps = front.sampleFormat().bytesPerSample();
+                            for (int c = 0; c < front.channelsCount(); ++c) {
+                                memcpy(remaining.data(c),
+                                    reinterpret_cast<const uint8_t*>(front.data(c)) + static_cast<size_t>(take) * bps,
+                                    static_cast<size_t>(remain) * bps);
+                            }
+                        }
+                        this->audioFifo.front() = std::move(remaining);
+                    }
+                    else {
+                        this->audioFifo.pop_front();
+                    }
+                }
+            }
+
+            frame.setTimeBase({ 1, this->aencoder.sampleRate() });
+            frame.setPts(av::Timestamp(this->aptsCounter, frame.timeBase()));
+            this->aptsCounter += frameSize;
+            try {
+                av::Packet pkt = this->aencoder.encode(frame);
+                if (pkt && pkt.size() > 0) {
+                    pkt.setStreamIndex(this->astream.index());
+                    pkt.setTimeBase(this->astream.timeBase());
+                    pkt.setDuration(frameSize, this->astream.timeBase());
+                    return pkt;
+                }
+            }
+            catch (const std::exception& e) {
+                this->ISys().LogError(std::string("音频刷新编码失败: ") + e.what());
+            }
         }
         this->audioFifo.clear();
     }

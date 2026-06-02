@@ -50,7 +50,12 @@ std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
 
         this->rescaler.rescale(dstFrame, srcFrame);
         dstFrame.setTimeBase(this->timeBase);
-        dstFrame.setPts(av::Timestamp(this->ptsCounter++, this->timeBase));
+
+        int64_t ptsValue = this->ptsCounter++;
+        if (srcFrame.pts().isValid()) {
+            ptsValue = srcFrame.pts().timestamp(this->timeBase);
+        }
+        dstFrame.setPts(av::Timestamp(ptsValue, this->timeBase));
         dstFrame.setStreamIndex(this->vstream.index());
 
         av::Packet pkt = this->encoder.encode(dstFrame);
@@ -58,7 +63,6 @@ std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
 
         pkt.setStreamIndex(this->vstream.index());
         pkt.setTimeBase(this->vstream.timeBase());
-        pkt.setDuration(1, this->vstream.timeBase());
 
         return pkt;
     }
@@ -74,7 +78,6 @@ std::optional<av::Packet> VEncodeHelper::TrySetOff() {
     if (pkt && pkt.size() != 0) {
         pkt.setStreamIndex(this->vstream.index());
         pkt.setTimeBase(this->vstream.timeBase());
-        pkt.setDuration(1, this->vstream.timeBase());
         return pkt;
     }
     

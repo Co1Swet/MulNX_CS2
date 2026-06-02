@@ -247,3 +247,10 @@ std::optional<av::AudioSamples> AudioCapturer::TryPop() {
     }
     return std::nullopt;
 }
+
+void AudioCapturer::ClearBuffer() {
+    av::AudioSamples discard;
+    while (this->buffer.try_dequeue(discard)) {
+        // drain stale audio data
+    }
+}

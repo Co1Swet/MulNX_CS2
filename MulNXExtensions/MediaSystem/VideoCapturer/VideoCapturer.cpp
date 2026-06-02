@@ -17,8 +17,12 @@ void VideoCapturer::ReleaseStagingTexture() {
 }
 
 void VideoCapturer::Reset() {
+    std::scoped_lock lock(this->captureMutex);
     this->srcPixelFormat = AV_PIX_FMT_NONE;
     this->ReleaseStagingTexture();
+    this->lastCapture.reset();
+    this->recordStartTime.reset();
+    this->runFlag1.store(false);
 }
 
 std::optional<av::VideoFrame> VideoCapturer::TryPop() {
@@ -29,13 +33,41 @@ std::optional<av::VideoFrame> VideoCapturer::TryPop() {
     return std::nullopt;
 }
 
+void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
+    std::scoped_lock lock(this->captureMutex);
+    this->recordStartTime = startTime;
+    this->lastCapture.reset();
+    this->runFlag1.store(true, std::memory_order_release);
+}
+
+void VideoCapturer::StopCapture() {
+    std::scoped_lock lock(this->captureMutex);
+    this->runFlag1.store(false);
+}
+
+void VideoCapturer::ClearBuffer() {
+    av::VideoFrame discard;
+    while (this->buffer.try_dequeue(discard)) {
+        // drain stale video data
+    }
+    std::scoped_lock lock(this->captureMutex);
+    this->lastCapture.reset();
+}
+
 void VideoCapturer::Captuer() {
     this->Update();
 
-    if (!this->runFlag2.load()) {
+    if (!this->runFlag1.load(std::memory_order_acquire)) {
         return;
     }
-    this->runFlag2.store(false);
+
+    auto now = std::chrono::steady_clock::now();
+    std::scoped_lock lock(this->captureMutex);
+    constexpr std::chrono::microseconds minInterval(16667);
+    if (this->lastCapture.has_value() && now - *this->lastCapture < minInterval) {
+        return;
+    }
+    this->lastCapture = now;
 
     ID3D11Texture2D* backBuffer = nullptr;
     this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
@@ -107,6 +139,11 @@ void VideoCapturer::Captuer() {
     this->pGraphicsManager->pd3dContext->Unmap(this->pStagingTex, 0);
 
     av::VideoFrame srcFrame(rawData.data(), rawData.size(), srcFormat, this->stagingWidth, this->stagingHeight);
+    if (this->recordStartTime.has_value()) {
+        int64_t pts = std::chrono::duration_cast<std::chrono::microseconds>(now - *this->recordStartTime).count();
+        srcFrame.setTimeBase({ 1, 1000000 });
+        srcFrame.setPts(av::Timestamp(pts, srcFrame.timeBase()));
+    }
     this->buffer.enqueue(std::move(srcFrame));
 
     return;

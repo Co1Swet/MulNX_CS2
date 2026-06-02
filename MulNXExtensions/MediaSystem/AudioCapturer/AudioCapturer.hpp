@@ -2,6 +2,7 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <audioclient.h>
 #include <Windows.h>
+#include <optional>
 
 class AudioCapturer final :public MediaModuleBase {
 private:
@@ -19,6 +20,7 @@ public:
     void Deinit()override;
 
     std::optional<av::AudioSamples> TryPop();
+    void ClearBuffer();
     // audio info accessors
     WAVEFORMATEX* GetWfx() const { return wfx; }
     int GetSampleRate() const { return wfx ? wfx->nSamplesPerSec : 0; }
