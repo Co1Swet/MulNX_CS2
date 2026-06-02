@@ -79,7 +79,6 @@ std::optional<av::Packet> AEncodeHelper::TrySetOff() {
     if (apkt && apkt.size() != 0) {
         apkt.setStreamIndex(this->astream.index());
         apkt.setTimeBase(this->astream.timeBase());
-        apkt.setDuration(1, this->astream.timeBase());
         return apkt;
     }
     
@@ -126,9 +125,10 @@ bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples
             return false;
         }
     }
-
-    // 格式已经匹配，直接使用
-    converted = std::move(asamples);
+    else {
+        // 格式已经匹配，直接使用
+        converted = std::move(asamples);
+    }
     return true;
 }
 
@@ -145,13 +145,13 @@ std::optional<av::Packet> AEncodeHelper::Encode(av::AudioSamples&& asamples) {
         converted.setTimeBase({ 1, this->aencoder.sampleRate() });
         converted.setPts(av::Timestamp(this->aptsCounter, converted.timeBase()));
         av::Packet pkt = this->aencoder.encode(converted);
+        this->aptsCounter += converted.samplesCount();
         if (pkt && pkt.size() > 0) {
             pkt.setStreamIndex(this->astream.index());
             pkt.setTimeBase(this->astream.timeBase());
-            pkt.setDuration(1, this->astream.timeBase());
+            pkt.setDuration(converted.samplesCount(), this->astream.timeBase());
             return pkt;
         }
-        this->aptsCounter += converted.samplesCount();
         return std::nullopt;
     }
 
@@ -247,10 +247,11 @@ std::optional<av::Packet> AEncodeHelper::Encode(av::AudioSamples&& asamples) {
 
         try {
             av::Packet pkt = this->aencoder.encode(frame);
+            this->aptsCounter += frameSize;
             if (pkt && pkt.size() > 0) {
                 pkt.setStreamIndex(this->astream.index());
                 pkt.setTimeBase(this->astream.timeBase());
-                pkt.setDuration(1, this->astream.timeBase());
+                pkt.setDuration(frameSize, this->astream.timeBase());
                 return pkt;
             }
             else {
