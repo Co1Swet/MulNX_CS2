@@ -207,6 +207,6 @@ void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
         }
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(I18n("smoke.error", e.what()));
+        return;
     }
 }

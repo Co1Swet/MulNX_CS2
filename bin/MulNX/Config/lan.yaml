@@ -44,6 +44,7 @@ win32:
 
 boot:
   launch: 启动CS2
+  check_env: 检查环境
   save: 保存所有设置到磁盘
   launch_options: 启动选项（无论是否添加-insecure启动项，程序都会强制在开头附带一个）
   game_path:

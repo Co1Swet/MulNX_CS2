@@ -8,7 +8,6 @@ add_subdirectory("MulNXController")
 add_subdirectory("WebSocketManager")
 add_subdirectory("GraphicsManager")
 add_subdirectory("MediaSystem")
-add_subdirectory("OBSRemoter")
 add_subdirectory("Win32Starter")
 add_subdirectory("CS2BootLoader")
 add_subdirectory("DLLInjectHelper")
@@ -25,7 +24,6 @@ target_link_libraries(MulNXExtensions INTERFACE
     WebSocketManager
     GraphicsManager
     MediaSystem
-    OBSRemoter
     Win32Starter
     CS2BootLoader
     DLLInjectHelper

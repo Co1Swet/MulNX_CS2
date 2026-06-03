@@ -47,10 +47,10 @@ bool OBSRemoter::Init() {
 
     this->ISys()
         .SubscribeAsync("OBS/CreateConnect")
-        .SubscribeAsync("OBS/Record/Start")
-        .SubscribeAsync("OBS/Record/Pause")
-        .SubscribeAsync("OBS/Record/Resume")
-        .SubscribeAsync("OBS/Record/Stop");
+        .SubscribeAsync("Media/Record/Start")
+        .SubscribeAsync("Media/Record/Pause")
+        .SubscribeAsync("Media/Record/Resume")
+        .SubscribeAsync("Media/Record/Stop");
 
     return true;
 }
@@ -64,23 +64,23 @@ void OBSRemoter::Deinit() {
 void OBSRemoter::ProcessMsg(MulNX::Message& msg) {
     return;
     switch (msg.type) {
-    case "OBS/CreateConnect"_hash: {
+    case "Media/Record/CreateConnect"_hash: {
         this->CreateConnect();
         break;
     }
-    case "OBS/Record/Start"_hash: {
+    case "Media/Record/Start"_hash: {
         this->StartRecording();
         break;
     }
-    case "OBS/Record/Pause"_hash: {
+    case "Media/Record/Pause"_hash: {
         this->PauseRecording();
         break;
     }
-    case "OBS/Record/Resume"_hash: {
+    case "Media/Record/Resume"_hash: {
         this->ResumeRecording();
         break;
     }
-    case "OBS/Record/Stop"_hash: {
+    case "Media/Record/Stop"_hash: {
         this->StopRecording();
         break;
     }

@@ -7,11 +7,12 @@ class CS2BootLoader final : public MulNX::ModuleBase {
     DLLInjectHelper* pInjectHelper = nullptr;
 
     std::filesystem::path gamePath;
-    std::filesystem::path dllPath;   // CS2OBTool.dll 路径
     std::filesystem::path helperPath;
-    std::filesystem::path dirFfmpeg;   
     std::string launchOptions;
 
+    std::vector<std::string> patternsCheckDangerous;
+    bool environmentChecked = false;
+    bool CheckEnvironment();
     bool LaunchAndInject();
     bool IsGameRunning();
 

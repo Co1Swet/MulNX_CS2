@@ -3,14 +3,6 @@
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
-#include <deque>
-#include <vector>
-#include <cstring>
-#include <optional>
-#include <chrono>
-#include <algorithm>
-#include <limits>
-#include <cstdint>
 
 bool MediaRecorder::Init() {
     this->pVideoCapturer = this->Core->ModuleManager()->FindModule<VideoCapturer>("VideoCapturer");
@@ -21,8 +13,8 @@ bool MediaRecorder::Init() {
     this->dirVedios = this->ISys().PathManager()->PathGetForShared("Vedios");
 
     this->ISys()
-        .SubscribeAsync("MulNX/Record/Start")
-        .SubscribeAsync("MulNX/Record/Stop");
+        .SubscribeAsync("Media/Record/Start")
+        .SubscribeAsync("Media/Record/Stop");
 
     this->ISys().SendTask("Main", "Media", [this]() {
         this->Main();
@@ -34,12 +26,12 @@ bool MediaRecorder::Init() {
 
 void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "MulNX/Record/Start"_hash: {
+    case "Media/Record/Start"_hash: {
         auto outFile = this->dirVedios / "record.mp4";
         this->StartRecording(outFile.string(), 1920, 1080);
         break;
     }
-    case "MulNX/Record/Stop"_hash: {
+    case "Media/Record/Stop"_hash: {
         this->StopRecording();
         break;
     }
