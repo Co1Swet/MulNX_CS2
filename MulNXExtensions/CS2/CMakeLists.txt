@@ -27,6 +27,7 @@ add_library(MulNXCS2Ext
     GameSettingsManager/GameSettingsManager.cpp
 
     HookManager/HookManager.cpp
+    EntityListScanner/EntityListScanner.cpp
 )
 
 add_subdirectory("CSController")

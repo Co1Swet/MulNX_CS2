@@ -145,4 +145,5 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     node->CallUINode("DeathMsgController");
     node->CallUINode("ESPController");
     node->CallUINode("MediaSystem");
+    node->CallUINode("EntityListScanner");
 }

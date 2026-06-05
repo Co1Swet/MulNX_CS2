@@ -80,6 +80,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<ESPController>("ESPController")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<TeamIDController>("TeamIDController")
+            .CreateModule<EntityListScanner>("EntityListScanner")
             .CreateModule<POVFixer>("POVFixer")
             // Demos
             .CreateModule<DemoSystem>("DemoSystem")

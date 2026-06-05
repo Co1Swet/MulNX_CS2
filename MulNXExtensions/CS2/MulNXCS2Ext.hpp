@@ -14,6 +14,7 @@
 #include "SkinController/SkinController.hpp"
 #include "POVFixer/POVFixer.hpp"
 #include "TeamIDController/TeamIDController.hpp"
+#include "EntityListScanner/EntityListScanner.hpp"
 
 #include "DemoSystem/DemoSystem.hpp"
 #include "DemoSystem/DemoJSONReader/DemoJSONReader.hpp"
