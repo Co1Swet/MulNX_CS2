@@ -1,8 +1,7 @@
 #pragma once
+#include <MulNXExtensions/CS2/PlayerHub/CSViewPlayerModuleBase.hpp>
 
-#include <MulNXExtensions/CS2/CSModuleBase.hpp>
-
-class NameController final :public CSModuleBase {
+class NameController final :public CSViewPlayerModuleBase {
     std::array<char[128], 64>nameReplace{};
     std::map<uint64_t, int>nameReplaceInfo{};
     std::unique_ptr<MulNX::Hook>hkGetDecoratedPlayerName = nullptr;
@@ -14,7 +13,8 @@ class NameController final :public CSModuleBase {
 public:
     bool Init()override;
     void ProcessMsg(MulNX::Message& Msg)override;
-    void Menu(MulNX::UINode* node);
+    void Player(MulNX::UINode* node);
+    void Team(MulNX::UINode* node) {};
 
     bool SetReplace(Steam64UID uid, const std::string& newName);
 };

@@ -9,11 +9,7 @@ using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_
 
 using GetPlayerName_t = const char* (*)(CS2::CCSPlayerController*);
 
-void NameController::Menu(MulNX::UINode* node) {
-    if (this->Hub->showView.load(std::memory_order_acquire) != PlayerHub::View::Player) {
-        ImGui::TextUnformatted("请切换到玩家视图以设置名称替换");
-        return;
-    }
+void NameController::Player(MulNX::UINode* node) {
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
     auto it = this->nameReplaceInfo.find(uid);
     if (it != this->nameReplaceInfo.end()) {
@@ -51,11 +47,6 @@ bool NameController::Init() {
             }).value();
         this->hkGetDecoratedPlayerName->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
-
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-            this->Menu(node);
-            return true;
-            });
 
         this->ISys().SendTask("Update", "CSControl", [this]() {
             this->Update();

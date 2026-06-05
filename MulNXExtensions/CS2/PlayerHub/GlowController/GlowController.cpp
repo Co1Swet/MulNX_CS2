@@ -3,16 +3,7 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
-void GlowController::Menu(MulNX::UINode* node) {
-    auto view = this->Hub->showView.load(std::memory_order_acquire);
-    if (view == PlayerHub::View::Player) {
-        this->MenuPlayer(node);
-    }
-    else {
-        this->MenuTeam(node);
-    }
-}
-void GlowController::MenuPlayer(MulNX::UINode* node) {
+void GlowController::Player(MulNX::UINode* node) {
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
     // 1. 获取当前为该玩家设置的颜色（若存在），否则使用默认白色
@@ -30,8 +21,7 @@ void GlowController::MenuPlayer(MulNX::UINode* node) {
 
     // 3. 显示颜色选择器
     // 使用 ColorEdit4 可以同时展示预览色块和数值，也可以只用 ColorPicker4
-    if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4,
-        ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel)) {
+    if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4)) {
         // 颜色被修改后，转换回 uint32_t 并保存到 playerColors
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
         MulNX::Message msg("Glow/Player/Set"_hash);
@@ -42,13 +32,13 @@ void GlowController::MenuPlayer(MulNX::UINode* node) {
 
     // 可选：添加一个重置按钮，删除该玩家的自定义颜色规则
     ImGui::SameLine();
-    if (ImGui::Button("重置")) {
+    if (ImGui::Button("重置发光颜色")) {
         MulNX::Message msg("Glow/Player/Clear"_hash);
         msg.p1.as<Steam64UID>() = uid;
         this->ISys().PublishAsync(std::move(msg));
     }
 }
-void GlowController::MenuTeam(MulNX::UINode* node) {
+void GlowController::Team(MulNX::UINode* node) {
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255); // 默认白色
@@ -62,8 +52,7 @@ void GlowController::MenuTeam(MulNX::UINode* node) {
 
     ImVec4 colorVec4 = ImGui::ColorConvertU32ToFloat4(currentColorU32);
 
-    if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4,
-        ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel)) {
+    if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4)) {
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
         MulNX::Message msg("Glow/Team/Set"_hash);
         msg.p1.low<uint32_t>() = newColorU32;
@@ -72,7 +61,7 @@ void GlowController::MenuTeam(MulNX::UINode* node) {
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("重置")) {
+    if (ImGui::Button("重置发光颜色")) {
         MulNX::Message msg("Glow/Team/Clear"_hash);
         msg.p1.high<CS2::ui8TeamNum>() = team;
         this->ISys().PublishAsync(std::move(msg));
@@ -89,12 +78,6 @@ bool GlowController::Init() {
             }).value();
         this->hkSetGlowColor->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "SetGlowColor"));
-
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-            this->Menu(node);
-            return true;
-            });
-
 
         this->ISys().SendTask("Update", "CSControl", [this]() {
             this->Update();

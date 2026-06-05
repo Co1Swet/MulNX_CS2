@@ -1,7 +1,7 @@
 #include "PlayerHub.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/PlayerHub/CSViewPlayerModuleBase.hpp>
 
 bool PlayerHub::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("玩家信息管理", this->showWindow);
@@ -16,7 +16,6 @@ bool PlayerHub::Window(MulNX::UINode* node) {
 
         int playerNum = 0;
 
-        // 用于按队伍分组存储的临时结构
         struct PlayerInfo {
             uint64_t steamID;
             std::string displayName;
@@ -33,10 +32,6 @@ bool PlayerHub::Window(MulNX::UINode* node) {
             auto* playerController = baseEntity->As<CS2::CCSPlayerController>();
             if (!playerController) continue;
 
-            auto hPawn = MulNX::MRead(playerController->m_hPlayerPawn());
-            auto* pawn = this->CS2->client.GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
-            if (!pawn) continue;
-
             uint64_t SteamID = MulNX::MRead(playerController->m_steamID());
             if (SteamID == 0) continue;
 
@@ -44,37 +39,63 @@ bool PlayerHub::Window(MulNX::UINode* node) {
             std::string displayName = std::format("玩家 {} (SteamID: {})", playerNum, SteamID);
             auto teamNum = MulNX::MRead(playerController->iTeamNum());
 
-            // 根据队伍存储
             if (teamNum == CS2::ui8TeamNum::CT) {
                 ctPlayers.push_back({ SteamID, displayName, playerController, teamNum });
             }
             else if (teamNum == CS2::ui8TeamNum::T) {
                 tPlayers.push_back({ SteamID, displayName, playerController, teamNum });
             }
-            // 注意：其他队伍（如观察者）不会被显示，但 playerNum 依然会递增，符合要求
         }
 
-        // 辅助 lambda 用于绘制玩家条目（保持原有交互逻辑）
+        // ---------- 绘制玩家条目 ----------
         auto DrawPlayerEntry = [&](const PlayerInfo& info) {
-            if (ImGui::Selectable(info.displayName.c_str(),
-                this->currentSteamId.load(std::memory_order_acquire) == info.steamID)
-                ) {
-                this->currentSteamId.store(info.steamID, std::memory_order_release);
-                this->ShowCompanionWindow.store(true, std::memory_order_release);
-                this->currentTeam.store(info.teamNum, std::memory_order_release);
-            }
+            if (ImGui::Selectable(info.displayName.c_str())) {}
+            // 左键点击时触发玩家弹出菜单
+            ImGui::OpenPopupOnItemClick(std::format("PlayerPopup_{:X}", info.steamID).c_str(),
+                ImGuiPopupFlags_MouseButtonLeft);
+
             auto naturalName = MulNX::Memory::ReadString(info.controller->m_iszPlayerName());
             ImGui::TextUnformatted(std::format("自然名字: {}", naturalName).c_str());
             ImGui::Separator();
             };
 
-        // ---------- 左右并排绘制 CT 和 T 区域 ----------
-        // 计算左右子区域宽度（各占一半，留出间距）
+        // ---------- 弹出菜单渲染 lambda ----------
+        auto RenderPlayerPopup = [&](const PlayerInfo& info) {
+            std::string popupName = std::format("PlayerPopup_{:X}", info.steamID);
+            if (ImGui::BeginPopup(popupName.c_str())) {
+                this->currentSteamId.store(info.steamID, std::memory_order_release);
+                this->currentTeam.store(info.teamNum, std::memory_order_release);
+                for (auto& mod : this->PlayerViewModules) {
+                    mod->Player(node);
+                }
+                ImGui::Separator();
+                if (ImGui::Button("关闭"))
+                    ImGui::CloseCurrentPopup();
+                ImGui::EndPopup();
+            }
+            };
+
+        auto RenderTeamPopup = [&](const char* name, CS2::ui8TeamNum team) {
+            if (ImGui::BeginPopup(name)) {
+                this->currentSteamId.store(0, std::memory_order_release);
+                this->currentTeam.store(team, std::memory_order_release);
+                for (auto& mod : this->PlayerViewModules) {
+                    mod->Team(node);
+                }
+                ImGui::Separator();
+                if (ImGui::Button("关闭"))
+                    ImGui::CloseCurrentPopup();
+                ImGui::EndPopup();
+            }
+            };
+
         float childWidth = (ImGui::GetContentRegionAvail().x - ImGui::GetStyle().ItemSpacing.x) * 0.5f;
 
-        // 左子区域：CT
+        // 左：CT
         ImGui::BeginChild("CT_List", ImVec2(childWidth, 0));
-        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "反恐精英 (CT)");
+        // 队伍名点击弹出队伍调节菜单
+        if (ImGui::Selectable("反恐精英 (CT)")) {}
+        ImGui::OpenPopupOnItemClick("TeamPopup_CT", ImGuiPopupFlags_MouseButtonLeft);
         ImGui::Separator();
         if (!ctPlayers.empty()) {
             for (const auto& info : ctPlayers) {
@@ -84,13 +105,19 @@ bool PlayerHub::Window(MulNX::UINode* node) {
         else {
             ImGui::TextDisabled("无 CT 玩家");
         }
+        // --- 在 CT 子窗口内渲染所有 CT 相关弹出菜单 ---
+        for (const auto& info : ctPlayers) {
+            RenderPlayerPopup(info);
+        }
+        RenderTeamPopup("TeamPopup_CT", CS2::ui8TeamNum::CT);
         ImGui::EndChild();
 
         ImGui::SameLine();
 
-        // 右子区域：T
+        // 右：T
         ImGui::BeginChild("T_List", ImVec2(childWidth, 0));
-        ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "恐怖分子 (T)");
+        if (ImGui::Selectable("恐怖分子 (T)")) {}
+        ImGui::OpenPopupOnItemClick("TeamPopup_T", ImGuiPopupFlags_MouseButtonLeft);
         ImGui::Separator();
         if (!tPlayers.empty()) {
             for (const auto& info : tPlayers) {
@@ -100,49 +127,12 @@ bool PlayerHub::Window(MulNX::UINode* node) {
         else {
             ImGui::TextDisabled("无 T 玩家");
         }
+        // --- 在 T 子窗口内渲染所有 T 相关弹出菜单 ---
+        for (const auto& info : tPlayers) {
+            RenderPlayerPopup(info);
+        }
+        RenderTeamPopup("TeamPopup_T", CS2::ui8TeamNum::T);
         ImGui::EndChild();
-
-        // 附加子窗口
-        auto pos = ImGui::GetWindowPos();
-        auto size = ImGui::GetWindowSize();
-        ImGui::SetNextWindowPos(ImVec2(pos.x + size.x, pos.y));
-
-        MulNX::UI::RAIIWindow infoWindow("玩家信息", this->ShowCompanionWindow);
-        if (!infoWindow) return true;
-        if (ImGui::BeginTabBar("视图选项")) {
-            if (ImGui::BeginTabItem("玩家视图（高优先级）")) {
-                this->showView.store(PlayerHub::View::Player, std::memory_order_release);
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("队伍视图（低优先级）")) {
-                this->showView.store(PlayerHub::View::Team, std::memory_order_release);
-                ImGui::EndTabItem();
-            }
-            ImGui::EndTabBar();
-        }
-        ImGui::SeparatorText("修改");
-        if (this->showView.load(std::memory_order_acquire) == PlayerHub::View::Player) {
-
-            ImGui::TextUnformatted(std::format("当前选中的 SteamID: {}", this->currentSteamId.load(std::memory_order_acquire)).c_str());
-            if (this->currentSteamId.load(std::memory_order_acquire) == 0) {
-                ImGui::TextDisabled("请先在列表中选择一名玩家");
-                return true;
-            }
-        }
-        else {
-            ImGui::TextUnformatted(std::format("当前选中的 队伍: {}",
-                (this->currentTeam.load(std::memory_order_acquire) == CS2::ui8TeamNum::CT) ? "CT" : "T"
-            ).c_str());
-            if (this->currentSteamId.load(std::memory_order_acquire) == 0) {
-                ImGui::TextDisabled("请先在列表中选择一名玩家");
-                return true;
-            }
-        }
-
-        ImGui::Separator();
-        node->CallUINode("NameController");
-        node->CallUINode("GlowController");
-        node->CallUINode("SmokeController");
     }
     catch (const std::exception& e) {
         this->ISys().LogWarning(std::format("在绘制玩家信息时捕获到异常：{}", e.what()));
