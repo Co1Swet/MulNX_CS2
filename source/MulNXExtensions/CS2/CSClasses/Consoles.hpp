@@ -1,8 +1,4 @@
 #pragma once
-
-#include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/WinExt/vtable/vtable.hpp>
-
 // command to convars and concommands
 enum EConVarFlag : int {
     // convar systems
@@ -130,12 +126,12 @@ class CCmd {
 public:
     const char* m_pszName;
     const char* m_pszHelpString;
-    int64_t            m_nFlags;
+    int64_t m_nFlags;
     ICommandCallback* m_pCommandCallback;
-    size_t           _unknown_32 = 0x0101;
-    size_t           _unknown_40 = 0;
-    size_t           _unknown_48 = 0x01;
-    uint64_t     m_NextCommand = 0xFFFFFFFF;
+    uint64_t unk32 = 0x0101;
+    uint64_t unk40 = 0;
+    uint64_t unk48 = 0x01;
+    uint64_t m_NextCommand = 0xFFFFFFFF;
 
     CCmd(const char* pszName, const char* pszHelpString, int64_t nFlags, ICommandCallback* pCommandCallback) {
         m_pszName = pszName;
@@ -153,32 +149,4 @@ public:
     void CommandCallback(void*, CCommand* args) override {
         m_func(args);
     }
-};
-
-inline void MulNXTest_impl(CCommand* args) {
-    MessageBoxW(nullptr, L"MulNXTest 命令已触发！", L"Hook测试", MB_OK | MB_ICONINFORMATION);
-}
-
-
-class C_ConVarSystem {
-    friend class ConsoleManager;
-public:
-    //控制台变量定位获取
-
-    //得到第一个Cvar的迭代器
-    VExecutor<void* (uint64_t&)>GetFirstCvarIterator{};
-    //得到下一个Cvar的迭代器
-    VExecutor<void* (uint64_t&, uint64_t)>GetNextCvarIterator{};
-    //通过迭代器ID获取Cvar
-    VExecutor<C_ConVar* (uint64_t)>GetCVarByIndex{};
-    //通过名称获取Cvar
-    C_ConVar* GetCVarByName(const char* var_name)const;
-
-    void UnlockHiddenCVars(int& Count)const;
-    void LockAllCvars(int& Count)const;
-
-    bool Load(uintptr_t addr);
-
-    //通过名称获取Cvar，使用缓存加速
-    C_ConVar* GetCvar(const std::string& CvarName);
 };

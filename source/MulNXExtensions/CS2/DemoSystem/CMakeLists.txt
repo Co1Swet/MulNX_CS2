@@ -11,5 +11,4 @@ add_library(DemoSystem
 target_link_libraries(DemoSystem PUBLIC
     MulNX
     WinExt
-    CSController
 )

@@ -1,6 +1,7 @@
 #include "DemoSystem.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 #include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 bool DemoSystem::Window(MulNX::UINode* node) {
@@ -123,7 +124,7 @@ bool DemoSystem::Init() {
         .SubscribeAsync("Window/Drag/FileDrop")
         .SubscribeSync("Hook/RegisterConCommand/RegisterOurCmd",
             [this](MulNX::Message& msg) {
-                this->CS2->RegisterCS2Cmd("mulnx_test", "this is MulNX Cmd", [this](CCommand* a) {
+                this->CS2Con->RegisterCS2Cmd("mulnx_test", "this is MulNX Cmd", [this](CCommand* a) {
                     MessageBoxW(NULL, L"test", L"test", MB_OK);
                     return;
                     });

@@ -1,6 +1,7 @@
 #include "GameSettingsManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {
     ImGui::Checkbox("作弊模式", this->sv_cheats);
@@ -10,25 +11,25 @@ bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {
     ImGui::SeparatorText("CS2控制台");
     if (ImGui::Button("解限所有CS2控制台变量")) {
         int Count = 0;
-        this->CS2->GetCvarSystem().UnlockHiddenCVars(Count);
+        this->CS2Con->UnlockHiddenCVars(Count);
         this->ISys().LogSucc("成功解限" + std::to_string(Count) + "个控制台命令！");
     }
     if (ImGui::Button("限住所有CS2控制台变量")) {
         int Count = 0;
-        this->CS2->GetCvarSystem().LockAllCvars(Count);
+        this->CS2Con->LockAllCvars(Count);
         this->ISys().LogSucc("成功限住" + std::to_string(Count) + "个控制台命令！");
     }
     if (ImGui::Button("列出所有CS2控制台变量")) {
         this->ISys().LogLine();
         uint64_t idx = 0;
-        this->CS2->GetCvarSystem().GetFirstCvarIterator(idx);
+        this->CS2Con->GetFirstCvarIterator(idx);
         while (idx != 0xFFFFFFFF) {
-            C_ConVar* var = this->CS2->GetCvarSystem().GetCVarByIndex(idx);
+            C_ConVar* var = this->CS2Con->GetCVarByIndex(idx);
             if (var) {
                 std::string Name = var->szName ? var->szName : "未知";
                 this->ISys().LogInfo("控制台命令：" + Name);
             }
-            this->CS2->GetCvarSystem().GetNextCvarIterator(idx, idx);
+            this->CS2Con->GetNextCvarIterator(idx, idx);
         }
         this->ISys().LogLine();
     }
@@ -100,7 +101,7 @@ bool GameSettingsManager::GameHudMenu(MulNX::UINode* node) {
 
 bool GameSettingsManager::Init() {
     this->ISys().SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
-        C_ConVarSystem& CVarSystem = this->CS2->GetCvarSystem();
+        auto& CVarSystem = *this->CS2Con;
 
         auto spec_show_xray = CVarSystem.GetCvar("spec_show_xray");
 

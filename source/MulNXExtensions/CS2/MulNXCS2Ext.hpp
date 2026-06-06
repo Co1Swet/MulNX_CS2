@@ -3,7 +3,8 @@
 #include "HookManager/HookManager.hpp"
 
 #include "CSController/CSController.hpp"
-#include "CSController/HookEntitySystem/HookEntitySystem.hpp"
+#include "HookConsole/HookConsole.hpp"
+#include "HookEntitySystem/HookEntitySystem.hpp"
 
 #include "ObserverController/ObserverController.hpp"
 #include "ViewController/ViewController.hpp"

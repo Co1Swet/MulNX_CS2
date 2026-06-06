@@ -1,8 +1,6 @@
 #include "ObserverController.hpp"
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
-#include <atomic>
-#include <chrono>
-#include <thread>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 bool ObserverController::Init() {
     this->ISys()
@@ -13,7 +11,7 @@ bool ObserverController::Init() {
         .SubscribeAsync("spec_mode_changed_to")
         .SubscribeSync("Hook/RegisterConCommand/RegisterOurCmd",
             [this](MulNX::Message& msg) {
-                this->CS2->RegisterCS2Cmd("mulnx_spec_steam64uid", "this is MulNX Cmd", [this](CCommand* a) {
+                this->CS2Con->RegisterCS2Cmd("mulnx_spec_steam64uid", "this is MulNX Cmd", [this](CCommand* a) {
                     return;
                     });
             });

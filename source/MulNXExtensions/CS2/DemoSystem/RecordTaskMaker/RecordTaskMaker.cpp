@@ -2,6 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 bool RecordTaskMaker::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("录制任务创建", this->showWindow);
@@ -115,7 +116,7 @@ bool RecordTaskMaker::Window(MulNX::UINode* node) {
                     rp->tickStart, rp->tickEnd);
                 rp->desc = std::move(desc);
 
-                float* pTimeScale = this->CS2->GetCvarSystem().GetCvar("host_timescale")->GetPtr<float>();
+                float* pTimeScale = this->CS2Con->GetCvar("host_timescale")->GetPtr<float>();
 
                 this->ISys().PublishAsync(std::move(msg));
             }

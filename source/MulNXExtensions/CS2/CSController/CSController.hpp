@@ -9,8 +9,6 @@
 #include <MulNXExtensions/CS2/CSClasses/CSDll/CSDll.hpp>
 #include <MulNXExtensions/CS2/CSClasses/C_CSGameRules/C_CSGameRules.hpp>
 
-#include "ConVarSystem/ConVarSystem.hpp"
-
 //1到10为玩家，0为本地
 class D_Player {
 public:
@@ -34,23 +32,13 @@ class CSController final :public MulNX::ModuleBase {
     std::unique_ptr<MulNX::Hook>hkSource2Client002_Init = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
-    std::unique_ptr<MulNX::Hook>hkVEngineCvar007_RegisterConCommand = nullptr;
-    std::unique_ptr<MulNX::Hook>hkPlaydemo = nullptr;
-    class MulNXCmd {
-    public:
-        std::string name;
-        std::string help;
-        MulNXCS2CmdCallback callback;
-    };
-    std::vector<MulNXCmd> CS2Cmds{};
-    MulNX::Hook::Then HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx);
+    
+
     uintptr_t retAddrForShowSpeaker = 0;
 
     D_GameData CS2EBGameData{};
     // 控制台指令执行器
     VExecutor<void(int, const char*, int)> executor{};
-    // 控制台变量系统
-    C_ConVarSystem CvarSystem{};
     // CS2全局变量
     C_GlobalVars* CSGlobalVars{};
 
@@ -59,8 +47,6 @@ class CSController final :public MulNX::ModuleBase {
     MulNX::CoTask InitTask();
     void ProcessMsg(MulNX::Message& Msg)override;
     void Main();
-
-    std::mutex ForceMutex;
 
     std::set<uintptr_t>detected;
     std::set<uintptr_t>force;
@@ -82,8 +68,6 @@ public:
     CS2::Module::engine2 engine2{};
     MulNX::Memory::DllModule tier0{};
     MulNX::Memory::DllModule panorama{};
-    // 获取控制台变量系统
-    C_ConVarSystem& GetCvarSystem() { return this->CvarSystem; }
     
     bool Init()override;
     
@@ -91,6 +75,4 @@ public:
     
     bool SpecPlayer(int IndexInMap);
     D_Player& GetPlayerMsg(int Index);
-
-    std::function<void(std::string&&, std::string&&, std::function<void(CCommand*)>&&)>RegisterCS2Cmd = nullptr;
 };

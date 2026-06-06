@@ -53,20 +53,17 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
             .CreateModule<FileRedirector>("FileRedirector")
-            .CreateModule<CSController>("CSController")
-            .CreateModule<TimeController>("TimeController")
-            .CreateModule<ViewController>("ViewController")
             .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
             .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
             .CreateModule<WebSocketManager>("WebSocketManager")
-            // 摄像机系统
-            .CreateModule<CameraSystem>("CameraSystem")
-            .CreateModule<WorkspaceManager>("WorkspaceManager")
-            .CreateModule<ProjectManager>("ProjectManager")
-            .CreateModule<SolutionManager>("SolutionManager")
-            .CreateModule<ElementManager>("ElementManager")
-            // CS2
+            // 底层CS2支持
+            .CreateModule<CSController>("CSController")
+            // CS2关键接口
+            .CreateModule<HookConsole>("HookConsole")
             .CreateModule<HookEntitySystem>("HookEntitySystem")
+            .CreateModule<TimeController>("TimeController")
+            .CreateModule<ViewController>("ViewController")
+            // CS2功能模块
             .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<FreeCameraController>("FreeCameraController")
             .CreateModule<PlayerHub>("PlayerHub")
@@ -82,6 +79,12 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<TeamIDController>("TeamIDController")
             .CreateModule<EntityListScanner>("EntityListScanner")
             .CreateModule<POVFixer>("POVFixer")
+            // 摄像机系统
+            .CreateModule<CameraSystem>("CameraSystem")
+            .CreateModule<WorkspaceManager>("WorkspaceManager")
+            .CreateModule<ProjectManager>("ProjectManager")
+            .CreateModule<SolutionManager>("SolutionManager")
+            .CreateModule<ElementManager>("ElementManager")
             // Demos
             .CreateModule<DemoSystem>("DemoSystem")
             .CreateModule<DemoAnalyzer>("DemoAnalyzer")

@@ -3,6 +3,10 @@ add_library(MulNXCS2Ext
     CSClasses/GlobalVars/GlobalVars.cpp
     CSClasses/tree/tree.cpp
 
+    CSController/CSController.cpp
+    HookEntitySystem/HookEntitySystem.cpp
+    HookConsole/HookConsole.cpp
+
     ViewController/ViewController.cpp
     TimeController/TimeController.cpp
     AdvancedViewController/AdvancedViewController.cpp
@@ -30,13 +34,11 @@ add_library(MulNXCS2Ext
     EntityListScanner/EntityListScanner.cpp
 )
 
-add_subdirectory("CSController")
 add_subdirectory("CameraSystem")
 add_subdirectory("DemoSystem")
 
 target_link_libraries(MulNXCS2Ext PUBLIC
     MulNX
     WinExt
-    CSController
     DemoSystem
 )
