@@ -4,19 +4,21 @@
 
 class ProjectileTracker final : public CSViewPlayerModuleBase {
     std::atomic<bool>Enable = false;
+    std::set<CS2::C_BaseCSGrenadeProjectile*> bufferProjectiles;
     std::atomic<CS2::C_BaseCSGrenadeProjectile*> pTargetWatchProjectile = nullptr;
 
     // void HandleGrenadeAdd(CS2::C_BaseCSGrenade* pGrenade, std::string&& name);
     // void HandleGrenadeRemove(CS2::C_BaseCSGrenade* pGrenade);
 
-    void HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile, std::string&& name);
+    bool HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile);
 
-    void ProcessMsg(MulNX::Message& msg)override;
     void Menu(MulNX::UINode* node)override;
     void Team(MulNX::UINode* node)override {};
     void Player(MulNX::UINode* node)override {};
     void Main();
     MulNX::NewestBuffer<MulNX::Math::View> currentView{};
+    void OnEntityAdd(MulNX::Message& msg);
+    void OnEntityRemove(MulNX::Message& msg);
 public:
     bool Init()override;
     std::optional<MulNX::Math::View> GetView();

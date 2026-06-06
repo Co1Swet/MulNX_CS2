@@ -25,74 +25,88 @@ bool ProjectileTracker::Init() {
         });
 
     this->ISys()
-        .SubscribeAsync("Game/Entity/Added")
-        .SubscribeAsync("Game/Entity/Removed");
+        .SubscribeSync("Hook/AddEntity", [this](MulNX::Message& msg) {return this->OnEntityAdd(msg);})
+        .SubscribeSync("Hook/RemoveEntity", [this](MulNX::Message& msg) {return this->OnEntityRemove(msg);})
+        ;
 
     return true;
 }
 
-void ProjectileTracker::ProcessMsg(MulNX::Message& msg) {
-    switch (msg.type) {
-    case "Game/Entity/Added"_hash: {
-        auto pEntity = msg.p1.as<CS2::C_BaseEntity*>();
-        auto hEntity = msg.p2.low<CS2::CHandleBase>();
-        std::string name;
-        try {
-            name = pEntity->GetName();
-        }
-        catch (const std::exception& e) {
-            this->ISys().LogWarning("添加：在分析实体消息以分流时发生异常");
-        }
-        if (name.find("projectile") != std::string::npos) {
-            this->HandleProjectileAdd(pEntity->As<CS2::C_BaseCSGrenadeProjectile>(), std::move(name));
-        }
-        // else if (name.find("grenade") != std::string::npos) {
-        //     this->HandleGrenadeAdd(pEntity->As<CS2::C_BaseCSGrenade>(), std::move(name));
-        // }
-        break;
+void ProjectileTracker::OnEntityAdd(MulNX::Message& msg) {
+    auto pEntity = msg.p1.as<CS2::C_BaseEntity*>();
+    std::string name;
+    try {
+        name = pEntity->GetName();
     }
-    case "Game/Entity/Removed"_hash: {
-        auto pEntity = msg.p1.as<CS2::C_BaseEntity*>();
-        break;
+    catch (const std::exception& e) {
+        this->ISys().LogWarning("添加：在分析实体消息以分流时发生异常");
     }
+    if (name.find("projectile") != std::string::npos) {
+        std::unique_lock lock(this->smutex);
+        this->bufferProjectiles.insert(pEntity->As<CS2::C_BaseCSGrenadeProjectile>());
     }
 }
 
-void ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile, std::string&& name) {
+void ProjectileTracker::OnEntityRemove(MulNX::Message& msg) {
+    auto pEntity = msg.p1.as<CS2::C_BaseEntity*>();
+    std::string name;
+    try {
+        name = pEntity->GetName();
+    }
+    catch (const std::exception& e) {
+        this->ISys().LogWarning("添加：在分析实体消息以分流时发生异常");
+    }
+    if (name.find("projectile") != std::string::npos) {
+        std::unique_lock lock(this->smutex);
+        this->bufferProjectiles.erase(pEntity->As<CS2::C_BaseCSGrenadeProjectile>());
+        if (this->pTargetWatchProjectile.load() == pEntity) {
+            this->pTargetWatchProjectile.store(nullptr);
+        }
+    }
+    
+}
+
+bool ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile) {
     try {
         auto hThrower = MulNX::MRead(pProjectile->m_hThrower());
         auto* pPawn = this->CS2->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
         auto hController = MulNX::MRead(pPawn->m_hController());
         auto* pController = this->CS2->client.GetBaseEntityFromHandle(hController)->As<CS2::CCSPlayerController>();
-        if (!pController)return;
-        std::unique_lock lock(this->smutex);
-        this->ISys().LogInfo(std::format("记录 projectile({}) -> 控制器 SteamID={} ", name, MulNX::MRead(pController->m_steamID())));
+        if (!pController)return false;
 
-        auto* pLocalPlayerPawn = this->CS2->client.GetLocalPlayerPawn();
-        if (!pLocalPlayerPawn)return;
-        auto* pObserverServices = MulNX::MRead(pLocalPlayerPawn->pObserverServices());
-        if (!pObserverServices)return;
-        auto hTargetObserverPawn = MulNX::MRead(pObserverServices->hObserverTarget());
-        auto* pTargetPawn = this->CS2->client.GetBaseEntityFromHandle(hTargetObserverPawn)->As<CS2::C_CSPlayerPawn>();
-        if (!pTargetPawn)return;
-        auto hTargetController = MulNX::MRead(pTargetPawn->m_hController());
+        this->ISys().LogInfo(std::format("记录 projectile({}) -> 控制器 SteamID={} ", pProjectile->GetName(), MulNX::MRead(pController->m_steamID())));
+
+        auto* pObPawn = this->CS2->client.TryGetObservingPawn();
+        if(!pObPawn) return true;
+        auto hTargetController = MulNX::MRead(pObPawn->m_hController());
         auto* pTargetController = this->CS2->client.GetBaseEntityFromHandle(hTargetController);
 
         if (pController == pTargetController) {
             this->pTargetWatchProjectile.store(pProjectile, std::memory_order_release);
         }
 
-        return;
+        return true;
     }
     catch (const std::exception& e) {
         this->ISys().LogWarning(std::format("在分析新增实体时发生异常：{}", e.what()));
+        return false;// 可能是因为实体数据尚未完全初始化，继续尝试直到成功或确认不相关
     }
 }
 
 void ProjectileTracker::Main() {
     this->Update();
     if (!this->Enable.load(std::memory_order_acquire))return;
+    std::unique_lock lock(this->smutex);
     try {
+        for (auto it=this->bufferProjectiles.begin(); it != this->bufferProjectiles.end();) {
+            if (this->HandleProjectileAdd(*it)) {
+                it = this->bufferProjectiles.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
+
         CS2::C_BaseCSGrenadeProjectile* pProjectile = this->pTargetWatchProjectile.load(std::memory_order_acquire);
         if (!pProjectile) return;
 

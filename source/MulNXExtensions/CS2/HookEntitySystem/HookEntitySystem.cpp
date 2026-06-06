@@ -16,12 +16,13 @@ bool HookEntitySystem::Init() {
             this->hkAddEntity = MulNX::Hook::Create(pAddEntity, [this](MulNX::Hook* hk, RegContext* ctx) {
                 CS2::C_BaseEntity* pEntity = (CS2::C_BaseEntity*)(ctx->rdx);
                 CS2::CHandleBase hEntity = *(CS2::CHandleBase*)&(ctx->r8);
-
-                MulNX::Message msg("Game/Entity/Added"_hash);
+                hk->CallMaybeOrigin(0, ctx);// 先调用原函数，确保实体已被添加到系统中，相关数据已初始化
+                
+                MulNX::Message msg("Hook/AddEntity"_hash);
                 msg.p1.as<CS2::C_BaseEntity*>() = pEntity;
                 msg.p2.low<CS2::CHandleBase>() = hEntity;
-                this->ISys().PublishAsync(std::move(msg));
-                return MulNX::Hook::Then::Continue;
+                this->ISys().PublishSync(msg);
+                return MulNX::Hook::Then::Return;
                 }).value();
             this->hkAddEntity->Attach();
             this->ISys().LogSucc(I18n("hook.attached", "AddEntity"));
@@ -29,9 +30,9 @@ bool HookEntitySystem::Init() {
             auto pRemoveEntity = vtable[16];
             this->hkRemoveEntity = MulNX::Hook::Create(pRemoveEntity, [this](MulNX::Hook* hk, RegContext* ctx) {
                 auto pEntity = (CS2::C_BaseEntity*)(ctx->rdx);
-                MulNX::Message msg("Game/Entity/Removed"_hash);
+                MulNX::Message msg("Hook/RemoveEntity"_hash);
                 msg.p1.as<CS2::C_BaseEntity*>() = pEntity;
-                this->ISys().PublishAsync(std::move(msg));
+                this->ISys().PublishSync(msg);
                 return MulNX::Hook::Then::Continue;
                 }).value();
             this->hkRemoveEntity->Attach();
