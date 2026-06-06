@@ -39,17 +39,7 @@ add_compile_definitions(NOMINMAX) # 防止windows的min max宏破坏程序
 add_compile_definitions(WIN32_LEAN_AND_MEAN) # 至少能让它少引入点东西
 add_compile_definitions(ASIO_STANDALONE) # 独立版本的asio，不引入boost
 
-# 以当前目录为唯一的起点，被所有子目录共享
-include_directories(${CMAKE_SOURCE_DIR})
-
-# 添加子目录
-add_subdirectory("MulNXThirdParty")
-add_subdirectory("MulNX")
-add_subdirectory("MulNXExtensions")
-add_subdirectory("CS2OBTool")
-add_subdirectory("CS2Injector")
-add_subdirectory("CS2InternalHelper")
-add_subdirectory("2_tests")
+add_subdirectory("src")
 
 # 定义目标路径
 set(MulNXPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
