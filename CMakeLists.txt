@@ -39,7 +39,7 @@ add_compile_definitions(NOMINMAX) # 防止windows的min max宏破坏程序
 add_compile_definitions(WIN32_LEAN_AND_MEAN) # 至少能让它少引入点东西
 add_compile_definitions(ASIO_STANDALONE) # 独立版本的asio，不引入boost
 
-add_subdirectory("src")
+add_subdirectory("source")
 
 # 定义目标路径
 set(MulNXPath ${CMAKE_SOURCE_DIR}/bin/MulNX)

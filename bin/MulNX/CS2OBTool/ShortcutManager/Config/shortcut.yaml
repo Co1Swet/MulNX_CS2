@@ -51,12 +51,12 @@ binds:
       vkCode: 80
       comboClick: 1
 
-  - desc: "切换自由摄像机模式（T）"
+  - desc: "切换自由摄像机模式（Alt+T）"
     msg: "FreeCamCtrl/Toggle"
     KCP:
       usable: true
       ctrl: false
       shift: false
-      alt: false
+      alt: true
       vkCode: 84
       comboClick: 1

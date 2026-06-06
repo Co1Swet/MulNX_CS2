@@ -17,10 +17,9 @@
 
 | 简体中文 | English |
 | --- | --- |
-| [安全指南](docs/readmes/zh-CN/safety.md) | [Safety Guide](docs/readmes/en/safety.md) |
+| [安全指南](docs/readmes/zh-CN/safe.md) | [Safety Guide](docs/readmes/en/safe.md) |
 | [用户手册](docs/readmes/zh-CN/user.md) | [User Guide](docs/readmes/en/user.md) |
 | [技术总览](docs/readmes/zh-CN/tech.md) | [Technical Overview](docs/readmes/en/tech.md) |
-
 
 ---
 
