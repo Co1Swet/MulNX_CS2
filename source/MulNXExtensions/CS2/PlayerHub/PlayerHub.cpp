@@ -133,6 +133,10 @@ bool PlayerHub::Window(MulNX::UINode* node) {
         }
         RenderTeamPopup("TeamPopup_T", CS2::ui8TeamNum::T);
         ImGui::EndChild();
+
+        for (auto& mod : this->PlayerViewModules) {
+            mod->Menu(node);
+        }
     }
     catch (const std::exception& e) {
         this->ISys().LogWarning(std::format("在绘制玩家信息时捕获到异常：{}", e.what()));

@@ -69,10 +69,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
         ImGuiWindowFlags_NoSavedSettings |
         ImGuiWindowFlags_NoDocking |
         ImGuiWindowFlags_NoBackground);
-
-    ImGui::DockSpace(ImGui::GetID("MainDockSpace"), ImVec2(0, 0),
-        ImGuiDockNodeFlags_PassthruCentralNode);
-
+    ImGui::DockSpace(ImGui::GetID("MainDockSpace"), ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
     ImGui::End();
 
     ImGui::PopStyleColor(2);
@@ -92,15 +89,14 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     node->CallUINode("PlayerFlashController");
     MulNX::UI::Checkbox("ESP", this->Core->ModuleManager()->FindModule("ESPController")->showWindow);
     node->CallUINode("GameHudMenu");
+    ImGui::End();
 
+    ImGui::Begin(I18n("高级功能").c_str());
     MulNX::UI::Checkbox("小地图窗口", this->Core->ModuleManager()->FindModule("MiniMap")->showWindow);
     MulNX::UI::Checkbox("游戏配置管理器窗口", this->Core->ModuleManager()->FindModule("GameCfgManager")->showWindow);
     MulNX::UI::Checkbox("Demo", this->Core->ModuleManager()->FindModule("DemoSystem")->showWindow);
     MulNX::UI::Checkbox("玩家信息管理窗口", this->Core->ModuleManager()->FindModule("PlayerHub")->showWindow);
-    
     MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->Core->ModuleManager()->FindModule("DeathMsgController")->showWindow);
-    
-
     ImGui::End();
 
     ImGui::Begin(I18n("3D视觉").c_str());
@@ -114,7 +110,6 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     ImGui::End();
 
     ImGui::Begin(I18n("视角视图").c_str());
-    MulNX::UI::Checkbox("投掷物追踪器窗口", this->Core->ModuleManager()->FindModule("ProjectileTracker")->showWindow);
     node->CallUINode("AdvancedViewController");
     ImGui::End();
 

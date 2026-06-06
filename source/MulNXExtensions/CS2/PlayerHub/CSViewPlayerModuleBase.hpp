@@ -6,6 +6,7 @@ public:
     virtual ~ICSViewPlayerModule() = default;
     virtual void Player(MulNX::UINode* node) = 0;
     virtual void Team(MulNX::UINode* node) = 0;
+    virtual void Menu(MulNX::UINode* node) {};
 };
 
 template <typename T>

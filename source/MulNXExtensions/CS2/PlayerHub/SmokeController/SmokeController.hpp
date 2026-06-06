@@ -7,9 +7,11 @@ class SmokeController final : public CSViewPlayerModuleBase {
     std::map<CS2::ui8TeamNum, uint32_t> teamColors;          // 队伍自定义烟雾颜色
 
 public:
-    bool Init() override;
-    void ProcessMsg(MulNX::Message& Msg) override;
+    bool Init()override;
+    void ProcessMsg(MulNX::Message& Msg)override;
+
+    void Player(MulNX::UINode* node)override;
+    void Team(MulNX::UINode* node)override;
+
     void MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke);
-    void Player(MulNX::UINode* node);
-    void Team(MulNX::UINode* node);
 };
