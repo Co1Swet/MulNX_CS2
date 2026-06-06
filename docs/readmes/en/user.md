@@ -23,12 +23,10 @@ MulNX_CS2 is a free, one‑stop toolkit for CS2 that integrates real‑time GOTV
 | | Four‑level resource management: Workspace (match) → Project (map) → Solution (composite camera movement) → Element (single track) |
 | | Real‑time preview: the camera responds synchronously when dragging the slider, adjustable frame by frame |
 | | Live broadcast and post‑production share the same data, doubling efficiency |
-
 | **Camera Control** | Free camera mode, adjustable movement speed, can move in space while paused |
 | | Free view adjustment, including position, angles (roll angle supported), FOV, and depth of field |
 | | Advanced view control: follow player bones/weapons, smooth absolute space follow |
 | | Projectile tracking: allows the view to track thrown items |
-
 | **Rendering (First‑person POV Fixes)** | Green screen based on scene depth |
 | | Edge glow modification |
 | | Team ID display modification |
@@ -39,30 +37,24 @@ MulNX_CS2 is a free, one‑stop toolkit for CS2 that integrates real‑time GOTV
 | | Death message display modification |
 | | Skin modification (skin changer) |
 | | Partial HUD fixes via file redirection without modifying disk files |
-
 | **UI** | Full ImGui overlay, real‑time parameter adjustment and preview |
 | | Supports UI docking, modern UI experience |
 | | Customizable UI style and fonts |
 | | OBS render separation: UI visible to the operator, invisible to recordings |
 | | MiniMap: real‑time minimap display and player positions |
 | | Player Center: displays the status of players on the field |
-
 | **Input System** | Independent keyboard raw input capture, low latency |
 | | Supports Ctrl/Shift/Alt + letter / numpad / F‑keys, supports combo presses (e.g., *2) |
 | | Custom hotkeys, can bind keys to send MulNX asynchronous messages |
 | | Freely bind hotkeys for projects/solutions, one‑key switch/trigger |
-
 | **Demo** | Demo parsing integration |
 | | Demo management |
 | | Demo viewing and control |
 | | Automatic Demo recording |
-
 | **Network Communication** | WebSocket remote control (localhost:55202), provides API |
 | | JS examples provided, can be controlled by external programs |
-
 | **Media & Output** | Independent audio/video encoding and capture |
 | | OBS compatible |
-
 | **Utilities** | Real‑time log monitoring |
 | | Multi‑language interface |
 | | Config file management: one‑click import/export/delete CFG |
