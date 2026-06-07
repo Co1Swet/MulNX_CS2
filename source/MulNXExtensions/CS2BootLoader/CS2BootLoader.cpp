@@ -106,6 +106,7 @@ void CS2BootLoader::ProcessMsg(MulNX::Message& msg) {
         YAML::Node config;
         config["path"] = this->gamePath.string();
         config["launchOptions"] = this->launchOptions;
+        config["patternsCheckDangerous"] = this->patternsCheckDangerous;
         std::ofstream fout(configPath / "config.yaml");
         fout << config;
         fout.close();

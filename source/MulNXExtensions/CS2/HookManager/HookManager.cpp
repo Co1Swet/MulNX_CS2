@@ -93,7 +93,6 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
         }).value();
     this->hkPresent->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "Present"));
-
     // ---- Hook ResizeBuffers (vtable index 13) ----
     this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(13), [this](MulNX::Hook* hk, RegContext* ctx) {
         this->pGraphicsManager->ReleaseOld();
@@ -114,7 +113,6 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
         }).value();
     this->hkDrop->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "OleDropTargetInterface::Drop"));
-
     // 窗口过程钩子
     this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->CS2hWnd, GWLP_WNDPROC), [this](MulNX::Hook* hk, RegContext* ctx) {
         return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
@@ -122,17 +120,14 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     this->hkWndProc->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "WndProc"));
 }
-
 MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx) {
     hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnPresent(hk, ctx);});
-
     // ImGui 初始化
     ImGui::CreateContext();
     ImGui_ImplWin32_Init(this->CS2hWnd);
     ImGui_ImplDX11_Init(this->pGraphicsManager->pd3dDevice, this->pGraphicsManager->pd3dContext);
 
     this->pGraphicsManager->ReleaseOld();
-
     // 创建绿幕着色器资源
     this->pGraphicsManager->CreateGreenScreenAssets();
 
@@ -140,6 +135,10 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+        ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+            auto pThis = static_cast<HookManager*>(cmd->UserCallbackData);
+            pThis->ISys().PublishSync("Hook/BeforePresent"_hash);
+            }, this, 0);
         return true;
         };
     this->pUISystem->FrameBehind = [this]() {
@@ -153,20 +152,16 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
 
     return MulNX::Hook::Then::Continue;
 }
-
 MulNX::Hook::Then HookManager::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
-    
+    // 绿幕渲染
     this->pGraphicsManager->BuildNew();
     this->pGraphicsManager->OnPresent();
-    this->ISys().PublishSync("Hook/BeforePresent"_hash);
     // UI 系统渲染
     this->pUISystem->HandleUpdate();
     this->pUISystem->Render();
-
     return MulNX::Hook::Then::Continue;
 }
-
 MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
     if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
@@ -181,16 +176,12 @@ MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
     }
     return MulNX::Hook::Then::Continue;
 }
-
 void HookManager::Deinit() {
-    this->hkLoadLibraryExW->Detach();
     this->hkClearDepthStencilView->Detach();
-    this->hkDrop->Detach();
     this->hkPresent->Detach();
-    this->hkResizeBuffers->Detach();
+    this->hkLoadLibraryExW->Detach();
     this->hkWndProc->Detach();
 }
-
 void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {
     if (!pDataObj) return;
     // 请求 CF_HDROP 格式

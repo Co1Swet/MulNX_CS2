@@ -14,7 +14,7 @@ bool VirtualUser::Init() {
         .SubscribeAsync("Game/NewRound");
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {
-        MulNX::UI::Checkbox("启用自动化增强（Alt+T可快速切换）", this->Enabled);
+        MulNX::UI::Checkbox("启用自动化增强（Alt+O可快速切换）", this->Enabled);
         return true;
         });
     this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
@@ -25,7 +25,7 @@ bool VirtualUser::Init() {
 }
 void VirtualUser::Main() {
     this->Update();
-    if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'T',1 })) {
+    if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'O',1 })) {
         bool AutoRunning = this->Enabled.load(std::memory_order_acquire);
         this->Enabled.store(!AutoRunning, std::memory_order_release);
         this->ISys().LogWarning(std::format("自动化增强已{}", AutoRunning ? "关闭" : "开启"));
