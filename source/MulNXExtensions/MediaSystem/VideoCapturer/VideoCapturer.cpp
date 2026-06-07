@@ -1,7 +1,9 @@
 #include "VideoCapturer.hpp"
 
 bool VideoCapturer::Init() {
-    this->ISys().SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->Captuer();});
+    this->ISys()
+        .SubscribeSync("Hook/Present/Fisrt", [this](MulNX::Message& msg) {;})
+        .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->Captuer();});
 
     return true;
 }
@@ -17,7 +19,7 @@ void VideoCapturer::ReleaseStagingTexture() {
 }
 
 void VideoCapturer::Reset() {
-    std::scoped_lock lock(this->captureMutex);
+    std::unique_lock lock(this->smutex);
     this->srcPixelFormat = AV_PIX_FMT_NONE;
     this->ReleaseStagingTexture();
     this->lastCapture.reset();
@@ -34,14 +36,14 @@ std::optional<av::VideoFrame> VideoCapturer::TryPop() {
 }
 
 void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
-    std::scoped_lock lock(this->captureMutex);
+    std::unique_lock lock(this->smutex);
     this->recordStartTime = startTime;
     this->lastCapture.reset();
     this->runFlag1.store(true, std::memory_order_release);
 }
 
 void VideoCapturer::StopCapture() {
-    std::scoped_lock lock(this->captureMutex);
+    std::unique_lock lock(this->smutex);
     this->runFlag1.store(false);
 }
 
@@ -50,7 +52,7 @@ void VideoCapturer::ClearBuffer() {
     while (this->buffer.try_dequeue(discard)) {
         // drain stale video data
     }
-    std::scoped_lock lock(this->captureMutex);
+    std::unique_lock lock(this->smutex);
     this->lastCapture.reset();
 }
 
@@ -62,7 +64,7 @@ void VideoCapturer::Captuer() {
     }
 
     auto now = std::chrono::steady_clock::now();
-    std::scoped_lock lock(this->captureMutex);
+    std::unique_lock lock(this->smutex);
     constexpr std::chrono::microseconds minInterval(16667);
     if (this->lastCapture.has_value() && now - *this->lastCapture < minInterval) {
         return;

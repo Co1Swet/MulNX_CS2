@@ -11,12 +11,10 @@ bool HookManager::Init() {
 
     this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, [this](MulNX::Hook* hk, RegContext* ctx) {
         LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
-        ctx->rax = hk->CallMaybeOrigin(0, ctx);
-
+        hk->CallMaybeOrigin(0, ctx);
         MulNX::Message msg("Hook/LoadLibraryExW"_hash);
         msg.p1.as<LPCWSTR>() = lpLibFileName;
         this->ISys().PublishSync(msg);
-
         return MulNX::Hook::Then::Return;
         }).value();
     this->hkLoadLibraryExW->Attach();
@@ -24,36 +22,25 @@ bool HookManager::Init() {
 
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
         auto pD3D11CreateDevice = (uint8_t*)GetProcAddress(GetModuleHandleW(L"d3d11.dll"), "D3D11CreateDevice");
-
         this->hkD3D11CreateDevice = MulNX::Hook::Create(pD3D11CreateDevice, [this](MulNX::Hook* hk, RegContext* ctx) {
             this->hkD3D11CreateDevice->Detach();
+            this->pGraphicsManager->pAdapter = (IDXGIAdapter*)ctx->rcx;
             auto ppDevice = *hk->GetStackParam<ID3D11Device**>(ctx, 7);
-            auto ppImmediateContext = *hk->GetStackParam<ID3D11DeviceContext**>(ctx, 9);
-
-            *reinterpret_cast<HRESULT*>(&ctx->rax) = hk->CallMaybeOrigin(6, ctx);
-            this->HookD3D11DeviceAndContext(*ppDevice, *ppImmediateContext);
-
+            auto ppDeviceContext = *hk->GetStackParam<ID3D11DeviceContext**>(ctx, 9);
+            hk->CallMaybeOrigin(6, ctx);
+            this->pGraphicsManager->pd3dDevice = *ppDevice;
+            this->pGraphicsManager->pd3dContext = *ppDeviceContext;
+            this->HookD3D11DeviceAndContext();
             return MulNX::Hook::Then::Return;
             }).value();
         this->hkD3D11CreateDevice->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "D3D11CreateDevice"));
         });
-
     return true;
 }
-
-void HookManager::HookD3D11DeviceAndContext(ID3D11Device* pDevice, ID3D11DeviceContext* pImmediateContext) {
-
-    IDXGIDevice* pDXGIDevice = nullptr;
-    pDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&pDXGIDevice);
-    IDXGIAdapter* pAdapter = nullptr;
-    pDXGIDevice->GetAdapter(&pAdapter);
-    pDXGIDevice->Release();
-
+void HookManager::HookD3D11DeviceAndContext() {
     IDXGIFactory* pFactory = nullptr;
-    pAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pFactory);
-    pAdapter->Release();
-
+    this->pGraphicsManager->pAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pFactory);
     this->hkCreateSwapChain = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pFactory)->GetVFuncPtr(10), [this](MulNX::Hook* hk, RegContext* ctx) {
         this->hkCreateSwapChain->Detach();
         IDXGISwapChain** ppSwapChain = (IDXGISwapChain**)ctx->r9;
@@ -63,9 +50,8 @@ void HookManager::HookD3D11DeviceAndContext(ID3D11Device* pDevice, ID3D11DeviceC
         }).value();
     this->hkCreateSwapChain->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "CreateSwapChain"));
-
     // ---- Hook ClearDepthStencilView (vtable index 53) ----
-    this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pImmediateContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
         ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
         ID3D11DepthStencilView* pDSV = (ID3D11DepthStencilView*)ctx->rdx;
         UINT ClearFlags = *(UINT*)(&ctx->r8);
@@ -74,11 +60,7 @@ void HookManager::HookD3D11DeviceAndContext(ID3D11Device* pDevice, ID3D11DeviceC
         }).value();
     this->hkClearDepthStencilView->Attach();
     this->ISys().LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
-
-    this->pGraphicsManager->pd3dDevice = pDevice;
-    this->pGraphicsManager->pd3dContext = pImmediateContext;
 }
-
 void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // Hook Present函数
     // 函数开头：
@@ -126,9 +108,8 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
     ImGui::CreateContext();
     ImGui_ImplWin32_Init(this->CS2hWnd);
     ImGui_ImplDX11_Init(this->pGraphicsManager->pd3dDevice, this->pGraphicsManager->pd3dContext);
-
-    this->pGraphicsManager->ReleaseOld();
     // 创建绿幕着色器资源
+    this->pGraphicsManager->ReleaseOld();
     this->pGraphicsManager->CreateGreenScreenAssets();
 
     this->pUISystem->FrameBefore = [this]() {
@@ -147,9 +128,7 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
         this->pGraphicsManager->pd3dContext->OMSetRenderTargets(1, &this->pGraphicsManager->view, nullptr);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         };
-
     this->CreateMainDraw();
-
     return MulNX::Hook::Then::Continue;
 }
 MulNX::Hook::Then HookManager::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {

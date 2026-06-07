@@ -31,7 +31,7 @@ private:
     std::unique_ptr<MulNX::Hook> hkDrop = nullptr;
     void HandleProcessDropFiles(IDataObject* pDataObj);
 
-    void HookD3D11DeviceAndContext(ID3D11Device* pDevice, ID3D11DeviceContext* pImmediateContext);
+    void HookD3D11DeviceAndContext();
     void HookD3D11SwapChain(IDXGISwapChain* pSwapChain);
 public:
     bool Init()override;

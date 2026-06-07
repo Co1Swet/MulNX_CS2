@@ -42,6 +42,8 @@ namespace MulNX {
         bool Init()override;
 
         // D3D11 核心指针
+        
+        IDXGIAdapter* pAdapter = nullptr;
         ID3D11Device* pd3dDevice = nullptr;
         IDXGISwapChain* pSwapChain = nullptr;
         ID3D11DeviceContext* pd3dContext = nullptr;
