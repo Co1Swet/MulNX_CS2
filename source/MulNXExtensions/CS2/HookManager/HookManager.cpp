@@ -24,9 +24,16 @@ bool HookManager::Init() {
         auto pD3D11CreateDevice = (uint8_t*)GetProcAddress(GetModuleHandleW(L"d3d11.dll"), "D3D11CreateDevice");
         this->hkD3D11CreateDevice = MulNX::Hook::Create(pD3D11CreateDevice, [this](MulNX::Hook* hk, RegContext* ctx) {
             this->hkD3D11CreateDevice->Detach();
-            this->pGraphicsManager->pAdapter = (IDXGIAdapter*)ctx->rcx;
+            // 暂存参数
             auto ppDevice = *hk->GetStackParam<ID3D11Device**>(ctx, 7);
             auto ppDeviceContext = *hk->GetStackParam<ID3D11DeviceContext**>(ctx, 9);
+            // 保存D3D11环境信息，供后续使用
+            this->pGraphicsManager->D3D11Cfg.pAdapter = (IDXGIAdapter*)ctx->rcx;
+            this->pGraphicsManager->D3D11Cfg.DriverType = *(D3D_DRIVER_TYPE*)&ctx->rdx;
+            this->pGraphicsManager->D3D11Cfg.Software = *(HMODULE*)&ctx->r8;
+            this->pGraphicsManager->D3D11Cfg.Flags = *(UINT*)&ctx->r9;
+            this->pGraphicsManager->D3D11Cfg.SDKVersion = *hk->GetStackParam<UINT>(ctx, 6);
+
             hk->CallMaybeOrigin(6, ctx);
             this->pGraphicsManager->pd3dDevice = *ppDevice;
             this->pGraphicsManager->pd3dContext = *ppDeviceContext;
@@ -40,7 +47,7 @@ bool HookManager::Init() {
 }
 void HookManager::HookD3D11DeviceAndContext() {
     IDXGIFactory* pFactory = nullptr;
-    this->pGraphicsManager->pAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pFactory);
+    this->pGraphicsManager->D3D11Cfg.pAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pFactory);
     this->hkCreateSwapChain = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pFactory)->GetVFuncPtr(10), [this](MulNX::Hook* hk, RegContext* ctx) {
         this->hkCreateSwapChain->Detach();
         IDXGISwapChain** ppSwapChain = (IDXGISwapChain**)ctx->r9;

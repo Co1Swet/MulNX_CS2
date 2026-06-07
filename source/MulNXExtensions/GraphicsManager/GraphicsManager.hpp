@@ -1,10 +1,19 @@
 #pragma once
-
 #include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/GraphicsManager/ShaderCompiler/ShaderCompiler.hpp>
 #include <d3d11.h>
 
 namespace MulNX {
+    class D3D11Config {
+    public:
+        IDXGIAdapter* pAdapter = nullptr;
+        D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE_UNKNOWN;
+        HMODULE Software = nullptr;
+        UINT Flags = 0;
+        UINT SDKVersion = D3D11_SDK_VERSION;
+        
+    };
+
     class GraphicsManager final :public MulNX::ModuleBase {
         MulNX::ShaderCompiler* pShaderCompiler = nullptr;
     private:
@@ -41,9 +50,8 @@ namespace MulNX {
     public:
         bool Init()override;
 
+        D3D11Config D3D11Cfg{};
         // D3D11 核心指针
-        
-        IDXGIAdapter* pAdapter = nullptr;
         ID3D11Device* pd3dDevice = nullptr;
         IDXGISwapChain* pSwapChain = nullptr;
         ID3D11DeviceContext* pd3dContext = nullptr;

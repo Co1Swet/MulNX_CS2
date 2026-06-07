@@ -3,6 +3,7 @@
 #include <MulNXThirdParty/queue/concurrentqueue.h>
 
 class VideoCapturer final :public MediaModuleBase {
+    class VCD3D11Manager* pVCD3D11Manager = nullptr;
     moodycamel::ConcurrentQueue<av::VideoFrame>buffer;
     std::optional<std::chrono::steady_clock::time_point> lastCapture;
     std::optional<std::chrono::steady_clock::time_point> recordStartTime;

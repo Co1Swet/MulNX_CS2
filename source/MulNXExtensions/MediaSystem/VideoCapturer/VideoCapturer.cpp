@@ -1,8 +1,8 @@
 #include "VideoCapturer.hpp"
 
 bool VideoCapturer::Init() {
+    this->pVCD3D11Manager = this->GetCore()->ModuleManager()->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->ISys()
-        .SubscribeSync("Hook/Present/Fisrt", [this](MulNX::Message& msg) {;})
         .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->Captuer();});
 
     return true;
