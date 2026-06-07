@@ -43,3 +43,4 @@ protected:
 };
 
 class MediaModuleBase :public MulNX::ModuleBase, public MediaModuleMixin<MediaModuleBase> {};
+using Microsoft::WRL::ComPtr;

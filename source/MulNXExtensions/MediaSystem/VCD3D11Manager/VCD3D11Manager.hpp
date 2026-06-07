@@ -1,15 +1,26 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class VCD3D11Manager final :public MediaModuleBase {
-    ID3D11Device* pDevice = nullptr;
-    ID3D11DeviceContext* pContext = nullptr;
+class MidTex {
+public:
+    ComPtr<ID3D11Texture2D> pTex;
+    ComPtr<IDXGIKeyedMutex> pMutex;
+};
 
-    ID3D11Texture2D* pSharedTex = nullptr;
-    HANDLE hSharedHandle = nullptr; // 共享句柄
-    ID3D11Texture2D* pRemoteTex = nullptr; // 本设备上打开的接收纹理
+class DoubleInterfaceTex {
+public:
+    MidTex srcTex; // 原设备上的共享纹理和同步接口
+    MidTex dstTex; // 录制设备上的共享纹理和同步接口
+};
+
+class VCD3D11Manager final : public MediaModuleBase {
+    ComPtr<ID3D11Device> pDevice;
+    ComPtr<ID3D11DeviceContext> pContext;
+
+    DoubleInterfaceTex buffer1;
 
     void OnPresentFirst(MulNX::Message& msg);
+    void CopyTexture();
 public:
-    bool Init()override;
+    bool Init() override;
 };
