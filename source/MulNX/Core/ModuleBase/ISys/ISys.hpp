@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNX/Config/Config.hpp>
 #include <MulNX/Systems/InputSystem/Key/Key.hpp>
 #include <filesystem>
@@ -28,6 +27,8 @@ namespace MulNX {
         void PublishSync(MulNX::Message& msg);
         void PublishSync(MulNX::MsgType msgType);
 
+        // 通过任意函数，发送一个UI节点
+        bool SendUINode(std::string&& name, std::function<void(MulNX::UINode*)>&& func);
         void SendTask(std::string&& name, std::string&& targetWorker, std::function<bool()>&& Do);
 
         void AsyncCommand(std::string&& cmd);

@@ -21,7 +21,7 @@ bool MediaSystem::Init() {
 
     this->ISys().LogSucc("FFmpeg 与 AvCpp 初始化成功！");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     return true;
 }

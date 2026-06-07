@@ -52,7 +52,7 @@ bool DemoRecorder::Init() {
         return true;
         });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
     this->showWindow.store(true, std::memory_order_release);

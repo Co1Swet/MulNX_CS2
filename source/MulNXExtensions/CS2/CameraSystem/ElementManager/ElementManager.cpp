@@ -111,8 +111,8 @@ bool ElementManager::Init() {
     this->SManager = this->Core->ModuleManager()->FindModule<SolutionManager>("SolutionManager");
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->SendUINode("MenuElement", [this](MulNX::UINode* node) {return this->MenuElement(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->ISys().SendUINode("MenuElement", [this](MulNX::UINode* node) {return this->MenuElement(node);});
 
     auto* PathManager = this->ISys().PathManager();
     if (PathManager->CreateKey("Elements", "Elements",

@@ -1,7 +1,6 @@
 #pragma once
-
+#include "IModuleBase.hpp"
 #include <MulNX/Common/coroutine.hpp>
-#include <MulNX/Common/Message.hpp>
 #include <MulNX/Common/Task.hpp>
 #include <MulNX/Base/MulNXHandle/MulNXHandle.hpp>
 #include "ISys/ISys.hpp"
@@ -10,8 +9,7 @@
 #include <functional>
 
 namespace MulNX {
-    class ModuleBase {
-        friend MulNX::Core::Core;
+    class ModuleBase :public IModuleBase {
         friend ISys;
         friend MulNX::Core::CoreStarterBase;
     private:
@@ -43,7 +41,6 @@ namespace MulNX {
             }
             void await_resume() {}
         };
-
         // 协程：消息
 
         // 等待句柄
@@ -72,45 +69,26 @@ namespace MulNX {
 
         MulNX::MessageManager* pMsgManager = nullptr;
         MulNX::PathManager* pPathManager = nullptr;
-        std::string ModuleName{};
         MulNX::MessageChannel* MainMsgChannel = nullptr;
         MulNX::ShortcutManager* pShortcutManager = nullptr;
     protected:
         MulNX::GlobalVars* GlobalVars = nullptr;
-        Debugger* IDebugger = nullptr;        
+        Debugger* IDebugger = nullptr;
     public:
+        MulNX::InputSystem* pInputSystem = nullptr;
         MulNX::Core::Core* Core = nullptr;
         std::atomic<bool>runFlag1 = false;
         std::atomic<bool>runFlag2 = false;
+        std::string ModuleName{};
         MulNXHandle HModule;
-        MulNX::InputSystem* pInputSystem = nullptr;
-        std::shared_mutex smutex;
-
-        ModuleBase() = default;
-
-        ModuleBase(const ModuleBase&) = delete;
-        ModuleBase(ModuleBase&&) = delete;
-        ModuleBase& operator=(const ModuleBase&) = delete;
-        ModuleBase& operator=(ModuleBase&&) = delete;
         
-        virtual ~ModuleBase() = default;
-        virtual void Deinit() {};
-
+        std::shared_mutex smutex;
         // 延迟初始化任务
-        std::vector<std::function<bool()>>delayInits{};
-    private:
-        virtual bool Init() = 0;
-        // 消息处理函数，只需处理即可，消息会由入口点释放
-        virtual void ProcessMsg(MulNX::Message& Msg) {};
+        std::unique_ptr<std::vector<std::function<bool()>>>delayInits = std::make_unique<std::vector<std::function<bool()>>>();
+    
     protected:
-        // 通过任意函数，发送一个UI节点
-        bool SendUINode(std::string&& name, std::function<void(MulNX::UINode*)>&& func);
-        auto WaitUntil(std::function<bool()>&& condition) {
-            return AwaitCondition(this, std::move(condition));
-        }
-        auto WaitMsg(MulNX::MsgType type) {
-            return AwaitMessage(this, type);
-        }
+        auto WaitUntil(std::function<bool()>&& condition) {return AwaitCondition(this, std::move(condition));}
+        auto WaitMsg(MulNX::MsgType type) {return AwaitMessage(this, type);}
         // 更新入口
         void Update();
     public:

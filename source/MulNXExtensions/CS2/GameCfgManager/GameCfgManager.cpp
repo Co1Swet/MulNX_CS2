@@ -112,7 +112,7 @@ bool GameCfgManager::Init() {
 	this->GamePath = this->IPCer->PathGet_CS_cfg();
 	//初始化Cfg文件列表
     this->UpdateCfgList();
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     return true;
 }
 

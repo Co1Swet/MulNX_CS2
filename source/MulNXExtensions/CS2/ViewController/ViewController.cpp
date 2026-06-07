@@ -36,7 +36,7 @@ bool ViewController::Init() {
         this->hkPosCallIsPlayingDemo->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
 
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+        this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
         });
 
     return true;

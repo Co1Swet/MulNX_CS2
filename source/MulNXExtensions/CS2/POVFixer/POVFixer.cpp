@@ -25,7 +25,7 @@ bool POVFixer::Init() {
         .SubscribeAsync("POVFix/Disable")
         ;
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Draw(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Draw(node);});
     
     return true;
 }

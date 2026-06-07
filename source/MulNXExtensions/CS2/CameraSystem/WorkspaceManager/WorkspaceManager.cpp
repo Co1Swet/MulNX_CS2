@@ -63,7 +63,7 @@ bool WorkspaceManager::Init() {
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
-    this->SendUINode("MenuWorkspace", [this](MulNX::UINode* node) {return this->MenuWorkspace(node);});
+    this->ISys().SendUINode("MenuWorkspace", [this](MulNX::UINode* node) {return this->MenuWorkspace(node);});
 
     this->ISys()
         .SubscribeAsync("CamereSystem/Workspace/Set")

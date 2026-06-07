@@ -84,7 +84,7 @@ bool CS2BootLoader::Init() {
         return true;
         });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     return true;
 }

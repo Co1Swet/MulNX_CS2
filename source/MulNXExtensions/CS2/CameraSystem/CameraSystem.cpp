@@ -99,7 +99,7 @@ bool CameraSystem::Init() {
         auto Workspaces = this->ISys().PathGet("Workspaces");
         PathManager->KeyBindStatic("CurrentWorkspace", Workspaces);
     }
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
     this->ISys()
         .SubscribeAsync("Global/Save")
         .SubscribeAsync("Global/Save/Strong")

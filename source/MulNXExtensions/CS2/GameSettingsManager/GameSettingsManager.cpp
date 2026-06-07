@@ -140,10 +140,10 @@ bool GameSettingsManager::Init() {
 
         *this->GameSettings.cl_trueview_show_status = 0;
 
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
-        this->SendUINode("SoundMenu", [this](MulNX::UINode* node) {return this->SoundMenu(node);});
-        this->SendUINode("DofMenu", [this](MulNX::UINode* node) {return this->DofMenu(node);});
-        this->SendUINode("GameHudMenu", [this](MulNX::UINode* node) {return this->GameHudMenu(node);});
+        this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+        this->ISys().SendUINode("SoundMenu", [this](MulNX::UINode* node) {return this->SoundMenu(node);});
+        this->ISys().SendUINode("DofMenu", [this](MulNX::UINode* node) {return this->DofMenu(node);});
+        this->ISys().SendUINode("GameHudMenu", [this](MulNX::UINode* node) {return this->GameHudMenu(node);});
         return false;
         });
 

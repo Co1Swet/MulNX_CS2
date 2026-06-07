@@ -9,7 +9,7 @@ bool MulNX::GraphicsManager::Menu(MulNX::UINode* node) {
 
 bool MulNX::GraphicsManager::Init() {
     this->pShaderCompiler = this->Core->ModuleManager()->FindModule<MulNX::ShaderCompiler>("ShaderCompiler");
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {return this->Menu(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {return this->Menu(node);});
     return true;
 }
 

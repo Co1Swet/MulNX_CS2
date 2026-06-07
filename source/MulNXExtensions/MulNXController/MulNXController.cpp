@@ -44,7 +44,7 @@ bool MulNXController::UINodeFunc(MulNX::UINode* ThisNode) {
 bool MulNXController::Init() {
     this->ISys()
         .SubscribeAsync("ModuleManager/ModuleInfo/Response");
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;

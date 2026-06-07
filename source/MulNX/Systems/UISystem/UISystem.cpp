@@ -30,7 +30,7 @@ bool MulNX::UISystem::Init() {
         .SubscribeAsync("UISystem/ModulePush")
         .SubscribeAsync("UISystem/SaveStyle");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
 
     return true;
 }

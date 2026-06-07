@@ -1,3 +1,5 @@
+#include <MulNX/Base/UI/UI.hpp>
+#include <MulNX/Systems/UISystem/UISystem.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 #include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
@@ -66,7 +68,19 @@ void MulNX::ISys::PublishSync(MulNX::MsgType msg) {
     auto m = MulNX::Message(msg);
     this->pModuleBase->pMsgManager->PublishSync(m);
 }
-
+bool MulNX::ISys::SendUINode(std::string&& name, std::function<void(MulNX::UINode*)>&& func) {
+    // 创建UI节点
+    MulNX::UINode UINode = MulNX::UINode::Create(this->pModuleBase);
+    // 设置UI节点属性
+    UINode.name = std::move(name);
+    UINode.MyFunc = std::move(func);
+    // 创建UI消息
+    auto [msg, rp] = MulNX::Message::Create<MulNX::UINode>("UISystem/ModulePush"_hash, std::move(UINode));
+    // 发送UI消息
+    this->PublishAsync(std::move(msg));
+    this->LogInfo(I18n("module.send_ui"));
+    return true;
+}
 void MulNX::ISys::SendTask(std::string&& name, std::string&& targetWorker, std::function<bool()>&& Do) {
     auto fullName = std::format("{}::{}", this->pModuleBase->GetName(), std::move(name));
     this->LogInfo(I18n("module.send_task", fullName, targetWorker));

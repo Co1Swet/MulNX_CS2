@@ -80,7 +80,7 @@ bool AdvancedViewController::Menu(MulNX::UINode* node) {
 }
 
 bool AdvancedViewController::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node); });
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node); });
 
     return true;
 }

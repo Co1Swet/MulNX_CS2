@@ -19,7 +19,7 @@ bool RecordTaskConfiger::Window(MulNX::UINode* node) {
 
 bool RecordTaskConfiger::Init() {
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();

@@ -115,8 +115,8 @@ bool ProjectManager::Init() {
     this->SManager = this->Core->ModuleManager()->FindModule<SolutionManager>("SolutionManager");
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->SendUINode("MenuProject", [this](MulNX::UINode* node) {return this->MenuProject(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->ISys().SendUINode("MenuProject", [this](MulNX::UINode* node) {return this->MenuProject(node);});
 
     auto* PathManager = this->ISys().PathManager();
     if (PathManager->CreateKey("CurrentProject", {},

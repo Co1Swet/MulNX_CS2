@@ -5,7 +5,7 @@
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
 bool MiniMap::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;

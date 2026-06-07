@@ -8,7 +8,7 @@ bool PlayerFlashController::Menu(MulNX::UINode* node) {
 }
 
 bool PlayerFlashController::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
     this->CS2->handlesControlPlayer.push_back([this](CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn) {return this->HandleForceFlash(controller, pawn);});
     return true;
 }

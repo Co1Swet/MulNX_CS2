@@ -181,7 +181,7 @@ bool RecordTaskMaker::Init() {
         .SubscribeAsync("Demo/SetOperating")
         .SubscribeAsync("Demo/InfoLoad");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();

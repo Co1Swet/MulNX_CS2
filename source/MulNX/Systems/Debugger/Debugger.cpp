@@ -63,7 +63,7 @@ bool MulNX::Debugger::Window(MulNX::UINode* ThisNode) {
 bool MulNX::Debugger::Init() {
     this->pLogger = this->Core->ModuleManager()->FindModule<MulNX::Logger>("Logger");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();

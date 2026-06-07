@@ -2,8 +2,8 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 bool UIDocker::Init() {
-    this->SendUINode("MainDraw", [this](MulNX::UINode* node) {this->MainDraw(node);});
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {this->Window(node);});
+    this->ISys().SendUINode("MainDraw", [this](MulNX::UINode* node) {this->MainDraw(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {this->Window(node);});
     return true;
 }
 

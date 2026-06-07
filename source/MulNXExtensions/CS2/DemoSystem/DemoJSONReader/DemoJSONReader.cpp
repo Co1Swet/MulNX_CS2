@@ -22,7 +22,7 @@ bool DemoJSONReader::Init() {
     this->dirDemos = this->ISys().PathManager()->PathGetForShared("Demos");
     this->ISys().SubscribeAsync("Demo/JSON/Load");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
 

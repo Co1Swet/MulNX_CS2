@@ -130,7 +130,7 @@ bool DemoSystem::Init() {
                     });
             });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
 

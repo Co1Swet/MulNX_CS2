@@ -63,7 +63,7 @@ bool DemoHelper::Init() {
         .SubscribeAsync("DemoHelper/JumpTIme")
         ;
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->ISys().SendTask("Main", "DemoSys", [this]()->bool {
         this->Main();
         return true;

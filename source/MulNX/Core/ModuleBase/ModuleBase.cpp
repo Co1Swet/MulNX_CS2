@@ -1,9 +1,7 @@
 #include "ModuleBase.hpp"
-#include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
-#include <MulNX/Systems/UISystem/UISystem.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 
 bool MulNX::ModuleBase::SetName(std::string&& Name) {
@@ -33,27 +31,11 @@ bool MulNX::ModuleBase::BaseInit(MulNX::Core::Core* core) {
 
     return true;
 }
-
-bool MulNX::ModuleBase::SendUINode(std::string&& name, std::function<void(MulNX::UINode*)>&& func) {
-    // 创建UI节点
-    MulNX::UINode UINode = MulNX::UINode::Create(this);
-    // 设置UI节点属性
-    UINode.name = std::move(name);
-    UINode.MyFunc = std::move(func);
-    // 创建UI消息
-    auto [msg, rp] = MulNX::Message::Create<MulNX::UINode>("UISystem/ModulePush"_hash, std::move(UINode));
-    // 发送UI消息
-    this->ISys().PublishAsync(std::move(msg));
-    this->ISys().LogInfo(I18n("module.send_ui"));
-    return true;
-}
-
 bool MulNX::ModuleBase::EntryInit() {
-    for (const auto& init : this->delayInits) {
+    for (const auto& init : *this->delayInits) {
         if (!init())return false;
     }
-    this->delayInits.clear();
-    this->delayInits.shrink_to_fit();
+    this->delayInits.reset();
     if (!this->Init()) {
         return false;
     }
