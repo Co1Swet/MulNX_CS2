@@ -100,6 +100,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<GameSettingsManager>("GameSettingsManager")
             // 音视频
             .CreateModule<MediaSystem>("MediaSystem")
+            .CreateModule<VCD3D11Manager>("VCD3D11Manager")
             .CreateModule<AudioCapturer>("AudioCapturer")
             .CreateModule<VideoCapturer>("VideoCapturer")
             .CreateModule<AEncodeHelper>("AEncodeHelper")

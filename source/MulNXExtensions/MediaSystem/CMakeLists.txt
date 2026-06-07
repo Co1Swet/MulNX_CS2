@@ -6,6 +6,7 @@ add_library(MediaSystem
     AudioCapturer/AudioCapturer.cpp
     AEncodeHelper/AEncodeHelper.cpp
     VEncodeHelper/VEncodeHelper.cpp
+    VCD3D11Manager/VCD3D11Manager.cpp
 )
 
 target_link_libraries(MediaSystem PUBLIC
