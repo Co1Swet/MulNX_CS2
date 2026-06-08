@@ -4,9 +4,9 @@
 class ICSViewPlayerModule {
 public:
     virtual ~ICSViewPlayerModule() = default;
-    virtual void Player(MulNX::UINode* node) {};
-    virtual void Team(MulNX::UINode* node) {};
-    virtual void Menu(MulNX::UINode* node) {};
+    virtual void HubPlayer(MulNX::UINode* node) {};
+    virtual void HubTeam(MulNX::UINode* node) {};
+    virtual void HubWindow(MulNX::UINode* node) {};
 };
 
 template <typename T>

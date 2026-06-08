@@ -10,8 +10,8 @@ public:
     bool Init()override;
     void ProcessMsg(MulNX::Message& Msg)override;
 
-    void Player(MulNX::UINode* node)override;
-    void Team(MulNX::UINode* node)override;
+    void HubPlayer(MulNX::UINode* node)override;
+    void HubTeam(MulNX::UINode* node)override;
 
     void MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke);
 };

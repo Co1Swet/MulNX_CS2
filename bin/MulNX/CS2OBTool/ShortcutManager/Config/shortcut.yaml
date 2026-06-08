@@ -60,3 +60,13 @@ binds:
       alt: true
       vkCode: 84
       comboClick: 1
+    
+  - desc: "切换UI显示（Insert）"
+    msg: "UISystem/Toggle"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: false
+      vkCode: 45
+      comboClick: 1

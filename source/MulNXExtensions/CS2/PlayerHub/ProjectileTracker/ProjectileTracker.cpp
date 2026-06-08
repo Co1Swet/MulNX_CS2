@@ -12,7 +12,7 @@ static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController
     return name.empty() ? "未知玩家" : name;
 }
 
-void ProjectileTracker::Menu(MulNX::UINode* node) {
+void ProjectileTracker::HubWindow(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("投掷物追踪器");
     MulNX::UI::Checkbox("启用功能", this->Enable);
 

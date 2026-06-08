@@ -1,9 +1,8 @@
 #include "SmokeController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
-void SmokeController::Player(MulNX::UINode* node) {
+void SmokeController::HubPlayer(MulNX::UINode* node) {
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);
@@ -32,7 +31,7 @@ void SmokeController::Player(MulNX::UINode* node) {
     }
 }
 
-void SmokeController::Team(MulNX::UINode* node) {
+void SmokeController::HubTeam(MulNX::UINode* node) {
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);

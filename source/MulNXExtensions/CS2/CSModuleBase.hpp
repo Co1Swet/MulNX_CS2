@@ -15,8 +15,8 @@ public:
     ~ICSModule() = default;
 
     virtual void OnItBegin() {};
-    virtual void OnItEntity(CS2::C_BaseEntity*) {};
-    virtual void OnItPlayer(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*) {};
+    virtual void OnItEntity(int index, CS2::C_BaseEntity*) {};
+    virtual void OnItPlayer(int index, CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*) {};
     virtual void OnItEnd() {};
 };
 

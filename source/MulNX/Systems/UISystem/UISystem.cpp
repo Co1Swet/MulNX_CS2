@@ -1,13 +1,10 @@
 #include "UISystem.hpp"
-
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
-#include <MulNX/Systems/InputSystem/InputSystem.hpp>
-#include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
 #include <yaml-cpp/yaml.h>
 #include <MulNXThirdParty/ImGuiStyleSerializer.h>
 #include <Windows.h>
@@ -27,6 +24,7 @@ bool MulNX::UISystem::Init() {
     this->UIContext.Core = this->Core;
     this->ISys()
         .SubscribeAsync("UISystem/Start")
+        .SubscribeAsync("UISystem/Toggle")
         .SubscribeAsync("UISystem/ModulePush")
         .SubscribeAsync("UISystem/SaveStyle");
 
@@ -55,6 +53,10 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         break;
     }
+    case "UISystem/Toggle"_hash: {
+        this->UIContext.Active = !this->UIContext.Active;
+        break;
+    }
     case "UISystem/ModulePush"_hash: {
         MulNX::UINode* node = Msg.asp.get<MulNX::UINode>();
         this->UIContext.AddUINode(node->hSelf, std::move(*node));
@@ -70,10 +72,6 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
 
 void MulNX::UISystem::HandleUpdate() {
     this->Update();
-    if (!this->UISystemRunning)return;
-    if (this->pInputSystem->CheckComboClick(VK_INSERT, 1)) {
-        this->UIContext.Active = !this->UIContext.Active;
-    }
 }
 
 // ImGui窗口处理函数导入

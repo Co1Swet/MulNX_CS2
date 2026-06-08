@@ -66,7 +66,7 @@ bool PlayerHub::Window(MulNX::UINode* node) {
                 this->currentSteamId.store(info.steamID, std::memory_order_release);
                 this->currentTeam.store(info.teamNum, std::memory_order_release);
                 for (auto& mod : this->PlayerViewModules) {
-                    mod->Player(node);
+                    mod->HubPlayer(node);
                 }
                 ImGui::Separator();
                 if (ImGui::Button("关闭"))
@@ -80,7 +80,7 @@ bool PlayerHub::Window(MulNX::UINode* node) {
                 this->currentSteamId.store(0, std::memory_order_release);
                 this->currentTeam.store(team, std::memory_order_release);
                 for (auto& mod : this->PlayerViewModules) {
-                    mod->Team(node);
+                    mod->HubTeam(node);
                 }
                 ImGui::Separator();
                 if (ImGui::Button("关闭"))
@@ -135,7 +135,7 @@ bool PlayerHub::Window(MulNX::UINode* node) {
         ImGui::EndChild();
 
         for (auto& mod : this->PlayerViewModules) {
-            mod->Menu(node);
+            mod->HubWindow(node);
         }
     }
     catch (const std::exception& e) {

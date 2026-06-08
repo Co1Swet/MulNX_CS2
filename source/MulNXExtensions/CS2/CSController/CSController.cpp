@@ -1,5 +1,6 @@
 #include "CSController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
 void CSController::Window(MulNX::UINode* node) {
@@ -202,6 +203,9 @@ void CSController::Main() {
     std::unique_lock lock(this->smutex);
     // 玩家控制器，地图上从1到10
     int playerNum = 0;
+    for (const auto& mod : this->ParticipateItCSModules) {
+        mod->OnItBegin();
+    }
     for (int i = 0; i < this->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
         auto* entity = this->client.GetBaseEntity(i);
         if (!entity)continue;
@@ -215,8 +219,8 @@ void CSController::Main() {
         if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT)continue;
         ++playerNum;
 
-        for (const auto& handle : this->handlesControlPlayer) {
-            handle(controller, pawn);
+        for (const auto& mod : this->ParticipateItCSModules) {
+            mod->OnItPlayer(i, controller, pawn);
         }
         //MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), true);
 
@@ -233,6 +237,10 @@ void CSController::Main() {
 
 
     }
+    for (const auto& mod : this->ParticipateItCSModules) {
+        mod->OnItEnd();
+    }
+
     return;
 }
 

@@ -1,7 +1,6 @@
 #include "PlayerFlashController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-
 bool PlayerFlashController::Menu(MulNX::UINode* node) {
     MulNX::UI::Checkbox("强制移除闪光效果", this->bForceNoFlash);
     return true;
@@ -9,12 +8,11 @@ bool PlayerFlashController::Menu(MulNX::UINode* node) {
 
 bool PlayerFlashController::Init() {
     this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
-    this->CS2->handlesControlPlayer.push_back([this](CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn) {return this->HandleForceFlash(controller, pawn);});
     return true;
 }
 
-bool PlayerFlashController::HandleForceFlash(CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn) {
-    if (!this->bForceNoFlash.load(std::memory_order_acquire))return true;
+void PlayerFlashController::OnItPlayer(int index, CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn) {
+    if (!this->bForceNoFlash.load(std::memory_order_acquire))return;
     try {
         auto m_flFlashBangTime = MulNX::MRead(pawn->m_flFlashBangTime());
         auto m_flFlashDuration = MulNX::MRead(pawn->m_flFlashDuration());
@@ -35,5 +33,5 @@ bool PlayerFlashController::HandleForceFlash(CS2::CCSPlayerController* controlle
         this->ISys().LogWarning(std::format("在修改闪光弹效果时发生错误：{}", e.what()).c_str());
     }
 
-    return true;
+    return;
 }

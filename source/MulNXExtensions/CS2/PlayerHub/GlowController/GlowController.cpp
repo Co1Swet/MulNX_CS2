@@ -3,7 +3,7 @@
 
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
-void GlowController::Player(MulNX::UINode* node) {
+void GlowController::HubPlayer(MulNX::UINode* node) {
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
     // 1. 获取当前为该玩家设置的颜色（若存在），否则使用默认白色
@@ -38,7 +38,7 @@ void GlowController::Player(MulNX::UINode* node) {
         this->ISys().PublishAsync(std::move(msg));
     }
 }
-void GlowController::Team(MulNX::UINode* node) {
+void GlowController::HubTeam(MulNX::UINode* node) {
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255); // 默认白色
