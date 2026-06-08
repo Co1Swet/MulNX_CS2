@@ -1,6 +1,9 @@
 #include "VCD3D11Manager.hpp"
 
 bool VCD3D11Manager::Init() {
+    this->pGraphicsManager = this->GetCore()->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+
+
     this->ISys()
         .SubscribeSync("Hook/Present/Fisrt", [this](MulNX::Message& msg) {this->OnPresentFirst(msg);})
         .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->CopyTexture();});
@@ -33,6 +36,8 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         return;
     }
 
+    D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+    pRTV->GetDesc(&rtvDesc);
     ComPtr<ID3D11Resource> pBBRes;
     pRTV->GetResource(&pBBRes);
     if (!pBBRes) {
@@ -51,8 +56,9 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     sharedDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     sharedDesc.CPUAccessFlags = 0;
     sharedDesc.Usage = D3D11_USAGE_DEFAULT;
+    sharedDesc.Format = rtvDesc.Format; // 使用RTV的格式，确保兼容性
 
-    hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &this->buffer1.srcTex.pTex);
+    hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &this->buffer1.rawTex.pTex);
     if (FAILED(hr)) {
         this->ISys().LogError("共享纹理创建失败");
         return;
@@ -62,7 +68,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     HANDLE hSharedHandle = nullptr;
     // 4. 获取共享句柄，并在我们自己的设备上打开
     ComPtr<IDXGIResource> pDXGIRes;
-    hr = this->buffer1.srcTex.pTex.As(&pDXGIRes);
+    hr = this->buffer1.rawTex.pTex.As(&pDXGIRes);
     if (FAILED(hr)) {
         this->ISys().LogError("获取IDXGIResource失败");
         return;
@@ -74,7 +80,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     }
     this->ISys().LogSucc("共享句柄获取成功");
 
-    hr = pDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&this->buffer1.dstTex.pTex));
+    hr = pDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&this->buffer1.shareTex.pTex));
     if (FAILED(hr)) {
         this->ISys().LogError("在捕获设备上打开共享资源失败");
         return;
@@ -82,12 +88,12 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     this->ISys().LogSucc("共享资源在捕获设备上打开成功");
 
     // 5. 获取两端的 Keyed Mutex 接口
-    hr = this->buffer1.srcTex.pTex.As(&this->buffer1.srcTex.pMutex);
+    hr = this->buffer1.rawTex.pTex.As(&this->buffer1.rawTex.pMutex);
     if (FAILED(hr)) {
         this->ISys().LogError("原设备获取KeyedMutex失败");
         return;
     }
-    hr = this->buffer1.dstTex.pTex.As(&this->buffer1.dstTex.pMutex);
+    hr = this->buffer1.shareTex.pTex.As(&this->buffer1.shareTex.pMutex);
     if (FAILED(hr)) {
         this->ISys().LogError("录制设备获取KeyedMutex失败");
         return;
@@ -96,23 +102,36 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
 }
 
 void VCD3D11Manager::CopyTexture() {
+    if (!this->runFlag1.load(std::memory_order_acquire)) {
+        return;
+    }
+
+    auto now = std::chrono::steady_clock::now();
+    constexpr std::chrono::microseconds minInterval(16667);
+    if (this->lastCapture.has_value() && now - *this->lastCapture < minInterval) {
+        return;
+    }
+    this->lastCapture = now;
+
     ComPtr<ID3D11Texture2D> backBuffer;
     HRESULT hr = pGraphicsManager->pSwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
     if (FAILED(hr)) return;
 
     // 等待录制端完成上一帧读取（key = 0 表示资源可写）
-    hr = this->buffer1.srcTex.pMutex->AcquireSync(0, INFINITE);
+    hr = this->buffer1.rawTex.pMutex->AcquireSync(0, INFINITE);
     if (FAILED(hr)) {
         this->ISys().LogError("AcquireSync(0) 失败");
         return;
     }
 
     // 执行拷贝
-    pGraphicsManager->pd3dContext->CopyResource(this->buffer1.srcTex.pTex.Get(), backBuffer.Get());
+    this->pGraphicsManager->pd3dContext->CopyResource(this->buffer1.rawTex.pTex.Get(), backBuffer.Get());
+    this->buffer1.captureTime.store(std::chrono::steady_clock::now());
 
     // 通知录制端新帧已就绪（key = 1）
-    hr = this->buffer1.srcTex.pMutex->ReleaseSync(1);
+    hr = this->buffer1.rawTex.pMutex->ReleaseSync(1);
     if (FAILED(hr)) {
         this->ISys().LogError("ReleaseSync(1) 失败");
     }
+    this->buffer1.hasNewFrame.store(true, std::memory_order_release);
 }

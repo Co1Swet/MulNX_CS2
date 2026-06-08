@@ -12,7 +12,7 @@ class MediaRecorder final :public MediaModuleBase {
     std::filesystem::path dirVedios;
     // 音视频输出
     av::FormatContext   ofctx;
-    AVRational timeBase = { 1, 60 };  // 60 fps
+    AVRational timeBase = { 1, 1000000 };  // 微秒
     std::chrono::steady_clock::time_point recordStartTime;
 
     bool StartRecording(const std::string& filename, int w, int h);

@@ -121,7 +121,12 @@ void MediaRecorder::Encode() {
     });
 
     for (auto &pkt : packets) {
-        this->ofctx.writePacket(pkt);
+        try {
+            this->ofctx.writePacket(pkt);
+        }
+        catch (const std::exception& e) {
+            this->ISys().LogWarning(std::format("写入 packet 失败: {}, 跳过该包", e.what()));
+        }
     }
 }
 

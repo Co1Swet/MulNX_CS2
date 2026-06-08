@@ -1,9 +1,13 @@
 #include "VideoCapturer.hpp"
+#include <MulNXExtensions/MediaSystem/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool VideoCapturer::Init() {
     this->pVCD3D11Manager = this->GetCore()->ModuleManager()->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->ISys()
-        .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->Captuer();});
+        .SendTask("Capture","Capture", [this]() -> bool {
+            this->Captuer();
+            return true; // 保持keep，反复轮询
+        });
 
     return true;
 }
@@ -22,7 +26,6 @@ void VideoCapturer::Reset() {
     std::unique_lock lock(this->smutex);
     this->srcPixelFormat = AV_PIX_FMT_NONE;
     this->ReleaseStagingTexture();
-    this->lastCapture.reset();
     this->recordStartTime.reset();
     this->runFlag1.store(false);
 }
@@ -30,7 +33,7 @@ void VideoCapturer::Reset() {
 std::optional<av::VideoFrame> VideoCapturer::TryPop() {
     av::VideoFrame outFrame;
     if (this->buffer.try_dequeue(outFrame)) {
-        return std::move(outFrame);
+        return outFrame;
     }
     return std::nullopt;
 }
@@ -38,7 +41,6 @@ std::optional<av::VideoFrame> VideoCapturer::TryPop() {
 void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
     std::unique_lock lock(this->smutex);
     this->recordStartTime = startTime;
-    this->lastCapture.reset();
     this->runFlag1.store(true, std::memory_order_release);
 }
 
@@ -53,36 +55,25 @@ void VideoCapturer::ClearBuffer() {
         // drain stale video data
     }
     std::unique_lock lock(this->smutex);
-    this->lastCapture.reset();
 }
 
 void VideoCapturer::Captuer() {
     this->Update();
 
     if (!this->runFlag1.load(std::memory_order_acquire)) {
+        this->pVCD3D11Manager->runFlag1.store(false, std::memory_order_release);
+        return;
+    }
+    this->pVCD3D11Manager->runFlag1.store(true, std::memory_order_release);
+    if(!this->pVCD3D11Manager->buffer1.hasNewFrame.load(std::memory_order_acquire)){
         return;
     }
 
-    auto now = std::chrono::steady_clock::now();
     std::unique_lock lock(this->smutex);
-    constexpr std::chrono::microseconds minInterval(16667);
-    if (this->lastCapture.has_value() && now - *this->lastCapture < minInterval) {
-        return;
-    }
-    this->lastCapture = now;
-
-    ID3D11Texture2D* backBuffer = nullptr;
-    this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
-    if (!backBuffer) {
-        return;
-    }
-    scope_exit releaseBackBuffer([&backBuffer]() {
-        backBuffer->Release();});
 
     D3D11_TEXTURE2D_DESC desc;
-    backBuffer->GetDesc(&desc);
+    this->pVCD3D11Manager->buffer1.shareTex.pTex->GetDesc(&desc);
     
-
     av::PixelFormat srcFormat = DXGIFormatToAvPixelFormat(desc.Format);
     if (srcFormat == AV_PIX_FMT_NONE) {
         this->ISys().LogError("当前后备缓冲区格式不受支持，无法录制");
@@ -103,7 +94,7 @@ void VideoCapturer::Captuer() {
         stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
         stagingDesc.BindFlags = 0;
 
-        HRESULT hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&stagingDesc, nullptr, &this->pStagingTex);
+        HRESULT hr = this->pVCD3D11Manager->pDevice->CreateTexture2D(&stagingDesc, nullptr, &this->pStagingTex);
         if (FAILED(hr)) {
             this->ISys().LogError("创建 D3D11 staging 纹理失败，录制中断");
             return;
@@ -115,16 +106,18 @@ void VideoCapturer::Captuer() {
         this->srcPixelFormat = srcFormat;
     }
 
-    // Copy back buffer into staging texture for CPU readback.
+    this->pVCD3D11Manager->buffer1.shareTex.pMutex->AcquireSync(1, INFINITE); // 等待新帧就绪（key = 1）
     if (desc.SampleDesc.Count > 1) {
-        this->pGraphicsManager->pd3dContext->ResolveSubresource(this->pStagingTex, 0, backBuffer, 0, desc.Format);
+        this->pVCD3D11Manager->pContext->ResolveSubresource(this->pStagingTex, 0, this->pVCD3D11Manager->buffer1.shareTex.pTex.Get(), 0, desc.Format);
     }
     else {
-        this->pGraphicsManager->pd3dContext->CopyResource(this->pStagingTex, backBuffer);
+        this->pVCD3D11Manager->pContext->CopyResource(this->pStagingTex, this->pVCD3D11Manager->buffer1.shareTex.pTex.Get());
     }
+    this->pVCD3D11Manager->buffer1.hasNewFrame.store(false);
+    this->pVCD3D11Manager->buffer1.shareTex.pMutex->ReleaseSync(0); // 释放资源（key = 0）
 
     D3D11_MAPPED_SUBRESOURCE mapped = {};
-    HRESULT hr = this->pGraphicsManager->pd3dContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &mapped);
+    HRESULT hr = this->pVCD3D11Manager->pContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &mapped);
     if (FAILED(hr) || !mapped.pData) {
         this->ISys().LogError("Map D3D11 staging 纹理失败，录制帧跳过");
         return;
@@ -138,10 +131,11 @@ void VideoCapturer::Captuer() {
         memcpy(dstRow, srcRow, rowBytes);
         dstRow += rowBytes;
     }
-    this->pGraphicsManager->pd3dContext->Unmap(this->pStagingTex, 0);
+    this->pVCD3D11Manager->pContext->Unmap(this->pStagingTex, 0);
 
     av::VideoFrame srcFrame(rawData.data(), rawData.size(), srcFormat, this->stagingWidth, this->stagingHeight);
     if (this->recordStartTime.has_value()) {
+        auto now = this->pVCD3D11Manager->buffer1.captureTime.load(std::memory_order_acquire);
         int64_t pts = std::chrono::duration_cast<std::chrono::microseconds>(now - *this->recordStartTime).count();
         srcFrame.setTimeBase({ 1, 1000000 });
         srcFrame.setPts(av::Timestamp(pts, srcFrame.timeBase()));
