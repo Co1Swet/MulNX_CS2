@@ -1,6 +1,6 @@
 #include "PlayerFlashController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 
 bool PlayerFlashController::Menu(MulNX::UINode* node) {
     MulNX::UI::Checkbox("强制移除闪光效果", this->bForceNoFlash);

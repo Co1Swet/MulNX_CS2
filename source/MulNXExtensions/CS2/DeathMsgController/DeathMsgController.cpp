@@ -1,6 +1,6 @@
 #include "DeathMsgController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 using GetPlayerController_t = void* (__fastcall*)(void* event, uint32_t keyHash);

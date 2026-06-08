@@ -1,5 +1,5 @@
 #include "TeamIDController.hpp"
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXThirdParty/hlae/binutils.h>  // 假定你已集成了 HLAE 的 binutils
 
 using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);

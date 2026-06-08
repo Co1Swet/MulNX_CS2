@@ -63,7 +63,8 @@ class CSController final :public MulNX::ModuleBase {
     void OnPanoramaLoad(MulNX::Message& msg);
 public:
     std::vector<std::function<bool(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*)>>handlesControlPlayer{};
-    
+    std::vector<class ICSModule*>ParticipateItCSModules{};
+
     CS2::Module::Client client{};
     CS2::Module::engine2 engine2{};
     MulNX::Memory::DllModule tier0{};

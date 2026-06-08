@@ -1,7 +1,7 @@
 #include "RecordTaskMaker.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 bool RecordTaskMaker::Window(MulNX::UINode* node) {

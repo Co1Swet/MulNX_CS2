@@ -30,6 +30,7 @@
 #include "PlayerHub/GlowController/GlowController.hpp"
 #include "PlayerHub/SmokeController/SmokeController.hpp"
 #include "PlayerHub/ProjectileTracker/ProjectileTracker.hpp"
+#include "PlayerHub/SpeakingController/SpeakingController.hpp"
 
 #include "GameCfgManager/GameCfgManager.hpp"
 #include "GameSettingsManager/GameSettingsManager.hpp"

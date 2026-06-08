@@ -1,6 +1,6 @@
 #include "PlayerHub.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/PlayerHub/CSViewPlayerModuleBase.hpp>
 
 bool PlayerHub::Window(MulNX::UINode* node) {

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 class SkinController final :public CSModuleBase {

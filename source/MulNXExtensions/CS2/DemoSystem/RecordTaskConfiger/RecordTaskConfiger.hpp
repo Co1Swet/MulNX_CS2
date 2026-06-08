@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 #include <MulNXExtensions/CS2/DemoSystem/DemoStruct.hpp>
 

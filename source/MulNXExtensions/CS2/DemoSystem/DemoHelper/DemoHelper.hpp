@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 class DemoHelper final :public CSModuleBase {

@@ -1,7 +1,7 @@
 #include "NameController.hpp"
 
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
 using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_CCSPlayerController,

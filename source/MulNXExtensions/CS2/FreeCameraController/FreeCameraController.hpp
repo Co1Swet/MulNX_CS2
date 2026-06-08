@@ -1,6 +1,4 @@
 #pragma once
-
-#include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 // 自由摄像机位置控制器（仅位置控制）

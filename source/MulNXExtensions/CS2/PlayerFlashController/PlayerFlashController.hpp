@@ -1,10 +1,8 @@
 #pragma once
-
-#include <MulNX/MulNX.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
-class CSController;
 class PlayerFlashController final :public CSModuleBase {
+    static constexpr bool ParticipateIt = true;
 private:
     std::atomic<bool>bForceNoFlash = false;
 public:

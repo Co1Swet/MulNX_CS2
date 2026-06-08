@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 #include <MulNXExtensions/CS2/AdvancedViewController/AdvancedViewController.hpp>

@@ -1,5 +1,6 @@
 #pragma once
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
+#include <MulNXExtensions/CS2/CSClasses/Consoles.hpp>
 
 class HookConsole final :public CSModuleBase {
     friend class ConsoleManager;

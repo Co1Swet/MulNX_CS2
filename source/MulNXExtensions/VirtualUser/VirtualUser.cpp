@@ -1,5 +1,4 @@
 #include "VirtualUser.hpp"
-
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/CSController/CSController.hpp>

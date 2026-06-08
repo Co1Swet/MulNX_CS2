@@ -1,6 +1,6 @@
 #include "HookEntitySystem.hpp"
 
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 
 using AddEntity_t = void* (*)(void*, CS2::C_BaseEntity*, CS2::CHandleBase);
 using RemoveEntity_t = void* (*)(void*, CS2::C_BaseEntity*, CS2::CHandleBase);

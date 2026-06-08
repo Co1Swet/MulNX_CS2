@@ -1,6 +1,6 @@
 #include "FreeCameraController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
 void FreeCameraController::Menu(MulNX::UINode* node) {

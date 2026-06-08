@@ -24,6 +24,7 @@ add_library(MulNXCS2Ext
     PlayerHub/NameController/NameController.cpp
     PlayerHub/SmokeController/SmokeController.cpp
     PlayerHub/ProjectileTracker/ProjectileTracker.cpp
+    PlayerHub/SpeakingController/SpeakingController.cpp
 
     MiniMap/MiniMap.cpp
 

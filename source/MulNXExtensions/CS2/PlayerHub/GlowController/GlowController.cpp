@@ -1,6 +1,6 @@
 #include "GlowController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
 void GlowController::Player(MulNX::UINode* node) {

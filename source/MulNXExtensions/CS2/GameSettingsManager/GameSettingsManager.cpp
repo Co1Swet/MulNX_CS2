@@ -1,6 +1,6 @@
 #include "GameSettingsManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {

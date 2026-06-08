@@ -2,7 +2,7 @@
 #include "CamSysExt.hpp"
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
 bool CameraSystem::Menu(MulNX::UINode* node) {

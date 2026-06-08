@@ -1,5 +1,5 @@
 #pragma once
-#include "IModuleBase.hpp"
+#include "IModule.hpp"
 #include <MulNX/Common/coroutine.hpp>
 #include <MulNX/Common/Task.hpp>
 #include <MulNX/Base/MulNXHandle/MulNXHandle.hpp>
@@ -9,7 +9,7 @@
 #include <functional>
 
 namespace MulNX {
-    class ModuleBase :public IModuleBase {
+    class ModuleBase :public IModule {
         friend ISys;
         friend MulNX::Core::CoreStarterBase;
     private:

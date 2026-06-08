@@ -1,6 +1,6 @@
 #include "ViewController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystem.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 #include <MulNXExtensions/CS2/PlayerHub/ProjectileTracker/ProjectileTracker.hpp>

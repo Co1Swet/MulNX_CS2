@@ -1,6 +1,6 @@
 #include "POVFixer.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 
 void POVFixer::Draw(MulNX::UINode* node) {
     if (ImGui::CollapsingHeader("POV Fix")) {

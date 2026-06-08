@@ -1,11 +1,6 @@
 #pragma once
+#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 
-#include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/CS2/CSClasses/tree/tree.hpp>
-#include <MulNXExtensions/CS2/Signatures.hpp>
-#include <MulNXExtensions/CS2/CSClasses/Consoles.hpp>
-
-class CSController;
 class PlayerHub;
 class ViewController;
 class TimeController;
@@ -13,8 +8,20 @@ class HookConsole;
 
 using Steam64UID = uint64_t;
 
+class ICSModule {
+protected:
+    static constexpr bool ParticipateIt = false;
+public:
+    ~ICSModule() = default;
+
+    virtual void OnItBegin() {};
+    virtual void OnItEntity(CS2::C_BaseEntity*) {};
+    virtual void OnItPlayer(CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*) {};
+    virtual void OnItEnd() {};
+};
+
 template <typename T>
-class CSModuleMixin {
+class CSModuleMixin: public ICSModule {
 public:
     CSController* CS2 = nullptr;
     ViewController* CS2View = nullptr;
@@ -31,9 +38,16 @@ protected:
             this->CS2Time = mod->GetCore()->ModuleManager()->FindModule<TimeController>("TimeController");
             this->Hub = mod->GetCore()->ModuleManager()->FindModule<PlayerHub>("PlayerHub");
             this->CS2Con = mod->GetCore()->ModuleManager()->FindModule<HookConsole>("HookConsole");
+
+            if constexpr (T::ParticipateIt) {
+                this->CS2->ParticipateItCSModules.push_back(this);
+            }
+
             return true;
         });
     }
 };
 
 class CSModuleBase :public MulNX::ModuleBase, public CSModuleMixin<CSModuleBase> {};
+template<typename T>
+class CSModuleBaseT :public MulNX::ModuleBase, public CSModuleMixin<T> {};

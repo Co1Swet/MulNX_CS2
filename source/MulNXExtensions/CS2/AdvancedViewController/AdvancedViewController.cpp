@@ -1,6 +1,5 @@
 #include "AdvancedViewController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
 #include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 

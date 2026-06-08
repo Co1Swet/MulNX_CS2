@@ -1,6 +1,6 @@
 #include "EntityListScanner.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 
 void EntityListScanner::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("实体列表探测器");

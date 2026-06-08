@@ -1,5 +1,5 @@
 ﻿#include "HookConsole.hpp"
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 
 bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);

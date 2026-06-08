@@ -4,8 +4,8 @@
 class ICSViewPlayerModule {
 public:
     virtual ~ICSViewPlayerModule() = default;
-    virtual void Player(MulNX::UINode* node) = 0;
-    virtual void Team(MulNX::UINode* node) = 0;
+    virtual void Player(MulNX::UINode* node) {};
+    virtual void Team(MulNX::UINode* node) {};
     virtual void Menu(MulNX::UINode* node) {};
 };
 
@@ -23,3 +23,5 @@ public:
 };
 
 class CSViewPlayerModuleBase :public MulNX::ModuleBase, public CSViewPlayerMixin<CSViewPlayerModuleBase> {};
+template<typename T>
+class CSViewPlayerModuleBaseT :public MulNX::ModuleBase, public CSViewPlayerMixin<T> {};

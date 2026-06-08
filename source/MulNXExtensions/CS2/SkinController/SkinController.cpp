@@ -1,6 +1,6 @@
 #include "SkinController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/CS2/CSController/CSController.hpp>
+
 
 void SkinController::Window(MulNX::UINode* node) {
     ImGui::SeparatorText(I18n("skin.changer").c_str());

@@ -1,4 +1,7 @@
 #pragma once
+#include <cstdint>
+#include <functional>
+
 // command to convars and concommands
 enum EConVarFlag : int {
     // convar systems
