@@ -8,6 +8,7 @@
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaSystem/Media.hpp>
+#include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
 MulNX::Core::Core* pCore = nullptr;
 HMODULE hOriginModule = nullptr;
@@ -56,6 +57,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
             .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
             .CreateModule<WebSocketManager>("WebSocketManager")
+            .CreateModule<TimeLiner>("TimeLiner")
             // 底层CS2支持
             .CreateModule<CSController>("CSController")
             // CS2关键接口
@@ -81,6 +83,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<GlowController>("GlowController")
             .CreateModule<SmokeController>("SmokeController")
             .CreateModule<SpeakingController>("SpeakingController")
+            .CreateModule<KeyboardOverlay>("KeyboardOverlay")
             // 摄像机系统
             .CreateModule<CameraSystem>("CameraSystem")
             .CreateModule<WorkspaceManager>("WorkspaceManager")
@@ -102,6 +105,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<GameSettingsManager>("GameSettingsManager")
             // 音视频
             .CreateModule<MediaSystem>("MediaSystem")
+            .CreateModule<MediaParamManager>("MediaParamManager")
             .CreateModule<VCD3D11Manager>("VCD3D11Manager")
             .CreateModule<AudioCapturer>("AudioCapturer")
             .CreateModule<VideoCapturer>("VideoCapturer")

@@ -31,6 +31,7 @@
 #include "PlayerHub/SmokeController/SmokeController.hpp"
 #include "PlayerHub/ProjectileTracker/ProjectileTracker.hpp"
 #include "PlayerHub/SpeakingController/SpeakingController.hpp"
+#include "PlayerHub/KeyboardOverlay/KeyboardOverlay.hpp"
 
 #include "GameCfgManager/GameCfgManager.hpp"
 #include "GameSettingsManager/GameSettingsManager.hpp"

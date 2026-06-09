@@ -7,6 +7,7 @@ add_library(MediaSystem
     AEncodeHelper/AEncodeHelper.cpp
     VEncodeHelper/VEncodeHelper.cpp
     VCD3D11Manager/VCD3D11Manager.cpp
+    MediaParamManager/MediaParamManager.cpp
 )
 
 target_link_libraries(MediaSystem PUBLIC

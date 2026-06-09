@@ -3,6 +3,8 @@ add_library(MulNXCS2Ext
     CSClasses/GlobalVars/GlobalVars.cpp
     CSClasses/tree/tree.cpp
 
+    HookManager/HookManager.cpp
+    EntityListScanner/EntityListScanner.cpp
     CSController/CSController.cpp
     HookEntitySystem/HookEntitySystem.cpp
     HookConsole/HookConsole.cpp
@@ -25,14 +27,12 @@ add_library(MulNXCS2Ext
     PlayerHub/SmokeController/SmokeController.cpp
     PlayerHub/ProjectileTracker/ProjectileTracker.cpp
     PlayerHub/SpeakingController/SpeakingController.cpp
+    PlayerHub/KeyboardOverlay/KeyboardOverlay.cpp
 
     MiniMap/MiniMap.cpp
 
     GameCfgManager/GameCfgManager.cpp
     GameSettingsManager/GameSettingsManager.cpp
-
-    HookManager/HookManager.cpp
-    EntityListScanner/EntityListScanner.cpp
 )
 
 add_subdirectory("CameraSystem")

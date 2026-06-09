@@ -13,6 +13,7 @@ add_subdirectory("CS2BootLoader")
 add_subdirectory("DLLInjectHelper")
 add_subdirectory("DLLLoadDispatcher")
 add_subdirectory("FileRedirector")
+add_subdirectory("TimeLiner")
 
 target_link_libraries(MulNXExtensions INTERFACE
     MulNX
@@ -29,4 +30,5 @@ target_link_libraries(MulNXExtensions INTERFACE
     DLLInjectHelper
     DLLLoadDispatcher
     FileRedirector
+    TimeLiner
 )
