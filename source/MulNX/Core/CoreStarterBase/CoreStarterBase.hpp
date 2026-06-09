@@ -1,5 +1,5 @@
 #pragma once
-
+#include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleBase/ModuleBase.hpp>
 #include <functional>
 

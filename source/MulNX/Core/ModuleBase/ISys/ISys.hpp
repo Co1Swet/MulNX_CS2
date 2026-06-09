@@ -4,7 +4,7 @@
 #include <filesystem>
 
 namespace MulNX {
-    class Task;
+    class ModuleBase;
     class ISys {
         friend ModuleBase;
         ISys() = delete;

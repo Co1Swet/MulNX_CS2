@@ -18,10 +18,6 @@ public:
 #endif
 };
 
-using GameTime_t = float;
-// 摄像机系统输入输出前置声明
-class CameraSystemIO;
-
 // 核心类前置声明
 
 namespace MulNX {

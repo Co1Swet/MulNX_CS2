@@ -7,6 +7,8 @@
 
 namespace MulNX {
     namespace Core {
+        class CoreStarterBase;
+        class ModuleManager;
         class Core {
             friend class MulNX::Core::CoreStarterBase;
         private:

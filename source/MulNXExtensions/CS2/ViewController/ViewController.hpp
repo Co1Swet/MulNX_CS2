@@ -3,6 +3,7 @@
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 #include <MulNXExtensions/CS2/AdvancedViewController/AdvancedViewController.hpp>
 #include <MulNXExtensions/CS2/FreeCameraController/FreeCameraController.hpp>
+#include <MulNXExtensions/CS2/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 
 class Dofs {
 public:

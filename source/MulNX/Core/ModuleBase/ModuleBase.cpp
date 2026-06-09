@@ -3,6 +3,11 @@
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
+#include <MulNX/Systems/Debugger/Debugger.hpp>
+#include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
+#include <MulNX/Systems/InputSystem/InputSystem.hpp>
+#include <MulNX/Systems/PathManager/PathManager.hpp>
+#include <MulNX/Systems/ShortcutManager/ShortcutManager.hpp>
 
 bool MulNX::ModuleBase::SetName(std::string&& Name) {
     this->ModuleName = std::move(Name);

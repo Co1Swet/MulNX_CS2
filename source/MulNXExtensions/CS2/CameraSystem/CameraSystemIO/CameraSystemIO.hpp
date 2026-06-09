@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/Math/Math.hpp>
 

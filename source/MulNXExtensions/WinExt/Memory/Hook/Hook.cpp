@@ -4,7 +4,7 @@
 #include <format>
 
 uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
-    this->threadNumInAsm.fetch_add(1, std::memory_order_release);
+    this->threadNumInAsm.fetch_add(1, std::memory_order_seq_cst);
     auto then = this->callback(this, ctx);
     uint64_t target;
     switch (then) {

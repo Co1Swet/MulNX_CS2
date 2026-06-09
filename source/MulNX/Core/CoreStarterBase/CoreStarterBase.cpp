@@ -1,7 +1,6 @@
 #include "CoreStarterBase.hpp"
 
 #include <MulNX/Common/Message.hpp>
-#include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 #include <MulNX/Systems/GlobalVars/GlobalVars.hpp>

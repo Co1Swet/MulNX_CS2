@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNX/Core/ModuleBase/ModuleBase.hpp>
 
 class ModuleInfo {
@@ -36,7 +35,7 @@ namespace MulNX {
             // 按类型查找模块
             template<typename T>
             T* FindModule(const std::string& Name) {
-                return reinterpret_cast<T*>(this->FindModule(Name));
+                return static_cast<T*>(this->FindModule(Name));
             }
 
             // 初始化最后部分使用
