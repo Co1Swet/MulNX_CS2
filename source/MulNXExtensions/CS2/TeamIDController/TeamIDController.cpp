@@ -10,7 +10,7 @@ bool TeamIDController::Init() {
         auto jmp = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::PosTeamID_xxIt);
         this->hkPosTeamID_CmpForHide = MulNX::Hook::Create(target.Data() + 3, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleForShowTeamID((CS2::C_CSPlayerPawn*)ctx->rdi);
-            }, false, (uintptr_t)jmp.Begin()).value();
+            }, false, false, (uintptr_t)jmp.Begin()).value();
         this->hkPosTeamID_CmpForHide->Attach();
         this->ISys().LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rdi is C_CSPlayerPawn*"));
         });

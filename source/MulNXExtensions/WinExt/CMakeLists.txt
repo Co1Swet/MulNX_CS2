@@ -21,7 +21,6 @@ add_library(WinExt STATIC
     Memory/Region/Region.cpp
     Memory/AddrTool/AddrTool.cpp
     Memory/Hook/Hook.cpp
-    Memory/Hook/FixAddress.cpp
     Memory/Memory.cpp
 )
 
