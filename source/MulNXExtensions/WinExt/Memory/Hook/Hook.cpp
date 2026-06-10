@@ -125,141 +125,141 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         return std::unexpected("windows内存分配失败！分配空间不合适");
     }
 
-    {
-        // 创建编译器
-        using enum MulNX::Memory::Asm::Reg;
-        using namespace MulNX::Memory::Asm;
-        Assembler Asm{};
 
-        // 计算结构体大小（保证16字节对齐）
-        constexpr size_t ctxSize = (sizeof(RegContext) + 15) & ~15;
-        HookInstance->frameSize = ctxSize;
-        if (!extraStackAdjust)HookInstance->frameSize += 8;
+    // 创建编译器
+    using enum MulNX::Memory::Asm::Reg;
+    using namespace MulNX::Memory::Asm;
+    Assembler Asm{};
 
-        Asm
-            .sub(RSP, HookInstance->frameSize) // 分配栈空间
-            .SaveReg();
+    // 计算结构体大小（保证16字节对齐）
+    constexpr size_t ctxSize = (sizeof(RegContext) + 15) & ~15;
+    HookInstance->frameSize = ctxSize;
+    if (!extraStackAdjust)HookInstance->frameSize += 8;
 
-        // 指令执行区
-        Asm
-            .mov(RCX, (uintptr_t)HookInstance.get())// 此参数对应 Hook，是第一个参数
-            .mov(RDX, RSP)// 此参数对应 RegContext，是第二个参数
-            .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::Dispatch))// 绑定分发函数
-            .sub(RSP, 32)// 分配影子空间
-            .call(RAX)// 调用函数，进入CPP语言空间
-            .add(RSP, 32)// 回收影子空间
-            .jmp(RAX);// 某种意义上，这里是一个分支操作，但是这个分支实际上是由CPP语言层面决定的，因此我们在汇编层面上并不需要区分真假分支，直接让它无条件跳转到jmpTarget即可
-        HookInstance->dispatcherAsmCode = Asm.Release();
+    Asm
+        .sub(RSP, HookInstance->frameSize) // 分配栈空间
+        .SaveReg();
 
-        // 执行完毕后强制返回被钩函数
-        HookInstance->jmpForReturn = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-        Asm
-            .LoadReg()
-            // 释放上下文空间
-            .add(RSP, HookInstance->frameSize)
-            .ret();// 从分发函数返回
+    // 指令执行区
+    Asm
+        .mov(RCX, (uintptr_t)HookInstance.get())// 此参数对应 Hook，是第一个参数
+        .mov(RDX, RSP)// 此参数对应 RegContext，是第二个参数
+        .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::Dispatch))// 绑定分发函数
+        .sub(RSP, 32)// 分配影子空间
+        .call(RAX)// 调用函数，进入CPP语言空间
+        .add(RSP, 32)// 回收影子空间
+        .jmp(RAX);// 某种意义上，这里是一个分支操作，但是这个分支实际上是由CPP语言层面决定的，因此我们在汇编层面上并不需要区分真假分支，直接让它无条件跳转到jmpTarget即可
+    HookInstance->dispatcherAsmCode = Asm.Release();
 
-        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+    // 执行完毕后强制返回被钩函数
+    HookInstance->jmpForReturn = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    Asm
+        .LoadReg()
+        // 释放上下文空间
+        .add(RSP, HookInstance->frameSize)
+        .ret();// 从分发函数返回
 
-        // 执行完毕后执行被覆盖指令并继续执行
-        HookInstance->jmpForContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-        Asm
-            .LoadReg()
-            // 释放上下文空间
-            .add(RSP, HookInstance->frameSize);
+    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+    // 执行完毕后执行被覆盖指令并继续执行
+    HookInstance->jmpForContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    Asm
+        .LoadReg()
+        // 释放上下文空间
+        .add(RSP, HookInstance->frameSize);
 
-        // 这里恰好可以记录一个可能是原函数地址的位置（如果覆盖的指令是一个完整函数的开头），供回调函数使用
-        HookInstance->pMaybeRawFunc = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        // 修复原始指令（包括jmp call rip相对寻址）
-        auto result = FixRelativeInstructions(HookInstance->hookTargetRawCode,
-            (uintptr_t)HookInstance->hookTarget,
-            (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size());
-        if (!result.has_value())return std::unexpected(result.error());
-        // 追加原始指令
-        HookInstance->dispatcherAsmCode.append_range(std::move(result.value()));
-        // 跳转到原处
-        Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
-        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+    // 这里恰好可以记录一个可能是原函数地址的位置（如果覆盖的指令是一个完整函数的开头），供回调函数使用
+    HookInstance->pMaybeRawFunc = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
 
-        // 执行完毕后跳过全部被覆盖指令并继续执行
-        HookInstance->jmpForSkipAllAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-        Asm
-            .LoadReg()
-            // 释放上下文空间
-            .add(RSP, HookInstance->frameSize)
-            .jmp64((uintptr_t)target + HookInstance->overrideSize); // 跳转到原处
-        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+    // 修复原始指令（包括jmp call rip相对寻址）
+    auto result = FixRelativeInstructions(HookInstance->hookTargetRawCode,
+        (uintptr_t)HookInstance->hookTarget,
+        (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size());
+    if (!result.has_value())return std::unexpected(result.error());
+    // 追加原始指令
+    HookInstance->dispatcherAsmCode.append_range(std::move(result.value()));
+    // 跳转到原处
+    Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
+    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        // 执行完毕后跳到用户指定的位置
-        HookInstance->jmpForUserSettedTarget = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-        Asm
-            .LoadReg()
-            // 释放上下文空间
-            .add(RSP, HookInstance->frameSize)
-            .jmp64(userJmpTarget); // 跳转到原处
-        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+    // 执行完毕后跳过全部被覆盖指令并继续执行
+    HookInstance->jmpForSkipAllAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    Asm
+        .LoadReg()
+        // 释放上下文空间
+        .add(RSP, HookInstance->frameSize)
+        .jmp64((uintptr_t)target + HookInstance->overrideSize); // 跳转到原处
+    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        // 栈伪造以调用原函数
-        HookInstance->pCallOrigin = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-        // rcx = hook*, rdx = stackCopySize, r8 = regctx*
-        Asm
-            // 序言
-            .push(R12)
-            .push(R13)
-            //.push(R12)
+    // 执行完毕后跳到用户指定的位置
+    HookInstance->jmpForUserSettedTarget = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    Asm
+        .LoadReg()
+        // 释放上下文空间
+        .add(RSP, HookInstance->frameSize)
+        .jmp64(userJmpTarget); // 跳转到原处
+    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-            .mov(R12, RDX)
-            .mov(R13, R8)
+    // 栈伪造以调用原函数
+    HookInstance->pCallOrigin = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    // rcx = hook*, rdx = stackCopySize, r8 = regctx*
+    Asm
+        // 序言
+        .push(R12)
+        .push(R13)
+        //.push(R12)
 
-            // 环境恢复
-            .sub(RSP, R12) // 分配需要的栈空间供参数转移
+        .mov(R12, RDX)
+        .mov(R13, R8)
+
+        // 环境恢复
+        .sub(RSP, R12) // 分配需要的栈空间供参数转移
 
 
-            // rcx == hook*, rdx == stackCopySize
-            .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::CopyStack)) // 定位栈拷贝函数
-            .mov(R9, RSP)
-            .sub(RSP, 0x28) // 分配影子空间
-            .call(RAX) // 执行栈拷贝
+        // rcx == hook*, rdx == stackCopySize
+        .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::CopyStack)) // 定位栈拷贝函数
+        .mov(R9, RSP)
+        .sub(RSP, 0x28) // 分配影子空间
+        .call(RAX) // 执行栈拷贝
 
-            // 恢复寄存器环境
-            .mov(RCX, Mem(R13, offsetof(RegContext, rcx)))
-            .mov(RDX, Mem(R13, offsetof(RegContext, rdx)))
-            .mov(R8, Mem(R13, offsetof(RegContext, r8)))
-            .mov(R9, Mem(R13, offsetof(RegContext, r9)))
+        // 恢复寄存器环境
+        .mov(RCX, Mem(R13, offsetof(RegContext, rcx)))
+        .mov(RDX, Mem(R13, offsetof(RegContext, rdx)))
+        .mov(R8, Mem(R13, offsetof(RegContext, r8)))
+        .mov(R9, Mem(R13, offsetof(RegContext, r9)))
 
-            // 调用执行
-            .mov(RAX, HookInstance->pMaybeRawFunc) // 定位原始函数
-            .call(RAX) // 调用
-            .add(RSP, 0x28) // 回收影子空间
+        // 调用执行
+        .mov(RAX, HookInstance->pMaybeRawFunc) // 定位原始函数
+        .call(RAX) // 调用
+        .add(RSP, 0x28) // 回收影子空间
 
-            // 重新保存寄存器环境
-            .mov(Mem(R13, offsetof(RegContext, rax)), RAX)
+        // 重新保存寄存器环境
+        .mov(Mem(R13, offsetof(RegContext, rax)), RAX)
 
-            .add(RSP, R12) // 回收拷贝栈空间
+        .add(RSP, R12) // 回收拷贝栈空间
 
-            // 尾声
-            .pop(R13)
-            .pop(R12)
-            .ret();
+        // 尾声
+        .pop(R13)
+        .pop(R12)
+        .ret();
 
-        HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-        // 复制机器码到VirtualAlloc分配的内存
-        memcpy(HookInstance->pAsmDispatcher,
-            HookInstance->dispatcherAsmCode.data(),
-            HookInstance->dispatcherAsmCode.size());
+    // 复制机器码到VirtualAlloc分配的内存
+    memcpy(HookInstance->pAsmDispatcher,
+        HookInstance->dispatcherAsmCode.data(),
+        HookInstance->dispatcherAsmCode.size());
 
-        // 生成用于覆盖原位置的代码
-        Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)target - 5);
-        //Asm.jmp64((uintptr_t)HookInstance->pAsmDispatcher);
-        for (int i = 5;i < HookInstance->overrideSize;++i) {
-            Asm.nop();
-        }
-        HookInstance->jumperAsmCode = Asm.Release();
+    // 生成用于覆盖原位置的代码
+    Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)target - 5);
+    //Asm.jmp64((uintptr_t)HookInstance->pAsmDispatcher);
+    for (int i = 5;i < HookInstance->overrideSize;++i) {
+        Asm.nop();
     }
+    HookInstance->jumperAsmCode = Asm.Release();
+
 
     return HookInstance;
 }

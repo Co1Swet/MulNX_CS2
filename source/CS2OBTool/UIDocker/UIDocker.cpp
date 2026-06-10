@@ -27,10 +27,10 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 fullSize = viewport->Size;
 
-    this->padding.top = std::clamp(this->padding.top, 0.0f, fullSize.y / 2);
-    this->padding.bottom = std::clamp(this->padding.bottom, 0.0f, fullSize.y / 2);
-    this->padding.left = std::clamp(this->padding.left, 0.0f, fullSize.x / 2);
-    this->padding.right = std::clamp(this->padding.right, 0.0f, fullSize.x / 2);
+    // this->padding.top = std::clamp(this->padding.top, 0.0f, fullSize.y / 2);
+    // this->padding.bottom = std::clamp(this->padding.bottom, 0.0f, fullSize.y / 2);
+    // this->padding.left = std::clamp(this->padding.left, 0.0f, fullSize.x / 2);
+    // this->padding.right = std::clamp(this->padding.right, 0.0f, fullSize.x / 2);
 
     // auto clampSum = [](float& a, float& b, float maxSum) {
     //     float sum = a + b;

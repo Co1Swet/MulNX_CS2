@@ -19,6 +19,7 @@ add_library(WinExt STATIC
     Memory/DllModule/DllModule.cpp
     Memory/Pattern/Pattern.cpp
     Memory/Region/Region.cpp
+    Memory/AddrTool/AddrTool.cpp
     Memory/Hook/Hook.cpp
     Memory/Hook/FixAddress.cpp
     Memory/Memory.cpp

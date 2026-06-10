@@ -32,6 +32,7 @@
 #include "PlayerHub/ProjectileTracker/ProjectileTracker.hpp"
 #include "PlayerHub/SpeakingController/SpeakingController.hpp"
 #include "PlayerHub/KeyboardOverlay/KeyboardOverlay.hpp"
+#include "PlayerHub/SpotController/SpotController.hpp"
 
 #include "GameCfgManager/GameCfgManager.hpp"
 #include "GameSettingsManager/GameSettingsManager.hpp"

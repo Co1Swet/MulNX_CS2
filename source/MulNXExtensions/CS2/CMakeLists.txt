@@ -21,6 +21,11 @@ add_library(MulNXCS2Ext
     POVFixer/POVFixer.cpp
     TeamIDController/TeamIDController.cpp
 
+    MiniMap/MiniMap.cpp
+
+    GameCfgManager/GameCfgManager.cpp
+    GameSettingsManager/GameSettingsManager.cpp
+
     PlayerHub/PlayerHub.cpp
     PlayerHub/GlowController/GlowController.cpp
     PlayerHub/NameController/NameController.cpp
@@ -28,11 +33,7 @@ add_library(MulNXCS2Ext
     PlayerHub/ProjectileTracker/ProjectileTracker.cpp
     PlayerHub/SpeakingController/SpeakingController.cpp
     PlayerHub/KeyboardOverlay/KeyboardOverlay.cpp
-
-    MiniMap/MiniMap.cpp
-
-    GameCfgManager/GameCfgManager.cpp
-    GameSettingsManager/GameSettingsManager.cpp
+    PlayerHub/SpotController/SpotController.cpp
 )
 
 add_subdirectory("CameraSystem")
