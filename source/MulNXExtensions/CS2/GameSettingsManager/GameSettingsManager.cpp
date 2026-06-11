@@ -107,7 +107,7 @@ bool GameSettingsManager::Init() {
 
         this->GameSettings.ScreenSettings.spec_show_xray = spec_show_xray->GetPtr<int>();
 
-        //auto temp = CVarSystem.GetCvar("cl_radar_show_all_players_when_spectating")->GetPtr<bool>();
+        auto temp = CVarSystem.GetCvar("cl_radar_show_all_players_when_spectating")->GetPtr<bool>();
         
 
         this->dof.r_dof_override = CVarSystem.GetCvar("r_dof_override")->GetPtr<bool>();

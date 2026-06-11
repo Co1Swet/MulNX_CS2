@@ -35,7 +35,6 @@ def count_cpp_lines():
         
         # 跳过包含排除关键字的目录
         if any(keyword in root for keyword in excluded_keyword):
-            print(f"[跳过目录] {relative_root} (包含排除关键字)")
             continue
             
         # 统计当前目录下的cpp/hpp文件
