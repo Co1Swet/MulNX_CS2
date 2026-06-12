@@ -16,8 +16,13 @@ namespace MulNX {
             inline const static MulNX::Memory::Pattern ifShowSpeaker("48 63 C3 48 8D 0D ?? ?? ?? ?? C6 84 08 ?? ?? ?? ?? 01 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 84 C0 0F 85");
             inline const static MulNX::Memory::Pattern PosTeamID_CmpForHide("0F 5B FF 0F 2F FE 0F 82 ?? ?? ?? 00 F3 0F 10 44 24");
             inline const static MulNX::Memory::Pattern PosTeamID_xxIt("41 BC FF FF 00 00 48 8B ?? ?? 33 DB 48 8B FB 66 44 ?? ?? ?? ?? 0F 84 ?? ?? ?? 00");
-            inline const static MulNX::Memory::Pattern Pos_Spot_CmpToSetShow("38 5C 24 ?? 0F 84 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? F3 41 0F 10 8E ?? ?? ?? ?? F3 0F 10 41");
-            inline const static MulNX::Memory::Pattern Pos_Spot_WriteBombState("41 FF D0 8B 0D ?? ?? ?? ?? 65 48 8B 04 25 ?? ?? ?? ?? 41 8B D4");
+
+            namespace Spot {
+                inline const static MulNX::Memory::Pattern Pos_CmpToSetShow("38 5C 24 ?? 0F 84 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? F3 41 0F 10 8E ?? ?? ?? ?? F3 0F 10 41");// 从cvar定位
+                inline const static MulNX::Memory::Pattern Pos_WriteMaybeEnumToChangeRadarPlayerDraw("48 8B 6C 24 ?? 41 39 9E ?? ?? ?? ?? 74 ?? 33 D2");// 交叉引用
+                inline const static MulNX::Memory::Pattern Func_FinallyUpdatePlayerState("44 8B F2 41 81 E6 FF FF FF ?? 8B D8 41 33 DE");// 交叉引用
+                inline const static MulNX::Memory::Pattern Pos_WriteBombState("41 FF D0 8B 0D ?? ?? ?? ?? 65 48 8B 04 25 ?? ?? ?? ?? 41 8B D4");// 交叉引用
+            }
         }
     }
 }

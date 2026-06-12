@@ -13,7 +13,7 @@ namespace MulNX {
             size_t Size = 0;
             const size_t RawSize;
             DWORD Protection = 0;// 当前保护属性
-        public:
+        
             std::optional<uint8_t*> FindHead(const uint8_t* Begin, const uint8_t Byte)const;
             bool MatchPattern(const uint8_t* Address, const Pattern& Pattern)const;
         public:
@@ -31,6 +31,8 @@ namespace MulNX {
             bool TryResize(size_t NewSize);
 
             Region FindRegion(const Pattern& pattern)const;
+
+            Region FindFuncStart();
         };
     }
 }

@@ -32,6 +32,15 @@ bool MulNX::Memory::Region::MatchPattern(const uint8_t* Address, const Pattern& 
     return true;//完全匹配
 }
 
+bool MulNX::Memory::Region::TryResize(size_t NewSize) {
+    if (this->Size < NewSize) {
+        // 不能扩大
+        return false;
+    }
+    this->Size = NewSize;
+    return true;
+}
+
 MulNX::Memory::Region MulNX::Memory::Region::FindRegion(const Pattern& pattern) const {
     for (const uint8_t* Current = this->Begin(); Current < this->End();) {
         auto FoundHead = this->FindHead(Current, *pattern.First());
@@ -48,11 +57,28 @@ MulNX::Memory::Region MulNX::Memory::Region::FindRegion(const Pattern& pattern) 
     return Region::InValid();//未找到匹配
 }
 
-bool MulNX::Memory::Region::TryResize(size_t NewSize) {
-    if (this->Size < NewSize) {
-        // 不能扩大
-        return false;
+MulNX::Memory::Region MulNX::Memory::Region::FindFuncStart() {
+    // 只有有效区域才能搜索函数头
+    if (!this->IsValid())
+        return Region::InValid();
+
+    const uint8_t* const regionEnd = this->End();         // 原来的结束地址
+    const uint8_t* const regionStart = this->Begin();    // 原来的起始地址
+    const uint8_t* scanPtr = regionStart - 1;            // 从基址前一个字节开始
+
+    // 设定最大向上搜索范围，防止跑到不可读内存或跨模块
+    constexpr ptrdiff_t kMaxSearchSize = 0x1000;         // 4096 字节
+    const uint8_t* const searchLimit = regionStart - kMaxSearchSize;
+
+    while (scanPtr >= searchLimit) {
+        if (*scanPtr == 0xCC) {                          // 找到 int3 填充
+            const uint8_t* funcEntry = scanPtr + 1;      // 函数入口 = int3 后第一个字节
+            uintptr_t newBase = reinterpret_cast<uintptr_t>(funcEntry);
+            size_t newSize = regionEnd - funcEntry;      // 保持原结束位置不变
+            return Region(newBase, newSize);
+        }
+        --scanPtr;
     }
-    this->Size = NewSize;
-    return true;
+    // 在限定范围内未找到 int3，返回无效区域
+    return Region::InValid();
 }
