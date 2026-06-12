@@ -25,22 +25,15 @@ add_library(MulNXCS2Ext
 
     GameCfgManager/GameCfgManager.cpp
     GameSettingsManager/GameSettingsManager.cpp
-
-    PlayerHub/PlayerHub.cpp
-    PlayerHub/GlowController/GlowController.cpp
-    PlayerHub/NameController/NameController.cpp
-    PlayerHub/SmokeController/SmokeController.cpp
-    PlayerHub/ProjectileTracker/ProjectileTracker.cpp
-    PlayerHub/SpeakingController/SpeakingController.cpp
-    PlayerHub/KeyboardOverlay/KeyboardOverlay.cpp
-    PlayerHub/SpotController/SpotController.cpp
 )
 
 add_subdirectory("CameraSystem")
 add_subdirectory("DemoSystem")
+add_subdirectory("PlayerHub")
 
 target_link_libraries(MulNXCS2Ext PUBLIC
     MulNX
     WinExt
     DemoSystem
+    PlayerHubs
 )

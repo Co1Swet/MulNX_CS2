@@ -84,7 +84,8 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<SmokeController>("SmokeController")
             .CreateModule<SpeakingController>("SpeakingController")
             .CreateModule<KeyboardOverlay>("KeyboardOverlay")
-            .CreateModule<SpotController>("SpotController")
+            .CreateModule<PlayerSpotController>("PlayerSpotController")
+            .CreateModule<BombSpotController>("BombSpotController")
             // 摄像机系统
             .CreateModule<CameraSystem>("CameraSystem")
             .CreateModule<WorkspaceManager>("WorkspaceManager")

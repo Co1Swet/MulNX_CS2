@@ -25,14 +25,7 @@
 #include "DemoSystem/RecordTaskMaker/RecordTaskMaker.hpp"
 #include "DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp"
 
-#include "PlayerHub/PlayerHub.hpp"
-#include "PlayerHub/NameController/NameController.hpp"
-#include "PlayerHub/GlowController/GlowController.hpp"
-#include "PlayerHub/SmokeController/SmokeController.hpp"
-#include "PlayerHub/ProjectileTracker/ProjectileTracker.hpp"
-#include "PlayerHub/SpeakingController/SpeakingController.hpp"
-#include "PlayerHub/KeyboardOverlay/KeyboardOverlay.hpp"
-#include "PlayerHub/SpotController/SpotController.hpp"
+#include "PlayerHub/PlayerHubs.hpp"
 
 #include "GameCfgManager/GameCfgManager.hpp"
 #include "GameSettingsManager/GameSettingsManager.hpp"
