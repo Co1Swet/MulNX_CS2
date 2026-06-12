@@ -7,12 +7,20 @@ enum TeamSytle :uint64_t {
     Enemy = 17
 };
 
+void PlayerSpotController::HubWindow(MulNX::UINode* node) {
+    auto w = MulNX::UI::RAIIWindow("雷达玩家标记控制");
+    MulNX::UI::Checkbox("隐藏数字显示", this->hideNumLabel);
+    MulNX::UI::Checkbox("强制敌人渲染为红色", this->forceEnemyRed);
+    MulNX::UI::Checkbox("强制队友显示", this->forceTeammateDraw);
+}
+
 bool PlayerSpotController::Init() {
 
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改绘制状态
         auto Pos_Spot_CmpToSetShow = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetShow).Data();
         this->hkPos_Spot_CmpToSetShow = MulNX::Hook::Create(Pos_Spot_CmpToSetShow, [this](MulNX::Hook* hk, RegContext* ctx) {
+            if (!this->forceTeammateDraw.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             auto pPawn = (CS2::C_CSPlayerPawn*)ctx->r15;
             try {
                 auto pOBing = this->CS2->client.TryGetObservingPawn();
@@ -32,6 +40,7 @@ bool PlayerSpotController::Init() {
         // 修改小地图上玩家图标的绘制样式
         auto Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_WriteMaybeEnumToChangeRadarPlayerDraw);
         this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = MulNX::Hook::Create(Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+            if (!this->forceEnemyRed.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             uint64_t Enum = ctx->rbx;
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             if (!pOBing)return MulNX::Hook::Then::Continue;
@@ -55,6 +64,7 @@ bool PlayerSpotController::Init() {
         // 修改玩家图标的具体绘制组件可见性
         auto pFunc_FinallyUpdatePlayerState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Func_FinallyUpdatePlayerState).FindFuncStart();
         this->hkFunc_FinallyUpdatePlayerState = MulNX::Hook::Create(pFunc_FinallyUpdatePlayerState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+            if (!this->hideNumLabel.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             ctx->rdx &= ~1ULL;
             return MulNX::Hook::Then::Continue;
             }).value();

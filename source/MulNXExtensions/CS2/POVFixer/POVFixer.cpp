@@ -1,7 +1,6 @@
 #include "POVFixer.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-
 void POVFixer::Draw(MulNX::UINode* node) {
     if (ImGui::CollapsingHeader("POV Fix")) {
         if (ImGui::Button(I18n("pov.enable").c_str())) {
@@ -52,40 +51,6 @@ void POVFixer::ProcessMsg(MulNX::Message& msg) {
 
 void POVFixer::BeforeDraw() {
     this->Update();
-    if (!this->runFlag1.load())return;
-
-    try {
-        auto pObservingPawn = this->CS2->client.TryGetObservingPawn();
-        if (!pObservingPawn)return;
-        auto currentTeam = MulNX::MRead(pObservingPawn->iTeamNum());
-
-        int playerNum = 0;
-        for (int i = 0; i < this->CS2->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-            auto* controller = this->CS2->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
-            if (!controller)continue;
-            auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
-            auto* pawn = this->CS2->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
-            if (!pawn)continue;
-
-            auto team = MulNX::MRead(pawn->iTeamNum());
-            if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT)continue;
-            ++playerNum;
-
-            if (playerNum == 20)return;
-
-            if (currentTeam == team) {
-                MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), true);
-            }
-            else {
-                MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), false);
-                auto pGlow = pawn->Glow()->bGlowing();
-                MulNX::MWrite(pGlow, false);
-            }
-        }
-        }
-    catch (const std::exception& e) {
-        this->ISys().LogError(e.what());
-    }
 }
 
 void POVFixer::OnSetGlow(MulNX::Message& msg) {
