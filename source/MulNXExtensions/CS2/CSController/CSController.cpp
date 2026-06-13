@@ -73,8 +73,7 @@ bool CSController::Init() {
         //     });
         ;
 
-    this->currentCoro = InitTask();
-    this->currentCoro.resume();
+    this->InitTask().resume();
 
     this->ISys().SendTask("Update", "CSControl", [this]()->bool {
         this->Update();

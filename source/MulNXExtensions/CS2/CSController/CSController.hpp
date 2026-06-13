@@ -43,7 +43,6 @@ class CSController final :public MulNX::ModuleBase {
     C_GlobalVars* CSGlobalVars{};
 
     std::atomic<int> needToLoadModules = 4;
-    MulNX::CoTask currentCoro;
     MulNX::CoTask InitTask();
     void ProcessMsg(MulNX::Message& Msg)override;
     void Main();

@@ -92,6 +92,7 @@ namespace MulNX {
         // 更新入口
         void Update();
     public:
+        ~ModuleBase();
         // 基础初始化
         bool BaseInit(MulNX::Core::Core* core);
         // 初始化入口

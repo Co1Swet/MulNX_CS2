@@ -10,29 +10,35 @@ namespace MulNX {
                 return CoTask{ std::coroutine_handle<promise_type>::from_promise(*this) };
             }
             std::suspend_always initial_suspend() noexcept { return {}; }
-            std::suspend_always final_suspend() noexcept { return {}; }
+            auto final_suspend() noexcept {
+                struct FinalAwaitable {
+                    bool await_ready() noexcept { return false; }
+                    void await_suspend(std::coroutine_handle<promise_type> h) noexcept {
+                        h.destroy();  // 自动销毁，协程帧释放
+                    }
+                    void await_resume() noexcept {}
+                };
+                return FinalAwaitable{};
+            }
             void return_void() noexcept {}
             void unhandled_exception() { std::terminate(); }
         };
 
         std::coroutine_handle<promise_type> handle;
+        bool started = false;
 
         CoTask() noexcept : handle(nullptr) {}
         explicit CoTask(std::coroutine_handle<promise_type> h) : handle(h) {}
 
-        ~CoTask() { if (handle) handle.destroy(); }
+        ~CoTask() { if (!this->started)this->handle.destroy(); }
         CoTask(const CoTask&) = delete;
-        CoTask(CoTask&& other) noexcept : handle(other.handle) { other.handle = nullptr; }
-        CoTask& operator=(CoTask&& other) noexcept {
-            if (this != &other) {
-                if (handle) handle.destroy(); // 先销毁自己持有的旧协程
-                handle = other.handle;
-                other.handle = nullptr;
-            }
-            return *this;
+        CoTask& operator=(CoTask& other) = delete;
+        CoTask(CoTask&& other) = delete;
+        CoTask& operator=(CoTask&& other) = delete;
+        
+        void resume() {
+            this->started = true;
+            this->handle.resume();
         }
-
-        bool done() const { return handle.done(); }
-        void resume() { if (!done()) handle.resume(); }
     };
 }

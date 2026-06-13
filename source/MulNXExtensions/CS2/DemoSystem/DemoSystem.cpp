@@ -32,7 +32,7 @@ bool DemoSystem::Window(MulNX::UINode* node) {
         std::string fullPath = filePath.string();
 
         bool anylized = false;
-        if (std::filesystem::exists(filePath.parent_path() / (filePath.stem().string() + ".json"))) {
+        if (std::filesystem::exists(this->dirData / (filePath.stem().string() + ".json"))) {
             anylized = true;
         }
 
@@ -113,7 +113,7 @@ bool DemoSystem::Window(MulNX::UINode* node) {
 }
 
 bool DemoSystem::Init() {
-    this->pathDemos = this->ISys().Path()->PathGetForShared("Demos");
+    this->dirData = this->ISys().Path()->PathGetForShared("Data");
 
     this->ISys()
         .SubscribeAsync("Demo/Play")
@@ -149,7 +149,7 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         auto ext = file.extension();
         if (ext != ".dem")break;
         try {
-            std::filesystem::copy(file, this->pathDemos / file.filename(), std::filesystem::copy_options::overwrite_existing);
+            std::filesystem::copy(file, this->CS2Paths->demo / file.filename(), std::filesystem::copy_options::overwrite_existing);
         }
         catch (const std::filesystem::filesystem_error& e) {
             this->ISys().LogError(I18n("demo.copy_failed", e.what()).c_str());
@@ -160,7 +160,7 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
     case "Demo/Refresh"_hash: {
         std::unique_lock lock(this->smutex);
         this->demoFiles.clear();
-        for (const auto& entry : std::filesystem::directory_iterator(this->pathDemos)) {
+        for (const auto& entry : std::filesystem::directory_iterator(this->CS2Paths->demo)) {
             if (entry.is_regular_file() && entry.path().extension() == ".dem") {
                 this->demoFiles.insert(entry.path());
             }

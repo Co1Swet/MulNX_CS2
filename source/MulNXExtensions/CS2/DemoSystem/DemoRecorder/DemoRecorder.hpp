@@ -16,7 +16,6 @@ class DemoRecorder final : public CSModuleBase {
 
     bool PeekQueue(RecordTask& task);   // 调用者需持有 mtx
 
-    MulNX::CoTask coTa;
     MulNX::CoTask Main();
     bool Window(MulNX::UINode* node);
     std::atomic<bool>newStart = false;

@@ -44,8 +44,7 @@ bool DemoRecorder::Init() {
         .SubscribeAsync("Demo/Record/Clear")
         .SubscribeAsync("Demo/Record/Stop");
 
-    this->coTa = Main();
-    this->coTa.resume();
+    this->Main().resume();
 
     this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();

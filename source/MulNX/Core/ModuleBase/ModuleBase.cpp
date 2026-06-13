@@ -79,3 +79,20 @@ void MulNX::ModuleBase::Update() {
     }
     return;
 }
+// 在 ModuleBase 类声明中添加
+MulNX::ModuleBase::~ModuleBase() {
+    // 销毁所有挂起的条件等待协程
+    for (auto& cw : conditionWaiters) {
+        if (cw.handle) {
+            cw.handle.destroy();
+        }
+    }
+    // 销毁所有挂起的消息等待协程
+    for (auto& [type, vec] : msgWaiters) {
+        for (auto& w : vec) {
+            if (w.handle) {
+                w.handle.destroy();
+            }
+        }
+    }
+}
