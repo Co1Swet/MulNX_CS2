@@ -1,3 +1,5 @@
+#pragma once
+
 // Cfg文件数据流向：
 // 从工具目录读取Cfg文件->移动到游戏目录->调用游戏接口加载Cfg文件
 // 工具目录允许移动和删除操作
@@ -6,11 +8,9 @@
 
 // 目前的函数和成员命名是临时的，后续可能会调整以符合整体命名规范
 
-#pragma once
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
-#include <MulNX/MulNX.hpp>
-
-class GameCfgManager final :public MulNX::ModuleBase {
+class GameCfgManager final :public CSModuleBase {
 private:
     MulNX::IPCer* IPCer = nullptr;
 

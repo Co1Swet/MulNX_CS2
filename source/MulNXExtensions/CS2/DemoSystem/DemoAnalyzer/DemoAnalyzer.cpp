@@ -2,9 +2,9 @@
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 
 bool DemoAnalyzer::Init() {
-    auto toolsPath = this->ISys().PathManager()->PathGetForShared("Tools");
+    auto toolsPath = this->ISys().Path()->PathGetForShared("Tools");
     this->csdaPath = toolsPath / "csda.exe";
-    this->dirDemos = this->ISys().PathManager()->PathGetForShared("Demos");
+    this->dirDemos = this->ISys().Path()->PathGetForShared("Demos");
 
     this->ISys().SubscribeAsync("Demo/Analyze");
 

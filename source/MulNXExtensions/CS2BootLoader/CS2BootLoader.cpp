@@ -56,7 +56,6 @@ bool CS2BootLoader::Window(MulNX::UINode* node) {
 
 bool CS2BootLoader::Init() {
     this->pInjectHelper = this->Core->ModuleManager()->FindModule<DLLInjectHelper>("DLLInjectHelper");
-    auto pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
     auto configPath = this->ISys().PathGet("Config");
     auto config = YAML::LoadFile((configPath / "config.yaml").string());
@@ -64,8 +63,7 @@ bool CS2BootLoader::Init() {
     this->launchOptions = config["launchOptions"].as<std::string>();
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
 
-
-    auto rootPath = pIPCer->GetRoot();
+    auto rootPath = this->ISys().Path()->GetRoot();
 
     this->helperPath = rootPath / "CS2InternalHelper" / "CS2InternalHelper.dll";
 

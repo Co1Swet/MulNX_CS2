@@ -5,12 +5,16 @@
 #include <MulNXThirdParty/All_pugixml.hpp>
 
 bool MulNX::PathManager::Init() {
-    this->IPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
-    this->Root = this->IPCer->GetRoot();
+    WCHAR path[MAX_PATH] = { 0 };
+    GetModuleFileNameW(this->Core->hMyOriginModule, path, MAX_PATH);
+    auto filePath = std::filesystem::path(path);
+    this->Root = filePath.parent_path().parent_path();
+
     this->CoreName = this->Core->GetName();
     this->CoreRoot = this->Root / this->CoreName;
     this->LoadPathLists(this->Root / "PathLists.xml");
     this->CheckShared();
+    auto pConfig = this->ISys().PathGet("Config");
     return true;
 }
 

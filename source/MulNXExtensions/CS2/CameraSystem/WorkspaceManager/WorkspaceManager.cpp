@@ -116,7 +116,7 @@ bool WorkspaceManager::Workspace_Set(const std::string& Name) {
     this->PManager->Project_ClearAll();
     // 制作指针
     this->CurrentWorkspace = std::make_unique<Workspace>(Name);
-    auto* PathManager = this->ISys().PathManager();
+    auto* PathManager = this->ISys().Path();
 
     PathManager->KeySetCurrent("CurrentProject", {});
     PathManager->KeySetCurrent("CurrentWorkspace", Name);
@@ -154,7 +154,7 @@ bool WorkspaceManager::Workspace_ConfigSave() {
     if (!this->CurrentWorkspace) {
         return false;
     }
-    auto [ok, msg] = this->CurrentWorkspace->Save(this->ISys().PathManager()->PathGetFromKey("CurrentWorkspace"));
+    auto [ok, msg] = this->CurrentWorkspace->Save(this->ISys().Path()->PathGetFromKey("CurrentWorkspace"));
     if (!ok) {
         this->ISys().LogError(std::move(msg));
         return false;

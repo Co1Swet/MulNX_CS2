@@ -109,7 +109,7 @@ bool GameCfgManager::Init() {
 	this->IPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
     //路径绑定
     this->ToolPath = this->ISys().PathGet("CS2Configs");
-	this->GamePath = this->IPCer->PathGet_CS_cfg();
+    this->GamePath = this->CS2Paths->config;
 	//初始化Cfg文件列表
     this->UpdateCfgList();
     this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});

@@ -125,7 +125,7 @@ void MulNX::UISystem::LoadFont() {
 void MulNX::UISystem::LoadStyle() {
     try {
         // 加载Style
-        auto stylePath = this->ISys().PathManager()->PathGetForShared("Config") / "ImStyle.yaml";
+        auto stylePath = this->ISys().Path()->PathGetForShared("Config") / "ImStyle.yaml";
         this->ISys().LogInfo(I18n("ui.style.load", stylePath.string()));
         YAML::Node root = YAML::LoadFile(stylePath.string());
         ImGuiStyle newStyle;
@@ -146,7 +146,7 @@ void MulNX::UISystem::LoadStyle() {
 void MulNX::UISystem::SaveStyle() {
     try {
         // 保存Style
-        auto stylePath = this->ISys().PathManager()->PathGetForShared("Config") / "ImStyle.yaml";
+        auto stylePath = this->ISys().Path()->PathGetForShared("Config") / "ImStyle.yaml";
         ImGuiStyle& style = ImGui::GetStyle();
         YAML::Node root;
         ImGuiYaml::StyleToYaml(style, root);

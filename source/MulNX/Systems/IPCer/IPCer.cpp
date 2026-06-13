@@ -1,8 +1,7 @@
 #include "IPCer.hpp"
-
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Systems/Debugger/Debugger.hpp>
-
+#include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <strstream>
 #include <Windows.h>
 
@@ -32,6 +31,7 @@ bool MulNX::IPCer::GetWindowPathByName(const LPCWSTR& WindowName, std::filesyste
     //获取可执行文件路径
     if (!QueryFullProcessImageNameW(hProcess, 0, exePath, &size)) {
         this->ISys().LogError("得到可执行文件路径失败");
+        CloseHandle(hProcess);
         return false;
     }
 
@@ -41,41 +41,9 @@ bool MulNX::IPCer::GetWindowPathByName(const LPCWSTR& WindowName, std::filesyste
     return true;
 }
 
-std::filesystem::path MulNX::IPCer::GetRoot() {
-    return this->Paths.MulNX.Path;
-}
-
 bool MulNX::IPCer::Init() {
-    WCHAR path[MAX_PATH] = { 0 };
-    GetModuleFileNameW(this->Core->hMyOriginModule, path, MAX_PATH);
-    auto filePath = std::filesystem::path(path);
-    this->Paths.MulNX.Path = filePath.parent_path().parent_path();
-    auto coreName = this->Core->GetName();
-    if (coreName != "CS2OBTool")return true;
 
-    // 获取 cs2.exe 的完整路径（进程主模块）
-    WCHAR cs2Path[MAX_PATH] = { 0 };
-    GetModuleFileNameW(nullptr, cs2Path, MAX_PATH);
-    this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path = cs2Path;
-
-    // 逐级推导目录
-    this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path
-        = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.cs2_exe.Path.parent_path();
-    this->Paths.Counter_Strike_Global_Offensive.game.bin.Path
-        = this->Paths.Counter_Strike_Global_Offensive.game.bin.win64.Path.parent_path();
-    this->Paths.Counter_Strike_Global_Offensive.game.Path
-        = this->Paths.Counter_Strike_Global_Offensive.game.bin.Path.parent_path();
-    this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path
-        = this->Paths.Counter_Strike_Global_Offensive.game.Path / "csgo";
-    this->Paths.Counter_Strike_Global_Offensive.game.csgo.cfg.Path
-        = this->Paths.Counter_Strike_Global_Offensive.game.csgo.Path / "cfg";
     return true;
-}
-
-
-
-std::filesystem::path MulNX::IPCer::PathGet_CS_cfg() {
-    return this->Paths.Counter_Strike_Global_Offensive.game.csgo.cfg.Path;
 }
 
 std::vector<std::string> MulNX::IPCer::GetProjectsNames(std::filesystem::path Path) {

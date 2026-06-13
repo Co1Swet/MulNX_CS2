@@ -63,7 +63,7 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
             ImGui::SetClipboardText(solution->name.c_str());
         }
         if (ImGui::MenuItem(I18n("text.save").c_str())) {
-            auto path = this->ISys().PathManager()->PathGetFromKey("Solutions");
+            auto path = this->ISys().Path()->PathGetFromKey("Solutions");
             auto [ok, msg] = solution->Save(path);
             if (ok) {
                 this->ISys().LogSucc(std::move(msg));
@@ -211,7 +211,7 @@ bool SolutionManager::Init() {
     this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->ISys().SendUINode("MenuSolution", [this](MulNX::UINode* node) {return this->MenuSolution(node);});
 
-    auto* PathManager = this->ISys().PathManager();
+    auto* PathManager = this->ISys().Path();
     if (PathManager->CreateKey("Solutions", "Solutions",
         [this](MulNX::PathManager* PathManager)->bool {
             auto Path = PathManager->PathGetFromKey("Solutions");
@@ -304,7 +304,7 @@ bool SolutionManager::Solution_SaveAll() {
         this->ISys().LogWarning("尝试在没有任何解决方案的情况下保存");
         return true;
     }
-    std::filesystem::path SolutionFolderPath = this->ISys().PathManager()->PathGetFromKey("Solutions");
+    std::filesystem::path SolutionFolderPath = this->ISys().Path()->PathGetFromKey("Solutions");
     //遍历所有解决方案保存
     for (const auto& [name, solution] : this->solutions) {
         if (!solution->dirty) {

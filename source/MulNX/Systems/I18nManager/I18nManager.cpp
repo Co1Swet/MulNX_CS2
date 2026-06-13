@@ -8,7 +8,7 @@ MulNX::I18nManager::I18nManager() {
 }
 
 bool MulNX::I18nManager::Init() {
-    auto path = this->ISys().PathManager()->PathGetForShared("Config");
+    auto path = this->ISys().Path()->PathGetForShared("Config");
     auto filePath = path / "lan.yaml";
 
     this->strings.clear();

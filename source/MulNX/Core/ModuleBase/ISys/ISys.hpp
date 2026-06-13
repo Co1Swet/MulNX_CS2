@@ -34,7 +34,7 @@ namespace MulNX {
         void AsyncCommand(std::string&& cmd);
 
         std::filesystem::path PathGet(const std::string& Target);
-        MulNX::PathManager* PathManager();
+        MulNX::PathManager* Path();
 
         std::optional<MulNX::KeyCheckPack> GetButton(const std::string& name);
     };

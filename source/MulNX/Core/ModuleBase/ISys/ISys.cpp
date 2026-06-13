@@ -99,7 +99,7 @@ std::filesystem::path MulNX::ISys::PathGet(const std::string& Target) {
     return this->pModuleBase->pPathManager->PathGetForModule(this->pModuleBase->GetName(), Target);
 }
 
-MulNX::PathManager* MulNX::ISys::PathManager() {
+MulNX::PathManager* MulNX::ISys::Path() {
     return this->pModuleBase->pPathManager;
 }
 

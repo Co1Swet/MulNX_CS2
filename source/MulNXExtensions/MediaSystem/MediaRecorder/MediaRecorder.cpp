@@ -10,7 +10,7 @@ bool MediaRecorder::Init() {
     this->pVEncodeHelper = this->Core->ModuleManager()->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pAEncodeHelper = this->Core->ModuleManager()->FindModule<AEncodeHelper>("AEncodeHelper");
 
-    this->dirVedios = this->ISys().PathManager()->PathGetForShared("Vedios");
+    this->dirVedios = this->ISys().Path()->PathGetForShared("Vedios");
 
     this->ISys()
         .SubscribeAsync("Media/Record/Start")

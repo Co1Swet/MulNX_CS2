@@ -75,7 +75,7 @@ bool CameraSystem::Init() {
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
     this->WManager = this->Core->ModuleManager()->FindModule<WorkspaceManager>("WorkspaceManager");
 
-    auto* PathManager = this->ISys().PathManager();
+    auto* PathManager = this->ISys().Path();
     if (PathManager->CreateKey("CurrentWorkspace", {},
         [this](MulNX::PathManager* PathManager)->bool {
             auto NewWorkspacePath = PathManager->PathGetFromKey("CurrentWorkspace");

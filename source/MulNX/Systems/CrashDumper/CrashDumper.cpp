@@ -23,7 +23,7 @@ LONG WINAPI MulNX::CrashDumper::UnhandledExceptionFilter(EXCEPTION_POINTERS* pEx
 }
 
 bool MulNX::CrashDumper::Init() {
-    auto path = this->ISys().PathManager()->PathGetForShared("Log");
+    auto path = this->ISys().Path()->PathGetForShared("Log");
 
     if (path.empty())
         return false;

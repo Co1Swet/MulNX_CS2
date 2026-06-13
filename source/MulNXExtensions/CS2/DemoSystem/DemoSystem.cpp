@@ -1,104 +1,107 @@
 #include "DemoSystem.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-
 #include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 #include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 
 bool DemoSystem::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("Demo", this->showWindow);
     if (!w) return true;
-    {
-        std::unique_lock lock(this->smutex);
 
-        if (ImGui::Button(I18n("demo.refresh").c_str())) {
-            this->ISys().PublishAsync("Demo/Refresh"_hash);
+    node->CallUINode("RecordTaskMaker");
+    node->CallUINode("RecordTaskConfiger");
+    node->CallUINode("DemoHelper");
+    node->CallUINode("DemoRecorder");
+
+    std::unique_lock lock(this->smutex);
+
+    if (ImGui::Button(I18n("demo.refresh").c_str())) {
+        this->ISys().PublishAsync("Demo/Refresh"_hash);
+    }
+
+    if (this->demoFiles.empty()) {
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", I18n("demo.empty").c_str());
+    }
+
+    // 可复制的列表控件标识
+    ImGui::BeginChild("DemoFileList", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() - 4), true);
+
+    int index = 0;
+    // 遍历文件集合（set 自动按路径排序）
+    for (auto it = this->demoFiles.begin(); it != this->demoFiles.end(); ) {
+        const auto& filePath = *it;
+        std::string fullPath = filePath.string();
+
+        bool anylized = false;
+        if (std::filesystem::exists(filePath.parent_path() / (filePath.stem().string() + ".json"))) {
+            anylized = true;
         }
 
-        if (this->demoFiles.empty()) {
-            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", I18n("demo.empty").c_str());
+        // 用 Selectable 展示条目，支持高亮
+        bool isSelected = (this->selectedDemoIndex == index);
+        std::string fileName = filePath.filename().string() + "      " + (anylized ? "已分析" : "未分析");
+        if (ImGui::Selectable(fileName.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick)) {
+            this->selectedDemoIndex = index;
         }
-        else {
-            // 可复制的列表控件标识
-            ImGui::BeginChild("DemoFileList", ImVec2(0, -ImGui::GetFrameHeightWithSpacing() - 4), true);
+        ImGui::SameLine();
 
-            int index = 0;
-            // 遍历文件集合（set 自动按路径排序）
-            for (auto it = this->demoFiles.begin(); it != this->demoFiles.end(); ) {
-                const auto& filePath = *it;
-                std::string fullPath = filePath.string();
-
-                bool anylized = false;
-                if (std::filesystem::exists(filePath.parent_path() / (filePath.stem().string() + ".json"))) {
-                    anylized = true;
-                }
-
-                // 用 Selectable 展示条目，支持高亮
-                bool isSelected = (this->selectedDemoIndex == index);
-                std::string fileName = filePath.filename().string() + "      " + (anylized ? "已分析" : "未分析");
-                if (ImGui::Selectable(fileName.c_str(), isSelected, ImGuiSelectableFlags_AllowDoubleClick)) {
-                    this->selectedDemoIndex = index;
-                }
-                ImGui::SameLine();
-
-                // 右键菜单（或在 Selectable 上悬浮右键）
-                if (ImGui::BeginPopupContextItem()) {
-                    if (ImGui::MenuItem(I18n("demo.play").c_str())) {
-                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
-                        rp->str1 = fullPath;
-                        this->ISys().PublishAsync(std::move(msg));
-                    }
-                    if (ImGui::MenuItem(I18n("demo.analyze").c_str())) {
-                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-                        rp->str1 = fullPath;
-                        this->ISys().PublishAsync(std::move(msg));
-                    }
-                    if (ImGui::MenuItem(I18n("demo.load").c_str())) {
-                        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
-                        rp->str1 = filePath.stem().string();
-                        this->ISys().PublishAsync(std::move(msg));
-                    }
-                    if (ImGui::MenuItem(I18n("demo.copy_path").c_str())) {
-                        ImGui::SetClipboardText(fullPath.c_str());
-                    }
-                    ImGui::Separator();
-                    if (ImGui::MenuItem(I18n("demo.remove").c_str())) {
-                        // 从集合中移除，并安全递增迭代器
-                        it = this->demoFiles.erase(it);
-                        // 调整选中索引
-                        if (this->selectedDemoIndex >= static_cast<int>(this->demoFiles.size()))
-                            this->selectedDemoIndex = std::max(0, static_cast<int>(this->demoFiles.size()) - 1);
-                        ImGui::EndPopup();
-                        continue; // 跳过 ++it
-                    }
-                    ImGui::EndPopup();
-                }
-
-                ++it;
-                ++index;
-
-                ImGui::NewLine();
+        // 右键菜单（或在 Selectable 上悬浮右键）
+        if (ImGui::BeginPopupContextItem()) {
+            if (ImGui::MenuItem(I18n("demo.play").c_str())) {
+                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
+                rp->str1 = fullPath;
+                this->ISys().PublishAsync(std::move(msg));
             }
-
-            ImGui::EndChild();
-
-            // 底部操作按钮
-            if (ImGui::Button(I18n("demo.clear_all").c_str())) {
-                this->demoFiles.clear();
-                this->selectedDemoIndex = -1;
+            if (ImGui::MenuItem(I18n("demo.analyze").c_str())) {
+                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
+                rp->str1 = fullPath;
+                this->ISys().PublishAsync(std::move(msg));
             }
-            ImGui::SameLine();
-            if (ImGui::Button(I18n("demo.play_selected").c_str())) {
-                if (this->selectedDemoIndex >= 0 &&
-                    this->selectedDemoIndex < static_cast<int>(this->demoFiles.size())) {
-                    auto iter = this->demoFiles.begin();
-                    std::advance(iter, this->selectedDemoIndex);
-                    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
-                    rp->str1 = iter->string();
-                    this->ISys().PublishAsync(std::move(msg));
-                }
+            if (ImGui::MenuItem(I18n("demo.load").c_str())) {
+                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
+                rp->str1 = filePath.stem().string();
+                this->ISys().PublishAsync(std::move(msg));
             }
+            if (ImGui::MenuItem(I18n("demo.copy_path").c_str())) {
+                ImGui::SetClipboardText(fullPath.c_str());
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem(I18n("demo.remove").c_str())) {
+                // 从集合中移除，并安全递增迭代器
+                it = this->demoFiles.erase(it);
+                // 调整选中索引
+                if (this->selectedDemoIndex >= static_cast<int>(this->demoFiles.size()))
+                    this->selectedDemoIndex = std::max(0, static_cast<int>(this->demoFiles.size()) - 1);
+                ImGui::EndPopup();
+                continue; // 跳过 ++it
+            }
+            ImGui::EndPopup();
+        }
+
+        ++it;
+        ++index;
+
+        ImGui::NewLine();
+    }
+
+    ImGui::EndChild();
+
+    // 底部操作按钮
+    if (ImGui::Button(I18n("demo.clear_all").c_str())) {
+        this->demoFiles.clear();
+        this->selectedDemoIndex = -1;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(I18n("demo.play_selected").c_str())) {
+        if (this->selectedDemoIndex >= 0 &&
+            this->selectedDemoIndex < static_cast<int>(this->demoFiles.size())) {
+            auto iter = this->demoFiles.begin();
+            std::advance(iter, this->selectedDemoIndex);
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
+            rp->str1 = iter->string();
+            this->ISys().PublishAsync(std::move(msg));
         }
     }
+
     ImGui::Separator();
 
     ImGui::Text(I18n("demo.status.is_playing", this->CS2Time->IsPlayingDemo()).c_str());
@@ -106,17 +109,11 @@ bool DemoSystem::Window(MulNX::UINode* node) {
 
     ImGui::Separator();
 
-    node->CallUINode("RecordTaskMaker");
-    node->CallUINode("RecordTaskConfiger");
-    node->CallUINode("DemoHelper");
-    node->CallUINode("DemoRecorder");
     return true;
 }
 
 bool DemoSystem::Init() {
-    this->pathDemos = this->ISys().PathManager()->PathGetForShared("Demos");
-
-    std::function<void(CCommand*)> f;
+    this->pathDemos = this->ISys().Path()->PathGetForShared("Demos");
 
     this->ISys()
         .SubscribeAsync("Demo/Play")

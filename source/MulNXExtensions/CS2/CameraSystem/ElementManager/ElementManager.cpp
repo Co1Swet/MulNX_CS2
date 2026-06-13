@@ -114,7 +114,7 @@ bool ElementManager::Init() {
     this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->ISys().SendUINode("MenuElement", [this](MulNX::UINode* node) {return this->MenuElement(node);});
 
-    auto* PathManager = this->ISys().PathManager();
+    auto* PathManager = this->ISys().Path();
     if (PathManager->CreateKey("Elements", "Elements",
         [this](MulNX::PathManager* PathManager)->bool {
             auto Path = PathManager->PathGetFromKey("Elements");
@@ -212,7 +212,7 @@ bool ElementManager::Element_SaveAll() {
         this->ISys().LogWarning("当前没有任何元素，跳过保存操作！");
         return true;
     }
-    std::filesystem::path ElementFolderPath = this->ISys().PathManager()->PathGetFromKey("Elements");
+    std::filesystem::path ElementFolderPath = this->ISys().Path()->PathGetFromKey("Elements");
     //遍历所有元素并保存
     for (const auto& [name, elem] : this->elements) {
         if (!elem->Dirty) {

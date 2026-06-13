@@ -13,7 +13,7 @@ bool MediaSystem::Window(MulNX::UINode* node) {
     }
 
     if (ImGui::Button("测试")) {
-        auto pathVedios = this->ISys().PathManager()->PathGetForShared("Vedios");
+        auto pathVedios = this->ISys().Path()->PathGetForShared("Vedios");
 
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/Begin"_hash);
         rp->str1 = (pathVedios / "testend.mp4").string();

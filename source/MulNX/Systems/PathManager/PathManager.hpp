@@ -16,10 +16,10 @@
 
 namespace MulNX {
     class PathManager :public ModuleBase {
+        friend IPCer;
     private:
         std::recursive_mutex MutexEx;
         
-        IPCer* IPCer = nullptr;
         // MulNX目录（根目录）
         std::filesystem::path Root;
         // 核心名
@@ -44,6 +44,7 @@ namespace MulNX {
         bool LoadPathLists(const std::filesystem::path& xmlPath);
         bool CheckShared();
 
+        const std::filesystem::path& GetRoot()const { return this->Root; }
         // 通过模块名，将目标（如Saves）映射到该模块的对应的目录（如ModuleA/Saves）
         std::filesystem::path PathGetForModule(const std::string& ModuleName, const std::string& Target);
         // 将目标映射到共享的目录

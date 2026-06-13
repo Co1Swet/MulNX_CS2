@@ -118,7 +118,7 @@ bool ProjectManager::Init() {
     this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->ISys().SendUINode("MenuProject", [this](MulNX::UINode* node) {return this->MenuProject(node);});
 
-    auto* PathManager = this->ISys().PathManager();
+    auto* PathManager = this->ISys().Path();
     if (PathManager->CreateKey("CurrentProject", {},
         [this](MulNX::PathManager* PathManager)->bool {
             auto NewProjectPath = PathManager->PathGetFromKey("CurrentProject");
@@ -207,7 +207,7 @@ bool ProjectManager::Project_Save() {
     this->EManager->Element_SaveAll();
     this->SManager->Solution_SaveAll();
     //保存项目到磁盘
-    std::filesystem::path Path = this->ISys().PathManager()->PathGetFromKey("CurrentWorkspace") / this->ActiveProject->Name;
+    std::filesystem::path Path = this->ISys().Path()->PathGetFromKey("CurrentWorkspace") / this->ActiveProject->Name;
     auto [ok, msg] = this->ActiveProject->Save(Path);
     if (ok) {
         this->ISys().LogSucc(std::move(msg));
@@ -228,19 +228,19 @@ bool ProjectManager::Project_Apply(const std::shared_ptr<Project> Project) {
     this->SManager->Solution_ClearAll();
     //清空旧元素，防止冲突
     this->EManager->Element_ClearAll();
-    if (!this->ISys().PathManager()->KeySetCurrent("CurrentProject", Project->Name)) {
+    if (!this->ISys().Path()->KeySetCurrent("CurrentProject", Project->Name)) {
         this->ISys().LogError("尝试切换到项目时出现问题，设置项目文件夹路径失败！");
         return false;
     }
     //获取元素文件夹路径
-    std::filesystem::path ElementsPath = this->ISys().PathManager()->PathGetFromKey("Elements");
+    std::filesystem::path ElementsPath = this->ISys().Path()->PathGetFromKey("Elements");
     std::vector<std::string>Elements = this->pIPCer->GetFileNamesByPath(ElementsPath);
     //遍历加载元素
     for (const std::string& Element : Elements) {
         this->EManager->Element_Load(ElementsPath / Element);
     }
     //获取解决方案文件夹路径
-    std::filesystem::path SolutionsPath = this->ISys().PathManager()->PathGetFromKey("Solutions");
+    std::filesystem::path SolutionsPath = this->ISys().Path()->PathGetFromKey("Solutions");
     std::vector<std::string>Solutions = this->pIPCer->GetFileNamesByPath(SolutionsPath);
     //遍历加载解决方案
     for (const std::string& Solution : Solutions) {
