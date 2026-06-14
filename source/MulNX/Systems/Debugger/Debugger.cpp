@@ -138,50 +138,7 @@ void MulNX::Debugger::ResetMaxMsgCount(const int Max) {
 }
 
 void MulNX::Debugger::PushBack(MulNX::NetExt&& pack, const std::string& strLevel) {
-    // 调用者已加锁，此处无锁
-
-    // 取出结构化字段
-    std::string moduleName = std::move(pack.str1);
-    std::string rawMsg = std::move(pack.str2);
-    auto eventTime = MulNX::FromUnixUs(pack.timestamp_us);
-
-    // 获取整行格式模板
-    const std::string& lineFmt = I18n("log.fmt");
-    // 例："[{}] [{}] [{}] {}"  占位顺序：时间、级别、模块、消息
-
-    // 按换行符拆分消息体
-    std::istringstream iss(rawMsg);
-    std::string line;
-    bool first = true;
-    while (std::getline(iss, line)) {
-        // 清理行尾回车
-        if (!line.empty() && line.back() == '\r') {
-            line.pop_back();
-        }
-        if (line.empty()) continue;  // 跳过纯空行
-
-        // 用整行模板拼接出最终日志
-        std::string formatted = std::vformat(lineFmt, std::make_format_args(
-            eventTime,      // {} 对应时间
-            strLevel,     // {} 对应级别
-            moduleName,   // {} 对应模块
-            line          // {} 对应本行消息
-        ));
-
-        this->pLogger->logs.enqueue(formatted);
-        // 存入双端队列（保持容量限制）
-        std::unique_lock lock(this->smutex);
-        if (this->DebugMsg.size() == this->MaxMsgCount) {
-            this->DebugMsg.pop_front();
-        }
-        this->DebugMsg.push_back(std::move(formatted));
-        first = false;
-    }
-
-    // 自动滚动标记
-    if (this->AutoScroll) {
-        this->NeedAutoScroll = true;
-    }
+    
 }
 
 void MulNX::Debugger::ShowStream() {

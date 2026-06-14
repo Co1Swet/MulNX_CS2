@@ -8,6 +8,7 @@
 #include <MulNX/Systems/InputSystem/InputSystem.hpp>
 #include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <MulNX/Systems/ShortcutManager/ShortcutManager.hpp>
+#include <MulNX/Systems/Logger/Logger.hpp>
 
 bool MulNX::ModuleBase::SetName(std::string&& Name) {
     this->ModuleName = std::move(Name);
@@ -28,6 +29,7 @@ bool MulNX::ModuleBase::BaseInit(MulNX::Core::Core* core) {
         this->pInputSystem = moduleManager->FindModule<MulNX::InputSystem>("InputSystem");
         this->pPathManager = moduleManager->FindModule<MulNX::PathManager>("PathManager");
         this->pShortcutManager = moduleManager->FindModule<MulNX::ShortcutManager>("ShortcutManager");
+        this->pLogger = moduleManager->FindModule<MulNX::Logger>("Logger");
         this->MainMsgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());
     }
     catch (...) {

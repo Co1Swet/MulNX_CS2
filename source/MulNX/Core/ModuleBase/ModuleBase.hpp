@@ -69,6 +69,7 @@ namespace MulNX {
         MulNX::PathManager* pPathManager = nullptr;
         MulNX::MessageChannel* MainMsgChannel = nullptr;
         MulNX::ShortcutManager* pShortcutManager = nullptr;
+        MulNX::Logger* pLogger = nullptr;
     protected:
         MulNX::GlobalVars* GlobalVars = nullptr;
         Debugger* IDebugger = nullptr;
