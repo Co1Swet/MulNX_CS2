@@ -19,7 +19,7 @@ bool DemoJSONReader::Window(MulNX::UINode* node) {
 }
 
 bool DemoJSONReader::Init() {
-    this->dirDemos = this->ISys().Path()->PathGetForShared("Demos");
+    this->dirData = this->ISys().Path()->PathGetForShared("Data");
     this->ISys().SubscribeAsync("Demo/JSON/Load");
 
     this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
@@ -43,7 +43,7 @@ void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
         std::string filename = pNetExt->str1 + ".json";
 
         std::unique_lock lock(this->smutex);
-        std::filesystem::path filePath = this->dirDemos / filename;
+        std::filesystem::path filePath = this->dirData / filename;
         if (!std::filesystem::exists(filePath)) {
             this->ISys().LogError("文件不存在: " + filePath.string());
             break;

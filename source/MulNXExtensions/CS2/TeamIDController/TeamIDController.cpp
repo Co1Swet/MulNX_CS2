@@ -1,6 +1,5 @@
 #include "TeamIDController.hpp"
-
-#include <MulNXThirdParty/hlae/binutils.h>  // 假定你已集成了 HLAE 的 binutils
+#include <MulNXThirdParty/hlae/binutils.h>
 
 using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);
 
@@ -18,7 +17,7 @@ bool TeamIDController::Init() {
     this->ISys().SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {
         auto& panorama = this->CS2->panorama;
         auto textRegion = panorama.GetTextRegion();
-        auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄（需确保你的 CS2 类型有此方法）
+        auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄
 
         // 1. Hook CLayoutFile::LoadFromFile
         auto lflAddr = textRegion.FindRegion(

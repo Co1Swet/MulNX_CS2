@@ -3,10 +3,9 @@
 #include <MulNXExtensions/CS2/DemoSystem/DemoStruct.hpp>
 #include <deque>
 
-class DemoJSONReader;
 class DemoRecorder final : public CSModuleBase {
-    DemoJSONReader* pJSON;
-
+    std::filesystem::path dirOutput{};
+    std::string subOutput = "default";
     std::deque<RecordTask> recordTaskBufferQueue;
     std::optional<RecordTask> currentRecordTask;
     int currentRecordTaskStartTick = 0;
@@ -17,9 +16,8 @@ class DemoRecorder final : public CSModuleBase {
     bool PeekQueue(RecordTask& task);   // 调用者需持有 mtx
 
     MulNX::CoTask Main();
+    std::atomic<uint64_t> num = 0;
     bool Window(MulNX::UINode* node);
-    std::atomic<bool>newStart = false;
-    std::atomic<bool>isEmpty = false;
 public:
     bool Init() override;
     void ProcessMsg(MulNX::Message& msg) override;

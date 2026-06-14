@@ -6,7 +6,9 @@ bool MediaSystem::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("音视频");
 
     if (ImGui::Button("开始录制")) {
-        this->ISys().PublishAsync("Media/Record/Start"_hash);
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
+        rp->str1 = (this->dirVedios / "record").string();
+        this->ISys().PublishAsync(std::move(msg));
     }
     if (ImGui::Button("结束录制")) {
         this->ISys().PublishAsync("Media/Record/Stop"_hash);
@@ -41,6 +43,8 @@ bool MediaSystem::Init() {
     this->ISys().LogSucc("FFmpeg 与 AvCpp 初始化成功！");
 
     this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+
+    this->dirVedios = this->ISys().Path()->PathGetForShared("Vedios");
 
     return true;
 }

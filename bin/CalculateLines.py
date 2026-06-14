@@ -107,12 +107,6 @@ def main():
                 print(f"{'='*60}")
                 for i, (file_path, lines) in enumerate(processed_files_sorted[:10]):
                     print(f"{i+1:2d}. {file_path:<60} : {lines:>8,} 行")
-                
-                print(f"\n{'='*60}")
-                print("行数最少的10个文件:")
-                print(f"{'='*60}")
-                for i, (file_path, lines) in enumerate(processed_files_sorted[-10:]):
-                    print(f"{i+1:2d}. {file_path:<60} : {lines:>8,} 行")
         
         # 显示排除的文件
         if excluded_files:

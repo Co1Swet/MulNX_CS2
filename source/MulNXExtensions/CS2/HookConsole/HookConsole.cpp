@@ -4,7 +4,14 @@
 bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);
     this->ISys()
-        .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);});
+        .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
+        .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
+        this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);})
+        .SubscribeAsync("Demo/GotoTick")
+        .SubscribeAsync("Game/Command")
+        ;
+
+    this->ISys().SendTask("Update", "CSControl", [this]() {this->Update();return true;});
 
     return true;
 }
@@ -46,6 +53,27 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
     this->ISys().LogSucc(I18n("hook.attached", "VEngineCvar007::RegisterConCommand"));
 }
 
+void HookConsole::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "Game/Command"_hash: {
+        auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
+        this->ISys().LogInfo(cmd);
+        this->executor(0, cmd.c_str(), 1);
+        break;
+    }
+    case "Demo/GotoTick"_hash: {
+        int tick = msg.p1.low<int>();
+        auto cmd = std::format("demo_gototick {}", tick);
+        this->ISys().LogInfo(cmd);
+        this->executor(0, cmd.c_str(), 1);
+        auto msg = MulNX::Message("Demo/GotoTick/Complete"_hash);
+        msg.p1.low<int>() = tick;
+        this->ISys().PublishAsync(std::move(msg));
+        break;
+    }
+    }
+}
+
 MulNX::Hook::Then HookConsole::HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx) {
     CCmd* pCmd = (CCmd*)ctx->r8;
     std::string_view name = pCmd->m_pszName;
@@ -67,17 +95,17 @@ MulNX::Hook::Then HookConsole::HandleOnRegisterConCommand(MulNX::Hook* hk, RegCo
 }
 
 C_ConVar* HookConsole::GetCVarByName(const char* var_name)const {
-	uint64_t i = 0;
-	this->GetFirstCvarIterator(i);
-	while (i != 0xFFFFFFFF) {
-		C_ConVar* pCvar = nullptr;
-		pCvar = this->GetCVarByIndex(i);
-		if (strcmp(pCvar->szName, var_name) == 0) {
-			return pCvar;
-		}
+    uint64_t i = 0;
+    this->GetFirstCvarIterator(i);
+    while (i != 0xFFFFFFFF) {
+        C_ConVar* pCvar = nullptr;
+        pCvar = this->GetCVarByIndex(i);
+        if (strcmp(pCvar->szName, var_name) == 0) {
+            return pCvar;
+        }
         this->GetNextCvarIterator(i, i);
-	}
-	return nullptr;
+    }
+    return nullptr;
 }
 C_ConVar* HookConsole::GetCvar(const std::string& CvarName) {
     C_ConVar* pCvar = this->GetCVarByName(CvarName.c_str());
@@ -85,32 +113,32 @@ C_ConVar* HookConsole::GetCvar(const std::string& CvarName) {
 }
 
 void HookConsole::UnlockHiddenCVars(int& Count)const {
-	uint64_t i = 0;
-	this->GetFirstCvarIterator(i);
-	while (i != 0xFFFFFFFF) {
-		C_ConVar* pConVar = this->GetCVarByIndex(i);
-		if (pConVar) {
-			if (pConVar->IsHidden()) {
-				pConVar->Unhide();
-				++Count;
-			}
-		}
-		this->GetNextCvarIterator(i,i);
-	}
-	return;
+    uint64_t i = 0;
+    this->GetFirstCvarIterator(i);
+    while (i != 0xFFFFFFFF) {
+        C_ConVar* pConVar = this->GetCVarByIndex(i);
+        if (pConVar) {
+            if (pConVar->IsHidden()) {
+                pConVar->Unhide();
+                ++Count;
+            }
+        }
+        this->GetNextCvarIterator(i, i);
+    }
+    return;
 }
 void HookConsole::LockAllCvars(int& Count)const {
-	uint64_t i = 0;
-	this->GetFirstCvarIterator(i);
-	while (i != 0xFFFFFFFF) {
-		C_ConVar* pConVar = this->GetCVarByIndex(i);
-		if (pConVar) {
-			if (!pConVar->IsHidden()) {
-				pConVar->Hide();
-				++Count;
-			}
-		}
-		this->GetNextCvarIterator(i,i);
-	}
-	return;
+    uint64_t i = 0;
+    this->GetFirstCvarIterator(i);
+    while (i != 0xFFFFFFFF) {
+        C_ConVar* pConVar = this->GetCVarByIndex(i);
+        if (pConVar) {
+            if (!pConVar->IsHidden()) {
+                pConVar->Hide();
+                ++Count;
+            }
+        }
+        this->GetNextCvarIterator(i, i);
+    }
+    return;
 }

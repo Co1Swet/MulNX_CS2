@@ -67,13 +67,13 @@ void MulNX::ModuleBase::Update() {
     while (Channel->PullMessage(msg)) {
         this->ProcessMsg(msg);// 高优先级
         auto it = this->msgWaiters.find(msg.type);
-        if (it != this->msgWaiters.end()) {
-            auto waiters = std::move(it->second);
-            this->msgWaiters.erase(it);
-            for (auto& w : waiters) {
-                w.result = &msg;
-                w.handle.resume();//  由于模块代码内聚，这里应当是不出现已经处理的情况
-            }
+        if (it == this->msgWaiters.end())continue;
+
+        auto waiters = std::move(it->second);
+
+        for (auto& w : waiters) {
+            w->result = &msg;
+            w->h.resume();//  由于模块代码内聚，这里应当是不出现已经处理的情况
         }
         continue;
     }
@@ -90,8 +90,8 @@ MulNX::ModuleBase::~ModuleBase() {
     // 销毁所有挂起的消息等待协程
     for (auto& [type, vec] : msgWaiters) {
         for (auto& w : vec) {
-            if (w.handle) {
-                w.handle.destroy();
+            if (w->h) {
+                w->h.destroy();
             }
         }
     }

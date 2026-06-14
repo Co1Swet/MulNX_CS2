@@ -54,24 +54,22 @@ bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const
 }
 
 bool MulNX::MessageManager::DispathAsyncMsg() {
-    std::shared_lock lock(this->asyncMutex);
     MulNX::Message Msg;
-    if (this->asyncMsgBuffer.try_dequeue(Msg)) {
-        // 检查是否存在管道订阅者
-        auto& SubscriberVector = this->asyncMap[Msg.type];// 获取订阅者容器，这里不可能是空指针
-        size_t size = SubscriberVector.size();
-        if (size == 0)return false;
-        --size;
-        // 按需复制
-        for (size_t Index = 0; Index < size; ++Index) {
-            // 其他订阅者使用克隆的消息
-            SubscriberVector[Index]->PushMessage(Message(Msg));
-        }
-        // 最后一个订阅者获得原始消息
-        SubscriberVector[size]->PushMessage(std::move(Msg));
-        return true;
+    if(!this->asyncMsgBuffer.wait_dequeue_timed(Msg, 100000))return false;
+    std::shared_lock lock(this->asyncMutex);
+    // 检查是否存在管道订阅者
+    auto& SubscriberVector = this->asyncMap[Msg.type];// 获取订阅者容器，这里不可能是空指针
+    size_t size = SubscriberVector.size();
+    if (size == 0)return true;
+    --size;
+    // 按需复制
+    for (size_t Index = 0; Index < size; ++Index) {
+        // 其他订阅者使用克隆的消息
+        SubscriberVector[Index]->PushMessage(Message(Msg));
     }
-    return false;
+    // 最后一个订阅者获得原始消息
+    SubscriberVector[size]->PushMessage(std::move(Msg));
+    return true;
 }
 
 void MulNX::MessageManager::HandleDispatch() {

@@ -33,18 +33,15 @@ class CSController final :public MulNX::ModuleBase {
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
     
-
     uintptr_t retAddrForShowSpeaker = 0;
 
     D_GameData CS2EBGameData{};
-    // 控制台指令执行器
-    VExecutor<void(int, const char*, int)> executor{};
+
     // CS2全局变量
     C_GlobalVars* CSGlobalVars{};
 
     std::atomic<int> needToLoadModules = 4;
     MulNX::CoTask InitTask();
-    void ProcessMsg(MulNX::Message& Msg)override;
     void Main();
 
     std::set<uintptr_t>detected;
@@ -65,6 +62,7 @@ public:
 
     CS2::Module::Client client{};
     CS2::Module::engine2 engine2{};
+    void* Source2EngineToClient001 = nullptr;
     MulNX::Memory::DllModule tier0{};
     MulNX::Memory::DllModule panorama{};
     

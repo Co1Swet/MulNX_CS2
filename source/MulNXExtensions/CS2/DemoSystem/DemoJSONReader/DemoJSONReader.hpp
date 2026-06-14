@@ -2,7 +2,7 @@
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 class DemoJSONReader final : public CSModuleBase {
-    std::filesystem::path dirDemos;
+    std::filesystem::path dirData;
     bool Window(MulNX::UINode* node);
 public:
     bool Init()override;

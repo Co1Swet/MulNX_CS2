@@ -56,8 +56,6 @@ void CSController::Window(MulNX::UINode* node) {
 bool CSController::Init() {
     this->showWindow = true;
     this->ISys()
-        .SubscribeAsync("Demo/GotoTick")
-        .SubscribeAsync("Game/Command")
         .SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {return this->OnClientLoad(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
@@ -103,22 +101,6 @@ MulNX::CoTask CSController::InitTask() {
     co_return;
 }
 
-void CSController::ProcessMsg(MulNX::Message& msg) {
-    switch (msg.type) {
-    case "Game/Command"_hash: {
-        auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
-        this->executor(0, cmd.c_str(), 1);
-        break;
-    }
-    case "Demo/GotoTick"_hash: {
-        int tick = msg.p1.low<int>();
-        auto cmd = std::format("demo_gototick {}", tick);
-        this->executor(0, cmd.c_str(), 1);
-        break;
-    }
-    }
-}
-
 void CSController::OnClientLoad(MulNX::Message& msg) {
     this->client = CS2::Module::Client(L"client.dll");
     void* pClient = this->client.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2Client002", nullptr);
@@ -138,12 +120,11 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
 }
 void CSController::OnEngine2Load(MulNX::Message& msg) {
     this->engine2 = CS2::Module::engine2(L"engine2.dll");
-    auto Source2EngineToClient001 = this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2EngineToClient001", nullptr);
+    this->Source2EngineToClient001 = this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2EngineToClient001", nullptr);
     // demo
-    this->GetDemo = IVClass::Assume(Source2EngineToClient001)->GetVFunc<void* ()>(68);
+    this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
     // cmd
-    this->executor = IVClass::Assume(Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);
-    this->hkSource2EngineToClient001_ExecuteCmd = MulNX::Hook::Create((uint8_t*)this->executor.GetRawFuncPtr(), [](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkSource2EngineToClient001_ExecuteCmd = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->Source2EngineToClient001)->GetVFuncPtr(50), [](MulNX::Hook* hk, RegContext* ctx) {
         static std::mutex mtx;
         std::lock_guard lock(mtx);
         hk->CallMaybeOrigin(0, ctx);
@@ -177,7 +158,6 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
 }
 void CSController::OnTier0Load(MulNX::Message& msg) {
     this->tier0 = MulNX::Memory::DllModule(L"tier0.dll");
-    
     --this->needToLoadModules;
 }
 void CSController::OnPanoramaLoad(MulNX::Message& msg) {

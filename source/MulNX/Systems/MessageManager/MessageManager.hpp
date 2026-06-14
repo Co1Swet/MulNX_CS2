@@ -7,7 +7,7 @@
 #include <MulNX/Core/ModuleBase/ModuleBase.hpp>
 #include "MessageChannel/MessageChannel.hpp"
 #include <unordered_map>
-#include <MulNXThirdParty/queue/concurrentqueue.h>
+#include <MulNXThirdParty/queue/blockingconcurrentqueue.h>
 
 namespace MulNX {
     class MsgMeta {
@@ -23,7 +23,7 @@ namespace MulNX {
         std::shared_mutex asyncMutex;
         std::unordered_map<MulNX::MsgType, std::vector<MessageChannel*>>asyncMap{};
         std::unordered_map<MulNXHandle, std::unique_ptr<MessageChannel>>asyncChannels;
-        moodycamel::ConcurrentQueue<MulNX::Message>asyncMsgBuffer;
+        moodycamel::BlockingConcurrentQueue<MulNX::Message> asyncMsgBuffer;
         // 同步
         std::shared_mutex syncMutex;
         std::unordered_map<MulNX::MsgType, std::vector<SyncMsgCallback>>syncMap{};
@@ -37,8 +37,8 @@ namespace MulNX {
         MessageChannel* GetMessageChannel(const MulNXHandle& hChannel);
         bool SubscribeAsync(MessageChannel* const pChannel, const std::string& type);
         bool PublishAsync(Message&& msg);
-        bool DispathAsyncMsg();
-        void HandleDispatch();
+        bool DispathAsyncMsg();// 单次派发，返回true意味着还有消息
+        void HandleDispatch();// 派发所有剩余消息
 
         bool SubscribeSync(const std::string& type, SyncMsgCallback&& handle);
         bool PublishSync(MulNX::Message& msg);

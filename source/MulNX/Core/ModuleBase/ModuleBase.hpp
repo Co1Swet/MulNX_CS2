@@ -43,27 +43,25 @@ namespace MulNX {
         };
         // 协程：消息
 
-        // 等待句柄
-        struct MessageWaiter {
-            std::coroutine_handle<> handle;
-            MulNX::Message* result = nullptr;  // 用于存放拉取到的消息
-        };
+        struct AwaitMessage;
         // 等待容器
-        std::unordered_map<size_t, std::vector<MessageWaiter>> msgWaiters;
+        std::unordered_map<size_t, std::vector<AwaitMessage*>> msgWaiters;
         // 等待对象
         struct AwaitMessage {
             ModuleBase* pModuleBase;
             MulNX::MsgType type;
+            std::coroutine_handle<> h;
             MulNX::Message* result = nullptr;  // 恢复后从这取消息
             AwaitMessage(ModuleBase* pModuleBase, MulNX::MsgType type) :
                 pModuleBase(pModuleBase), type(type) {}
             bool await_ready() { return false; }  // 总是挂起，或检查缓存
             void await_suspend(std::coroutine_handle<> h) {
                 // 注册到模块
-                pModuleBase->msgWaiters[type].push_back({ h, result });
+                this->h = h;
+                this->pModuleBase->msgWaiters[type].push_back(this);
             }
             MulNX::Message& await_resume() {
-                return *result;
+                return *this->result;
             }
         };
 

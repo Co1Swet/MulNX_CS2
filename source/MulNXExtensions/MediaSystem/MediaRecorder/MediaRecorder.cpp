@@ -27,8 +27,9 @@ bool MediaRecorder::Init() {
 void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Media/Record/Start"_hash: {
-        auto outFile = this->dirVedios / "record.mp4";
-        this->StartRecording(outFile.string(), 1920, 1080);
+        auto path = msg.asp.get<MulNX::NetExt>()->str1;
+        auto outFile = path + ".mp4";
+        this->StartRecording(outFile, 1920, 1080);
         break;
     }
     case "Media/Record/Stop"_hash: {
@@ -159,16 +160,15 @@ bool MediaRecorder::StopRecording() {
         while (auto pkt = this->pAEncodeHelper->TrySetOff()) {
             this->ofctx.writePacket(*pkt);
         }
-
-        this->ofctx.writeTrailer();
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::string("停止录制出错: ") + e.what());
+        this->ISys().LogWarning(std::string("停止录制时捕获到异常: ") + e.what());
     }
 
-    this->runFlag1 = false;
-    this->pVideoCapturer->StopCapture();
+    this->ofctx.writeTrailer();
+
     this->pVideoCapturer->Reset();
+    
     this->pAEncodeHelper->Reset();
 
     this->ofctx.close();

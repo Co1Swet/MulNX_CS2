@@ -23,7 +23,7 @@ void VEncodeHelper::SetOn(av::FormatContext* oCtx, int width, int height, AVRati
     this->encoder.setHeight(this->height);
     this->encoder.setPixelFormat(AV_PIX_FMT_YUV420P);
     this->encoder.setTimeBase(this->timeBase);
-    this->encoder.setBitRate(12000000);
+    this->encoder.setBitRate(20000000);
     this->encoder.open();
 
     this->vstream = oCtx->addStream(this->encoder);
