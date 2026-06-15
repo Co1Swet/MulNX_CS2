@@ -3,22 +3,9 @@
 #include <MulNX/Core/ModuleBase/ModuleBase.hpp>
 #include <MulNXThirdParty/queue/concurrentqueue.h>
 #include <fstream>
+#include <Windows.h>
 
 namespace MulNX {
-    class Log {
-    public:
-        enum class Level {
-            Info,
-            Succ,
-            Warning,
-            Error
-        };
-
-        ModuleBase* pModule = nullptr;
-        Level level;
-        std::string raw{};
-        int64_t timestamp_us = 0; // 微秒，Unix epoch
-    };
         
     class Logger final :public MulNX::ModuleBase {
     private:
@@ -36,5 +23,6 @@ namespace MulNX {
         moodycamel::ConcurrentQueue<Log>logs{};
         bool Init();
         void Log();
+        void test() { MessageBoxW(NULL, L"test", L"test", MB_OK); }
     };
 }

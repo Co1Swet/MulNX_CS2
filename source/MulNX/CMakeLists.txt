@@ -14,6 +14,7 @@ add_library(MulNX
     Core/Core.cpp
     Core/CoreStarterBase/CoreStarterBase.cpp
     Core/ModuleBase/ModuleBase.cpp
+    Core/ModuleBase/IModule.cpp
     Core/ModuleBase/ISys/ISys.cpp
     Core/ModuleManager/ModuleManager.cpp
 

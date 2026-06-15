@@ -7,6 +7,7 @@
 #include <shared_mutex>
 #include <thread>
 #include <functional>
+#include <MulNX/Systems/Logger/LogMixin.hpp>
 
 namespace MulNX {
     class ModuleBase :public IModule {
@@ -78,13 +79,9 @@ namespace MulNX {
         MulNX::Core::Core* Core = nullptr;
         std::atomic<bool>runFlag1 = false;
         std::atomic<bool>runFlag2 = false;
-        std::string ModuleName{};
         MulNXHandle HModule;
         
         std::shared_mutex smutex;
-        // 延迟初始化任务
-        std::unique_ptr<std::vector<std::function<bool()>>>delayInits = std::make_unique<std::vector<std::function<bool()>>>();
-    
     protected:
         auto WaitUntil(std::function<bool()>&& condition) {return AwaitCondition(this, std::move(condition));}
         auto WaitMsg(MulNX::MsgType type) {return AwaitMessage(this, type);}
@@ -96,9 +93,6 @@ namespace MulNX {
         bool BaseInit(MulNX::Core::Core* core);
         // 初始化入口
         bool EntryInit();
-        // 设置模块名称
-        bool SetName(std::string&& Name);
-        std::string GetName()const;
         // 得到核心指针
         MulNX::Core::Core* GetCore()const { return this->Core; }
         // 便捷窗口显示标志

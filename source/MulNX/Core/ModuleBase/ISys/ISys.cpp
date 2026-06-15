@@ -6,6 +6,7 @@
 #include <MulNX/Systems/ShortcutManager/ShortcutManager.hpp>
 #include <MulNX/Systems/TaskSystem/TaskSystem.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
+#include <MulNX/Systems/Logger/LogMixin.hpp>
 
 MulNX::ISys MulNX::ModuleBase::ISys() {
     return MulNX::ISys(this);

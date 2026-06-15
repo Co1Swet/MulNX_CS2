@@ -10,14 +10,6 @@
 #include <MulNX/Systems/ShortcutManager/ShortcutManager.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
 
-bool MulNX::ModuleBase::SetName(std::string&& Name) {
-    this->ModuleName = std::move(Name);
-    return true;
-}
-std::string MulNX::ModuleBase::GetName()const {
-    return this->ModuleName;
-}
-
 // 初始化
 bool MulNX::ModuleBase::BaseInit(MulNX::Core::Core* core) {
     this->Core = core;
