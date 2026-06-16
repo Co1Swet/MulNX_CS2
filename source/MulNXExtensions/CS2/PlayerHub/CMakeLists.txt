@@ -6,8 +6,11 @@ add_library(PlayerHubs
     ProjectileTracker/ProjectileTracker.cpp
     SpeakingController/SpeakingController.cpp
     KeyboardOverlay/KeyboardOverlay.cpp
-    PlayerSpotController/PlayerSpotController.cpp
+
     BombSpotController/BombSpotController.cpp
+
+    PlayerSpotRenderController/PlayerSpotRenderController.cpp
+    PlayerSpotColorController/PlayerSpotColorController.cpp
 )
 
 target_link_libraries(PlayerHubs PUBLIC

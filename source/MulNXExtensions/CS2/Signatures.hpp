@@ -22,6 +22,10 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern Pos_WriteMaybeEnumToChangeRadarPlayerDraw("48 8B 6C 24 ?? 41 39 9E ?? ?? ?? ?? 74 ?? 33 D2");// 交叉引用
                 inline const static MulNX::Memory::Pattern Func_FinallyUpdatePlayerState("44 8B F2 41 81 E6 FF FF FF ?? 8B D8 41 33 DE");// 交叉引用
                 inline const static MulNX::Memory::Pattern Pos_WriteBombState("41 FF D0 8B 0D ?? ?? ?? ?? 65 48 8B 04 25 ?? ?? ?? ?? 41 8B D4");// 交叉引用
+
+                inline const static MulNX::Memory::Pattern Pos_CmpToSetColor("4C 89 6C 24 ?? 84 DB 0F 84");// 附近引用了 字符串： CCSGO_HudTeamCounter
+                inline const static MulNX::Memory::Pattern Pos_CmpToSetTColor("E8 ?? ?? ?? ?? 41 3B C5 0F 85 ?? ?? ?? ?? F6 86");// 附近引用了 字符串： CCSGO_HudTeamCounter
+                inline const static MulNX::Memory::Pattern Pos_CmpToSetCTColor("E8 ?? ?? ?? ?? 83 F8 03 75 ?? 8B D3");// 附近引用了 字符串： CCSGO_HudTeamCounter
             }
         }
     }

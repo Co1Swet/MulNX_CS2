@@ -7,5 +7,6 @@
 #include "ProjectileTracker/ProjectileTracker.hpp"
 #include "SpeakingController/SpeakingController.hpp"
 #include "KeyboardOverlay/KeyboardOverlay.hpp"
-#include "PlayerSpotController/PlayerSpotController.hpp"
+#include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
+#include "PlayerSpotColorController/PlayerSpotColorController.hpp"
 #include "BombSpotController/BombSpotController.hpp"

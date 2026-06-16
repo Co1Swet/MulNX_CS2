@@ -1,4 +1,4 @@
-#include "PlayerSpotController.hpp"
+#include "PlayerSpotRenderController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
 enum TeamSytle :uint64_t {
@@ -7,14 +7,14 @@ enum TeamSytle :uint64_t {
     Enemy = 17
 };
 
-void PlayerSpotController::HubWindow(MulNX::UINode* node) {
+void PlayerSpotRenderController::HubWindow(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("雷达玩家标记控制");
     MulNX::UI::Checkbox("隐藏数字显示", this->hideNumLabel);
     MulNX::UI::Checkbox("强制敌人渲染为红色", this->forceEnemyRed);
     MulNX::UI::Checkbox("强制队友显示", this->forceTeammateDraw);
 }
 
-bool PlayerSpotController::Init() {
+bool PlayerSpotRenderController::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改绘制状态
