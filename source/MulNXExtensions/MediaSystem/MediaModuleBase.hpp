@@ -29,16 +29,14 @@ inline av::PixelFormat DXGIFormatToAvPixelFormat(DXGI_FORMAT format) {
 
 template <typename T>
 class MediaModuleMixin {
-public:
+    T* This() { return static_cast<T*>(this); }
 protected:
     MediaModuleMixin() {
-        static_assert(MulNX::Module<T>, "T must be a MulNX Module");
-        auto* mod = static_cast<MulNX::ModuleBase*>(static_cast<T*>(this));
-        mod->delayInits->push_back([this, mod]() -> bool {
+        This()->delayInits->push_back([this]() -> bool {
             return true;
             });
     }
 };
 
-class MediaModuleBase :public MulNX::ModuleBase, public MediaModuleMixin<MediaModuleBase> {};
+class MediaModuleBase :public MulNX::Module<MediaModuleBase>, public MediaModuleMixin<MediaModuleBase> {};
 using Microsoft::WRL::ComPtr;

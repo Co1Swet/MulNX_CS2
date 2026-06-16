@@ -14,7 +14,7 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
 
     if (ImGui::Button("标记当前时间")) {
         MulNX::Message msg("DemoHelper/MarkTime"_hash);
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
     ImGui::Text("时间列表:");
     for (auto time : this->TimeMarks) {
@@ -24,7 +24,7 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
         if (ImGui::Button(str.c_str())) {
             MulNX::Message Msg("DemoHelper/JumpTIme"_hash);
             Msg.p1.low<float>() = time;
-            this->ISys().PublishAsync(std::move(Msg));
+            this->PublishAsync(std::move(Msg));
         }
     }
     ImGui::SeparatorText("快捷时间");
@@ -58,13 +58,13 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
 }
 
 bool DemoHelper::Init() {
-    this->ISys()
+    (*this)
         .SubscribeAsync("DemoHelper/MarkTime")
         .SubscribeAsync("DemoHelper/JumpTIme")
         ;
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->ISys().SendTask("Main", "DemoSys", [this]()->bool {
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendTask("Main", "DemoSys", [this]()->bool {
         this->Main();
         return true;
         });
@@ -79,8 +79,7 @@ void DemoHelper::ProcessMsg(MulNX::Message& msg) {
     }
     case "DemoHelper/JumpTIme"_hash: {
         float data = msg.p1.low<float>();
-        std::string str = "跳转到" + std::to_string(data);
-        this->ISys().LogInfo(str);
+        this->LogInfo(std::format("跳转到{}", data));
         this->CS2Time->JumpReal(data);
         break;
     }

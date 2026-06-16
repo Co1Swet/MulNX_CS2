@@ -3,7 +3,7 @@
 
 bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);
-    this->ISys()
+    (*this)
         .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
         this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);})
@@ -11,7 +11,7 @@ bool HookConsole::Init() {
         .SubscribeAsync("Game/Command")
         ;
 
-    this->ISys().SendTask("Update", "CSControl", [this]() {this->Update();return true;});
+    this->SendTask("Update", "CSControl", [this]() {this->Update();return true;});
 
     return true;
 }
@@ -41,7 +41,7 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
 
             };
 
-        this->ISys().PublishSync("Hook/RegisterConCommand/RegisterOurCmd"_hash);
+        this->PublishSync("Hook/RegisterConCommand/RegisterOurCmd"_hash);
 
         ctx->r8 = pOrigCmd;
         hk->CallMaybeOrigin(5, ctx);
@@ -50,25 +50,25 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
         }
     ).value();
     this->hkVEngineCvar007_RegisterConCommand->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "VEngineCvar007::RegisterConCommand"));
+    this->LogSucc(I18n("hook.attached", "VEngineCvar007::RegisterConCommand"));
 }
 
 void HookConsole::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Game/Command"_hash: {
         auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
-        this->ISys().LogInfo(cmd);
         this->executor(0, cmd.c_str(), 1);
+        this->LogInfo(std::move(cmd));
         break;
     }
     case "Demo/GotoTick"_hash: {
         int tick = msg.p1.low<int>();
         auto cmd = std::format("demo_gototick {}", tick);
-        this->ISys().LogInfo(cmd);
         this->executor(0, cmd.c_str(), 1);
+        this->LogInfo(std::move(cmd));
         auto msg = MulNX::Message("Demo/GotoTick/Complete"_hash);
         msg.p1.low<int>() = tick;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
         break;
     }
     }
@@ -81,8 +81,7 @@ MulNX::Hook::Then HookConsole::HandleOnRegisterConCommand(MulNX::Hook* hk, RegCo
         auto pf = pCmd->m_pCommandCallback;
         this->hkPlaydemo = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto cmd = (CCommand*)ctx->rdx;
-            auto str = std::string(cmd->pRawString);
-            this->ISys().LogInfo(str);
+            this->LogInfo(std::format("指令已经执行：{}", cmd->pRawString));
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkPlaydemo->Attach();

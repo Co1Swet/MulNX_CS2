@@ -1,3 +1,5 @@
+#include <MulNX/Systems/MessageManager/MessageManager.hpp>
+#include <MulNX/Systems/Logger/Logger.hpp>
 #include "InputSystem.hpp"
 
 #include <unordered_map>
@@ -5,8 +7,9 @@
 #include <DirectXMath.h>
 #include <MulNX/Base/Math/Translate/Translate.hpp>
 
+
 bool MulNX::InputSystem::Init() {
-    this->ISys().SendTask("UpdateKeysState", "InputSystem", [this]()->bool {
+    this->SendTask("UpdateKeysState", "InputSystem", [this]()->bool {
         this->UpdateKeysState();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         return true;

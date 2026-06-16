@@ -2,14 +2,13 @@
 #include <limits>
 
 bool MediaProcesser::Init() {
-
-    this->ISys()
+    (*this)
         .SubscribeAsync("Media/Concat/Begin")
         .SubscribeAsync("Media/Concat/Add")
         .SubscribeAsync("Media/Concat/End")
         ;
 
-    this->ISys().SendTask("Update", "Media", [this]() {
+    this->SendTask("Update", "Media", [this]() {
         this->Update();
         return true;
         });
@@ -40,16 +39,16 @@ void MediaProcesser::BeginConcat(const std::filesystem::path& target) {
     this->concatInputs.clear();
     this->concatTarget = target;
     this->concatActive = true;
-    this->ISys().LogInfo(std::string("开始合并, 目标=") + (target.empty() ? "(未指定)" : target.string()));
+    this->LogInfo(std::string("开始合并, 目标=") + (target.empty() ? "(未指定)" : target.string()));
 }
 
 void MediaProcesser::AddConcat(const std::filesystem::path& add) {
     if (!this->concatActive) {
-        this->ISys().LogWarning("未处于合并状态，忽略 AddConcat");
+        this->LogWarning("未处于合并状态，忽略 AddConcat");
         return;
     }
     this->concatInputs.push_back(add);
-    this->ISys().LogInfo(std::string("已加入文件: ") + add.string());
+    this->LogInfo(std::string("已加入文件: ") + add.string());
 }
 
 void MediaProcesser::EndConcat() {
@@ -57,7 +56,7 @@ void MediaProcesser::EndConcat() {
     std::filesystem::path output;
     {
         if (!this->concatActive) {
-            this->ISys().LogWarning("EndConcat 在非合并状态被调用，忽略");
+            this->LogWarning("EndConcat 在非合并状态被调用，忽略");
             return;
         }
         inputs = this->concatInputs;
@@ -68,11 +67,11 @@ void MediaProcesser::EndConcat() {
     }
 
     if (inputs.empty()) {
-        this->ISys().LogWarning("没有要合并的输入文件");
+        this->LogWarning("没有要合并的输入文件");
         return;
     }
     if (output.empty()) {
-        this->ISys().LogWarning("未指定输出文件，合并取消");
+        this->LogWarning("未指定输出文件，合并取消");
         return;
     }
 
@@ -155,7 +154,7 @@ void MediaProcesser::EndConcat() {
             }
             catch (const std::exception& e) {
                 try {
-                    this->ISys().LogWarning(std::format("writePacket 失败 idx={} pts={} dts={} err={}，尝试 writePacketDirect",
+                    this->LogWarning(std::format("writePacket 失败 idx={} pts={} dts={} err={}，尝试 writePacketDirect",
                         idx,
                         pkt.pts().isValid() ? std::to_string(pkt.pts().timestamp(outStream.timeBase())) : std::string("no"),
                         pkt.dts().isValid() ? std::to_string(pkt.dts().timestamp(outStream.timeBase())) : std::string("no"),
@@ -168,7 +167,7 @@ void MediaProcesser::EndConcat() {
                 }
                 catch (const std::exception& e2) {
                     try {
-                        this->ISys().LogError(std::format("writePacketDirect 也失败 idx={} err={}", idx, e2.what()));
+                        this->LogError(std::format("writePacketDirect 也失败 idx={} err={}", idx, e2.what()));
                     }
                     catch (...) {}
                 }
@@ -186,7 +185,7 @@ void MediaProcesser::EndConcat() {
     }
 
     outCtx.writeTrailer();
-    this->ISys().LogSucc(std::string("合并完成: ") + output.string());
+    this->LogSucc(std::string("合并完成: ") + output.string());
     outCtx.close();
     try {
 
@@ -194,6 +193,6 @@ void MediaProcesser::EndConcat() {
 
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::string("合并失败: ") + e.what());
+        this->LogError(std::string("合并失败: ") + e.what());
     }
 }

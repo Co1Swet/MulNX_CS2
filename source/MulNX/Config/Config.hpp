@@ -21,28 +21,6 @@ public:
 // 核心类前置声明
 
 namespace MulNX {
-    namespace Core {
-        class Core;
-        class ModuleManager;
-        class CoreStarterBase;
-    }
-    class ModuleBase;
-    class Debugger;
-    class HandleSystem;
-    class IPCer;
-    class InputSystem;
-    class GlobalVars;
-    class UISystem;
-    class Message;
-    using MsgType = size_t;
-    class MessageManager;
-    class MessageChannel;
-    class PathManager;
-    class UINode;
-    class I18nManager;
-    class Logger;
-    class ShortcutManager;
-
     [[noreturn]] void ErrorTerminate(const std::string& Msg,
         const std::source_location& loc = std::source_location::current());
 }

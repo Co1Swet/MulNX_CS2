@@ -1,6 +1,7 @@
 #include "Core.hpp"
 #include "CoreStarterBase/CoreStarterBase.hpp"
 #include "ModuleManager/ModuleManager.hpp"
+#include <MulNX/Systems/Systems.hpp>
 
 MulNX::Core::Core::Core(std::string&& Name) :
     createTime(std::chrono::steady_clock::now()),

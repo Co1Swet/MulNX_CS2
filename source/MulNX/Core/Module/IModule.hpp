@@ -1,6 +1,7 @@
 #pragma once
 #include <MulNX/Common/Message.hpp>
 #include <MulNX/Core/Core.hpp>
+#include <MulNX/Systems/I18nManager/I18n.hpp>
 
 namespace MulNX {
     class IModule {
@@ -10,21 +11,19 @@ namespace MulNX {
         IModule& operator=(IModule&&) = delete;
     protected:
         virtual bool Init() = 0;
-        // 消息处理函数，只需处理即可，消息会由入口点释放
         virtual void ProcessMsg(MulNX::Message& Msg) {};
     public:
-        // 延迟初始化任务
+        MulNX::Core::Core* Core = nullptr;
         std::unique_ptr<std::vector<std::function<bool()>>>delayInits = std::make_unique<std::vector<std::function<bool()>>>();
+
         IModule() = default;
         virtual void Deinit() {};
         virtual ~IModule() = default;
 
-        std::string ModuleName{};
-        MulNX::Core::Core* Core = nullptr;
-        // 设置模块名称
-        void SetName(std::string&& Name) { this->ModuleName = std::move(Name); }
-        std::string GetName()const { return this->ModuleName; };
-
         IModule* FindModule(const std::string& name);
+        template<typename T>
+        T* FindModule(const std::string& Name) {
+            return static_cast<T*>(this->FindModule(Name));
+        }
     };
 }

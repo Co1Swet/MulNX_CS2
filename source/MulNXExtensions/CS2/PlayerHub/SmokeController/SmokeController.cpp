@@ -20,14 +20,14 @@ void SmokeController::HubPlayer(MulNX::UINode* node) {
         MulNX::Message msg("Smoke/Player/Set"_hash);
         msg.p1.as<Steam64UID>() = uid;
         msg.p2.low<uint32_t>() = newColorU32;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 
     ImGui::SameLine();
     if (ImGui::Button("重置烟雾颜色")) {
         MulNX::Message msg("Smoke/Player/Clear"_hash);
         msg.p1.as<Steam64UID>() = uid;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 }
 
@@ -49,19 +49,19 @@ void SmokeController::HubTeam(MulNX::UINode* node) {
         MulNX::Message msg("Smoke/Team/Set"_hash);
         msg.p1.low<uint32_t>() = newColorU32;
         msg.p1.high<CS2::ui8TeamNum>() = team;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 
     ImGui::SameLine();
     if (ImGui::Button("重置烟雾颜色")) {
         MulNX::Message msg("Smoke/Team/Clear"_hash);
         msg.p1.high<CS2::ui8TeamNum>() = team;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 }
 
 bool SmokeController::Init() {
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
         auto target = this->CS2->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::SetSmokeProps).Data();
@@ -71,16 +71,15 @@ bool SmokeController::Init() {
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkSetSmokeProps->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "SetSmokeProps"));
+        this->LogSucc(I18n("hook.attached", "SetSmokeProps"));
 
-        this->ISys().SendTask("Update", "CSControl", [this]() {
+        this->SendTask("Update", "CSControl", [this]() {
             this->Update();
             return true;
             });
         });
 
-    // 4. 订阅消息
-    this->ISys()
+    (*this)
         .SubscribeAsync("Smoke/Player/Set")
         .SubscribeAsync("Smoke/Player/Clear")
         .SubscribeAsync("Smoke/Player/ClearAll")

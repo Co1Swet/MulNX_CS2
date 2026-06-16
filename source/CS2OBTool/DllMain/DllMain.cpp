@@ -4,7 +4,6 @@
 #include <MulNXExtensions/FileRedirector/FileRedirector.hpp>
 #include <MulNXExtensions/CS2/CameraSystem/CamSysExt.hpp>
 #include <MulNXExtensions/CS2/MulNXCS2Ext.hpp>
-#include <MulNXExtensions/VirtualUser/VirtualUser.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaSystem/Media.hpp>
@@ -38,11 +37,11 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
         starter->SetName("HookManager");
         // 设置初始化完成回调
         starter->InitEndCall = [starter]() {
-            starter->ISys().LogWarning(I18n("disclaimer"));
+            starter->LogWarning(I18n("disclaimer"));
             if (MulNXInfo::IsDebugVersion) {
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
                 rp->str1 = "111";
-                starter->ISys().PublishAsync(std::move(msg));
+                starter->PublishAsync(std::move(msg));
                 std::thread([]() {
                     MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
                     }).detach();
@@ -122,6 +121,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
 
         // 启动核心
         pCore->Init();
+        return 0;
     }
     catch (std::exception& e) {
         MulNX::ErrorTerminate("在启动时发生异常！异常描述：" + std::string(e.what()));

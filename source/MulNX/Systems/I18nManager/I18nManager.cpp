@@ -1,5 +1,5 @@
 #include "I18nManager.hpp"
-#include <MulNX/Systems/PathManager/PathManager.hpp>
+#include <MulNX/Systems/Systems.hpp>
 #include <yaml-cpp/yaml.h>
 #include <stack>
 
@@ -8,19 +8,19 @@ MulNX::I18nManager::I18nManager() {
 }
 
 bool MulNX::I18nManager::Init() {
-    auto path = this->ISys().Path()->PathGetForShared("Config");
+    auto path = this->Path()->PathGetForShared("Config");
     auto filePath = path / "lan.yaml";
 
     this->strings.clear();
     YAML::Node root = YAML::LoadFile(filePath.string());
     this->LoadYaml(root, {});
     
-    this->ISys().LogSucc(I18n("sys.i18n.load_succ", filePath.string()));
-    this->ISys().LogSucc(I18n("sys.i18n.load_nums", this->strings.size()));
+    this->LogSucc(I18n("sys.i18n.load_succ", filePath.string()));
+    this->LogSucc(I18n("sys.i18n.load_nums", this->strings.size()));
     return true;
 }
 
-const std::string& I18n(const std::string& key) {
+std::string I18n(const std::string& key) {
     return MulNX::I18nManager::pThis->Get(key);
 }
 

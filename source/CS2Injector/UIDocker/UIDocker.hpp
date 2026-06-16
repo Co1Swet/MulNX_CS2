@@ -2,7 +2,7 @@
 
 #include <MulNX/MulNX.hpp>
 
-class UIDocker final :public MulNX::ModuleBase {
+class UIDocker final :public MulNX::Module<UIDocker> {
     struct Padding {
         float top = 350;
         float bottom = 200;

@@ -1,8 +1,7 @@
 #pragma once
+#include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
-#include <MulNX/MulNX.hpp>
-
-class VirtualUser final :public MulNX::ModuleBase {
+class VirtualUser final :public CSModuleBase {
 public:
     std::atomic<bool> Enabled = true;
     bool Init()override;

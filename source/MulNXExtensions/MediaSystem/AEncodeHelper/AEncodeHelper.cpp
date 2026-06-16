@@ -9,17 +9,17 @@ void AEncodeHelper::SetOn(av::FormatContext* oCtx, int sampleRate) {
 
     av::Codec acodec = av::findEncodingCodec(AV_CODEC_ID_AAC);
     if (!acodec.canEncode()) {
-        this->ISys().LogWarning("AAC 编码器不可用，仅录制视频");
+        this->LogWarning("AAC 编码器不可用，仅录制视频");
         return;
     } 
     auto supportedFmts = acodec.supportedSampleFormats();
     if (supportedFmts.empty()) {
-        this->ISys().LogWarning("AAC 编码器未报告支持的样本格式，跳过音频");
+        this->LogWarning("AAC 编码器未报告支持的样本格式，跳过音频");
         return;
     }
     // 取第一个支持的格式（通常是 fltp）
     av::SampleFormat targetFmt = supportedFmts.front();
-    this->ISys().LogWarning(std::string("音频编码器目标格式: ") + targetFmt.name());
+    this->LogWarning(std::string("音频编码器目标格式: ") + targetFmt.name());
 
     this->aencoder = av::AudioEncoderContext(acodec);
     int outChannels = 2;
@@ -34,10 +34,10 @@ void AEncodeHelper::SetOn(av::FormatContext* oCtx, int sampleRate) {
 
     try {
         this->aencoder.open();
-        this->ISys().LogWarning(std::string("音频编码器已打开，frame_size=") + std::to_string(this->aencoder.frameSize()));
+        this->LogWarning(std::string("音频编码器已打开，frame_size=") + std::to_string(this->aencoder.frameSize()));
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::string("音频编码器打开失败: ") + e.what());
+        this->LogError(std::string("音频编码器打开失败: ") + e.what());
         this->aencoder = {}; // 重置
         return;
     }
@@ -50,10 +50,10 @@ void AEncodeHelper::SetOn(av::FormatContext* oCtx, int sampleRate) {
     this->astream.setCodecParameters(cp);
 
     try {
-        this->ISys().LogInfo(std::format(" 音频开启=m{}", (this->aencoder.isOpened() ? "是" : "否")));
+        this->LogInfo(std::format(" 音频开启=m{}", (this->aencoder.isOpened() ? "是" : "否")));
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::format("输出提示失败，错误信息：{}", e.what()));
+        this->LogError(std::format("输出提示失败，错误信息：{}", e.what()));
     }
 }
 
@@ -130,7 +130,7 @@ std::optional<av::Packet> AEncodeHelper::TrySetOff() {
                 }
             }
             catch (const std::exception& e) {
-                this->ISys().LogError(std::string("音频刷新编码失败: ") + e.what());
+                this->LogError(std::string("音频刷新编码失败: ") + e.what());
             }
         }
         this->audioFifo.clear();
@@ -173,10 +173,10 @@ bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples
                 this->aencoder.channelLayout(), this->aencoder.sampleRate(), this->aencoder.sampleFormat(),
                 asamples.channelsLayout(), asamples.sampleRate(), asamples.sampleFormat(), err);
             if (!ok) {
-                this->ISys().LogError(std::string("AudioResampler 初始化失败: ") + (err ? err.message() : "unknown"));
+                this->LogError(std::string("AudioResampler 初始化失败: ") + (err ? err.message() : "unknown"));
                 return false;
             }
-            this->ISys().LogWarning("AudioResampler 已初始化");
+            this->LogWarning("AudioResampler 已初始化");
         }
 
         this->aresampler.push(asamples);
@@ -233,7 +233,7 @@ std::optional<av::Packet> AEncodeHelper::Encode(av::AudioSamples&& asamples) {
         av::AudioSamples frame;
         if (frame.init(this->aencoder.sampleFormat(), frameSize,
             this->aencoder.channelLayout(), this->aencoder.sampleRate()) < 0) {
-            this->ISys().LogError("无法分配音频帧");
+            this->LogError("无法分配音频帧");
             break;
         }
 
@@ -316,11 +316,11 @@ std::optional<av::Packet> AEncodeHelper::Encode(av::AudioSamples&& asamples) {
                 return pkt;
             }
             else {
-                this->ISys().LogWarning("编码器未产生音频包");
+                this->LogWarning("编码器未产生音频包");
             }
         }
         catch (const std::exception& e) {
-            this->ISys().LogError(std::string("音频编码失败: ") + e.what());
+            this->LogError(std::string("音频编码失败: ") + e.what());
         }
 
         this->aptsCounter += frameSize;

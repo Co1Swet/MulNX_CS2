@@ -19,7 +19,7 @@ bool ProjectManager::MenuProject(MulNX::UINode* node) {
         ImGui::SameLine();
         if (ImGui::Button(I18n("text.create").c_str())) {
             if (CreateProjectName.empty()) {
-                this->ISys().LogError(I18n("result.error_empty_name"));
+                this->LogError(I18n("result.error_empty_name"));
                 return true;
             }
             if (this->Project_Create(CreateProjectName)) {
@@ -115,16 +115,16 @@ bool ProjectManager::Init() {
     this->SManager = this->Core->ModuleManager()->FindModule<SolutionManager>("SolutionManager");
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->ISys().SendUINode("MenuProject", [this](MulNX::UINode* node) {return this->MenuProject(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendUINode("MenuProject", [this](MulNX::UINode* node) {return this->MenuProject(node);});
 
-    auto* PathManager = this->ISys().Path();
+    auto* PathManager = this->Path();
     if (PathManager->CreateKey("CurrentProject", {},
         [this](MulNX::PathManager* PathManager)->bool {
             auto NewProjectPath = PathManager->PathGetFromKey("CurrentProject");
             // 检验文件夹是否已存在
             if (!std::filesystem::exists(NewProjectPath)) {
-                this->ISys().LogInfo("指定的项目文件夹不存在，需创建新的项目文件夹！  路径：" + NewProjectPath.string());
+                this->LogInfo("指定的项目文件夹不存在，需创建新的项目文件夹！  路径：" + NewProjectPath.string());
                 //创建文件夹
                 try {
                     std::filesystem::create_directory(NewProjectPath);
@@ -133,13 +133,13 @@ bool ProjectManager::Init() {
                     std::filesystem::create_directory(NewProjectPath / "Solutions");
                 }
                 catch (const std::filesystem::filesystem_error& e) {
-                    this->ISys().LogError("创建项目文件夹失败，错误信息：" + std::string(e.what()));
+                    this->LogError("创建项目文件夹失败，错误信息：" + std::string(e.what()));
                     return false;
                 }
-                this->ISys().LogSucc("成功创建项目文件夹，路径：" + NewProjectPath.string());
+                this->LogSucc("成功创建项目文件夹，路径：" + NewProjectPath.string());
                 return true;
             }
-            this->ISys().LogSucc("成功设置项目路径为：" + NewProjectPath.string());
+            this->LogSucc("成功设置项目路径为：" + NewProjectPath.string());
             return true;
         })) {
         PathManager->KeyBindDynamic("CurrentProject", "CurrentWorkspace");
@@ -175,7 +175,7 @@ bool ProjectManager::Project_ClearAll() {
 bool ProjectManager::Project_Create(const std::string& name) {
     //检查是否已存在同名项目
     if (this->projects.find(name)!=this->projects.end()) {
-        this->ISys().LogError("项目名已占用！ 项目名：" + name);
+        this->LogError("项目名已占用！ 项目名：" + name);
         return false;
     }
     //创建项目指针
@@ -183,7 +183,7 @@ bool ProjectManager::Project_Create(const std::string& name) {
     CreateProject->Refresh();
     //添加进项目组
     this->projects[name] = std::move(CreateProject);
-    this->ISys().LogSucc("成功创建项目：" + name);
+    this->LogSucc("成功创建项目：" + name);
     return true;
 }
 bool ProjectManager::Project_Refresh() {
@@ -207,14 +207,14 @@ bool ProjectManager::Project_Save() {
     this->EManager->Element_SaveAll();
     this->SManager->Solution_SaveAll();
     //保存项目到磁盘
-    std::filesystem::path Path = this->ISys().Path()->PathGetFromKey("CurrentWorkspace") / this->ActiveProject->Name;
+    std::filesystem::path Path = this->Path()->PathGetFromKey("CurrentWorkspace") / this->ActiveProject->Name;
     auto [ok, msg] = this->ActiveProject->Save(Path);
     if (ok) {
-        this->ISys().LogSucc(std::move(msg));
+        this->LogSucc(std::move(msg));
         return true;
     }
     else {
-        this->ISys().LogError(std::move(msg));
+        this->LogError(std::move(msg));
         return false;
     }
 }
@@ -228,36 +228,36 @@ bool ProjectManager::Project_Apply(const std::shared_ptr<Project> Project) {
     this->SManager->Solution_ClearAll();
     //清空旧元素，防止冲突
     this->EManager->Element_ClearAll();
-    if (!this->ISys().Path()->KeySetCurrent("CurrentProject", Project->Name)) {
-        this->ISys().LogError("尝试切换到项目时出现问题，设置项目文件夹路径失败！");
+    if (!this->Path()->KeySetCurrent("CurrentProject", Project->Name)) {
+        this->LogError("尝试切换到项目时出现问题，设置项目文件夹路径失败！");
         return false;
     }
     //获取元素文件夹路径
-    std::filesystem::path ElementsPath = this->ISys().Path()->PathGetFromKey("Elements");
+    std::filesystem::path ElementsPath = this->Path()->PathGetFromKey("Elements");
     std::vector<std::string>Elements = this->pIPCer->GetFileNamesByPath(ElementsPath);
     //遍历加载元素
     for (const std::string& Element : Elements) {
         this->EManager->Element_Load(ElementsPath / Element);
     }
     //获取解决方案文件夹路径
-    std::filesystem::path SolutionsPath = this->ISys().Path()->PathGetFromKey("Solutions");
+    std::filesystem::path SolutionsPath = this->Path()->PathGetFromKey("Solutions");
     std::vector<std::string>Solutions = this->pIPCer->GetFileNamesByPath(SolutionsPath);
     //遍历加载解决方案
     for (const std::string& Solution : Solutions) {
         this->SManager->Solution_Load(SolutionsPath / Solution);
     }
     this->ActiveProject = Project;
-    this->ISys().LogSucc("已切换至项目" + Project->Name);
-    this->ISys().LogSucc("尝试加载元素总数：" + std::to_string(Elements.size()));
-    this->ISys().LogSucc("尝试加载解决方案总数：" + std::to_string(Solutions.size()));
-    this->ISys().LogSucc("成功加载元素总数：" + std::to_string(this->EManager->elements.size()));
-    this->ISys().LogSucc("成功加载解决方案总数：" + std::to_string(this->SManager->solutions.size()));
+    this->LogSucc("已切换至项目" + Project->Name);
+    this->LogSucc("尝试加载元素总数：" + std::to_string(Elements.size()));
+    this->LogSucc("尝试加载解决方案总数：" + std::to_string(Solutions.size()));
+    this->LogSucc("成功加载元素总数：" + std::to_string(this->EManager->elements.size()));
+    this->LogSucc("成功加载解决方案总数：" + std::to_string(this->SManager->solutions.size()));
     return true;
 }
 bool ProjectManager::Project_Load(const std::filesystem::path& ProjectPath, const std::string& yamlName) {
     // 检查文件路径和名称存在性
     if (ProjectPath.empty() || yamlName.empty()) {
-        this->ISys().LogError("文件夹路径或文件名为空，无法从文件加载项目！");
+        this->LogError("文件夹路径或文件名为空，无法从文件加载项目！");
         return false;
     }
 
@@ -265,11 +265,11 @@ bool ProjectManager::Project_Load(const std::filesystem::path& ProjectPath, cons
     std::filesystem::path FullPath = ProjectPath / (yamlName + ".yaml");
 
     // 输出调试信息
-    this->ISys().LogInfo("尝试从文件加载项目，文件路径：" + FullPath.string());
+    this->LogInfo("尝试从文件加载项目，文件路径：" + FullPath.string());
 
     // 检查文件本身存在性
     if (!std::filesystem::exists(FullPath)) {
-        this->ISys().LogError("文件不存在！文件路径：" + FullPath.string());
+        this->LogError("文件不存在！文件路径：" + FullPath.string());
         return false;
     }
 
@@ -278,7 +278,7 @@ bool ProjectManager::Project_Load(const std::filesystem::path& ProjectPath, cons
         std::string loadProjectName = root["name"].as<std::string>();
         //检查是否存在同名项目
         if (this->projects.find(loadProjectName)!=this->projects.end()) {
-            this->ISys().LogError("项目名已占用，无法从文件加载项目！ 项目名：" + std::move(loadProjectName));
+            this->LogError("项目名已占用，无法从文件加载项目！ 项目名：" + std::move(loadProjectName));
             return false;
         }
         auto loadProject = std::make_shared<Project>(loadProjectName);
@@ -286,40 +286,40 @@ bool ProjectManager::Project_Load(const std::filesystem::path& ProjectPath, cons
         loadProject->OnNewRound = root["OnNewRound"].as<std::vector<std::string>>();
 
         loadProject->Refresh();
-        this->ISys().LogSucc("成功从文件加载项目：" + loadProjectName);
+        this->LogSucc("成功从文件加载项目：" + loadProjectName);
 
         //添加进项目组
         this->projects[loadProjectName] = std::move(loadProject);
         return true;
     }
     catch (const YAML::Exception& e) {
-        this->ISys().LogError("在加载项目时出现问题：" + std::string(e.what()));
+        this->LogError("在加载项目时出现问题：" + std::string(e.what()));
         return false;
     }
 }
 bool ProjectManager::Playing_AutoCall(const MulNX::Message& Msg) {
-    this->ISys().LogInfo("项目管理器正在处理消息！");
+    this->LogInfo("项目管理器正在处理消息！");
     if (!this->ActiveProject) {
-        this->ISys().LogWarning("无活跃项目，无法执行自动操作");
+        this->LogWarning("无活跃项目，无法执行自动操作");
         return false;
     }
     switch (Msg.type) {
     case "Game/NewRound"_hash: {
         const std::vector<std::string>& OnNewRound = this->ActiveProject->OnNewRound;
         if (OnNewRound.empty()) {
-            this->ISys().LogWarning("无新回合解决方案可尝试调用");
+            this->LogWarning("无新回合解决方案可尝试调用");
             return false;
         }
         int temp = rand() % OnNewRound.size();
         auto [msg,rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
         rp->str1 = OnNewRound[temp];
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
         return true;
     }
     case "Game/RoundEnd"_hash: {
         // const std::vector<std::string>& OnEnd = this->ActiveProject->OnRoundEnd;
         // if (OnEnd.empty()) {
-        //     this->ISys().LogWarning("无回合结束解决方案可尝试调用");
+        //     this->LogWarning("无回合结束解决方案可尝试调用");
         //     return false;
         // }
         // int temp = rand() % OnEnd.size();

@@ -10,13 +10,13 @@ bool MediaRecorder::Init() {
     this->pVEncodeHelper = this->Core->ModuleManager()->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pAEncodeHelper = this->Core->ModuleManager()->FindModule<AEncodeHelper>("AEncodeHelper");
 
-    this->dirVedios = this->ISys().Path()->PathGetForShared("Vedios");
+    this->dirVedios = this->Path()->PathGetForShared("Vedios");
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("Media/Record/Start")
         .SubscribeAsync("Media/Record/Stop");
 
-    this->ISys().SendTask("Main", "Media", [this]() {
+    this->SendTask("Main", "Media", [this]() {
         this->Main();
         return true;
         });
@@ -41,12 +41,12 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 
 bool MediaRecorder::StartRecording(const std::string& filename, int w, int h) {
     if (this->runFlag1) {
-        this->ISys().LogWarning("已在录制中，StartRecording 被忽略");
+        this->LogWarning("已在录制中，StartRecording 被忽略");
         return false;
     }
 
     if (!this->pAudioCapturer || !this->pVideoCapturer || !this->pAEncodeHelper || !this->pVEncodeHelper) {
-        this->ISys().LogError("录制启动失败：缺少音视频模块");
+        this->LogError("录制启动失败：缺少音视频模块");
         return false;
     }
 
@@ -66,14 +66,14 @@ bool MediaRecorder::StartRecording(const std::string& filename, int w, int h) {
 
         // 写文件头（即使只有视频流）
         this->ofctx.writeHeader();
-        this->ISys().LogWarning(std::format("输出文件头已写入，流数量={}", this->ofctx.streamsCount()));
+        this->LogWarning(std::format("输出文件头已写入，流数量={}", this->ofctx.streamsCount()));
 
         this->runFlag1 = true;
-        this->ISys().LogSucc("已开始录制: " + filename);
+        this->LogSucc("已开始录制: " + filename);
         return true;
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::string("录制启动失败: ") + e.what());
+        this->LogError(std::string("录制启动失败: ") + e.what());
         this->ofctx.close();
         return false;
     }
@@ -126,7 +126,7 @@ void MediaRecorder::Encode() {
             this->ofctx.writePacket(pkt);
         }
         catch (const std::exception& e) {
-            this->ISys().LogWarning(std::format("写入 packet 失败: {}, 跳过该包", e.what()));
+            this->LogWarning(std::format("写入 packet 失败: {}, 跳过该包", e.what()));
         }
     }
 }
@@ -162,7 +162,7 @@ bool MediaRecorder::StopRecording() {
         }
     }
     catch (const std::exception& e) {
-        this->ISys().LogWarning(std::string("停止录制时捕获到异常: ") + e.what());
+        this->LogWarning(std::string("停止录制时捕获到异常: ") + e.what());
     }
 
     this->ofctx.writeTrailer();

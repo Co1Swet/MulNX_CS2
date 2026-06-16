@@ -1,5 +1,6 @@
 #pragma once
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
+#include <map>
 
 class ModuleInfo {
 public:
@@ -9,7 +10,7 @@ public:
 namespace MulNX {
     namespace Core {
         // 模块管理器类，负责加载、卸载和管理各个模块
-        class ModuleManager final :public MulNX::ModuleBase {
+        class ModuleManager final :public MulNX::Module<ModuleManager> {
         private:
             // 存储从字符串到模块句柄的映射，便于按名称查找
             std::unordered_map<std::string, MulNXHandle> NameToHandleMap{};
@@ -22,7 +23,7 @@ namespace MulNX {
             bool RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module);
 
             // 创建模块
-            template<MulNX::Module T>
+            template<MulNX::IsModule T>
             ModuleManager& CreateModule(std::string&& Name) {
                 std::unique_ptr<T>Module = std::make_unique<T>();
                 Module->SetName(std::move(Name));
@@ -39,7 +40,6 @@ namespace MulNX {
             }
 
             // 初始化最后部分使用
-            bool ModulesBaseInit();
             bool ModulesInit();
 
             void DeinitModules();

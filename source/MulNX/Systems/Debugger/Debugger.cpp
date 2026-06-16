@@ -1,12 +1,28 @@
 #include "Debugger.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
+#include <MulNX/Systems/MessageManager/MessageManager.hpp>
 
-bool MulNX::Debugger::Window(MulNX::UINode* ThisNode) {
+void MulNX::Debugger::DeMe(MulNX::UINode* node) {
+    MulNX::UI::Checkbox("调试器窗口", this->showWindow);
+    ImGui::Checkbox("当有错误信息时弹出调试器", &this->ShowWhenError);
+    ImGui::Checkbox("自动滚动到最新消息", &this->AutoScroll);
+    static int MaxDebugMsgs = 1000;
+    ImGui::Text("设置最大消息数量（至少100）:");
+    ImGui::SameLine();
+    ImGui::InputInt("##最大消息数量", &MaxDebugMsgs);
+    ImGui::SameLine();
+    if (ImGui::Button("应用")) {
+        MulNX::Message Msg("Debugger/SetMaxInfoCount"_hash);
+        Msg.p1.low<int>() = MaxDebugMsgs;
+        this->PublishAsync(std::move(Msg));
+    }
+}
+
+bool MulNX::Debugger::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("调试器", this->showWindow);
     if (!w)return true;
     std::shared_lock lock(this->smutex);
@@ -16,7 +32,7 @@ bool MulNX::Debugger::Window(MulNX::UINode* ThisNode) {
     childSize.y -= ImGui::GetStyle().ItemSpacing.y; // 留出一点空间
 
     // 开始子窗口，占据标签页的剩余空间
-    ImGui::BeginChild("信息", childSize, true, ImGuiWindowFlags_HorizontalScrollbar);
+    auto c = MulNX::UI::RAIIChild("信息", childSize, true, ImGuiWindowFlags_HorizontalScrollbar);
 
     // 使用虚拟列表优化性能
     ImGuiListClipper clipper;
@@ -55,22 +71,21 @@ bool MulNX::Debugger::Window(MulNX::UINode* ThisNode) {
         this->NeedAutoScroll = false;
     }
 
-    // 结束子窗口
-    ImGui::EndChild();
     return true;
 }
 
 bool MulNX::Debugger::Init() {
     this->pLogger = this->Core->ModuleManager()->FindModule<MulNX::Logger>("Logger");
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUINode("DeDebugger", [this](MulNX::UINode* node) {return this->DeMe(node);});
 
-    this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
+    this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
         });
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("Log/Info")
         .SubscribeAsync("Log/Succ")
         .SubscribeAsync("Log/Warning")
@@ -91,30 +106,16 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
         this->ResetMaxMsgCount(msg.p1.low<float>());
         break;
     }
-    case "Log/Info"_hash: {
-        MulNX::NetExt ext = std::move(*msg.asp.get<MulNX::NetExt>());
-        this->PushBack(std::move(ext), this->kInfo);
-        break;
-    }
-    case "Log/Succ"_hash: {
-        MulNX::NetExt ext = std::move(*msg.asp.get<MulNX::NetExt>());
-        this->PushBack(std::move(ext), this->kSucc);
-        break;
-    }
+    case "Log/Error"_hash: if (this->ShowWhenError) this->showWindow = true;
+    case "Log/Info"_hash: 
+    case "Log/Succ"_hash: 
     case "Log/Warning"_hash: {
-        MulNX::NetExt ext = std::move(*msg.asp.get<MulNX::NetExt>());
-        this->PushBack(std::move(ext), this->kWarning);
+        auto fmtted = std::move(msg.asp.get<MulNX::NetExt>()->str1);
+        std::unique_lock lock(this->smutex);
+        this->DebugMsg.push_back(fmtted);
         break;
     }
-    case "Log/Error"_hash: {
-        MulNX::NetExt ext = std::move(*msg.asp.get<MulNX::NetExt>());
-        if (this->ShowWhenError) {
-            this->showWindow = true;
-            this->IfShowStream = true;
-        }
-        this->PushBack(std::move(ext), this->kError);
-        break;
-    }
+    
     }
 }
 void MulNX::Debugger::Main() {
@@ -135,15 +136,4 @@ void MulNX::Debugger::ResetMaxMsgCount(const int Max) {
     //this->AddInfo("已重置最大信息条数为 " + std::to_string(Max) + " 条");
 
     return;
-}
-
-void MulNX::Debugger::PushBack(MulNX::NetExt&& pack, const std::string& strLevel) {
-    
-}
-
-void MulNX::Debugger::ShowStream() {
-    this->IfShowStream = true;
-}
-void MulNX::Debugger::HideStream() {
-    this->IfShowStream = false;
 }

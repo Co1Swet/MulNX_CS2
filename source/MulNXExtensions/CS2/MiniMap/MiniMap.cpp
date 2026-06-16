@@ -5,8 +5,8 @@
 
 
 bool MiniMap::Init() {
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
         });
@@ -110,10 +110,10 @@ bool MiniMap::UINodeFunc(MulNX::UINode* ThisNode) {
                 this->LastClickedPlayer = i;
                 std::ostringstream oss;
                 oss << "点击玩家: " << i << " 位置: (" << Player.Position.x << ", " << Player.Position.y << ", " << Player.Position.z << ")";
-                this->ISys().LogInfo(oss.str().c_str());
+                this->LogInfo(oss.str().c_str());
                 MulNX::Message ClickMsg("Command/SpecPlayer"_hash);
                 ClickMsg.p1.low<int>() = i;
-                this->ISys().PublishAsync(std::move(ClickMsg));
+                this->PublishAsync(std::move(ClickMsg));
             }
         }
     }

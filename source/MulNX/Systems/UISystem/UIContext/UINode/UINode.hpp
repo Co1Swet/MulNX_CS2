@@ -1,7 +1,5 @@
 #pragma once
-
-#include <MulNX/Systems/MessageManager/MessageManager.hpp>
-#include <functional>
+#include <MulNX/Core/Module/ModuleBase.hpp>
 
 namespace MulNX {
     class UIContext;
@@ -9,7 +7,6 @@ namespace MulNX {
     public:
         std::string name{};
         std::function<void(UINode*)>MyFunc = nullptr;
-        MulNX::MessageManager* pMsgManager = nullptr;
 
         // 按照线程管理进行成员分类
 

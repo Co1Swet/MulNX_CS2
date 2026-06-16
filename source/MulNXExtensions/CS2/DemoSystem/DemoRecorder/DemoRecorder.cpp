@@ -9,11 +9,11 @@ bool DemoRecorder::Window(MulNX::UINode* node) {
     std::shared_lock lock(this->smutex);
 
     if (ImGui::Button("启动")) {
-        this->ISys().PublishAsync("Demo/Record/Start"_hash);
+        this->PublishAsync("Demo/Record/Start"_hash);
     }
     ImGui::SameLine();
     if (ImGui::Button("清空队列")) {
-        this->ISys().PublishAsync("Demo/Record/Clear"_hash);
+        this->PublishAsync("Demo/Record/Clear"_hash);
     }
     ImGui::Text(
         std::format("当前输出文件夹：{}", (this->dirOutput / this->subOutput).string()).c_str()
@@ -23,7 +23,7 @@ bool DemoRecorder::Window(MulNX::UINode* node) {
     if (ImGui::Button("更新子路径")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/SetOutput"_hash);
         rp->str1 = buf;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
     ImGui::Text(std::format("当前索引：{}", this->num.load()).c_str());
 
@@ -45,8 +45,8 @@ bool DemoRecorder::Window(MulNX::UINode* node) {
 }
 
 bool DemoRecorder::Init() {
-    this->dirOutput = this->ISys().Path()->PathGetForShared("Output");
-    this->ISys()
+    this->dirOutput = this->Path()->PathGetForShared("Output");
+    (*this)
         .SubscribeAsync("Demo/Record/Enqueue")
         .SubscribeAsync("Demo/Record/Start")
         .SubscribeAsync("Demo/Record/Clear")
@@ -57,12 +57,12 @@ bool DemoRecorder::Init() {
 
     this->Main().resume();
 
-    this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
+    this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
         return true;
         });
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
     this->showWindow.store(true, std::memory_order_release);
@@ -85,7 +85,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/Record/Start"_hash: {
         this->moduleActive.store(true, std::memory_order_release);
-        this->ISys().LogInfo("Module activated.");
+        this->LogInfo("Module activated.");
         break;
     }
     case "Demo/Record/Stop"_hash: {
@@ -96,7 +96,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
         std::unique_lock lock(this->smutex);
         auto target = msg.asp.get<MulNX::NetExt>()->str1;
         if (target.empty()) {
-            this->ISys().LogError("不能使用空子路径作为输出路径");
+            this->LogError("不能使用空子路径作为输出路径");
             return;
         }
 
@@ -105,13 +105,13 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
         std::error_code ec;
         if (!std::filesystem::exists(fullPath, ec)) {
             if (!std::filesystem::create_directories(fullPath, ec)) {
-                this->ISys().LogError("无法创建输出文件夹: " + fullPath.string() + " - " + ec.message());
+                this->LogError("无法创建输出文件夹: " + fullPath.string() + " - " + ec.message());
                 return;
             }
-            this->ISys().LogInfo("已创建输出文件夹: " + fullPath.string());
+            this->LogInfo("已创建输出文件夹: " + fullPath.string());
         }
         else if (!std::filesystem::is_directory(fullPath, ec)) {
-            this->ISys().LogError("指定路径已存在但并非文件夹: " + fullPath.string());
+            this->LogError("指定路径已存在但并非文件夹: " + fullPath.string());
             return;
         }
 
@@ -149,7 +149,7 @@ MulNX::CoTask DemoRecorder::Main() {
         this->currentRecordTask = std::move(task);
 
         if (this->currentRecordTaskStartTick < 0) {
-            this->ISys().LogWarning("Window start tick adjusted from "
+            this->LogWarning("Window start tick adjusted from "
                 + std::to_string(this->currentRecordTaskStartTick) + " to 0.");
             this->currentRecordTaskStartTick = 0;
         }
@@ -157,12 +157,12 @@ MulNX::CoTask DemoRecorder::Main() {
         // 暂停并跳转
         MulNX::Message gotoMsg("Demo/GotoTick"_hash);
         gotoMsg.p1.low<int>() = this->currentRecordTaskStartTick - 64;
-        this->ISys().PublishAsync(std::move(gotoMsg));
+        this->PublishAsync(std::move(gotoMsg));
 
         // 等待跳转完成
         auto gotoCplt = co_await this->WaitMsg("Demo/GotoTick/Complete"_hash);
         if (int jmped = gotoCplt.p1.low<int>();jmped != this->currentRecordTaskStartTick - 64) {
-            this->ISys().LogError(std::format("期望跳到tick:{}而接收到了跳转到tick:{}，已丢弃此片段",
+            this->LogError(std::format("期望跳到tick:{}而接收到了跳转到tick:{}，已丢弃此片段",
                 this->currentRecordTaskStartTick - 64, jmped));
             continue;
         }
@@ -175,9 +175,9 @@ MulNX::CoTask DemoRecorder::Main() {
         // 设置观察目标
         MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
         specMsg.p1.as<Steam64UID>() = uid;
-        this->ISys().PublishAsync(std::move(specMsg));
+        this->PublishAsync(std::move(specMsg));
 
-        this->ISys().LogInfo("Jumped to tick " + std::to_string(this->currentRecordTaskStartTick)
+        this->LogInfo("Jumped to tick " + std::to_string(this->currentRecordTaskStartTick)
             + ", observing UID=" + std::to_string(uid));
 
         // 开始录制
@@ -185,9 +185,9 @@ MulNX::CoTask DemoRecorder::Main() {
         ++this->num;
         rp->str1 = (this->dirOutput / this->subOutput / std::to_string(this->num)).string();
         
-        this->ISys().PublishAsync(std::move(msgRS));
+        this->PublishAsync(std::move(msgRS));
 
-        this->ISys().LogSucc("Recording started for UID="
+        this->LogSucc("Recording started for UID="
             + std::to_string(uid)
             + " from tick " + std::to_string(this->currentRecordTaskStartTick)
             + " to " + std::to_string(this->currentRecordTaskEndTick));
@@ -202,9 +202,9 @@ MulNX::CoTask DemoRecorder::Main() {
             });
 
         // 停止录制
-        this->ISys().PublishAsync("Media/Record/Stop"_hash);
+        this->PublishAsync("Media/Record/Stop"_hash);
 
-        this->ISys().LogSucc(std::format("Recording finished for UID={}", uid));
+        this->LogSucc(std::format("Recording finished for UID={}", uid));
         this->currentRecordTask.reset();
     }
     co_return;

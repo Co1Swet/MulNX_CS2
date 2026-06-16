@@ -34,7 +34,7 @@ void EntityListScanner::Window(MulNX::UINode* node) {
 }
 
 bool EntityListScanner::Init() {
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
     return true;

@@ -9,7 +9,7 @@ bool MulNX::GraphicsManager::Menu(MulNX::UINode* node) {
 
 bool MulNX::GraphicsManager::Init() {
     this->pShaderCompiler = this->Core->ModuleManager()->FindModule<MulNX::ShaderCompiler>("ShaderCompiler");
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {return this->Menu(node);});
     return true;
 }
 
@@ -100,7 +100,7 @@ void MulNX::GraphicsManager::EnsureCopyResources() {
                     m_ColorWidth = bbDesc.Width;
                     m_ColorHeight = bbDesc.Height;
                     m_ColorCopyFormat = bbDesc.Format;
-                    this->ISys().LogSucc("颜色副本创建成功");
+                    this->LogSucc("颜色副本创建成功");
                 }
             }
         }
@@ -154,7 +154,7 @@ void MulNX::GraphicsManager::EnsureCopyResources() {
                         m_DepthWidth = ddesc.Width;
                         m_DepthHeight = ddesc.Height;
                         m_DepthCopyFormat = ddesc.Format;
-                        this->ISys().LogSucc("深度副本创建成功");
+                        this->LogSucc("深度副本创建成功");
                     }
                 }
             }
@@ -226,7 +226,7 @@ void MulNX::GraphicsManager::CreateGreenScreenAssets() {
     blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     device->CreateBlendState(&blendDesc, &m_pBlendState);
 
-    this->ISys().LogSucc("绿幕着色器资源创建成功");
+    this->LogSucc("绿幕着色器资源创建成功");
 }
 
 // ------------------------------------------------------------------

@@ -2,9 +2,8 @@
 #include <MulNXExtensions/MediaSystem/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool VideoCapturer::Init() {
-    this->pVCD3D11Manager = this->GetCore()->ModuleManager()->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->ISys()
-        .SendTask("Capture","Capture", [this]() -> bool {
+    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
+    this->SendTask("Capture","Capture", [this]() -> bool {
             this->Captuer();
             return true; // 保持keep，反复轮询
         });
@@ -76,7 +75,7 @@ void VideoCapturer::Captuer() {
     
     av::PixelFormat srcFormat = DXGIFormatToAvPixelFormat(desc.Format);
     if (srcFormat == AV_PIX_FMT_NONE) {
-        this->ISys().LogError("当前后备缓冲区格式不受支持，无法录制");
+        this->LogError("当前后备缓冲区格式不受支持，无法录制");
         return;
     }
 
@@ -96,7 +95,7 @@ void VideoCapturer::Captuer() {
 
         HRESULT hr = this->pVCD3D11Manager->pDevice->CreateTexture2D(&stagingDesc, nullptr, &this->pStagingTex);
         if (FAILED(hr)) {
-            this->ISys().LogError("创建 D3D11 staging 纹理失败，录制中断");
+            this->LogError("创建 D3D11 staging 纹理失败，录制中断");
             return;
         }
 
@@ -119,7 +118,7 @@ void VideoCapturer::Captuer() {
     D3D11_MAPPED_SUBRESOURCE mapped = {};
     HRESULT hr = this->pVCD3D11Manager->pContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &mapped);
     if (FAILED(hr) || !mapped.pData) {
-        this->ISys().LogError("Map D3D11 staging 纹理失败，录制帧跳过");
+        this->LogError("Map D3D11 staging 纹理失败，录制帧跳过");
         return;
     }
 

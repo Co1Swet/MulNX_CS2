@@ -1,6 +1,5 @@
 #pragma once
-
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include "Key/Key.hpp"
 #include <thread>
 #include <chrono>
@@ -15,7 +14,7 @@ namespace MulNX {
 		std::atomic<unsigned char> BufferComboClick{};//跨线程，原子化 同上
 		unsigned int LastPressTimeMs{};//线程内，非原子化，单位为毫秒
 	};
-    class InputSystem final :public ModuleBase {
+    class InputSystem final :public Module<InputSystem> {
         friend class FreeCameraController;
     private:
 		std::atomic<bool> IfCreated{};//跨线程，原子化，标记是否已经创建好检测线程	

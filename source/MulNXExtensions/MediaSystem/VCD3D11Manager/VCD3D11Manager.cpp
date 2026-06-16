@@ -1,10 +1,10 @@
 #include "VCD3D11Manager.hpp"
 
 bool VCD3D11Manager::Init() {
-    this->pGraphicsManager = this->GetCore()->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
 
-    this->ISys()
+    (*this)
         .SubscribeSync("Hook/Present/Fisrt", [this](MulNX::Message& msg) {this->OnPresentFirst(msg);})
         .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->CopyTexture();});
     return true;
@@ -23,16 +23,16 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         &pDevice, nullptr, &pContext
     );
     if (FAILED(hr)) {
-        this->ISys().LogError("捕获用D3D11设备创建失败");
+        this->LogError("捕获用D3D11设备创建失败");
         return;
     }
-    this->ISys().LogSucc("捕获用D3D11设备创建成功");
+    this->LogSucc("捕获用D3D11设备创建成功");
 
     // 2. 获取原设备后台缓冲区描述（只需尺寸/格式，不持有资源）
     ComPtr<ID3D11RenderTargetView> pRTV;
     this->pGraphicsManager->pd3dContext->OMGetRenderTargets(1, pRTV.GetAddressOf(), nullptr);
     if (!pRTV) {
-        this->ISys().LogError("无法获取原设备渲染目标");
+        this->LogError("无法获取原设备渲染目标");
         return;
     }
 
@@ -41,7 +41,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     ComPtr<ID3D11Resource> pBBRes;
     pRTV->GetResource(&pBBRes);
     if (!pBBRes) {
-        this->ISys().LogError("无法获取后台缓冲区资源");
+        this->LogError("无法获取后台缓冲区资源");
         return;
     }
 
@@ -60,45 +60,45 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
 
     hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &this->buffer1.rawTex.pTex);
     if (FAILED(hr)) {
-        this->ISys().LogError("共享纹理创建失败");
+        this->LogError("共享纹理创建失败");
         return;
     }
-    this->ISys().LogSucc("共享纹理创建成功");
+    this->LogSucc("共享纹理创建成功");
 
     HANDLE hSharedHandle = nullptr;
     // 4. 获取共享句柄，并在我们自己的设备上打开
     ComPtr<IDXGIResource> pDXGIRes;
     hr = this->buffer1.rawTex.pTex.As(&pDXGIRes);
     if (FAILED(hr)) {
-        this->ISys().LogError("获取IDXGIResource失败");
+        this->LogError("获取IDXGIResource失败");
         return;
     }
     hr = pDXGIRes->GetSharedHandle(&hSharedHandle);
     if (FAILED(hr)) {
-        this->ISys().LogError("获取共享句柄失败");
+        this->LogError("获取共享句柄失败");
         return;
     }
-    this->ISys().LogSucc("共享句柄获取成功");
+    this->LogSucc("共享句柄获取成功");
 
     hr = pDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&this->buffer1.shareTex.pTex));
     if (FAILED(hr)) {
-        this->ISys().LogError("在捕获设备上打开共享资源失败");
+        this->LogError("在捕获设备上打开共享资源失败");
         return;
     }
-    this->ISys().LogSucc("共享资源在捕获设备上打开成功");
+    this->LogSucc("共享资源在捕获设备上打开成功");
 
     // 5. 获取两端的 Keyed Mutex 接口
     hr = this->buffer1.rawTex.pTex.As(&this->buffer1.rawTex.pMutex);
     if (FAILED(hr)) {
-        this->ISys().LogError("原设备获取KeyedMutex失败");
+        this->LogError("原设备获取KeyedMutex失败");
         return;
     }
     hr = this->buffer1.shareTex.pTex.As(&this->buffer1.shareTex.pMutex);
     if (FAILED(hr)) {
-        this->ISys().LogError("录制设备获取KeyedMutex失败");
+        this->LogError("录制设备获取KeyedMutex失败");
         return;
     }
-    this->ISys().LogSucc("Keyed Mutex初始化完成");
+    this->LogSucc("Keyed Mutex初始化完成");
 }
 
 void VCD3D11Manager::CopyTexture() {
@@ -120,7 +120,7 @@ void VCD3D11Manager::CopyTexture() {
     // 等待录制端完成上一帧读取（key = 0 表示资源可写）
     hr = this->buffer1.rawTex.pMutex->AcquireSync(0, INFINITE);
     if (FAILED(hr)) {
-        this->ISys().LogError("AcquireSync(0) 失败");
+        this->LogError("AcquireSync(0) 失败");
         return;
     }
 
@@ -131,7 +131,7 @@ void VCD3D11Manager::CopyTexture() {
     // 通知录制端新帧已就绪（key = 1）
     hr = this->buffer1.rawTex.pMutex->ReleaseSync(1);
     if (FAILED(hr)) {
-        this->ISys().LogError("ReleaseSync(1) 失败");
+        this->LogError("ReleaseSync(1) 失败");
     }
     this->buffer1.hasNewFrame.store(true, std::memory_order_release);
 }

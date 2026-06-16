@@ -16,7 +16,7 @@ bool RecordTaskMaker::Window(MulNX::UINode* node) {
         if (ImGui::Button(name.c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
             rp->str1 = name;
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
     }
 
@@ -118,7 +118,7 @@ bool RecordTaskMaker::Window(MulNX::UINode* node) {
 
                 float* pTimeScale = this->CS2Con->GetCvar("host_timescale")->GetPtr<float>();
 
-                this->ISys().PublishAsync(std::move(msg));
+                this->PublishAsync(std::move(msg));
             }
             ImGui::SameLine();
             if (btn.Next("受害者视角")) {
@@ -130,7 +130,7 @@ bool RecordTaskMaker::Window(MulNX::UINode* node) {
                     demoInfo.GetPlayerName(ev.victimSteamId),
                     demoInfo.GetPlayerName(ev.killerSteamId),
                     rp->tickStart, rp->tickEnd);
-                this->ISys().PublishAsync(std::move(msg));
+                this->PublishAsync(std::move(msg));
             }
 
             // 后续各列：击杀事件的具体字段
@@ -162,7 +162,7 @@ bool RecordTaskMaker::Window(MulNX::UINode* node) {
                     demoInfo.GetPlayerName(ev.victimSteamId),
                     demoInfo.GetPlayerName(ev.killerSteamId),
                     rp->tickStart, rp->tickEnd);
-                this->ISys().PublishAsync(std::move(msg));
+                this->PublishAsync(std::move(msg));
             }
 
             ImGui::TableSetColumnIndex(1); ImGui::Text("%d", ev.tick);
@@ -177,13 +177,13 @@ bool RecordTaskMaker::Window(MulNX::UINode* node) {
 bool RecordTaskMaker::Init() {
     this->pConfiger = this->Core->ModuleManager()->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("Demo/SetOperating")
         .SubscribeAsync("Demo/InfoLoad");
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
-    this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
+    this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
         return true;
         });

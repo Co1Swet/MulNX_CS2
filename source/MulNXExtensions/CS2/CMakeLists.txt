@@ -22,7 +22,7 @@ add_library(MulNXCS2Ext
     TeamIDController/TeamIDController.cpp
 
     MiniMap/MiniMap.cpp
-
+    VirtualUser/VirtualUser.cpp
     GameCfgManager/GameCfgManager.cpp
     GameSettingsManager/GameSettingsManager.cpp
 )

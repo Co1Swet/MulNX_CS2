@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/Math/Math.hpp>
 #include <MulNXExtensions/WinExt/WinExt.hpp>
@@ -28,14 +27,12 @@ public:
 
 };
 
-class CSController final :public MulNX::ModuleBase {
+class CSController final :public MulNX::Module<CSController> {
     std::unique_ptr<MulNX::Hook>hkSource2Client002_Init = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
     
     uintptr_t retAddrForShowSpeaker = 0;
-
-    D_GameData CS2EBGameData{};
 
     // CS2全局变量
     C_GlobalVars* CSGlobalVars{};
@@ -70,6 +67,6 @@ public:
     
     VExecutor<void* ()> GetDemo{};
     
-    bool SpecPlayer(int IndexInMap);
+    D_GameData CS2EBGameData{};
     D_Player& GetPlayerMsg(int Index);
 };

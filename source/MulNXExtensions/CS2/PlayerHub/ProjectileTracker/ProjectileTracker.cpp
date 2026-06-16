@@ -19,12 +19,12 @@ void ProjectileTracker::HubWindow(MulNX::UINode* node) {
 }
 
 bool ProjectileTracker::Init() {
-    this->ISys().SendTask("Main", "CSControl", [this]() {
+    this->SendTask("Main", "CSControl", [this]() {
         this->Main();
         return true;
         });
 
-    this->ISys()
+    (*this)
         .SubscribeSync("Hook/AddEntity", [this](MulNX::Message& msg) {return this->OnEntityAdd(msg);})
         .SubscribeSync("Hook/RemoveEntity", [this](MulNX::Message& msg) {return this->OnEntityRemove(msg);})
         ;
@@ -39,7 +39,7 @@ void ProjectileTracker::OnEntityAdd(MulNX::Message& msg) {
         name = pEntity->GetName();
     }
     catch (const std::exception& e) {
-        this->ISys().LogWarning("添加：在分析实体消息以分流时发生异常");
+        this->LogWarning("添加：在分析实体消息以分流时发生异常");
     }
     if (name.find("projectile") != std::string::npos) {
         std::unique_lock lock(this->smutex);
@@ -54,7 +54,7 @@ void ProjectileTracker::OnEntityRemove(MulNX::Message& msg) {
         name = pEntity->GetName();
     }
     catch (const std::exception& e) {
-        this->ISys().LogWarning("添加：在分析实体消息以分流时发生异常");
+        this->LogWarning("添加：在分析实体消息以分流时发生异常");
     }
     if (name.find("projectile") != std::string::npos) {
         std::unique_lock lock(this->smutex);
@@ -74,7 +74,7 @@ bool ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pPro
         auto* pController = this->CS2->client.GetBaseEntityFromHandle(hController)->As<CS2::CCSPlayerController>();
         if (!pController)return false;
 
-        this->ISys().LogInfo(std::format("记录 projectile({}) -> 控制器 SteamID={} ", pProjectile->GetName(), MulNX::MRead(pController->m_steamID())));
+        this->LogInfo(std::format("记录 projectile({}) -> 控制器 SteamID={} ", pProjectile->GetName(), MulNX::MRead(pController->m_steamID())));
 
         auto* pObPawn = this->CS2->client.TryGetObservingPawn();
         if(!pObPawn) return true;
@@ -88,7 +88,7 @@ bool ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pPro
         return true;
     }
     catch (const std::exception& e) {
-        this->ISys().LogWarning(std::format("在分析新增实体时发生异常：{}", e.what()));
+        this->LogWarning(std::format("在分析新增实体时发生异常：{}", e.what()));
         return false;// 可能是因为实体数据尚未完全初始化，继续尝试直到成功或确认不相关
     }
 }
@@ -148,7 +148,7 @@ void ProjectileTracker::Main() {
         }
     }
     catch (const std::exception& e) {
-        this->ISys().LogWarning(std::format("在追踪投掷物时发生异常：{}", e.what()));
+        this->LogWarning(std::format("在追踪投掷物时发生异常：{}", e.what()));
     }
 }
 

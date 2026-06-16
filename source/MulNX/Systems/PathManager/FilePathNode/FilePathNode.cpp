@@ -1,4 +1,5 @@
 #include "../PathManager.hpp"
+#include <MulNX/Systems/Logger/Logger.hpp>
 
 MulNX::FilePathNode* MulNX::PathManager::NodeGetFromKey(const std::string& Key) {
     auto it = this->Nodes.find(Key);
@@ -72,7 +73,7 @@ bool MulNX::PathManager::CreateKey(const std::string& Key, std::string&& Value, 
     std::unique_lock lock(this->MutexEx);
     auto it = this->Nodes.find(Key);
     if (it != this->Nodes.end()) {
-        this->ISys().LogWarning("key尝试被二次创建:" + Key);
+        this->LogWarning("key尝试被二次创建:" + Key);
         return false;
     }
     this->Nodes[Key] = MulNX::FilePathNode{};
@@ -123,11 +124,11 @@ std::filesystem::path MulNX::PathManager::PathGetFromKey(const std::string& Key)
     }
     else {
         if (Node->KeyParent.empty()) {
-            this->ISys().LogError("一个节点在向上追溯时，发现既不存在静态绑定，父节点字符串也为空");
+            this->LogError("一个节点在向上追溯时，发现既不存在静态绑定，父节点字符串也为空");
             return {};
         }
         if (Node->CurrentValue.empty()) {
-            this->ISys().LogError(Key + " 对应的节点不存在当前值，无法拼接路径");
+            this->LogError(Key + " 对应的节点不存在当前值，无法拼接路径");
             return {};
         }
         return this->PathGetFromKey(Node->KeyParent) / Node->CurrentValue;// 一路构建完整路径

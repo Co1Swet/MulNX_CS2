@@ -1,7 +1,7 @@
 #include "MessageManager.hpp"
 #include "MessageChannel/MessageChannel.hpp"
 #include <MulNX/Core/Core.hpp>
-#include <MulNX/Systems/GlobalVars/GlobalVars.hpp>
+#include <MulNX/Systems/Systems.hpp>
 
 bool MulNX::MessageManager::Init() {
 
@@ -72,10 +72,16 @@ bool MulNX::MessageManager::DispathAsyncMsg() {
     return true;
 }
 
-void MulNX::MessageManager::HandleDispatch() {
-    while (this->DispathAsyncMsg()) {
+bool MulNX::MessageManager::HandleDispatch() {
+    if (!this->pGlobalVars->SystemReady.load()) {
+        return true;
+    }
+    this->LogSucc("消息派发激活！");
+    while (this->runFlag1.load(std::memory_order_acquire)) {
+        this->DispathAsyncMsg();
         continue;
     }
+    return false;
 }
 
 bool MulNX::MessageManager::SubscribeSync(const std::string& type, SyncMsgCallback&& handle) {

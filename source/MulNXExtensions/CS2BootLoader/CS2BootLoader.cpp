@@ -17,7 +17,7 @@ bool CS2BootLoader::Window(MulNX::UINode* node) {
 
     if (this->environmentChecked) {
         if (ImGui::Button(I18n("boot.launch").c_str())) {
-            this->ISys().PublishAsync("CS2BootLoader/Launch"_hash);
+            this->PublishAsync("CS2BootLoader/Launch"_hash);
         }
     }
     else {
@@ -41,14 +41,14 @@ bool CS2BootLoader::Window(MulNX::UINode* node) {
         if (GetOpenFileNameA(&ofn)) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CS2BootLoader/PathUpdate"_hash);
             rp->str1 = filePath;
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
     }
 
     ImGui::InputText(I18n("boot.launch_options").c_str(), &this->launchOptions);
 
     if (ImGui::Button(I18n("boot.save").c_str())) {
-        this->ISys().PublishAsync("CS2BootLoader/Save"_hash);
+        this->PublishAsync("CS2BootLoader/Save"_hash);
     }
 
     return true;
@@ -57,13 +57,13 @@ bool CS2BootLoader::Window(MulNX::UINode* node) {
 bool CS2BootLoader::Init() {
     this->pInjectHelper = this->Core->ModuleManager()->FindModule<DLLInjectHelper>("DLLInjectHelper");
 
-    auto configPath = this->ISys().PathGet("Config");
+    auto configPath = this->PathGet("Config");
     auto config = YAML::LoadFile((configPath / "config.yaml").string());
     this->gamePath = config["path"].as<std::string>();
     this->launchOptions = config["launchOptions"].as<std::string>();
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
 
-    auto rootPath = this->ISys().Path()->GetRoot();
+    auto rootPath = this->Path()->GetRoot();
 
     this->helperPath = rootPath / "CS2InternalHelper" / "CS2InternalHelper.dll";
 
@@ -71,18 +71,18 @@ bool CS2BootLoader::Init() {
 
     this->showWindow = true;
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("CS2BootLoader/Launch")
         .SubscribeAsync("CS2BootLoader/PathUpdate")
         .SubscribeAsync("CS2BootLoader/Save")
         ;
 
-    this->ISys().SendTask("Update", "MulNXMain", [this]()->bool {
+    this->SendTask("Update", "MulNXMain", [this]()->bool {
         this->Update();
         return true;
         });
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     return true;
 }
@@ -100,7 +100,7 @@ void CS2BootLoader::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "CS2BootLoader/Save"_hash: {
-        auto configPath = this->ISys().PathGet("Config");
+        auto configPath = this->PathGet("Config");
         YAML::Node config;
         config["path"] = this->gamePath.string();
         config["launchOptions"] = this->launchOptions;
@@ -117,7 +117,7 @@ void CS2BootLoader::ProcessMsg(MulNX::Message& msg) {
 bool CS2BootLoader::CheckEnvironment() {
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnapshot == INVALID_HANDLE_VALUE) {
-        this->ISys().LogError(std::format("无法创建进程快照. Error: {}", GetLastError()));
+        this->LogError(std::format("无法创建进程快照. Error: {}", GetLastError()));
         return false;
     }
 
@@ -125,7 +125,7 @@ bool CS2BootLoader::CheckEnvironment() {
     pe32.dwSize = sizeof(pe32);
 
     if (!Process32FirstW(hSnapshot, &pe32)) {
-        this->ISys().LogError(std::format("Process32First failed. Error: {}", GetLastError()));
+        this->LogError(std::format("Process32First failed. Error: {}", GetLastError()));
         CloseHandle(hSnapshot);
         return false;
     }
@@ -136,7 +136,7 @@ bool CS2BootLoader::CheckEnvironment() {
 
         for (const auto& pattern : patternsCheckDangerous) {
             if (exeNameUtf8.find(pattern) != std::string::npos) {
-                this->ISys().LogError("为防止反作弊冲突，请先自行检验环境");
+                this->LogError("为防止反作弊冲突，请先自行检验环境");
                 CloseHandle(hSnapshot);
                 return false;
             }
@@ -150,18 +150,18 @@ bool CS2BootLoader::CheckEnvironment() {
 bool CS2BootLoader::LaunchAndInject() {
     // 验证游戏路径
     if (gamePath.empty() || !std::filesystem::exists(gamePath)) {
-        this->ISys().LogError(std::format("Invalid CS2 path: {}", gamePath.string()));
+        this->LogError(std::format("Invalid CS2 path: {}", gamePath.string()));
         return false;
     }
 
     if (gamePath.filename() != "cs2.exe") {
-        this->ISys().LogError(std::format("The specified game path does not point to cs2.exe: {}", gamePath.string()));
+        this->LogError(std::format("The specified game path does not point to cs2.exe: {}", gamePath.string()));
         return false;
     }
 
     // 检查游戏是否已在运行
     if (IsGameRunning()) {
-        this->ISys().LogError(std::format("CS2 is already running. Please close it first."));
+        this->LogError(std::format("CS2 is already running. Please close it first."));
         return false;
     }
 
@@ -183,7 +183,7 @@ bool CS2BootLoader::LaunchAndInject() {
         &si, &pi
     );
     if (!ok) {
-        this->ISys().LogError(std::format("Failed to create CS2 process. Error: {}", GetLastError()));
+        this->LogError(std::format("Failed to create CS2 process. Error: {}", GetLastError()));
         return false;
     }
 
@@ -209,7 +209,7 @@ bool CS2BootLoader::LaunchAndInject() {
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
 
-    this->ISys().LogInfo(std::format("CS2 launched and injected successfully."));
+    this->LogInfo(std::format("CS2 launched and injected successfully."));
     return true;
 }
 

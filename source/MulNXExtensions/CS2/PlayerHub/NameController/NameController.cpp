@@ -24,16 +24,15 @@ void NameController::HubPlayer(MulNX::UINode* node) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Name/Player/Set"_hash);
         msg.p1.as<Steam64UID>() = uid;
         rp->str1 = this->newNameBuffer;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
         this->newNameBuffer.clear();
     }
 }
 
 bool NameController::Init() {
-    this->ISys()
-        .SubscribeAsync("Name/Player/Set");
+    this->SubscribeAsync("Name/Player/Set");
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
         auto FnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::GetDecoratedPlayerName);
         this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -46,9 +45,9 @@ bool NameController::Init() {
             return MulNX::Hook::Then::Continue; // 继续执行原始函数，获取装饰名并写入 pBuffer
             }).value();
         this->hkGetDecoratedPlayerName->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
+        this->LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
 
-        this->ISys().SendTask("Update", "CSControl", [this]() {
+        this->SendTask("Update", "CSControl", [this]() {
             this->Update();
             return true;
             });
@@ -100,25 +99,25 @@ void NameController::HandleVHook(CS2::CCSPlayerController* pPlayerController) {
         }).value();
     this->hkGetPlayerName->Attach();
     this->bGetPlayerNameHooked = true;
-    this->ISys().LogSucc(I18n("hook.attached", "GetPlayerName"));
+    this->LogSucc(I18n("hook.attached", "GetPlayerName"));
 }
 
 bool NameController::SetReplace(Steam64UID uid, const std::string& newName) {
     if (newName.empty()) {
         auto it = this->nameReplaceInfo.find(uid);
         if (it == this->nameReplaceInfo.end()) {
-            this->ISys().LogError("无法删除不存在的替换规则！");
+            this->LogError("无法删除不存在的替换规则！");
             return false;
         }
         int idx = it->second;
         this->nameReplaceInfo.erase(it);
         memset(this->nameReplace[idx], 0, 128);   // 清空槽位
-        this->ISys().LogInfo(std::format("已删除 SteamID {} 的名称替换规则", uid));
+        this->LogInfo(std::format("已删除 SteamID {} 的名称替换规则", uid));
         return true;
     }
 
     if (newName.size() >= 128) {
-        this->ISys().LogError("名称长度不能超过127个字符！");
+        this->LogError("名称长度不能超过127个字符！");
         return false;
     }
 
@@ -139,7 +138,7 @@ bool NameController::SetReplace(Steam64UID uid, const std::string& newName) {
             if (!used) { idx = i; break; }
         }
         if (idx == -1) {
-            this->ISys().LogError("名称替换槽位已满 (最多64条)！");
+            this->LogError("名称替换槽位已满 (最多64条)！");
             return false;
         }
         this->nameReplaceInfo[uid] = idx;
@@ -148,7 +147,7 @@ bool NameController::SetReplace(Steam64UID uid, const std::string& newName) {
     // 安全复制字符串
     strncpy_s(this->nameReplace[idx], newName.c_str(), 127);
     this->nameReplace[idx][127] = '\0';
-    this->ISys().LogInfo(std::format("已为 SteamID {} 设置替换名称: {}", uid, newName));
+    this->LogInfo(std::format("已为 SteamID {} 设置替换名称: {}", uid, newName));
 
     return true;
 }

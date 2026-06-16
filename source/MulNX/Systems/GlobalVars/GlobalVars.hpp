@@ -1,9 +1,8 @@
 #pragma once
-
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 
 namespace MulNX {
-	class GlobalVars final :public ModuleBase {
+    class GlobalVars final :public Module<GlobalVars> {
 	private:
 		void PublishTickAll();
 		void Tick();

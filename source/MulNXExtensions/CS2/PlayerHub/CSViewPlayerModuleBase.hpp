@@ -11,17 +11,16 @@ public:
 
 template <typename T>
 class CSViewPlayerMixin :public ICSViewPlayerModule, public CSModuleMixin<T> {
+    T* This() { return static_cast<T*>(this); }
 public:
     CSViewPlayerMixin() {
-        static_assert(MulNX::Module<T>, "T must be a MulNX Module");
-        auto* mod = static_cast<MulNX::ModuleBase*>(static_cast<T*>(this));
-        mod->delayInits->push_back([this, mod]() -> bool {
-            this->Hub->PlayerViewModules.push_back(this);
+        This()->delayInits->push_back([this]() -> bool {
+            this->Hub->PlayerViewModules.push_back(This());
             return true;
             });
     }
 };
 
-class CSViewPlayerModuleBase :public MulNX::ModuleBase, public CSViewPlayerMixin<CSViewPlayerModuleBase> {};
+class CSViewPlayerModuleBase :public MulNX::Module<CSViewPlayerModuleBase>, public CSViewPlayerMixin<CSViewPlayerModuleBase> {};
 template<typename T>
-class CSViewPlayerModuleBaseT :public MulNX::ModuleBase, public CSViewPlayerMixin<T> {};
+class CSViewPlayerModuleBaseT :public MulNX::Module<T>, public CSViewPlayerMixin<T> {};

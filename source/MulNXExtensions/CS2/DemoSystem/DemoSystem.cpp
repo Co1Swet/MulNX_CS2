@@ -15,7 +15,7 @@ bool DemoSystem::Window(MulNX::UINode* node) {
     std::unique_lock lock(this->smutex);
 
     if (ImGui::Button(I18n("demo.refresh").c_str())) {
-        this->ISys().PublishAsync("Demo/Refresh"_hash);
+        this->PublishAsync("Demo/Refresh"_hash);
     }
 
     if (this->demoFiles.empty()) {
@@ -49,17 +49,17 @@ bool DemoSystem::Window(MulNX::UINode* node) {
             if (ImGui::MenuItem(I18n("demo.play").c_str())) {
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
                 rp->str1 = fullPath;
-                this->ISys().PublishAsync(std::move(msg));
+                this->PublishAsync(std::move(msg));
             }
             if (ImGui::MenuItem(I18n("demo.analyze").c_str())) {
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
                 rp->str1 = fullPath;
-                this->ISys().PublishAsync(std::move(msg));
+                this->PublishAsync(std::move(msg));
             }
             if (ImGui::MenuItem(I18n("demo.load").c_str())) {
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
                 rp->str1 = filePath.stem().string();
-                this->ISys().PublishAsync(std::move(msg));
+                this->PublishAsync(std::move(msg));
             }
             if (ImGui::MenuItem(I18n("demo.copy_path").c_str())) {
                 ImGui::SetClipboardText(fullPath.c_str());
@@ -98,7 +98,7 @@ bool DemoSystem::Window(MulNX::UINode* node) {
             std::advance(iter, this->selectedDemoIndex);
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
             rp->str1 = iter->string();
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
     }
 
@@ -113,9 +113,9 @@ bool DemoSystem::Window(MulNX::UINode* node) {
 }
 
 bool DemoSystem::Init() {
-    this->dirData = this->ISys().Path()->PathGetForShared("Data");
+    this->dirData = this->Path()->PathGetForShared("Data");
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("Demo/Play")
         .SubscribeAsync("Demo/Refresh")
         .SubscribeAsync("Window/Drag/FileDrop")
@@ -127,16 +127,16 @@ bool DemoSystem::Init() {
                     });
             });
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
 
-    this->ISys().SendTask("Update", "DemoSys", [this]() {
+    this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
         return true;
         });
 
-    this->ISys().PublishAsync("Demo/Refresh"_hash);
+    this->PublishAsync("Demo/Refresh"_hash);
 
     return true;
 }
@@ -152,9 +152,9 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
             std::filesystem::copy(file, this->CS2Paths->demo / file.filename(), std::filesystem::copy_options::overwrite_existing);
         }
         catch (const std::filesystem::filesystem_error& e) {
-            this->ISys().LogError(I18n("demo.copy_failed", e.what()).c_str());
+            this->LogError(I18n("demo.copy_failed", e.what()).c_str());
         }
-        this->ISys().PublishAsync("Demo/Refresh"_hash);
+        this->PublishAsync("Demo/Refresh"_hash);
         break;
     }
     case "Demo/Refresh"_hash: {
@@ -169,7 +169,7 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/Play"_hash: {
         auto& path = msg.asp.get<MulNX::NetExt>()->str1;
-        this->ISys().AsyncCommand(std::format("playdemo \"{}\"", path));
+        this->AsyncCommand(std::format("playdemo \"{}\"", path));
         break;
     }
     }

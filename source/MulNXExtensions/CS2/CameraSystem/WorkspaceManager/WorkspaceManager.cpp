@@ -20,7 +20,7 @@ bool WorkspaceManager::MenuWorkspace(MulNX::UINode* node) {
         if (ImGui::Button(I18n("camsys.ws.open_default").c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamereSystem/Workspace/Set"_hash);
             rp->str1 = "DefaultWorkspace";
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
     }
     // 打开工作区后允许保存工作区
@@ -28,7 +28,7 @@ bool WorkspaceManager::MenuWorkspace(MulNX::UINode* node) {
         ImGui::Text(I18n("camsys.ws.current_workspace", this->CurrentWorkspace->Name).c_str());
         ImGui::SameLine();
         if (ImGui::Button(I18n("camsys.ws.save").c_str())) {
-            this->ISys().PublishAsync("CameraSystem/Workspace/Save"_hash);
+            this->PublishAsync("CameraSystem/Workspace/Save"_hash);
         }
     }
     // 详情信息
@@ -42,12 +42,12 @@ bool WorkspaceManager::MenuWorkspace(MulNX::UINode* node) {
         ImGui::SameLine();
         if (ImGui::Button(I18n("text.change").c_str())) {
             if (TargetWorkspaceName.empty()) {
-                this->ISys().LogError(I18n("result.error_empty_name"));
+                this->LogError(I18n("result.error_empty_name"));
                 return true;
             }
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamereSystem/Workspace/Set"_hash);
             rp->str1 = std::move(TargetWorkspaceName);
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
         if (!this->CurrentWorkspace) {// 无工作区
             ImGui::Text(I18n("camsys.ws.current_null").c_str());
@@ -63,9 +63,9 @@ bool WorkspaceManager::Init() {
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
-    this->ISys().SendUINode("MenuWorkspace", [this](MulNX::UINode* node) {return this->MenuWorkspace(node);});
+    this->SendUINode("MenuWorkspace", [this](MulNX::UINode* node) {return this->MenuWorkspace(node);});
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("CamereSystem/Workspace/Set")
         .SubscribeAsync("CameraSystem/Workspace/Save");
 
@@ -105,7 +105,7 @@ bool WorkspaceManager::Workspace_Save() {
     if (!this->PManager->Project_Save()) {
         return false;
     }
-    this->ISys().LogSucc(I18n("result.save_success"));
+    this->LogSucc(I18n("result.save_success"));
     return true;
 }
 bool WorkspaceManager::Workspace_Set(const std::string& Name) {
@@ -116,7 +116,7 @@ bool WorkspaceManager::Workspace_Set(const std::string& Name) {
     this->PManager->Project_ClearAll();
     // 制作指针
     this->CurrentWorkspace = std::make_unique<Workspace>(Name);
-    auto* PathManager = this->ISys().Path();
+    auto* PathManager = this->Path();
 
     PathManager->KeySetCurrent("CurrentProject", {});
     PathManager->KeySetCurrent("CurrentWorkspace", Name);
@@ -154,12 +154,12 @@ bool WorkspaceManager::Workspace_ConfigSave() {
     if (!this->CurrentWorkspace) {
         return false;
     }
-    auto [ok, msg] = this->CurrentWorkspace->Save(this->ISys().Path()->PathGetFromKey("CurrentWorkspace"));
+    auto [ok, msg] = this->CurrentWorkspace->Save(this->Path()->PathGetFromKey("CurrentWorkspace"));
     if (!ok) {
-        this->ISys().LogError(std::move(msg));
+        this->LogError(std::move(msg));
         return false;
     }
-    this->ISys().LogSucc(std::move(msg));
+    this->LogSucc(std::move(msg));
     return true;
 }
 bool WorkspaceManager::Workspace_ConfigLoad(const std::filesystem::path& WorkspacePath) {
@@ -168,18 +168,18 @@ bool WorkspaceManager::Workspace_ConfigLoad(const std::filesystem::path& Workspa
     }
     // 检查文件路径和名称存在性
     if (WorkspacePath.empty()) {
-        this->ISys().LogError(I18n("result.error_no_path", WorkspacePath.string()));
+        this->LogError(I18n("result.error_no_path", WorkspacePath.string()));
         return false;
     }
     // 拼接完整路径
     std::filesystem::path FullPath = WorkspacePath / ("WorkspaceConfig.yaml");
     // 检查文件本身存在性
     if (!std::filesystem::exists(FullPath)) {
-        this->ISys().LogWarning(I18n("result.error_no_file", FullPath.string()));
+        this->LogWarning(I18n("result.error_no_file", FullPath.string()));
         return false;
     }
     // 输出调试信息
-    this->ISys().LogInfo(I18n("action.try_load_config", FullPath.string()));
+    this->LogInfo(I18n("action.try_load_config", FullPath.string()));
 
     try {
         YAML::Node root = YAML::LoadFile(FullPath.string());
@@ -199,11 +199,11 @@ bool WorkspaceManager::Workspace_ConfigLoad(const std::filesystem::path& Workspa
         auto projects = config["projects"];
         Config.ProjectCfg.ProjectShortcutEnable = projects["ProjectShortcutEnable"].as<bool>();
 
-        this->ISys().LogSucc(I18n("result.cfg_load_succ", FullPath.string()));
+        this->LogSucc(I18n("result.cfg_load_succ", FullPath.string()));
         return true;
     }
     catch (const YAML::Exception& e) {
-        this->ISys().LogError(I18n("result.cfg_load_error", e.what()));
+        this->LogError(I18n("result.cfg_load_error", e.what()));
         return false;
     }
 }

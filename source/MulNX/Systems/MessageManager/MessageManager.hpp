@@ -4,7 +4,7 @@
 // 管理整个系统消息的发送和接受
 // 消息由发布者创建，经过发布后，生命周期的管理即委托给消息管理器
 
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include "MessageChannel/MessageChannel.hpp"
 #include <unordered_map>
 #include <MulNXThirdParty/queue/blockingconcurrentqueue.h>
@@ -14,7 +14,7 @@ namespace MulNX {
     public:
         std::string RawString;
     };
-    class MessageManager final :public MulNX::ModuleBase {
+    class MessageManager final :public MulNX::Module<MessageManager> {
         friend MessageChannel;
     private:
         // 元数据
@@ -38,7 +38,7 @@ namespace MulNX {
         bool SubscribeAsync(MessageChannel* const pChannel, const std::string& type);
         bool PublishAsync(Message&& msg);
         bool DispathAsyncMsg();// 单次派发，返回true意味着还有消息
-        void HandleDispatch();// 派发所有剩余消息
+        bool HandleDispatch();// 派发所有剩余消息
 
         bool SubscribeSync(const std::string& type, SyncMsgCallback&& handle);
         bool PublishSync(MulNX::Message& msg);

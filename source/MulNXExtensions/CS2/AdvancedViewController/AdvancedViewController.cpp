@@ -79,7 +79,7 @@ bool AdvancedViewController::Menu(MulNX::UINode* node) {
 }
 
 bool AdvancedViewController::Init() {
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node); });
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node); });
 
     return true;
 }
@@ -98,7 +98,7 @@ void AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup) {
             }
             else {
                 this->hasAxisInfo.store(false, std::memory_order_release);
-                this->ISys().LogWarning(std::format("HandleSelfViewUpdate failed with code: 0x{:X}", result.error()));
+                this->LogWarning(std::format("HandleSelfViewUpdate failed with code: 0x{:X}", result.error()));
             }
             lastTime = currentTime;
         }
@@ -175,7 +175,7 @@ std::expected<MulNX::Math::Point3, int> AdvancedViewController::GetPoint3(CS2::C
         return point3;
     }
     catch (const std::exception& e) {
-        this->ISys().LogWarning(std::format("GetObserverTargetBonePos exception: {}", e.what()));
+        this->LogWarning(std::format("GetObserverTargetBonePos exception: {}", e.what()));
         return std::unexpected(5);
     }
 }

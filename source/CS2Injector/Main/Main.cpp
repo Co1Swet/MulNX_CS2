@@ -19,7 +19,7 @@ int main(int, char**) {
         starter->SetName("Win32Starter");
         // 设置初始化完成回调
         starter->InitEndCall = [starter]() {
-            starter->ISys().LogWarning(I18n("disclaimer"));
+            starter->LogWarning(I18n("disclaimer"));
             };
 
         // 注册所有模块

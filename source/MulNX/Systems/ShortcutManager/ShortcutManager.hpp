@@ -1,10 +1,9 @@
 #pragma once
-
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include <MulNX/Systems/InputSystem/Key/Key.hpp>
 
 namespace MulNX {
-    class ShortcutManager final :public MulNX::ModuleBase {
+    class ShortcutManager final :public MulNX::Module<ShortcutManager> {
         class Bind {
         public:
             std::string desc;

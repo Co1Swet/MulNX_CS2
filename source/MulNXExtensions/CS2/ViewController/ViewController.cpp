@@ -22,7 +22,7 @@ bool ViewController::Init() {
     this->pFreeCameraController = this->Core->ModuleManager()->FindModule<FreeCameraController>("FreeCameraController");
     this->pAdvancedViewController = this->Core->ModuleManager()->FindModule<AdvancedViewController>("AdvancedViewController");
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         this->controlView.dofs.pNearBlurry = this->CS2Con->GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
         this->controlView.dofs.pNearCrisp = this->CS2Con->GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
         this->controlView.dofs.pFarCrisp = this->CS2Con->GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
@@ -34,9 +34,9 @@ bool ViewController::Init() {
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->hkPosCallIsPlayingDemo->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
+        this->LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
 
-        this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
         });
 
     return true;
@@ -56,7 +56,7 @@ void ViewController::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
 }
 
 void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
-    if (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
+    if (!this->pGlobalVars->SystemReady.load(std::memory_order_acquire)) {
         return;
     }
     this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem")->HandleUpdate();
@@ -87,7 +87,7 @@ void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
         this->HandleCameraSystemPlay(viewSetup);
     }
 
-    this->ISys().PublishSync("Call/BeforeDraw"_hash);
+    this->PublishSync("Call/BeforeDraw"_hash);
 
     // 记录视角数据
     {
@@ -147,7 +147,7 @@ MulNX::Math::View ViewController::GetView() {
 }
 
 void ViewController::spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot) {
-    this->ISys().AsyncCommand(std::format("spec_goto {} {} {} {} {}", pos.x, pos.y, pos.z, rot.x, rot.y));
+    this->AsyncCommand(std::format("spec_goto {} {} {} {} {}", pos.x, pos.y, pos.z, rot.x, rot.y));
     this->controlView.InputRoll.store(rot.z, std::memory_order_release);
 }
 void ViewController::ClearViewOverride() {

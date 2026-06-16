@@ -20,4 +20,5 @@ public:
     void ProcessMsg(MulNX::Message& Msg) override;
     void Main();
     void UpdateObserverState();   // 只负责轮询并发布 spec_mode_changed_to 事件
+    bool SpecPlayer(int IndexInMap);
 };

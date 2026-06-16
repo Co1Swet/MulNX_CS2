@@ -1,9 +1,8 @@
 #pragma once
-
 #include <MulNX/MulNX.hpp>
 
 class DLLInjectHelper;
-class CS2BootLoader final : public MulNX::ModuleBase {
+class CS2BootLoader final : public MulNX::Module<CS2BootLoader> {
     DLLInjectHelper* pInjectHelper = nullptr;
 
     std::filesystem::path gamePath;

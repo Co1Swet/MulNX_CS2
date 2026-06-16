@@ -1,9 +1,9 @@
 #pragma once
-
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <filesystem>
 #include <functional>
 
 namespace MulNX {
+    class PathManager;
     class FilePathNode {
     public:
         // 记录静态绑定，查询时有静态绑定返回静态绑定

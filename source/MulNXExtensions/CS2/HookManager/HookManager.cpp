@@ -14,13 +14,13 @@ bool HookManager::Init() {
         hk->CallMaybeOrigin(0, ctx);
         MulNX::Message msg("Hook/LoadLibraryExW"_hash);
         msg.p1.as<LPCWSTR>() = lpLibFileName;
-        this->ISys().PublishSync(msg);
+        this->PublishSync(msg);
         return MulNX::Hook::Then::Return;
         }).value();
     this->hkLoadLibraryExW->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "LoadLibraryExW"));
+    this->LogSucc(I18n("hook.attached", "LoadLibraryExW"));
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
         auto pD3D11CreateDevice = (uint8_t*)GetProcAddress(GetModuleHandleW(L"d3d11.dll"), "D3D11CreateDevice");
         this->hkD3D11CreateDevice = MulNX::Hook::Create(pD3D11CreateDevice, [this](MulNX::Hook* hk, RegContext* ctx) {
             this->hkD3D11CreateDevice->Detach();
@@ -41,7 +41,7 @@ bool HookManager::Init() {
             return MulNX::Hook::Then::Return;
             }).value();
         this->hkD3D11CreateDevice->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "D3D11CreateDevice"));
+        this->LogSucc(I18n("hook.attached", "D3D11CreateDevice"));
         });
     return true;
 }
@@ -56,7 +56,7 @@ void HookManager::HookD3D11DeviceAndContext() {
         return MulNX::Hook::Then::Return;
         }).value();
     this->hkCreateSwapChain->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "CreateSwapChain"));
+    this->LogSucc(I18n("hook.attached", "CreateSwapChain"));
     // ---- Hook ClearDepthStencilView (vtable index 53) ----
     this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
         ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
@@ -66,7 +66,7 @@ void HookManager::HookD3D11DeviceAndContext() {
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkClearDepthStencilView->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
+    this->LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
 }
 void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // Hook Present函数
@@ -75,20 +75,19 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
     this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
-        this->GlobalVars->SystemReady.store(true);
-        this->ISys().PublishSync("Hook/Present/Fisrt"_hash);
+        this->PublishSync("Hook/Present/Fisrt"_hash);
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11AndImGuiInit(hk, ctx);});
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkPresent->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "Present"));
+    this->LogSucc(I18n("hook.attached", "Present"));
     // ---- Hook ResizeBuffers (vtable index 13) ----
     this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(13), [this](MulNX::Hook* hk, RegContext* ctx) {
         this->pGraphicsManager->ReleaseOld();
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkResizeBuffers->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "ResizeBuffers"));
+    this->LogSucc(I18n("hook.attached", "ResizeBuffers"));
 
     DXGI_SWAP_CHAIN_DESC sd;
     pSwapChain->GetDesc(&sd);
@@ -101,13 +100,13 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkDrop->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "OleDropTargetInterface::Drop"));
+    this->LogSucc(I18n("hook.attached", "OleDropTargetInterface::Drop"));
     // 窗口过程钩子
     this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->CS2hWnd, GWLP_WNDPROC), [this](MulNX::Hook* hk, RegContext* ctx) {
         return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
         }).value();
     this->hkWndProc->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "WndProc"));
+    this->LogSucc(I18n("hook.attached", "WndProc"));
 }
 MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx) {
     hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnPresent(hk, ctx);});
@@ -124,8 +123,7 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
-            auto pThis = static_cast<HookManager*>(cmd->UserCallbackData);
-            pThis->ISys().PublishSync("Hook/BeforePresent"_hash);
+            static_cast<HookManager*>(cmd->UserCallbackData)->PublishSync("Hook/BeforePresent"_hash);
             }, this, 0);
         return true;
         };
@@ -136,6 +134,7 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         };
     this->CreateMainDraw();
+    this->pGlobalVars->SystemReady.store(true);
     return MulNX::Hook::Then::Continue;
 }
 MulNX::Hook::Then HookManager::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
@@ -157,7 +156,7 @@ MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
             return MulNX::Hook::Then::Return; // 当alt按下时进行拦截，此时属于 MulNX 按键通道判定快捷键的时刻
     }
     if (uMsg == WM_CLOSE) {
-        this->ISys().LogWarning(I18n("sys.shutdown_warning"));
+        this->LogWarning(I18n("sys.shutdown_warning"));
         this->CloseSystem();
     }
     return MulNX::Hook::Then::Continue;
@@ -191,14 +190,14 @@ void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {
             std::filesystem::path filePath{ buffer };
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Window/Drag/FileDrop"_hash);
             rp->str1 = std::move(filePath.string());
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(I18n("win32.drag.analisy.error", e.what()));
+        this->LogError(I18n("win32.drag.analisy.error", e.what()));
     }
     catch (...) {
-        this->ISys().LogError(I18n("win32.drag.analisy.unk_error"));
+        this->LogError(I18n("win32.drag.analisy.unk_error"));
     }
     GlobalUnlock(med.hGlobal);
     ReleaseStgMedium(&med);

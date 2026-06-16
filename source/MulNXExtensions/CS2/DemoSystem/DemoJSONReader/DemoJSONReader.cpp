@@ -19,14 +19,14 @@ bool DemoJSONReader::Window(MulNX::UINode* node) {
 }
 
 bool DemoJSONReader::Init() {
-    this->dirData = this->ISys().Path()->PathGetForShared("Data");
-    this->ISys().SubscribeAsync("Demo/JSON/Load");
+    this->dirData = this->Path()->PathGetForShared("Data");
+    this->SubscribeAsync("Demo/JSON/Load");
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
 
-    this->ISys().SendTask("Update", "DemoSys", [this]()->bool {
+    this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
         return true;
         });
@@ -45,12 +45,12 @@ void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
         std::unique_lock lock(this->smutex);
         std::filesystem::path filePath = this->dirData / filename;
         if (!std::filesystem::exists(filePath)) {
-            this->ISys().LogError("文件不存在: " + filePath.string());
+            this->LogError("文件不存在: " + filePath.string());
             break;
         }
         try {
             auto json = nlohmann::json::parse(std::ifstream(filePath));
-            this->ISys().LogInfo("成功读取 JSON 文件: " + filePath.string());
+            this->LogInfo("成功读取 JSON 文件: " + filePath.string());
             Demo::Info info{};
             info.demoFileName = json["demoFileName"].get<std::string>();
             info.mapName = json["mapName"].get<std::string>();
@@ -103,10 +103,10 @@ void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
                 info.players[killEvent.killerSteamId].roundInfo[killEvent.roundNumber].killEvents.push_back(std::move(killEvent));
             }
             auto [msg, rp] = MulNX::Message::Create<Demo::Info>("Demo/InfoLoad"_hash, std::move(info));
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
         catch (const std::exception& e) {
-            this->ISys().LogError("读取 JSON 文件时发生错误: " + filePath.string());
+            this->LogError("读取 JSON 文件时发生错误: " + filePath.string());
         }
         break;
     }

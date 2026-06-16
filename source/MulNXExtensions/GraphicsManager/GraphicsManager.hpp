@@ -14,7 +14,7 @@ namespace MulNX {
         
     };
 
-    class GraphicsManager final :public MulNX::ModuleBase {
+    class GraphicsManager final :public MulNX::Module<GraphicsManager> {
         MulNX::ShaderCompiler* pShaderCompiler = nullptr;
     private:
         // 深度副本

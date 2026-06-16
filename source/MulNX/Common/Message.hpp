@@ -6,6 +6,8 @@
 #include <cstdint>
 
 namespace MulNX {
+    using MsgType = size_t;
+
     class NetExt {
     public:
         std::string str1;

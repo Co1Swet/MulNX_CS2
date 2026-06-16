@@ -7,7 +7,7 @@ bool PlayerFlashController::Menu(MulNX::UINode* node) {
 }
 
 bool PlayerFlashController::Init() {
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
     return true;
 }
 
@@ -30,7 +30,7 @@ void PlayerFlashController::OnItPlayer(int index, CS2::CCSPlayerController* cont
         MulNX::MWrite(pawn->m_flFlashScreenshotAlpha(), 0.0f);
     }
     catch (const std::runtime_error& e) {
-        this->ISys().LogWarning(std::format("在修改闪光弹效果时发生错误：{}", e.what()).c_str());
+        this->LogWarning(std::format("在修改闪光弹效果时发生错误：{}", e.what()).c_str());
     }
 
     return;

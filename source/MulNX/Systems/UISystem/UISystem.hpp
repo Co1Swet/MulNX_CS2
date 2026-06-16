@@ -1,12 +1,11 @@
 #pragma once
-
 #include "UIContext/UIContext.hpp"
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include <MulNXExtensions/WinExt/WIN32Msg/WIN32Msg.hpp>
 #include <MulNXThirdParty/queue/concurrentqueue.h>
 
 namespace MulNX {
-    class UISystem final :public MulNX::ModuleBase {
+    class UISystem final :public MulNX::Module<UISystem> {
     private:
         MulNX::UIContext UIContext{};
         bool UISystemRunning = false;

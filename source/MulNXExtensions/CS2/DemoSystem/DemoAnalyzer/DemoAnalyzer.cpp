@@ -2,13 +2,13 @@
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 
 bool DemoAnalyzer::Init() {
-    auto toolsPath = this->ISys().Path()->PathGetForShared("Tools");
+    auto toolsPath = this->Path()->PathGetForShared("Tools");
     this->csdaPath = toolsPath / "csda.exe";
-    this->dirData = this->ISys().Path()->PathGetForShared("Data");
+    this->dirData = this->Path()->PathGetForShared("Data");
 
-    this->ISys().SubscribeAsync("Demo/Analyze");
+    this->SubscribeAsync("Demo/Analyze");
 
-    this->ISys().SendTask("Update", "DemoSys", [this]() {
+    this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
         return true;
         });
@@ -20,7 +20,7 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Analyze"_hash: {
         std::string demoPath = msg.asp.get<MulNX::NetExt>()->str1;
-        this->ISys().LogInfo("Received demo path: " + demoPath);
+        this->LogInfo("Received demo path: " + demoPath);
         this->AnalyzeDemoWithCSDA(std::move(demoPath)).resume();
         break;
     }
@@ -39,7 +39,7 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(std::filesystem::path&& pthDemo)
         << "-format=json";   // 可根据需要加 -positions 等
 
     std::string cmdStr = cmdLine.str();
-    this->ISys().LogInfo("Executing: " + cmdStr);
+    this->LogInfo("Executing: " + cmdStr);
 
     // 准备 STARTUPINFO 和 PROCESS_INFORMATION
     STARTUPINFOW si;
@@ -67,7 +67,7 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(std::filesystem::path&& pthDemo)
 
     if (!success) {
         DWORD err = GetLastError();
-        this->ISys().LogError("Failed to create process, error code: " + std::to_string(err));
+        this->LogError("Failed to create process, error code: " + std::to_string(err));
         co_return;
     }
 
@@ -79,10 +79,10 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(std::filesystem::path&& pthDemo)
     DWORD exitCode = 0;
     GetExitCodeProcess(pi.hProcess, &exitCode);
     if (exitCode != 0) {
-        this->ISys().LogError("csda.exe exited with code: " + std::to_string(exitCode));
+        this->LogError("csda.exe exited with code: " + std::to_string(exitCode));
     }
     else {
-        this->ISys().LogInfo("Demo analysis completed successfully.");
+        this->LogInfo("Demo analysis completed successfully.");
     }
 
     // 清理句柄

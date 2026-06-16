@@ -3,7 +3,7 @@
 
 bool TimeController::Init() {
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
         auto demo = this->CS2->GetDemo();
         this->GetDemoTick = IVClass::Assume(demo)->GetVFunc<int()>(3);
         this->IsPlayingDemo = IVClass::Assume(demo)->GetVFunc<bool()>(11);
@@ -25,7 +25,7 @@ bool TimeController::JumpReal(const float time) {
     int tick = targetGameTick - deltaTick;
 
     std::string command = std::format("demo_gototick {}", tick);
-    this->ISys().AsyncCommand(std::move(command));
+    this->AsyncCommand(std::move(command));
     return true;
 }
 bool TimeController::JumpRealRel(float time) {

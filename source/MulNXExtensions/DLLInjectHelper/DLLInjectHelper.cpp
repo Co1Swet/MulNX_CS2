@@ -48,7 +48,7 @@ bool DLLInjectHelper::InitDLL(HANDLE hProcess, const std::wstring& dllName, cons
     // 获取远程初始化函数地址
     FARPROC pRemoteInit = GetRemoteProcAddress(hProcess, dllName, initFuncName);
     if (!pRemoteInit) {
-        this->ISys().LogError("Failed to locate MulNX_CS2_Start in remote process");
+        this->LogError("Failed to locate MulNX_CS2_Start in remote process");
         return false;
     }
 
@@ -56,7 +56,7 @@ bool DLLInjectHelper::InitDLL(HANDLE hProcess, const std::wstring& dllName, cons
     HANDLE hThread = CreateRemoteThread(hProcess, nullptr, 0,
         (LPTHREAD_START_ROUTINE)pRemoteInit, nullptr, 0, nullptr);
     if (!hThread) {
-        this->ISys().LogError("Failed to create remote init thread");
+        this->LogError("Failed to create remote init thread");
         return false;
     }
 
@@ -69,10 +69,10 @@ bool DLLInjectHelper::InitDLL(HANDLE hProcess, const std::wstring& dllName, cons
 
     // 检查返回码：你的 MulNX_CS2_Start 成功时返回 0
     if (exitCode != 0) {
-        this->ISys().LogError(std::format("Remote initialization failed with code: {}", exitCode));
+        this->LogError(std::format("Remote initialization failed with code: {}", exitCode));
         return false;
     }
 
-    this->ISys().LogInfo("Remote initialization completed successfully");
+    this->LogInfo("Remote initialization completed successfully");
     return true;
 }

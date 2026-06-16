@@ -1,12 +1,11 @@
 #pragma once
-
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include <MulNX/Base/any_smart_ptr/any_smart_ptr.hpp>
 #include <unordered_map>
 
 namespace MulNX {
 	// 句柄系统用于全局提供句柄标识，中转any_unique_ptr资源
-	class HandleSystem final :public MulNX::ModuleBase {
+    class HandleSystem final :public MulNX::Module<HandleSystem> {
 	private:
 		std::shared_mutex MapMutex{};
 		std::unordered_map<MulNXHandle, MulNX::any_unique_ptr>UniqueResources{};

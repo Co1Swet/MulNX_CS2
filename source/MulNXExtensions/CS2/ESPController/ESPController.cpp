@@ -29,7 +29,7 @@ bool ESPController::Draw(MulNX::UINode* node) {
 }
 
 bool ESPController::Init() {
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {
         return this->Draw(node);
         });
 

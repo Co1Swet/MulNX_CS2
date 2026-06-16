@@ -18,7 +18,7 @@ bool DeathMsgController::Window(MulNX::UINode* node) {
 }
 
 bool DeathMsgController::Init() {
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto pattern = MulNX::CS2::Signatures::CSHashString;
         uint8_t* callSite = this->CS2->client.GetTextRegion()
             .FindRegion(pattern).Data();
@@ -41,10 +41,10 @@ bool DeathMsgController::Init() {
             return this->HandleOnPlayerDeath(event);
             }).value();
         this->hkHandlePlayerDeath->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
+        this->LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
 
-        this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
-        this->ISys().SendTask("Update", "CSControl", [this]()->bool {
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+        this->SendTask("Update", "CSControl", [this]()->bool {
             this->Update();
             return true;
             });
@@ -82,7 +82,7 @@ MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(void* event) {
         rp->attackerSteamId = killerSteamID;
         rp->victimSteamId = beKillerSteamID;
         rp->assisterSteamId = assisterSteamID;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
 
         if (!this->enable.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
 

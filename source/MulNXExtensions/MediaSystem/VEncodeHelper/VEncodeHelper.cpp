@@ -14,7 +14,7 @@ void VEncodeHelper::SetOn(av::FormatContext* oCtx, int width, int height, AVRati
 
     av::Codec vcodec = av::findEncodingCodec(AV_CODEC_ID_H264);
     if (!vcodec.canEncode()) {
-        this->ISys().LogError("未找到可用的 H264 编码器");
+        this->LogError("未找到可用的 H264 编码器");
         return;
     }
 
@@ -67,7 +67,7 @@ std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
         return pkt;
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::string("视频帧写入失败: ") + e.what());
+        this->LogError(std::string("视频帧写入失败: ") + e.what());
         return std::nullopt;
     }
 }

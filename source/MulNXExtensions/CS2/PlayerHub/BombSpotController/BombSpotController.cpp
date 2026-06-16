@@ -8,7 +8,7 @@ void BombSpotController::HubWindow(MulNX::UINode* node) {
 
 bool BombSpotController::Init() {
     this->runFlag1 = true;
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改雷包颜色
         auto Pos_Spot_WriteBombState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_WriteBombState);
         this->hkPos_Spot_WriteBombState = MulNX::Hook::Create(Pos_Spot_WriteBombState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -27,7 +27,7 @@ bool BombSpotController::Init() {
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkPos_Spot_WriteBombState->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "Pos_Spot_WriteBombState where rdx is BombColor*"));
+        this->LogSucc(I18n("hook.attached", "Pos_Spot_WriteBombState where rdx is BombColor*"));
         });
 
     return true;

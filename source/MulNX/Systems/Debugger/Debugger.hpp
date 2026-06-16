@@ -1,11 +1,10 @@
 #pragma once
-
 #include <MulNX/Common/Message.hpp>
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include <deque>
 
 namespace MulNX {
-    class Debugger final :public MulNX::ModuleBase {
+    class Debugger final :public MulNX::Module<Debugger> {
     private:
         MulNX::Logger* pLogger = nullptr;
         std::string kInfo{};
@@ -13,22 +12,18 @@ namespace MulNX {
         std::string kWarning{};
         std::string kError{};
         std::deque<std::string> DebugMsg{};
-    public:
-		bool IfShowStream = true;
-		int MaxMsgCount = 1000;
+
+        int MaxMsgCount = 1000;
         bool ShowWhenError = true;
         bool AutoScroll = true;
 		bool NeedAutoScroll = false;
 
-		bool Init()override;
-		void ProcessMsg(MulNX::Message& Msg)override;
-	private:
         void Main();
-        bool Window(MulNX::UINode* ThisNode);		
+        bool Window(MulNX::UINode* node);
+        void DeMe(MulNX::UINode* node);
         void ResetMaxMsgCount(const int Max);
-        void PushBack(MulNX::NetExt&& pack,const std::string& strLevel);
-    public:
-		void ShowStream();
-		void HideStream();
+
+		bool Init()override;
+		void ProcessMsg(MulNX::Message& Msg)override;        
 	};
 }

@@ -12,26 +12,26 @@ bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {
     if (ImGui::Button("解限所有CS2控制台变量")) {
         int Count = 0;
         this->CS2Con->UnlockHiddenCVars(Count);
-        this->ISys().LogSucc("成功解限" + std::to_string(Count) + "个控制台命令！");
+        this->LogSucc("成功解限" + std::to_string(Count) + "个控制台命令！");
     }
     if (ImGui::Button("限住所有CS2控制台变量")) {
         int Count = 0;
         this->CS2Con->LockAllCvars(Count);
-        this->ISys().LogSucc("成功限住" + std::to_string(Count) + "个控制台命令！");
+        this->LogSucc("成功限住" + std::to_string(Count) + "个控制台命令！");
     }
     if (ImGui::Button("列出所有CS2控制台变量")) {
-        this->ISys().LogLine();
+        this->LogLine();
         uint64_t idx = 0;
         this->CS2Con->GetFirstCvarIterator(idx);
         while (idx != 0xFFFFFFFF) {
             C_ConVar* var = this->CS2Con->GetCVarByIndex(idx);
             if (var) {
                 std::string Name = var->szName ? var->szName : "未知";
-                this->ISys().LogInfo("控制台命令：" + Name);
+                this->LogInfo("控制台命令：" + Name);
             }
             this->CS2Con->GetNextCvarIterator(idx, idx);
         }
-        this->ISys().LogLine();
+        this->LogLine();
     }
 
     return true;
@@ -94,13 +94,13 @@ bool GameSettingsManager::GameHudMenu(MulNX::UINode* node) {
     ImGui::SliderInt("TrueView控制", this->GameSettings.cl_trueview_show_status, 0, 2);
     ImGui::SliderInt("X光", this->GameSettings.ScreenSettings.spec_show_xray, 0, 100);
     if (ImGui::Button("切换Demo进度条UI显示")) {
-        this->ISys().AsyncCommand("demoui");
+        this->AsyncCommand("demoui");
     }
     return true;
 }
 
 bool GameSettingsManager::Init() {
-    this->ISys().SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
         auto& CVarSystem = *this->CS2Con;
 
         auto spec_show_xray = CVarSystem.GetCvar("spec_show_xray");
@@ -141,10 +141,10 @@ bool GameSettingsManager::Init() {
 
         *this->GameSettings.cl_trueview_show_status = 0;
 
-        this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
-        this->ISys().SendUINode("SoundMenu", [this](MulNX::UINode* node) {return this->SoundMenu(node);});
-        this->ISys().SendUINode("DofMenu", [this](MulNX::UINode* node) {return this->DofMenu(node);});
-        this->ISys().SendUINode("GameHudMenu", [this](MulNX::UINode* node) {return this->GameHudMenu(node);});
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+        this->SendUINode("SoundMenu", [this](MulNX::UINode* node) {return this->SoundMenu(node);});
+        this->SendUINode("DofMenu", [this](MulNX::UINode* node) {return this->DofMenu(node);});
+        this->SendUINode("GameHudMenu", [this](MulNX::UINode* node) {return this->GameHudMenu(node);});
         return false;
         });
 

@@ -27,7 +27,7 @@ void GlowController::HubPlayer(MulNX::UINode* node) {
         MulNX::Message msg("Glow/Player/Set"_hash);
         msg.p1.as<Steam64UID>() = uid;
         msg.p2.low<uint32_t>() = newColorU32;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 
     // 可选：添加一个重置按钮，删除该玩家的自定义颜色规则
@@ -35,7 +35,7 @@ void GlowController::HubPlayer(MulNX::UINode* node) {
     if (ImGui::Button("重置发光颜色")) {
         MulNX::Message msg("Glow/Player/Clear"_hash);
         msg.p1.as<Steam64UID>() = uid;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 }
 void GlowController::HubTeam(MulNX::UINode* node) {
@@ -57,19 +57,19 @@ void GlowController::HubTeam(MulNX::UINode* node) {
         MulNX::Message msg("Glow/Team/Set"_hash);
         msg.p1.low<uint32_t>() = newColorU32;
         msg.p1.high<CS2::ui8TeamNum>() = team;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 
     ImGui::SameLine();
     if (ImGui::Button("重置发光颜色")) {
         MulNX::Message msg("Glow/Team/Clear"_hash);
         msg.p1.high<CS2::ui8TeamNum>() = team;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
 }
 
 bool GlowController::Init() {
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto region = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
         auto target = region.Data();
         this->hkSetGlowColor = MulNX::Hook::Create(target, [this](MulNX::Hook* hk,RegContext* ctx) {
@@ -77,15 +77,15 @@ bool GlowController::Init() {
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkSetGlowColor->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "SetGlowColor"));
+        this->LogSucc(I18n("hook.attached", "SetGlowColor"));
 
-        this->ISys().SendTask("Update", "CSControl", [this]() {
+        this->SendTask("Update", "CSControl", [this]() {
             this->Update();
             return true;
             });
         });
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("Glow/Player/Set")
         .SubscribeAsync("Glow/Player/Clear")
         .SubscribeAsync("Glow/Player/ClearAll")
@@ -153,7 +153,7 @@ void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t*
     auto msg = MulNX::Message("Call/OnSetGlow"_hash);
     bool needErase = false;
     msg.p2.as<bool*>() = &needErase;
-    this->ISys().PublishSync(msg);
+    this->PublishSync(msg);
     if (needErase) {
         *color = 0;
         return;

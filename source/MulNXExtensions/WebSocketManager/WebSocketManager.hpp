@@ -1,12 +1,10 @@
 #pragma once
-
 #include <MulNX/MulNX.hpp>
-
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 #include <set>
 
-class WebSocketManager final :public MulNX::ModuleBase {
+class WebSocketManager final :public MulNX::Module<WebSocketManager> {
     using Server = websocketpp::server<websocketpp::config::asio>;
     using ConnectionHandle = websocketpp::connection_hdl;
     Server server;

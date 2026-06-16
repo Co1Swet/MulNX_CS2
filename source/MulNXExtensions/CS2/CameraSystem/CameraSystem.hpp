@@ -43,14 +43,13 @@ public:
 
 template <typename T>
 class CamSysModuleMixin {
+    T* This() { return static_cast<T*>(this); }
 public:
     CameraSystem* CamSys = nullptr;
 protected:
     CamSysModuleMixin() {
-        static_assert(MulNX::Module<T>, "T must be a MulNX Module");
-        auto* mod = static_cast<MulNX::ModuleBase*>(static_cast<T*>(this));
-        mod->delayInits->push_back([this, mod]() -> bool {
-            this->CamSys = mod->GetCore()->ModuleManager()->FindModule<CameraSystem>("CameraSystem");
+        This()->delayInits->push_back([this]() -> bool {
+            this->CamSys = This()->FindModule<CameraSystem>("CameraSystem");
             return true;
             });
     }

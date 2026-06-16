@@ -1,12 +1,12 @@
 #pragma once
 #include <MulNX/Core/Core.hpp>
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include <functional>
 
 namespace MulNX {
     namespace Core {
         // 核心启动器基类，定义核心启动的基本接口
-        class CoreStarterBase :public MulNX::ModuleBase {
+        class CoreStarterBase :public MulNX::Module<CoreStarterBase> {
         public:
             // 初始化Core的所有系统组件
             bool SystemInit(MulNX::Core::Core* pCore);

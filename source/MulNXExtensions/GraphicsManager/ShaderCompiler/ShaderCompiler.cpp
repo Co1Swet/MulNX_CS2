@@ -53,11 +53,11 @@ static ID3DBlob* CompileShader(const char* src, const char* target, const char* 
 }
 
 bool MulNX::ShaderCompiler::Init() {
-    this->ISys().LogInfo(I18n("graph.shader.compiling"));
+    this->LogInfo(I18n("graph.shader.compiling"));
     this->vsBlob = CompileShader(g_GreenVS, "vs_4_0", "main");
     this->psBlob = CompileShader(g_GreenPS, "ps_4_0", "main");
     if (!vsBlob || !psBlob) MulNX::ErrorTerminate(I18n("graph.shader.compile_fail"));
-    this->ISys().LogSucc(I18n("graph.shader.compiled"));
+    this->LogSucc(I18n("graph.shader.compiled"));
     return true;
 }
 

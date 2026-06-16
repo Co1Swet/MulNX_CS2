@@ -1,13 +1,10 @@
 #pragma once
-
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
-#include <MulNXThirdParty/queue/concurrentqueue.h>
+#include <MulNX/Core/Module/Module.hpp>
+#include <MulNXThirdParty/queue/blockingconcurrentqueue.h>
 #include <fstream>
-#include <Windows.h>
 
 namespace MulNX {
-        
-    class Logger final :public MulNX::ModuleBase {
+    class Logger final :public MulNX::Module<Logger> {
     private:
         std::filesystem::path logPath{};
         std::ofstream target{};
@@ -19,10 +16,10 @@ namespace MulNX {
         std::string kError{};
 
         std::string PraseLevel(Log::Level level);
+        MulNX::MsgType MakeMsgType(Log::Level level);
     public:
-        moodycamel::ConcurrentQueue<Log>logs{};
+        moodycamel::BlockingConcurrentQueue<Log>logs{};
         bool Init();
         void Log();
-        void test() { MessageBoxW(NULL, L"test", L"test", MB_OK); }
     };
 }

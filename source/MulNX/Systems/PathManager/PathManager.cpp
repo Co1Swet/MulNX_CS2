@@ -1,6 +1,7 @@
 #include "PathManager.hpp"
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
+#include <MulNX/Systems/Logger/Logger.hpp>
 #include <MulNX/Systems/IPCer/IPCer.hpp>
 #include <MulNXThirdParty/All_pugixml.hpp>
 
@@ -14,7 +15,7 @@ bool MulNX::PathManager::Init() {
     this->CoreRoot = this->Root / this->CoreName;
     this->LoadPathLists(this->Root / "PathLists.xml");
     this->CheckShared();
-    auto pConfig = this->ISys().PathGet("Config");
+    auto pConfig = this->PathGet("Config");
     return true;
 }
 
@@ -35,15 +36,15 @@ bool MulNX::PathManager::CheckShared() {
     for (const auto& shared : this->Shareds) {
         std::filesystem::path Path = this->Root / shared;
         if (std::filesystem::exists(Path)) {
-            this->ISys().LogInfo("检测到共享目录已创建：" + Path.string());
+            this->LogInfo("检测到共享目录已创建：" + Path.string());
         }
         else {
             try {
                 std::filesystem::create_directory(Path);
-                this->ISys().LogSucc("成功创建新的共享目录" + Path.string());
+                this->LogSucc("成功创建新的共享目录" + Path.string());
             }
             catch (const std::exception& e) {
-                this->ISys().LogError("在创建共享目录" + Path.string() + "时出现错误：" + e.what());
+                this->LogError("在创建共享目录" + Path.string() + "时出现错误：" + e.what());
             }
         }
     }
@@ -53,15 +54,15 @@ bool MulNX::PathManager::CheckShared() {
 std::filesystem::path MulNX::PathManager::PathGetForModule(const std::string& ModuleName, const std::string& Target) {
     auto path = this->CoreRoot / ModuleName / Target;
     if (!std::filesystem::exists(path)) {
-        this->ISys().LogInfo("模块[" + ModuleName + "]尝试访问不存在的文件夹，将尝试为其创建");
+        this->LogInfo("模块[" + ModuleName + "]尝试访问不存在的文件夹，将尝试为其创建");
         try {
             // 可创建多级目录
             if (!std::filesystem::create_directories(path)) {
-                this->ISys().LogError("创建文件夹失败！路径：" + path.string());
+                this->LogError("创建文件夹失败！路径：" + path.string());
                 return {};
             }
             else {
-                this->ISys().LogSucc("文件夹创建成功：" + path.string());
+                this->LogSucc("文件夹创建成功：" + path.string());
             }
         }
         catch (const std::filesystem::filesystem_error& e) {
@@ -82,15 +83,15 @@ std::filesystem::path MulNX::PathManager::PathGetForShared(const std::string& Ta
     auto path = this->Root / Target;
 
     if (!std::filesystem::exists(path)) {
-        this->ISys().LogInfo("共享资源路径不存在，将尝试为其创建：" + path.string());
+        this->LogInfo("共享资源路径不存在，将尝试为其创建：" + path.string());
         try {
             // 可创建多级目录
             if (!std::filesystem::create_directories(path)) {
-                this->ISys().LogError("创建共享目录失败！路径：" + path.string());
+                this->LogError("创建共享目录失败！路径：" + path.string());
                 return {};
             }
             else {
-                this->ISys().LogSucc("共享目录创建成功：" + path.string());
+                this->LogSucc("共享目录创建成功：" + path.string());
             }
         }
         catch (const std::filesystem::filesystem_error& e) {

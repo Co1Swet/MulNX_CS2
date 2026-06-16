@@ -8,7 +8,7 @@ void FreeCameraController::Menu(MulNX::UINode* node) {
     ImGui::Text(I18n("freCamCon.status", currentEnable ? "ON" : "OFF").c_str());
 
     if (ImGui::Button(I18n("freCamCon.change").c_str())) {
-        this->ISys().PublishAsync("FreeCamCtrl/Toggle"_hash);
+        this->PublishAsync("FreeCamCtrl/Toggle"_hash);
     }
 
     if (currentEnable) {
@@ -20,10 +20,10 @@ void FreeCameraController::Menu(MulNX::UINode* node) {
 }
 
 bool FreeCameraController::Init() {
-    this->kMovUp = this->ISys().GetButton("CamMovUp").value();
-    this->kMovDown = this->ISys().GetButton("CamMovDown").value();
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
-    this->ISys().SubscribeAsync("FreeCamCtrl/Toggle");
+    this->kMovUp = this->Shortcut()->GetButton("CamMovUp").value();
+    this->kMovDown = this->Shortcut()->GetButton("CamMovDown").value();
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SubscribeAsync("FreeCamCtrl/Toggle");
     return true;
 }
 

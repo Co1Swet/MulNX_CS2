@@ -7,17 +7,17 @@ void SkinController::Window(MulNX::UINode* node) {
     MulNX::UI::SliderInt(I18n("skin.target.index").c_str(), this->targetIndex, 0, 10000);
     MulNX::UI::Checkbox(I18n("skin.target.legacy").c_str(), this->legacyModel);
     if (ImGui::Button(I18n("skin.apply").c_str())) {
-        this->ISys().PublishAsync("Skin/Apply"_hash);
+        this->PublishAsync("Skin/Apply"_hash);
     }
 }
 
 bool SkinController::Init() {
-    this->ISys()
+    (*this)
         .SubscribeSync("Call/BeforeDraw", [this](MulNX::Message& msg) {this->Update();})
         .SubscribeAsync("Skin/Apply")
         ;
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::RegenerateWeaponSkins);
         this->regenerateWeaponSkins = (RegenerateWeaponSkins)target.Data();
         // static auto hkSkin = MulNX::Hook::Create(target.Data(), 0, false, [this](RegContext* ctx, MulNX::Hook* Hook) {
@@ -42,7 +42,7 @@ bool SkinController::Init() {
         else {
             MulNX::ErrorTerminate(I18n("skin.controller.hook.fail"));
         }
-        this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
         });
 
     return true;

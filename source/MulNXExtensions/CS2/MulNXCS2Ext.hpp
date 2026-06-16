@@ -29,5 +29,5 @@
 
 #include "GameCfgManager/GameCfgManager.hpp"
 #include "GameSettingsManager/GameSettingsManager.hpp"
-
+#include "VirtualUser/VirtualUser.hpp"
 #include "MiniMap/MiniMap.hpp"

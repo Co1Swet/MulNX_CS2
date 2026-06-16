@@ -33,12 +33,12 @@ bool ElementManager::MenuElement(MulNX::UINode* node) {
         // 创建自由摄像机轨道
         if (ImGui::Button(I18n("camsys.elem.new_free_camera_path").c_str())) {
             if (newElementName.empty()) {
-                this->ISys().LogError(I18n("result.error_empty_name").c_str());
+                this->LogError(I18n("result.error_empty_name").c_str());
             }
             else {
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Element/Create"_hash);
                 rp->str1 = std::move(newElementName);
-                this->ISys().PublishAsync(std::move(msg));
+                this->PublishAsync(std::move(msg));
             }
             newElementName.clear();
         }
@@ -111,20 +111,20 @@ bool ElementManager::Init() {
     this->SManager = this->Core->ModuleManager()->FindModule<SolutionManager>("SolutionManager");
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->ISys().SendUINode("MenuElement", [this](MulNX::UINode* node) {return this->MenuElement(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendUINode("MenuElement", [this](MulNX::UINode* node) {return this->MenuElement(node);});
 
-    auto* PathManager = this->ISys().Path();
+    auto* PathManager = this->Path();
     if (PathManager->CreateKey("Elements", "Elements",
         [this](MulNX::PathManager* PathManager)->bool {
             auto Path = PathManager->PathGetFromKey("Elements");
-            this->ISys().LogSucc("成功设置元素路径为：" + Path.string());
+            this->LogSucc("成功设置元素路径为：" + Path.string());
             return true;
         })) {
         PathManager->KeyBindDynamic("Elements", "CurrentProject");
     }
 
-    this->ISys()
+    (*this)
         .SubscribeAsync("Element/Create")
         .SubscribeAsync("Element/Delete");
 
@@ -137,7 +137,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->CamSys->smutex);
         if (!this->Element_Create(ElementType::FreeCameraPath, name)) {
-            this->ISys().LogError(std::format("元素创建失败：{}", name));
+            this->LogError(std::format("元素创建失败：{}", name));
         }
         break;
     }
@@ -145,7 +145,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->CamSys->smutex);
         if (!this->Element_Delete(name)) {
-            this->ISys().LogError(std::format("元素删除失败：{}", name));
+            this->LogError(std::format("元素删除失败：{}", name));
         }
         break;
     }
@@ -183,7 +183,7 @@ void ElementManager::HandleUpdate() {
 ElementBase* ElementManager::Element_Create(const ElementType type, const std::string& name) {
     // 检查是否已存在同名元素
     if (this->elements.find(name) != this->elements.end()) {
-        this->ISys().LogError("元素名已占用！ 元素名：" + name);
+        this->LogError("元素名已占用！ 元素名：" + name);
         return nullptr;
     }
     std::shared_ptr<ElementBase> pElement = nullptr;
@@ -198,7 +198,7 @@ ElementBase* ElementManager::Element_Create(const ElementType type, const std::s
         break;
     }
     // 输出成功信息
-    this->ISys().LogSucc("成功创建元素！  元素名：" + name);
+    this->LogSucc("成功创建元素！  元素名：" + name);
     // 设置元素类型
     pElement->Type = type;
     // 添加进Elements
@@ -209,10 +209,10 @@ ElementBase* ElementManager::Element_Create(const ElementType type, const std::s
 bool ElementManager::Element_SaveAll() {
     //检查是否有元素
     if (this->elements.empty()) {
-        this->ISys().LogWarning("当前没有任何元素，跳过保存操作！");
+        this->LogWarning("当前没有任何元素，跳过保存操作！");
         return true;
     }
-    std::filesystem::path ElementFolderPath = this->ISys().Path()->PathGetFromKey("Elements");
+    std::filesystem::path ElementFolderPath = this->Path()->PathGetFromKey("Elements");
     //遍历所有元素并保存
     for (const auto& [name, elem] : this->elements) {
         if (!elem->Dirty) {
@@ -221,21 +221,21 @@ bool ElementManager::Element_SaveAll() {
         }
         auto [ok, msg] = elem->Save(ElementFolderPath);
         if (ok) {
-            this->ISys().LogSucc(std::move(msg));
+            this->LogSucc(std::move(msg));
         }
         else {
-            this->ISys().LogError(std::move(msg));
+            this->LogError(std::move(msg));
             return false;
         }
     }
-    this->ISys().LogSucc("成功保存所有元素到磁盘！");
+    this->LogSucc("成功保存所有元素到磁盘！");
     return true;
 }
 bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
-    this->ISys().LogInfo("尝试从磁盘文件加载元素，文件路径：" + FullPath.string());
+    this->LogInfo("尝试从磁盘文件加载元素，文件路径：" + FullPath.string());
     // 检查文件本身存在性
     if (!std::filesystem::exists(FullPath)) {
-        this->ISys().LogError("磁盘文件不存在！文件路径：" + FullPath.string());
+        this->LogError("磁盘文件不存在！文件路径：" + FullPath.string());
         return false;
     }
 
@@ -246,7 +246,7 @@ bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
         std::string NewElementTypeString = root["type"].as<std::string>();
         ElementType NewElementType = ElementType_StringToEnum(NewElementTypeString);
         if (static_cast<int>(NewElementType) <= 0) {
-            this->ISys().LogError("尝试从磁盘文件加载元素失败，不可加载的元素类型！");
+            this->LogError("尝试从磁盘文件加载元素失败，不可加载的元素类型！");
             return false;
         }
 
@@ -254,32 +254,32 @@ bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
         std::string NewElementName = root["name"].as<std::string>();
         // 检查元素名是否为空
         if (NewElementName.empty()) {
-            this->ISys().LogError("尝试从磁盘文件加载元素失败，元素名称为空！");
+            this->LogError("尝试从磁盘文件加载元素失败，元素名称为空！");
             return false;
         }
         // 检查是否存在同名元素
         if (this->elements.find(NewElementName) != this->elements.end()) {
-            this->ISys().LogError("元素名已占用，无法从磁盘文件加载元素！ 元素名：" + NewElementName);
+            this->LogError("元素名已占用，无法从磁盘文件加载元素！ 元素名：" + NewElementName);
             return false;
         }
         // 创建基类指针
-        this->ISys().LogInfo("尝试进行分发，元素类型为 " + NewElementTypeString + " ，文件路径：" + FullPath.string());
+        this->LogInfo("尝试进行分发，元素类型为 " + NewElementTypeString + " ，文件路径：" + FullPath.string());
 
         auto pElement = this->Element_Create(NewElementType, NewElementName);
         // 判空
         if (!pElement) {
-            this->ISys().LogError("尝试从磁盘文件加载元素失败，无法创建指定类型的元素实例！ 元素类型：" + NewElementTypeString);
+            this->LogError("尝试从磁盘文件加载元素失败，无法创建指定类型的元素实例！ 元素类型：" + NewElementTypeString);
             return false;
         }
         // 统一加载信息
         auto [ok, msg] = pElement->Load(root);
         if (!ok) {
-            this->ISys().LogError(std::move(msg));
+            this->LogError(std::move(msg));
             return false;
         }
         pElement->Refresh();
         pElement->Dirty = false;// 刚刚进入内存，非脏
-        this->ISys().LogSucc(std::move(msg));
+        this->LogSucc(std::move(msg));
         return true;
     }
     catch (...) {
@@ -289,7 +289,7 @@ bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
 bool ElementManager::Element_Delete(const std::string Name) {
     // 安全检查
     if (Name.empty()) {
-        this->ISys().LogError("尝试删除空名称的元素！");
+        this->LogError("尝试删除空名称的元素！");
         return false;
     }
 
@@ -297,7 +297,7 @@ bool ElementManager::Element_Delete(const std::string Name) {
     auto it = this->elements.find(Name);
     // 判空
     if (it == this->elements.end()) {
-        this->ISys().LogError("未找到指定名称的元素：" + Name);
+        this->LogError("未找到指定名称的元素：" + Name);
         return false;
     }
 
@@ -317,15 +317,15 @@ bool ElementManager::Element_Delete(const std::string Name) {
     // 通过迭代器删除元素
     this->elements.erase(it);
     // 添加刷新信息
-    this->ISys().PublishAsync("CameraSystem/Element/Deleted"_hash);
+    this->PublishAsync("CameraSystem/Element/Deleted"_hash);
 
-    this->ISys().LogSucc("成功删除元素：" + Name);
+    this->LogSucc("成功删除元素：" + Name);
     return true;
 }
 bool ElementManager::Element_ClearAll() {
     // 检查是否有元素
     if (this->elements.empty()) {
-        this->ISys().LogWarning("当前没有任何元素，跳过清空操作！");
+        this->LogWarning("当前没有任何元素，跳过清空操作！");
         return true;
     }
     // 禁用预览
@@ -339,39 +339,39 @@ bool ElementManager::Element_ClearAll() {
     }
     this->elements.clear();
     // 添加刷新信息
-    this->ISys().PublishAsync("CameraSystem/Element/Deleted"_hash);
-    this->ISys().LogSucc("成功清空所有元素！");
+    this->PublishAsync("CameraSystem/Element/Deleted"_hash);
+    this->LogSucc("成功清空所有元素！");
     return true;
 }
 
 //预览相关
 void ElementManager::Preview_Enable() {
     if (!this->Preview_CurrentElement) {
-        this->ISys().LogError("无法开启预览：未设置预览元素！");
+        this->LogError("无法开启预览：未设置预览元素！");
         return;
     }
     this->OnPreview = true;
-    this->ISys().PublishAsync("CameraSystem/Preview/Started"_hash);
-    this->ISys().LogInfo("已开启预览");
+    this->PublishAsync("CameraSystem/Preview/Started"_hash);
+    this->LogInfo("已开启预览");
 }
 void ElementManager::Preview_Disable() {
     this->OnPreview = false;
     this->CS2View->ClearViewOverride();
-    this->ISys().PublishAsync("CameraSystem/Preview/Ended"_hash);
-    this->ISys().LogInfo("已关闭预览");
+    this->PublishAsync("CameraSystem/Preview/Ended"_hash);
+    this->LogInfo("已关闭预览");
 }
 void ElementManager::Preview_SetElement(const std::string& name) {
     auto it = this->elements.find(name);
     if (it == this->elements.end()) {
-        this->ISys().LogError("找不到目标元素   元素名：" + name);
+        this->LogError("找不到目标元素   元素名：" + name);
         return;
     }
     this->Preview_CurrentElement = it->second;
-    this->ISys().LogInfo("准备预览该元素   元素名：" + name);
+    this->LogInfo("准备预览该元素   元素名：" + name);
 }
 void ElementManager::Preview_SetPreviewSchema(const float Time) {
     this->Preview_TimeSchema = Time;
-    this->ISys().LogInfo("元素预览时间偏移设置为：" + std::to_string(this->Preview_TimeSchema));
+    this->LogInfo("元素预览时间偏移设置为：" + std::to_string(this->Preview_TimeSchema));
     this->Preview_EndTime = this->Preview_CurrentElement->StartTime + this->Preview_CurrentElement->DurationTime;
 }
 bool ElementManager::Preview_Call(CameraSystemIO* IO) {

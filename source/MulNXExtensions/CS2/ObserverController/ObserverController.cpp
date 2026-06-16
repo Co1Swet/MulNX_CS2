@@ -1,9 +1,8 @@
 #include "ObserverController.hpp"
-
 #include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 bool ObserverController::Init() {
-    this->ISys()
+    (*this)
         .SubscribeAsync("CameraSystem/Play/Started")
         .SubscribeAsync("CameraSystem/Play/Ended")
         .SubscribeAsync("Observe/SpecSteam64UID")
@@ -16,7 +15,7 @@ bool ObserverController::Init() {
                     });
             });
 
-    this->ISys().SendTask("Main", "CSControl", [this]() -> bool {
+    this->SendTask("Main", "CSControl", [this]() -> bool {
         this->Main();
         return true;
         });
@@ -27,12 +26,12 @@ bool ObserverController::Init() {
 void ObserverController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "CameraSystem/Play/Started"_hash: {
-        this->ISys().LogInfo("收到运镜开始消息");
+        this->LogInfo("收到运镜开始消息");
         this->HandlePlayStarted();
         break;
     }
     case "CameraSystem/Play/Ended"_hash: {
-        this->ISys().LogInfo("收到运镜结束消息");
+        this->LogInfo("收到运镜结束消息");
         this->HandlePlayEnded();
         break;
     }
@@ -70,36 +69,36 @@ void ObserverController::UpdateObserverState() {
         if (lastObservedSpecMode != detectedMode) {
             MulNX::Message msg("spec_mode_changed_to"_hash);
             msg.p1.low<uint8_t>() = detectedMode;
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
             lastObservedSpecMode = detectedMode;
         }
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::format("UpdateObserverState error: {}", e.what()));
+        this->LogError(std::format("UpdateObserverState error: {}", e.what()));
     }
 }
 
 bool ObserverController::HandlePlayStarted() {
     if (this->CampathPlaying) {
-        this->ISys().LogWarning("已在运镜播放中，重复的播放开始消息将被忽略。");
+        this->LogWarning("已在运镜播放中，重复的播放开始消息将被忽略。");
         return false;
     }
     this->startedAsSpecMode = this->currentMode;
     this->CampathPlaying = true;
 
     if (this->currentMode != 4) {   // 不是自由视角，需要切换
-        this->ISys().LogInfo("运镜开始时当前模式非 spec_mode 4，切换");
+        this->LogInfo("运镜开始时当前模式非 spec_mode 4，切换");
         this->SetSpecMode(4);
     }
     else {
-        this->ISys().LogInfo("运镜开始时已是 spec_mode 4，直接开始播放。");
+        this->LogInfo("运镜开始时已是 spec_mode 4，直接开始播放。");
     }
     return true;
 }
 
 bool ObserverController::HandlePlayEnded() {
     if (startedAsSpecMode == 2) {
-        this->ISys().LogInfo("运镜结束后恢复 spec_mode 2。");
+        this->LogInfo("运镜结束后恢复 spec_mode 2。");
         this->SetSpecMode(2);
     }
     this->CampathPlaying = false;
@@ -111,8 +110,8 @@ void ObserverController::OnSpecModeChanged(uint8_t newMode) {
     this->currentMode = newMode;
     // 运镜播放中，检测用户是否切回 spec_mode 2
     if (this->CampathPlaying && newMode == 2) {
-        this->ISys().LogWarning("检测到 spec_mode 2，已中断当前运镜。");
-        this->ISys().PublishAsync("CameraSystem/Play/Shutdown"_hash);
+        this->LogWarning("检测到 spec_mode 2，已中断当前运镜。");
+        this->PublishAsync("CameraSystem/Play/Shutdown"_hash);
         this->CampathPlaying = false;
     }
 }
@@ -131,20 +130,20 @@ CS2::CCSPlayerController* ObserverController::FindControllerBySteam64UID(Steam64
         }
     }
     catch (...) {
-        this->ISys().LogError("FindControllerBySteam64UID 失败");
+        this->LogError("FindControllerBySteam64UID 失败");
     }
     return pController;
 }
 
 void ObserverController::SetSpecMode(uint8_t mode) {
-    this->ISys().AsyncCommand(std::format("spec_mode {}", mode));
+    this->AsyncCommand(std::format("spec_mode {}", mode));
 }
 
 bool ObserverController::SpecHandle(CS2::CHandleBase handle) {
     try {
         auto* localPawn = this->CS2->client.GetLocalPlayerPawn();
         if (!localPawn) {
-            this->ISys().LogWarning("尝试在无本地实体情况下设置观战？");
+            this->LogWarning("尝试在无本地实体情况下设置观战？");
             return false;
         }
         auto pObserverServices = MulNX::MRead(localPawn->pObserverServices());
@@ -154,11 +153,11 @@ bool ObserverController::SpecHandle(CS2::CHandleBase handle) {
         return true;
     }
     catch (const std::runtime_error& e) {
-        this->ISys().LogError(std::format("在设置观战目标时发生错误：{}", e.what()));
+        this->LogError(std::format("在设置观战目标时发生错误：{}", e.what()));
         return false;
     }
     catch (...) {
-        this->ISys().LogError("在设置观战目标时发生未知错误");
+        this->LogError("在设置观战目标时发生未知错误");
         return false;
     }
 }
@@ -171,11 +170,11 @@ void ObserverController::SpecSteam64UID(Steam64UID uid) {
             auto handle = MulNX::MRead(pController->m_hPlayerPawn());
             MulNX::Message msg("Observe/SpecHandle"_hash);
             msg.p1.low<CS2::CHandleBase>() = handle;
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
             break;
         }
         catch (const std::exception& e) {
-            this->ISys().LogError(I18n("ob.Spec64.error", e.what()));
+            this->LogError(I18n("ob.Spec64.error", e.what()));
             ++counter;
             if (counter == 10) {
                 return;
@@ -183,4 +182,8 @@ void ObserverController::SpecSteam64UID(Steam64UID uid) {
             continue;
         }
     }
+}
+bool ObserverController::SpecPlayer(int IndexInMap) {
+    this->AsyncCommand("spec_mode 2;spec_player " + std::to_string(this->CS2->CS2EBGameData.Players[IndexInMap].IndexInMap));
+    return true;
 }

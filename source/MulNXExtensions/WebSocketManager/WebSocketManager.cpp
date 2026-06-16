@@ -65,8 +65,7 @@ uint64_t parse_uint64_from_json_base64(const nlohmann::json& j) {
 }
 
 bool WebSocketManager::Init() {
-    this->ISys()
-        .SubscribeAsync("WebSocketManager/Post");
+    this->SubscribeAsync("WebSocketManager/Post");
 
     // 关闭它自带的日志功能
     this->server.clear_access_channels(websocketpp::log::alevel::all);
@@ -103,24 +102,24 @@ bool WebSocketManager::Init() {
                 rp->str1 = std::move(str1);
                 rp->str2 = std::move(str2);
 
-                this->ISys().PublishAsync(std::move(mmsg));
+                this->PublishAsync(std::move(mmsg));
 
                 this->server.send(hdl, "已投入消息总线" + msg->get_payload(), msg->get_opcode());
             }
             catch (const websocketpp::exception& e) {
-                this->ISys().LogError("网络回调接口错误: " + *e.what());
+                this->LogError("网络回调接口错误: " + *e.what());
             }
         });
 
-    this->ISys().SendTask("server::run", "Web", [this]()->bool {
+    this->SendTask("server::run", "Web", [this]()->bool {
         try {
-            if (!this->GlobalVars->SystemReady.load(std::memory_order_acquire)) {
+            if (!this->pGlobalVars->SystemReady.load()) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 return true;
             }
             this->server.listen(this->port);
             this->server.start_accept();
-            this->ISys().LogSucc("正在监听端口：" + std::to_string(port));
+            this->LogSucc("正在监听端口：" + std::to_string(port));
             // 阻塞调用
             this->server.run();
         }
@@ -129,7 +128,7 @@ bool WebSocketManager::Init() {
         }
         return false;
         });
-    this->ISys().SendTask("Main", "MulNXMain", [this]()->bool {
+    this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
         });
@@ -160,7 +159,7 @@ void WebSocketManager::ProcessMsg(MulNX::Message& Msg) {
                     this->server.send(hdl, payLoad, websocketpp::frame::opcode::text);
                 }
                 catch (const websocketpp::exception& e) {
-                    this->ISys().LogError("网络消息发送失败！内容：" + payLoad);
+                    this->LogError("网络消息发送失败！内容：" + payLoad);
                 }
             }
 

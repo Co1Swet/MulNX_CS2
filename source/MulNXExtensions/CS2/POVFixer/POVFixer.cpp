@@ -4,11 +4,11 @@
 void POVFixer::Draw(MulNX::UINode* node) {
     if (ImGui::CollapsingHeader("POV Fix")) {
         if (ImGui::Button(I18n("pov.enable").c_str())) {
-            this->ISys().PublishAsync("POVFix/Enable"_hash);
+            this->PublishAsync("POVFix/Enable"_hash);
         }
         ImGui::SameLine();
         if (ImGui::Button(I18n("pov.disable").c_str())) {
-            this->ISys().PublishAsync("POVFix/Disable"_hash);
+            this->PublishAsync("POVFix/Disable"_hash);
         }
         MulNX::UI::Checkbox("Team ID隐藏敌方", this->pTeamIDController->runFlag1);
     }
@@ -17,14 +17,14 @@ void POVFixer::Draw(MulNX::UINode* node) {
 bool POVFixer::Init() {
     this->pTeamIDController = this->Core->ModuleManager()->FindModule("TeamIDController");
 
-    this->ISys()
+    (*this)
         .SubscribeSync("Call/BeforeDraw", [this](MulNX::Message& msg) {this->BeforeDraw();})
         .SubscribeSync("Call/OnSetGlow", [this](MulNX::Message& msg) {this->OnSetGlow(msg);})
         .SubscribeAsync("POVFix/Enable")
         .SubscribeAsync("POVFix/Disable")
         ;
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Draw(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Draw(node);});
     
     return true;
 }
@@ -33,17 +33,17 @@ void POVFixer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "POVFix/Enable"_hash: {
         this->runFlag1.store(true);
-        this->ISys().AsyncCommand("cl_radar_show_all_players_when_spectating false");
-        this->ISys().AsyncCommand("cl_radar_square_always false");
-        this->ISys().AsyncCommand("cl_radar_square_when_spectating false");
-        this->ISys().AsyncCommand("cl_demo_predict 0");
-        this->ISys().AsyncCommand("cl_spec_show_bindings false");
+        this->AsyncCommand("cl_radar_show_all_players_when_spectating false");
+        this->AsyncCommand("cl_radar_square_always false");
+        this->AsyncCommand("cl_radar_square_when_spectating false");
+        this->AsyncCommand("cl_demo_predict 0");
+        this->AsyncCommand("cl_spec_show_bindings false");
         break;
     }
     case "POVFix/Disable"_hash: {
         this->runFlag1.store(false);
-        this->ISys().AsyncCommand("cl_radar_show_all_players_when_spectating true");
-        this->ISys().AsyncCommand("cl_radar_square_when_spectating true");
+        this->AsyncCommand("cl_radar_show_all_players_when_spectating true");
+        this->AsyncCommand("cl_radar_square_when_spectating true");
         break;
     }
     }
@@ -67,7 +67,7 @@ void POVFixer::OnSetGlow(MulNX::Message& msg) {
     //     }
     // }
     // catch (const std::exception& e) {
-    //     this->ISys().LogError(e.what());
+    //     this->LogError(e.what());
     // }
 
     return;

@@ -1,9 +1,9 @@
 #pragma once
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include <Windows.h>
 
 namespace MulNX {
-    class IPCer final :public MulNX::ModuleBase {
+    class IPCer final :public MulNX::Module<IPCer> {
     public:
         bool Init()override;
 

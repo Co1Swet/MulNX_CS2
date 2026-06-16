@@ -55,7 +55,7 @@ void CSController::Window(MulNX::UINode* node) {
 
 bool CSController::Init() {
     this->showWindow = true;
-    this->ISys()
+    (*this)
         .SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {return this->OnClientLoad(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
@@ -73,7 +73,7 @@ bool CSController::Init() {
 
     this->InitTask().resume();
 
-    this->ISys().SendTask("Update", "CSControl", [this]()->bool {
+    this->SendTask("Update", "CSControl", [this]()->bool {
         this->Update();
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         return true;
@@ -86,17 +86,17 @@ MulNX::CoTask CSController::InitTask() {
     // 等待必要模块加载完成
     co_await this->WaitUntil([this]()->bool {return this->needToLoadModules.load() == 0;});
 
-    this->ISys().SendTask("Main", "CSControl", [this]()->bool {
+    this->SendTask("Main", "CSControl", [this]()->bool {
         try {
             this->Main();
         }
         catch (const std::runtime_error& e) {
-            this->ISys().LogWarning("在更新数据时捕获到异常：" + std::string(e.what()));
+            this->LogWarning("在更新数据时捕获到异常：" + std::string(e.what()));
         }
         return true;
         });
 
-    // this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    // this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     co_return;
 }
@@ -106,13 +106,13 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
     void* pClient = this->client.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2Client002", nullptr);
     this->hkSource2Client002_Init = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pClient)->GetVFuncPtr(3), [this](MulNX::Hook* hk, RegContext* ctx) {
         hk->CallMaybeOrigin(0, ctx);
-        this->ISys().PublishSync("Hook/Source2Client002::Inited"_hash);
+        this->PublishSync("Hook/Source2Client002::Inited"_hash);
         this->hkSource2Client002_Init->Detach();
         return MulNX::Hook::Then::Return;
         }
     ).value();
     this->hkSource2Client002_Init->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "Source2Client002::Init"));
+    this->LogSucc(I18n("hook.attached", "Source2Client002::Init"));
 
     auto back = this->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::ifShowSpeaker).Rdata();
     this->retAddrForShowSpeaker = reinterpret_cast<uintptr_t>(back) - 4;
@@ -131,7 +131,7 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
         return MulNX::Hook::Then::Return;
         }).value();
     this->hkSource2EngineToClient001_ExecuteCmd->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "Source2EngineToClient001::ExecuteCmd"));
+    this->LogSucc(I18n("hook.attached", "Source2EngineToClient001::ExecuteCmd"));
 
     // for show speaker
     this->hkSource2EngineToClient001_IsPlayingDemo = MulNX::Hook::Create((uint8_t*)IVClass::Assume(Source2EngineToClient001)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -152,7 +152,7 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
         return MulNX::Hook::Then::Return;
         }).value();
     this->hkSource2EngineToClient001_IsPlayingDemo->Attach();
-    this->ISys().LogSucc(I18n("hook.attached", "Source2EngineToClient001::IsPlayingDemo"));
+    this->LogSucc(I18n("hook.attached", "Source2EngineToClient001::IsPlayingDemo"));
 
     --this->needToLoadModules;
 }
@@ -175,7 +175,7 @@ void CSController::Main() {
     static int32_t OldRoundStartCount = 0;
     auto currentStartCount = MulNX::MRead(pGameRules->m_nRoundStartCount());
     if (OldRoundStartCount != currentStartCount) {
-        this->ISys().PublishAsync("Game/NewRound"_hash);
+        this->PublishAsync("Game/NewRound"_hash);
         OldRoundStartCount = currentStartCount;
     }
 
@@ -242,10 +242,6 @@ void CSController::Main() {
 //     }
 // }
 
-bool CSController::SpecPlayer(int IndexInMap) {
-    this->ISys().AsyncCommand("spec_mode 2;spec_player " + std::to_string(this->CS2EBGameData.Players[IndexInMap].IndexInMap));
-    return true;
-}
 D_Player& CSController::GetPlayerMsg(int Index) {
     //std::shared_lock lock(this->GetMtx());
     return this->CS2EBGameData.Players[Index];

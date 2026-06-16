@@ -1,6 +1,5 @@
 #pragma once
-
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include <MulNXThirdParty/queue/concurrentqueue.h>
 
 namespace MulNX {
@@ -12,12 +11,13 @@ namespace MulNX {
         void Start();
     };
 
-    class TaskSystem final :public ModuleBase {
+    class TaskSystem final :public Module<TaskSystem> {
+        MessageManager* pMessageManager = nullptr;
         std::unordered_map<std::string, std::unique_ptr<Worker>>workers{};
-        void HandleAddTask(MulNX::Message& msg);
-    public:
         bool Init()override;
         void ProcessMsg(MulNX::Message& msg)override;
+    public:
         void Deinit()override;
+        void HandleAddTask(MulNX::Task&& msg);
     };
 }

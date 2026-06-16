@@ -31,12 +31,12 @@ bool SolutionManager::MenuSolution(MulNX::UINode* node) {
         // 创建成功则清空输入框
         if (ImGui::Button(I18n("camsys.sol.create_btn").c_str())) {
             if (CreateSolutionName.empty()) {
-                this->ISys().LogError(I18n("result.error_empty_name").c_str());
+                this->LogError(I18n("result.error_empty_name").c_str());
                 return true;
             }
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Create"_hash);
             rp->str1 = std::move(CreateSolutionName);
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
             CreateSolutionName.clear();
         }
     }
@@ -63,24 +63,24 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
             ImGui::SetClipboardText(solution->name.c_str());
         }
         if (ImGui::MenuItem(I18n("text.save").c_str())) {
-            auto path = this->ISys().Path()->PathGetFromKey("Solutions");
+            auto path = this->Path()->PathGetFromKey("Solutions");
             auto [ok, msg] = solution->Save(path);
             if (ok) {
-                this->ISys().LogSucc(std::move(msg));
+                this->LogSucc(std::move(msg));
             }
             else {
-                this->ISys().LogError(std::move(msg));
+                this->LogError(std::move(msg));
             }
         }
         if (ImGui::MenuItem(I18n("text.print_debug").c_str())) {
-            this->ISys().LogLine();
-            this->ISys().LogInfo(solution->GetMsg());
-            this->ISys().LogLine();
+            this->LogLine();
+            this->LogInfo(solution->GetMsg());
+            this->LogLine();
         }
         if (ImGui::MenuItem(I18n("text.delete").c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Delete"_hash);
             rp->str1 = solution->name;
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
         ImGui::EndPopup();
     }
@@ -105,7 +105,7 @@ bool SolutionManager::UINodeFunc(MulNX::UINode* node) {
     if (this->Buffer_KCPack.DebugWindow(this->OpenSolutionKCPackDebugWindow)) {
         this->OpenSolutionKCPackDebugWindow.store(false, std::memory_order_release);
         if (!this->Buffer_KCPack.Usable) {
-            this->ISys().LogError("当前按键绑定不可用，无法使用这个绑键播放解决方案！");
+            this->LogError("当前按键绑定不可用，无法使用这个绑键播放解决方案！");
         }
         else {
             this->CurrentSolution->KCPack = this->Buffer_KCPack;//更新绑键
@@ -138,7 +138,7 @@ void SolutionManager::Solution_DebugWindow() {
     if (ImGui::Button(I18n("camsys.sol.enable_current").c_str())) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
         rp->str1 = this->CurrentSolution->name;
-        this->ISys().PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();
     // if (ImGui::Button("按激活模式生成编排模式偏移")) {
@@ -155,14 +155,14 @@ void SolutionManager::Solution_DebugWindow() {
     if (ImGui::Button(I18n("text.add").c_str())) {
         auto it = this->EManager->elements.find(NewElementName);
         if (it == this->EManager->elements.end()) {
-            this->ISys().LogError("找不到目标元素   元素名：" + NewElementName);
+            this->LogError("找不到目标元素   元素名：" + NewElementName);
         }
         else {
             if (!this->CurrentSolution->AddElement(it->second, 0)) {
-                this->ISys().LogError("无法添加元素到解决方案，可能是元素已存在于解决方案中   元素名：" + NewElementName);
+                this->LogError("无法添加元素到解决方案，可能是元素已存在于解决方案中   元素名：" + NewElementName);
             }
             else {
-                this->ISys().LogSucc("成功添加元素到解决方案   元素名：" + NewElementName);
+                this->LogSucc("成功添加元素到解决方案   元素名：" + NewElementName);
                 NewElementName.clear();
             }
         }
@@ -170,7 +170,7 @@ void SolutionManager::Solution_DebugWindow() {
     ImGui::SameLine();
     if (ImGui::Button(I18n("text.clear").c_str())) {
         this->CurrentSolution->Clear();
-        this->ISys().LogSucc("成功清空解决方案所有元素");
+        this->LogSucc("成功清空解决方案所有元素");
     }
 
     ImGui::Separator();
@@ -208,19 +208,19 @@ bool SolutionManager::Init() {
     this->EManager = this->Core->ModuleManager()->FindModule<ElementManager>("ElementManager");
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->ISys().SendUINode("MenuSolution", [this](MulNX::UINode* node) {return this->MenuSolution(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendUINode("MenuSolution", [this](MulNX::UINode* node) {return this->MenuSolution(node);});
 
-    auto* PathManager = this->ISys().Path();
+    auto* PathManager = this->Path();
     if (PathManager->CreateKey("Solutions", "Solutions",
         [this](MulNX::PathManager* PathManager)->bool {
             auto Path = PathManager->PathGetFromKey("Solutions");
-            this->ISys().LogSucc("成功设置解决方案路径为：" + Path.string());
+            this->LogSucc("成功设置解决方案路径为：" + Path.string());
             return true;
         })) {
         PathManager->KeyBindDynamic("Solutions", "CurrentProject");
     }
-    this->ISys()
+    (*this)
         .SubscribeAsync("CameraSystem/Element/Deleted")
         .SubscribeAsync("CameraSystem/Solution/Create")
         .SubscribeAsync("CameraSystem/Solution/Delete")
@@ -235,7 +235,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->CamSys->smutex);
         if (!this->Solution_Create(name)) {
-            this->ISys().LogError(std::format("创建解决方案失败：{}", name));
+            this->LogError(std::format("创建解决方案失败：{}", name));
         }
         break;
     }
@@ -243,7 +243,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->CamSys->smutex);
         if (!this->Solution_Delete(name)) {
-            this->ISys().LogError(std::format("删除解决方案失败：{}", name));
+            this->LogError(std::format("删除解决方案失败：{}", name));
         }
         break;
     }
@@ -277,7 +277,7 @@ void SolutionManager::HandleUpdate() {
         if (this->pInputSystem->CheckWithPack(pSolution->KCPack)) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
             rp->str1 = pSolution.get()->name;
-            this->ISys().PublishAsync(std::move(msg));
+            this->PublishAsync(std::move(msg));
         }
         //后续其它任务待补充
     }
@@ -288,11 +288,11 @@ void SolutionManager::HandleUpdate() {
 bool SolutionManager::Solution_Create(const std::string& name) {
     // 检查是否已存在同名解决方案
     if (this->solutions.find(name) != this->solutions.end()) {
-        this->ISys().LogError("解决方案名已占用！ 解决方案名：" + name);
+        this->LogError("解决方案名已占用！ 解决方案名：" + name);
         return false;
     }
     //输出成功信息
-    this->ISys().LogSucc("成功创建解决方案！  解决方案名：" + name);
+    this->LogSucc("成功创建解决方案！  解决方案名：" + name);
     //创建新解决方案
     std::unique_ptr<Solution> newSolution = std::make_unique<Solution>(name);
     this->solutions[name] = std::move(newSolution);
@@ -301,10 +301,10 @@ bool SolutionManager::Solution_Create(const std::string& name) {
 }
 bool SolutionManager::Solution_SaveAll() {
     if (this->solutions.empty()) {
-        this->ISys().LogWarning("尝试在没有任何解决方案的情况下保存");
+        this->LogWarning("尝试在没有任何解决方案的情况下保存");
         return true;
     }
-    std::filesystem::path SolutionFolderPath = this->ISys().Path()->PathGetFromKey("Solutions");
+    std::filesystem::path SolutionFolderPath = this->Path()->PathGetFromKey("Solutions");
     //遍历所有解决方案保存
     for (const auto& [name, solution] : this->solutions) {
         if (!solution->dirty) {
@@ -312,20 +312,20 @@ bool SolutionManager::Solution_SaveAll() {
         }
         auto [ok, msg] = solution->Save(SolutionFolderPath);
         if (!ok) {
-            this->ISys().LogError(msg);
+            this->LogError(std::move(msg));
             return false;
         }
-        this->ISys().LogSucc(msg);
+        this->LogSucc(std::move(msg));
     }
-    this->ISys().LogSucc("成功保存所有解决方案到文件！");
+    this->LogSucc("成功保存所有解决方案到文件！");
     return true;
 }
 bool SolutionManager::Solution_Load(const std::filesystem::path& FullPath) {
     // 输出调试信息
-    this->ISys().LogInfo("尝试从yaml文件加载解决方案，文件路径：" + FullPath.string());
+    this->LogInfo("尝试从yaml文件加载解决方案，文件路径：" + FullPath.string());
     // 检查文件本身存在性
     if (!std::filesystem::exists(FullPath)) {
-        this->ISys().LogError("yaml文件不存在！文件路径：" + FullPath.string());
+        this->LogError("yaml文件不存在！文件路径：" + FullPath.string());
         return false;
     }
     try {
@@ -334,13 +334,13 @@ bool SolutionManager::Solution_Load(const std::filesystem::path& FullPath) {
         std::string NewSolutionName = root["name"].as<std::string>();
 
         if (NewSolutionName.empty()) {
-            this->ISys().LogError("尝试从yaml文件加载解决方案失败，解决方案名称为空！");
+            this->LogError("尝试从yaml文件加载解决方案失败，解决方案名称为空！");
             return false;
         }
 
         // 检查是否存在同名解决方案
         if (this->solutions.find(NewSolutionName) != this->solutions.end()) {
-            this->ISys().LogError("解决方案名已占用，无法从yaml文件加载解决方案！ 解决方案名：" + std::move(NewSolutionName));
+            this->LogError("解决方案名已占用，无法从yaml文件加载解决方案！ 解决方案名：" + std::move(NewSolutionName));
             return false;
         }
         // 获取持续时长信息
@@ -350,23 +350,23 @@ bool SolutionManager::Solution_Load(const std::filesystem::path& FullPath) {
         auto [ok, msg] = newSolution->Load(root, this->EManager);
 
         if (!ok) {
-            this->ISys().LogError(std::move(msg));
+            this->LogError(std::move(msg));
             return false;
         }
 
         // 检验时间关系
         if (newSolution->totalDurationTime != TargetDurationTime) {
-            this->ISys().LogWarning("该解决方案实际持续时长与预估持续时长不同，可能出现问题");
+            this->LogWarning("该解决方案实际持续时长与预估持续时长不同，可能出现问题");
         }
 
         // 添加进解决方案组
         this->solutions[NewSolutionName] = std::move(newSolution);
-        this->ISys().LogSucc(std::move(msg));
-        this->ISys().LogLine();
+        this->LogSucc(std::move(msg));
+        this->LogLine();
         return true;
     }
     catch (const YAML::Exception& e) {
-        this->ISys().LogError("在加载yaml时遇到异常：" + std::string(e.what()));
+        this->LogError("在加载yaml时遇到异常：" + std::string(e.what()));
         return false;
     }
 }
@@ -374,13 +374,13 @@ bool SolutionManager::Solution_Load(const std::filesystem::path& FullPath) {
 bool SolutionManager::Solution_Delete(const std::string& name) {
     //安全检查
     if (name.empty()) {
-        this->ISys().LogError("尝试删除空名称的解决方案！");
+        this->LogError("尝试删除空名称的解决方案！");
         return false;
     }
 
     auto it = this->solutions.find(name);
     if (it == this->solutions.end()) {
-        this->ISys().LogError("未找到指定名称的解决方案：" + name);
+        this->LogError("未找到指定名称的解决方案：" + name);
         return false;
     }
 
@@ -400,7 +400,7 @@ bool SolutionManager::Solution_Delete(const std::string& name) {
 
     this->solutions.erase(it);
 
-    this->ISys().LogSucc("成功删除解决方案：" + name);
+    this->LogSucc("成功删除解决方案：" + name);
     return true;
 }
 bool SolutionManager::Solution_ClearAll() {
@@ -411,19 +411,19 @@ bool SolutionManager::Solution_ClearAll() {
     this->CurrentSolution = nullptr;
 
     if (this->solutions.empty()) {
-        this->ISys().LogWarning("当前没有任何解决方案，跳过清空操作！");
+        this->LogWarning("当前没有任何解决方案，跳过清空操作！");
         return true;
     }
     //清空所有解决方案
     this->solutions.clear();
-    this->ISys().LogSucc("成功删除所有解决方案！");
+    this->LogSucc("成功删除所有解决方案！");
     return true;
 }
 
 void SolutionManager::Playing_Solution(const std::string& name) {
     auto it = this->solutions.find(name);
     if (it == this->solutions.end()) {
-        this->ISys().LogError(std::format("目标解决方案不存在：{}", name));
+        this->LogError(std::format("目标解决方案不存在：{}", name));
         return;
     }
     this->Playing_pSolution = it->second.get();
@@ -431,22 +431,22 @@ void SolutionManager::Playing_Solution(const std::string& name) {
     switch (this->Playing_pSolution->playmode) {
     case PlaybackMode::Orchestration:
         this->Playing_pSolution->SetSolutionOffset(this->CS2Time->GetReal());//偏移时间轴播放
-        this->ISys().LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2Time->GetReal()));
+        this->LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2Time->GetReal()));
         break;
     case PlaybackMode::Activation:
         this->Playing_pSolution->SetSolutionOffset(0);
         break;
     }
     this->Playing = true;
-    this->ISys().PublishAsync("CameraSystem/Play/Started"_hash);
-    this->ISys().LogInfo(std::format("播放解决方案：{}", name));
+    this->PublishAsync("CameraSystem/Play/Started"_hash);
+    this->LogInfo(std::format("播放解决方案：{}", name));
     return;
 }
 void SolutionManager::Playing_Disable() {
     this->Playing = false;
     this->CS2View->ClearViewOverride();
-    this->ISys().PublishAsync("CameraSystem/Play/Ended"_hash);
-    this->ISys().LogInfo("已关闭播放");
+    this->PublishAsync("CameraSystem/Play/Ended"_hash);
+    this->LogInfo("已关闭播放");
 }
 void SolutionManager::Playing_Call() {
     if (!this->Playing) {

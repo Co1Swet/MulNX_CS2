@@ -4,17 +4,17 @@
 using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);
 
 bool TeamIDController::Init() {
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::PosTeamID_CmpForHide);
         auto jmp = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::PosTeamID_xxIt);
         this->hkPosTeamID_CmpForHide = MulNX::Hook::Create(target.Data() + 3, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleForShowTeamID((CS2::C_CSPlayerPawn*)ctx->rdi);
             }, false, false, (uintptr_t)jmp.Begin()).value();
         this->hkPosTeamID_CmpForHide->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rdi is C_CSPlayerPawn*"));
+        this->LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rdi is C_CSPlayerPawn*"));
         });
 
-    this->ISys().SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {
         auto& panorama = this->CS2->panorama;
         auto textRegion = panorama.GetTextRegion();
         auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄
@@ -39,7 +39,7 @@ bool TeamIDController::Init() {
             }
         ).value();
         hkLoadFromFile_->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "CLayoutFile::LoadFromFile"));
+        this->LogSucc(I18n("hook.attached", "CLayoutFile::LoadFromFile"));
 
         // 2. 获取 CStylePropertyWashColor 的虚表
         void** vtable = (void**)Afx::BinUtils::FindClassVtable(
@@ -70,7 +70,7 @@ bool TeamIDController::Init() {
             }
         ).value();
         hkWashColorParse_->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "CStylePropertyWashColor::Parse"));
+        this->LogSucc(I18n("hook.attached", "CStylePropertyWashColor::Parse"));
 
         // 5. Hook Clone
         hkWashColorClone_ = MulNX::Hook::Create((uint8_t*)cloneFunc, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
@@ -85,10 +85,10 @@ bool TeamIDController::Init() {
             }
         ).value();
         hkWashColorClone_->Attach();
-        this->ISys().LogSucc(I18n("hook.attached", "CStylePropertyWashColor::Clone"));
+        this->LogSucc(I18n("hook.attached", "CStylePropertyWashColor::Clone"));
         });
 
-    this->ISys().SubscribeSync("Debug/TeamID", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Debug/TeamID", [this](MulNX::Message& msg) {
         this->SetCTColor(0, 255, 0, 255);
         this->SetTColor(255, 0, 0, 255);
         });
@@ -132,7 +132,7 @@ MulNX::Hook::Then TeamIDController::HandleForShowTeamID(CS2::C_CSPlayerPawn* pCS
         return MulNX::Hook::Then::JmpUserSettedTarget;
     }
     catch (const std::exception& e) {
-        this->ISys().LogError(std::format("在控制Team ID显示时遇到错误：{}", e.what()));
+        this->LogError(std::format("在控制Team ID显示时遇到错误：{}", e.what()));
     }
     return MulNX::Hook::Then::Continue;
 }

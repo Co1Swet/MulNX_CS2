@@ -82,7 +82,7 @@ bool Win32Starter::Init() {
     this->CreateMainDraw();
 
     // 设置系统标志位
-    this->GlobalVars->SystemReady.store(true, std::memory_order_release);
+    this->pGlobalVars->SystemReady.store(true);
     return true;
 }
 void Win32Starter::Run() {
@@ -100,7 +100,7 @@ void Win32Starter::Run() {
             }
         }
     }
-    this->ISys().LogWarning(I18n("sys.shutdown_warning"));
+    this->LogWarning(I18n("sys.shutdown_warning"));
     this->CloseSystem();
     this->Core->Close();
     return;

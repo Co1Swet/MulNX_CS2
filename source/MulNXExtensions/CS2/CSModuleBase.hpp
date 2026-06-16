@@ -44,6 +44,7 @@ class CSModuleMixin : public ICSModule {
             return &CS2Paths;
         }
     };
+    T* This() { return static_cast<T*>(this); }
 public:
     CSController* CS2 = nullptr;
     ViewController* CS2View = nullptr;
@@ -53,14 +54,12 @@ public:
     CS2Paths* CS2Paths = nullptr;
 protected:
     CSModuleMixin() {
-        static_assert(MulNX::Module<T>, "T must be a MulNX Module");
-        auto* mod = static_cast<MulNX::ModuleBase*>(static_cast<T*>(this));
-        mod->delayInits->push_back([this, mod]() -> bool {
-            this->CS2 = mod->GetCore()->ModuleManager()->FindModule<CSController>("CSController");
-            this->CS2View = mod->GetCore()->ModuleManager()->FindModule<ViewController>("ViewController");
-            this->CS2Time = mod->GetCore()->ModuleManager()->FindModule<TimeController>("TimeController");
-            this->Hub = mod->GetCore()->ModuleManager()->FindModule<PlayerHub>("PlayerHub");
-            this->CS2Con = mod->GetCore()->ModuleManager()->FindModule<HookConsole>("HookConsole");
+        This()->delayInits->push_back([this]() -> bool {
+            this->CS2 = This()->FindModule<CSController>("CSController");
+            this->CS2View = This()->FindModule<ViewController>("ViewController");
+            this->CS2Time = This()->FindModule<TimeController>("TimeController");
+            this->Hub = This()->FindModule<PlayerHub>("PlayerHub");
+            this->CS2Con = This()->FindModule<HookConsole>("HookConsole");
 
             this->CS2Paths = CS2Paths->Get();
 
@@ -71,8 +70,14 @@ protected:
             return true;
             });
     }
+
+    void AsyncCommand(std::string&& cmd) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command"_hash);
+        rp->str1 = std::move(cmd);
+        This()->PublishAsync(std::move(msg));
+    }
 };
 
-class CSModuleBase :public MulNX::ModuleBase, public CSModuleMixin<CSModuleBase> {};
+class CSModuleBase :public MulNX::Module<CSModuleBase>, public CSModuleMixin<CSModuleBase> {};
 template<typename T>
-class CSModuleBaseT :public MulNX::ModuleBase, public CSModuleMixin<T> {};
+class CSModuleBaseT :public MulNX::Module<T>, public CSModuleMixin<T> {};

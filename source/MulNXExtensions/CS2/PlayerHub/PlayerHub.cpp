@@ -139,12 +139,12 @@ bool PlayerHub::Window(MulNX::UINode* node) {
         }
     }
     catch (const std::exception& e) {
-        this->ISys().LogWarning(std::format("在绘制玩家信息时捕获到异常：{}", e.what()));
+        this->LogWarning(std::format("在绘制玩家信息时捕获到异常：{}", e.what()));
     }
     return true;
 }
 
 bool PlayerHub::Init() {
-    this->ISys().SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
     return true;
 }

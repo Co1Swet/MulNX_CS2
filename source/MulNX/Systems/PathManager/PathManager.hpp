@@ -11,12 +11,11 @@
 //     MulNX/CS2OBTool/CameraSystem/Saves
 // 共享目录（如 Shared/Saves）不受核心名影响，为所有二进制文件共用。
 
-#include <MulNX/Core/ModuleBase/ModuleBase.hpp>
+#include <MulNX/Core/Module/Module.hpp>
 #include "FilePathNode/FilePathNode.hpp"
 
 namespace MulNX {
-    class PathManager :public ModuleBase {
-        friend IPCer;
+    class PathManager :public Module<PathManager> {
     private:
         std::recursive_mutex MutexEx;
         

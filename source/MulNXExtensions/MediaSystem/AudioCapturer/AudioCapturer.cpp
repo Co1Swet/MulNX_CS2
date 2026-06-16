@@ -14,7 +14,7 @@ using Microsoft::WRL::ComPtr;
 static GUID REFERENCE_GUID = GUID_NULL;
 
 bool AudioCapturer::Init() {
-    this->ISys().SubscribeSync("Hook/Present/Fisrt", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/Present/Fisrt", [this](MulNX::Message& msg) {
         // start capture thread
         this->capturing.store(true);
 
@@ -80,7 +80,7 @@ bool AudioCapturer::Init() {
         this->runFlag1.store(true);
 
         // Schedule Main via ISys task (no explicit thread)
-        this->ISys().SendTask("Main", "AudioCapturer", [this]() {
+        this->SendTask("Main", "AudioCapturer", [this]() {
             while (this->runFlag1.load()) {
                 this->runFlag1.store(false);
                 std::unique_lock lock(this->smutex);
@@ -190,13 +190,13 @@ void AudioCapturer::Main() {
                             }
                         }
                         else {
-                            this->ISys().LogWarning(std::string("AudioCapturer: resampler init failed: ") + (rerr ? rerr.message() : "unknown"));
+                            this->LogWarning(std::string("AudioCapturer: resampler init failed: ") + (rerr ? rerr.message() : "unknown"));
                             this->buffer.enqueue(std::move(captured));
                         }
                     }
                 }
                 catch (const std::exception& e) {
-                    this->ISys().LogWarning(std::string("AudioCapturer: normalization failed: ") + e.what());
+                    this->LogWarning(std::string("AudioCapturer: normalization failed: ") + e.what());
                     // best effort: if normalization fails, enqueue original raw data
                     try { this->buffer.enqueue(std::move(samples)); }
                     catch (...) {}

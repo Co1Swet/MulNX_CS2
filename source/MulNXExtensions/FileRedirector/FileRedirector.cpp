@@ -1,7 +1,7 @@
 #include "FileRedirector.hpp"
 
 bool FileRedirector::Init() {
-    std::filesystem::path toolPath = this->ISys().Path()->PathGetForShared("Tools");
+    std::filesystem::path toolPath = this->Path()->PathGetForShared("Tools");
 
     this->pathGameinfo_gi = L"\\\\?\\" + (toolPath / "gameinfo.gi").wstring();
     this->pathMulNXPOV = L"\\\\?\\" + (toolPath / "MulNXPOV.vpk").wstring();
