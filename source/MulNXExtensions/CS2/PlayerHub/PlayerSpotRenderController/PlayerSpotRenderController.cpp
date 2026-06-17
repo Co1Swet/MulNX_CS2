@@ -1,5 +1,6 @@
 #include "PlayerSpotRenderController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/CS2/PlayerHub/PlayerSpotColorController/PlayerSpotColorController.hpp>
 
 enum TeamSytle :uint64_t {
     CT = 9,
@@ -12,10 +13,11 @@ void PlayerSpotRenderController::HubWindow(MulNX::UINode* node) {
     MulNX::UI::Checkbox("隐藏数字显示", this->hideNumLabel);
     MulNX::UI::Checkbox("强制敌人渲染为红色", this->forceEnemyRed);
     MulNX::UI::Checkbox("强制队友显示", this->forceTeammateDraw);
+    this->pColorController->IDraw(node);
 }
 
 bool PlayerSpotRenderController::Init() {
-
+    this->pColorController = this->FindModule<PlayerSpotColorController>("PlayerSpotColorController");
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改绘制状态
         auto Pos_Spot_CmpToSetShow = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetShow).Data();

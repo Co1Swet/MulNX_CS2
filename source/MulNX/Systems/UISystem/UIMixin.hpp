@@ -4,10 +4,10 @@
 
 namespace MulNX {
 
-    template<typename Derived>
+    template<typename T>
     class UIMixin {
     public:
-        Derived* This() { return static_cast<Derived*>(this); }
+        T* This() { return static_cast<T*>(this); }
         UIMixin() {
 
         }
@@ -26,5 +26,6 @@ namespace MulNX {
             return true;
         }
 
+        virtual void IDraw(MulNX::UINode* node) {};
     };
 }

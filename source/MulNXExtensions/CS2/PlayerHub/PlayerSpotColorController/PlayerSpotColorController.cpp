@@ -1,6 +1,11 @@
 #include "PlayerSpotColorController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
+void PlayerSpotColorController::IDraw(MulNX::UINode* node) {
+    MulNX::UI::Checkbox("让T方显示五种颜色", this->TColorMulti);
+    MulNX::UI::Checkbox("让CT方显示五种颜色", this->CTColorMulti);
+}
+
 bool PlayerSpotColorController::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
