@@ -9,7 +9,7 @@ KCP:
   comboClick: 0
 size: 2
 elements:
-  - name: CT_Begin_2
-    offset: 0
   - name: CT_Begin_1
+    offset: 0
+  - name: CT_Begin_2
     offset: 0

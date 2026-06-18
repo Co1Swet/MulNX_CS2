@@ -4,6 +4,7 @@
 #include <MulNX/Systems/I18nManager/I18n.hpp>
 
 namespace MulNX {
+    class UINode;
     class IModule {
         IModule(const IModule&) = delete;
         IModule(IModule&&) = delete;
@@ -17,8 +18,15 @@ namespace MulNX {
         std::unique_ptr<std::vector<std::function<bool()>>>delayInits = std::make_unique<std::vector<std::function<bool()>>>();
 
         IModule() = default;
-        virtual void Deinit() {};
         virtual ~IModule() = default;
+        virtual void Deinit() {};
+        
+        virtual void IDraw(MulNX::UINode* node) {};
+        virtual void IDraw2(MulNX::UINode* node) {};
+        virtual void IDrawBackGround(MulNX::UINode* node) {};
+        virtual void IDrawBackGround2(MulNX::UINode* node) {};
+        virtual void IDrawForeGround(MulNX::UINode* node) {};
+        virtual void IDrawForeGround2(MulNX::UINode* node) {};
 
         IModule* FindModule(const std::string& name);
         template<typename T>

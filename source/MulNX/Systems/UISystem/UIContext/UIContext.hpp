@@ -1,8 +1,5 @@
 #pragma once
-
 #include "UINode/UINode.hpp"
-
-#include <queue>
 
 namespace MulNX {
     class UIContext {

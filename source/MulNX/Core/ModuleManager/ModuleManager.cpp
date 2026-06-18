@@ -43,6 +43,7 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
         .CreateModule<MulNX::CrashDumper>("CrashDumper")
         .CreateModule<MulNX::I18nManager>("I18nManager")
         .CreateModule<MulNX::MessageManager>("MessageManager")// 消息管理器模块
+        .CreateModule<MulNX::UICoordinator>("UICoordinator")
         .CreateModule<MulNX::UISystem>("UISystem")// UI系统模块
         .CreateModule<MulNX::TaskSystem>("TaskSystem")// 任务系统
         .CreateModule<MulNX::Logger>("Logger")

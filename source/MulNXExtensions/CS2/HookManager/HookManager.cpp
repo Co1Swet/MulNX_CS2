@@ -3,7 +3,6 @@
 #include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
 #include <shellapi.h>
-#pragma comment(lib, "d3d11.lib")
 
 bool HookManager::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");

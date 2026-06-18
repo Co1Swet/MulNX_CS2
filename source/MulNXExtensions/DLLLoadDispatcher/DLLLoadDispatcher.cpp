@@ -18,6 +18,7 @@ void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {
 }
 
 void DLLLoadDispatcher::DispatchModuleLoadMessage(const std::filesystem::path& modulePath) {
+    auto filename = modulePath.filename();
     if (modulePath.filename() == L"client.dll") {
         this->PublishSync("Hook/LoadLibraryExW/client.dll"_hash);
     }
@@ -32,5 +33,8 @@ void DLLLoadDispatcher::DispatchModuleLoadMessage(const std::filesystem::path& m
     }
     if (modulePath.filename() == L"d3d11.dll") {
         this->PublishSync("Hook/LoadLibraryExW/d3d11.dll"_hash);
+    }
+    if (modulePath.filename() == L"gameoverlayrenderer64.dll") {
+        this->PublishSync("Hook/LoadLibraryExW/gameoverlayrenderer64.dll"_hash);
     }
 }

@@ -7,8 +7,10 @@
 #include "PathManager/PathManager.hpp"
 #include "CrashDumper/CrashDumper.hpp"
 #include "I18nManager/I18nManager.hpp"
-#include "UISystem/UISystem.hpp"
 #include "Debugger/Debugger.hpp"
 #include "HandleSystem/HandleSystem.hpp"
 #include "InputSystem/InputSystem.hpp"
 #include "TaskSystem/TaskSystem.hpp"
+
+#include "UISystem/UISystem.hpp"
+#include "UISystem/UICoordinator/UICoordinator.hpp"

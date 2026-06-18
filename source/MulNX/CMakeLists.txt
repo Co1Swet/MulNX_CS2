@@ -26,15 +26,17 @@ add_library(MulNX
     Systems/MessageManager/MessageChannel/MessageChannel.cpp
     Systems/MessageManager/MessageManager.cpp
     Systems/GlobalVars/GlobalVars.cpp
-    Systems/UISystem/UISystem.cpp
-    Systems/UISystem/UIContext/UIContext.cpp
-    Systems/UISystem/UIContext/UINode/UINode.cpp
     Systems/PathManager/PathManager.cpp
     Systems/PathManager/FilePathNode/FilePathNode.cpp
     Systems/TaskSystem/TaskSystem.cpp
     Systems/I18nManager/I18nManager.cpp
     Systems/Logger/Logger.cpp
     Systems/ShortcutManager/ShortcutManager.cpp
+
+    Systems/UISystem/UISystem.cpp
+    Systems/UISystem/UIContext/UIContext.cpp
+    Systems/UISystem/UIContext/UINode/UINode.cpp
+    Systems/UISystem/UICoordinator/UICoordinator.cpp
 )
 target_link_libraries(MulNX PUBLIC
     MulNXThirdParty

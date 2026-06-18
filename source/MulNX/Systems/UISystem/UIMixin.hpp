@@ -25,7 +25,5 @@ namespace MulNX {
             This()->LogInfo(I18n("module.send_ui"));
             return true;
         }
-
-        virtual void IDraw(MulNX::UINode* node) {};
     };
 }
