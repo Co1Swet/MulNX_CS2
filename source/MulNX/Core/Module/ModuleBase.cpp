@@ -35,9 +35,14 @@ void MulNX::ModuleBase::Update() {
         cw->h.resume();
     }
     MulNX::MessageChannel* Channel = this->MainMsgChannel;
-    MulNX::Message msg{};
     // 注意这里，msg掌握潜在的asp对象，直到协程使用asp，仍保持有效，直到离开作用域，msg析构引起asp析构
-    while (Channel->PullMessage(msg)) {
+    std::vector<MulNX::Message>msgs;
+    while (true) {
+        MulNX::Message msg;
+        if (!Channel->PullMessage(msg))break;
+        msgs.push_back(std::move(msg));
+    }
+    for (auto& msg : msgs) {
         this->ProcessMsg(msg);// 高优先级
         auto it = this->msgWaiters.find(msg.type);
         if (it == this->msgWaiters.end())continue;

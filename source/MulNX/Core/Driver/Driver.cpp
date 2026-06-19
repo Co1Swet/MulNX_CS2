@@ -3,6 +3,13 @@
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/Systems.hpp>
 
+MulNX::Core::Driver::Driver() {
+    this->backInits->clear();
+    this->delayInits->push_back([this]() {
+        this->LogSucc("驱动就绪");
+        return true;
+        });
+}
 bool MulNX::Core::Driver::Init() {
     // 初始化模块管理器
     this->Core->ModuleManager()->EntryInit(this->Core);

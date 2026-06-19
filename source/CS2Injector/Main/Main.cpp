@@ -27,7 +27,7 @@ int main(int, char**) {
         auto pStarter = pCore->ModuleManager()->FindModule<Win32Starter>("Win32Starter");
 
         // 启动核心
-        pCore->Init();
+        pCore->EntryInit(pCore);
         // 启动主循环
         pStarter->Run();
     }

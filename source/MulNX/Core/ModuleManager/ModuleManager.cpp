@@ -81,7 +81,7 @@ bool MulNX::Core::ModuleManager::ModulesInit() {
             return false;
         }
     }
-    this->LogSucc(I18n("sys.inited_info", this->modules.size() + 2)); // 模块管理器自身和核心启动器
+    this->LogSucc(I18n("sys.inited_info", this->modules.size() + 3)); // 核心，驱动，自身
     return true;
 }
 

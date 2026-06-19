@@ -106,7 +106,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             ;
 
         // 启动核心
-        pCore->Init();
+        pCore->EntryInit(pCore);
 
         auto pHookManager = pCore->ModuleManager()->FindModule<HookManager>("HookManager");
 

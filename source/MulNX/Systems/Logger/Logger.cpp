@@ -1,8 +1,6 @@
 #include "Logger.hpp"
-#include <MulNX/Systems/PathManager/PathManager.hpp>
-#include <MulNX/Systems/I18nManager/I18nManager.hpp>
-#include <MulNX/Systems/TaskSystem/TaskSystem.hpp>
-#include <MulNX/Systems/MessageManager/MessageManager.hpp>
+#include <MulNX/Core/Core.hpp>
+#include <MulNX/Systems/Systems.hpp>
 #include <format>
 
 bool MulNX::Logger::Init() {

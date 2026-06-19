@@ -1,9 +1,12 @@
 #pragma once
+#include <MulNX/Config/Config.hpp>
 #include <MulNX/Common/Message.hpp>
-#include <MulNX/Core/Core.hpp>
 #include <MulNX/Systems/I18nManager/I18n.hpp>
 
 namespace MulNX {
+    namespace Core{
+        class Core;
+    }
     class UINode;
     class IModule {
         IModule(const IModule&) = delete;

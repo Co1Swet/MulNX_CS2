@@ -8,6 +8,7 @@ namespace MulNX {
         // 核心启动器基类，定义核心启动的基本接口
         class Driver :public MulNX::Module<Driver> {
         public:
+            Driver();
             // 初始化Core的所有系统组件
             bool Init()override;
             // 注册主绘制函数

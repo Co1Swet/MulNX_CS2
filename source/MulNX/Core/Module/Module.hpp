@@ -16,6 +16,9 @@
 #include <filesystem>
 
 namespace MulNX {
+    namespace Core{
+        class Driver;
+    }
     template<typename T>
     class Module :public ModuleBase,
         public LogMixin<T>, public MsgMixin<T>, public TaskMixin<T>,
