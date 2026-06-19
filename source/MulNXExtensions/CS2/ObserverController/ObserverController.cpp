@@ -8,12 +8,7 @@ bool ObserverController::Init() {
         .SubscribeAsync("Observe/SpecSteam64UID")
         .SubscribeAsync("Observe/SpecHandle")
         .SubscribeAsync("spec_mode_changed_to")
-        .SubscribeSync("Hook/RegisterConCommand/RegisterOurCmd",
-            [this](MulNX::Message& msg) {
-                this->CS2Con->RegisterCS2Cmd("mulnx_spec_steam64uid", "this is MulNX Cmd", [this](CCommand* a) {
-                    return;
-                    });
-            });
+        ;
 
     this->SendTask("Main", "CSControl", [this]() -> bool {
         this->Main();

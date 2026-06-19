@@ -119,13 +119,7 @@ bool DemoSystem::Init() {
         .SubscribeAsync("Demo/Play")
         .SubscribeAsync("Demo/Refresh")
         .SubscribeAsync("Window/Drag/FileDrop")
-        .SubscribeSync("Hook/RegisterConCommand/RegisterOurCmd",
-            [this](MulNX::Message& msg) {
-                this->CS2Con->RegisterCS2Cmd("mulnx_test", "this is MulNX Cmd", [this](CCommand* a) {
-                    MessageBoxW(NULL, L"test", L"test", MB_OK);
-                    return;
-                    });
-            });
+        ;
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);

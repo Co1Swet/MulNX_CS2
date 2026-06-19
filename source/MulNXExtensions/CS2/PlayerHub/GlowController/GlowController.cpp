@@ -1,6 +1,7 @@
 #include "GlowController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 void GlowController::HubPlayer(MulNX::UINode* node) {
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
@@ -77,11 +78,11 @@ bool GlowController::Init() {
             }).value();
         this->hkSetGlowColor->Attach();
         this->LogSucc(I18n("hook.attached", "SetGlowColor"));
+        });
 
-        this->SendTask("Update", "CSControl", [this]() {
-            this->Update();
-            return true;
-            });
+    this->SendTask("Update", "CSControl", [this]() {
+        this->Update();
+        return true;
         });
 
     (*this)
@@ -94,6 +95,10 @@ bool GlowController::Init() {
         .SubscribeAsync("Glow/Team/Clear")
         .SubscribeAsync("Glow/Team/ClearAll")
         .SubscribeAsync("Glow/ClearAll");
+
+    this->CS2Con->RegisterCmd("mulnx_glow_enable", [this](CCommand* cmd) {this->PublishAsync("Glow/Enable"_hash);})
+        .RegisterCmd("mulnx_glow_disable", [this](CCommand* cmd) {this->PublishAsync("Glow/Disable"_hash);})
+        ;
 
     return true;
 }
@@ -144,7 +149,6 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
         this->teamColors.clear();
         break;
     }
-
     case "Glow/ClearAll"_hash: {
         std::unique_lock lock(this->Hub->smutex);
         this->playerColors.clear();

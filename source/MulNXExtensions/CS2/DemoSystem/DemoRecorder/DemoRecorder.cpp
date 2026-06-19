@@ -2,10 +2,10 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/CS2/TimeController/TimeController.hpp>
 #include <MulNXExtensions/CS2/DemoSystem/DemoJSONReader/DemoJSONReader.hpp>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 bool DemoRecorder::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("Demo Recorder", this->showWindow);
-    if (!w) return true;
+    auto w = MulNX::UI::RAIIWindow("Demo Recorder");
     std::shared_lock lock(this->smutex);
 
     if (ImGui::Button("启动")) {
@@ -65,7 +65,10 @@ bool DemoRecorder::Init() {
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
-    this->showWindow.store(true, std::memory_order_release);
+
+    this->CS2Con->RegisterCmd("mulnx_record_start", [this](CCommand* cmd) {this->StartRecord();})
+        .RegisterCmd("mulnx_record_stop", [this](CCommand* cmd) {this->PublishAsync("Media/Record/Stop"_hash);})
+        ;
 
     return true;
 }
@@ -133,6 +136,12 @@ bool DemoRecorder::PeekQueue(RecordTask& task) {
     }
     return true;
 }
+void DemoRecorder::StartRecord() {
+    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
+    ++this->num;
+    rp->str1 = (this->dirOutput / this->subOutput / std::to_string(this->num)).string();
+    this->PublishAsync(std::move(msg));
+}
 
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
@@ -181,11 +190,7 @@ MulNX::CoTask DemoRecorder::Main() {
             + ", observing UID=" + std::to_string(uid));
 
         // 开始录制
-        auto [msgRS, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
-        ++this->num;
-        rp->str1 = (this->dirOutput / this->subOutput / std::to_string(this->num)).string();
-        
-        this->PublishAsync(std::move(msgRS));
+        this->StartRecord();
 
         this->LogSucc("Recording started for UID="
             + std::to_string(uid)

@@ -1,7 +1,7 @@
 #include "FreeCameraController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 void FreeCameraController::Menu(MulNX::UINode* node) {
     bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
@@ -24,6 +24,7 @@ bool FreeCameraController::Init() {
     this->kMovDown = this->Shortcut()->GetButton("CamMovDown").value();
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
     this->SubscribeAsync("FreeCamCtrl/Toggle");
+    this->CS2Con->RegisterCmd("mulnx_freeCamCtrl_toggle", [this](CCommand* cmd) {this->PublishAsync("FreeCamCtrl/Toggle"_hash);});
     return true;
 }
 

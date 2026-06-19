@@ -16,6 +16,14 @@ bool HookConsole::Init() {
     return true;
 }
 
+HookConsole& HookConsole::RegisterCmd(std::string&& name, std::function<void(CCommand*)>&& callback) {
+    this->LogInfo(std::format("请求了指令创建: {}", name));
+    MulNXCS2CmdCallback CmdCallback(std::move(callback));
+    MulNXCmd cmd(std::move(name), "one MulNX Cmd", std::move(CmdCallback));
+    this->CS2Cmds.push_back(std::move(cmd));
+    return *this;
+}
+
 void HookConsole::OnTier0Load(MulNX::Message& msg) {
     auto VEngineCvar007 = (uintptr_t)this->CS2->tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("VEngineCvar007", nullptr);
 
@@ -24,12 +32,11 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
     this->GetCVarByIndex = IVClass::Assume(VEngineCvar007)->GetVFunc<C_ConVar * (uint64_t)>(43);
 
     this->hkVEngineCvar007_RegisterConCommand = MulNX::Hook::Create((uint8_t*)IVClass::Assume(VEngineCvar007)->GetVFuncPtr(44), [this](MulNX::Hook* hk, RegContext* ctx) {
+        hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnRegisterConCommand(hk, ctx);});
         auto pOrigCmd = ctx->r8;
 
-        this->RegisterCS2Cmd = [this, &hk, &ctx](std::string&& name, std::string&& help, std::function<void(CCommand*)>&& callback)->void {
-            this->CS2Cmds.push_back({ std::move(name), std::move(help), std::move(callback) });
-            auto& cmd = this->CS2Cmds.back();
-
+        this->LogInfo("开始注册MulNX的控制台指令");
+        for (auto& cmd : this->CS2Cmds) {
             CCmd cmdForCS2(
                 cmd.name.c_str(),
                 cmd.help.c_str(),
@@ -38,14 +45,12 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
             );
             ctx->r8 = (uint64_t)&cmdForCS2;
             hk->CallMaybeOrigin(5, ctx);
-
-            };
-
-        this->PublishSync("Hook/RegisterConCommand/RegisterOurCmd"_hash);
+        }
+        this->LogSucc(std::format("共注册指令数：{}", this->CS2Cmds.size()));
 
         ctx->r8 = pOrigCmd;
         hk->CallMaybeOrigin(5, ctx);
-        hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnRegisterConCommand(hk, ctx);});
+        
         return MulNX::Hook::Then::Return;
         }
     ).value();

@@ -13,7 +13,8 @@ class DemoRecorder final : public CSModuleBase {
 
     std::atomic<bool> moduleActive = false;
 
-    bool PeekQueue(RecordTask& task);   // 调用者需持有 mtx
+    bool PeekQueue(RecordTask& task);
+    void StartRecord();
 
     MulNX::CoTask Main();
     std::atomic<uint64_t> num = 0;
