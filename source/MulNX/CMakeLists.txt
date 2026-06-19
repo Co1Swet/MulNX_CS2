@@ -34,8 +34,7 @@ add_library(MulNX
     Systems/ShortcutManager/ShortcutManager.cpp
 
     Systems/UISystem/UISystem.cpp
-    Systems/UISystem/UIContext/UIContext.cpp
-    Systems/UISystem/UIContext/UINode/UINode.cpp
+    Systems/UISystem/UINode/UINode.cpp
     Systems/UISystem/UICoordinator/UICoordinator.cpp
 )
 target_link_libraries(MulNX PUBLIC

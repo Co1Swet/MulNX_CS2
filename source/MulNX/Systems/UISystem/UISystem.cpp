@@ -1,10 +1,7 @@
 #include "UISystem.hpp"
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNX/Systems/PathManager/PathManager.hpp>
-#include <MulNX/Systems/I18nManager/I18nManager.hpp>
-#include <MulNX/Systems/MessageManager/MessageManager.hpp>
-#include <MulNX/Systems/Logger/Logger.hpp>
+#include <MulNX/Systems/Systems.hpp>
 #include <yaml-cpp/yaml.h>
 #include <MulNXThirdParty/ImGuiStyleSerializer.h>
 #include <Windows.h>
@@ -21,11 +18,10 @@ bool MulNX::UISystem::Menu(MulNX::UINode* node) {
 }
 
 bool MulNX::UISystem::Init() {
-    this->UIContext.Core = this->Core;
+    this->pCoordinator = this->FindModule<UICoordinator>("UICoordinator");
     (*this)
         .SubscribeAsync("UISystem/Start")
         .SubscribeAsync("UISystem/Toggle")
-        .SubscribeAsync("UISystem/ModulePush")
         .SubscribeAsync("UISystem/SaveStyle");
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
@@ -37,9 +33,8 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "UISystem/Start"_hash: {
         std::string* pStr = Msg.asp.get<std::string>();
-        this->UIContext.EntryDraw = std::move(*pStr);
-        this->UISystemRunning = true;
-        this->UIContext.Active = true;
+        this->runFlag1.store(true);
+        this->runFlag2.store(true);
         this->LogWarning("接收到启动消息，UI系统开始启动");
 
         // 设置ini文件路径
@@ -54,13 +49,7 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
         break;
     }
     case "UISystem/Toggle"_hash: {
-        this->UIContext.Active = !this->UIContext.Active;
-        break;
-    }
-    case "UISystem/ModulePush"_hash: {
-        MulNX::UINode* node = Msg.asp.get<MulNX::UINode>();
-        this->UIContext.AddUINode(node->hSelf, std::move(*node));
-        this->LogSucc("接收到一个UI节点");
+        this->runFlag2.store(!this->runFlag2.load());
         break;
     }
     case "UISystem/SaveStyle"_hash: {
@@ -70,18 +59,20 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     }
 }
 
-void MulNX::UISystem::HandleUpdate() {
-    this->Update();
-}
-
 // ImGui窗口处理函数导入
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-int MulNX::UISystem::Render() {
+void MulNX::UISystem::HandleUpdate() {
+    this->pCoordinator->HandleUpdate();
+    this->Update();
+
     MulNX::Win32::Msg4 msg4;
     while (this->winMsgs.try_dequeue(msg4)) {
+        if (!this->runFlag1.load())continue;
         ImGui_ImplWin32_WndProcHandler(msg4.hWnd, msg4.uMsg, msg4.wParam, msg4.lParam);
     }
-    if (!this->UISystemRunning) {
+}
+int MulNX::UISystem::Render() {
+    if (!this->runFlag2.load()) {
         return 0;
     }
     ImGuiIO& io = ImGui::GetIO();
@@ -93,9 +84,7 @@ int MulNX::UISystem::Render() {
     }
 
     if (!this->FrameBefore())return 0;
-    if (this->UIContext.Active) {
-        this->UIContext.Draw();
-    }
+    this->pCoordinator->Render();
     this->FrameBehind();
 
     return 0;
