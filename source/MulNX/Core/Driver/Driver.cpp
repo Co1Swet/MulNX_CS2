@@ -1,13 +1,10 @@
-#include "CoreStarterBase.hpp"
+#include "Driver.hpp"
 #include <MulNX/Common/Message.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/Systems.hpp>
 
-bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
-    // 初始化核心启动器
-    this->EntryInit(pCore);
+bool MulNX::Core::Driver::Init() {
     // 初始化模块管理器
-    this->Core->ModuleManager()->SetName("ModuleManager");
     this->Core->ModuleManager()->EntryInit(this->Core);
     // 初始化注册模块
     this->Core->ModuleManager()->ModulesInit();
@@ -16,24 +13,23 @@ bool MulNX::Core::CoreStarterBase::SystemInit(MulNX::Core::Core* pCore) {
     this->LogWarning(I18n("sys.version_is_testing", MulNXInfo::IsDebugVersion));
     this->LogWarning(I18n("sys.version_is", MulNXInfo::Version));
     this->LogWarning(I18n("sys.build_stamp", MulNXInfo::TimeStamp));
-    // 执行启动器回调
-    this->InitEndCall();
     // 记录结束时间
     auto end = std::chrono::steady_clock::now();
     // 输出总时间
     auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->createTime);
     this->LogWarning(I18n("sys.inited_time_sum", cost.count()));
+    this->LogWarning(I18n("disclaimer"));
     return true;
 }
 
-void MulNX::Core::CoreStarterBase::CreateMainDraw() {
+void MulNX::Core::Driver::CreateMainDraw() {
     // UI系统主界面初始化
     auto [msg2, rp] = MulNX::Message::Create<std::string>("UISystem/Start"_hash, "MainDraw");
     this->PublishAsync(std::move(msg2));
     this->LogWarning("发送了UI启动指令！渲染即将开始！");
 }
 
-void MulNX::Core::CoreStarterBase::CloseSystem() {
+void MulNX::Core::Driver::CloseSystem() {
     // 设置系统标志位
     this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(false, std::memory_order_release);
     // 通知所有模块，以清理资源，包括线程停止

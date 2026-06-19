@@ -7,10 +7,10 @@
 
 namespace MulNX {
     namespace Core {
-        class CoreStarterBase;
+        class Driver;
         class ModuleManager;
         class Core {
-            friend class MulNX::Core::CoreStarterBase;
+            friend class MulNX::Core::Driver;
         private:
             // 自身指针
             std::unique_ptr<Core> pMyself = nullptr;
@@ -19,7 +19,7 @@ namespace MulNX {
             // 模块管理器指针
             std::unique_ptr<ModuleManager> pModuleManager;
 			// 核心启动器指针
-            std::unique_ptr<MulNX::Core::CoreStarterBase> pCoreStarter = nullptr;
+            std::unique_ptr<MulNX::Core::Driver> pDriver = nullptr;
             // 核心创建时间
             std::chrono::steady_clock::time_point createTime;
 
@@ -41,14 +41,8 @@ namespace MulNX {
             void Close();
 
             // 获取模块的接口
+            MulNX::Core::Driver* Driver();
             ModuleManager* ModuleManager();
-
-            // 设置启动器
-            template<typename T>
-            T* CreateCoreStarter() {
-                this->pCoreStarter = std::make_unique<T>();
-                return static_cast<T*>(this->pCoreStarter.get());
-            }
 
             // 获取核心名
             std::string GetName();

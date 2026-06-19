@@ -31,25 +31,10 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
         pCore = MulNX::Core::Core::Create("CS2OBTool");
         // 将DLL模块句柄传递给核心，以便后续使用
         pCore->hMyOriginModule = hOriginModule;
-        // 创建核心启动器
-        auto* starter = pCore->CreateCoreStarter<HookManager>();
-        // 手动创建的模块需要手动设置名称
-        starter->SetName("HookManager");
-        // 设置初始化完成回调
-        starter->InitEndCall = [starter]() {
-            starter->LogWarning(I18n("disclaimer"));
-            if (MulNXInfo::IsDebugVersion) {
-                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
-                rp->str1 = "111";
-                starter->PublishAsync(std::move(msg));
-                std::thread([]() {
-                    MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
-                    }).detach();
-            }
-            };
 
         // 注册所有模块
         (*pCore->ModuleManager())
+            .CreateModule<HookManager>("HookManager")
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
             .CreateModule<FileRedirector>("FileRedirector")
@@ -122,6 +107,17 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
 
         // 启动核心
         pCore->Init();
+
+        auto pHookManager = pCore->ModuleManager()->FindModule<HookManager>("HookManager");
+
+        if (MulNXInfo::IsDebugVersion) {
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
+            rp->str1 = "111";
+            pHookManager->PublishAsync(std::move(msg));
+            std::thread([]() {
+                MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
+                }).detach();
+        }
         return 0;
     }
     catch (std::exception& e) {

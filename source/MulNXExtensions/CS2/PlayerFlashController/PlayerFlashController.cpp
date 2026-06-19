@@ -8,6 +8,7 @@ bool PlayerFlashController::Menu(MulNX::UINode* node) {
 
 bool PlayerFlashController::Init() {
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->participateIt = true;
     return true;
 }
 

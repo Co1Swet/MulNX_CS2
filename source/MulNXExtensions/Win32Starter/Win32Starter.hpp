@@ -4,7 +4,7 @@
 #include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
 #include <d3d11.h>
 
-class Win32Starter final :public MulNX::Core::CoreStarterBase {
+class Win32Starter final :public MulNX::Module<Win32Starter> {
     MulNX::UISystem* pUISystem = nullptr;
 
     // Data

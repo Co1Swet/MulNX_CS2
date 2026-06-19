@@ -12,9 +12,9 @@ add_library(MulNX
     Config/Config.cpp
 
     Core/Core.cpp
-    Core/CoreStarterBase/CoreStarterBase.cpp
-    Core/Module/ModuleBase.cpp
     Core/Module/IModule.cpp
+    Core/Module/ModuleBase.cpp
+    Core/Driver/Driver.cpp
     Core/ModuleManager/ModuleManager.cpp
 
     Systems/Debugger/Debugger.cpp

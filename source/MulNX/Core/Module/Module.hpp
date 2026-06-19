@@ -21,9 +21,14 @@ namespace MulNX {
         public LogMixin<T>, public MsgMixin<T>, public TaskMixin<T>,
         public UIMixin<T>, public PathMixin<T>, public InputMixin<T>,
         public GlobalVarMixin<T>, public ShortcutMixin<T> {
-        friend MulNX::Core::CoreStarterBase;
+        friend MulNX::Core::Driver;
     public:
-
+        Module() {
+            this->backInits->push_back([this]() {
+                this->LogSucc(I18n("module.inited"));
+                return true;
+                });
+        }
     };
 
     template <typename T>

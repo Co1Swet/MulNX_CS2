@@ -5,7 +5,7 @@
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
-class HookManager final : public MulNX::Core::CoreStarterBase, public CSModuleMixin<HookManager> {
+class HookManager final : public CSModuleBase {
 private:
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
@@ -14,8 +14,7 @@ private:
 
     std::unique_ptr<MulNX::Hook> hkD3D11CreateDevice = nullptr;
     std::unique_ptr<MulNX::Hook> hkCreateSwapChain = nullptr;
-    // LoadLibrary 函数钩子（用于DLL注入检测）
-    std::unique_ptr<MulNX::Hook> hkLoadLibraryExW = nullptr;
+    
     // ClearDepthStencilView 钩子（清空前偷深度）
     std::unique_ptr<MulNX::Hook> hkClearDepthStencilView = nullptr;
     // Present 钩子

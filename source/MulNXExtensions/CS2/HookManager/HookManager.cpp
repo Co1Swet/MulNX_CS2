@@ -8,17 +8,6 @@ bool HookManager::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
-    this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, [this](MulNX::Hook* hk, RegContext* ctx) {
-        LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
-        hk->CallMaybeOrigin(0, ctx);
-        MulNX::Message msg("Hook/LoadLibraryExW"_hash);
-        msg.p1.as<LPCWSTR>() = lpLibFileName;
-        this->PublishSync(msg);
-        return MulNX::Hook::Then::Return;
-        }).value();
-    this->hkLoadLibraryExW->Attach();
-    this->LogSucc(I18n("hook.attached", "LoadLibraryExW"));
-
     this->SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
         auto pD3D11CreateDevice = (uint8_t*)GetProcAddress(GetModuleHandleW(L"d3d11.dll"), "D3D11CreateDevice");
         this->hkD3D11CreateDevice = MulNX::Hook::Create(pD3D11CreateDevice, [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -132,7 +121,7 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
         this->pGraphicsManager->pd3dContext->OMSetRenderTargets(1, &this->pGraphicsManager->view, nullptr);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         };
-    this->CreateMainDraw();
+    this->Core->Driver()->CreateMainDraw();
     this->pGlobalVars->SystemReady.store(true);
     return MulNX::Hook::Then::Continue;
 }
@@ -156,14 +145,13 @@ MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
     }
     if (uMsg == WM_CLOSE) {
         this->LogWarning(I18n("sys.shutdown_warning"));
-        this->CloseSystem();
+        this->Core->Driver()->CloseSystem();
     }
     return MulNX::Hook::Then::Continue;
 }
 void HookManager::Deinit() {
     this->hkClearDepthStencilView->Detach();
     this->hkPresent->Detach();
-    this->hkLoadLibraryExW->Detach();
     this->hkWndProc->Detach();
 }
 void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {

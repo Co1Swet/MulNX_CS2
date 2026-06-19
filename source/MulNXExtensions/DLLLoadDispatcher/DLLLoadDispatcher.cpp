@@ -2,8 +2,22 @@
 
 bool DLLLoadDispatcher::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW", [this](MulNX::Message& msg) {this->OnModuleLoaded(msg); });
+
+    this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, [this](MulNX::Hook* hk, RegContext* ctx) {
+        LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
+        hk->CallMaybeOrigin(0, ctx);
+        MulNX::Message msg("Hook/LoadLibraryExW"_hash);
+        msg.p1.as<LPCWSTR>() = lpLibFileName;
+        this->PublishSync(msg);
+        return MulNX::Hook::Then::Return;
+        }).value();
+    this->hkLoadLibraryExW->Attach();
+    this->LogSucc(I18n("hook.attached", "LoadLibraryExW"));
     
     return true;
+}
+void DLLLoadDispatcher::Deinit() {
+    this->hkLoadLibraryExW->Detach();
 }
 
 void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {

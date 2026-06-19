@@ -2,6 +2,7 @@
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/Systems.hpp>
+#include <ranges>
 
 // 初始化
 bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {
@@ -13,6 +14,10 @@ bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {
     if (!this->Init()) {
         return false;
     }
+    for (const auto& init : *this->backInits | std::views::reverse) {
+        if (!init())return false;
+    }
+    this->backInits.reset();
     return true;
 }
 void MulNX::ModuleBase::Update() {

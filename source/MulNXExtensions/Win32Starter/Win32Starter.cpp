@@ -79,7 +79,7 @@ bool Win32Starter::Init() {
         this->SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
         };
     // 通过MainDraw字符串发送UI启动命令
-    this->CreateMainDraw();
+    this->Core->Driver()->CreateMainDraw();
 
     // 设置系统标志位
     this->pGlobalVars->SystemReady.store(true);
@@ -101,7 +101,7 @@ void Win32Starter::Run() {
         }
     }
     this->LogWarning(I18n("sys.shutdown_warning"));
-    this->CloseSystem();
+    this->Core->Driver()->CloseSystem();
     this->Core->Close();
     return;
 }

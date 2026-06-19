@@ -80,7 +80,6 @@ bool MulNX::Core::ModuleManager::ModulesInit() {
             MulNX::ErrorTerminate("在模块初始化时出现错误，模块名：" + pModule->GetName());
             return false;
         }
-        this->LogSucc(I18n("module.inited{}", pModule->GetName()));
     }
     this->LogSucc(I18n("sys.inited_info", this->modules.size() + 2)); // 模块管理器自身和核心启动器
     return true;
@@ -98,7 +97,7 @@ void MulNX::Core::ModuleManager::DeinitModules() {
 
 void MulNX::Core::ModuleManager::Deinit() {
     std::unique_lock lock(this->smutex);
-    for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
+    for (auto it = this->modules.rbegin();it != --this->modules.rend();++it) {
         if (it->second->GetName() == "TaskSystem")continue;
         it->second = nullptr;
     }

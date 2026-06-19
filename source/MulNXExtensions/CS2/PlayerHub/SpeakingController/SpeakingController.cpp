@@ -13,7 +13,7 @@ bool SpeakingController::Init() {
         this->tv_listen_voice_indices = this->CS2Con->GetCvar("tv_listen_voice_indices")->GetPtr<int>();
         return;
         });
-
+    this->participateIt = true;
     return true;
 }
 void SpeakingController::OnItBegin() {

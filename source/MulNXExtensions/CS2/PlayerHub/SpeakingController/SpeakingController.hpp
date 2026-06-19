@@ -2,7 +2,6 @@
 #include <MulNXExtensions/CS2/PlayerHub/CSViewPlayerModuleBase.hpp>
 
 class SpeakingController :public CSViewPlayerModuleBaseT<SpeakingController> {
-    static constexpr bool ParticipateIt = true;
 private:
     int* tv_listen_voice_indices = nullptr;
     int bufferMask = 0;

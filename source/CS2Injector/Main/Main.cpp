@@ -13,17 +13,9 @@ int main(int, char**) {
         pCore = MulNX::Core::Core::Create("CS2Injector");
         // 将模块句柄传递给核心，以便后续使用
         pCore->hMyOriginModule = GetModuleHandleW(NULL);
-        // 创建核心启动器
-        auto* starter = pCore->CreateCoreStarter<Win32Starter>();
-        // 手动创建的模块需要手动设置名称
-        starter->SetName("Win32Starter");
-        // 设置初始化完成回调
-        starter->InitEndCall = [starter]() {
-            starter->LogWarning(I18n("disclaimer"));
-            };
-
         // 注册所有模块
         (*pCore->ModuleManager())
+            .CreateModule<Win32Starter>("Win32Starter")
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
             // 管理
             .CreateModule<DLLInjectHelper>("DLLInjectHelper")
@@ -32,10 +24,12 @@ int main(int, char**) {
             .CreateModule<UIDocker>("UIDocker")
             ;
 
+        auto pStarter = pCore->ModuleManager()->FindModule<Win32Starter>("Win32Starter");
+
         // 启动核心
         pCore->Init();
         // 启动主循环
-        starter->Run();
+        pStarter->Run();
     }
     catch (std::exception& e) {
         MulNX::ErrorTerminate("在启动时发生异常！异常描述：" + std::string(e.what()));

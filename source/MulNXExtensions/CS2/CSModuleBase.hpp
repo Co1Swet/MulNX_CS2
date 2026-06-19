@@ -9,8 +9,6 @@ class HookConsole;
 using Steam64UID = uint64_t;
 
 class ICSModule {
-protected:
-    static constexpr bool ParticipateIt = false;
 public:
     ~ICSModule() = default;
 
@@ -53,6 +51,7 @@ public:
     HookConsole* CS2Con = nullptr;
     CS2Paths* CS2Paths = nullptr;
 protected:
+    bool participateIt = false;
     CSModuleMixin() {
         This()->delayInits->push_back([this]() -> bool {
             this->CS2 = This()->FindModule<CSController>("CSController");
@@ -63,10 +62,13 @@ protected:
 
             this->CS2Paths = CS2Paths->Get();
 
-            if constexpr (T::ParticipateIt) {
+            return true;
+            });
+
+        This()->backInits->push_back([this]()->bool {
+            if (this->participateIt) {
                 this->CS2->ParticipateItCSModules.push_back(this);
             }
-
             return true;
             });
     }
