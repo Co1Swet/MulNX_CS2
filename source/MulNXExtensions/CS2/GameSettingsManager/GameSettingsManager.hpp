@@ -1,68 +1,85 @@
 #pragma once
-
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
+#include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
+#include <type_traits>
 
-class ScreenSettings {
+template<typename T>
+class CvarPtr {
+    const char* const name;
+    T* ptr = nullptr;
 public:
-    int* spec_show_xray = nullptr;
-    bool operator==(const ScreenSettings&)const = default;
+    constexpr explicit CvarPtr(const char* name) noexcept : name(name) {}
+    void Init(HookConsole* con) {
+        if (auto* cvar = con->GetCvar(this->name)) {
+            this->ptr = cvar->GetPtr<T>();
+        }
+    }
+    operator T* () const noexcept { return this->ptr; }
+    T* operator->() const noexcept { return this->ptr; }
+    T& operator*()  const noexcept { return *this->ptr; }
 };
 
-class SoundSettings {
-public:
-    bool* snd_mute_losefocus = nullptr;//游戏窗口失去焦点时静音
+#define GAME_SETTINGS_CVARS(X)                          \
+    /* ========== 基础 / 作弊 ========== */             \
+    X(bool,  sv_cheats)                                 \
+    X(int,   fps_max)                                   \
+    X(float, host_timescale)                            \
+                                                        \
+    /* ========== 显示 / HUD ========== */              \
+    X(int,   spec_show_xray)                            \
+    X(int,   cl_showfps)                                \
+    X(int,   cl_showtick)                               \
+    X(int,   cl_trueview_show_status)                   \
+    X(bool,  cl_drawhud)                                \
+    X(bool,  cl_draw_only_deathnotices)                 \
+    X(bool,  cl_drawhud_force_radar)                    \
+    X(bool,  crosshair)                    \
+                                                        \
+    /* ========== 雷达 / 观战 ========== */             \
+    X(bool,  cl_radar_show_all_players_when_spectating) \
+    X(bool,  cl_radar_square_always)                    \
+    X(bool,  cl_radar_square_when_spectating)           \
+    X(bool,  cl_demo_predict)                           \
+    X(bool,  cl_spec_show_bindings)                     \
+                                                        \
+    /* ========== 声音 ========== */                    \
+    X(bool,  snd_mute_losefocus)                        \
+    X(float, snd_menumusic_volume)                      \
+    X(float, snd_roundstart_volume)                     \
+    X(float, snd_roundaction_volume)                    \
+    X(float, snd_roundend_volume)                       \
+    X(float, snd_mvp_volume)                            \
+    X(float, snd_mapobjective_volume)                   \
+    X(float, snd_tensecondwarning_volume)               \
+    X(float, snd_deathcamera_volume)                    \
+    X(bool,  snd_mute_mvp_music_live_players)           \
+                                                        \
+    /* ========== 景深 (DoF) ========== */              \
+    X(bool,  r_dof_override)                            \
+    X(float, r_dof_override_far_blurry)                 \
+    X(float, r_dof_override_far_crisp)                  \
+    X(float, r_dof_override_near_blurry)                \
+    X(float, r_dof_override_near_crisp)                 \
+    X(float, r_dof_override_tilt_to_ground)
 
-    float* snd_menumusic_volume = nullptr; //主菜单音量
-    float* snd_roundstart_volume = nullptr; //回合开始音量
-    float* snd_roundaction_volume = nullptr; //回合开始行动音量
-    float* snd_roundend_volume = nullptr; //回合结束音量
-    float* snd_mvp_volume = nullptr; //MVP音量
-    float* snd_mapobjective_volume = nullptr; //炸弹/人质音量
-    float* snd_tensecondwarning_volume = nullptr; //十秒警告音量(0.04就是游戏设置中的20)
-    float* snd_deathcamera_volume = nullptr; //死亡视角音量
-    bool* snd_mute_mvp_music_live_players = nullptr; //当双方团队成员都存活时关闭MVP音乐(0--否，1--是)
-
-    bool operator==(const SoundSettings&)const = default;
+struct C_GameSettings {
+#define DECL_CVAR(type, name) CvarPtr<type> name{#name};
+    GAME_SETTINGS_CVARS(DECL_CVAR)
+#undef DECL_CVAR
+    void Init(HookConsole* cvarSys) {
+#define INIT_CVAR(type, name) name.Init(cvarSys);
+        GAME_SETTINGS_CVARS(INIT_CVAR)
+#undef INIT_CVAR
+    }
 };
-
-class C_GameSettings {
-public:
-    bool* cl_drawhud = nullptr;
-    bool* cl_draw_only_deathnotices = nullptr;
-    bool* cl_drawhud_force_radar = nullptr;
-    int* cl_showfps = nullptr;
-    int* cl_showtick = nullptr;
-    int* cl_trueview_show_status = nullptr;
-    float* host_timescale = nullptr;
-    int* fps_max = nullptr;
-    SoundSettings SoundSettings{};
-    ScreenSettings ScreenSettings{};
-
-    bool operator==(const C_GameSettings&)const = default;
-};
-
-class dof {
-public:
-    //bool指针，默认nullptr
-    bool* r_dof_override = nullptr;
-
-    float FocusDistance = 1000;
-    float CrispRadius = 100;
-    float BlurDistance = 100;
-
-    //float指针，默认nullptr
-    float* r_dof_override_far_blurry = nullptr;
-    float* r_dof_override_far_crisp = nullptr;
-    float* r_dof_override_near_blurry = nullptr;
-    float* r_dof_override_near_crisp = nullptr;
-    float* r_dof_override_tilt_to_ground = nullptr;
-};
+#undef GAME_SETTINGS_CVARS
 
 class GameSettingsManager final :public CSModuleBase {
 private:
-    C_GameSettings GameSettings{};
-    dof dof{};
-    bool* sv_cheats = nullptr;
+    float FocusDistance;
+    float CrispRadius;
+    float BlurDistance;
+    C_GameSettings settings{};
     bool Menu(MulNX::UINode* node);
     bool SoundMenu(MulNX::UINode* node);
     bool DofMenu(MulNX::UINode* node);

@@ -1,6 +1,5 @@
 #include "GlowController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
 void GlowController::HubPlayer(MulNX::UINode* node) {
@@ -86,6 +85,8 @@ bool GlowController::Init() {
         });
 
     (*this)
+        .SubscribeAsync("Glow/Enable")
+        .SubscribeAsync("Glow/Disable")
         .SubscribeAsync("Glow/Player/Set")
         .SubscribeAsync("Glow/Player/Clear")
         .SubscribeAsync("Glow/Player/ClearAll")
@@ -99,6 +100,14 @@ bool GlowController::Init() {
 
 void GlowController::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
+    case "Glow/Enable"_hash: {
+        this->disableGlow.store(false);
+        break;
+    }
+    case "Glow/Disable"_hash: {
+        this->disableGlow.store(true);
+        break;
+    }
     case "Glow/Player/Set"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
         auto color = Msg.p2.low<uint32_t>();
@@ -150,11 +159,7 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
 void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t* color) {
     std::shared_lock lock(this->Hub->smutex);
 
-    auto msg = MulNX::Message("Call/OnSetGlow"_hash);
-    bool needErase = false;
-    msg.p2.as<bool*>() = &needErase;
-    this->PublishSync(msg);
-    if (needErase) {
+    if (this->disableGlow.load()) {
         *color = 0;
         return;
     }

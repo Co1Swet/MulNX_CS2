@@ -13,8 +13,6 @@
 #include "PlayerFlashController/PlayerFlashController.hpp"
 #include "DeathMsgController/DeathMsgController.hpp"
 #include "SkinController/SkinController.hpp"
-#include "POVFixer/POVFixer.hpp"
-#include "TeamIDController/TeamIDController.hpp"
 #include "EntityListScanner/EntityListScanner.hpp"
 
 #include "DemoSystem/DemoSystem.hpp"

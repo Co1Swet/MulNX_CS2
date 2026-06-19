@@ -87,7 +87,7 @@ void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
         this->HandleCameraSystemPlay(viewSetup);
     }
 
-    this->PublishSync("Call/BeforeDraw"_hash);
+    this->PublishSync("Hook/OnSetupView"_hash);
 
     // 记录视角数据
     {

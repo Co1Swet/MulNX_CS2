@@ -6,6 +6,7 @@ add_library(PlayerHubs
     ProjectileTracker/ProjectileTracker.cpp
     SpeakingController/SpeakingController.cpp
     KeyboardOverlay/KeyboardOverlay.cpp
+    TeamIDController/TeamIDController.cpp
 
     BombSpotController/BombSpotController.cpp
 

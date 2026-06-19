@@ -13,7 +13,7 @@ void SkinController::Window(MulNX::UINode* node) {
 
 bool SkinController::Init() {
     (*this)
-        .SubscribeSync("Call/BeforeDraw", [this](MulNX::Message& msg) {this->Update();})
+        .SubscribeSync("Hook/OnSetupView", [this](MulNX::Message& msg) {this->Update();})
         .SubscribeAsync("Skin/Apply")
         ;
 

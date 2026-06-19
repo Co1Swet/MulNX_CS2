@@ -1,5 +1,4 @@
 #pragma once
-
 #include "PlayerHub.hpp"
 #include "NameController/NameController.hpp"
 #include "GlowController/GlowController.hpp"
@@ -7,6 +6,7 @@
 #include "ProjectileTracker/ProjectileTracker.hpp"
 #include "SpeakingController/SpeakingController.hpp"
 #include "KeyboardOverlay/KeyboardOverlay.hpp"
+#include "TeamIDController/TeamIDController.hpp"
 #include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
 #include "PlayerSpotColorController/PlayerSpotColorController.hpp"
 #include "BombSpotController/BombSpotController.hpp"

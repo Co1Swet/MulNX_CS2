@@ -57,9 +57,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<ESPController>("ESPController")
             .CreateModule<SkinController>("SkinController")
-            .CreateModule<TeamIDController>("TeamIDController")
             .CreateModule<EntityListScanner>("EntityListScanner")
-            .CreateModule<POVFixer>("POVFixer")
             // 玩家强相关
             .CreateModule<PlayerHub>("PlayerHub")
             .CreateModule<ProjectileTracker>("ProjectileTracker")
@@ -68,6 +66,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<SmokeController>("SmokeController")
             .CreateModule<SpeakingController>("SpeakingController")
             .CreateModule<KeyboardOverlay>("KeyboardOverlay")
+            .CreateModule<TeamIDController>("TeamIDController")
             .CreateModule<PlayerSpotRenderController>("PlayerSpotRenderController")
             .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
             .CreateModule<BombSpotController>("BombSpotController")

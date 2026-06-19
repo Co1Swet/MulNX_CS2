@@ -18,8 +18,6 @@ add_library(MulNXCS2Ext
     PlayerFlashController/PlayerFlashController.cpp
     DeathMsgController/DeathMsgController.cpp
     SkinController/SkinController.cpp
-    POVFixer/POVFixer.cpp
-    TeamIDController/TeamIDController.cpp
 
     MiniMap/MiniMap.cpp
     VirtualUser/VirtualUser.cpp
