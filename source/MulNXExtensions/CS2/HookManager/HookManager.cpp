@@ -110,9 +110,6 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
-        ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
-            static_cast<HookManager*>(cmd->UserCallbackData)->PublishSync("Hook/BeforePresent"_hash);
-            }, this, 0);
         return true;
         };
     this->pUISystem->FrameBehind = [this]() {

@@ -1,6 +1,5 @@
 #include "ESPController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-
 #include <MulNXExtensions/CS2/ViewController/ViewController.hpp>
 
 bool ESPController::Draw(MulNX::UINode* node) {
@@ -29,7 +28,7 @@ bool ESPController::Draw(MulNX::UINode* node) {
 }
 
 bool ESPController::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {
+    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node)->bool {
         return this->Draw(node);
         });
 

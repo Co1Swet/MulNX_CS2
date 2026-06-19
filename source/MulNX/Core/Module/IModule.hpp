@@ -24,13 +24,6 @@ namespace MulNX {
         IModule() = default;
         virtual ~IModule() = default;
         virtual void Deinit() {};
-        
-        virtual void IDraw(MulNX::UINode* node) {};
-        virtual void IDraw2(MulNX::UINode* node) {};
-        virtual void IDrawBackGround(MulNX::UINode* node) {};
-        virtual void IDrawBackGround2(MulNX::UINode* node) {};
-        virtual void IDrawForeGround(MulNX::UINode* node) {};
-        virtual void IDrawForeGround2(MulNX::UINode* node) {};
 
         IModule* FindModule(const std::string& name);
         template<typename T>

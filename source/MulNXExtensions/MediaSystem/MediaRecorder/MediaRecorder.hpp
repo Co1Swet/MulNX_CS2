@@ -18,6 +18,7 @@ class MediaRecorder final :public MediaModuleBase {
     bool StartRecording(const std::string& filename, int w, int h);
     bool StopRecording();
 
+    void CaptureCallback(MulNX::UINode* node);
     void Encode();
     void ProcessMsg(MulNX::Message& msg);
     void Main();

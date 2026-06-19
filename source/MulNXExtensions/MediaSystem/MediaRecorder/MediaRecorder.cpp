@@ -1,8 +1,15 @@
 #include "MediaRecorder.hpp"
+#include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/MediaSystem/VideoCapturer/VideoCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
+
+void MediaRecorder::CaptureCallback(MulNX::UINode* node) {
+    ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+        static_cast<MediaRecorder*>(cmd->UserCallbackData)->PublishSync("Hook/BeforePresent"_hash);
+        }, this, 0);
+}
 
 bool MediaRecorder::Init() {
     this->pVideoCapturer = this->Core->ModuleManager()->FindModule<VideoCapturer>("VideoCapturer");
@@ -20,6 +27,8 @@ bool MediaRecorder::Init() {
         this->Main();
         return true;
         });
+
+    this->SendUIRoot("捕获以上所有根触发的UI渲染", [this](MulNX::UINode* node) {return this->CaptureCallback(node);});
 
     return true;
 }
