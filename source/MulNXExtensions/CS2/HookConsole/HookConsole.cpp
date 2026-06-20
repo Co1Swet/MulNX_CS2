@@ -5,9 +5,7 @@ bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);
     (*this)
         .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
-        .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-        this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int)>(50);})
-        .SubscribeAsync("Demo/GotoTick")
+        .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeAsync("Game/Command")
         ;
 
@@ -22,6 +20,19 @@ HookConsole& HookConsole::RegisterCmd(std::string&& name, std::function<void(CCo
     MulNXCmd cmd(std::move(name), "one MulNX Cmd", std::move(CmdCallback));
     this->CS2Cmds.push_back(std::move(cmd));
     return *this;
+}
+void HookConsole::OnEngine2Load(MulNX::Message& msg) {
+    this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int, double, int64_t)>(50);
+    auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Pos_Call_CInputService_ProcessCommands);
+    this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+        std::string cmd;
+        while (this->bufferGameCmds.try_dequeue(cmd)){
+            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+            this->LogSucc(std::format("已推入游戏缓冲队列：{}", std::move(cmd)));
+        }
+        return MulNX::Hook::Then::Continue;
+        },true).value();
+    this->hkPos_Call_CInputService_ProcessCommands->Attach();
 }
 
 void HookConsole::OnTier0Load(MulNX::Message& msg) {
@@ -62,18 +73,8 @@ void HookConsole::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Game/Command"_hash: {
         auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
-        this->executor(0, cmd.c_str(), 1);
-        this->LogInfo(std::move(cmd));
-        break;
-    }
-    case "Demo/GotoTick"_hash: {
-        int tick = msg.p1.low<int>();
-        auto cmd = std::format("demo_gototick {}", tick);
-        this->executor(0, cmd.c_str(), 1);
-        this->LogInfo(std::move(cmd));
-        auto msg = MulNX::Message("Demo/GotoTick/Complete"_hash);
-        msg.p1.low<int>() = tick;
-        this->PublishAsync(std::move(msg));
+        this->LogInfo(std::format("已推入MulNX缓冲队列：{}", cmd));
+        this->bufferGameCmds.enqueue(std::move(cmd));
         break;
     }
     }
@@ -81,20 +82,9 @@ void HookConsole::ProcessMsg(MulNX::Message& msg) {
 
 MulNX::Hook::Then HookConsole::HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx) {
     CCmd* pCmd = (CCmd*)ctx->r8;
-    std::string_view name = pCmd->m_pszName;
-    if (name == "playdemo") {
-        auto pf = pCmd->m_pCommandCallback;
-        this->hkPlaydemo = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto cmd = (CCommand*)ctx->rdx;
-            this->LogInfo(std::format("指令已经执行：{}", cmd->pRawString));
-            return MulNX::Hook::Then::Continue;
-            }).value();
-        this->hkPlaydemo->Attach();
-
-        return MulNX::Hook::Then::Continue;
-    }
-
-
+    MulNX::Message msg("Hook/RegisterConCommand"_hash);
+    msg.p1.as<CCmd*>() = pCmd;
+    this->PublishSync(msg);
     return MulNX::Hook::Then::Continue;
 }
 

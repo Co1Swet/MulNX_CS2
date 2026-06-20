@@ -15,14 +15,7 @@
 #include "SkinController/SkinController.hpp"
 #include "EntityListScanner/EntityListScanner.hpp"
 
-#include "DemoSystem/DemoSystem.hpp"
-#include "DemoSystem/DemoJSONReader/DemoJSONReader.hpp"
-#include "DemoSystem/DemoHelper/DemoHelper.hpp"
-#include "DemoSystem/DemoAnalyzer/DemoAnalyzer.hpp"
-#include "DemoSystem/DemoRecorder/DemoRecorder.hpp"
-#include "DemoSystem/RecordTaskMaker/RecordTaskMaker.hpp"
-#include "DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp"
-
+#include "DemoSystem/DemoSystems.hpp"
 #include "PlayerHub/PlayerHubs.hpp"
 
 #include "GameCfgManager/GameCfgManager.hpp"

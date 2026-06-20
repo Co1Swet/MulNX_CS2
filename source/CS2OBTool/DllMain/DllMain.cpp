@@ -77,6 +77,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<SolutionManager>("SolutionManager")
             .CreateModule<ElementManager>("ElementManager")
             // Demos
+            .CreateModule<HookDemo>("HookDemo")
             .CreateModule<DemoSystem>("DemoSystem")
             .CreateModule<DemoAnalyzer>("DemoAnalyzer")
             .CreateModule<DemoHelper>("DemoHelper")

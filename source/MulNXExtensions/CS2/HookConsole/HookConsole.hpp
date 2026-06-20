@@ -13,13 +13,15 @@ class HookConsole final :public CSModuleBase {
     std::vector<MulNXCmd> CS2Cmds{};
 
     std::unique_ptr<MulNX::Hook>hkVEngineCvar007_RegisterConCommand = nullptr;
-    std::unique_ptr<MulNX::Hook>hkPlaydemo = nullptr;
-
+    std::unique_ptr<MulNX::Hook>hkPos_Call_CInputService_ProcessCommands = nullptr;
+    
     // 控制台指令执行器
-    VExecutor<void(int, const char*, int)> executor{};
+    VExecutor<void(int, const char*, int, double, int64_t)> executor{};
+    moodycamel::ConcurrentQueue<std::string>bufferGameCmds;
 
     MulNX::Hook::Then HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx);
     void OnTier0Load(MulNX::Message& msg);
+    void OnEngine2Load(MulNX::Message& msg);
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;

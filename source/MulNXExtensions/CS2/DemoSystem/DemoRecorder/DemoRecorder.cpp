@@ -164,9 +164,7 @@ MulNX::CoTask DemoRecorder::Main() {
         }
 
         // 暂停并跳转
-        MulNX::Message gotoMsg("Demo/GotoTick"_hash);
-        gotoMsg.p1.low<int>() = this->currentRecordTaskStartTick - 64;
-        this->PublishAsync(std::move(gotoMsg));
+        this->AsyncCommand(std::format("demo_gototick {}", this->currentRecordTaskStartTick - 64));
 
         // 等待跳转完成
         auto gotoCplt = co_await this->WaitMsg("Demo/GotoTick/Complete"_hash);

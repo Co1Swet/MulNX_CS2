@@ -1,4 +1,5 @@
 add_library(DemoSystem
+    HookDemo/HookDemo.cpp
     DemoSystem.cpp
     DemoHelper/DemoHelper.cpp
     DemoAnalyzer/DemoAnalyzer.cpp
