@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/Math/Math.hpp>
-#include <MulNXExtensions/WinExt/WinExt.hpp>
+#include <MulNXUtils/WinExt/WinExt.hpp>
 #include <MulNXExtensions/CS2/Signatures.hpp>
 #include <MulNXExtensions/CS2/CSClasses/tree/tree.hpp>
 #include <MulNXExtensions/CS2/CSClasses/GlobalVars/GlobalVars.hpp>

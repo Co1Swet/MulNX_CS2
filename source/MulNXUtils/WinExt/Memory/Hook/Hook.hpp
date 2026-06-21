@@ -1,7 +1,7 @@
 #pragma once
-#include <MulNXExtensions/WinExt/Memory/AddrTool/AddrTool.hpp>
+#include <MulNXUtils/WinExt/Memory/AddrTool/AddrTool.hpp>
 #include <MulNX/Common/Common.hpp>
-#include <MulNXExtensions/WinExt/Memory/Assembler/Assembler.hpp>
+#include <MulNXUtils/WinExt/Memory/Assembler/Assembler.hpp>
 #include <functional>
 #include <expected>
 

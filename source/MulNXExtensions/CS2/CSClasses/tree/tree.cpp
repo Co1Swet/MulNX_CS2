@@ -1,6 +1,6 @@
 #include "tree.hpp"
 
-#include <MulNXExtensions/WinExt/Memory/Memory.hpp>
+#include <MulNXUtils/WinExt/Memory/Memory.hpp>
 
 DirectX::XMFLOAT3 CS2::C_BaseEntity::GetBonePos(int index) {
     auto* pGameSceneNode = MulNX::MRead(this->pGameSceneNode());

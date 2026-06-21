@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/Systems/UISystem/UICoordinator/UICoordinator.hpp>
-#include <MulNXExtensions/WinExt/WIN32Msg/WIN32Msg.hpp>
+#include <MulNXUtils/WinExt/WIN32Msg/WIN32Msg.hpp>
 #include <MulNXThirdParty/queue/concurrentqueue.h>
 
 namespace MulNX {

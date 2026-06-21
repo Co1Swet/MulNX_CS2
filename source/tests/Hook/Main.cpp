@@ -1,4 +1,4 @@
-#include <MulNXExtensions/WinExt/WinExt.hpp>
+#include <MulNXUtils/WinExt/WinExt.hpp>
 int Test(int rcx, int rdx, int r8, int r9, int stack4, int stack5) {
     auto str1 = std::to_string(stack4);
     auto str2 = std::to_string(stack5);

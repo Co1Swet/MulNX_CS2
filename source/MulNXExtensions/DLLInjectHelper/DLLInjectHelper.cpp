@@ -1,5 +1,5 @@
 #include "DLLInjectHelper.hpp"
-#include <MulNXExtensions/WinExt/Remote/Remote.hpp>
+#include <MulNXUtils/WinExt/Remote/Remote.hpp>
 
 bool DLLInjectHelper::Init() {
 

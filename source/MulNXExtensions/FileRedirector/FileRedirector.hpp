@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/WinExt/WinExt.hpp>
+#include <MulNXUtils/WinExt/WinExt.hpp>
 
 class FileRedirector final :public MulNX::Module<FileRedirector> {
     std::unique_ptr<MulNX::Hook> hkCreateFileW = nullptr;

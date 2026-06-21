@@ -1,7 +1,7 @@
 #pragma once
 
 #include <MulNX/Config/Config.hpp>
-#include <MulNXExtensions/WinExt/WinExt.hpp>
+#include <MulNXUtils/WinExt/WinExt.hpp>
 #include <MulNXExtensions/CS2/CSClasses/tree/tree.hpp>
 #include <MulNXExtensions/CS2/CSClasses/C_CSGameRules/C_CSGameRules.hpp>
 

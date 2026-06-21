@@ -2,7 +2,6 @@ add_library(MulNXExtensions INTERFACE
 )
 
 add_subdirectory("CS2")
-add_subdirectory("WinExt")
 add_subdirectory("MulNXController")
 add_subdirectory("WebSocketManager")
 add_subdirectory("GraphicsManager")

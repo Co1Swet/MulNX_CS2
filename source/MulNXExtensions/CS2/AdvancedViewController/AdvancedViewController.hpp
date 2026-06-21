@@ -2,7 +2,7 @@
 
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/WinExt/WinExt.hpp>
+#include <MulNXUtils/WinExt/WinExt.hpp>
 #include <MulNXExtensions/CS2/CSModuleBase.hpp>
 
 #include <expected>

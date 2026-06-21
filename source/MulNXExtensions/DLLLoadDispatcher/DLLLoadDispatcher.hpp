@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/WinExt/Memory/Memory.hpp>
+#include <MulNXUtils/WinExt/Memory/Memory.hpp>
 
 class DLLLoadDispatcher final : public MulNX::Module<DLLLoadDispatcher> {
     // LoadLibrary 函数钩子（用于DLL注入检测）

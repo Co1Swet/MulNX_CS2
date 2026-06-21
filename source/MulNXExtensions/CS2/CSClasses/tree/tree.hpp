@@ -3,7 +3,7 @@
 #include <stdfloat>
 #include <MulNX/Base/Math/Math.hpp>
 #include <MulNX/Config/Config.hpp>
-#include <MulNXExtensions/WinExt/vtable/vtable.hpp>
+#include <MulNXUtils/WinExt/vtable/vtable.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
 using GameTime_t = float;

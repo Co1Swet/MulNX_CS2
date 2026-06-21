@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNXExtensions/CS2/PlayerHub/CSViewPlayerModuleBase.hpp>
-#include <MulNXExtensions/WinExt/WinExt.hpp>
+#include <MulNXUtils/WinExt/WinExt.hpp>
 #include <set>
 
 class TeamIDController final : public CSViewPlayerModuleBase {
