@@ -10,3 +10,4 @@
 #include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
 #include "PlayerSpotColorController/PlayerSpotColorController.hpp"
 #include "BombSpotController/BombSpotController.hpp"
+#include "TeamCounterController/TeamCounterController.hpp"

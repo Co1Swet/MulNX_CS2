@@ -71,6 +71,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<PlayerSpotRenderController>("PlayerSpotRenderController")
             .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
             .CreateModule<BombSpotController>("BombSpotController")
+            .CreateModule<TeamCounterController>("TeamCounterController")
             // 摄像机系统
             .CreateModule<CameraSystem>("CameraSystem")
             .CreateModule<WorkspaceManager>("WorkspaceManager")

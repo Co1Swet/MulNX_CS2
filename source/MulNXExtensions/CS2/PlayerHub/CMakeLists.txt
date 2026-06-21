@@ -7,9 +7,8 @@ add_library(PlayerHubs
     SpeakingController/SpeakingController.cpp
     KeyboardOverlay/KeyboardOverlay.cpp
     TeamIDController/TeamIDController.cpp
-
     BombSpotController/BombSpotController.cpp
-
+    TeamCounterController/TeamCounterController.cpp
     PlayerSpotRenderController/PlayerSpotRenderController.cpp
     PlayerSpotColorController/PlayerSpotColorController.cpp
 )
