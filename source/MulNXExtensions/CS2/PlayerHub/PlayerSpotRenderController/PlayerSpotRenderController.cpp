@@ -68,6 +68,10 @@ bool PlayerSpotRenderController::Init() {
         this->hkFunc_FinallyUpdatePlayerState = MulNX::Hook::Create(pFunc_FinallyUpdatePlayerState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->hideNumLabel.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             ctx->rdx &= ~1ULL;
+            if (ctx->rdx & (1ULL << 27)) {          // 如果 bit 27 是 1
+                ctx->rdx &= ~(1ULL << 27);          // 清零 bit 27
+                ctx->rdx |= (1ULL << 28);          // 置位 bit 28
+            }
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkFunc_FinallyUpdatePlayerState->Attach();

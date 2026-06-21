@@ -1,5 +1,6 @@
 #pragma once
-#include <MUlNXExtensions/CS2/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <MulNXExtensions/CS2/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <MulNXUtils/MemInsights/BitMaskEditor/BitMaskEditor.hpp>
 
 class PlayerSpotRenderController :public CSViewPlayerModuleBase {
     class PlayerSpotColorController* pColorController = nullptr;
@@ -10,6 +11,7 @@ class PlayerSpotRenderController :public CSViewPlayerModuleBase {
     std::atomic<bool>hideNumLabel = true;
     std::atomic<bool>forceTeammateDraw = true;
     std::atomic<bool>forceEnemyRed = true;
+
     void HubWindow(MulNX::UINode* node)override;
 public:
     bool Init()override;
