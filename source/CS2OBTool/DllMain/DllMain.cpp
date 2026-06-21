@@ -34,8 +34,9 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
 
         // 注册所有模块
         (*pCore->ModuleManager())
-            .CreateModule<HookManager>("HookManager")
+            .CreateModule<HookWindow>("HookWindow")
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
+            .CreateModule<HookD3D11>("HookD3D11")
             .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
             .CreateModule<FileRedirector>("FileRedirector")
             .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
@@ -108,12 +109,11 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
         // 启动核心
         pCore->EntryInit(pCore);
 
-        auto pHookManager = pCore->ModuleManager()->FindModule<HookManager>("HookManager");
-
         if (MulNXInfo::IsDebugVersion) {
+            auto pHookConsole = pCore->ModuleManager()->FindModule<HookConsole>("HookConsole");
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
             rp->str1 = "111";
-            pHookManager->PublishAsync(std::move(msg));
+            pHookConsole->PublishAsync(std::move(msg));
             std::thread([]() {
                 MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
                 }).detach();

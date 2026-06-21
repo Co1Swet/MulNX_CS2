@@ -1,10 +1,9 @@
-#include "HookManager.hpp"
+#include "HookD3D11.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
-#include <shellapi.h>
 
-bool HookManager::Init() {
+bool HookD3D11::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
@@ -33,7 +32,7 @@ bool HookManager::Init() {
         });
     return true;
 }
-void HookManager::HookD3D11DeviceAndContext() {
+void HookD3D11::HookD3D11DeviceAndContext() {
     IDXGIFactory* pFactory = nullptr;
     this->pGraphicsManager->D3D11Cfg.pAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pFactory);
     this->hkCreateSwapChain = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pFactory)->GetVFuncPtr(10), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -56,7 +55,7 @@ void HookManager::HookD3D11DeviceAndContext() {
     this->hkClearDepthStencilView->Attach();
     this->LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
 }
-void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
+void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // Hook Present函数
     // 函数开头：
     // 0~4：Steam钩子（OBS游戏捕获钩子会与其交互，进行画面捕获）
@@ -79,28 +78,13 @@ void HookManager::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
 
     DXGI_SWAP_CHAIN_DESC sd;
     pSwapChain->GetDesc(&sd);
-    this->CS2hWnd = sd.OutputWindow;
-    // 文件拖拽钩子
-    HANDLE hProp = GetPropW(this->CS2hWnd, L"OleDropTargetInterface");
-    IDropTarget* pTarget = static_cast<IDropTarget*>(hProp);
-    this->hkDrop = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTarget)->GetVFuncPtr(6), [this](MulNX::Hook* hk, RegContext* ctx) {
-        this->HandleProcessDropFiles((IDataObject*)ctx->rdx);
-        return MulNX::Hook::Then::Continue;
-        }).value();
-    this->hkDrop->Attach();
-    this->LogSucc(I18n("hook.attached", "OleDropTargetInterface::Drop"));
-    // 窗口过程钩子
-    this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->CS2hWnd, GWLP_WNDPROC), [this](MulNX::Hook* hk, RegContext* ctx) {
-        return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
-        }).value();
-    this->hkWndProc->Attach();
-    this->LogSucc(I18n("hook.attached", "WndProc"));
+    MulNX::Message msg("Hook/hWnd"_hash);
+    msg.p1.as<HWND>() = sd.OutputWindow;
+    this->PublishSync(msg);
 }
-MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx) {
+MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx) {
     hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnPresent(hk, ctx);});
     // ImGui 初始化
-    ImGui::CreateContext();
-    ImGui_ImplWin32_Init(this->CS2hWnd);
     ImGui_ImplDX11_Init(this->pGraphicsManager->pd3dDevice, this->pGraphicsManager->pd3dContext);
     // 创建绿幕着色器资源
     this->pGraphicsManager->ReleaseOld();
@@ -122,7 +106,7 @@ MulNX::Hook::Then HookManager::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ct
     this->pGlobalVars->SystemReady.store(true);
     return MulNX::Hook::Then::Continue;
 }
-MulNX::Hook::Then HookManager::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
+MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
     // 绿幕渲染
     this->pGraphicsManager->BuildNew();
@@ -132,57 +116,7 @@ MulNX::Hook::Then HookManager::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx)
     this->pUISystem->Render();
     return MulNX::Hook::Then::Continue;
 }
-MulNX::Hook::Then HookManager::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
-    if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
-        return MulNX::Hook::Then::Return;
-    if (MulNX::Win32::IsKeyboardMessage(uMsg)) {
-        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) || this->pInputSystem->IsKeyPressed(VK_MENU))
-            return MulNX::Hook::Then::Return; // 当alt按下时进行拦截，此时属于 MulNX 按键通道判定快捷键的时刻
-    }
-    if (uMsg == WM_CLOSE) {
-        this->LogWarning(I18n("sys.shutdown_warning"));
-        this->Core->Driver()->CloseSystem();
-    }
-    return MulNX::Hook::Then::Continue;
-}
-void HookManager::Deinit() {
+void HookD3D11::Deinit() {
     this->hkClearDepthStencilView->Detach();
     this->hkPresent->Detach();
-    this->hkWndProc->Detach();
-}
-void HookManager::HandleProcessDropFiles(IDataObject* pDataObj) {
-    if (!pDataObj) return;
-    // 请求 CF_HDROP 格式
-    FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-    STGMEDIUM med{};
-    if (FAILED(pDataObj->GetData(&fmt, &med))) return;
-    // 锁住全局内存，拿到 HDROP
-    HDROP hDrop = static_cast<HDROP>(GlobalLock(med.hGlobal));
-    if (!hDrop) {
-        ReleaseStgMedium(&med);
-        return;
-    }
-    UINT numFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, nullptr, 0);
-    // try catch保证无论如何，占有的句柄必须释放回去
-    try {
-        for (UINT i = 0; i < numFiles; ++i) {
-            UINT len = DragQueryFileW(hDrop, i, nullptr, 0);  // 含 '\0'
-            if (len == 0) continue;
-            std::wstring buffer(len, L'\0');
-            if (!DragQueryFileW(hDrop, i, buffer.data(), len + 1))continue;
-            std::filesystem::path filePath{ buffer };
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Window/Drag/FileDrop"_hash);
-            rp->str1 = std::move(filePath.string());
-            this->PublishAsync(std::move(msg));
-        }
-    }
-    catch (const std::exception& e) {
-        this->LogError(I18n("win32.drag.analisy.error", e.what()));
-    }
-    catch (...) {
-        this->LogError(I18n("win32.drag.analisy.unk_error"));
-    }
-    GlobalUnlock(med.hGlobal);
-    ReleaseStgMedium(&med);
 }

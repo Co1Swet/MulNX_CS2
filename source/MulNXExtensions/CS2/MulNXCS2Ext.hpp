@@ -1,10 +1,11 @@
 #pragma once
 
-#include "HookManager/HookManager.hpp"
-
-#include "CSController/CSController.hpp"
+#include "HookWindow/HookWindow.hpp"
+#include "HookD3D11/HookD3D11.hpp"
 #include "HookConsole/HookConsole.hpp"
 #include "HookEntitySystem/HookEntitySystem.hpp"
+
+#include "CSController/CSController.hpp"
 
 #include "ObserverController/ObserverController.hpp"
 #include "ViewController/ViewController.hpp"

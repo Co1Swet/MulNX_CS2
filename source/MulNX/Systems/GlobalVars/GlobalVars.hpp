@@ -7,7 +7,6 @@ namespace MulNX {
 		void PublishTickAll();
 		void Tick();
 	public:
-
         // 框架系统是否就绪
         std::atomic<bool>SystemReady = false;
         // 调试功能设置

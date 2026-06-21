@@ -3,7 +3,8 @@ add_library(MulNXCS2Ext
     CSClasses/GlobalVars/GlobalVars.cpp
     CSClasses/tree/tree.cpp
 
-    HookManager/HookManager.cpp
+    HookWindow/HookWindow.cpp
+    HookD3D11/HookD3D11.cpp
     EntityListScanner/EntityListScanner.cpp
     CSController/CSController.cpp
     HookEntitySystem/HookEntitySystem.cpp
