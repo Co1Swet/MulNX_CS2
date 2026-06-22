@@ -110,7 +110,7 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
     case "Log/Info"_hash: 
     case "Log/Succ"_hash: 
     case "Log/Warning"_hash: {
-        auto fmtted = std::move(msg.asp.get<MulNX::NetExt>()->str1);
+        auto fmtted = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
         this->DebugMsg.push_back(fmtted);
         break;

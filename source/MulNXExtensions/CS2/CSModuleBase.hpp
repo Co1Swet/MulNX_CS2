@@ -78,6 +78,11 @@ protected:
         rp->str1 = std::move(cmd);
         This()->PublishAsync(std::move(msg));
     }
+    void AsyncCommandNoReport(std::string&& cmd) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command/NoReport"_hash);
+        rp->str1 = std::move(cmd);
+        This()->PublishAsync(std::move(msg));
+    }
 };
 
 class CSModuleBase :public MulNX::Module<CSModuleBase>, public CSModuleMixin<CSModuleBase> {};

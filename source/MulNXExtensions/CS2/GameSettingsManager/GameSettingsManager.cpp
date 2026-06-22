@@ -94,12 +94,16 @@ bool GameSettingsManager::GameHudMenu(MulNX::UINode* node) {
 
     ImGui::Checkbox("显示HUD", this->settings.cl_drawhud);
     ImGui::Checkbox("只渲染击杀信息", this->settings.cl_draw_only_deathnotices);
-    ImGui::Checkbox("强制雷达渲染", this->settings.cl_drawhud_force_radar);
     ImGui::SliderInt("展示FPS", this->settings.cl_showfps, 0, 3, "%d");
     ImGui::SliderInt("展示Tick", this->settings.cl_showtick, 0, 3, "%d");
     ImGui::SliderInt("TrueView控制", this->settings.cl_trueview_show_status, 0, 2);
-    ImGui::SliderInt("X光", this->settings.spec_show_xray, 0, 100);
-    ImGui::Checkbox("方形雷达", this->settings.cl_radar_square_when_spectating);
+    ImGui::SliderInt("观战X光", this->settings.spec_show_xray, 0, 100);
+
+    ImGui::Checkbox("强制雷达渲染", this->settings.cl_drawhud_force_radar);
+    ImGui::Checkbox("在观战时使用方形雷达", this->settings.cl_radar_square_when_spectating);
+    ImGui::Checkbox("永远使用方形雷达", this->settings.cl_radar_square_always);
+    ImGui::Checkbox("雷达在观战时显示所有人", this->settings.cl_radar_show_all_players_when_spectating);
+
     ImGui::Checkbox("准星", this->settings.crosshair);
     if (ImGui::Button("切换Demo进度条UI显示")) {
         this->AsyncCommand("demoui");

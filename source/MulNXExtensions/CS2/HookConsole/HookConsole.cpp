@@ -7,9 +7,13 @@ bool HookConsole::Init() {
         .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeAsync("Game/Command")
+        .SubscribeAsync("Game/Command/NoReport")
         ;
-
-    this->SendTask("Update", "CSControl", [this]() {this->Update();return true;});
+    
+    this->SendTask("Update", "CSControl", [this]() {
+        this->Update();
+        return true;
+        });
 
     return true;
 }
@@ -28,7 +32,6 @@ void HookConsole::OnEngine2Load(MulNX::Message& msg) {
         std::string cmd;
         while (this->bufferGameCmds.try_dequeue(cmd)){
             this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-            this->LogSucc(std::format("已推入游戏缓冲队列：{}", std::move(cmd)));
         }
         return MulNX::Hook::Then::Continue;
         },true).value();
@@ -74,6 +77,11 @@ void HookConsole::ProcessMsg(MulNX::Message& msg) {
     case "Game/Command"_hash: {
         auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
         this->LogInfo(std::format("已推入MulNX缓冲队列：{}", cmd));
+        this->bufferGameCmds.enqueue(std::move(cmd));
+        break;
+    }
+    case "Game/Command/NoReport"_hash: {
+        auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
         this->bufferGameCmds.enqueue(std::move(cmd));
         break;
     }

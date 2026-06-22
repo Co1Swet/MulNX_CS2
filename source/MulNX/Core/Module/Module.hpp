@@ -1,7 +1,6 @@
 #pragma once
 #include "ModuleBase.hpp"
-#include <MulNX/Common/Task.hpp>
-
+#include <MulNX/Systems/Logger/LogMixin.hpp>
 #include <MulNX/Systems/MessageManager/MsgMixin.hpp>
 #include <MulNX/Systems/TaskSystem/TaskMixin.hpp>
 #include <MulNX/Systems/UISystem/UIMixin.hpp>
@@ -9,11 +8,6 @@
 #include <MulNX/Systems/InputSystem/InputMixin.hpp>
 #include <MulNX/Systems/GlobalVars/GlobalVarMixin.hpp>
 #include <MulNX/Systems/ShortcutManager/ShortcutMixin.hpp>
-
-#include <thread>
-#include <functional>
-#include <concepts>
-#include <filesystem>
 
 namespace MulNX {
     namespace Core{

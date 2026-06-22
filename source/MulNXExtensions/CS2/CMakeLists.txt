@@ -9,6 +9,7 @@ add_library(MulNXCS2Ext
     CSController/CSController.cpp
     HookEntitySystem/HookEntitySystem.cpp
     HookConsole/HookConsole.cpp
+    ConsoleOutput/ConsoleOutput.cpp
 
     ViewController/ViewController.cpp
     TimeController/TimeController.cpp

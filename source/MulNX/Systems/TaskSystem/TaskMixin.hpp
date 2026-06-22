@@ -1,5 +1,6 @@
 #pragma once
 #include <MulNX/Core/Module/IModule.hpp>
+#include <MulNX/Common/Task.hpp>
 
 namespace MulNX {
     class TaskSystem;

@@ -121,8 +121,6 @@ void CSController::Main() {
         this->PublishAsync("Game/NewRound"_hash);
         OldRoundStartCount = currentStartCount;
     }
-
-    std::unique_lock lock(this->smutex);
     // 玩家控制器，地图上从1到10
     int playerNum = 0;
     for (const auto& mod : this->ParticipateItCSModules) {
@@ -147,6 +145,7 @@ void CSController::Main() {
         //MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), true);
 
         if (playerNum <= 10) {
+            std::unique_lock lock(this->smutex);
             auto& CS2EBEntity = this->CS2EBGameData.Players[playerNum];
             CS2EBEntity.Position = MulNX::MRead(pawn->vOldOrigin());
             CS2EBEntity.EyePosition = MulNX::MRead(pawn->vOldOrigin()) + MulNX::MRead(pawn->vecViewOffset());
@@ -156,36 +155,14 @@ void CSController::Main() {
             CS2EBEntity.Alive = CS2EBEntity.HP;
             CS2EBEntity.IndexInMap = playerNum;
         }
-
-
     }
     for (const auto& mod : this->ParticipateItCSModules) {
         mod->OnItEnd();
     }
-
     return;
 }
 
-// C_ConVar* m_yawPtr = nullptr;
-// m_yawPtr = this->CvarSystem.GetCvar("m_yaw");
-// std::vector<int> schemas;
-// for (int schema = 0;schema < 0x100;++schema) {
-//     const float targetValue = 0.0165f;
-//     bool valueIsRight = false;
-//     auto checkValue = [&]()->bool {
-//         float currentValue = *(float*)((uintptr_t)m_yawPtr + schema);
-//         if (fabs(currentValue - targetValue) < 0.001f) {
-//             valueIsRight = true;
-//         }
-//         return true;// 无崩溃
-//         };
-//     MulNX::Base::UnsafeFunc(checkValue);
-//     if (valueIsRight) {
-//         schemas.push_back(schema);
-//     }
-// }
-
 D_Player& CSController::GetPlayerMsg(int Index) {
-    //std::shared_lock lock(this->GetMtx());
+    std::shared_lock lock(this->smutex);
     return this->CS2EBGameData.Players[Index];
 }

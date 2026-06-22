@@ -47,6 +47,7 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<CSController>("CSController")
             // CS2关键接口
             .CreateModule<HookConsole>("HookConsole")
+            .CreateModule<ConsoleOutput>("ConsoleOutput")
             .CreateModule<HookEntitySystem>("HookEntitySystem")
             .CreateModule<TimeController>("TimeController")
             .CreateModule<ViewController>("ViewController")
