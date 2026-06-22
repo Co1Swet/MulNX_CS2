@@ -4,57 +4,13 @@
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
 void CSController::Window(MulNX::UINode* node) {
-    // auto w = MulNX::UI::RAIIWindow("实验性功能", this->showWindow);
-    // if (!w)return;
-    // MulNX::UI::Checkbox("Source2EngineToClient001 强制返回？", this->Source2EngineToClient001ForceReturn);
-    // MulNX::UI::Checkbox("Source2EngineToClient001 返回值", this->Source2EngineToClient001ForceReturnValue);
-
-    // MulNX::UI::Checkbox("IDemo 强制返回？", this->IDemoForceReturn);
-    // MulNX::UI::Checkbox("IDemo 返回值", this->IDemoForceReturnValue);
-
-    // std::unique_lock lock(this->ForceMutex);
-    // ImGui::SeparatorText("检测到的调用点");
-    // if (this->detected.empty()) {
-    //     ImGui::TextDisabled("（空）");
-    // }
-    // else {
-    //     for (const auto& call : this->detected) {
-    //         ImGui::Text("%llX", call);                      // 十六进制显示
-    //         ImGui::SameLine();
-    //         bool alreadyForced = (this->force.find(call) != this->force.end());
-    //         if (alreadyForced) {
-    //             ImGui::TextDisabled("已添加");
-    //         }
-    //         else {
-    //             // 使用 call 作为 ID 后缀，保证按钮唯一
-    //             if (ImGui::Button(("添加##" + std::to_string(call)).c_str())) {
-    //                 this->force.insert(call);
-    //             }
-    //         }
-    //     }
-    // }
-
-    // ImGui::SeparatorText("已强制返回的调用点");
-    // if (this->force.empty()) {
-    //     ImGui::TextDisabled("（空）");
-    // }
-    // else {
-    //     std::vector<uintptr_t> toRemove;
-    //     for (const auto& call : this->force) {
-    //         ImGui::Text("%llX", call);
-    //         ImGui::SameLine();
-    //         if (ImGui::Button(("移除##" + std::to_string(call)).c_str())) {
-    //             toRemove.push_back(call);
-    //         }
-    //     }
-    //     for (auto addr : toRemove) {
-    //         this->force.erase(addr);
-    //     }
-    // }
+    auto w = MulNX::UI::RAIIWindow("实验性功能");
+    MulNX::UI::Checkbox("Source2EngineToClient001 强制返回？", this->Source2EngineToClient001ForceReturn);
+    MulNX::UI::Checkbox("Source2EngineToClient001 返回值", this->Source2EngineToClient001ForceReturnValue);
+    this->checkSource2EngineToClient001_IsPlayingDemo.Render();
 }
 
 bool CSController::Init() {
-    this->showWindow = true;
     (*this)
         .SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {return this->OnClientLoad(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
@@ -70,7 +26,8 @@ bool CSController::Init() {
         return true;
         });
     
-
+    // this->SendUIRoot("RTEST", [this](MulNX::UINode* node) {return this->Window(node);});
+    
     return true;
 }
 MulNX::CoTask CSController::InitTask() {
@@ -86,8 +43,6 @@ MulNX::CoTask CSController::InitTask() {
         }
         return true;
         });
-
-    // this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
 
     co_return;
 }
@@ -132,14 +87,11 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
         if (returnAddress == this->retAddrForShowSpeaker) {
             *(bool*)(&ctx->rax) = false;
         }
-        // std::unique_lock lock(this->ForceMutex);
-        // this->detected.insert(callPos);
-        // if (this->force.find(callPos) != this->force.end()) {
+        // if (this->checkSource2EngineToClient001_IsPlayingDemo.Check(hk, ctx)) {
         //     if (this->Source2EngineToClient001ForceReturn) {
         //         *(bool*)(&ctx->rax) = this->Source2EngineToClient001ForceReturnValue;
         //     }
         // }
-
         return MulNX::Hook::Then::Return;
         }).value();
     this->hkSource2EngineToClient001_IsPlayingDemo->Attach();

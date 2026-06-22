@@ -35,4 +35,5 @@ target_link_libraries(MulNXCS2Ext PUBLIC
     WinExt
     DemoSystem
     PlayerHubs
+    MemInsights
 )

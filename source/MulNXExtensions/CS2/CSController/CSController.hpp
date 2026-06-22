@@ -7,6 +7,7 @@
 #include <MulNXExtensions/CS2/CSClasses/GlobalVars/GlobalVars.hpp>
 #include <MulNXExtensions/CS2/CSClasses/CSDll/CSDll.hpp>
 #include <MulNXExtensions/CS2/CSClasses/C_CSGameRules/C_CSGameRules.hpp>
+#include <MulNXUtils/MemInsights/RetEditor/RetEditor.hpp>
 
 //1到10为玩家，0为本地
 class D_Player {
@@ -31,7 +32,7 @@ class CSController final :public MulNX::Module<CSController> {
     std::unique_ptr<MulNX::Hook>hkSource2Client002_Init = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
-    
+
     uintptr_t retAddrForShowSpeaker = 0;
 
     // CS2全局变量
@@ -41,13 +42,10 @@ class CSController final :public MulNX::Module<CSController> {
     MulNX::CoTask InitTask();
     void Main();
 
-    std::set<uintptr_t>detected;
-    std::set<uintptr_t>force;
-
+    RetEditor checkSource2EngineToClient001_IsPlayingDemo{};
     std::atomic<bool> Source2EngineToClient001ForceReturn = false;
     std::atomic<bool> Source2EngineToClient001ForceReturnValue = true;
-    std::atomic<bool> IDemoForceReturn = false;
-    std::atomic<bool> IDemoForceReturnValue = true;
+
     void Window(MulNX::UINode* node);
 
     void OnClientLoad(MulNX::Message& msg);
