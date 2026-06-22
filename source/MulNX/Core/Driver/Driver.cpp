@@ -11,6 +11,7 @@ MulNX::Core::Driver::Driver() {
         });
 }
 bool MulNX::Core::Driver::Init() {
+    this->smutex.lock();
     // 初始化模块管理器
     this->Core->ModuleManager()->EntryInit(this->Core);
     // 初始化注册模块
@@ -28,15 +29,14 @@ bool MulNX::Core::Driver::Init() {
     this->LogWarning(I18n("disclaimer"));
     return true;
 }
-
 void MulNX::Core::Driver::CreateMainDraw() {
     // UI系统主界面初始化
     auto [msg2, rp] = MulNX::Message::Create<std::string>("UISystem/Start"_hash, "MainDraw");
     this->PublishAsync(std::move(msg2));
     this->LogWarning("发送了UI启动指令！渲染即将开始！");
 }
-
-void MulNX::Core::Driver::CloseSystem() {
+void MulNX::Core::Driver::WaitEnd() {
+    this->smutex.lock();
     // 设置系统标志位
     this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(false, std::memory_order_release);
     // 通知所有模块，以清理资源，包括线程停止

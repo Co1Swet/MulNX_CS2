@@ -23,6 +23,8 @@ namespace MulNX {
 
         IModule() = default;
         virtual ~IModule() = default;
+        // 模块需要自行保证此函数的线程安全性，此函数常常用于抛出信号停止自己的线程
+        // 如有资源释放尽量走析构函数
         virtual void Deinit() {};
 
         IModule* FindModule(const std::string& name);

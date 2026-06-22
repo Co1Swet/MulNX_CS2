@@ -38,8 +38,17 @@ MulNX::Hook::Then HookWindow::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
             return MulNX::Hook::Then::Return; // 当alt按下时进行拦截，此时属于 MulNX 按键通道判定快捷键的时刻
     }
     if (uMsg == WM_CLOSE) {
-        this->LogWarning(I18n("sys.shutdown_warning"));
-        this->Core->Driver()->CloseSystem();
+        int result = MessageBoxW(hwnd,
+            L"要关闭游戏前，必须先卸载 MulNX。\n点击“确定”卸载 MulNX，之后可再次尝试关闭游戏。",
+            L"MulNX 警告",
+            MB_OKCANCEL | MB_ICONWARNING | MB_TOPMOST
+        );
+        if (result == IDOK) {
+            this->hkWndProc->Detach();
+            this->LogWarning(I18n("sys.shutdown_warning"));
+            this->Core->Driver()->smutex.unlock();
+        }
+        return MulNX::Hook::Then::Return;
     }
     return MulNX::Hook::Then::Continue;
 }

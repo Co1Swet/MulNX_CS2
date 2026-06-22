@@ -19,6 +19,18 @@ bool MulNX::UISystem::Menu(MulNX::UINode* node) {
 
 bool MulNX::UISystem::Init() {
     this->pCoordinator = this->FindModule<UICoordinator>("UICoordinator");
+
+    ImGui::CreateContext();
+    // 设置ini文件路径
+    ImGuiIO& io = ImGui::GetIO();
+    auto IniPath = this->PathGet("Config") / "MulNXUIConfig.ini";
+    // 这里需要进行转换，以适配ImGui的接口
+    this->strImguiIniPath = MulNX::CharUtility::FilePathToString(IniPath);
+    io.IniFilename = this->strImguiIniPath.c_str();
+    this->LoadFont();
+    this->LoadStyle();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
     (*this)
         .SubscribeAsync("UISystem/Start")
         .SubscribeAsync("UISystem/Toggle")
@@ -32,20 +44,10 @@ bool MulNX::UISystem::Init() {
 void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "UISystem/Start"_hash: {
-        std::string* pStr = Msg.asp.get<std::string>();
         this->runFlag1.store(true);
         this->runFlag2.store(true);
         this->LogWarning("接收到启动消息，UI系统开始启动");
 
-        // 设置ini文件路径
-        ImGuiIO& io = ImGui::GetIO();
-        auto IniPath = this->PathGet("Config") / "MulNXUIConfig.ini";
-        // 这里需要进行转换，以适配ImGui的接口
-        this->strImguiIniPath = MulNX::CharUtility::FilePathToString(IniPath);
-        io.IniFilename = this->strImguiIniPath.c_str();
-        this->LoadFont();
-        this->LoadStyle();
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         break;
     }
     case "UISystem/Toggle"_hash: {
@@ -67,7 +69,6 @@ void MulNX::UISystem::HandleUpdate() {
 
     MulNX::Win32::Msg4 msg4;
     while (this->winMsgs.try_dequeue(msg4)) {
-        if (!this->runFlag1.load())continue;
         ImGui_ImplWin32_WndProcHandler(msg4.hWnd, msg4.uMsg, msg4.wParam, msg4.lParam);
     }
 }

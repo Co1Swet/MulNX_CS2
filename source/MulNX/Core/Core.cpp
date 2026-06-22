@@ -18,11 +18,9 @@ MulNX::Core::Core::Core(std::string&& name) :
         return true;
         });
 }
-MulNX::Core::Core* MulNX::Core::Core::Create(std::string&& coreName) {
+std::unique_ptr<MulNX::Core::Core> MulNX::Core::Core::Create(std::string&& coreName) {
     auto core = std::make_unique<MulNX::Core::Core>(std::move(coreName));
-    auto& self = core->pMyself;
-    core->pMyself = std::move(core);
-    return self.get();
+    return core;
 }
 MulNX::Core::Driver* MulNX::Core::Core::Driver() {
     return this->pDriver.get();
@@ -34,8 +32,4 @@ MulNX::Core::ModuleManager* MulNX::Core::Core::ModuleManager() {
 bool MulNX::Core::Core::Init() {
     this->pDriver->EntryInit(this);
     return true;
-}
-void MulNX::Core::Core::Close() {
-    this->pMyself = nullptr;
-    return;
 }

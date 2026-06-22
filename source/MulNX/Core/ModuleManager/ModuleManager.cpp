@@ -97,7 +97,7 @@ void MulNX::Core::ModuleManager::DeinitModules() {
 
 void MulNX::Core::ModuleManager::Deinit() {
     std::unique_lock lock(this->smutex);
-    for (auto it = this->modules.rbegin();it != --this->modules.rend();++it) {
+    for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
         if (it->second->GetName() == "TaskSystem")continue;
         it->second = nullptr;
     }

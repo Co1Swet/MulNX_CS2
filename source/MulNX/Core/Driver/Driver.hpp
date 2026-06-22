@@ -9,12 +9,10 @@ namespace MulNX {
         class Driver :public MulNX::Module<Driver> {
         public:
             Driver();
-            // 初始化Core的所有系统组件
             bool Init()override;
             // 注册主绘制函数
             void CreateMainDraw();
-            // 激活系统，以开始工作
-            void CloseSystem();
+            void WaitEnd();
         };
     }
 }

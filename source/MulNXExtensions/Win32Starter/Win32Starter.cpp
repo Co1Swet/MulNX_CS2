@@ -28,10 +28,6 @@ bool Win32Starter::Init() {
     ShowWindow(hwnd, SW_SHOWDEFAULT);
     UpdateWindow(hwnd);
 
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX11_Init(this->pd3dDevice, this->pd3dDeviceContext);
@@ -101,8 +97,7 @@ void Win32Starter::Run() {
         }
     }
     this->LogWarning(I18n("sys.shutdown_warning"));
-    this->Core->Driver()->CloseSystem();
-    this->Core->Close();
+    this->Core->Driver()->smutex.unlock();
     return;
 }
 void Win32Starter::Deinit() {

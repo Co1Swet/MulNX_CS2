@@ -9,33 +9,29 @@
 #include <MulNXExtensions/MediaSystem/Media.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
-MulNX::Core::Core* pCore = nullptr;
 HMODULE hOriginModule = nullptr;
+HANDLE hInitCompleteEvent = nullptr;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
         hOriginModule = hModule;
-        break;
-    case DLL_PROCESS_DETACH:
-        if (pCore)
-            pCore->Close();
+        hInitCompleteEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
         break;
     }
     return TRUE;
 }
-
-DWORD WINAPI MulNX_CS2_Start(void*) {
+DWORD WINAPI StartImpl(LPVOID lpParam) {
     try {
         // 创建核心
-        pCore = MulNX::Core::Core::Create("CS2OBTool");
+        auto core = MulNX::Core::Core::Create("CS2OBTool");
         // 将DLL模块句柄传递给核心，以便后续使用
-        pCore->hMyOriginModule = hOriginModule;
+        core->hMyOriginModule = hOriginModule;
 
         // 注册所有模块
-        (*pCore->ModuleManager())
-            .CreateModule<HookWindow>("HookWindow")
+        (*core->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
+            .CreateModule<HookWindow>("HookWindow")
             .CreateModule<HookD3D11>("HookD3D11")
             .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
             .CreateModule<FileRedirector>("FileRedirector")
@@ -107,12 +103,10 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
             .CreateModule<MulNXController>("MulNXController")
             .CreateModule<UIDocker>("UIDocker")
             ;
-
         // 启动核心
-        pCore->EntryInit(pCore);
-
+        core->EntryInit(core.get());
         if (MulNXInfo::IsDebugVersion) {
-            auto pHookConsole = pCore->ModuleManager()->FindModule<HookConsole>("HookConsole");
+            auto pHookConsole = core->ModuleManager()->FindModule<HookConsole>("HookConsole");
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
             rp->str1 = "111";
             pHookConsole->PublishAsync(std::move(msg));
@@ -120,7 +114,8 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
                 MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
                 }).detach();
         }
-        return 0;
+        SetEvent(hInitCompleteEvent);
+        core->Driver()->WaitEnd();
     }
     catch (std::exception& e) {
         MulNX::ErrorTerminate("在启动时发生异常！异常描述：" + std::string(e.what()));
@@ -128,5 +123,10 @@ DWORD WINAPI MulNX_CS2_Start(void*) {
     catch (...) {
         MulNX::ErrorTerminate("在启动时发生未知异常！");
     }
+    FreeLibraryAndExitThread(hOriginModule, 0);
+}
+DWORD WINAPI MulNX_CS2_Start(void*) {
+    HANDLE hInitThread = CreateThread(NULL, 0, StartImpl, NULL, 0, NULL);
+    WaitForSingleObject(hInitCompleteEvent, INFINITE);
     return 0;
 }
