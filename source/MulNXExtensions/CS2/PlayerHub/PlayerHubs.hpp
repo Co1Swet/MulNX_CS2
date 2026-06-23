@@ -4,6 +4,7 @@
 #include "GlowController/GlowController.hpp"
 #include "SmokeController/SmokeController.hpp"
 #include "ProjectileTracker/ProjectileTracker.hpp"
+#include "TrailsController/TrailsController.hpp"
 #include "SpeakingController/SpeakingController.hpp"
 #include "KeyboardOverlay/KeyboardOverlay.hpp"
 #include "TeamIDController/TeamIDController.hpp"

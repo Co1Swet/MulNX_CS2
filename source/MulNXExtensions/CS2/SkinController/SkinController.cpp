@@ -1,7 +1,6 @@
 #include "SkinController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-
 void SkinController::Window(MulNX::UINode* node) {
     ImGui::SeparatorText(I18n("skin.changer").c_str());
     MulNX::UI::SliderInt(I18n("skin.target.index").c_str(), this->targetIndex, 0, 10000);
@@ -10,7 +9,6 @@ void SkinController::Window(MulNX::UINode* node) {
         this->PublishAsync("Skin/Apply"_hash);
     }
 }
-
 bool SkinController::Init() {
     (*this)
         .SubscribeSync("Hook/OnSetupView", [this](MulNX::Message& msg) {this->Update();})
@@ -18,7 +16,7 @@ bool SkinController::Init() {
         ;
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::RegenerateWeaponSkins);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::RegenerateWeaponSkins);
         this->regenerateWeaponSkins = (RegenerateWeaponSkins)target.Data();
         // static auto hkSkin = MulNX::Hook::Create(target.Data(), 0, false, [this](RegContext* ctx, MulNX::Hook* Hook) {
         //     return MulNX::Hook::Then::Continue;

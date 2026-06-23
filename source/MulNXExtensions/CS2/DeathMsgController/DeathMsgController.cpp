@@ -19,7 +19,7 @@ bool DeathMsgController::Window(MulNX::UINode* node) {
 
 bool DeathMsgController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto pattern = MulNX::CS2::Signatures::CSHashString;
+        auto pattern = MulNX::CS2::Signatures::Utils::CSHashString;
         uint8_t* callSite = this->CS2->client.GetTextRegion()
             .FindRegion(pattern).Data();
 
@@ -35,7 +35,7 @@ bool DeathMsgController::Init() {
         this->CSHashString(&this->assister_hash, "assister");
 
         auto target = this->CS2->client.GetTextRegion()
-            .FindRegion(MulNX::CS2::Signatures::HandlePlayerDeath);
+            .FindRegion(MulNX::CS2::Signatures::Hud::HandlePlayerDeath);
         this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             void* event = reinterpret_cast<void*>(ctx->rdx);
             return this->HandleOnPlayerDeath(event);

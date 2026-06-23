@@ -53,6 +53,7 @@ boot:
 
 hook:
   attached: 钩子部署成功！钩子名：{}
+  destroyed: 钩子已销毁：{}
 
 graph:
   shader:

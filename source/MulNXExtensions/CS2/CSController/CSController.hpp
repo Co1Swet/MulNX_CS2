@@ -34,10 +34,6 @@ class CSController final :public MulNX::Module<CSController> {
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
 
     uintptr_t retAddrForShowSpeaker = 0;
-
-    // CS2全局变量
-    C_GlobalVars* CSGlobalVars{};
-
     std::atomic<int> needToLoadModules = 4;
     MulNX::CoTask InitTask();
     void Main();
@@ -53,6 +49,8 @@ class CSController final :public MulNX::Module<CSController> {
     void OnTier0Load(MulNX::Message& msg);
     void OnPanoramaLoad(MulNX::Message& msg);
 public:
+    // CS2全局变量
+    C_GlobalVars* CSGlobalVars{};
     std::vector<class ICSModule*>ParticipateItCSModules{};
 
     CS2::Module::Client client{};

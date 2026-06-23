@@ -326,6 +326,7 @@ namespace CS2 {
     // 源于飞行投掷物继承树
     class C_BaseCSGrenadeProjectile :public C_BaseGrenade {
     public:
+        using ParticleIndex_t = int;
         DirectX::XMFLOAT3* m_vInitialPosition() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_BaseCSGrenadeProjectile::m_vInitialPosition); }
         DirectX::XMFLOAT3* m_vInitialVelocity() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_BaseCSGrenadeProjectile::m_vInitialVelocity); }
         int32_t* m_nBounces() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_BaseCSGrenadeProjectile::m_nBounces); }
@@ -337,7 +338,7 @@ namespace CS2 {
         GameTime_t* flNextTrailLineTime() { return Schema<GameTime_t>(this, cs2_dumper::schemas::client_dll::C_BaseCSGrenadeProjectile::flNextTrailLineTime); }
         bool* m_bExplodeEffectBegan() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::C_BaseCSGrenadeProjectile::m_bExplodeEffectBegan); }
         bool* m_bCanCreateGrenadeTrail() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::C_BaseCSGrenadeProjectile::m_bCanCreateGrenadeTrail); }
-        //constexpr std::ptrdiff_t m_nSnapshotTrajectoryEffectIndex = 0x13F0; // ParticleIndex_t
+        ParticleIndex_t* m_nSnapshotTrajectoryEffectIndex() { return Schema<ParticleIndex_t>(this, cs2_dumper::schemas::client_dll::C_BaseCSGrenadeProjectile::m_nSnapshotTrajectoryEffectIndex); }
         //constexpr std::ptrdiff_t m_hSnapshotTrajectoryParticleSnapshot = 0x13F8; // CStrongHandle<InfoForResourceTypeIParticleSnapshot>
         //constexpr std::ptrdiff_t m_arrTrajectoryTrailPoints = 0x1400; // CUtlVector<Vector>
         //constexpr std::ptrdiff_t m_arrTrajectoryTrailPointCreationTimes = 0x1418; // CUtlVector<float32>

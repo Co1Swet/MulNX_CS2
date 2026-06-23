@@ -9,7 +9,7 @@ void TeamCounterController::HubWindow(MulNX::UINode* node) {
 bool TeamCounterController::Init() {
     this->runFlag1.store(true);
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::PosTeamCounterWriteHP).Data();
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamCounterWriteHP).Data();
         this->hkTeamCounterWriteHP = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->runFlag1.load())return MulNX::Hook::Then::Continue;
             uint8_t teamByte = *(uint8_t*)((char*)ctx->rbx + 0x10);   // 0 = T, 非0 = CT

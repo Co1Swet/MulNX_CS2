@@ -60,7 +60,7 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
     this->hkSource2Client002_Init->Attach();
     this->LogSucc(I18n("hook.attached", "Source2Client002::Init"));
 
-    auto back = this->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::ifShowSpeaker).Rdata();
+    auto back = this->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::ifShowSpeaker).Rdata();
     this->retAddrForShowSpeaker = reinterpret_cast<uintptr_t>(back) - 4;
     --this->needToLoadModules;
 }

@@ -70,7 +70,7 @@ void GlowController::HubTeam(MulNX::UINode* node) {
 
 bool GlowController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto region = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::SetGlowColor);
+        auto region = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::SetGlowColor);
         auto target = region.Data();
         this->hkSetGlowColor = MulNX::Hook::Create(target, [this](MulNX::Hook* hk,RegContext* ctx) {
                 this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)&(ctx->rdx));

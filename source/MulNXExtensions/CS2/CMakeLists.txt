@@ -10,6 +10,7 @@ add_library(MulNXCS2Ext
     HookEntitySystem/HookEntitySystem.cpp
     HookConsole/HookConsole.cpp
     ConsoleOutput/ConsoleOutput.cpp
+    ParticleManager/ParticleManager.cpp
 
     ViewController/ViewController.cpp
     TimeController/TimeController.cpp

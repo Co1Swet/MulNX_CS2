@@ -37,6 +37,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<HookConsole>("HookConsole")
             .CreateModule<ConsoleOutput>("ConsoleOutput")
             .CreateModule<HookEntitySystem>("HookEntitySystem")
+            .CreateModule<ParticleManager>("ParticleManager")
             .CreateModule<TimeController>("TimeController")
             .CreateModule<ViewController>("ViewController")
             // CS2功能模块
@@ -51,6 +52,7 @@ void StartImpl(HMODULE& hModule) {
             // 玩家强相关
             .CreateModule<PlayerHub>("PlayerHub")
             .CreateModule<ProjectileTracker>("ProjectileTracker")
+            .CreateModule<TrailsController>("TrailsController")
             .CreateModule<NameController>("NameController")
             .CreateModule<GlowController>("GlowController")
             .CreateModule<SmokeController>("SmokeController")

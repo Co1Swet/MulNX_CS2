@@ -89,6 +89,9 @@ void MulNX::Core::ModuleManager::DeinitModules() {
     std::unique_lock lock(this->smutex);
     for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
         if (it->second->GetName() == "TaskSystem")continue;
+        for (auto& de : *it->second->beforeDeinits) {
+            if (!de())MulNX::ErrorTerminate(std::format("预关停模块失败：{}", it->second->GetName()));
+        }
         it->second->Deinit();
         this->LogInfo(I18n("module.deinited", it->second->GetName()));
     }

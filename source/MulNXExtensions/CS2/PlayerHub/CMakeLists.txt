@@ -4,6 +4,7 @@ add_library(PlayerHubs
     NameController/NameController.cpp
     SmokeController/SmokeController.cpp
     ProjectileTracker/ProjectileTracker.cpp
+    TrailsController/TrailsController.cpp
     SpeakingController/SpeakingController.cpp
     KeyboardOverlay/KeyboardOverlay.cpp
     TeamIDController/TeamIDController.cpp

@@ -20,6 +20,7 @@ namespace MulNX {
         MulNX::Core::Core* Core = nullptr;
         std::unique_ptr<std::vector<std::function<bool()>>>delayInits = std::make_unique<std::vector<std::function<bool()>>>();
         std::unique_ptr<std::vector<std::function<bool()>>>backInits = std::make_unique<std::vector<std::function<bool()>>>();
+        std::unique_ptr<std::vector<std::function<bool()>>>beforeDeinits = std::make_unique<std::vector<std::function<bool()>>>();
 
         IModule() = default;
         virtual ~IModule() = default;

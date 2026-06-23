@@ -12,8 +12,8 @@ void TeamIDController::HubWindow(MulNX::UINode* node) {
 bool TeamIDController::Init() {
     this->runFlag1.store(true);
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::PosTeamID_CmpForHide);
-        auto jmp = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::PosTeamID_xxIt);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_CmpForHide);
+        auto jmp = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_xxIt);
         this->hkPosTeamID_CmpForHide = MulNX::Hook::Create(target.Data() + 3, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleForShowTeamID((CS2::C_CSPlayerPawn*)ctx->rdi);
             }, false, false, (uintptr_t)jmp.Begin()).value();
@@ -28,7 +28,7 @@ bool TeamIDController::Init() {
 
         // Hook CLayoutFile::LoadFromFile
         auto lflAddr = textRegion.FindRegion(
-            MulNX::CS2::Signatures::CLayoutFile_LoadFromFile
+            MulNX::CS2::Signatures::Hud::CLayoutFile_LoadFromFile
         );
         if (!lflAddr.IsValid()) return;
 
