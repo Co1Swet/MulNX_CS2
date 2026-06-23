@@ -9,25 +9,17 @@
 #include <MulNXExtensions/MediaSystem/Media.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
-HMODULE hOriginModule = nullptr;
-HANDLE hInitCompleteEvent = nullptr;
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
-    switch (ul_reason_for_call) {
-    case DLL_PROCESS_ATTACH:
-        hOriginModule = hModule;
-        hInitCompleteEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
-        break;
-    }
-    return TRUE;
-}
-DWORD WINAPI StartImpl(LPVOID lpParam) {
+static HANDLE hInitCompleteEvent = nullptr;
+BOOL APIENTRY DllMain(HMODULE, DWORD, LPVOID) { return TRUE; }
+void StartImpl(HMODULE& hModule) {
+    volatile unsigned dummy = avcodec_version();
+    (void)dummy;
+    hModule = GetModuleHandleW(L"CS2OBTool.dll");
     try {
         // 创建核心
         auto core = MulNX::Core::Core::Create("CS2OBTool");
         // 将DLL模块句柄传递给核心，以便后续使用
-        core->hMyOriginModule = hOriginModule;
-
+        core->hMyOriginModule = hModule;
         // 注册所有模块
         (*core->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
@@ -123,10 +115,15 @@ DWORD WINAPI StartImpl(LPVOID lpParam) {
     catch (...) {
         MulNX::ErrorTerminate("在启动时发生未知异常！");
     }
-    FreeLibraryAndExitThread(hOriginModule, 0);
+}
+DWORD WINAPI StartWrapper(LPVOID lpParam) {
+    HMODULE hModule;
+    StartImpl(hModule);
+    FreeLibraryAndExitThread(hModule, 0);
 }
 DWORD WINAPI MulNX_CS2_Start(void*) {
-    HANDLE hInitThread = CreateThread(NULL, 0, StartImpl, NULL, 0, NULL);
+    hInitCompleteEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
+    HANDLE hInitThread = CreateThread(NULL, 0, StartWrapper, NULL, 0, NULL);
     WaitForSingleObject(hInitCompleteEvent, INFINITE);
     return 0;
 }
