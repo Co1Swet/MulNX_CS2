@@ -3,6 +3,7 @@
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
 void SmokeController::HubPlayer(MulNX::UINode* node) {
+    std::shared_lock lock(this->smutex);
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);
@@ -32,6 +33,7 @@ void SmokeController::HubPlayer(MulNX::UINode* node) {
 }
 
 void SmokeController::HubTeam(MulNX::UINode* node) {
+    std::shared_lock lock(this->smutex);
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);
@@ -95,41 +97,41 @@ void SmokeController::ProcessMsg(MulNX::Message& Msg) {
     case "Smoke/Player/Set"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
         auto color = Msg.p2.low<uint32_t>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors[uid] = color;
         break;
     }
     case "Smoke/Player/Clear"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors.erase(uid);
         break;
     }
     case "Smoke/Player/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors.clear();
         break;
     }
     case "Smoke/Team/Set"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
         auto color = Msg.p1.low<uint32_t>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->teamColors[team] = color;
         break;
     }
     case "Smoke/Team/Clear"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->teamColors.erase(team);
         break;
     }
     case "Smoke/Team/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->teamColors.clear();
         break;
     }
     case "Smoke/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors.clear();
         this->teamColors.clear();
         break;
@@ -140,7 +142,7 @@ void SmokeController::ProcessMsg(MulNX::Message& Msg) {
 }
 
 void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
-    std::shared_lock lock(this->Hub->smutex);
+    std::shared_lock lock(this->smutex);
     try {
         
         // 获取投掷者实体

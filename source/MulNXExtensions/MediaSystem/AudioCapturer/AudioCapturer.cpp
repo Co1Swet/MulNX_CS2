@@ -14,7 +14,7 @@ using Microsoft::WRL::ComPtr;
 static GUID REFERENCE_GUID = GUID_NULL;
 
 bool AudioCapturer::Init() {
-    this->SubscribeSync("Hook/Present/Fisrt", [this](MulNX::Message& msg) {
+    this->SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {
         // start capture thread
         this->capturing.store(true);
 

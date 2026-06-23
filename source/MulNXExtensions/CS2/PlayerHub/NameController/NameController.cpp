@@ -1,7 +1,5 @@
 #include "NameController.hpp"
-
 #include <MulNX/Base/UI/UI.hpp>
-
 #include <MulNXExtensions/CS2/PlayerHub/PlayerHub.hpp>
 
 using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_CCSPlayerController,
@@ -10,6 +8,7 @@ using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_
 using GetPlayerName_t = const char* (*)(CS2::CCSPlayerController*);
 
 void NameController::HubPlayer(MulNX::UINode* node) {
+    std::shared_lock lock(this->smutex);
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
     auto it = this->nameReplaceInfo.find(uid);
     if (it != this->nameReplaceInfo.end()) {
@@ -63,7 +62,7 @@ void NameController::ProcessMsg(MulNX::Message& Msg) {
     case "Name/Player/Set"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
         auto newName = Msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->SetReplace(uid, newName);
         break;
     }
@@ -76,7 +75,7 @@ void NameController::HandleVHook(CS2::CCSPlayerController* pPlayerController) {
     if (this->bGetPlayerNameHooked)return;
     this->hkGetPlayerName = MulNX::Hook::Create(reinterpret_cast<uint8_t*>(pPlayerController->GetVFuncPtr(226)), [this](MulNX::Hook* hk, RegContext* ctx) {
         // 而在这里，我们则需要加锁，因为我们要访问替换表了
-        std::shared_lock lock(this->Hub->smutex);
+        std::shared_lock lock(this->smutex);
 
         auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
 

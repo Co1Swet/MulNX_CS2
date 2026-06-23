@@ -1,8 +1,6 @@
 #include "ProjectileTracker.hpp"
-
 #include <MulNX/Base/Math/Translate/Translate.hpp>
 #include <MulNX/Base/UI/UI.hpp>
-
 
 static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController) {
     if (!pController) return "未知玩家";
@@ -13,9 +11,10 @@ static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController
 }
 
 void ProjectileTracker::HubWindow(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("投掷物追踪器");
-    MulNX::UI::Checkbox("启用功能", this->Enable);
-
+    std::shared_lock lock(this->smutex);
+    auto w = MulNX::UI::RAIIWindow("投掷物");
+    MulNX::UI::Checkbox("启用投掷物追踪", this->Enable);
+    node->CallUINode("TrailsController");
 }
 
 bool ProjectileTracker::Init() {

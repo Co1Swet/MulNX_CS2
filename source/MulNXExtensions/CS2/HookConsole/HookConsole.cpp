@@ -29,8 +29,9 @@ void HookConsole::OnEngine2Load(MulNX::Message& msg) {
     this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int, double, int64_t)>(50);
     auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
     this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+        if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
         std::string cmd;
-        while (this->bufferGameCmds.try_dequeue(cmd)){
+        while (this->bufferGameCmds.try_dequeue(cmd)) {
             this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
         }
         return MulNX::Hook::Then::Continue;

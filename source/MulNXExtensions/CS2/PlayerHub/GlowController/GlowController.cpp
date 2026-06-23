@@ -4,6 +4,7 @@
 #include <MulNXExtensions/CS2/HookConsole/HookConsole.hpp>
 
 void GlowController::HubPlayer(MulNX::UINode* node) {
+    std::shared_lock lock(this->smutex);
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
     // 1. 获取当前为该玩家设置的颜色（若存在），否则使用默认白色
@@ -19,8 +20,6 @@ void GlowController::HubPlayer(MulNX::UINode* node) {
     // 2. 将 uint32_t 颜色转换为 ImVec4，以便使用 ImGui 颜色编辑器
     ImVec4 colorVec4 = ImGui::ColorConvertU32ToFloat4(currentColorU32);
 
-    // 3. 显示颜色选择器
-    // 使用 ColorEdit4 可以同时展示预览色块和数值，也可以只用 ColorPicker4
     if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4)) {
         // 颜色被修改后，转换回 uint32_t 并保存到 playerColors
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
@@ -30,7 +29,6 @@ void GlowController::HubPlayer(MulNX::UINode* node) {
         this->PublishAsync(std::move(msg));
     }
 
-    // 可选：添加一个重置按钮，删除该玩家的自定义颜色规则
     ImGui::SameLine();
     if (ImGui::Button("重置发光颜色")) {
         MulNX::Message msg("Glow/Player/Clear"_hash);
@@ -39,6 +37,7 @@ void GlowController::HubPlayer(MulNX::UINode* node) {
     }
 }
 void GlowController::HubTeam(MulNX::UINode* node) {
+    std::shared_lock lock(this->smutex);
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255); // 默认白色
@@ -116,41 +115,41 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
     case "Glow/Player/Set"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
         auto color = Msg.p2.low<uint32_t>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors[uid] = color;
         break;
     }
     case "Glow/Player/Clear"_hash: {
         auto uid = Msg.p1.as<Steam64UID>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors.erase(uid);
         break;
     }
     case "Glow/Player/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors.clear();
         break;
     }
     case "Glow/Team/Set"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
         auto color = Msg.p1.low<uint32_t>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->teamColors[team] = color;
         break;
     }
     case "Glow/Team/Clear"_hash: {
         auto team = Msg.p1.high<CS2::ui8TeamNum>();
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->teamColors.erase(team);
         break;
     }
     case "Glow/Team/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->teamColors.clear();
         break;
     }
     case "Glow/ClearAll"_hash: {
-        std::unique_lock lock(this->Hub->smutex);
+        std::unique_lock lock(this->smutex);
         this->playerColors.clear();
         this->teamColors.clear();
         break;
@@ -161,7 +160,7 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
 }
 
 void GlowController::MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t* color) {
-    std::shared_lock lock(this->Hub->smutex);
+    std::shared_lock lock(this->smutex);
 
     if (this->disableGlow.load()) {
         *color = 0;

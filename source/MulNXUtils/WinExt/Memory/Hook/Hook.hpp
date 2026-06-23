@@ -81,5 +81,9 @@ namespace MulNX {
             T* param = reinterpret_cast<T*>(stack + 0x8 + num * 0x8);
             return param;
         }
+        template<typename F, typename... Args>
+        auto CallMaybeAs(Args... args) {
+            return reinterpret_cast<F>(this->pMaybeRawFunc)(std::forward<Args>(args)...);
+        }
     };
 }

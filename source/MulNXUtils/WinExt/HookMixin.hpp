@@ -30,6 +30,8 @@ protected:
                 });
         }
         auto Detach() { return hook->Detach(); }
+        MulNX::Hook* operator->() { return hook.get(); }
+        const MulNX::Hook* operator->() const { return hook.get(); }
     };
 
     template<typename... Args>
