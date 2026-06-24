@@ -12,8 +12,6 @@
 static HANDLE hInitCompleteEvent = nullptr;
 BOOL APIENTRY DllMain(HMODULE, DWORD, LPVOID) { return TRUE; }
 void StartImpl(HMODULE& hModule) {
-    volatile unsigned dummy = avcodec_version();
-    (void)dummy;
     hModule = GetModuleHandleW(L"CS2OBTool.dll");
     try {
         // 创建核心

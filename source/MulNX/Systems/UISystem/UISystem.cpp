@@ -78,17 +78,18 @@ int MulNX::UISystem::Render() {
         this->WantTextInput.store(false, std::memory_order_release);
         return 0;
     }
+    
+    if (!this->FrameBefore())return 0;
+    this->pCoordinator->Render();
+    this->FrameBehind();
+
     ImGuiIO& io = ImGui::GetIO();
-    if (this->WantCaptureMouse.load(std::memory_order_acquire)!= io.WantCaptureMouse) {
+    if (this->WantCaptureMouse.load(std::memory_order_acquire) != io.WantCaptureMouse) {
         this->WantCaptureMouse.store(io.WantCaptureMouse, std::memory_order_release);
     }
     if (this->WantTextInput.load(std::memory_order_acquire) != io.WantTextInput) {
         this->WantTextInput.store(io.WantTextInput, std::memory_order_release);
     }
-
-    if (!this->FrameBefore())return 0;
-    this->pCoordinator->Render();
-    this->FrameBehind();
 
     return 0;
 }

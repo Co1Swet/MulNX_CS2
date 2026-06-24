@@ -4,6 +4,8 @@
 
 bool HookWindow::Init() {
     this->pUISystem = this->FindModule<MulNX::UISystem>("UISystem");
+    this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+
     this->SubscribeSync("Hook/hWnd", [this](MulNX::Message& msg) {
         this->hCS2Wnd = msg.p1.as<HWND>();
         // 文件拖拽钩子
@@ -21,7 +23,6 @@ bool HookWindow::Init() {
             }).value();
         this->hkWndProc->Attach();
         this->LogSucc(I18n("hook.attached", "WndProc"));
-        ImGui::CreateContext();
         ImGui_ImplWin32_Init(this->hCS2Wnd);
         });
     return true;
@@ -29,7 +30,22 @@ bool HookWindow::Init() {
 void HookWindow::Deinit() {
     this->hkWndProc->Detach();
 }
+void HookWindow::FixMouse(UINT& uMsg, LPARAM& lParam) {
+    if (!MulNX::Win32::IsMouseMessage(uMsg)) return;
+    IDXGISwapChain* pSC = this->pGraphicsManager->pSwapChain;
+    if (!pSC)return;
+    DXGI_SWAP_CHAIN_DESC sd;
+    if (!SUCCEEDED(pSC->GetDesc(&sd))) return;
+    RECT rc;
+    if (!GetClientRect(this->hCS2Wnd, &rc)) return;
+    int x = LOWORD(lParam);
+    int y = HIWORD(lParam);
+    int newX = (int)(x * ((float)sd.BufferDesc.Width / (rc.right - rc.left)));
+    int newY = (int)(y * ((float)sd.BufferDesc.Height / (rc.bottom - rc.top)));
+    lParam = MAKELPARAM(newX, newY);
+}
 MulNX::Hook::Then HookWindow::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    this->FixMouse(uMsg, lParam);
     this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
     if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
         return MulNX::Hook::Then::Return;

@@ -80,6 +80,7 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     pSwapChain->GetDesc(&sd);
     MulNX::Message msg("Hook/hWnd"_hash);
     msg.p1.as<HWND>() = sd.OutputWindow;
+    this->hCS2Wnd = sd.OutputWindow;
     this->PublishSync(msg);
 }
 MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx) {
@@ -92,7 +93,16 @@ MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx)
 
     this->pUISystem->FrameBefore = [this]() {
         ImGui_ImplDX11_NewFrame();
-        ImGui_ImplWin32_NewFrame();
+        ImGui_ImplWin32_NewFrame();          // 更新键盘、时间等
+        // 缩放修正
+        ImGuiIO& io = ImGui::GetIO();
+        DXGI_SWAP_CHAIN_DESC sd;
+        if (this->pGraphicsManager->pSwapChain &&
+            SUCCEEDED(this->pGraphicsManager->pSwapChain->GetDesc(&sd))) {
+            io.DisplaySize = ImVec2((float)sd.BufferDesc.Width, (float)sd.BufferDesc.Height);
+            io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+        }
+        // 开启新帧
         ImGui::NewFrame();
         return true;
         };
@@ -112,7 +122,7 @@ MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->BuildNew();
     this->pGraphicsManager->OnPresent();
     // UI 系统渲染
-    this->pUISystem->HandleUpdate();
+    this->pUISystem->HandleUpdate();    // 处理消息（坐标已在 HookWindow 中预缩放）
     this->pUISystem->Render();
     return MulNX::Hook::Then::Continue;
 }

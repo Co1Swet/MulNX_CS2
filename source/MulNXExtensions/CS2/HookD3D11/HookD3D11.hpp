@@ -6,6 +6,7 @@ class HookD3D11 final : public CSModuleBase {
 private:
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
+    HWND hCS2Wnd = nullptr;
 
     std::unique_ptr<MulNX::Hook> hkD3D11CreateDevice = nullptr;
     std::unique_ptr<MulNX::Hook> hkCreateSwapChain = nullptr;
