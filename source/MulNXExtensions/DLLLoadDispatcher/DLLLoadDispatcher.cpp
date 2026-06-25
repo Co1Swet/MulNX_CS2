@@ -13,7 +13,12 @@ bool DLLLoadDispatcher::Init() {
         }).value();
     this->hkLoadLibraryExW->Attach();
     this->LogSucc(I18n("hook.attached", "LoadLibraryExW"));
-    
+
+    auto pthFile = this->PathGet("Config") / "dllTargets.yaml";
+    auto file= YAML::LoadFile(pthFile.string());
+    for (const auto& target : file["targets"]) {
+        this->targets.insert(target.as<std::string>());
+    }
     return true;
 }
 void DLLLoadDispatcher::Deinit() {
@@ -32,23 +37,9 @@ void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {
 }
 
 void DLLLoadDispatcher::DispatchModuleLoadMessage(const std::filesystem::path& modulePath) {
-    auto filename = modulePath.filename();
-    if (modulePath.filename() == L"client.dll") {
-        this->PublishSync("Hook/LoadLibraryExW/client.dll"_hash);
-    }
-    if (modulePath.filename() == L"engine2.dll") {
-        this->PublishSync("Hook/LoadLibraryExW/engine2.dll"_hash);
-    }
-    if (modulePath.filename() == L"tier0.dll") {
-        this->PublishSync("Hook/LoadLibraryExW/tier0.dll"_hash);
-    }
-    if (modulePath.filename() == L"panorama.dll") {
-        this->PublishSync("Hook/LoadLibraryExW/panorama.dll"_hash);
-    }
-    if (modulePath.filename() == L"d3d11.dll") {
-        this->PublishSync("Hook/LoadLibraryExW/d3d11.dll"_hash);
-    }
-    if (modulePath.filename() == L"gameoverlayrenderer64.dll") {
-        this->PublishSync("Hook/LoadLibraryExW/gameoverlayrenderer64.dll"_hash);
+    auto filename = modulePath.filename().string();
+    if (this->targets.find(filename) != this->targets.end()) {
+        auto full = "Hook/LoadLibraryExW/" + filename;
+        this->PublishSync(MulNX::HashString(full));
     }
 }

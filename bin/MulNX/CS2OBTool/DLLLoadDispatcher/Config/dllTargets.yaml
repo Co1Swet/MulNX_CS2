@@ -1,0 +1,8 @@
+targets:
+  - tier0.dll
+  - panorama.dll
+  - client.dll
+  - engine2.dll
+  - d3d11.dll
+  - materialsystem2.dll
+  - scenesystem.dll

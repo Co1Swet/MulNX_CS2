@@ -6,3 +6,4 @@
 #include "TeamIDController/TeamIDController.hpp"
 #include "TrailsController/TrailsController.hpp"
 #include "GlowController/GlowController.hpp"
+#include "SkyController/SkyController.hpp"

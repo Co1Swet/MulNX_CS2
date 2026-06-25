@@ -32,6 +32,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
 
     ImGui::Begin(I18n("3D视觉").c_str());
     node->CallUINode("SkinController");
+    node->CallUINode("SkyController");
     ImGui::End();
 
     ImGui::Begin(I18n("镜头参数").c_str());

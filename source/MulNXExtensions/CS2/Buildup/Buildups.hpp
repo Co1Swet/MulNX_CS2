@@ -4,3 +4,5 @@
 #include "ParticleManager/ParticleManager.hpp"
 #include "PlayerHub/PlayerHub.hpp"
 #include "TimeController/TimeController.hpp"
+#include "MaterialSystem/MaterialSystem.hpp"
+#include "SceneSystem/SceneSystem.hpp"

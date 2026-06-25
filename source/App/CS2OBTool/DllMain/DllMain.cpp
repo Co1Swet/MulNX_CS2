@@ -35,6 +35,8 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<ConsoleOutput>("ConsoleOutput")
             .CreateModule<HookEntitySystem>("HookEntitySystem")
             .CreateModule<ParticleManager>("ParticleManager")
+            .CreateModule<MaterialSystem>("MaterialSystem")
+            .CreateModule<SceneSystem>("SceneSystem")
             .CreateModule<TimeController>("TimeController")
             .CreateModule<ViewController>("ViewController")
             // CS2功能模块
@@ -43,6 +45,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<ObserverController>("ObserverController")
             .CreateModule<PlayerFlashController>("PlayerFlashController")
             .CreateModule<DeathMsgController>("DeathMsgController")
+            .CreateModule<SkyController>("SkyController")
             .CreateModule<ESPController>("ESPController")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<EntityListScanner>("EntityListScanner")
