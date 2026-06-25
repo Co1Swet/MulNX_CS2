@@ -1,14 +1,11 @@
 #pragma once
-
 #include "../Region/Region.hpp"
-
+#include "../../../MulNX/Config/Config.hpp"
 #include <cstdint>
 #include <cstddef>
 #include <string>
 #include <Windows.h>
 #include <Psapi.h>
-
-#include <MulNX/Config/Config.hpp>
 
 namespace MulNX {
     namespace Memory {

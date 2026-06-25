@@ -1,0 +1,13 @@
+add_library(CS2Visual STATIC
+    ESPController/ESPController.cpp
+    GlowController/GlowController.cpp
+    PlayerFlashController/PlayerFlashController.cpp
+    SkinController/SkinController.cpp
+    SmokeController/SmokeController.cpp
+    TeamIDController/TeamIDController.cpp
+    TrailsController/TrailsController.cpp
+)
+
+target_link_libraries(CS2Visual PUBLIC
+    CS2Buildup
+)

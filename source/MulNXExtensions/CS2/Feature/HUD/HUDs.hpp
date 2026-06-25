@@ -1,0 +1,9 @@
+#pragma once
+#include "BombSpotController/BombSpotController.hpp"
+#include "DeathMsgController/DeathMsgController.hpp"
+#include "KeyboardOverlay/KeyboardOverlay.hpp"
+#include "NameController/NameController.hpp"
+#include "PlayerSpotColorController/PlayerSpotColorController.hpp"
+#include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
+#include "SpeakingController/SpeakingController.hpp"
+#include "TeamCounterController/TeamCounterController.hpp"

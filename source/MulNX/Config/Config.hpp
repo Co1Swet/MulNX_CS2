@@ -1,9 +1,9 @@
 #pragma once
-
+#include <MulNX/Base/Hash/Hash.hpp>
 #include <cstdint>
 #include <string>
 #include <source_location>
-#include <MulNX/Base/Hash/Hash.hpp>
+
 
 class MulNXInfo {
 public:

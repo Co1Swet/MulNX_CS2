@@ -1,0 +1,3 @@
+add_subdirectory("CS2OBTool")
+add_subdirectory("CS2Injector")
+add_subdirectory("CS2InternalHelper")

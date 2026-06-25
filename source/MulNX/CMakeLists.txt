@@ -40,3 +40,8 @@ add_library(MulNX
 target_link_libraries(MulNX PUBLIC
     MulNXThirdParty
 )
+target_include_directories(MulNX PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(MulNX PUBLIC
+    MulNX.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)

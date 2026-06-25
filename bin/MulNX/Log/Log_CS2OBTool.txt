@@ -1,892 +1,1085 @@
 +----------新的日志片段----------+
 日志系统已上线，欢迎使用MulNX
 
-[2026-06-24 06:25:49.3202050][成功][CS2OBTool]核心就绪
-[2026-06-24 06:25:49.3202470][成功][Driver]驱动就绪
-[2026-06-24 06:25:49.3203900][成功][ModuleManager]sys.msg.async.subedModuleManager/ModuleInfo/Request
-[2026-06-24 06:25:49.3204010][提示][ModuleManager]module.send_task
-[2026-06-24 06:25:49.3204270][成功][ModuleManager]module.inited
-[2026-06-24 06:25:49.3204770][成功][IPCer]module.inited
-[2026-06-24 06:25:49.3209570][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
-[2026-06-24 06:25:49.3209960][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
-[2026-06-24 06:25:49.3210280][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Vedios
-[2026-06-24 06:25:49.3210580][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Data
-[2026-06-24 06:25:49.3210870][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Output
-[2026-06-24 06:25:49.3211660][成功][PathManager]module.inited
-[2026-06-24 06:25:49.3213170][成功][CrashDumper]module.inited
-[2026-06-24 06:25:49.3333610][成功][I18nManager]语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\lan.yaml
-[2026-06-24 06:25:49.3333770][成功][I18nManager]共加载键值对：201
-[2026-06-24 06:25:49.3339050][成功][I18nManager]初始化成功！
-[2026-06-24 06:25:49.3339700][成功][MessageManager]初始化成功！
-[2026-06-24 06:25:49.3340230][成功][UICoordinator]异步消息订阅：UISystem/ModulePush
-[2026-06-24 06:25:49.3340280][成功][UICoordinator]异步消息订阅：UINode/Swap
-[2026-06-24 06:25:49.3340500][提示][UICoordinator]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3340520][成功][UICoordinator]初始化成功！
-[2026-06-24 06:25:49.3344970][提示][UISystem]尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ui.yaml
-[2026-06-24 06:25:49.3348630][成功][UISystem]字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16
-[2026-06-24 06:25:49.3348710][提示][UISystem]尝试加载字体：C:/Windows/Fonts/msyh.ttc
-[2026-06-24 06:25:49.3429600][成功][UISystem]字体加载成功：C:/Windows/Fonts/msyh.ttc
-[2026-06-24 06:25:49.3431440][提示][UISystem]尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml
-[2026-06-24 06:25:49.3562620][成功][UISystem]UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml
-[2026-06-24 06:25:49.3568540][成功][UISystem]异步消息订阅：UISystem/Start
-[2026-06-24 06:25:49.3568590][成功][UISystem]异步消息订阅：UISystem/Toggle
-[2026-06-24 06:25:49.3568640][成功][UISystem]异步消息订阅：UISystem/SaveStyle
-[2026-06-24 06:25:49.3568720][提示][UISystem]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3568780][成功][UISystem]初始化成功！
-[2026-06-24 06:25:49.3569460][成功][TaskSystem]异步消息订阅：Task/Create
-[2026-06-24 06:25:49.3573570][成功][TaskSystem]成功创建工作者：MulNXMain
-[2026-06-24 06:25:49.3573980][成功][TaskSystem]成功将任务：TaskSystem::Update 添加进入工作者：MulNXMain
-[2026-06-24 06:25:49.3576460][成功][TaskSystem]成功创建工作者：Messaging
-[2026-06-24 06:25:49.3576540][成功][TaskSystem]成功将任务：TaskSystem::CreateFor->MessageManager::HandleDispatch 添加进入工作者：Messaging
-[2026-06-24 06:25:49.3576800][成功][TaskSystem]初始化成功！
-[2026-06-24 06:25:49.3589300][成功][TaskSystem]成功创建工作者：Loging
-[2026-06-24 06:25:49.3590230][成功][TaskSystem]成功将任务：Logger::Log 添加进入工作者：Loging
-[2026-06-24 06:25:49.3590510][成功][Logger]初始化成功！
-[2026-06-24 06:25:49.3591200][提示][Debugger]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3591250][提示][Debugger]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3591350][提示][Debugger]消息推送：将任务 Debugger::Main 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3591460][成功][Debugger]异步消息订阅：Log/Info
-[2026-06-24 06:25:49.3591610][成功][Debugger]异步消息订阅：Log/Succ
-[2026-06-24 06:25:49.3591670][成功][Debugger]异步消息订阅：Log/Warning
-[2026-06-24 06:25:49.3591720][成功][Debugger]异步消息订阅：Log/Error
-[2026-06-24 06:25:49.3591790][成功][Debugger]异步消息订阅：Debugger/SetMaxInfoCount
-[2026-06-24 06:25:49.3591870][成功][Debugger]初始化成功！
-[2026-06-24 06:25:49.3592260][成功][HandleSystem]初始化成功！
-[2026-06-24 06:25:49.3592840][提示][InputSystem]消息推送：将任务 InputSystem::UpdateKeysState 注册到工作者 InputSystem
-[2026-06-24 06:25:49.3592920][成功][InputSystem]初始化成功！
-[2026-06-24 06:25:49.3624030][提示][ShortcutManager]配置文件名称: MulNX 官方快捷键配置
-[2026-06-24 06:25:49.3627250][提示][ShortcutManager]消息推送：将任务 ShortcutManager::Check 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3628570][成功][ShortcutManager]初始化成功！
-[2026-06-24 06:25:49.3629160][提示][GlobalVars]消息推送：将任务 GlobalVars::Main 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3629200][成功][GlobalVars]初始化成功！
-[2026-06-24 06:25:49.3630130][成功][HookWindow]同步消息订阅：Hook/hWnd
-[2026-06-24 06:25:49.3630210][成功][HookWindow]初始化成功！
-[2026-06-24 06:25:49.3630810][成功][HookD3D11]同步消息订阅：Hook/LoadLibraryExW/d3d11.dll
-[2026-06-24 06:25:49.3630840][成功][HookD3D11]初始化成功！
-[2026-06-24 06:25:49.3631310][成功][DLLLoadDispatcher]同步消息订阅：Hook/LoadLibraryExW
-[2026-06-24 06:25:49.3634000][成功][DLLLoadDispatcher]钩子部署成功！钩子名：LoadLibraryExW
-[2026-06-24 06:25:49.3634020][成功][DLLLoadDispatcher]初始化成功！
-[2026-06-24 06:25:49.3636510][成功][FileRedirector]初始化成功！
-[2026-06-24 06:25:49.3636930][提示][ShaderCompiler]正在编译着色器！
-[2026-06-24 06:25:49.3665380][成功][ShaderCompiler]着色器编译完毕！
-[2026-06-24 06:25:49.3665450][成功][ShaderCompiler]初始化成功！
-[2026-06-24 06:25:49.3666030][提示][GraphicsManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3666050][成功][GraphicsManager]初始化成功！
-[2026-06-24 06:25:49.3666520][成功][WebSocketManager]异步消息订阅：WebSocketManager/Post
-[2026-06-24 06:25:49.3668160][提示][WebSocketManager]消息推送：将任务 WebSocketManager::server::run 注册到工作者 Web
-[2026-06-24 06:25:49.3668280][提示][WebSocketManager]消息推送：将任务 WebSocketManager::Main 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3668310][成功][WebSocketManager]初始化成功！
-[2026-06-24 06:25:49.3668700][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3668780][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/engine2.dll
-[2026-06-24 06:25:49.3668820][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/tier0.dll
-[2026-06-24 06:25:49.3668870][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/panorama.dll
-[2026-06-24 06:25:49.3668980][提示][CSController]消息推送：将任务 CSController::Update 注册到工作者 CSControl
-[2026-06-24 06:25:49.3669020][成功][CSController]初始化成功！
-[2026-06-24 06:25:49.3669550][成功][HookConsole]同步消息订阅：Hook/LoadLibraryExW/tier0.dll
-[2026-06-24 06:25:49.3669590][成功][HookConsole]同步消息订阅：Hook/LoadLibraryExW/engine2.dll
-[2026-06-24 06:25:49.3669640][成功][HookConsole]异步消息订阅：Game/Command
-[2026-06-24 06:25:49.3669690][成功][HookConsole]异步消息订阅：Game/Command/NoReport
-[2026-06-24 06:25:49.3669750][提示][HookConsole]消息推送：将任务 HookConsole::Update 注册到工作者 CSControl
-[2026-06-24 06:25:49.3669790][成功][HookConsole]初始化成功！
-[2026-06-24 06:25:49.3670130][成功][ConsoleOutput]异步消息订阅：Log/Info
-[2026-06-24 06:25:49.3670170][成功][ConsoleOutput]异步消息订阅：Log/Succ
-[2026-06-24 06:25:49.3670210][成功][ConsoleOutput]异步消息订阅：Log/Warning
-[2026-06-24 06:25:49.3670240][成功][ConsoleOutput]异步消息订阅：Log/Error
-[2026-06-24 06:25:49.3670310][提示][ConsoleOutput]消息推送：将任务 ConsoleOutput::ConsoleOutput 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3670340][成功][ConsoleOutput]初始化成功！
-[2026-06-24 06:25:49.3670780][成功][HookEntitySystem]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3670800][成功][HookEntitySystem]初始化成功！
-[2026-06-24 06:25:49.3671180][成功][ParticleManager]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3671200][成功][ParticleManager]初始化成功！
-[2026-06-24 06:25:49.3671670][成功][TimeController]同步消息订阅：Hook/LoadLibraryExW/engine2.dll
-[2026-06-24 06:25:49.3671690][成功][TimeController]初始化成功！
-[2026-06-24 06:25:49.3672100][成功][ViewController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3672120][成功][ViewController]初始化成功！
-[2026-06-24 06:25:49.3672510][提示][AdvancedViewController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3672530][成功][AdvancedViewController]初始化成功！
-[2026-06-24 06:25:49.3672920][提示][FreeCameraController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3672980][成功][FreeCameraController]异步消息订阅：FreeCamCtrl/Toggle
-[2026-06-24 06:25:49.3673040][提示][HookConsole]请求了指令创建: mulnx_freeCamCtrl_toggle
-[2026-06-24 06:25:49.3673100][成功][FreeCameraController]初始化成功！
-[2026-06-24 06:25:49.3673430][成功][ObserverController]异步消息订阅：CameraSystem/Play/Started
-[2026-06-24 06:25:49.3673480][成功][ObserverController]异步消息订阅：CameraSystem/Play/Ended
-[2026-06-24 06:25:49.3673520][成功][ObserverController]异步消息订阅：Observe/SpecSteam64UID
-[2026-06-24 06:25:49.3673570][成功][ObserverController]异步消息订阅：Observe/SpecHandle
-[2026-06-24 06:25:49.3673610][成功][ObserverController]异步消息订阅：spec_mode_changed_to
-[2026-06-24 06:25:49.3673710][提示][ObserverController]消息推送：将任务 ObserverController::Main 注册到工作者 CSControl
-[2026-06-24 06:25:49.3673760][成功][ObserverController]初始化成功！
-[2026-06-24 06:25:49.3674340][提示][PlayerFlashController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3674380][成功][PlayerFlashController]初始化成功！
-[2026-06-24 06:25:49.3674750][成功][DeathMsgController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3674770][成功][DeathMsgController]初始化成功！
-[2026-06-24 06:25:49.3675100][提示][ESPController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3675120][成功][ESPController]初始化成功！
-[2026-06-24 06:25:49.3675560][成功][SkinController]同步消息订阅：Hook/OnSetupView
-[2026-06-24 06:25:49.3675600][成功][SkinController]异步消息订阅：Skin/Apply
-[2026-06-24 06:25:49.3675640][成功][SkinController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3675660][成功][SkinController]初始化成功！
-[2026-06-24 06:25:49.3676040][提示][EntityListScanner]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3676060][成功][EntityListScanner]初始化成功！
-[2026-06-24 06:25:49.3676470][提示][PlayerHub]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3676490][成功][PlayerHub]初始化成功！
-[2026-06-24 06:25:49.3677100][提示][ProjectileTracker]消息推送：将任务 ProjectileTracker::Main 注册到工作者 CSControl
-[2026-06-24 06:25:49.3677230][成功][ProjectileTracker]同步消息订阅：Hook/AddEntity
-[2026-06-24 06:25:49.3677280][成功][ProjectileTracker]同步消息订阅：Hook/RemoveEntity
-[2026-06-24 06:25:49.3677300][成功][ProjectileTracker]初始化成功！
-[2026-06-24 06:25:49.3677760][成功][TrailsController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3677810][成功][TrailsController]异步消息订阅：Trails/Player/Set
-[2026-06-24 06:25:49.3677860][成功][TrailsController]异步消息订阅：Trails/Player/Clear
-[2026-06-24 06:25:49.3677900][成功][TrailsController]异步消息订阅：Trails/Player/ClearAll
-[2026-06-24 06:25:49.3677940][成功][TrailsController]异步消息订阅：Trails/Team/Set
-[2026-06-24 06:25:49.3677990][成功][TrailsController]异步消息订阅：Trails/Team/Clear
-[2026-06-24 06:25:49.3678030][成功][TrailsController]异步消息订阅：Trails/Team/ClearAll
-[2026-06-24 06:25:49.3678060][成功][TrailsController]异步消息订阅：Trails/ClearAll
-[2026-06-24 06:25:49.3678100][成功][TrailsController]异步消息订阅：Trails/Prop
-[2026-06-24 06:25:49.3678170][提示][TrailsController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3678230][提示][TrailsController]消息推送：将任务 TrailsController::Update 注册到工作者 CSControl
-[2026-06-24 06:25:49.3678270][成功][TrailsController]初始化成功！
-[2026-06-24 06:25:49.3678640][成功][NameController]异步消息订阅：Name/Player/Set
-[2026-06-24 06:25:49.3678760][成功][NameController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3678780][成功][NameController]初始化成功！
-[2026-06-24 06:25:49.3679250][成功][GlowController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3679310][提示][GlowController]消息推送：将任务 GlowController::Update 注册到工作者 CSControl
-[2026-06-24 06:25:49.3679370][成功][GlowController]异步消息订阅：Glow/Enable
-[2026-06-24 06:25:49.3679420][成功][GlowController]异步消息订阅：Glow/Disable
-[2026-06-24 06:25:49.3679460][成功][GlowController]异步消息订阅：Glow/Player/Set
-[2026-06-24 06:25:49.3679500][成功][GlowController]异步消息订阅：Glow/Player/Clear
-[2026-06-24 06:25:49.3679540][成功][GlowController]异步消息订阅：Glow/Player/ClearAll
-[2026-06-24 06:25:49.3679580][成功][GlowController]异步消息订阅：Glow/Team/Set
-[2026-06-24 06:25:49.3679620][成功][GlowController]异步消息订阅：Glow/Team/Clear
-[2026-06-24 06:25:49.3679660][成功][GlowController]异步消息订阅：Glow/Team/ClearAll
-[2026-06-24 06:25:49.3679730][成功][GlowController]异步消息订阅：Glow/ClearAll
-[2026-06-24 06:25:49.3679760][提示][HookConsole]请求了指令创建: mulnx_glow_enable
-[2026-06-24 06:25:49.3679800][提示][HookConsole]请求了指令创建: mulnx_glow_disable
-[2026-06-24 06:25:49.3679830][成功][GlowController]初始化成功！
-[2026-06-24 06:25:49.3680260][成功][SmokeController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3680310][成功][SmokeController]异步消息订阅：Smoke/Player/Set
-[2026-06-24 06:25:49.3680360][成功][SmokeController]异步消息订阅：Smoke/Player/Clear
-[2026-06-24 06:25:49.3680400][成功][SmokeController]异步消息订阅：Smoke/Player/ClearAll
-[2026-06-24 06:25:49.3680450][成功][SmokeController]异步消息订阅：Smoke/Team/Set
-[2026-06-24 06:25:49.3680490][成功][SmokeController]异步消息订阅：Smoke/Team/Clear
-[2026-06-24 06:25:49.3680530][成功][SmokeController]异步消息订阅：Smoke/Team/ClearAll
-[2026-06-24 06:25:49.3680570][成功][SmokeController]异步消息订阅：Smoke/ClearAll
-[2026-06-24 06:25:49.3680600][成功][SmokeController]初始化成功！
-[2026-06-24 06:25:49.3681120][成功][SpeakingController]同步消息订阅：Hook/Source2Client002::Inited
-[2026-06-24 06:25:49.3681260][成功][SpeakingController]初始化成功！
-[2026-06-24 06:25:49.3681660][成功][KeyboardOverlay]初始化成功！
-[2026-06-24 06:25:49.3682160][成功][TeamIDController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3682240][成功][TeamIDController]同步消息订阅：Hook/LoadLibraryExW/panorama.dll
-[2026-06-24 06:25:49.3682300][成功][TeamIDController]同步消息订阅：Debug/TeamID
-[2026-06-24 06:25:49.3682320][成功][TeamIDController]初始化成功！
-[2026-06-24 06:25:49.3682770][成功][PlayerSpotRenderController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3682790][成功][PlayerSpotRenderController]初始化成功！
-[2026-06-24 06:25:49.3683210][成功][PlayerSpotColorController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3683230][成功][PlayerSpotColorController]初始化成功！
-[2026-06-24 06:25:49.3683660][成功][BombSpotController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3683690][成功][BombSpotController]初始化成功！
-[2026-06-24 06:25:49.3684020][成功][TeamCounterController]同步消息订阅：Hook/LoadLibraryExW/client.dll
-[2026-06-24 06:25:49.3684040][成功][TeamCounterController]初始化成功！
-[2026-06-24 06:25:49.3685850][提示][CameraSystem]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3685930][成功][CameraSystem]异步消息订阅：Global/Save
-[2026-06-24 06:25:49.3685980][成功][CameraSystem]异步消息订阅：Global/Save/Strong
-[2026-06-24 06:25:49.3686030][成功][CameraSystem]异步消息订阅：Command/SpecPlayer
-[2026-06-24 06:25:49.3686080][成功][CameraSystem]异步消息订阅：Game/NewRound
-[2026-06-24 06:25:49.3686120][成功][CameraSystem]异步消息订阅：CameraSystem/Play/Shutdown
-[2026-06-24 06:25:49.3686150][成功][CameraSystem]初始化成功！
-[2026-06-24 06:25:49.3686670][提示][WorkspaceManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3686810][成功][WorkspaceManager]异步消息订阅：CamereSystem/Workspace/Set
-[2026-06-24 06:25:49.3686860][成功][WorkspaceManager]异步消息订阅：CameraSystem/Workspace/Save
-[2026-06-24 06:25:49.3686880][成功][WorkspaceManager]初始化成功！
-[2026-06-24 06:25:49.3687310][提示][ProjectManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3687340][提示][ProjectManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3687510][成功][ProjectManager]初始化成功！
-[2026-06-24 06:25:49.3687950][提示][SolutionManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3688000][提示][SolutionManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3688110][成功][SolutionManager]异步消息订阅：CameraSystem/Element/Deleted
-[2026-06-24 06:25:49.3688150][成功][SolutionManager]异步消息订阅：CameraSystem/Solution/Create
-[2026-06-24 06:25:49.3688200][成功][SolutionManager]异步消息订阅：CameraSystem/Solution/Delete
-[2026-06-24 06:25:49.3688240][成功][SolutionManager]异步消息订阅：CameraSystem/Solution/Play
-[2026-06-24 06:25:49.3688270][成功][SolutionManager]初始化成功！
-[2026-06-24 06:25:49.3688680][提示][ElementManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3688710][提示][ElementManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3688820][成功][ElementManager]异步消息订阅：Element/Create
-[2026-06-24 06:25:49.3688860][成功][ElementManager]异步消息订阅：Element/Delete
-[2026-06-24 06:25:49.3688880][成功][ElementManager]初始化成功！
-[2026-06-24 06:25:49.3689350][成功][HookDemo]同步消息订阅：Hook/RegisterConCommand
-[2026-06-24 06:25:49.3689380][成功][HookDemo]初始化成功！
-[2026-06-24 06:25:49.3690480][成功][DemoSystem]异步消息订阅：Demo/Play
-[2026-06-24 06:25:49.3690530][成功][DemoSystem]异步消息订阅：Demo/Refresh
-[2026-06-24 06:25:49.3690570][成功][DemoSystem]异步消息订阅：Window/Drag/FileDrop
-[2026-06-24 06:25:49.3690640][提示][DemoSystem]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3690710][提示][DemoSystem]消息推送：将任务 DemoSystem::Update 注册到工作者 DemoSys
-[2026-06-24 06:25:49.3690750][成功][DemoSystem]初始化成功！
-[2026-06-24 06:25:49.3692350][成功][DemoAnalyzer]异步消息订阅：Demo/Analyze
-[2026-06-24 06:25:49.3692450][提示][DemoAnalyzer]消息推送：将任务 DemoAnalyzer::Update 注册到工作者 DemoSys
-[2026-06-24 06:25:49.3692490][成功][DemoAnalyzer]初始化成功！
-[2026-06-24 06:25:49.3692990][成功][DemoHelper]异步消息订阅：DemoHelper/MarkTime
-[2026-06-24 06:25:49.3693040][成功][DemoHelper]异步消息订阅：DemoHelper/JumpTIme
-[2026-06-24 06:25:49.3693120][提示][DemoHelper]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3693190][提示][DemoHelper]消息推送：将任务 DemoHelper::Main 注册到工作者 DemoSys
-[2026-06-24 06:25:49.3693230][成功][DemoHelper]初始化成功！
-[2026-06-24 06:25:49.3694160][成功][DemoJSONReader]异步消息订阅：Demo/JSON/Load
-[2026-06-24 06:25:49.3694230][提示][DemoJSONReader]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3694290][提示][DemoJSONReader]消息推送：将任务 DemoJSONReader::Update 注册到工作者 DemoSys
-[2026-06-24 06:25:49.3694330][成功][DemoJSONReader]初始化成功！
-[2026-06-24 06:25:49.3694700][提示][RecordTaskConfiger]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3694770][提示][RecordTaskConfiger]消息推送：将任务 RecordTaskConfiger::Update 注册到工作者 DemoSys
-[2026-06-24 06:25:49.3694800][成功][RecordTaskConfiger]初始化成功！
-[2026-06-24 06:25:49.3695250][成功][RecordTaskMaker]异步消息订阅：Demo/SetOperating
-[2026-06-24 06:25:49.3695290][成功][RecordTaskMaker]异步消息订阅：Demo/InfoLoad
-[2026-06-24 06:25:49.3695350][提示][RecordTaskMaker]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3695410][提示][RecordTaskMaker]消息推送：将任务 RecordTaskMaker::Update 注册到工作者 DemoSys
-[2026-06-24 06:25:49.3695440][成功][RecordTaskMaker]初始化成功！
-[2026-06-24 06:25:49.3696500][成功][DemoRecorder]异步消息订阅：Demo/Record/Enqueue
-[2026-06-24 06:25:49.3696550][成功][DemoRecorder]异步消息订阅：Demo/Record/Start
-[2026-06-24 06:25:49.3696590][成功][DemoRecorder]异步消息订阅：Demo/Record/Clear
-[2026-06-24 06:25:49.3696630][成功][DemoRecorder]异步消息订阅：Demo/Record/Stop
-[2026-06-24 06:25:49.3696680][成功][DemoRecorder]异步消息订阅：Demo/Record/SetOutput
-[2026-06-24 06:25:49.3696720][成功][DemoRecorder]异步消息订阅：Demo/GotoTick/Complete
-[2026-06-24 06:25:49.3696930][提示][DemoRecorder]消息推送：将任务 DemoRecorder::Update 注册到工作者 DemoSys
-[2026-06-24 06:25:49.3696970][提示][DemoRecorder]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3697010][提示][HookConsole]请求了指令创建: mulnx_record_start
-[2026-06-24 06:25:49.3697050][提示][HookConsole]请求了指令创建: mulnx_record_stop
-[2026-06-24 06:25:49.3697480][成功][DemoRecorder]初始化成功！
-[2026-06-24 06:25:49.3699370][提示][MiniMap]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3699590][提示][MiniMap]消息推送：将任务 MiniMap::Main 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3699690][成功][MiniMap]初始化成功！
-[2026-06-24 06:25:49.3700360][成功][VirtualUser]异步消息订阅：Core/Tick30min
-[2026-06-24 06:25:49.3700470][成功][VirtualUser]异步消息订阅：Core/Tick60
-[2026-06-24 06:25:49.3700580][成功][VirtualUser]异步消息订阅：Command/SpecPlayer
-[2026-06-24 06:25:49.3700670][成功][VirtualUser]异步消息订阅：Game/NewRound
-[2026-06-24 06:25:49.3700850][提示][VirtualUser]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3701000][提示][VirtualUser]消息推送：将任务 VirtualUser::Main 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3701080][成功][VirtualUser]初始化成功！
-[2026-06-24 06:25:49.3708270][成功][GameCfgManager]Cfg文件列表更新完成
-[2026-06-24 06:25:49.3708390][提示][GameCfgManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3708440][成功][GameCfgManager]初始化成功！
-[2026-06-24 06:25:49.3709010][成功][GameSettingsManager]同步消息订阅：Hook/Source2Client002::Inited
-[2026-06-24 06:25:49.3709050][成功][GameSettingsManager]初始化成功！
-[2026-06-24 06:25:49.3709820][成功][MediaSystem]FFmpeg 与 AvCpp 初始化成功！
-[2026-06-24 06:25:49.3709920][提示][MediaSystem]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3710940][成功][MediaSystem]初始化成功！
-[2026-06-24 06:25:49.3711450][成功][MediaParamManager]初始化成功！
-[2026-06-24 06:25:49.3711980][成功][VCD3D11Manager]同步消息订阅：Hook/Present/First
-[2026-06-24 06:25:49.3712070][成功][VCD3D11Manager]同步消息订阅：Hook/BeforePresent
-[2026-06-24 06:25:49.3712100][成功][VCD3D11Manager]初始化成功！
-[2026-06-24 06:25:49.3712590][成功][AudioCapturer]同步消息订阅：Hook/Present/First
-[2026-06-24 06:25:49.3712640][成功][AudioCapturer]初始化成功！
-[2026-06-24 06:25:49.3713120][提示][VideoCapturer]消息推送：将任务 VideoCapturer::Capture 注册到工作者 Capture
-[2026-06-24 06:25:49.3713220][成功][VideoCapturer]初始化成功！
-[2026-06-24 06:25:49.3713560][成功][AEncodeHelper]初始化成功！
-[2026-06-24 06:25:49.3713890][成功][VEncodeHelper]初始化成功！
-[2026-06-24 06:25:49.3715020][成功][MediaRecorder]异步消息订阅：Media/Record/Start
-[2026-06-24 06:25:49.3715110][成功][MediaRecorder]异步消息订阅：Media/Record/Stop
-[2026-06-24 06:25:49.3715270][提示][MediaRecorder]消息推送：将任务 MediaRecorder::Main 注册到工作者 Media
-[2026-06-24 06:25:49.3715380][提示][MediaRecorder]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3715400][成功][MediaRecorder]初始化成功！
-[2026-06-24 06:25:49.3715790][成功][MediaProcesser]异步消息订阅：Media/Concat/Begin
-[2026-06-24 06:25:49.3715880][成功][MediaProcesser]异步消息订阅：Media/Concat/Add
-[2026-06-24 06:25:49.3715960][成功][MediaProcesser]异步消息订阅：Media/Concat/End
-[2026-06-24 06:25:49.3716110][提示][MediaProcesser]消息推送：将任务 MediaProcesser::Update 注册到工作者 Media
-[2026-06-24 06:25:49.3716180][成功][MediaProcesser]初始化成功！
-[2026-06-24 06:25:49.3716610][成功][MulNXController]异步消息订阅：ModuleManager/ModuleInfo/Response
-[2026-06-24 06:25:49.3716680][提示][MulNXController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3716770][提示][MulNXController]消息推送：将任务 MulNXController::Main 注册到工作者 MulNXMain
-[2026-06-24 06:25:49.3716850][成功][MulNXController]初始化成功！
-[2026-06-24 06:25:49.3717250][提示][UIDocker]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:49.3717270][成功][UIDocker]初始化成功！
-[2026-06-24 06:25:49.3717370][成功][ModuleManager]所有模块初始化成功，模块总量：81
-[2026-06-24 06:25:49.3717390][成功][Driver]各模块初始化完毕，系统已启动
-[2026-06-24 06:25:49.3717440][警告][Driver]当前版本是否为测试版：true
-[2026-06-24 06:25:49.3717520][警告][Driver]当前版本号：B0.2.0C0.39.0
-[2026-06-24 06:25:49.3717570][警告][Driver]当前版本构建时间：Built: Jun 23 2026 20:42:20
-[2026-06-24 06:25:49.3717680][警告][Driver]初始化完成，自核心分配内存并创建开始，共耗时：53853（微秒）
-[2026-06-24 06:25:49.3717710][警告][Driver]版权所有 © Co1Swet
-[2026-06-24 06:25:49.3717710][警告][Driver]欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
-[2026-06-24 06:25:49.3717710][警告][Driver]在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
-[2026-06-24 06:25:49.3717710][警告][Driver]但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
-[2026-06-24 06:25:49.3798650][成功][HookConsole]钩子部署成功！钩子名：VEngineCvar007::RegisterConCommand
-[2026-06-24 06:25:49.3902430][成功][CSController]钩子部署成功！钩子名：Source2EngineToClient001::ExecuteCmd
-[2026-06-24 06:25:49.3903770][成功][CSController]钩子部署成功！钩子名：Source2EngineToClient001::IsPlayingDemo
-[2026-06-24 06:25:49.4042700][提示][HookConsole]开始注册MulNX的控制台指令
-[2026-06-24 06:25:49.4042940][成功][HookConsole]共注册指令数：5
-[2026-06-24 06:25:50.0556900][成功][HookDemo]钩子部署成功！钩子名：PlayDemo
-[2026-06-24 06:25:50.0558650][成功][HookDemo]钩子部署成功！钩子名：DemoGotoTick
-[2026-06-24 06:25:51.4513900][成功][HookD3D11]钩子部署成功！钩子名：D3D11CreateDevice
-[2026-06-24 06:25:52.1149850][成功][HookD3D11]钩子部署成功！钩子名：CreateSwapChain
-[2026-06-24 06:25:52.1150940][成功][HookD3D11]钩子部署成功！钩子名：ClearDepthStencilView
-[2026-06-24 06:25:52.1752120][成功][HookD3D11]钩子部署成功！钩子名：Present
-[2026-06-24 06:25:52.1752980][成功][HookD3D11]钩子部署成功！钩子名：ResizeBuffers
-[2026-06-24 06:25:52.1754020][成功][HookWindow]钩子部署成功！钩子名：OleDropTargetInterface::Drop
-[2026-06-24 06:25:52.1754910][成功][HookWindow]钩子部署成功！钩子名：WndProc
-[2026-06-24 06:25:52.2285490][成功][VCD3D11Manager]捕获用D3D11设备创建成功
-[2026-06-24 06:25:52.2294340][成功][VCD3D11Manager]共享纹理创建成功
-[2026-06-24 06:25:52.2296950][成功][VCD3D11Manager]共享句柄获取成功
-[2026-06-24 06:25:52.2297410][成功][VCD3D11Manager]共享资源在捕获设备上打开成功
-[2026-06-24 06:25:52.2297430][成功][VCD3D11Manager]Keyed Mutex初始化完成
-[2026-06-24 06:25:52.2641520][提示][AudioCapturer]消息推送：将任务 AudioCapturer::Main 注册到工作者 AudioCapturer
-[2026-06-24 06:25:52.5006560][成功][TeamIDController]钩子部署成功！钩子名：CLayoutFile::LoadFromFile
-[2026-06-24 06:25:52.5096540][成功][TeamIDController]钩子部署成功！钩子名：CStylePropertyWashColor::Parse
-[2026-06-24 06:25:52.5097680][成功][TeamIDController]钩子部署成功！钩子名：CStylePropertyWashColor::Clone
-[2026-06-24 06:25:52.6627350][成功][CSController]钩子部署成功！钩子名：Source2Client002::Init
-[2026-06-24 06:25:52.7026560][提示][HookEntitySystem]消息推送：将任务 HookEntitySystem::DelayInit 注册到工作者 CSControl
-[2026-06-24 06:25:52.8285930][成功][ViewController]钩子部署成功！钩子名：Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup
-[2026-06-24 06:25:52.8286050][提示][ViewController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:52.9373080][成功][DeathMsgController]钩子部署成功！钩子名：UI::OnPlayerDeath
-[2026-06-24 06:25:52.9373200][提示][DeathMsgController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:52.9373310][提示][DeathMsgController]消息推送：将任务 DeathMsgController::Update 注册到工作者 CSControl
-[2026-06-24 06:25:52.9671110][提示][SkinController]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:52.9760780][成功][TrailsController]钩子部署成功！钩子名：C_BaseCSGrenadeProjectile_DrawStuff
-[2026-06-24 06:25:52.9872220][成功][NameController]钩子部署成功！钩子名：GetDecoratedPlayerName
-[2026-06-24 06:25:52.9872360][提示][NameController]消息推送：将任务 NameController::Update 注册到工作者 CSControl
-[2026-06-24 06:25:53.0008160][成功][GlowController]钩子部署成功！钩子名：SetGlowColor
-[2026-06-24 06:25:53.0098710][成功][SmokeController]钩子部署成功！钩子名：SetSmokeProps
-[2026-06-24 06:25:53.0098840][提示][SmokeController]消息推送：将任务 SmokeController::Update 注册到工作者 CSControl
-[2026-06-24 06:25:53.0534380][成功][TeamIDController]钩子部署成功！钩子名：cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rdi is C_CSPlayerPawn*
-[2026-06-24 06:25:53.0690030][成功][PlayerSpotRenderController]钩子部署成功！钩子名：Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*
-[2026-06-24 06:25:53.1249620][成功][PlayerSpotRenderController]钩子部署成功！钩子名：Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw
-[2026-06-24 06:25:53.1437150][成功][PlayerSpotRenderController]钩子部署成功！钩子名：Func_FinallyUpdatePlayerState
-[2026-06-24 06:25:53.1634870][成功][PlayerSpotColorController]钩子部署成功！钩子名：Pos_CmpToSetColor
-[2026-06-24 06:25:53.1873060][成功][PlayerSpotColorController]钩子部署成功！钩子名：Pos_CmpToSetTColor
-[2026-06-24 06:25:53.2122710][成功][PlayerSpotColorController]钩子部署成功！钩子名：Pos_CmpToSetCTColor
-[2026-06-24 06:25:53.2329860][成功][BombSpotController]钩子部署成功！钩子名：Pos_Spot_WriteBombState where rdx is BombColor*
-[2026-06-24 06:25:53.5318460][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:53.5318510][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:53.5318540][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:53.5318570][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
-[2026-06-24 06:25:56.6432650][成功][GraphicsManager]绿幕着色器资源创建成功
-[2026-06-24 06:25:56.6432820][警告][Driver]发送了UI启动指令！渲染即将开始！
-[2026-06-24 06:25:56.6505270][成功][MessageManager]消息派发激活！
-[2026-06-24 06:25:56.6607540][成功][TaskSystem]成功创建工作者：CSControl
-[2026-06-24 06:25:56.6607650][成功][TaskSystem]成功将任务：HookEntitySystem::DelayInit 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6607750][成功][TaskSystem]成功将任务：DeathMsgController::Update 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6607810][成功][TaskSystem]成功将任务：NameController::Update 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6607870][成功][TaskSystem]成功将任务：SmokeController::Update 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6613710][成功][TaskSystem]成功创建工作者：AudioCapturer
-[2026-06-24 06:25:56.6616710][成功][TaskSystem]成功将任务：AudioCapturer::Main 添加进入工作者：AudioCapturer
-[2026-06-24 06:25:56.6616840][成功][TaskSystem]成功将任务：ModuleManager::Update 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6616930][成功][TaskSystem]成功将任务：Debugger::Main 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6618000][成功][TaskSystem]成功创建工作者：InputSystem
-[2026-06-24 06:25:56.6618040][成功][TaskSystem]成功将任务：InputSystem::UpdateKeysState 添加进入工作者：InputSystem
-[2026-06-24 06:25:56.6618210][成功][TaskSystem]成功将任务：ShortcutManager::Check 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6618280][成功][TaskSystem]成功将任务：GlobalVars::Main 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6619130][成功][TaskSystem]成功创建工作者：Web
-[2026-06-24 06:25:56.6619170][成功][TaskSystem]成功将任务：WebSocketManager::server::run 添加进入工作者：Web
-[2026-06-24 06:25:56.6619250][成功][TaskSystem]成功将任务：WebSocketManager::Main 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6619310][成功][TaskSystem]成功将任务：CSController::Update 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6619370][成功][TaskSystem]成功将任务：HookConsole::Update 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6619410][成功][TaskSystem]成功将任务：ConsoleOutput::ConsoleOutput 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6619460][成功][TaskSystem]成功将任务：ObserverController::Main 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6619500][成功][TaskSystem]成功将任务：ProjectileTracker::Main 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6619550][成功][TaskSystem]成功将任务：TrailsController::Update 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6619600][成功][TaskSystem]成功将任务：GlowController::Update 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6620390][成功][TaskSystem]成功创建工作者：DemoSys
-[2026-06-24 06:25:56.6620420][成功][TaskSystem]成功将任务：DemoSystem::Update 添加进入工作者：DemoSys
-[2026-06-24 06:25:56.6620480][成功][TaskSystem]成功将任务：DemoAnalyzer::Update 添加进入工作者：DemoSys
-[2026-06-24 06:25:56.6620520][成功][TaskSystem]成功将任务：DemoHelper::Main 添加进入工作者：DemoSys
-[2026-06-24 06:25:56.6620570][成功][TaskSystem]成功将任务：DemoJSONReader::Update 添加进入工作者：DemoSys
-[2026-06-24 06:25:56.6620610][成功][TaskSystem]成功将任务：RecordTaskConfiger::Update 添加进入工作者：DemoSys
-[2026-06-24 06:25:56.6620660][成功][TaskSystem]成功将任务：RecordTaskMaker::Update 添加进入工作者：DemoSys
-[2026-06-24 06:25:56.6620700][成功][TaskSystem]成功将任务：DemoRecorder::Update 添加进入工作者：DemoSys
-[2026-06-24 06:25:56.6620850][成功][TaskSystem]成功将任务：MiniMap::Main 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6621050][成功][TaskSystem]成功将任务：VirtualUser::Main 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6622130][成功][TaskSystem]成功创建工作者：Capture
-[2026-06-24 06:25:56.6622170][成功][TaskSystem]成功将任务：VideoCapturer::Capture 添加进入工作者：Capture
-[2026-06-24 06:25:56.6622940][成功][TaskSystem]成功创建工作者：Media
-[2026-06-24 06:25:56.6622970][成功][TaskSystem]成功将任务：MediaRecorder::Main 添加进入工作者：Media
-[2026-06-24 06:25:56.6623030][成功][TaskSystem]成功将任务：MediaProcesser::Update 添加进入工作者：Media
-[2026-06-24 06:25:56.6623090][成功][TaskSystem]成功将任务：MulNXController::Main 添加进入工作者：MulNXMain
-[2026-06-24 06:25:56.6633590][成功][HookEntitySystem]钩子部署成功！钩子名：AddEntity
-[2026-06-24 06:25:56.6639910][成功][HookEntitySystem]钩子部署成功！钩子名：RemoveEntity
-[2026-06-24 06:25:56.6640190][提示][CSController]消息推送：将任务 CSController::Main 注册到工作者 CSControl
-[2026-06-24 06:25:56.6668640][成功][WebSocketManager]正在监听端口：55202
-[2026-06-24 06:25:56.6723880][成功][TaskSystem]成功将任务：CSController::Main 添加进入工作者：CSControl
-[2026-06-24 06:25:56.6764850][提示][HookConsole]已推入MulNX缓冲队列：playdemo "111"
-[2026-06-24 06:25:57.0313070][提示][HookDemo]播放Demo: "111"
-[2026-06-24 06:25:57.2945310][成功][UICoordinator]接收到UI节点: ViewController (索引 0)
-[2026-06-24 06:25:57.2945440][成功][UICoordinator]接收到UI节点: DeathMsgController (索引 1)
-[2026-06-24 06:25:57.2945500][成功][UICoordinator]接收到UI节点: SkinController (索引 2)
-[2026-06-24 06:25:57.2945570][成功][UICoordinator]接收到UI节点: GameSettingsManager (索引 3)
-[2026-06-24 06:25:57.2945630][成功][UICoordinator]接收到UI节点: SoundMenu (索引 4)
-[2026-06-24 06:25:57.2945670][成功][UICoordinator]接收到UI节点: DofMenu (索引 5)
-[2026-06-24 06:25:57.2945740][成功][UICoordinator]接收到UI节点: GameHudMenu (索引 6)
-[2026-06-24 06:25:57.2945800][成功][UICoordinator]接收到UI节点: UICoordinator (索引 7)
-[2026-06-24 06:25:57.2945890][成功][UICoordinator]接收到UI节点: UISystem (索引 8)
-[2026-06-24 06:25:57.2945960][成功][UICoordinator]接收到UI节点: Debugger (索引 9)
-[2026-06-24 06:25:57.2946000][成功][UICoordinator]接收到UI节点: DeDebugger (索引 10)
-[2026-06-24 06:25:57.2946040][成功][UICoordinator]接收到UI节点: GraphicsManager (索引 11)
-[2026-06-24 06:25:57.2946080][成功][UICoordinator]接收到UI节点: AdvancedViewController (索引 12)
-[2026-06-24 06:25:57.2946170][成功][UICoordinator]接收到UI节点: FreeCameraController (索引 13)
-[2026-06-24 06:25:57.2946210][成功][UICoordinator]接收到UI节点: PlayerFlashController (索引 14)
-[2026-06-24 06:25:57.2946250][成功][UICoordinator]接收到UI节点: ESPController (索引 15)
-[2026-06-24 06:25:57.2946300][成功][UICoordinator]接收到UI节点: EntityListScanner (索引 16)
-[2026-06-24 06:25:57.2946340][成功][UICoordinator]接收到UI节点: PlayerHub (索引 17)
-[2026-06-24 06:25:57.2946390][成功][UICoordinator]接收到UI节点: TrailsController (索引 18)
-[2026-06-24 06:25:57.2946530][成功][UICoordinator]接收到UI节点: CameraSystem (索引 19)
-[2026-06-24 06:25:57.2946570][成功][UICoordinator]接收到UI节点: MenuWorkspace (索引 20)
-[2026-06-24 06:25:57.2946610][成功][UICoordinator]接收到UI节点: ProjectManager (索引 21)
-[2026-06-24 06:25:57.2946640][成功][UICoordinator]接收到UI节点: MenuProject (索引 22)
-[2026-06-24 06:25:57.2946690][成功][UICoordinator]接收到UI节点: SolutionManager (索引 23)
-[2026-06-24 06:25:57.2946720][成功][UICoordinator]接收到UI节点: MenuSolution (索引 24)
-[2026-06-24 06:25:57.2946780][成功][UICoordinator]接收到UI节点: ElementManager (索引 25)
-[2026-06-24 06:25:57.2946810][成功][UICoordinator]接收到UI节点: MenuElement (索引 26)
-[2026-06-24 06:25:57.2946850][成功][UICoordinator]接收到UI节点: DemoSystem (索引 27)
-[2026-06-24 06:25:57.2946990][成功][UICoordinator]接收到UI节点: DemoHelper (索引 28)
-[2026-06-24 06:25:57.2947030][成功][UICoordinator]接收到UI节点: DemoJSONReader (索引 29)
-[2026-06-24 06:25:57.2947080][成功][UICoordinator]接收到UI节点: RecordTaskConfiger (索引 30)
-[2026-06-24 06:25:57.2947130][成功][UICoordinator]接收到UI节点: RecordTaskMaker (索引 31)
-[2026-06-24 06:25:57.2947170][成功][UICoordinator]接收到UI节点: DemoRecorder (索引 32)
-[2026-06-24 06:25:57.2947200][成功][UICoordinator]接收到UI节点: MiniMap (索引 33)
-[2026-06-24 06:25:57.2947280][成功][UICoordinator]接收到UI节点: VirtualUser (索引 34)
-[2026-06-24 06:25:57.2947350][成功][UICoordinator]接收到UI节点: GameCfgManager (索引 35)
-[2026-06-24 06:25:57.2947420][成功][UICoordinator]接收到UI节点: MediaSystem (索引 36)
-[2026-06-24 06:25:57.2947490][成功][UICoordinator]接收到UI节点: 捕获以上所有根触发的UI渲染 (索引 37)
-[2026-06-24 06:25:57.2947540][成功][UICoordinator]接收到UI节点: MulNXController (索引 38)
-[2026-06-24 06:25:57.2947600][成功][UICoordinator]接收到UI节点: MainDraw (索引 39)
-[2026-06-24 06:25:57.2947910][警告][UISystem]接收到启动消息，UI系统开始启动
-[2026-06-24 06:26:00.5038360][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:26:00.5336510][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:26:00.5336570][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:26:00.5430280][成功][NameController]钩子部署成功！钩子名：GetPlayerName
-[2026-06-24 06:26:15.4634720][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.4768680][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.4951390][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.5082990][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.5275510][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.5395950][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.5587150][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.5720500][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.5891160][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.6028160][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.6226720][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.6350890][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.6491750][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.6677290][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.6820150][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.6983270][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.7118370][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.7313640][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.7438640][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.7607930][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.7754900][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.7916670][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.8076590][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.8252790][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.8407550][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.8526780][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.8730790][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.8849900][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.8990260][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.9137410][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.9318260][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.9488370][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.9627580][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.9803230][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:15.9939820][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.0078990][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.0264470][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.0416860][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.0584280][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.0739540][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.0862260][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.1062830][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.1180910][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.1357570][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.1507800][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.1667880][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.1808330][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.1956160][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.2121210][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.2314900][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.2437030][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.2578940][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.2757960][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.2940120][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.3063040][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.3199570][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.3401910][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.3521020][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.3716380][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.3847600][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.4017990][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.4180850][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.4318420][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.4492690][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.4678350][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.4770480][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.4926150][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.5130490][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.5247000][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.5388400][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.5548790][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.5711550][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.5872410][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.6031520][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.6172990][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.6355940][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.6484240][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.6644600][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.6798640][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.6962380][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.7140090][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.7262720][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.7427720][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.7607510][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.7731050][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.7910390][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.8066070][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.8224070][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.8365870][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.8523750][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.8684130][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.8848290][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.9008550][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.9172430][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.9310680][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.9471090][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.9628070][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.9785250][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:16.9950390][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.0098270][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.0253490][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.0390340][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.0549350][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.0718170][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.0867780][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.1027710][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.1182450][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.1325400][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.1508770][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.1642970][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.1800470][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.1964790][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.2122880][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.2263140][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.2438490][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.2595420][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.2739760][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.2891810][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.3061360][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.3224590][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.3360980][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.3530140][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.3672650][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.3864990][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.4002030][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.4145720][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.4293090][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.4455080][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.4646230][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.4780400][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.4959660][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.5082170][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.5253100][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.5389040][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.5544670][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.5736680][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.5861480][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.6023740][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.6191050][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.6331540][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.6493100][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.6654620][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.6797490][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.6990190][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.7116170][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.7282760][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.7437250][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.7585960][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.7746140][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.7932080][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.8047100][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.8210550][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.8374450][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.8516880][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.8679120][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.8844830][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.9012180][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.9141770][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.9316330][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.9460280][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.9644360][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.9790140][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:17.9938820][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.0078640][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.0238570][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.0405380][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.0557270][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.0726040][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.0890870][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.1017600][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.1189100][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.1348090][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.1486610][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.1688430][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.1806510][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.1961500][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.2131000][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.2282270][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.2425220][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.2593180][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.2753380][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.2911500][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.3062390][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.3221870][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.3376800][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.3525120][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.3700020][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.3848050][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.3991070][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.4153100][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.4297420][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.4455790][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.4624310][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.4784750][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.4929890][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.5096910][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.5234410][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.5401260][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.5561010][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.5736380][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.5875980][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.6013520][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.6185970][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.6339830][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.6484380][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.6640780][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.6790850][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.6958030][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.7105520][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.7291710][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.7441010][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.7592290][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.7749540][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.7899050][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.8050520][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.8223130][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.8375400][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.8531480][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.8683760][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.8848400][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.8997750][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.9157320][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.9313090][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.9464400][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.9604310][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.9774570][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:18.9923100][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:19.0097760][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:19.0243530][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:19.0408450][警告][AdvancedViewController]HandleSelfViewUpdate failed with code: 0x5
-[2026-06-24 06:26:56.6920630][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:27:56.6909630][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:28:56.6858840][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:29:01.0498530][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:29:01.0498580][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:29:01.0507000][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:29:56.6920250][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:30:56.6939750][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:30:59.1749600][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:30:59.1812750][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:30:59.1812790][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:31:56.6866400][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:32:39.6673220][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:32:39.6673270][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:32:39.6694920][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:32:41.4649090][提示][HookDemo]跳转到tick: 23456
-[2026-06-24 06:32:41.5337220][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:32:41.6923320][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:32:41.6923370][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:32:56.6852400][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:33:11.4773000][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:33:11.4831940][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:33:11.4831990][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:33:56.6915090][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:34:53.8110090][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:34:53.8142240][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:34:53.8142290][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:34:56.6858350][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:35:56.6846060][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:36:27.1872140][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:36:27.1891750][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:36:27.1891800][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:36:56.6848310][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:37:56.6875660][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:38:05.8000120][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:38:05.8069060][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:38:05.8069110][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:38:56.6903520][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:39:49.8200810][提示][MulNXController]检测到以下注册模块
-[2026-06-24 06:39:49.8200830][提示][MulNXController]IPCer
-[2026-06-24 06:39:49.8200840][提示][MulNXController]ElementManager
-[2026-06-24 06:39:49.8200860][提示][MulNXController]Debugger
-[2026-06-24 06:39:49.8200870][提示][MulNXController]TaskSystem
-[2026-06-24 06:39:49.8200870][提示][MulNXController]WorkspaceManager
-[2026-06-24 06:39:49.8200880][提示][MulNXController]PathManager
-[2026-06-24 06:39:49.8200890][提示][MulNXController]CrashDumper
-[2026-06-24 06:39:49.8200900][提示][MulNXController]DemoRecorder
-[2026-06-24 06:39:49.8200910][提示][MulNXController]PlayerSpotRenderController
-[2026-06-24 06:39:49.8200920][提示][MulNXController]SkinController
-[2026-06-24 06:39:49.8200940][提示][MulNXController]I18nManager
-[2026-06-24 06:39:49.8200950][提示][MulNXController]MessageManager
-[2026-06-24 06:39:49.8200960][提示][MulNXController]ESPController
-[2026-06-24 06:39:49.8200970][提示][MulNXController]UICoordinator
-[2026-06-24 06:39:49.8200980][提示][MulNXController]InputSystem
-[2026-06-24 06:39:49.8200990][提示][MulNXController]DLLLoadDispatcher
-[2026-06-24 06:39:49.8201010][提示][MulNXController]UISystem
-[2026-06-24 06:39:49.8201030][提示][MulNXController]Logger
-[2026-06-24 06:39:49.8201040][提示][MulNXController]HandleSystem
-[2026-06-24 06:39:49.8201050][提示][MulNXController]ProjectileTracker
-[2026-06-24 06:39:49.8201060][提示][MulNXController]PlayerFlashController
-[2026-06-24 06:39:49.8201080][提示][MulNXController]ShortcutManager
-[2026-06-24 06:39:49.8201090][提示][MulNXController]TeamCounterController
-[2026-06-24 06:39:49.8201100][提示][MulNXController]TrailsController
-[2026-06-24 06:39:49.8201110][提示][MulNXController]GlobalVars
-[2026-06-24 06:39:49.8201130][提示][MulNXController]HookWindow
-[2026-06-24 06:39:49.8201140][提示][MulNXController]CSController
-[2026-06-24 06:39:49.8201150][提示][MulNXController]MediaParamManager
-[2026-06-24 06:39:49.8201160][提示][MulNXController]HookD3D11
-[2026-06-24 06:39:49.8201180][提示][MulNXController]FileRedirector
-[2026-06-24 06:39:49.8201190][提示][MulNXController]ShaderCompiler
-[2026-06-24 06:39:49.8201200][提示][MulNXController]DemoSystem
-[2026-06-24 06:39:49.8201210][提示][MulNXController]GraphicsManager
-[2026-06-24 06:39:49.8201220][提示][MulNXController]WebSocketManager
-[2026-06-24 06:39:49.8201240][提示][MulNXController]CameraSystem
-[2026-06-24 06:39:49.8201240][提示][MulNXController]GlowController
-[2026-06-24 06:39:49.8201260][提示][MulNXController]TimeLiner
-[2026-06-24 06:39:49.8201270][提示][MulNXController]HookConsole
-[2026-06-24 06:39:49.8201280][提示][MulNXController]RecordTaskMaker
-[2026-06-24 06:39:49.8201290][提示][MulNXController]DemoJSONReader
-[2026-06-24 06:39:49.8201310][提示][MulNXController]PlayerSpotColorController
-[2026-06-24 06:39:49.8201320][提示][MulNXController]ConsoleOutput
-[2026-06-24 06:39:49.8201330][提示][MulNXController]HookEntitySystem
-[2026-06-24 06:39:49.8201340][提示][MulNXController]SmokeController
-[2026-06-24 06:39:49.8201360][提示][MulNXController]ParticleManager
-[2026-06-24 06:39:49.8201370][提示][MulNXController]MiniMap
-[2026-06-24 06:39:49.8201380][提示][MulNXController]VideoCapturer
-[2026-06-24 06:39:49.8201400][提示][MulNXController]TimeController
-[2026-06-24 06:39:49.8201410][提示][MulNXController]ViewController
-[2026-06-24 06:39:49.8201410][提示][MulNXController]AdvancedViewController
-[2026-06-24 06:39:49.8201420][提示][MulNXController]DemoAnalyzer
-[2026-06-24 06:39:49.8201440][提示][MulNXController]FreeCameraController
-[2026-06-24 06:39:49.8201440][提示][MulNXController]UIDocker
-[2026-06-24 06:39:49.8201450][提示][MulNXController]SpeakingController
-[2026-06-24 06:39:49.8201470][提示][MulNXController]ObserverController
-[2026-06-24 06:39:49.8201480][提示][MulNXController]DemoHelper
-[2026-06-24 06:39:49.8201490][提示][MulNXController]DeathMsgController
-[2026-06-24 06:39:49.8201510][提示][MulNXController]KeyboardOverlay
-[2026-06-24 06:39:49.8201520][提示][MulNXController]EntityListScanner
-[2026-06-24 06:39:49.8201530][提示][MulNXController]MediaProcesser
-[2026-06-24 06:39:49.8201540][提示][MulNXController]PlayerHub
-[2026-06-24 06:39:49.8201540][提示][MulNXController]NameController
-[2026-06-24 06:39:49.8201560][提示][MulNXController]TeamIDController
-[2026-06-24 06:39:49.8201570][提示][MulNXController]SolutionManager
-[2026-06-24 06:39:49.8201570][提示][MulNXController]ProjectManager
-[2026-06-24 06:39:49.8201580][提示][MulNXController]BombSpotController
-[2026-06-24 06:39:49.8201600][提示][MulNXController]HookDemo
-[2026-06-24 06:39:49.8201610][提示][MulNXController]RecordTaskConfiger
-[2026-06-24 06:39:49.8201620][提示][MulNXController]VirtualUser
-[2026-06-24 06:39:49.8201640][提示][MulNXController]GameCfgManager
-[2026-06-24 06:39:49.8201650][提示][MulNXController]GameSettingsManager
-[2026-06-24 06:39:49.8201670][提示][MulNXController]VCD3D11Manager
-[2026-06-24 06:39:49.8201680][提示][MulNXController]MediaSystem
-[2026-06-24 06:39:49.8201690][提示][MulNXController]AudioCapturer
-[2026-06-24 06:39:49.8201710][提示][MulNXController]AEncodeHelper
-[2026-06-24 06:39:49.8201710][提示][MulNXController]VEncodeHelper
-[2026-06-24 06:39:49.8201730][提示][MulNXController]MediaRecorder
-[2026-06-24 06:39:49.8201740][提示][MulNXController]MulNXController
-[2026-06-24 06:39:56.6864160][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:40:29.3916670][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:40:29.3968130][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:40:29.3968180][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:40:56.6924440][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:41:56.6938840][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:42:56.6889330][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:42:56.8478530][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:42:56.8516990][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:42:56.8517030][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:43:56.6864630][提示][VirtualUser]已触发自动保存（频率：每分钟）
-[2026-06-24 06:44:42.9277990][提示][VirtualUser]接收到新回合信息
-[2026-06-24 06:44:42.9321670][提示][ProjectManager]项目管理器正在处理消息！
-[2026-06-24 06:44:42.9321710][警告][ProjectManager]无活跃项目，无法执行自动操作
-[2026-06-24 06:44:56.6535340][警告][HookWindow]检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态
-[2026-06-24 06:44:56.6535930][提示][ModuleManager]已关闭模块：UIDocker
-[2026-06-24 06:44:56.6536010][提示][ModuleManager]已关闭模块：MulNXController
-[2026-06-24 06:44:56.6536060][提示][ModuleManager]已关闭模块：MediaProcesser
-[2026-06-24 06:44:56.6536100][提示][ModuleManager]已关闭模块：MediaRecorder
-[2026-06-24 06:44:56.6536150][提示][ModuleManager]已关闭模块：VEncodeHelper
-[2026-06-24 06:44:56.6536190][提示][ModuleManager]已关闭模块：AEncodeHelper
-[2026-06-24 06:44:56.6536230][提示][ModuleManager]已关闭模块：VideoCapturer
-[2026-06-24 06:44:56.6592640][提示][ModuleManager]已关闭模块：AudioCapturer
-[2026-06-24 06:44:56.6592730][提示][ModuleManager]已关闭模块：VCD3D11Manager
-[2026-06-24 06:44:56.6592780][提示][ModuleManager]已关闭模块：MediaParamManager
-[2026-06-24 06:44:56.6592820][提示][ModuleManager]已关闭模块：MediaSystem
-[2026-06-24 06:44:56.6592870][提示][ModuleManager]已关闭模块：GameSettingsManager
-[2026-06-24 06:44:56.6592910][提示][ModuleManager]已关闭模块：GameCfgManager
-[2026-06-24 06:44:56.6592950][提示][ModuleManager]已关闭模块：VirtualUser
-[2026-06-24 06:44:56.6592990][提示][ModuleManager]已关闭模块：MiniMap
-[2026-06-24 06:44:56.6593030][提示][ModuleManager]已关闭模块：DemoRecorder
-[2026-06-24 06:44:56.6593070][提示][ModuleManager]已关闭模块：RecordTaskMaker
-[2026-06-24 06:44:56.6593120][提示][ModuleManager]已关闭模块：RecordTaskConfiger
-[2026-06-24 06:44:56.6593160][提示][ModuleManager]已关闭模块：DemoJSONReader
-[2026-06-24 06:44:56.6593200][提示][ModuleManager]已关闭模块：DemoHelper
-[2026-06-24 06:44:56.6593250][提示][ModuleManager]已关闭模块：DemoAnalyzer
-[2026-06-24 06:44:56.6593290][提示][ModuleManager]已关闭模块：DemoSystem
-[2026-06-24 06:44:56.6593330][提示][ModuleManager]已关闭模块：HookDemo
-[2026-06-24 06:44:56.6593380][提示][ModuleManager]已关闭模块：ElementManager
-[2026-06-24 06:44:56.6593420][提示][ModuleManager]已关闭模块：SolutionManager
-[2026-06-24 06:44:56.6593460][提示][ModuleManager]已关闭模块：ProjectManager
-[2026-06-24 06:44:56.6593500][提示][ModuleManager]已关闭模块：WorkspaceManager
-[2026-06-24 06:44:56.6593540][提示][ModuleManager]已关闭模块：CameraSystem
-[2026-06-24 06:44:56.6593590][提示][ModuleManager]已关闭模块：TeamCounterController
-[2026-06-24 06:44:56.6593630][提示][ModuleManager]已关闭模块：BombSpotController
-[2026-06-24 06:44:56.6593670][提示][ModuleManager]已关闭模块：PlayerSpotColorController
-[2026-06-24 06:44:56.6593720][提示][ModuleManager]已关闭模块：PlayerSpotRenderController
-[2026-06-24 06:44:56.6593770][提示][ModuleManager]已关闭模块：TeamIDController
-[2026-06-24 06:44:56.6593810][提示][ModuleManager]已关闭模块：KeyboardOverlay
-[2026-06-24 06:44:56.6593850][提示][ModuleManager]已关闭模块：SpeakingController
-[2026-06-24 06:44:56.6593890][提示][ModuleManager]已关闭模块：SmokeController
-[2026-06-24 06:44:56.6593930][提示][ModuleManager]已关闭模块：GlowController
-[2026-06-24 06:44:56.6593970][提示][ModuleManager]已关闭模块：NameController
-[2026-06-24 06:44:56.6677270][提示][TrailsController]钩子已销毁：C_BaseCSGrenadeProjectile_DrawStuff
-[2026-06-24 06:44:56.6677380][提示][ModuleManager]已关闭模块：TrailsController
-[2026-06-24 06:44:56.6677460][提示][ModuleManager]已关闭模块：ProjectileTracker
-[2026-06-24 06:44:56.6677510][提示][ModuleManager]已关闭模块：PlayerHub
-[2026-06-24 06:44:56.6677560][提示][ModuleManager]已关闭模块：EntityListScanner
-[2026-06-24 06:44:56.6677600][提示][ModuleManager]已关闭模块：SkinController
-[2026-06-24 06:44:56.6677650][提示][ModuleManager]已关闭模块：ESPController
-[2026-06-24 06:44:56.6677700][提示][ModuleManager]已关闭模块：DeathMsgController
-[2026-06-24 06:44:56.6677750][提示][ModuleManager]已关闭模块：PlayerFlashController
-[2026-06-24 06:44:56.6677800][提示][ModuleManager]已关闭模块：ObserverController
-[2026-06-24 06:44:56.6677850][提示][ModuleManager]已关闭模块：FreeCameraController
-[2026-06-24 06:44:56.6677900][提示][ModuleManager]已关闭模块：AdvancedViewController
-[2026-06-24 06:44:56.6678190][提示][ModuleManager]已关闭模块：ViewController
-[2026-06-24 06:44:56.6678260][提示][ModuleManager]已关闭模块：TimeController
-[2026-06-24 06:44:56.6678310][提示][ModuleManager]已关闭模块：ParticleManager
-[2026-06-24 06:44:56.6678360][提示][ModuleManager]已关闭模块：HookEntitySystem
-[2026-06-24 06:44:56.6678400][提示][ModuleManager]已关闭模块：ConsoleOutput
-[2026-06-24 06:44:56.6678440][提示][ModuleManager]已关闭模块：HookConsole
-[2026-06-24 06:44:56.6678490][提示][ModuleManager]已关闭模块：CSController
-[2026-06-24 06:44:56.6678530][提示][ModuleManager]已关闭模块：TimeLiner
-[2026-06-24 06:44:56.6678630][提示][ModuleManager]已关闭模块：WebSocketManager
-[2026-06-24 06:44:56.6678670][提示][ModuleManager]已关闭模块：GraphicsManager
-[2026-06-24 06:44:56.6678710][提示][ModuleManager]已关闭模块：ShaderCompiler
-[2026-06-24 06:44:56.6678750][提示][ModuleManager]已关闭模块：FileRedirector
-[2026-06-24 06:44:56.6679330][提示][ModuleManager]已关闭模块：DLLLoadDispatcher
-[2026-06-24 06:44:56.6679630][提示][ModuleManager]已关闭模块：HookD3D11
-[2026-06-24 06:44:56.6679680][提示][ModuleManager]已关闭模块：HookWindow
-[2026-06-24 06:44:56.6679730][提示][ModuleManager]已关闭模块：GlobalVars
-[2026-06-24 06:44:56.6679770][提示][ModuleManager]已关闭模块：ShortcutManager
-[2026-06-24 06:44:56.6679810][提示][ModuleManager]已关闭模块：InputSystem
-[2026-06-24 06:44:56.6679850][提示][ModuleManager]已关闭模块：HandleSystem
-[2026-06-24 06:44:56.6680450][提示][ModuleManager]已关闭模块：Debugger
-[2026-06-24 06:44:56.6680490][提示][ModuleManager]已关闭模块：Logger
-[2026-06-24 06:44:56.6680530][提示][ModuleManager]已关闭模块：UISystem
-[2026-06-24 06:44:56.6680580][提示][ModuleManager]已关闭模块：UICoordinator
-[2026-06-24 06:44:56.6680620][提示][ModuleManager]已关闭模块：MessageManager
-[2026-06-24 06:44:56.6680660][提示][ModuleManager]已关闭模块：I18nManager
-[2026-06-24 06:44:56.6680710][提示][ModuleManager]已关闭模块：CrashDumper
-[2026-06-24 06:44:56.6680750][提示][ModuleManager]已关闭模块：PathManager
-[2026-06-24 06:44:56.6680790][提示][ModuleManager]已关闭模块：IPCer
-[2026-06-24 06:44:56.6680820][成功][ModuleManager]日志模块即将下线，收尾析构等工作将由剩余子系统完成，MulNX期待与您下次再见
-[2026-06-24 06:44:56.7691520][警告][MessageManager]消息派发终止！
+[2026-06-25 06:57:21.5882350][成功][CS2OBTool]核心就绪
+[2026-06-25 06:57:21.5882800][成功][Driver]驱动就绪
+[2026-06-25 06:57:21.5884480][成功][ModuleManager]sys.msg.async.subedModuleManager/ModuleInfo/Request
+[2026-06-25 06:57:21.5884610][提示][ModuleManager]module.send_task
+[2026-06-25 06:57:21.5884820][成功][ModuleManager]module.inited
+[2026-06-25 06:57:21.5885240][成功][IPCer]module.inited
+[2026-06-25 06:57:21.5889930][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
+[2026-06-25 06:57:21.5890320][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
+[2026-06-25 06:57:21.5890660][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Vedios
+[2026-06-25 06:57:21.5890970][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Data
+[2026-06-25 06:57:21.5891270][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Output
+[2026-06-25 06:57:21.5892110][成功][PathManager]module.inited
+[2026-06-25 06:57:21.5893750][成功][CrashDumper]module.inited
+[2026-06-25 06:57:21.6004150][成功][I18nManager]语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\lan.yaml
+[2026-06-25 06:57:21.6004450][成功][I18nManager]共加载键值对：201
+[2026-06-25 06:57:21.6010060][成功][I18nManager]初始化成功！
+[2026-06-25 06:57:21.6010650][成功][MessageManager]初始化成功！
+[2026-06-25 06:57:21.6011200][成功][UICoordinator]异步消息订阅：UISystem/ModulePush
+[2026-06-25 06:57:21.6011250][成功][UICoordinator]异步消息订阅：UINode/Swap
+[2026-06-25 06:57:21.6011450][提示][UICoordinator]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6011480][成功][UICoordinator]初始化成功！
+[2026-06-25 06:57:21.6015990][提示][UISystem]尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2OBTool\UISystem\Config\ui.yaml
+[2026-06-25 06:57:21.6020010][成功][UISystem]字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16
+[2026-06-25 06:57:21.6020100][提示][UISystem]尝试加载字体：C:/Windows/Fonts/msyh.ttc
+[2026-06-25 06:57:21.6109190][成功][UISystem]字体加载成功：C:/Windows/Fonts/msyh.ttc
+[2026-06-25 06:57:21.6111390][提示][UISystem]尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml
+[2026-06-25 06:57:21.6237890][成功][UISystem]UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml
+[2026-06-25 06:57:21.6243880][成功][UISystem]异步消息订阅：UISystem/Start
+[2026-06-25 06:57:21.6243940][成功][UISystem]异步消息订阅：UISystem/Toggle
+[2026-06-25 06:57:21.6243990][成功][UISystem]异步消息订阅：UISystem/SaveStyle
+[2026-06-25 06:57:21.6244060][提示][UISystem]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6244120][成功][UISystem]初始化成功！
+[2026-06-25 06:57:21.6244760][成功][TaskSystem]异步消息订阅：Task/Create
+[2026-06-25 06:57:21.6256150][成功][TaskSystem]成功创建工作者：MulNXMain
+[2026-06-25 06:57:21.6256330][成功][TaskSystem]成功将任务：TaskSystem::Update 添加进入工作者：MulNXMain
+[2026-06-25 06:57:21.6257540][成功][TaskSystem]成功创建工作者：Messaging
+[2026-06-25 06:57:21.6258680][成功][TaskSystem]成功将任务：TaskSystem::CreateFor->MessageManager::HandleDispatch 添加进入工作者：Messaging
+[2026-06-25 06:57:21.6258820][成功][TaskSystem]初始化成功！
+[2026-06-25 06:57:21.6274440][成功][TaskSystem]成功创建工作者：Loging
+[2026-06-25 06:57:21.6274540][成功][TaskSystem]成功将任务：Logger::Log 添加进入工作者：Loging
+[2026-06-25 06:57:21.6274670][成功][Logger]初始化成功！
+[2026-06-25 06:57:21.6275590][提示][Debugger]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6275690][提示][Debugger]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6275800][提示][Debugger]消息推送：将任务 Debugger::Main 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6275920][成功][Debugger]异步消息订阅：Log/Info
+[2026-06-25 06:57:21.6276060][成功][Debugger]异步消息订阅：Log/Succ
+[2026-06-25 06:57:21.6276110][成功][Debugger]异步消息订阅：Log/Warning
+[2026-06-25 06:57:21.6276160][成功][Debugger]异步消息订阅：Log/Error
+[2026-06-25 06:57:21.6276220][成功][Debugger]异步消息订阅：Debugger/SetMaxInfoCount
+[2026-06-25 06:57:21.6276310][成功][Debugger]初始化成功！
+[2026-06-25 06:57:21.6276690][成功][HandleSystem]初始化成功！
+[2026-06-25 06:57:21.6277140][提示][InputSystem]消息推送：将任务 InputSystem::UpdateKeysState 注册到工作者 InputSystem
+[2026-06-25 06:57:21.6277220][成功][InputSystem]初始化成功！
+[2026-06-25 06:57:21.6306380][提示][ShortcutManager]配置文件名称: MulNX 官方快捷键配置
+[2026-06-25 06:57:21.6310280][提示][ShortcutManager]消息推送：将任务 ShortcutManager::Check 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6311580][成功][ShortcutManager]初始化成功！
+[2026-06-25 06:57:21.6312020][提示][GlobalVars]消息推送：将任务 GlobalVars::Main 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6312100][成功][GlobalVars]初始化成功！
+[2026-06-25 06:57:21.6313250][成功][HookWindow]同步消息订阅：Hook/hWnd
+[2026-06-25 06:57:21.6313310][成功][HookWindow]初始化成功！
+[2026-06-25 06:57:21.6313830][成功][HookD3D11]同步消息订阅：Hook/LoadLibraryExW/d3d11.dll
+[2026-06-25 06:57:21.6313850][成功][HookD3D11]初始化成功！
+[2026-06-25 06:57:21.6314300][成功][DLLLoadDispatcher]同步消息订阅：Hook/LoadLibraryExW
+[2026-06-25 06:57:21.6316720][成功][DLLLoadDispatcher]钩子部署成功！钩子名：LoadLibraryExW
+[2026-06-25 06:57:21.6316750][成功][DLLLoadDispatcher]初始化成功！
+[2026-06-25 06:57:21.6319180][成功][FileRedirector]初始化成功！
+[2026-06-25 06:57:21.6328270][提示][ShaderCompiler]正在编译着色器！
+[2026-06-25 06:57:21.6357290][成功][ShaderCompiler]着色器编译完毕！
+[2026-06-25 06:57:21.6357380][成功][ShaderCompiler]初始化成功！
+[2026-06-25 06:57:21.6358040][提示][GraphicsManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6358070][成功][GraphicsManager]初始化成功！
+[2026-06-25 06:57:21.6358640][成功][WebSocketManager]异步消息订阅：WebSocketManager/Post
+[2026-06-25 06:57:21.6360650][提示][WebSocketManager]消息推送：将任务 WebSocketManager::server::run 注册到工作者 Web
+[2026-06-25 06:57:21.6360760][提示][WebSocketManager]消息推送：将任务 WebSocketManager::Main 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6360800][成功][WebSocketManager]初始化成功！
+[2026-06-25 06:57:21.6361430][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6361490][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/engine2.dll
+[2026-06-25 06:57:21.6361530][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/tier0.dll
+[2026-06-25 06:57:21.6361580][成功][CSController]同步消息订阅：Hook/LoadLibraryExW/panorama.dll
+[2026-06-25 06:57:21.6361800][提示][CSController]消息推送：将任务 CSController::Update 注册到工作者 CSControl
+[2026-06-25 06:57:21.6361840][成功][CSController]初始化成功！
+[2026-06-25 06:57:21.6362510][成功][HookConsole]同步消息订阅：Hook/LoadLibraryExW/tier0.dll
+[2026-06-25 06:57:21.6362550][成功][HookConsole]同步消息订阅：Hook/LoadLibraryExW/engine2.dll
+[2026-06-25 06:57:21.6362640][成功][HookConsole]异步消息订阅：Game/Command
+[2026-06-25 06:57:21.6362680][成功][HookConsole]异步消息订阅：Game/Command/NoReport
+[2026-06-25 06:57:21.6362750][提示][HookConsole]消息推送：将任务 HookConsole::Update 注册到工作者 CSControl
+[2026-06-25 06:57:21.6362780][成功][HookConsole]初始化成功！
+[2026-06-25 06:57:21.6363120][成功][ConsoleOutput]异步消息订阅：Log/Info
+[2026-06-25 06:57:21.6363170][成功][ConsoleOutput]异步消息订阅：Log/Succ
+[2026-06-25 06:57:21.6363200][成功][ConsoleOutput]异步消息订阅：Log/Warning
+[2026-06-25 06:57:21.6363240][成功][ConsoleOutput]异步消息订阅：Log/Error
+[2026-06-25 06:57:21.6363330][提示][ConsoleOutput]消息推送：将任务 ConsoleOutput::ConsoleOutput 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6363400][成功][ConsoleOutput]初始化成功！
+[2026-06-25 06:57:21.6363820][成功][HookEntitySystem]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6363840][成功][HookEntitySystem]初始化成功！
+[2026-06-25 06:57:21.6364220][成功][ParticleManager]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6364240][成功][ParticleManager]初始化成功！
+[2026-06-25 06:57:21.6364610][成功][TimeController]同步消息订阅：Hook/LoadLibraryExW/engine2.dll
+[2026-06-25 06:57:21.6364630][成功][TimeController]初始化成功！
+[2026-06-25 06:57:21.6365080][成功][ViewController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6365100][成功][ViewController]初始化成功！
+[2026-06-25 06:57:21.6365490][提示][AdvancedViewController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6365510][成功][AdvancedViewController]初始化成功！
+[2026-06-25 06:57:21.6365930][提示][FreeCameraController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6365980][成功][FreeCameraController]异步消息订阅：FreeCamCtrl/Toggle
+[2026-06-25 06:57:21.6366020][提示][HookConsole]请求了指令创建: mulnx_freeCamCtrl_toggle
+[2026-06-25 06:57:21.6366090][成功][FreeCameraController]初始化成功！
+[2026-06-25 06:57:21.6366430][成功][ObserverController]异步消息订阅：CameraSystem/Play/Started
+[2026-06-25 06:57:21.6366480][成功][ObserverController]异步消息订阅：CameraSystem/Play/Ended
+[2026-06-25 06:57:21.6366530][成功][ObserverController]异步消息订阅：Observe/SpecSteam64UID
+[2026-06-25 06:57:21.6366570][成功][ObserverController]异步消息订阅：Observe/SpecHandle
+[2026-06-25 06:57:21.6366620][成功][ObserverController]异步消息订阅：spec_mode_changed_to
+[2026-06-25 06:57:21.6366720][提示][ObserverController]消息推送：将任务 ObserverController::Main 注册到工作者 CSControl
+[2026-06-25 06:57:21.6366770][成功][ObserverController]初始化成功！
+[2026-06-25 06:57:21.6367350][提示][PlayerFlashController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6367390][成功][PlayerFlashController]初始化成功！
+[2026-06-25 06:57:21.6367870][成功][DeathMsgController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6367890][成功][DeathMsgController]初始化成功！
+[2026-06-25 06:57:21.6368230][提示][ESPController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6368250][成功][ESPController]初始化成功！
+[2026-06-25 06:57:21.6368690][成功][SkinController]同步消息订阅：Hook/OnSetupView
+[2026-06-25 06:57:21.6368730][成功][SkinController]异步消息订阅：Skin/Apply
+[2026-06-25 06:57:21.6368780][成功][SkinController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6368800][成功][SkinController]初始化成功！
+[2026-06-25 06:57:21.6369130][提示][EntityListScanner]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6369150][成功][EntityListScanner]初始化成功！
+[2026-06-25 06:57:21.6369540][提示][PlayerHub]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6369570][成功][PlayerHub]初始化成功！
+[2026-06-25 06:57:21.6370190][提示][ProjectileTracker]消息推送：将任务 ProjectileTracker::Main 注册到工作者 CSControl
+[2026-06-25 06:57:21.6370340][成功][ProjectileTracker]同步消息订阅：Hook/AddEntity
+[2026-06-25 06:57:21.6370390][成功][ProjectileTracker]同步消息订阅：Hook/RemoveEntity
+[2026-06-25 06:57:21.6370410][成功][ProjectileTracker]初始化成功！
+[2026-06-25 06:57:21.6370910][成功][TrailsController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6370960][成功][TrailsController]异步消息订阅：Trails/Player/Set
+[2026-06-25 06:57:21.6371000][成功][TrailsController]异步消息订阅：Trails/Player/Clear
+[2026-06-25 06:57:21.6371040][成功][TrailsController]异步消息订阅：Trails/Player/ClearAll
+[2026-06-25 06:57:21.6371090][成功][TrailsController]异步消息订阅：Trails/Team/Set
+[2026-06-25 06:57:21.6371130][成功][TrailsController]异步消息订阅：Trails/Team/Clear
+[2026-06-25 06:57:21.6371170][成功][TrailsController]异步消息订阅：Trails/Team/ClearAll
+[2026-06-25 06:57:21.6371210][成功][TrailsController]异步消息订阅：Trails/ClearAll
+[2026-06-25 06:57:21.6371250][成功][TrailsController]异步消息订阅：Trails/Prop
+[2026-06-25 06:57:21.6371310][提示][TrailsController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6371380][提示][TrailsController]消息推送：将任务 TrailsController::Update 注册到工作者 CSControl
+[2026-06-25 06:57:21.6371410][成功][TrailsController]初始化成功！
+[2026-06-25 06:57:21.6371790][成功][NameController]异步消息订阅：Name/Player/Set
+[2026-06-25 06:57:21.6371900][成功][NameController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6371920][成功][NameController]初始化成功！
+[2026-06-25 06:57:21.6372360][成功][GlowController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6372460][提示][GlowController]消息推送：将任务 GlowController::Update 注册到工作者 CSControl
+[2026-06-25 06:57:21.6372510][成功][GlowController]异步消息订阅：Glow/Enable
+[2026-06-25 06:57:21.6372560][成功][GlowController]异步消息订阅：Glow/Disable
+[2026-06-25 06:57:21.6372600][成功][GlowController]异步消息订阅：Glow/Player/Set
+[2026-06-25 06:57:21.6372640][成功][GlowController]异步消息订阅：Glow/Player/Clear
+[2026-06-25 06:57:21.6372680][成功][GlowController]异步消息订阅：Glow/Player/ClearAll
+[2026-06-25 06:57:21.6372720][成功][GlowController]异步消息订阅：Glow/Team/Set
+[2026-06-25 06:57:21.6372760][成功][GlowController]异步消息订阅：Glow/Team/Clear
+[2026-06-25 06:57:21.6372800][成功][GlowController]异步消息订阅：Glow/Team/ClearAll
+[2026-06-25 06:57:21.6372840][成功][GlowController]异步消息订阅：Glow/ClearAll
+[2026-06-25 06:57:21.6372870][提示][HookConsole]请求了指令创建: mulnx_glow_enable
+[2026-06-25 06:57:21.6372910][提示][HookConsole]请求了指令创建: mulnx_glow_disable
+[2026-06-25 06:57:21.6372940][成功][GlowController]初始化成功！
+[2026-06-25 06:57:21.6373370][成功][SmokeController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6373420][成功][SmokeController]异步消息订阅：Smoke/Player/Set
+[2026-06-25 06:57:21.6373470][成功][SmokeController]异步消息订阅：Smoke/Player/Clear
+[2026-06-25 06:57:21.6373510][成功][SmokeController]异步消息订阅：Smoke/Player/ClearAll
+[2026-06-25 06:57:21.6373560][成功][SmokeController]异步消息订阅：Smoke/Team/Set
+[2026-06-25 06:57:21.6373610][成功][SmokeController]异步消息订阅：Smoke/Team/Clear
+[2026-06-25 06:57:21.6373650][成功][SmokeController]异步消息订阅：Smoke/Team/ClearAll
+[2026-06-25 06:57:21.6373690][成功][SmokeController]异步消息订阅：Smoke/ClearAll
+[2026-06-25 06:57:21.6373720][成功][SmokeController]初始化成功！
+[2026-06-25 06:57:21.6374220][成功][SpeakingController]同步消息订阅：Hook/Source2Client002::Inited
+[2026-06-25 06:57:21.6374260][成功][SpeakingController]初始化成功！
+[2026-06-25 06:57:21.6374600][成功][KeyboardOverlay]初始化成功！
+[2026-06-25 06:57:21.6375060][成功][TeamIDController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6375110][成功][TeamIDController]同步消息订阅：Hook/LoadLibraryExW/panorama.dll
+[2026-06-25 06:57:21.6375160][成功][TeamIDController]同步消息订阅：Debug/TeamID
+[2026-06-25 06:57:21.6375180][成功][TeamIDController]初始化成功！
+[2026-06-25 06:57:21.6375610][成功][PlayerSpotRenderController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6375630][成功][PlayerSpotRenderController]初始化成功！
+[2026-06-25 06:57:21.6376080][成功][PlayerSpotColorController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6376100][成功][PlayerSpotColorController]初始化成功！
+[2026-06-25 06:57:21.6376490][成功][BombSpotController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6376510][成功][BombSpotController]初始化成功！
+[2026-06-25 06:57:21.6376870][成功][TeamCounterController]同步消息订阅：Hook/LoadLibraryExW/client.dll
+[2026-06-25 06:57:21.6376890][成功][TeamCounterController]初始化成功！
+[2026-06-25 06:57:21.6379060][提示][CameraSystem]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6379140][成功][CameraSystem]异步消息订阅：Global/Save
+[2026-06-25 06:57:21.6379190][成功][CameraSystem]异步消息订阅：Global/Save/Strong
+[2026-06-25 06:57:21.6379230][成功][CameraSystem]异步消息订阅：Command/SpecPlayer
+[2026-06-25 06:57:21.6379280][成功][CameraSystem]异步消息订阅：Game/NewRound
+[2026-06-25 06:57:21.6379330][成功][CameraSystem]异步消息订阅：CameraSystem/Play/Shutdown
+[2026-06-25 06:57:21.6379360][成功][CameraSystem]初始化成功！
+[2026-06-25 06:57:21.6379900][提示][WorkspaceManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6380080][成功][WorkspaceManager]异步消息订阅：CamereSystem/Workspace/Set
+[2026-06-25 06:57:21.6380130][成功][WorkspaceManager]异步消息订阅：CameraSystem/Workspace/Save
+[2026-06-25 06:57:21.6380160][成功][WorkspaceManager]初始化成功！
+[2026-06-25 06:57:21.6380620][提示][ProjectManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6380650][提示][ProjectManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6380810][成功][ProjectManager]初始化成功！
+[2026-06-25 06:57:21.6381220][提示][SolutionManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6381250][提示][SolutionManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6381390][成功][SolutionManager]异步消息订阅：CameraSystem/Element/Deleted
+[2026-06-25 06:57:21.6381440][成功][SolutionManager]异步消息订阅：CameraSystem/Solution/Create
+[2026-06-25 06:57:21.6381480][成功][SolutionManager]异步消息订阅：CameraSystem/Solution/Delete
+[2026-06-25 06:57:21.6381530][成功][SolutionManager]异步消息订阅：CameraSystem/Solution/Play
+[2026-06-25 06:57:21.6381550][成功][SolutionManager]初始化成功！
+[2026-06-25 06:57:21.6382030][提示][ElementManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6382060][提示][ElementManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6382170][成功][ElementManager]异步消息订阅：Element/Create
+[2026-06-25 06:57:21.6382210][成功][ElementManager]异步消息订阅：Element/Delete
+[2026-06-25 06:57:21.6382230][成功][ElementManager]初始化成功！
+[2026-06-25 06:57:21.6382610][成功][HookDemo]同步消息订阅：Hook/RegisterConCommand
+[2026-06-25 06:57:21.6382640][成功][HookDemo]初始化成功！
+[2026-06-25 06:57:21.6383810][成功][DemoSystem]异步消息订阅：Demo/Play
+[2026-06-25 06:57:21.6383860][成功][DemoSystem]异步消息订阅：Demo/Refresh
+[2026-06-25 06:57:21.6383910][成功][DemoSystem]异步消息订阅：Window/Drag/FileDrop
+[2026-06-25 06:57:21.6383970][提示][DemoSystem]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6384040][提示][DemoSystem]消息推送：将任务 DemoSystem::Update 注册到工作者 DemoSys
+[2026-06-25 06:57:21.6384090][成功][DemoSystem]初始化成功！
+[2026-06-25 06:57:21.6385640][成功][DemoAnalyzer]异步消息订阅：Demo/Analyze
+[2026-06-25 06:57:21.6385710][提示][DemoAnalyzer]消息推送：将任务 DemoAnalyzer::Update 注册到工作者 DemoSys
+[2026-06-25 06:57:21.6385760][成功][DemoAnalyzer]初始化成功！
+[2026-06-25 06:57:21.6386230][成功][DemoHelper]异步消息订阅：DemoHelper/MarkTime
+[2026-06-25 06:57:21.6386280][成功][DemoHelper]异步消息订阅：DemoHelper/JumpTIme
+[2026-06-25 06:57:21.6386350][提示][DemoHelper]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6386420][提示][DemoHelper]消息推送：将任务 DemoHelper::Main 注册到工作者 DemoSys
+[2026-06-25 06:57:21.6386460][成功][DemoHelper]初始化成功！
+[2026-06-25 06:57:21.6387690][成功][DemoJSONReader]异步消息订阅：Demo/JSON/Load
+[2026-06-25 06:57:21.6387790][提示][DemoJSONReader]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6387860][提示][DemoJSONReader]消息推送：将任务 DemoJSONReader::Update 注册到工作者 DemoSys
+[2026-06-25 06:57:21.6387900][成功][DemoJSONReader]初始化成功！
+[2026-06-25 06:57:21.6388320][提示][RecordTaskConfiger]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6388390][提示][RecordTaskConfiger]消息推送：将任务 RecordTaskConfiger::Update 注册到工作者 DemoSys
+[2026-06-25 06:57:21.6388420][成功][RecordTaskConfiger]初始化成功！
+[2026-06-25 06:57:21.6388850][成功][RecordTaskMaker]异步消息订阅：Demo/SetOperating
+[2026-06-25 06:57:21.6388890][成功][RecordTaskMaker]异步消息订阅：Demo/InfoLoad
+[2026-06-25 06:57:21.6388970][提示][RecordTaskMaker]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6389040][提示][RecordTaskMaker]消息推送：将任务 RecordTaskMaker::Update 注册到工作者 DemoSys
+[2026-06-25 06:57:21.6389070][成功][RecordTaskMaker]初始化成功！
+[2026-06-25 06:57:21.6390150][成功][DemoRecorder]异步消息订阅：Demo/Record/Enqueue
+[2026-06-25 06:57:21.6390190][成功][DemoRecorder]异步消息订阅：Demo/Record/Start
+[2026-06-25 06:57:21.6390240][成功][DemoRecorder]异步消息订阅：Demo/Record/Clear
+[2026-06-25 06:57:21.6390280][成功][DemoRecorder]异步消息订阅：Demo/Record/Stop
+[2026-06-25 06:57:21.6390330][成功][DemoRecorder]异步消息订阅：Demo/Record/SetOutput
+[2026-06-25 06:57:21.6390370][成功][DemoRecorder]异步消息订阅：Demo/GotoTick/Complete
+[2026-06-25 06:57:21.6390570][提示][DemoRecorder]消息推送：将任务 DemoRecorder::Update 注册到工作者 DemoSys
+[2026-06-25 06:57:21.6390610][提示][DemoRecorder]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6390640][提示][HookConsole]请求了指令创建: mulnx_record_start
+[2026-06-25 06:57:21.6390680][提示][HookConsole]请求了指令创建: mulnx_record_stop
+[2026-06-25 06:57:21.6390710][成功][DemoRecorder]初始化成功！
+[2026-06-25 06:57:21.6391070][提示][MiniMap]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6391140][提示][MiniMap]消息推送：将任务 MiniMap::Main 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6391170][成功][MiniMap]初始化成功！
+[2026-06-25 06:57:21.6391510][成功][VirtualUser]异步消息订阅：Core/Tick30min
+[2026-06-25 06:57:21.6391550][成功][VirtualUser]异步消息订阅：Core/Tick60
+[2026-06-25 06:57:21.6391600][成功][VirtualUser]异步消息订阅：Command/SpecPlayer
+[2026-06-25 06:57:21.6391630][成功][VirtualUser]异步消息订阅：Game/NewRound
+[2026-06-25 06:57:21.6391680][提示][VirtualUser]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6391740][提示][VirtualUser]消息推送：将任务 VirtualUser::Main 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6391770][成功][VirtualUser]初始化成功！
+[2026-06-25 06:57:21.6398890][成功][GameCfgManager]Cfg文件列表更新完成
+[2026-06-25 06:57:21.6399030][提示][GameCfgManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6399070][成功][GameCfgManager]初始化成功！
+[2026-06-25 06:57:21.6399630][成功][GameSettingsManager]同步消息订阅：Hook/Source2Client002::Inited
+[2026-06-25 06:57:21.6399660][成功][GameSettingsManager]初始化成功！
+[2026-06-25 06:57:21.6400080][成功][MediaSystem]FFmpeg 与 AvCpp 初始化成功！
+[2026-06-25 06:57:21.6400170][提示][MediaSystem]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6400920][成功][MediaSystem]初始化成功！
+[2026-06-25 06:57:21.6401240][成功][MediaParamManager]初始化成功！
+[2026-06-25 06:57:21.6401720][成功][VCD3D11Manager]同步消息订阅：Hook/Present/First
+[2026-06-25 06:57:21.6401780][成功][VCD3D11Manager]同步消息订阅：Hook/BeforePresent
+[2026-06-25 06:57:21.6401800][成功][VCD3D11Manager]初始化成功！
+[2026-06-25 06:57:21.6402210][成功][AudioCapturer]同步消息订阅：Hook/Present/First
+[2026-06-25 06:57:21.6402230][成功][AudioCapturer]初始化成功！
+[2026-06-25 06:57:21.6402710][提示][VideoCapturer]消息推送：将任务 VideoCapturer::Capture 注册到工作者 Capture
+[2026-06-25 06:57:21.6402790][成功][VideoCapturer]初始化成功！
+[2026-06-25 06:57:21.6403080][成功][AEncodeHelper]初始化成功！
+[2026-06-25 06:57:21.6403370][成功][VEncodeHelper]初始化成功！
+[2026-06-25 06:57:21.6404380][成功][MediaRecorder]异步消息订阅：Media/Record/Start
+[2026-06-25 06:57:21.6404440][成功][MediaRecorder]异步消息订阅：Media/Record/Stop
+[2026-06-25 06:57:21.6404540][提示][MediaRecorder]消息推送：将任务 MediaRecorder::Main 注册到工作者 Media
+[2026-06-25 06:57:21.6404590][提示][MediaRecorder]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6404620][成功][MediaRecorder]初始化成功！
+[2026-06-25 06:57:21.6404980][成功][MediaProcesser]异步消息订阅：Media/Concat/Begin
+[2026-06-25 06:57:21.6405030][成功][MediaProcesser]异步消息订阅：Media/Concat/Add
+[2026-06-25 06:57:21.6405080][成功][MediaProcesser]异步消息订阅：Media/Concat/End
+[2026-06-25 06:57:21.6405210][提示][MediaProcesser]消息推送：将任务 MediaProcesser::Update 注册到工作者 Media
+[2026-06-25 06:57:21.6405270][成功][MediaProcesser]初始化成功！
+[2026-06-25 06:57:21.6405640][成功][MulNXController]异步消息订阅：ModuleManager/ModuleInfo/Response
+[2026-06-25 06:57:21.6405720][提示][MulNXController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6405790][提示][MulNXController]消息推送：将任务 MulNXController::Main 注册到工作者 MulNXMain
+[2026-06-25 06:57:21.6405820][成功][MulNXController]初始化成功！
+[2026-06-25 06:57:21.6406140][提示][UIDocker]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:21.6406160][成功][UIDocker]初始化成功！
+[2026-06-25 06:57:21.6406220][成功][ModuleManager]所有模块初始化成功，模块总量：81
+[2026-06-25 06:57:21.6406240][成功][Driver]各模块初始化完毕，系统已启动
+[2026-06-25 06:57:21.6406290][警告][Driver]当前版本是否为测试版：true
+[2026-06-25 06:57:21.6406360][警告][Driver]当前版本号：B0.2.0C0.39.0
+[2026-06-25 06:57:21.6406390][警告][Driver]当前版本构建时间：Built: Jun 25 2026 14:48:50
+[2026-06-25 06:57:21.6406460][警告][Driver]初始化完成，自核心分配内存并创建开始，共耗时：53834（微秒）
+[2026-06-25 06:57:21.6406480][警告][Driver]版权所有 © Co1Swet
+[2026-06-25 06:57:21.6406480][警告][Driver]欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
+[2026-06-25 06:57:21.6406480][警告][Driver]在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
+[2026-06-25 06:57:21.6406480][警告][Driver]但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
+[2026-06-25 06:57:21.6486360][成功][HookConsole]钩子部署成功！钩子名：VEngineCvar007::RegisterConCommand
+[2026-06-25 06:57:21.6588240][成功][CSController]钩子部署成功！钩子名：Source2EngineToClient001::ExecuteCmd
+[2026-06-25 06:57:21.6589910][成功][CSController]钩子部署成功！钩子名：Source2EngineToClient001::IsPlayingDemo
+[2026-06-25 06:57:21.6734230][提示][HookConsole]开始注册MulNX的控制台指令
+[2026-06-25 06:57:21.6734510][成功][HookConsole]共注册指令数：5
+[2026-06-25 06:57:22.3523710][成功][HookDemo]钩子部署成功！钩子名：PlayDemo
+[2026-06-25 06:57:22.3525310][成功][HookDemo]钩子部署成功！钩子名：DemoGotoTick
+[2026-06-25 06:57:23.8123350][成功][HookD3D11]钩子部署成功！钩子名：D3D11CreateDevice
+[2026-06-25 06:57:24.4862710][成功][HookD3D11]钩子部署成功！钩子名：CreateSwapChain
+[2026-06-25 06:57:24.4863900][成功][HookD3D11]钩子部署成功！钩子名：ClearDepthStencilView
+[2026-06-25 06:57:24.5565280][成功][HookD3D11]钩子部署成功！钩子名：Present
+[2026-06-25 06:57:24.5566360][成功][HookD3D11]钩子部署成功！钩子名：ResizeBuffers
+[2026-06-25 06:57:24.5567460][成功][HookWindow]钩子部署成功！钩子名：OleDropTargetInterface::Drop
+[2026-06-25 06:57:24.5568360][成功][HookWindow]钩子部署成功！钩子名：WndProc
+[2026-06-25 06:57:24.6178850][成功][VCD3D11Manager]捕获用D3D11设备创建成功
+[2026-06-25 06:57:24.6180860][成功][VCD3D11Manager]共享纹理创建成功
+[2026-06-25 06:57:24.6180900][成功][VCD3D11Manager]共享句柄获取成功
+[2026-06-25 06:57:24.6181240][成功][VCD3D11Manager]共享资源在捕获设备上打开成功
+[2026-06-25 06:57:24.6181260][成功][VCD3D11Manager]Keyed Mutex初始化完成
+[2026-06-25 06:57:24.6542560][提示][AudioCapturer]消息推送：将任务 AudioCapturer::Main 注册到工作者 AudioCapturer
+[2026-06-25 06:57:24.8246920][成功][TeamIDController]钩子部署成功！钩子名：CLayoutFile::LoadFromFile
+[2026-06-25 06:57:24.8332880][成功][TeamIDController]钩子部署成功！钩子名：CStylePropertyWashColor::Parse
+[2026-06-25 06:57:24.8333940][成功][TeamIDController]钩子部署成功！钩子名：CStylePropertyWashColor::Clone
+[2026-06-25 06:57:25.0096090][成功][CSController]钩子部署成功！钩子名：Source2Client002::Init
+[2026-06-25 06:57:25.0500980][提示][HookEntitySystem]消息推送：将任务 HookEntitySystem::DelayInit 注册到工作者 CSControl
+[2026-06-25 06:57:25.1698010][成功][ViewController]钩子部署成功！钩子名：Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup
+[2026-06-25 06:57:25.1698110][提示][ViewController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:25.2740800][成功][DeathMsgController]钩子部署成功！钩子名：UI::OnPlayerDeath
+[2026-06-25 06:57:25.2740900][提示][DeathMsgController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:25.2741010][提示][DeathMsgController]消息推送：将任务 DeathMsgController::Update 注册到工作者 CSControl
+[2026-06-25 06:57:25.3033790][提示][SkinController]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:25.3123500][成功][TrailsController]钩子部署成功！钩子名：C_BaseCSGrenadeProjectile_DrawStuff
+[2026-06-25 06:57:25.3233380][成功][NameController]钩子部署成功！钩子名：GetDecoratedPlayerName
+[2026-06-25 06:57:25.3233540][提示][NameController]消息推送：将任务 NameController::Update 注册到工作者 CSControl
+[2026-06-25 06:57:25.3365540][成功][GlowController]钩子部署成功！钩子名：SetGlowColor
+[2026-06-25 06:57:25.3455380][成功][SmokeController]钩子部署成功！钩子名：SetSmokeProps
+[2026-06-25 06:57:25.3455500][提示][SmokeController]消息推送：将任务 SmokeController::Update 注册到工作者 CSControl
+[2026-06-25 06:57:25.3907160][成功][TeamIDController]钩子部署成功！钩子名：cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rdi is C_CSPlayerPawn*
+[2026-06-25 06:57:25.4048750][成功][PlayerSpotRenderController]钩子部署成功！钩子名：Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*
+[2026-06-25 06:57:25.4611760][成功][PlayerSpotRenderController]钩子部署成功！钩子名：Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw
+[2026-06-25 06:57:25.4792580][成功][PlayerSpotRenderController]钩子部署成功！钩子名：Func_FinallyUpdatePlayerState
+[2026-06-25 06:57:25.4987330][成功][PlayerSpotColorController]钩子部署成功！钩子名：Pos_CmpToSetColor
+[2026-06-25 06:57:25.5236010][成功][PlayerSpotColorController]钩子部署成功！钩子名：Pos_CmpToSetTColor
+[2026-06-25 06:57:25.5465930][成功][PlayerSpotColorController]钩子部署成功！钩子名：Pos_CmpToSetCTColor
+[2026-06-25 06:57:25.5665900][成功][BombSpotController]钩子部署成功！钩子名：Pos_Spot_WriteBombState where rdx is BombColor*
+[2026-06-25 06:57:25.8688860][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:25.8688910][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:25.8688960][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:25.8688990][提示][GameSettingsManager]将UI节点注册信息推送到了消息系统
+[2026-06-25 06:57:28.9320930][成功][GraphicsManager]绿幕着色器资源创建成功
+[2026-06-25 06:57:28.9321100][警告][Driver]发送了UI启动指令！渲染即将开始！
+[2026-06-25 06:57:28.9401680][成功][MessageManager]消息派发激活！
+[2026-06-25 06:57:28.9525530][成功][TaskSystem]成功创建工作者：CSControl
+[2026-06-25 06:57:28.9525650][成功][TaskSystem]成功将任务：HookEntitySystem::DelayInit 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9525750][成功][TaskSystem]成功将任务：DeathMsgController::Update 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9525800][成功][TaskSystem]成功将任务：NameController::Update 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9525850][成功][TaskSystem]成功将任务：SmokeController::Update 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9526800][成功][TaskSystem]成功创建工作者：AudioCapturer
+[2026-06-25 06:57:28.9526830][成功][TaskSystem]成功将任务：AudioCapturer::Main 添加进入工作者：AudioCapturer
+[2026-06-25 06:57:28.9526910][成功][TaskSystem]成功将任务：ModuleManager::Update 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9526980][成功][TaskSystem]成功将任务：Debugger::Main 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9528130][成功][TaskSystem]成功创建工作者：InputSystem
+[2026-06-25 06:57:28.9528170][成功][TaskSystem]成功将任务：InputSystem::UpdateKeysState 添加进入工作者：InputSystem
+[2026-06-25 06:57:28.9528240][成功][TaskSystem]成功将任务：ShortcutManager::Check 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9528290][成功][TaskSystem]成功将任务：GlobalVars::Main 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9529270][成功][TaskSystem]成功创建工作者：Web
+[2026-06-25 06:57:28.9529300][成功][TaskSystem]成功将任务：WebSocketManager::server::run 添加进入工作者：Web
+[2026-06-25 06:57:28.9529360][成功][TaskSystem]成功将任务：WebSocketManager::Main 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9529410][成功][TaskSystem]成功将任务：CSController::Update 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9529460][成功][TaskSystem]成功将任务：HookConsole::Update 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9529510][成功][TaskSystem]成功将任务：ConsoleOutput::ConsoleOutput 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9529560][成功][TaskSystem]成功将任务：ObserverController::Main 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9529610][成功][TaskSystem]成功将任务：ProjectileTracker::Main 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9529650][成功][TaskSystem]成功将任务：TrailsController::Update 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9529700][成功][TaskSystem]成功将任务：GlowController::Update 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9530520][成功][TaskSystem]成功创建工作者：DemoSys
+[2026-06-25 06:57:28.9530560][成功][TaskSystem]成功将任务：DemoSystem::Update 添加进入工作者：DemoSys
+[2026-06-25 06:57:28.9530620][成功][TaskSystem]成功将任务：DemoAnalyzer::Update 添加进入工作者：DemoSys
+[2026-06-25 06:57:28.9530660][成功][TaskSystem]成功将任务：DemoHelper::Main 添加进入工作者：DemoSys
+[2026-06-25 06:57:28.9530700][成功][TaskSystem]成功将任务：DemoJSONReader::Update 添加进入工作者：DemoSys
+[2026-06-25 06:57:28.9530750][成功][TaskSystem]成功将任务：RecordTaskConfiger::Update 添加进入工作者：DemoSys
+[2026-06-25 06:57:28.9530790][成功][TaskSystem]成功将任务：RecordTaskMaker::Update 添加进入工作者：DemoSys
+[2026-06-25 06:57:28.9530840][成功][TaskSystem]成功将任务：DemoRecorder::Update 添加进入工作者：DemoSys
+[2026-06-25 06:57:28.9530880][成功][TaskSystem]成功将任务：MiniMap::Main 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9530940][成功][TaskSystem]成功将任务：VirtualUser::Main 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9532130][成功][TaskSystem]成功创建工作者：Capture
+[2026-06-25 06:57:28.9532160][成功][TaskSystem]成功将任务：VideoCapturer::Capture 添加进入工作者：Capture
+[2026-06-25 06:57:28.9533740][成功][TaskSystem]成功创建工作者：Media
+[2026-06-25 06:57:28.9533770][成功][TaskSystem]成功将任务：MediaRecorder::Main 添加进入工作者：Media
+[2026-06-25 06:57:28.9533840][成功][TaskSystem]成功将任务：MediaProcesser::Update 添加进入工作者：Media
+[2026-06-25 06:57:28.9533890][成功][TaskSystem]成功将任务：MulNXController::Main 添加进入工作者：MulNXMain
+[2026-06-25 06:57:28.9562740][成功][HookEntitySystem]钩子部署成功！钩子名：AddEntity
+[2026-06-25 06:57:28.9583160][成功][HookEntitySystem]钩子部署成功！钩子名：RemoveEntity
+[2026-06-25 06:57:28.9583550][提示][CSController]消息推送：将任务 CSController::Main 注册到工作者 CSControl
+[2026-06-25 06:57:28.9637200][成功][WebSocketManager]正在监听端口：55202
+[2026-06-25 06:57:28.9681470][成功][TaskSystem]成功将任务：CSController::Main 添加进入工作者：CSControl
+[2026-06-25 06:57:28.9722340][提示][HookConsole]已推入MulNX缓冲队列：playdemo "111"
+[2026-06-25 06:57:29.1506890][提示][HookDemo]播放Demo: "111"
+[2026-06-25 06:57:29.1709400][成功][UICoordinator]接收到UI节点: ViewController (索引 0)
+[2026-06-25 06:57:29.1709510][成功][UICoordinator]接收到UI节点: DeathMsgController (索引 1)
+[2026-06-25 06:57:29.1709580][成功][UICoordinator]接收到UI节点: SkinController (索引 2)
+[2026-06-25 06:57:29.1709650][成功][UICoordinator]接收到UI节点: GameSettingsManager (索引 3)
+[2026-06-25 06:57:29.1709710][成功][UICoordinator]接收到UI节点: SoundMenu (索引 4)
+[2026-06-25 06:57:29.1709750][成功][UICoordinator]接收到UI节点: DofMenu (索引 5)
+[2026-06-25 06:57:29.1709810][成功][UICoordinator]接收到UI节点: GameHudMenu (索引 6)
+[2026-06-25 06:57:29.1709850][成功][UICoordinator]接收到UI节点: UICoordinator (索引 7)
+[2026-06-25 06:57:29.1709940][成功][UICoordinator]接收到UI节点: UISystem (索引 8)
+[2026-06-25 06:57:29.1710020][成功][UICoordinator]接收到UI节点: Debugger (索引 9)
+[2026-06-25 06:57:29.1710050][成功][UICoordinator]接收到UI节点: DeDebugger (索引 10)
+[2026-06-25 06:57:29.1710090][成功][UICoordinator]接收到UI节点: GraphicsManager (索引 11)
+[2026-06-25 06:57:29.1710130][成功][UICoordinator]接收到UI节点: AdvancedViewController (索引 12)
+[2026-06-25 06:57:29.1710260][成功][UICoordinator]接收到UI节点: FreeCameraController (索引 13)
+[2026-06-25 06:57:29.1710300][成功][UICoordinator]接收到UI节点: PlayerFlashController (索引 14)
+[2026-06-25 06:57:29.1710340][成功][UICoordinator]接收到UI节点: ESPController (索引 15)
+[2026-06-25 06:57:29.1710400][成功][UICoordinator]接收到UI节点: EntityListScanner (索引 16)
+[2026-06-25 06:57:29.1710440][成功][UICoordinator]接收到UI节点: PlayerHub (索引 17)
+[2026-06-25 06:57:29.1710490][成功][UICoordinator]接收到UI节点: TrailsController (索引 18)
+[2026-06-25 06:57:29.1710600][成功][UICoordinator]接收到UI节点: CameraSystem (索引 19)
+[2026-06-25 06:57:29.1710640][成功][UICoordinator]接收到UI节点: MenuWorkspace (索引 20)
+[2026-06-25 06:57:29.1710680][成功][UICoordinator]接收到UI节点: ProjectManager (索引 21)
+[2026-06-25 06:57:29.1710710][成功][UICoordinator]接收到UI节点: MenuProject (索引 22)
+[2026-06-25 06:57:29.1710750][成功][UICoordinator]接收到UI节点: SolutionManager (索引 23)
+[2026-06-25 06:57:29.1710780][成功][UICoordinator]接收到UI节点: MenuSolution (索引 24)
+[2026-06-25 06:57:29.1710830][成功][UICoordinator]接收到UI节点: ElementManager (索引 25)
+[2026-06-25 06:57:29.1710860][成功][UICoordinator]接收到UI节点: MenuElement (索引 26)
+[2026-06-25 06:57:29.1710900][成功][UICoordinator]接收到UI节点: DemoSystem (索引 27)
+[2026-06-25 06:57:29.1711030][成功][UICoordinator]接收到UI节点: DemoHelper (索引 28)
+[2026-06-25 06:57:29.1711070][成功][UICoordinator]接收到UI节点: DemoJSONReader (索引 29)
+[2026-06-25 06:57:29.1711180][成功][UICoordinator]接收到UI节点: RecordTaskConfiger (索引 30)
+[2026-06-25 06:57:29.1711220][成功][UICoordinator]接收到UI节点: RecordTaskMaker (索引 31)
+[2026-06-25 06:57:29.1711260][成功][UICoordinator]接收到UI节点: DemoRecorder (索引 32)
+[2026-06-25 06:57:29.1711290][成功][UICoordinator]接收到UI节点: MiniMap (索引 33)
+[2026-06-25 06:57:29.1711330][成功][UICoordinator]接收到UI节点: VirtualUser (索引 34)
+[2026-06-25 06:57:29.1711370][成功][UICoordinator]接收到UI节点: GameCfgManager (索引 35)
+[2026-06-25 06:57:29.1711410][成功][UICoordinator]接收到UI节点: MediaSystem (索引 36)
+[2026-06-25 06:57:29.1711460][成功][UICoordinator]接收到UI节点: 捕获以上所有根触发的UI渲染 (索引 37)
+[2026-06-25 06:57:29.1711490][成功][UICoordinator]接收到UI节点: MulNXController (索引 38)
+[2026-06-25 06:57:29.1711530][成功][UICoordinator]接收到UI节点: MainDraw (索引 39)
+[2026-06-25 06:57:29.1711780][警告][UISystem]接收到启动消息，UI系统开始启动
+[2026-06-25 06:57:33.2539800][提示][VirtualUser]接收到新回合信息
+[2026-06-25 06:57:33.2902010][提示][ProjectManager]项目管理器正在处理消息！
+[2026-06-25 06:57:33.2902070][警告][ProjectManager]无活跃项目，无法执行自动操作
+[2026-06-25 06:57:33.2986070][成功][NameController]钩子部署成功！钩子名：GetPlayerName
+[2026-06-25 06:58:28.9809060][提示][VirtualUser]已触发自动保存（频率：每分钟）
+[2026-06-25 06:58:38.2316820][提示][MulNXController]检测到以下注册模块
+[2026-06-25 06:58:38.2316850][提示][MulNXController]IPCer
+[2026-06-25 06:58:38.2316850][提示][MulNXController]ElementManager
+[2026-06-25 06:58:38.2316860][提示][MulNXController]Debugger
+[2026-06-25 06:58:38.2316860][提示][MulNXController]TaskSystem
+[2026-06-25 06:58:38.2316870][提示][MulNXController]WorkspaceManager
+[2026-06-25 06:58:38.2316870][提示][MulNXController]PathManager
+[2026-06-25 06:58:38.2316880][提示][MulNXController]CrashDumper
+[2026-06-25 06:58:38.2316880][提示][MulNXController]DemoRecorder
+[2026-06-25 06:58:38.2316880][提示][MulNXController]PlayerSpotRenderController
+[2026-06-25 06:58:38.2316890][提示][MulNXController]SkinController
+[2026-06-25 06:58:38.2316890][提示][MulNXController]I18nManager
+[2026-06-25 06:58:38.2316900][提示][MulNXController]MessageManager
+[2026-06-25 06:58:38.2316900][提示][MulNXController]ESPController
+[2026-06-25 06:58:38.2316900][提示][MulNXController]UICoordinator
+[2026-06-25 06:58:38.2316910][提示][MulNXController]InputSystem
+[2026-06-25 06:58:38.2316910][提示][MulNXController]DLLLoadDispatcher
+[2026-06-25 06:58:38.2316920][提示][MulNXController]UISystem
+[2026-06-25 06:58:38.2316920][提示][MulNXController]Logger
+[2026-06-25 06:58:38.2316930][提示][MulNXController]HandleSystem
+[2026-06-25 06:58:38.2316930][提示][MulNXController]ProjectileTracker
+[2026-06-25 06:58:38.2316930][提示][MulNXController]PlayerFlashController
+[2026-06-25 06:58:38.2316940][提示][MulNXController]ShortcutManager
+[2026-06-25 06:58:38.2316950][提示][MulNXController]TeamCounterController
+[2026-06-25 06:58:38.2316960][提示][MulNXController]TrailsController
+[2026-06-25 06:58:38.2316960][提示][MulNXController]GlobalVars
+[2026-06-25 06:58:38.2316970][提示][MulNXController]HookWindow
+[2026-06-25 06:58:38.2316970][提示][MulNXController]CSController
+[2026-06-25 06:58:38.2316980][提示][MulNXController]MediaParamManager
+[2026-06-25 06:58:38.2316980][提示][MulNXController]HookD3D11
+[2026-06-25 06:58:38.2316980][提示][MulNXController]FileRedirector
+[2026-06-25 06:58:38.2316990][提示][MulNXController]ShaderCompiler
+[2026-06-25 06:58:38.2316990][提示][MulNXController]DemoSystem
+[2026-06-25 06:58:38.2317000][提示][MulNXController]GraphicsManager
+[2026-06-25 06:58:38.2317000][提示][MulNXController]WebSocketManager
+[2026-06-25 06:58:38.2317000][提示][MulNXController]CameraSystem
+[2026-06-25 06:58:38.2317010][提示][MulNXController]GlowController
+[2026-06-25 06:58:38.2317010][提示][MulNXController]TimeLiner
+[2026-06-25 06:58:38.2317020][提示][MulNXController]HookConsole
+[2026-06-25 06:58:38.2317020][提示][MulNXController]RecordTaskMaker
+[2026-06-25 06:58:38.2317020][提示][MulNXController]DemoJSONReader
+[2026-06-25 06:58:38.2317030][提示][MulNXController]PlayerSpotColorController
+[2026-06-25 06:58:38.2317030][提示][MulNXController]ConsoleOutput
+[2026-06-25 06:58:38.2317040][提示][MulNXController]HookEntitySystem
+[2026-06-25 06:58:38.2317040][提示][MulNXController]SmokeController
+[2026-06-25 06:58:38.2317050][提示][MulNXController]ParticleManager
+[2026-06-25 06:58:38.2317050][提示][MulNXController]MiniMap
+[2026-06-25 06:58:38.2317050][提示][MulNXController]VideoCapturer
+[2026-06-25 06:58:38.2317060][提示][MulNXController]TimeController
+[2026-06-25 06:58:38.2317060][提示][MulNXController]ViewController
+[2026-06-25 06:58:38.2317060][提示][MulNXController]AdvancedViewController
+[2026-06-25 06:58:38.2317070][提示][MulNXController]DemoAnalyzer
+[2026-06-25 06:58:38.2317070][提示][MulNXController]FreeCameraController
+[2026-06-25 06:58:38.2317080][提示][MulNXController]UIDocker
+[2026-06-25 06:58:38.2317080][提示][MulNXController]SpeakingController
+[2026-06-25 06:58:38.2317090][提示][MulNXController]ObserverController
+[2026-06-25 06:58:38.2317100][提示][MulNXController]DemoHelper
+[2026-06-25 06:58:38.2317100][提示][MulNXController]DeathMsgController
+[2026-06-25 06:58:38.2317110][提示][MulNXController]KeyboardOverlay
+[2026-06-25 06:58:38.2317110][提示][MulNXController]EntityListScanner
+[2026-06-25 06:58:38.2317120][提示][MulNXController]MediaProcesser
+[2026-06-25 06:58:38.2317120][提示][MulNXController]PlayerHub
+[2026-06-25 06:58:38.2317120][提示][MulNXController]NameController
+[2026-06-25 06:58:38.2317130][提示][MulNXController]TeamIDController
+[2026-06-25 06:58:38.2317130][提示][MulNXController]SolutionManager
+[2026-06-25 06:58:38.2317140][提示][MulNXController]ProjectManager
+[2026-06-25 06:58:38.2317140][提示][MulNXController]BombSpotController
+[2026-06-25 06:58:38.2317140][提示][MulNXController]HookDemo
+[2026-06-25 06:58:38.2317150][提示][MulNXController]RecordTaskConfiger
+[2026-06-25 06:58:38.2317150][提示][MulNXController]VirtualUser
+[2026-06-25 06:58:38.2317160][提示][MulNXController]GameCfgManager
+[2026-06-25 06:58:38.2317160][提示][MulNXController]GameSettingsManager
+[2026-06-25 06:58:38.2317160][提示][MulNXController]VCD3D11Manager
+[2026-06-25 06:58:38.2317170][提示][MulNXController]MediaSystem
+[2026-06-25 06:58:38.2317170][提示][MulNXController]AudioCapturer
+[2026-06-25 06:58:38.2317180][提示][MulNXController]AEncodeHelper
+[2026-06-25 06:58:38.2317180][提示][MulNXController]VEncodeHelper
+[2026-06-25 06:58:38.2317180][提示][MulNXController]MediaRecorder
+[2026-06-25 06:58:38.2317190][提示][MulNXController]MulNXController
+[2026-06-25 06:58:46.1047580][提示][MulNXController]检测到以下注册模块
+[2026-06-25 06:58:46.1047600][提示][MulNXController]IPCer
+[2026-06-25 06:58:46.1047610][提示][MulNXController]ElementManager
+[2026-06-25 06:58:46.1047610][提示][MulNXController]Debugger
+[2026-06-25 06:58:46.1047620][提示][MulNXController]TaskSystem
+[2026-06-25 06:58:46.1047620][提示][MulNXController]WorkspaceManager
+[2026-06-25 06:58:46.1047630][提示][MulNXController]PathManager
+[2026-06-25 06:58:46.1047630][提示][MulNXController]CrashDumper
+[2026-06-25 06:58:46.1047640][提示][MulNXController]DemoRecorder
+[2026-06-25 06:58:46.1047650][提示][MulNXController]PlayerSpotRenderController
+[2026-06-25 06:58:46.1047650][提示][MulNXController]SkinController
+[2026-06-25 06:58:46.1047660][提示][MulNXController]I18nManager
+[2026-06-25 06:58:46.1047660][提示][MulNXController]MessageManager
+[2026-06-25 06:58:46.1047660][提示][MulNXController]ESPController
+[2026-06-25 06:58:46.1047670][提示][MulNXController]UICoordinator
+[2026-06-25 06:58:46.1047670][提示][MulNXController]InputSystem
+[2026-06-25 06:58:46.1047670][提示][MulNXController]DLLLoadDispatcher
+[2026-06-25 06:58:46.1047680][提示][MulNXController]UISystem
+[2026-06-25 06:58:46.1047680][提示][MulNXController]Logger
+[2026-06-25 06:58:46.1047690][提示][MulNXController]HandleSystem
+[2026-06-25 06:58:46.1047690][提示][MulNXController]ProjectileTracker
+[2026-06-25 06:58:46.1047690][提示][MulNXController]PlayerFlashController
+[2026-06-25 06:58:46.1047700][提示][MulNXController]ShortcutManager
+[2026-06-25 06:58:46.1047700][提示][MulNXController]TeamCounterController
+[2026-06-25 06:58:46.1047710][提示][MulNXController]TrailsController
+[2026-06-25 06:58:46.1047710][提示][MulNXController]GlobalVars
+[2026-06-25 06:58:46.1047710][提示][MulNXController]HookWindow
+[2026-06-25 06:58:46.1047720][提示][MulNXController]CSController
+[2026-06-25 06:58:46.1047720][提示][MulNXController]MediaParamManager
+[2026-06-25 06:58:46.1047730][提示][MulNXController]HookD3D11
+[2026-06-25 06:58:46.1047730][提示][MulNXController]FileRedirector
+[2026-06-25 06:58:46.1047730][提示][MulNXController]ShaderCompiler
+[2026-06-25 06:58:46.1047740][提示][MulNXController]DemoSystem
+[2026-06-25 06:58:46.1047740][提示][MulNXController]GraphicsManager
+[2026-06-25 06:58:46.1047740][提示][MulNXController]WebSocketManager
+[2026-06-25 06:58:46.1047750][提示][MulNXController]CameraSystem
+[2026-06-25 06:58:46.1047750][提示][MulNXController]GlowController
+[2026-06-25 06:58:46.1047760][提示][MulNXController]TimeLiner
+[2026-06-25 06:58:46.1047760][提示][MulNXController]HookConsole
+[2026-06-25 06:58:46.1047760][提示][MulNXController]RecordTaskMaker
+[2026-06-25 06:58:46.1047770][提示][MulNXController]DemoJSONReader
+[2026-06-25 06:58:46.1047780][提示][MulNXController]PlayerSpotColorController
+[2026-06-25 06:58:46.1047780][提示][MulNXController]ConsoleOutput
+[2026-06-25 06:58:46.1047780][提示][MulNXController]HookEntitySystem
+[2026-06-25 06:58:46.1047790][提示][MulNXController]SmokeController
+[2026-06-25 06:58:46.1047790][提示][MulNXController]ParticleManager
+[2026-06-25 06:58:46.1047790][提示][MulNXController]MiniMap
+[2026-06-25 06:58:46.1047800][提示][MulNXController]VideoCapturer
+[2026-06-25 06:58:46.1047800][提示][MulNXController]TimeController
+[2026-06-25 06:58:46.1047810][提示][MulNXController]ViewController
+[2026-06-25 06:58:46.1047810][提示][MulNXController]AdvancedViewController
+[2026-06-25 06:58:46.1047810][提示][MulNXController]DemoAnalyzer
+[2026-06-25 06:58:46.1047820][提示][MulNXController]FreeCameraController
+[2026-06-25 06:58:46.1047820][提示][MulNXController]UIDocker
+[2026-06-25 06:58:46.1047830][提示][MulNXController]SpeakingController
+[2026-06-25 06:58:46.1047830][提示][MulNXController]ObserverController
+[2026-06-25 06:58:46.1047830][提示][MulNXController]DemoHelper
+[2026-06-25 06:58:46.1047840][提示][MulNXController]DeathMsgController
+[2026-06-25 06:58:46.1047840][提示][MulNXController]KeyboardOverlay
+[2026-06-25 06:58:46.1047840][提示][MulNXController]EntityListScanner
+[2026-06-25 06:58:46.1047850][提示][MulNXController]MediaProcesser
+[2026-06-25 06:58:46.1047850][提示][MulNXController]PlayerHub
+[2026-06-25 06:58:46.1047860][提示][MulNXController]NameController
+[2026-06-25 06:58:46.1047860][提示][MulNXController]TeamIDController
+[2026-06-25 06:58:46.1047860][提示][MulNXController]SolutionManager
+[2026-06-25 06:58:46.1047870][提示][MulNXController]ProjectManager
+[2026-06-25 06:58:46.1047870][提示][MulNXController]BombSpotController
+[2026-06-25 06:58:46.1047880][提示][MulNXController]HookDemo
+[2026-06-25 06:58:46.1047880][提示][MulNXController]RecordTaskConfiger
+[2026-06-25 06:58:46.1047880][提示][MulNXController]VirtualUser
+[2026-06-25 06:58:46.1047890][提示][MulNXController]GameCfgManager
+[2026-06-25 06:58:46.1047890][提示][MulNXController]GameSettingsManager
+[2026-06-25 06:58:46.1047900][提示][MulNXController]VCD3D11Manager
+[2026-06-25 06:58:46.1047910][提示][MulNXController]MediaSystem
+[2026-06-25 06:58:46.1047910][提示][MulNXController]AudioCapturer
+[2026-06-25 06:58:46.1047920][提示][MulNXController]AEncodeHelper
+[2026-06-25 06:58:46.1047920][提示][MulNXController]VEncodeHelper
+[2026-06-25 06:58:46.1047920][提示][MulNXController]MediaRecorder
+[2026-06-25 06:58:46.1047930][提示][MulNXController]MulNXController
+[2026-06-25 06:58:49.2737850][提示][MulNXController]检测到以下注册模块
+[2026-06-25 06:58:49.2737880][提示][MulNXController]IPCer
+[2026-06-25 06:58:49.2737890][提示][MulNXController]ElementManager
+[2026-06-25 06:58:49.2737890][提示][MulNXController]Debugger
+[2026-06-25 06:58:49.2737900][提示][MulNXController]TaskSystem
+[2026-06-25 06:58:49.2737900][提示][MulNXController]WorkspaceManager
+[2026-06-25 06:58:49.2737910][提示][MulNXController]PathManager
+[2026-06-25 06:58:49.2737910][提示][MulNXController]CrashDumper
+[2026-06-25 06:58:49.2737910][提示][MulNXController]DemoRecorder
+[2026-06-25 06:58:49.2737920][提示][MulNXController]PlayerSpotRenderController
+[2026-06-25 06:58:49.2737920][提示][MulNXController]SkinController
+[2026-06-25 06:58:49.2737930][提示][MulNXController]I18nManager
+[2026-06-25 06:58:49.2737930][提示][MulNXController]MessageManager
+[2026-06-25 06:58:49.2737930][提示][MulNXController]ESPController
+[2026-06-25 06:58:49.2737940][提示][MulNXController]UICoordinator
+[2026-06-25 06:58:49.2737940][提示][MulNXController]InputSystem
+[2026-06-25 06:58:49.2737950][提示][MulNXController]DLLLoadDispatcher
+[2026-06-25 06:58:49.2737950][提示][MulNXController]UISystem
+[2026-06-25 06:58:49.2737960][提示][MulNXController]Logger
+[2026-06-25 06:58:49.2737960][提示][MulNXController]HandleSystem
+[2026-06-25 06:58:49.2737960][提示][MulNXController]ProjectileTracker
+[2026-06-25 06:58:49.2737970][提示][MulNXController]PlayerFlashController
+[2026-06-25 06:58:49.2737970][提示][MulNXController]ShortcutManager
+[2026-06-25 06:58:49.2737980][提示][MulNXController]TeamCounterController
+[2026-06-25 06:58:49.2737980][提示][MulNXController]TrailsController
+[2026-06-25 06:58:49.2738000][提示][MulNXController]GlobalVars
+[2026-06-25 06:58:49.2738000][提示][MulNXController]HookWindow
+[2026-06-25 06:58:49.2738010][提示][MulNXController]CSController
+[2026-06-25 06:58:49.2738010][提示][MulNXController]MediaParamManager
+[2026-06-25 06:58:49.2738010][提示][MulNXController]HookD3D11
+[2026-06-25 06:58:49.2738020][提示][MulNXController]FileRedirector
+[2026-06-25 06:58:49.2738020][提示][MulNXController]ShaderCompiler
+[2026-06-25 06:58:49.2738030][提示][MulNXController]DemoSystem
+[2026-06-25 06:58:49.2738030][提示][MulNXController]GraphicsManager
+[2026-06-25 06:58:49.2738030][提示][MulNXController]WebSocketManager
+[2026-06-25 06:58:49.2738040][提示][MulNXController]CameraSystem
+[2026-06-25 06:58:49.2738040][提示][MulNXController]GlowController
+[2026-06-25 06:58:49.2738050][提示][MulNXController]TimeLiner
+[2026-06-25 06:58:49.2738050][提示][MulNXController]HookConsole
+[2026-06-25 06:58:49.2738060][提示][MulNXController]RecordTaskMaker
+[2026-06-25 06:58:49.2738060][提示][MulNXController]DemoJSONReader
+[2026-06-25 06:58:49.2738060][提示][MulNXController]PlayerSpotColorController
+[2026-06-25 06:58:49.2738070][提示][MulNXController]ConsoleOutput
+[2026-06-25 06:58:49.2738070][提示][MulNXController]HookEntitySystem
+[2026-06-25 06:58:49.2738080][提示][MulNXController]SmokeController
+[2026-06-25 06:58:49.2738080][提示][MulNXController]ParticleManager
+[2026-06-25 06:58:49.2738080][提示][MulNXController]MiniMap
+[2026-06-25 06:58:49.2738090][提示][MulNXController]VideoCapturer
+[2026-06-25 06:58:49.2738090][提示][MulNXController]TimeController
+[2026-06-25 06:58:49.2738100][提示][MulNXController]ViewController
+[2026-06-25 06:58:49.2738100][提示][MulNXController]AdvancedViewController
+[2026-06-25 06:58:49.2738100][提示][MulNXController]DemoAnalyzer
+[2026-06-25 06:58:49.2738110][提示][MulNXController]FreeCameraController
+[2026-06-25 06:58:49.2738110][提示][MulNXController]UIDocker
+[2026-06-25 06:58:49.2738120][提示][MulNXController]SpeakingController
+[2026-06-25 06:58:49.2738120][提示][MulNXController]ObserverController
+[2026-06-25 06:58:49.2738130][提示][MulNXController]DemoHelper
+[2026-06-25 06:58:49.2738130][提示][MulNXController]DeathMsgController
+[2026-06-25 06:58:49.2738140][提示][MulNXController]KeyboardOverlay
+[2026-06-25 06:58:49.2738140][提示][MulNXController]EntityListScanner
+[2026-06-25 06:58:49.2738150][提示][MulNXController]MediaProcesser
+[2026-06-25 06:58:49.2738150][提示][MulNXController]PlayerHub
+[2026-06-25 06:58:49.2738150][提示][MulNXController]NameController
+[2026-06-25 06:58:49.2738160][提示][MulNXController]TeamIDController
+[2026-06-25 06:58:49.2738160][提示][MulNXController]SolutionManager
+[2026-06-25 06:58:49.2738170][提示][MulNXController]ProjectManager
+[2026-06-25 06:58:49.2738170][提示][MulNXController]BombSpotController
+[2026-06-25 06:58:49.2738180][提示][MulNXController]HookDemo
+[2026-06-25 06:58:49.2738180][提示][MulNXController]RecordTaskConfiger
+[2026-06-25 06:58:49.2738180][提示][MulNXController]VirtualUser
+[2026-06-25 06:58:49.2738190][提示][MulNXController]GameCfgManager
+[2026-06-25 06:58:49.2738190][提示][MulNXController]GameSettingsManager
+[2026-06-25 06:58:49.2738200][提示][MulNXController]VCD3D11Manager
+[2026-06-25 06:58:49.2738200][提示][MulNXController]MediaSystem
+[2026-06-25 06:58:49.2738210][提示][MulNXController]AudioCapturer
+[2026-06-25 06:58:49.2738210][提示][MulNXController]AEncodeHelper
+[2026-06-25 06:58:49.2738210][提示][MulNXController]VEncodeHelper
+[2026-06-25 06:58:49.2738220][提示][MulNXController]MediaRecorder
+[2026-06-25 06:58:49.2738220][提示][MulNXController]MulNXController
+[2026-06-25 06:58:50.5728270][提示][MulNXController]检测到以下注册模块
+[2026-06-25 06:58:50.5728290][提示][MulNXController]IPCer
+[2026-06-25 06:58:50.5728290][提示][MulNXController]ElementManager
+[2026-06-25 06:58:50.5728300][提示][MulNXController]Debugger
+[2026-06-25 06:58:50.5728300][提示][MulNXController]TaskSystem
+[2026-06-25 06:58:50.5728310][提示][MulNXController]WorkspaceManager
+[2026-06-25 06:58:50.5728310][提示][MulNXController]PathManager
+[2026-06-25 06:58:50.5728320][提示][MulNXController]CrashDumper
+[2026-06-25 06:58:50.5728320][提示][MulNXController]DemoRecorder
+[2026-06-25 06:58:50.5728320][提示][MulNXController]PlayerSpotRenderController
+[2026-06-25 06:58:50.5728340][提示][MulNXController]SkinController
+[2026-06-25 06:58:50.5728340][提示][MulNXController]I18nManager
+[2026-06-25 06:58:50.5728350][提示][MulNXController]MessageManager
+[2026-06-25 06:58:50.5728350][提示][MulNXController]ESPController
+[2026-06-25 06:58:50.5728350][提示][MulNXController]UICoordinator
+[2026-06-25 06:58:50.5728360][提示][MulNXController]InputSystem
+[2026-06-25 06:58:50.5728360][提示][MulNXController]DLLLoadDispatcher
+[2026-06-25 06:58:50.5728370][提示][MulNXController]UISystem
+[2026-06-25 06:58:50.5728370][提示][MulNXController]Logger
+[2026-06-25 06:58:50.5728370][提示][MulNXController]HandleSystem
+[2026-06-25 06:58:50.5728380][提示][MulNXController]ProjectileTracker
+[2026-06-25 06:58:50.5728380][提示][MulNXController]PlayerFlashController
+[2026-06-25 06:58:50.5728390][提示][MulNXController]ShortcutManager
+[2026-06-25 06:58:50.5728390][提示][MulNXController]TeamCounterController
+[2026-06-25 06:58:50.5728390][提示][MulNXController]TrailsController
+[2026-06-25 06:58:50.5728400][提示][MulNXController]GlobalVars
+[2026-06-25 06:58:50.5728400][提示][MulNXController]HookWindow
+[2026-06-25 06:58:50.5728400][提示][MulNXController]CSController
+[2026-06-25 06:58:50.5728410][提示][MulNXController]MediaParamManager
+[2026-06-25 06:58:50.5728410][提示][MulNXController]HookD3D11
+[2026-06-25 06:58:50.5728420][提示][MulNXController]FileRedirector
+[2026-06-25 06:58:50.5728420][提示][MulNXController]ShaderCompiler
+[2026-06-25 06:58:50.5728420][提示][MulNXController]DemoSystem
+[2026-06-25 06:58:50.5728430][提示][MulNXController]GraphicsManager
+[2026-06-25 06:58:50.5728430][提示][MulNXController]WebSocketManager
+[2026-06-25 06:58:50.5728440][提示][MulNXController]CameraSystem
+[2026-06-25 06:58:50.5728440][提示][MulNXController]GlowController
+[2026-06-25 06:58:50.5728440][提示][MulNXController]TimeLiner
+[2026-06-25 06:58:50.5728450][提示][MulNXController]HookConsole
+[2026-06-25 06:58:50.5728450][提示][MulNXController]RecordTaskMaker
+[2026-06-25 06:58:50.5728460][提示][MulNXController]DemoJSONReader
+[2026-06-25 06:58:50.5728460][提示][MulNXController]PlayerSpotColorController
+[2026-06-25 06:58:50.5728470][提示][MulNXController]ConsoleOutput
+[2026-06-25 06:58:50.5728470][提示][MulNXController]HookEntitySystem
+[2026-06-25 06:58:50.5728480][提示][MulNXController]SmokeController
+[2026-06-25 06:58:50.5728480][提示][MulNXController]ParticleManager
+[2026-06-25 06:58:50.5728490][提示][MulNXController]MiniMap
+[2026-06-25 06:58:50.5728490][提示][MulNXController]VideoCapturer
+[2026-06-25 06:58:50.5728490][提示][MulNXController]TimeController
+[2026-06-25 06:58:50.5728500][提示][MulNXController]ViewController
+[2026-06-25 06:58:50.5728500][提示][MulNXController]AdvancedViewController
+[2026-06-25 06:58:50.5728500][提示][MulNXController]DemoAnalyzer
+[2026-06-25 06:58:50.5728510][提示][MulNXController]FreeCameraController
+[2026-06-25 06:58:50.5728510][提示][MulNXController]UIDocker
+[2026-06-25 06:58:50.5728520][提示][MulNXController]SpeakingController
+[2026-06-25 06:58:50.5728520][提示][MulNXController]ObserverController
+[2026-06-25 06:58:50.5728520][提示][MulNXController]DemoHelper
+[2026-06-25 06:58:50.5728530][提示][MulNXController]DeathMsgController
+[2026-06-25 06:58:50.5728530][提示][MulNXController]KeyboardOverlay
+[2026-06-25 06:58:50.5728540][提示][MulNXController]EntityListScanner
+[2026-06-25 06:58:50.5728540][提示][MulNXController]MediaProcesser
+[2026-06-25 06:58:50.5728540][提示][MulNXController]PlayerHub
+[2026-06-25 06:58:50.5728550][提示][MulNXController]NameController
+[2026-06-25 06:58:50.5728550][提示][MulNXController]TeamIDController
+[2026-06-25 06:58:50.5728550][提示][MulNXController]SolutionManager
+[2026-06-25 06:58:50.5728560][提示][MulNXController]ProjectManager
+[2026-06-25 06:58:50.5728560][提示][MulNXController]BombSpotController
+[2026-06-25 06:58:50.5728570][提示][MulNXController]HookDemo
+[2026-06-25 06:58:50.5728570][提示][MulNXController]RecordTaskConfiger
+[2026-06-25 06:58:50.5728570][提示][MulNXController]VirtualUser
+[2026-06-25 06:58:50.5728580][提示][MulNXController]GameCfgManager
+[2026-06-25 06:58:50.5728580][提示][MulNXController]GameSettingsManager
+[2026-06-25 06:58:50.5728590][提示][MulNXController]VCD3D11Manager
+[2026-06-25 06:58:50.5728590][提示][MulNXController]MediaSystem
+[2026-06-25 06:58:50.5728600][提示][MulNXController]AudioCapturer
+[2026-06-25 06:58:50.5728600][提示][MulNXController]AEncodeHelper
+[2026-06-25 06:58:50.5728610][提示][MulNXController]VEncodeHelper
+[2026-06-25 06:58:50.5728610][提示][MulNXController]MediaRecorder
+[2026-06-25 06:58:50.5728610][提示][MulNXController]MulNXController
+[2026-06-25 06:58:51.6670500][提示][MulNXController]检测到以下注册模块
+[2026-06-25 06:58:51.6670530][提示][MulNXController]IPCer
+[2026-06-25 06:58:51.6670530][提示][MulNXController]ElementManager
+[2026-06-25 06:58:51.6670540][提示][MulNXController]Debugger
+[2026-06-25 06:58:51.6670540][提示][MulNXController]TaskSystem
+[2026-06-25 06:58:51.6670550][提示][MulNXController]WorkspaceManager
+[2026-06-25 06:58:51.6670550][提示][MulNXController]PathManager
+[2026-06-25 06:58:51.6670550][提示][MulNXController]CrashDumper
+[2026-06-25 06:58:51.6670560][提示][MulNXController]DemoRecorder
+[2026-06-25 06:58:51.6670560][提示][MulNXController]PlayerSpotRenderController
+[2026-06-25 06:58:51.6670570][提示][MulNXController]SkinController
+[2026-06-25 06:58:51.6670570][提示][MulNXController]I18nManager
+[2026-06-25 06:58:51.6670570][提示][MulNXController]MessageManager
+[2026-06-25 06:58:51.6670580][提示][MulNXController]ESPController
+[2026-06-25 06:58:51.6670580][提示][MulNXController]UICoordinator
+[2026-06-25 06:58:51.6670590][提示][MulNXController]InputSystem
+[2026-06-25 06:58:51.6670590][提示][MulNXController]DLLLoadDispatcher
+[2026-06-25 06:58:51.6670600][提示][MulNXController]UISystem
+[2026-06-25 06:58:51.6670600][提示][MulNXController]Logger
+[2026-06-25 06:58:51.6670600][提示][MulNXController]HandleSystem
+[2026-06-25 06:58:51.6670610][提示][MulNXController]ProjectileTracker
+[2026-06-25 06:58:51.6670610][提示][MulNXController]PlayerFlashController
+[2026-06-25 06:58:51.6670620][提示][MulNXController]ShortcutManager
+[2026-06-25 06:58:51.6670620][提示][MulNXController]TeamCounterController
+[2026-06-25 06:58:51.6670630][提示][MulNXController]TrailsController
+[2026-06-25 06:58:51.6670630][提示][MulNXController]GlobalVars
+[2026-06-25 06:58:51.6670640][提示][MulNXController]HookWindow
+[2026-06-25 06:58:51.6670650][提示][MulNXController]CSController
+[2026-06-25 06:58:51.6670660][提示][MulNXController]MediaParamManager
+[2026-06-25 06:58:51.6670660][提示][MulNXController]HookD3D11
+[2026-06-25 06:58:51.6670660][提示][MulNXController]FileRedirector
+[2026-06-25 06:58:51.6670670][提示][MulNXController]ShaderCompiler
+[2026-06-25 06:58:51.6670670][提示][MulNXController]DemoSystem
+[2026-06-25 06:58:51.6670680][提示][MulNXController]GraphicsManager
+[2026-06-25 06:58:51.6670680][提示][MulNXController]WebSocketManager
+[2026-06-25 06:58:51.6670680][提示][MulNXController]CameraSystem
+[2026-06-25 06:58:51.6670690][提示][MulNXController]GlowController
+[2026-06-25 06:58:51.6670690][提示][MulNXController]TimeLiner
+[2026-06-25 06:58:51.6670700][提示][MulNXController]HookConsole
+[2026-06-25 06:58:51.6670700][提示][MulNXController]RecordTaskMaker
+[2026-06-25 06:58:51.6670700][提示][MulNXController]DemoJSONReader
+[2026-06-25 06:58:51.6670710][提示][MulNXController]PlayerSpotColorController
+[2026-06-25 06:58:51.6670710][提示][MulNXController]ConsoleOutput
+[2026-06-25 06:58:51.6670720][提示][MulNXController]HookEntitySystem
+[2026-06-25 06:58:51.6670720][提示][MulNXController]SmokeController
+[2026-06-25 06:58:51.6670720][提示][MulNXController]ParticleManager
+[2026-06-25 06:58:51.6670730][提示][MulNXController]MiniMap
+[2026-06-25 06:58:51.6670730][提示][MulNXController]VideoCapturer
+[2026-06-25 06:58:51.6670740][提示][MulNXController]TimeController
+[2026-06-25 06:58:51.6670740][提示][MulNXController]ViewController
+[2026-06-25 06:58:51.6670740][提示][MulNXController]AdvancedViewController
+[2026-06-25 06:58:51.6670750][提示][MulNXController]DemoAnalyzer
+[2026-06-25 06:58:51.6670750][提示][MulNXController]FreeCameraController
+[2026-06-25 06:58:51.6670760][提示][MulNXController]UIDocker
+[2026-06-25 06:58:51.6670760][提示][MulNXController]SpeakingController
+[2026-06-25 06:58:51.6670770][提示][MulNXController]ObserverController
+[2026-06-25 06:58:51.6670770][提示][MulNXController]DemoHelper
+[2026-06-25 06:58:51.6670770][提示][MulNXController]DeathMsgController
+[2026-06-25 06:58:51.6670780][提示][MulNXController]KeyboardOverlay
+[2026-06-25 06:58:51.6670790][提示][MulNXController]EntityListScanner
+[2026-06-25 06:58:51.6670790][提示][MulNXController]MediaProcesser
+[2026-06-25 06:58:51.6670790][提示][MulNXController]PlayerHub
+[2026-06-25 06:58:51.6670800][提示][MulNXController]NameController
+[2026-06-25 06:58:51.6670800][提示][MulNXController]TeamIDController
+[2026-06-25 06:58:51.6670810][提示][MulNXController]SolutionManager
+[2026-06-25 06:58:51.6670810][提示][MulNXController]ProjectManager
+[2026-06-25 06:58:51.6670810][提示][MulNXController]BombSpotController
+[2026-06-25 06:58:51.6670820][提示][MulNXController]HookDemo
+[2026-06-25 06:58:51.6670820][提示][MulNXController]RecordTaskConfiger
+[2026-06-25 06:58:51.6670830][提示][MulNXController]VirtualUser
+[2026-06-25 06:58:51.6670830][提示][MulNXController]GameCfgManager
+[2026-06-25 06:58:51.6670840][提示][MulNXController]GameSettingsManager
+[2026-06-25 06:58:51.6670840][提示][MulNXController]VCD3D11Manager
+[2026-06-25 06:58:51.6670840][提示][MulNXController]MediaSystem
+[2026-06-25 06:58:51.6670850][提示][MulNXController]AudioCapturer
+[2026-06-25 06:58:51.6670850][提示][MulNXController]AEncodeHelper
+[2026-06-25 06:58:51.6670860][提示][MulNXController]VEncodeHelper
+[2026-06-25 06:58:51.6670860][提示][MulNXController]MediaRecorder
+[2026-06-25 06:58:51.6670860][提示][MulNXController]MulNXController
+[2026-06-25 06:58:52.8631600][提示][MulNXController]检测到以下注册模块
+[2026-06-25 06:58:52.8631630][提示][MulNXController]IPCer
+[2026-06-25 06:58:52.8631640][提示][MulNXController]ElementManager
+[2026-06-25 06:58:52.8631640][提示][MulNXController]Debugger
+[2026-06-25 06:58:52.8631650][提示][MulNXController]TaskSystem
+[2026-06-25 06:58:52.8631650][提示][MulNXController]WorkspaceManager
+[2026-06-25 06:58:52.8631660][提示][MulNXController]PathManager
+[2026-06-25 06:58:52.8631660][提示][MulNXController]CrashDumper
+[2026-06-25 06:58:52.8631670][提示][MulNXController]DemoRecorder
+[2026-06-25 06:58:52.8631670][提示][MulNXController]PlayerSpotRenderController
+[2026-06-25 06:58:52.8631680][提示][MulNXController]SkinController
+[2026-06-25 06:58:52.8631680][提示][MulNXController]I18nManager
+[2026-06-25 06:58:52.8631700][提示][MulNXController]MessageManager
+[2026-06-25 06:58:52.8631700][提示][MulNXController]ESPController
+[2026-06-25 06:58:52.8631710][提示][MulNXController]UICoordinator
+[2026-06-25 06:58:52.8631710][提示][MulNXController]InputSystem
+[2026-06-25 06:58:52.8631710][提示][MulNXController]DLLLoadDispatcher
+[2026-06-25 06:58:52.8631720][提示][MulNXController]UISystem
+[2026-06-25 06:58:52.8631730][提示][MulNXController]Logger
+[2026-06-25 06:58:52.8631730][提示][MulNXController]HandleSystem
+[2026-06-25 06:58:52.8631740][提示][MulNXController]ProjectileTracker
+[2026-06-25 06:58:52.8631750][提示][MulNXController]PlayerFlashController
+[2026-06-25 06:58:52.8631750][提示][MulNXController]ShortcutManager
+[2026-06-25 06:58:52.8631760][提示][MulNXController]TeamCounterController
+[2026-06-25 06:58:52.8631770][提示][MulNXController]TrailsController
+[2026-06-25 06:58:52.8631770][提示][MulNXController]GlobalVars
+[2026-06-25 06:58:52.8631770][提示][MulNXController]HookWindow
+[2026-06-25 06:58:52.8631780][提示][MulNXController]CSController
+[2026-06-25 06:58:52.8631780][提示][MulNXController]MediaParamManager
+[2026-06-25 06:58:52.8631790][提示][MulNXController]HookD3D11
+[2026-06-25 06:58:52.8631800][提示][MulNXController]FileRedirector
+[2026-06-25 06:58:52.8631800][提示][MulNXController]ShaderCompiler
+[2026-06-25 06:58:52.8631810][提示][MulNXController]DemoSystem
+[2026-06-25 06:58:52.8631810][提示][MulNXController]GraphicsManager
+[2026-06-25 06:58:52.8631820][提示][MulNXController]WebSocketManager
+[2026-06-25 06:58:52.8631820][提示][MulNXController]CameraSystem
+[2026-06-25 06:58:52.8631830][提示][MulNXController]GlowController
+[2026-06-25 06:58:52.8631830][提示][MulNXController]TimeLiner
+[2026-06-25 06:58:52.8631840][提示][MulNXController]HookConsole
+[2026-06-25 06:58:52.8631840][提示][MulNXController]RecordTaskMaker
+[2026-06-25 06:58:52.8631840][提示][MulNXController]DemoJSONReader
+[2026-06-25 06:58:52.8631850][提示][MulNXController]PlayerSpotColorController
+[2026-06-25 06:58:52.8631850][提示][MulNXController]ConsoleOutput
+[2026-06-25 06:58:52.8631860][提示][MulNXController]HookEntitySystem
+[2026-06-25 06:58:52.8631880][提示][MulNXController]SmokeController
+[2026-06-25 06:58:52.8631880][提示][MulNXController]ParticleManager
+[2026-06-25 06:58:52.8631880][提示][MulNXController]MiniMap
+[2026-06-25 06:58:52.8631890][提示][MulNXController]VideoCapturer
+[2026-06-25 06:58:52.8631890][提示][MulNXController]TimeController
+[2026-06-25 06:58:52.8631890][提示][MulNXController]ViewController
+[2026-06-25 06:58:52.8631900][提示][MulNXController]AdvancedViewController
+[2026-06-25 06:58:52.8631900][提示][MulNXController]DemoAnalyzer
+[2026-06-25 06:58:52.8631910][提示][MulNXController]FreeCameraController
+[2026-06-25 06:58:52.8631910][提示][MulNXController]UIDocker
+[2026-06-25 06:58:52.8631920][提示][MulNXController]SpeakingController
+[2026-06-25 06:58:52.8631920][提示][MulNXController]ObserverController
+[2026-06-25 06:58:52.8631920][提示][MulNXController]DemoHelper
+[2026-06-25 06:58:52.8631930][提示][MulNXController]DeathMsgController
+[2026-06-25 06:58:52.8631930][提示][MulNXController]KeyboardOverlay
+[2026-06-25 06:58:52.8631940][提示][MulNXController]EntityListScanner
+[2026-06-25 06:58:52.8631940][提示][MulNXController]MediaProcesser
+[2026-06-25 06:58:52.8631950][提示][MulNXController]PlayerHub
+[2026-06-25 06:58:52.8631950][提示][MulNXController]NameController
+[2026-06-25 06:58:52.8631950][提示][MulNXController]TeamIDController
+[2026-06-25 06:58:52.8631960][提示][MulNXController]SolutionManager
+[2026-06-25 06:58:52.8631960][提示][MulNXController]ProjectManager
+[2026-06-25 06:58:52.8631970][提示][MulNXController]BombSpotController
+[2026-06-25 06:58:52.8631970][提示][MulNXController]HookDemo
+[2026-06-25 06:58:52.8631970][提示][MulNXController]RecordTaskConfiger
+[2026-06-25 06:58:52.8631980][提示][MulNXController]VirtualUser
+[2026-06-25 06:58:52.8631980][提示][MulNXController]GameCfgManager
+[2026-06-25 06:58:52.8631990][提示][MulNXController]GameSettingsManager
+[2026-06-25 06:58:52.8631990][提示][MulNXController]VCD3D11Manager
+[2026-06-25 06:58:52.8632000][提示][MulNXController]MediaSystem
+[2026-06-25 06:58:52.8632010][提示][MulNXController]AudioCapturer
+[2026-06-25 06:58:52.8632010][提示][MulNXController]AEncodeHelper
+[2026-06-25 06:58:52.8632020][提示][MulNXController]VEncodeHelper
+[2026-06-25 06:58:52.8632030][提示][MulNXController]MediaRecorder
+[2026-06-25 06:58:52.8632030][提示][MulNXController]MulNXController
+[2026-06-25 06:58:53.9690070][提示][MulNXController]检测到以下注册模块
+[2026-06-25 06:58:53.9690090][提示][MulNXController]IPCer
+[2026-06-25 06:58:53.9690100][提示][MulNXController]ElementManager
+[2026-06-25 06:58:53.9690100][提示][MulNXController]Debugger
+[2026-06-25 06:58:53.9690110][提示][MulNXController]TaskSystem
+[2026-06-25 06:58:53.9690110][提示][MulNXController]WorkspaceManager
+[2026-06-25 06:58:53.9690120][提示][MulNXController]PathManager
+[2026-06-25 06:58:53.9690120][提示][MulNXController]CrashDumper
+[2026-06-25 06:58:53.9690130][提示][MulNXController]DemoRecorder
+[2026-06-25 06:58:53.9690130][提示][MulNXController]PlayerSpotRenderController
+[2026-06-25 06:58:53.9690130][提示][MulNXController]SkinController
+[2026-06-25 06:58:53.9690140][提示][MulNXController]I18nManager
+[2026-06-25 06:58:53.9690140][提示][MulNXController]MessageManager
+[2026-06-25 06:58:53.9690150][提示][MulNXController]ESPController
+[2026-06-25 06:58:53.9690150][提示][MulNXController]UICoordinator
+[2026-06-25 06:58:53.9690150][提示][MulNXController]InputSystem
+[2026-06-25 06:58:53.9690160][提示][MulNXController]DLLLoadDispatcher
+[2026-06-25 06:58:53.9690160][提示][MulNXController]UISystem
+[2026-06-25 06:58:53.9690170][提示][MulNXController]Logger
+[2026-06-25 06:58:53.9690170][提示][MulNXController]HandleSystem
+[2026-06-25 06:58:53.9690180][提示][MulNXController]ProjectileTracker
+[2026-06-25 06:58:53.9690180][提示][MulNXController]PlayerFlashController
+[2026-06-25 06:58:53.9690180][提示][MulNXController]ShortcutManager
+[2026-06-25 06:58:53.9690190][提示][MulNXController]TeamCounterController
+[2026-06-25 06:58:53.9690190][提示][MulNXController]TrailsController
+[2026-06-25 06:58:53.9690200][提示][MulNXController]GlobalVars
+[2026-06-25 06:58:53.9690200][提示][MulNXController]HookWindow
+[2026-06-25 06:58:53.9690210][提示][MulNXController]CSController
+[2026-06-25 06:58:53.9690210][提示][MulNXController]MediaParamManager
+[2026-06-25 06:58:53.9690230][提示][MulNXController]HookD3D11
+[2026-06-25 06:58:53.9690230][提示][MulNXController]FileRedirector
+[2026-06-25 06:58:53.9690230][提示][MulNXController]ShaderCompiler
+[2026-06-25 06:58:53.9690240][提示][MulNXController]DemoSystem
+[2026-06-25 06:58:53.9690240][提示][MulNXController]GraphicsManager
+[2026-06-25 06:58:53.9690250][提示][MulNXController]WebSocketManager
+[2026-06-25 06:58:53.9690250][提示][MulNXController]CameraSystem
+[2026-06-25 06:58:53.9690260][提示][MulNXController]GlowController
+[2026-06-25 06:58:53.9690260][提示][MulNXController]TimeLiner
+[2026-06-25 06:58:53.9690260][提示][MulNXController]HookConsole
+[2026-06-25 06:58:53.9690270][提示][MulNXController]RecordTaskMaker
+[2026-06-25 06:58:53.9690270][提示][MulNXController]DemoJSONReader
+[2026-06-25 06:58:53.9690280][提示][MulNXController]PlayerSpotColorController
+[2026-06-25 06:58:53.9690280][提示][MulNXController]ConsoleOutput
+[2026-06-25 06:58:53.9690280][提示][MulNXController]HookEntitySystem
+[2026-06-25 06:58:53.9690290][提示][MulNXController]SmokeController
+[2026-06-25 06:58:53.9690290][提示][MulNXController]ParticleManager
+[2026-06-25 06:58:53.9690300][提示][MulNXController]MiniMap
+[2026-06-25 06:58:53.9690300][提示][MulNXController]VideoCapturer
+[2026-06-25 06:58:53.9690310][提示][MulNXController]TimeController
+[2026-06-25 06:58:53.9690310][提示][MulNXController]ViewController
+[2026-06-25 06:58:53.9690310][提示][MulNXController]AdvancedViewController
+[2026-06-25 06:58:53.9690320][提示][MulNXController]DemoAnalyzer
+[2026-06-25 06:58:53.9690330][提示][MulNXController]FreeCameraController
+[2026-06-25 06:58:53.9690330][提示][MulNXController]UIDocker
+[2026-06-25 06:58:53.9690340][提示][MulNXController]SpeakingController
+[2026-06-25 06:58:53.9690340][提示][MulNXController]ObserverController
+[2026-06-25 06:58:53.9690350][提示][MulNXController]DemoHelper
+[2026-06-25 06:58:53.9690350][提示][MulNXController]DeathMsgController
+[2026-06-25 06:58:53.9690360][提示][MulNXController]KeyboardOverlay
+[2026-06-25 06:58:53.9690360][提示][MulNXController]EntityListScanner
+[2026-06-25 06:58:53.9690370][提示][MulNXController]MediaProcesser
+[2026-06-25 06:58:53.9690370][提示][MulNXController]PlayerHub
+[2026-06-25 06:58:53.9690380][提示][MulNXController]NameController
+[2026-06-25 06:58:53.9690380][提示][MulNXController]TeamIDController
+[2026-06-25 06:58:53.9690390][提示][MulNXController]SolutionManager
+[2026-06-25 06:58:53.9690390][提示][MulNXController]ProjectManager
+[2026-06-25 06:58:53.9690400][提示][MulNXController]BombSpotController
+[2026-06-25 06:58:53.9690400][提示][MulNXController]HookDemo
+[2026-06-25 06:58:53.9690400][提示][MulNXController]RecordTaskConfiger
+[2026-06-25 06:58:53.9690410][提示][MulNXController]VirtualUser
+[2026-06-25 06:58:53.9690410][提示][MulNXController]GameCfgManager
+[2026-06-25 06:58:53.9690420][提示][MulNXController]GameSettingsManager
+[2026-06-25 06:58:53.9690420][提示][MulNXController]VCD3D11Manager
+[2026-06-25 06:58:53.9690420][提示][MulNXController]MediaSystem
+[2026-06-25 06:58:53.9690430][提示][MulNXController]AudioCapturer
+[2026-06-25 06:58:53.9690430][提示][MulNXController]AEncodeHelper
+[2026-06-25 06:58:53.9690440][提示][MulNXController]VEncodeHelper
+[2026-06-25 06:58:53.9690440][提示][MulNXController]MediaRecorder
+[2026-06-25 06:58:53.9690450][提示][MulNXController]MulNXController
+[2026-06-25 06:59:07.4663310][警告][HookWindow]检测到 WM_CLOSE 消息，游戏即将关闭，系统进入终止态
+[2026-06-25 06:59:07.4663850][提示][ModuleManager]已关闭模块：UIDocker
+[2026-06-25 06:59:07.4663920][提示][ModuleManager]已关闭模块：MulNXController
+[2026-06-25 06:59:07.4663970][提示][ModuleManager]已关闭模块：MediaProcesser
+[2026-06-25 06:59:07.4664010][提示][ModuleManager]已关闭模块：MediaRecorder
+[2026-06-25 06:59:07.4664060][提示][ModuleManager]已关闭模块：VEncodeHelper
+[2026-06-25 06:59:07.4664100][提示][ModuleManager]已关闭模块：AEncodeHelper
+[2026-06-25 06:59:07.4664220][提示][ModuleManager]已关闭模块：VideoCapturer
+[2026-06-25 06:59:07.4768680][提示][ModuleManager]已关闭模块：AudioCapturer
+[2026-06-25 06:59:07.4768780][提示][ModuleManager]已关闭模块：VCD3D11Manager
+[2026-06-25 06:59:07.4768840][提示][ModuleManager]已关闭模块：MediaParamManager
+[2026-06-25 06:59:07.4768880][提示][ModuleManager]已关闭模块：MediaSystem
+[2026-06-25 06:59:07.4768940][提示][ModuleManager]已关闭模块：GameSettingsManager
+[2026-06-25 06:59:07.4768980][提示][ModuleManager]已关闭模块：GameCfgManager
+[2026-06-25 06:59:07.4769020][提示][ModuleManager]已关闭模块：VirtualUser
+[2026-06-25 06:59:07.4769060][提示][ModuleManager]已关闭模块：MiniMap
+[2026-06-25 06:59:07.4769110][提示][ModuleManager]已关闭模块：DemoRecorder
+[2026-06-25 06:59:07.4769150][提示][ModuleManager]已关闭模块：RecordTaskMaker
+[2026-06-25 06:59:07.4769190][提示][ModuleManager]已关闭模块：RecordTaskConfiger
+[2026-06-25 06:59:07.4769360][提示][ModuleManager]已关闭模块：DemoJSONReader
+[2026-06-25 06:59:07.4769500][提示][ModuleManager]已关闭模块：DemoHelper
+[2026-06-25 06:59:07.4769550][提示][ModuleManager]已关闭模块：DemoAnalyzer
+[2026-06-25 06:59:07.4769590][提示][ModuleManager]已关闭模块：DemoSystem
+[2026-06-25 06:59:07.4769630][提示][ModuleManager]已关闭模块：HookDemo
+[2026-06-25 06:59:07.4769680][提示][ModuleManager]已关闭模块：ElementManager
+[2026-06-25 06:59:07.4769720][提示][ModuleManager]已关闭模块：SolutionManager
+[2026-06-25 06:59:07.4769760][提示][ModuleManager]已关闭模块：ProjectManager
+[2026-06-25 06:59:07.4769800][提示][ModuleManager]已关闭模块：WorkspaceManager
+[2026-06-25 06:59:07.4769840][提示][ModuleManager]已关闭模块：CameraSystem
+[2026-06-25 06:59:07.4769890][提示][ModuleManager]已关闭模块：TeamCounterController
+[2026-06-25 06:59:07.4769930][提示][ModuleManager]已关闭模块：BombSpotController
+[2026-06-25 06:59:07.4769980][提示][ModuleManager]已关闭模块：PlayerSpotColorController
+[2026-06-25 06:59:07.4770030][提示][ModuleManager]已关闭模块：PlayerSpotRenderController
+[2026-06-25 06:59:07.4770080][提示][ModuleManager]已关闭模块：TeamIDController
+[2026-06-25 06:59:07.4770120][提示][ModuleManager]已关闭模块：KeyboardOverlay
+[2026-06-25 06:59:07.4770160][提示][ModuleManager]已关闭模块：SpeakingController
+[2026-06-25 06:59:07.4770210][提示][ModuleManager]已关闭模块：SmokeController
+[2026-06-25 06:59:07.4770250][提示][ModuleManager]已关闭模块：GlowController
+[2026-06-25 06:59:07.4770280][提示][ModuleManager]已关闭模块：NameController
+[2026-06-25 06:59:07.4848230][提示][TrailsController]钩子已销毁：C_BaseCSGrenadeProjectile_DrawStuff
+[2026-06-25 06:59:07.4848350][提示][ModuleManager]已关闭模块：TrailsController
+[2026-06-25 06:59:07.4848420][提示][ModuleManager]已关闭模块：ProjectileTracker
+[2026-06-25 06:59:07.4848460][提示][ModuleManager]已关闭模块：PlayerHub
+[2026-06-25 06:59:07.4848510][提示][ModuleManager]已关闭模块：EntityListScanner
+[2026-06-25 06:59:07.4848550][提示][ModuleManager]已关闭模块：SkinController
+[2026-06-25 06:59:07.4848600][提示][ModuleManager]已关闭模块：ESPController
+[2026-06-25 06:59:07.4848650][提示][ModuleManager]已关闭模块：DeathMsgController
+[2026-06-25 06:59:07.4848700][提示][ModuleManager]已关闭模块：PlayerFlashController
+[2026-06-25 06:59:07.4848750][提示][ModuleManager]已关闭模块：ObserverController
+[2026-06-25 06:59:07.4848790][提示][ModuleManager]已关闭模块：FreeCameraController
+[2026-06-25 06:59:07.4848840][提示][ModuleManager]已关闭模块：AdvancedViewController
+[2026-06-25 06:59:07.4848880][提示][ModuleManager]已关闭模块：ViewController
+[2026-06-25 06:59:07.4848930][提示][ModuleManager]已关闭模块：TimeController
+[2026-06-25 06:59:07.4848990][提示][ModuleManager]已关闭模块：ParticleManager
+[2026-06-25 06:59:07.4849040][提示][ModuleManager]已关闭模块：HookEntitySystem
+[2026-06-25 06:59:07.4849090][提示][ModuleManager]已关闭模块：ConsoleOutput
+[2026-06-25 06:59:07.4849130][提示][ModuleManager]已关闭模块：HookConsole
+[2026-06-25 06:59:07.4849170][提示][ModuleManager]已关闭模块：CSController
+[2026-06-25 06:59:07.4849210][提示][ModuleManager]已关闭模块：TimeLiner
+[2026-06-25 06:59:07.4849310][提示][ModuleManager]已关闭模块：WebSocketManager
+[2026-06-25 06:59:07.4849360][提示][ModuleManager]已关闭模块：GraphicsManager
+[2026-06-25 06:59:07.4849410][提示][ModuleManager]已关闭模块：ShaderCompiler
+[2026-06-25 06:59:07.4849500][提示][ModuleManager]已关闭模块：FileRedirector
+[2026-06-25 06:59:07.4849900][提示][ModuleManager]已关闭模块：DLLLoadDispatcher
+[2026-06-25 06:59:07.4850170][提示][ModuleManager]已关闭模块：HookD3D11
+[2026-06-25 06:59:07.4850230][提示][ModuleManager]已关闭模块：HookWindow
+[2026-06-25 06:59:07.4850280][提示][ModuleManager]已关闭模块：GlobalVars
+[2026-06-25 06:59:07.4850330][提示][ModuleManager]已关闭模块：ShortcutManager
+[2026-06-25 06:59:07.4850370][提示][ModuleManager]已关闭模块：InputSystem
+[2026-06-25 06:59:07.4850410][提示][ModuleManager]已关闭模块：HandleSystem
+[2026-06-25 06:59:07.4850460][提示][ModuleManager]已关闭模块：Debugger
+[2026-06-25 06:59:07.4850500][提示][ModuleManager]已关闭模块：Logger
+[2026-06-25 06:59:07.4850550][提示][ModuleManager]已关闭模块：UISystem
+[2026-06-25 06:59:07.4850590][提示][ModuleManager]已关闭模块：UICoordinator
+[2026-06-25 06:59:07.4850640][提示][ModuleManager]已关闭模块：MessageManager
+[2026-06-25 06:59:07.4850690][提示][ModuleManager]已关闭模块：I18nManager
+[2026-06-25 06:59:07.4850730][提示][ModuleManager]已关闭模块：CrashDumper
+[2026-06-25 06:59:07.4850780][提示][ModuleManager]已关闭模块：PathManager
+[2026-06-25 06:59:07.4850820][提示][ModuleManager]已关闭模块：IPCer
+[2026-06-25 06:59:07.4850850][成功][ModuleManager]日志模块即将下线，收尾析构等工作将由剩余子系统完成，MulNX期待与您下次再见
+[2026-06-25 06:59:07.5824530][警告][MessageManager]消息派发终止！

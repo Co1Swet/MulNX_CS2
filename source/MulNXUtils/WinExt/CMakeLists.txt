@@ -23,7 +23,7 @@ add_library(WinExt STATIC
     Memory/Hook/Hook.cpp
     Memory/Memory.cpp
 )
-
 target_link_libraries(WinExt PUBLIC
     MulNXThirdParty
 )
+target_include_directories(WinExt PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../..)
