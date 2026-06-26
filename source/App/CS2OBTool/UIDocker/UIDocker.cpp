@@ -36,7 +36,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     ImGui::End();
 
     ImGui::Begin(I18n("镜头参数").c_str());
-    node->CallUINode("ViewController");
+    node->CallUINode("HookView");
     node->CallUINode("FreeCameraController");
     node->CallUINode("DofMenu");
     ImGui::End();

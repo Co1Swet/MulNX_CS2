@@ -3,7 +3,7 @@
 #include <MulNXUtils/WinExt/HookMixin.hpp>
 
 class PlayerHub;
-class ViewController;
+class HookView;
 class TimeController;
 class HookConsole;
 
@@ -46,7 +46,7 @@ class CSModuleMixin : public ICSModule, public HookMixin<T> {
     T* This() { return static_cast<T*>(this); }
 public:
     CSController* CS2 = nullptr;
-    ViewController* CS2View = nullptr;
+    HookView* CS2View = nullptr;
     TimeController* CS2Time = nullptr;
     PlayerHub* Hub = nullptr;
     HookConsole* CS2Con = nullptr;
@@ -56,7 +56,7 @@ protected:
     CSModuleMixin() {
         This()->delayInits->push_back([this]() -> bool {
             this->CS2 = This()->FindModule<CSController>("CSController");
-            this->CS2View = This()->FindModule<ViewController>("ViewController");
+            this->CS2View = This()->FindModule<HookView>("HookView");
             this->CS2Time = This()->FindModule<TimeController>("TimeController");
             this->Hub = This()->FindModule<PlayerHub>("PlayerHub");
             this->CS2Con = This()->FindModule<HookConsole>("HookConsole");

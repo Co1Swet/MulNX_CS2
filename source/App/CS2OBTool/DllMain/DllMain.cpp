@@ -38,7 +38,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<MaterialSystem>("MaterialSystem")
             .CreateModule<SceneSystem>("SceneSystem")
             .CreateModule<TimeController>("TimeController")
-            .CreateModule<ViewController>("ViewController")
+            .CreateModule<HookView>("HookView")
             // CS2功能模块
             .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<FreeCameraController>("FreeCameraController")

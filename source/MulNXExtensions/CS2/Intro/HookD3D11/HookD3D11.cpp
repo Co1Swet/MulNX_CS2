@@ -16,7 +16,7 @@ bool HookD3D11::Init() {
             auto pSwapChain = (IDXGISwapChain*)ctx->rcx;
 
             static int i = 0;
-            if (++i < 10)return MulNX::Hook::Then::Continue;
+            if (++i < 64)return MulNX::Hook::Then::Continue;
             this->hkPosCallPresent.Detach();
 
             this->HookD3D11SwapChain(pSwapChain);

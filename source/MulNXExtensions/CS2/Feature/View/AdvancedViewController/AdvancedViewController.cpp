@@ -1,11 +1,11 @@
 #include "AdvancedViewController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
-#include <Feature/View/ViewController/ViewController.hpp>
+#include <Intro/HookView/HookView.hpp>
 
 bool AdvancedViewController::Menu(MulNX::UINode* node) {
     if (ImGui::CollapsingHeader("高级视角控制")) {
-        MulNX::UI::Checkbox("启用高级视角控制", this->Enable);
+        MulNX::UI::Checkbox("启用高级视角控制", this->runFlag1);
         MulNX::UI::Checkbox("覆盖自视角", this->OverrideSelfView);
         MulNX::UI::Checkbox("始终计算视角", this->AlwaysCaulate);
 
@@ -84,25 +84,27 @@ bool AdvancedViewController::Init() {
     return true;
 }
 
-void AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup) {
+bool AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
     // 如果启用了高级视角控制，尝试更新视角数据，注意这里只是更新，不涉及具体的视角控制逻辑，视角控制逻辑在后面根据状态分流执行
-    if (this->Enable.load(std::memory_order_acquire)) {
-        // 通过时间桥判断是否需要更新视角，防止抖动
-        static auto lastTime = this->CS2Time->GetReal();
-        auto currentTime = this->CS2Time->GetReal();
-        if (currentTime > lastTime || lastTime - currentTime > 0.015f || this->AlwaysCaulate.load(std::memory_order_acquire)) {
-            auto result = this->HandleSelfViewUpdate(viewSetup);
-            if (result.has_value()) {
-                auto newView = result.value();
-                this->viewBuffer.Push(newView);
-            }
-            else {
-                this->hasAxisInfo.store(false, std::memory_order_release);
-                this->LogWarning(std::format("HandleSelfViewUpdate failed with code: 0x{:X}", result.error()));
-            }
-            lastTime = currentTime;
+    if (!this->runFlag1.load(std::memory_order_acquire)) return false;
+
+    // 通过时间桥判断是否需要更新视角，防止抖动
+    static auto lastTime = this->CS2Time->GetReal();
+    auto currentTime = this->CS2Time->GetReal();
+    if (currentTime > lastTime || lastTime - currentTime > 0.015f || this->AlwaysCaulate.load(std::memory_order_acquire)) {
+        auto result = this->HandleSelfViewUpdate(viewSetup);
+        if (result.has_value()) {
+            auto newView = result.value();
+            this->viewBuffer.Push(newView);
         }
+        else {
+            this->hasAxisInfo.store(false, std::memory_order_release);
+            this->LogWarning(std::format("HandleSelfViewUpdate failed with code: 0x{:X}", result.error()));
+        }
+        lastTime = currentTime;
     }
+
+    return this->HandleOverrideView(viewSetup);
 }
 
 std::expected<MulNX::Math::Point3, int> AdvancedViewController::GetPoint3(CS2::CViewSetup* viewSetup) {

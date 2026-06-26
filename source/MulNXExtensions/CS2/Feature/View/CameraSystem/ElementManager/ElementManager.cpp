@@ -1,7 +1,7 @@
 #include "ElementManager.hpp"
 #include <MulNX/MulNX.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
-#include <Feature/View/ViewController/ViewController.hpp>
+#include <Intro/HookView/HookView.hpp>
 #include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <CameraSystem/SolutionManager/SolutionManager.hpp>

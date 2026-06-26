@@ -4,3 +4,4 @@
 #include "CSController/CSController.hpp"
 #include "HookConsole/HookConsole.hpp"
 #include "HookEntitySystem/HookEntitySystem.hpp"
+#include "HookView/HookView.hpp"

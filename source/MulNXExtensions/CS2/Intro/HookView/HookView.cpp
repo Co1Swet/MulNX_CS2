@@ -1,11 +1,12 @@
-#include "ViewController.hpp"
+#include "HookView.hpp"
+#include "CSViewControlModuleBase.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/View/ProjectileTracker/ProjectileTracker.hpp>
 #include <Feature/View/CameraSystem/CameraSystem.hpp>
 #include <Feature/View/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 
-bool ViewController::Menu(MulNX::UINode* node) {
+bool HookView::Menu(MulNX::UINode* node) {
 
     MulNX::UI::SliderFloat("roll调整", this->controlView.InputRoll, -179.99f, 179.99f);
     static auto* pGlobalFOV = this->CS2Con->GetCvar("fov_cs_debug")->GetPtr<float>();
@@ -17,9 +18,8 @@ bool ViewController::Menu(MulNX::UINode* node) {
     return true;
 }
 
-bool ViewController::Init() {
+bool HookView::Init() {
     this->pFreeCameraController = this->Core->ModuleManager()->FindModule<FreeCameraController>("FreeCameraController");
-    this->pAdvancedViewController = this->Core->ModuleManager()->FindModule<AdvancedViewController>("AdvancedViewController");
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         this->controlView.dofs.pNearBlurry = this->CS2Con->GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
@@ -41,7 +41,7 @@ bool ViewController::Init() {
     return true;
 }
 
-void ViewController::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
+void HookView::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
     // 加载来自摄像机系统的View
     if (this->controlView.hasViewToGame.load(std::memory_order_acquire)) {
         auto view = this->controlView.ViewToGame.Read();
@@ -54,7 +54,7 @@ void ViewController::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
     }
 }
 
-void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
+void HookView::HandleOverrideView(CS2::CViewSetup* viewSetup) {
     if (!this->pGlobalVars->SystemReady.load(std::memory_order_acquire)) {
         return;
     }
@@ -72,14 +72,21 @@ void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
 
     // 执行roll覆盖，这是优先级最低的覆盖，保证运镜至少优先于此，且不影响于此
     viewSetup->pViewAngles()->z = this->controlView.InputRoll.load(std::memory_order_acquire);
-    this->pAdvancedViewController->HandleUpdate(viewSetup);
+
+    auto updateView = [&,this]()->bool {
+        int num = 0;
+        for (auto& viewCtrlModule : this->viewControlModules) {
+            viewCtrlModule->HandleUpdate(viewSetup, num);
+        }
+        return true;
+        };
 
     // 根据状态调用不同的视角控制逻辑
     // 自由摄像机优先级最高，其次是高级视角控制，最后是普通摄像机系统控制
     if (this->pFreeCameraController->HandleUpdate(viewSetup)) {
         this->pFreeCameraController->HandleOverrideView(viewSetup);
     }
-    else if (this->pAdvancedViewController->HandleOverrideView(viewSetup)) {
+    else if (updateView()) {
 
     }
     else {
@@ -99,7 +106,7 @@ void ViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
     }
 }
 
-void ViewController::HandleFreeCameraPath(const CameraSystemIO* const IO) {
+void HookView::HandleFreeCameraPath(const CameraSystemIO* const IO) {
     const auto& pos = IO->Frame.view.position;
     const auto& fov = IO->Frame.view.FOV;
     const auto& rot = IO->Frame.view.rotation;
@@ -119,16 +126,16 @@ void ViewController::HandleFreeCameraPath(const CameraSystemIO* const IO) {
     this->controlView.hasViewToGame.store(true, std::memory_order_release);
 }
 
-float ViewController::GetWinWidth()const {
+float HookView::GetWinWidth()const {
     return this->controlView.WindowWidth.load(std::memory_order_relaxed);
 }
-float ViewController::GetWinHeight()const {
+float HookView::GetWinHeight()const {
     return this->controlView.WindowHeight.load(std::memory_order_relaxed);
 }
-float* ViewController::GetViewMatrix() {
+float* HookView::GetViewMatrix() {
     return this->CS2->client.dwViewMatrix();
 }
-MulNX::Math::View ViewController::GetView() {
+MulNX::Math::View HookView::GetView() {
     MulNX::Math::View view;
     {
         auto read = this->controlView.currentView.Read();
@@ -145,20 +152,20 @@ MulNX::Math::View ViewController::GetView() {
     return view;
 }
 
-void ViewController::spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot) {
+void HookView::spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot) {
     this->AsyncCommand(std::format("spec_goto {} {} {} {} {}", pos.x, pos.y, pos.z, rot.x, rot.y));
     this->controlView.InputRoll.store(rot.z, std::memory_order_release);
 }
-void ViewController::ClearViewOverride() {
+void HookView::ClearViewOverride() {
     this->controlView.hasViewToGame.store(false, std::memory_order_release);
 }
-void ViewController::SetDOF(const MulNX::Math::DOFParam& dof) {
+void HookView::SetDOF(const MulNX::Math::DOFParam& dof) {
     *this->controlView.dofs.pNearBlurry = dof.NearBlurry;
     *this->controlView.dofs.pNearCrisp = dof.NearCrisp;
     *this->controlView.dofs.pFarCrisp = dof.FarCrisp;
     *this->controlView.dofs.pFarBlurry = dof.FarBlurry;
 }
-bool ViewController::CameraSystemIOOverride(const CameraSystemIO* const IO) {
+bool HookView::CameraSystemIOOverride(const CameraSystemIO* const IO) {
     static float LastCallTime = IO->FrameGameTime;
     if (LastCallTime == IO->FrameGameTime) {
         return true;

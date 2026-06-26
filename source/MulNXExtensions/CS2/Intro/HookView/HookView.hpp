@@ -1,6 +1,5 @@
 #pragma once
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
-#include <Feature/View/AdvancedViewController/AdvancedViewController.hpp>
 #include <Feature/View/FreeCameraController/FreeCameraController.hpp>
 #include <Feature/View/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 
@@ -25,8 +24,8 @@ public:
     Dofs dofs{};
 };
 
-class ViewController final :public CSModuleBase {
-    AdvancedViewController* pAdvancedViewController = nullptr;
+class ICSViewControlModule;
+class HookView final :public CSModuleBase {
     FreeCameraController* pFreeCameraController = nullptr;
     // 视角控制钩子
     std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo = nullptr;
@@ -38,6 +37,7 @@ class ViewController final :public CSModuleBase {
     bool Menu(MulNX::UINode* node);
 public:
     bool Init()override;
+    std::vector<ICSViewControlModule*>viewControlModules{};
     float GetWinWidth()const;
     float GetWinHeight()const;
     MulNX::Math::View GetView();

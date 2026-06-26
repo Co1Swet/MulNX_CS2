@@ -1,7 +1,7 @@
 #include "FreeCameraController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
-#include <Feature/View/ViewController/ViewController.hpp>
+#include <Intro/HookView/HookView.hpp>
 
 void FreeCameraController::Menu(MulNX::UINode* node) {
     bool currentEnable = this->EnableControl.load(std::memory_order_acquire);

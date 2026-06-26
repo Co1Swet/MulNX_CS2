@@ -1,7 +1,7 @@
 #include "CameraSystem.hpp"
 #include "CamSysExt.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Feature/View/ViewController/ViewController.hpp>
+#include <Intro/HookView/HookView.hpp>
 
 bool CameraSystem::Menu(MulNX::UINode* node) {
     std::shared_lock lock(this->smutex);

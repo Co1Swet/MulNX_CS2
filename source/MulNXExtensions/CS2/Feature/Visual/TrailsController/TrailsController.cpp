@@ -121,39 +121,41 @@ bool TrailsController::Init() {
 
 // ==================== Hook 处理（颜色已是 0-255 浮点） ====================
 
-MulNX::Hook::Then TrailsController::HandleOnCreate(CS2::C_BaseCSGrenadeProjectile* pProjectile) {
-    std::optional<ParticleColor> color;
-    auto pPawn = this->CS2->client.GetBaseEntityFromHandle(
-        MulNX::MRead(pProjectile->m_hThrower()))
-        ->As<CS2::C_CSPlayerPawn>();
-    auto pController = this->CS2->client.GetBaseEntityFromHandle(
-        MulNX::MRead(pPawn->m_hController()))
-        ->As<CS2::CCSPlayerController>();
-    auto steamID = MulNX::MRead(pController->m_steamID());
-
+std::optional<TrailsController::ParticleColor> TrailsController::FindColor(CS2::C_CSPlayerPawn* pPawn, CS2::CCSPlayerController* pController) {
     std::shared_lock lock(this->smutex);
-    if (auto it = this->playerColors.find(steamID); it != this->playerColors.end()) {
-        color = it->second;   // 直接使用 0-255 范围的颜色
+    if (pController) {
+        auto steamID = MulNX::MRead(pController->m_steamID());
+        if (auto it = this->playerColors.find(steamID); it != this->playerColors.end()) {
+            return it->second;   // 直接使用 0-255 范围的颜色
+        }
     }
-    else {
-        auto team = MulNX::MRead(pController->iTeamNum());
-        color = (team == CS2::ui8TeamNum::T) ? this->TColor : this->CTColor;
+    auto team = MulNX::MRead(pPawn->iTeamNum());
+    return (team == CS2::ui8TeamNum::T) ? this->TColor : this->CTColor;
+}
+
+MulNX::Hook::Then TrailsController::HandleOnCreate(CS2::C_BaseCSGrenadeProjectile* pProjectile) {
+    try {
+        auto pPawn = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pProjectile->m_hThrower()))->As<CS2::C_CSPlayerPawn>();
+        auto pController = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pPawn->m_hController()))->As<CS2::CCSPlayerController>();
+        auto bColor = this->FindColor(pPawn, pController);
+
+        if (!bColor)
+            return MulNX::Hook::Then::Continue;
+
+        int newIdx = -1;
+        this->pParticleMgr->CreateParticle(&newIdx, "particles/entity/spectator_utility_trail.vpcf", 8, 0, 0, 0, 0);
+        if (newIdx == -1)
+            return MulNX::Hook::Then::Continue;
+
+        *pProjectile->m_nSnapshotTrajectoryEffectIndex() = newIdx;
+        *pProjectile->m_flTrajectoryTrailEffectCreationTime() =
+            MulNX::MRead(this->CS2->CSGlobalVars->fCurrentTime());
+        this->pParticleMgr->UpdateParticle(newIdx, 0x10, &bColor.value(), 0);
+        return MulNX::Hook::Then::Continue;
     }
-    lock.unlock();
-
-    if (!color)
+    catch (...) {
         return MulNX::Hook::Then::Continue;
-
-    int newIdx = -1;
-    this->pParticleMgr->CreateParticle(&newIdx, "particles/entity/spectator_utility_trail.vpcf", 8, 0, 0, 0, 0);
-    if (newIdx == -1)
-        return MulNX::Hook::Then::Continue;
-
-    *pProjectile->m_nSnapshotTrajectoryEffectIndex() = newIdx;
-    *pProjectile->m_flTrajectoryTrailEffectCreationTime() =
-        MulNX::MRead(this->CS2->CSGlobalVars->fCurrentTime());
-    this->pParticleMgr->UpdateParticle(newIdx, 0x10, &color.value(), 0);
-    return MulNX::Hook::Then::Continue;
+    }
 }
 
 MulNX::Hook::Then TrailsController::HandleOnUpdate(CS2::C_BaseCSGrenadeProjectile* pProjectile) {
