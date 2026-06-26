@@ -19,6 +19,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     node->CallUINode("GraphicsManager");
     node->CallUINode("PlayerFlashController");
     MulNX::UI::Checkbox("ESP", this->Core->ModuleManager()->FindModule("ESPController")->showWindow);
+    node->CallUINode("ESPSkeleton");
     node->CallUINode("GameHudMenu");
     ImGui::End();
 

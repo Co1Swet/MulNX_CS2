@@ -39,6 +39,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<SceneSystem>("SceneSystem")
             .CreateModule<TimeController>("TimeController")
             .CreateModule<HookView>("HookView")
+            .CreateModule<PlayerHub>("PlayerHub")
             // CS2功能模块
             .CreateModule<FreeCameraController>("FreeCameraController")
             .CreateModule<AdvancedViewController>("AdvancedViewController")
@@ -47,10 +48,10 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<SkyController>("SkyController")
             .CreateModule<ESPController>("ESPController")
+            .CreateModule<ESPSkeleton>("ESPSkeleton")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<EntityListScanner>("EntityListScanner")
             // 玩家强相关
-            .CreateModule<PlayerHub>("PlayerHub")
             .CreateModule<ProjectileTracker>("ProjectileTracker")
             .CreateModule<TrailsController>("TrailsController")
             .CreateModule<NameController>("NameController")

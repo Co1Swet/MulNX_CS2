@@ -7,6 +7,7 @@ add_library(CS2Visual STATIC
     TeamIDController/TeamIDController.cpp
     TrailsController/TrailsController.cpp
     SkyController/SkyController.cpp
+    ESPSkeleton/ESPSkeleton.cpp
 )
 
 target_link_libraries(CS2Visual PUBLIC

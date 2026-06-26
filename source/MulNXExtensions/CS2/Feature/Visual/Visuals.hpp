@@ -1,5 +1,6 @@
 #pragma once
 #include "ESPController/ESPController.hpp"
+#include "ESPSkeleton/ESPSkeleton.hpp"
 #include "PlayerFlashController/PlayerFlashController.hpp"
 #include "SkinController/SkinController.hpp"
 #include "SmokeController/SmokeController.hpp"

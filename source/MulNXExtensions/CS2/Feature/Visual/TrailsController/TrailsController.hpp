@@ -9,7 +9,7 @@ class TrailsController final :public CSViewPlayerModuleBase {
     std::unordered_map<Steam64UID, ParticleColor>playerColors{};
     ParticleColor TColor{ 224, 175, 86 };
     ParticleColor CTColor{ 114, 155, 221 };
-    ParticleProp prop{ 4.0f, 1.0f, 1.0f };
+    ParticleProp prop{ 4.0f, 1.0f, 0.0f };
 
     ParticleManager* pParticleMgr = nullptr;
     WrapHook hkFunc_BaseCSGrenadeProjectile_DrawStuff;
