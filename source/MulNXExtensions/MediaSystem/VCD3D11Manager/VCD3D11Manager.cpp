@@ -11,15 +11,35 @@ bool VCD3D11Manager::Init() {
 }
 
 void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
-    // 1. 创建我们的 D3D11 设备（与原设备同一级别）
+    // 从原设备反推参数，创建兼容录制设备
     D3D_FEATURE_LEVEL originalLevel = this->pGraphicsManager->pd3dDevice->GetFeatureLevel();
+
+    // 获取适配器
+    ComPtr<IDXGIDevice> dxgiDevice;
+    this->pGraphicsManager->pd3dDevice->QueryInterface(
+        __uuidof(IDXGIDevice), (void**)dxgiDevice.GetAddressOf());
+    ComPtr<IDXGIAdapter> pAdapter;
+    dxgiDevice->GetAdapter(pAdapter.GetAddressOf());
+
+    // 恢复标志位（补上 BGRA 防身）
+    UINT flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+    ComPtr<ID3D11Debug> d3dDebug;
+    if (SUCCEEDED(this->pGraphicsManager->pd3dDevice->QueryInterface(
+        __uuidof(ID3D11Debug), (void**)d3dDebug.GetAddressOf()))) {
+        flags |= D3D11_CREATE_DEVICE_DEBUG;
+    }
+
+    // 根据 pAdapter 是否为空决定 DriverType
+    D3D_DRIVER_TYPE driverType = pAdapter ? D3D_DRIVER_TYPE_UNKNOWN
+        : D3D_DRIVER_TYPE_WARP; // 降级用 WARP
+
     HRESULT hr = D3D11CreateDevice(
-        this->pGraphicsManager->D3D11Cfg.pAdapter,
-        this->pGraphicsManager->D3D11Cfg.DriverType,
-        this->pGraphicsManager->D3D11Cfg.Software,
-        this->pGraphicsManager->D3D11Cfg.Flags,
+        pAdapter.Get(),
+        driverType,                      // UNKNOWN 如果 pAdapter 非空
+        nullptr,
+        flags,
         &originalLevel, 1,
-        this->pGraphicsManager->D3D11Cfg.SDKVersion,
+        D3D11_SDK_VERSION,
         &pDevice, nullptr, &pContext
     );
     if (FAILED(hr)) {
@@ -28,7 +48,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     }
     this->LogSucc("捕获用D3D11设备创建成功");
 
-    // 2. 获取原设备后台缓冲区描述（只需尺寸/格式，不持有资源）
+    // 获取原设备后台缓冲区描述
     ComPtr<ID3D11RenderTargetView> pRTV;
     this->pGraphicsManager->pd3dContext->OMGetRenderTargets(1, pRTV.GetAddressOf(), nullptr);
     if (!pRTV) {
@@ -56,7 +76,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     sharedDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     sharedDesc.CPUAccessFlags = 0;
     sharedDesc.Usage = D3D11_USAGE_DEFAULT;
-    sharedDesc.Format = rtvDesc.Format; // 使用RTV的格式，确保兼容性
+    sharedDesc.Format = rtvDesc.Format;
 
     hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &this->buffer1.rawTex.pTex);
     if (FAILED(hr)) {
@@ -65,14 +85,14 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     }
     this->LogSucc("共享纹理创建成功");
 
-    HANDLE hSharedHandle = nullptr;
-    // 4. 获取共享句柄，并在我们自己的设备上打开
+    // 获取共享句柄，并在录制设备上打开
     ComPtr<IDXGIResource> pDXGIRes;
     hr = this->buffer1.rawTex.pTex.As(&pDXGIRes);
     if (FAILED(hr)) {
         this->LogError("获取IDXGIResource失败");
         return;
     }
+    HANDLE hSharedHandle = nullptr;
     hr = pDXGIRes->GetSharedHandle(&hSharedHandle);
     if (FAILED(hr)) {
         this->LogError("获取共享句柄失败");
@@ -87,7 +107,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     }
     this->LogSucc("共享资源在捕获设备上打开成功");
 
-    // 5. 获取两端的 Keyed Mutex 接口
+    // 获取两端的 Keyed Mutex
     hr = this->buffer1.rawTex.pTex.As(&this->buffer1.rawTex.pMutex);
     if (FAILED(hr)) {
         this->LogError("原设备获取KeyedMutex失败");

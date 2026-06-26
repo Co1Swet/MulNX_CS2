@@ -7,43 +7,29 @@ bool HookD3D11::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
-    this->SubscribeSync("Hook/LoadLibraryExW/d3d11.dll", [this](MulNX::Message& msg) {
-        auto pD3D11CreateDevice = (uint8_t*)GetProcAddress(GetModuleHandleW(L"d3d11.dll"), "D3D11CreateDevice");
-        this->hkD3D11CreateDevice = MulNX::Hook::Create(pD3D11CreateDevice, [this](MulNX::Hook* hk, RegContext* ctx) {
-            this->hkD3D11CreateDevice->Detach();
-            // 暂存参数
-            auto ppDevice = *hk->GetStackParam<ID3D11Device**>(ctx, 7);
-            auto ppDeviceContext = *hk->GetStackParam<ID3D11DeviceContext**>(ctx, 9);
-            // 保存D3D11环境信息，供后续使用
-            this->pGraphicsManager->D3D11Cfg.pAdapter = (IDXGIAdapter*)ctx->rcx;
-            this->pGraphicsManager->D3D11Cfg.DriverType = *(D3D_DRIVER_TYPE*)&ctx->rdx;
-            this->pGraphicsManager->D3D11Cfg.Software = *(HMODULE*)&ctx->r8;
-            this->pGraphicsManager->D3D11Cfg.Flags = *(UINT*)&ctx->r9;
-            this->pGraphicsManager->D3D11Cfg.SDKVersion = *hk->GetStackParam<UINT>(ctx, 6);
+    this->SubscribeSync("Hook/LoadLibraryExW/gameoverlayrenderer64.dll", [this](MulNX::Message& msg) {
+        this->gameoverlayrenderer64 = MulNX::Memory::DllModule(L"gameoverlayrenderer64.dll");
+        auto target = this->gameoverlayrenderer64.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Render::CSHashString).Data();
 
-            hk->CallMaybeOrigin(6, ctx);
-            this->pGraphicsManager->pd3dDevice = *ppDevice;
-            this->pGraphicsManager->pd3dContext = *ppDeviceContext;
-            this->HookD3D11DeviceAndContext();
-            return MulNX::Hook::Then::Return;
-            }).value();
-        this->hkD3D11CreateDevice->Attach();
-        this->LogSucc(I18n("hook.attached", "D3D11CreateDevice"));
+        this->hkPosCallPresent = this->CreateHook("PosCallPresent", target, [this](MulNX::Hook* hk, RegContext* ctx) {
+            
+            auto pSwapChain = (IDXGISwapChain*)ctx->rcx;
+
+            static int i = 0;
+            if (++i < 10)return MulNX::Hook::Then::Continue;
+            this->hkPosCallPresent.Detach();
+
+            this->HookD3D11SwapChain(pSwapChain);
+
+            return MulNX::Hook::Then::Continue;
+            },true).value();
+        this->hkPosCallPresent.Attach();
         });
+
+        
     return true;
 }
 void HookD3D11::HookD3D11DeviceAndContext() {
-    IDXGIFactory* pFactory = nullptr;
-    this->pGraphicsManager->D3D11Cfg.pAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&pFactory);
-    this->hkCreateSwapChain = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pFactory)->GetVFuncPtr(10), [this](MulNX::Hook* hk, RegContext* ctx) {
-        this->hkCreateSwapChain->Detach();
-        IDXGISwapChain** ppSwapChain = (IDXGISwapChain**)ctx->r9;
-        hk->CallMaybeOrigin(0, ctx);
-        this->HookD3D11SwapChain(*ppSwapChain);
-        return MulNX::Hook::Then::Return;
-        }).value();
-    this->hkCreateSwapChain->Attach();
-    this->LogSucc(I18n("hook.attached", "CreateSwapChain"));
     // ---- Hook ClearDepthStencilView (vtable index 53) ----
     this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
         ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
@@ -56,6 +42,14 @@ void HookD3D11::HookD3D11DeviceAndContext() {
     this->LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
 }
 void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
+    IDXGIDevice* dxgiDevice = nullptr;
+    pSwapChain->GetDevice(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
+    dxgiDevice->QueryInterface(__uuidof(ID3D11Device), (void**)&this->pGraphicsManager->pd3dDevice);
+    this->pGraphicsManager->pd3dDevice->GetImmediateContext(&this->pGraphicsManager->pd3dContext);
+    dxgiDevice->Release();
+
+    this->HookD3D11DeviceAndContext();
+
     // Hook Present函数
     // 函数开头：
     // 0~4：Steam钩子（OBS游戏捕获钩子会与其交互，进行画面捕获）
@@ -104,6 +98,7 @@ MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx)
         }
         // 开启新帧
         ImGui::NewFrame();
+        this->present.Render();
         return true;
         };
     this->pUISystem->FrameBehind = [this]() {
@@ -121,6 +116,7 @@ MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
     // 绿幕渲染
     this->pGraphicsManager->BuildNew();
     this->pGraphicsManager->OnPresent();
+    this->present.Check(hk, ctx);
     // UI 系统渲染
     this->pUISystem->HandleUpdate();    // 处理消息（坐标已在 HookWindow 中预缩放）
     this->pUISystem->Render();

@@ -53,6 +53,7 @@ boot:
 
 hook:
   attached: 钩子部署成功！钩子名：{}
+  destroyed: 钩子已销毁：{}
 
 graph:
   shader:
@@ -62,26 +63,6 @@ graph:
   chroma_key:
     enable: 启用绿幕分离
     threshold: 设置阈值
-
-media:
-  obs:
-    connect:
-      please_try: |
-        当前尚未连接OBS，请尝试连接
-        关于OBS连接：
-          1.确保OBS已经运行
-          2.标题栏-工具（T）-WebSocket 服务器设置
-          3.开启 WebSocket 服务器
-          4.服务器端口号应保持OBS默认端口：4455
-          5.取消勾选 开启身份认证
-          6.应用，随后尝试连接
-      try: 尝试连接
-      succ: 成功连接OBS WebSocket接口！身份认证成功 (Identified)！
-      cant_again: OBS连接已创建，请勿重复连接！
-      error_empty: OBS连接未建立！请先建立OBS连接！
-    record:
-      start: 开始录制
-      stop: 停止录制
 
 demo:
   status:
@@ -139,7 +120,7 @@ math:
     fmt: "时间：{0}  坐标（XYZ）：{1}，{2}，{3}  FOV：{4}  角度： 俯仰：{5}  偏航：{6}  滚转：{7}  景深： 近模糊：{8}  近清晰：{9}  远清晰：{10}  远模糊：{11}"
 
 module:
-  inited{}: 成功初始化模块：{}
+  inited: 初始化成功！
   send_ui: 将UI节点注册信息推送到了消息系统
   send_task: 消息推送：将任务 {} 注册到工作者 {}
   deinited: 已关闭模块：{}

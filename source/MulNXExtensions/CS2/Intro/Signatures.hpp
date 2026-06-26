@@ -6,6 +6,9 @@ namespace MulNX {
     namespace CS2 {
         namespace Signatures {
             inline const static MulNX::Memory::Pattern CallIsPlayingDemo("48 8b 0d ?? ?? ?? ?? 48 8b 01 ff 90 50 01 00 00 0f 57 ff 84 c0 74 63 ba ff ff ff ff");
+            namespace Render {
+                inline const static MulNX::Memory::Pattern CSHashString("FF D0 8B F0 48 85 FF 74 2A");
+            }
             namespace Utils {
                 inline const static MulNX::Memory::Pattern CSHashString("48 8B 58 ?? 0F 29 B4 24 C0 20 00 00 E8 ?? ?? ?? ??");
                 inline const static MulNX::Memory::Pattern Pos_Call_CInputService_ProcessCommands("E8 ?? ?? ?? ?? 4C 8B BC 24 ?? ?? 00 00 45 84 ED");
@@ -41,7 +44,7 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern Func_ParticleManager_CreateParticle("4C 8B DC 53 48 81 EC ?? ?? ?? ?? F2 0F 10 05");
                 inline const static MulNX::Memory::Pattern Func_ParticleManager_UpdateParticle("48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? F3 0F 10 1D ?? ?? ?? ?? 41 8B F8 8B DA 4C 8D 05");
             }
-            namespace Sky{
+            namespace Sky {
                 inline const static MulNX::Memory::Pattern Pos_C_EnvSky_VF10_Call_ForceUpdateSkybox("33 DB 48 8D 05 ?? ?? ?? ?? 48 8B CF 48 89 44 24 ??");
             }
         }
