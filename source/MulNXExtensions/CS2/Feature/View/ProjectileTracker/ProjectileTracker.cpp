@@ -151,8 +151,11 @@ void ProjectileTracker::Main() {
     }
 }
 
-std::optional<MulNX::Math::View> ProjectileTracker::GetView() {
-    if (!this->Enable.load(std::memory_order_acquire))return std::nullopt;
-    if (!this->pTargetWatchProjectile.load(std::memory_order_acquire)) return std::nullopt;
-    return *this->currentView.Read();
+bool ProjectileTracker::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
+    if (!this->Enable.load(std::memory_order_acquire))return false;
+    if (!this->pTargetWatchProjectile.load(std::memory_order_acquire)) return false;
+    auto view = this->currentView.Read();
+    *viewSetup->pViewOrigin() = view->position;
+    *viewSetup->pViewAngles() = view->rotation;
+    return true;
 }

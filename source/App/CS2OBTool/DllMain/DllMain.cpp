@@ -40,8 +40,8 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<TimeController>("TimeController")
             .CreateModule<HookView>("HookView")
             // CS2功能模块
-            .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<FreeCameraController>("FreeCameraController")
+            .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<ObserverController>("ObserverController")
             .CreateModule<PlayerFlashController>("PlayerFlashController")
             .CreateModule<DeathMsgController>("DeathMsgController")

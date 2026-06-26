@@ -31,15 +31,14 @@ bool HookD3D11::Init() {
 }
 void HookD3D11::HookD3D11DeviceAndContext() {
     // ---- Hook ClearDepthStencilView (vtable index 53) ----
-    this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkClearDepthStencilView = this->CreateHook("ClearDepthStencilView", (uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
         ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
         ID3D11DepthStencilView* pDSV = (ID3D11DepthStencilView*)ctx->rdx;
         UINT ClearFlags = *(UINT*)(&ctx->r8);
         this->pGraphicsManager->OnClearDepthStencilView(pCtx, pDSV, ClearFlags);
         return MulNX::Hook::Then::Continue;
         }).value();
-    this->hkClearDepthStencilView->Attach();
-    this->LogSucc(I18n("hook.attached", "ClearDepthStencilView"));
+    this->hkClearDepthStencilView.Attach();
 }
 void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     IDXGIDevice* dxgiDevice = nullptr;
@@ -55,20 +54,18 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // 0~4：Steam钩子（OBS游戏捕获钩子会与其交互，进行画面捕获）
     // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
-    this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkPresent = this->CreateHook("Present", (uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
         this->PublishSync("Hook/Present/First"_hash);
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11AndImGuiInit(hk, ctx);});
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkPresent->Attach();
-    this->LogSucc(I18n("hook.attached", "Present"));
     // ---- Hook ResizeBuffers (vtable index 13) ----
-    this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(13), [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkResizeBuffers = this->CreateHook("ResizeBuffers", (uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(13), [this](MulNX::Hook* hk, RegContext* ctx) {
         this->pGraphicsManager->ReleaseOld();
         return MulNX::Hook::Then::Continue;
         }).value();
     this->hkResizeBuffers->Attach();
-    this->LogSucc(I18n("hook.attached", "ResizeBuffers"));
 
     DXGI_SWAP_CHAIN_DESC sd;
     pSwapChain->GetDesc(&sd);

@@ -2,7 +2,6 @@
 #include "CSViewControlModuleBase.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
-#include <Feature/View/ProjectileTracker/ProjectileTracker.hpp>
 #include <Feature/View/CameraSystem/CameraSystem.hpp>
 #include <Feature/View/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 
@@ -19,7 +18,6 @@ bool HookView::Menu(MulNX::UINode* node) {
 }
 
 bool HookView::Init() {
-    this->pFreeCameraController = this->Core->ModuleManager()->FindModule<FreeCameraController>("FreeCameraController");
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         this->controlView.dofs.pNearBlurry = this->CS2Con->GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
@@ -58,13 +56,8 @@ void HookView::HandleOverrideView(CS2::CViewSetup* viewSetup) {
     if (!this->pGlobalVars->SystemReady.load(std::memory_order_acquire)) {
         return;
     }
-    this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem")->HandleUpdate();
-    static auto* pProjectileTracker = this->Core->ModuleManager()->FindModule<ProjectileTracker>("ProjectileTracker");
-    auto trckerView = pProjectileTracker->GetView();
-    if (trckerView.has_value()) {
-        *viewSetup->pViewOrigin() = trckerView.value().position;
-        *viewSetup->pViewAngles() = trckerView.value().rotation;
-    }
+    static auto pCam = this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem");
+    pCam->HandleUpdate();
 
     // 同步窗口尺寸到ControlView
     this->controlView.WindowWidth.store(*viewSetup->pWidth(), std::memory_order_relaxed);
@@ -73,24 +66,11 @@ void HookView::HandleOverrideView(CS2::CViewSetup* viewSetup) {
     // 执行roll覆盖，这是优先级最低的覆盖，保证运镜至少优先于此，且不影响于此
     viewSetup->pViewAngles()->z = this->controlView.InputRoll.load(std::memory_order_acquire);
 
-    auto updateView = [&,this]()->bool {
-        int num = 0;
-        for (auto& viewCtrlModule : this->viewControlModules) {
-            viewCtrlModule->HandleUpdate(viewSetup, num);
-        }
-        return true;
-        };
 
-    // 根据状态调用不同的视角控制逻辑
-    // 自由摄像机优先级最高，其次是高级视角控制，最后是普通摄像机系统控制
-    if (this->pFreeCameraController->HandleUpdate(viewSetup)) {
-        this->pFreeCameraController->HandleOverrideView(viewSetup);
-    }
-    else if (updateView()) {
-
-    }
-    else {
-        this->HandleCameraSystemPlay(viewSetup);
+    int num = 0;
+    this->HandleCameraSystemPlay(viewSetup);
+    for (auto& viewCtrlModule : this->viewControlModules) {
+        if (viewCtrlModule->HandleUpdate(viewSetup, num))++num;
     }
 
     this->PublishSync("Hook/OnSetupView"_hash);

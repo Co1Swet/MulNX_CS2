@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
-#include <Feature/View/FreeCameraController/FreeCameraController.hpp>
+#include <Intro/CSModuleBase.hpp>
 #include <Feature/View/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 
 class Dofs {
@@ -26,7 +26,6 @@ public:
 
 class ICSViewControlModule;
 class HookView final :public CSModuleBase {
-    FreeCameraController* pFreeCameraController = nullptr;
     // 视角控制钩子
     std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo = nullptr;
     ControlView controlView{};

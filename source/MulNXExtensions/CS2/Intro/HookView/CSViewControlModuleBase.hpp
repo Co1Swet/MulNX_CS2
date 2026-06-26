@@ -5,6 +5,7 @@
 class ICSViewControlModule {
 public:
     virtual bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) = 0;
+    virtual MulNX::ModuleBase* ViewControlToBase() = 0;
 };
 
 template<typename T>
@@ -18,4 +19,6 @@ protected:
             return true;
             });
     }
+public:
+    MulNX::ModuleBase* ViewControlToBase()override { return static_cast<MulNX::ModuleBase*>(This()); }
 };

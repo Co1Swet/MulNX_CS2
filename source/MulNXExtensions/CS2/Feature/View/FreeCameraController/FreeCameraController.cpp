@@ -46,8 +46,9 @@ void FreeCameraController::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool FreeCameraController::HandleUpdate(CS2::CViewSetup* viewSetup) {
+bool FreeCameraController::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
     this->Update();
+    if (num)return false;
     if (!this->EnableControl.load(std::memory_order_acquire)) return false;
     this->Rotation = *viewSetup->pViewAngles();
 
@@ -98,13 +99,9 @@ bool FreeCameraController::HandleUpdate(CS2::CViewSetup* viewSetup) {
     Position.y += (forward.y * moveDir.x + left.y * moveDir.y + up.y * moveDir.z) * speed * deltaTime;
     Position.z += (forward.z * moveDir.x + left.z * moveDir.y + up.z * moveDir.z) * speed * deltaTime;
 
-    return true;
-}
-
-void FreeCameraController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
-    // 如果启用自由摄像机控制，同步角度到InputSystem
-
     viewSetup->pViewOrigin()->x = this->Position.x;
     viewSetup->pViewOrigin()->y = this->Position.y;
     viewSetup->pViewOrigin()->z = this->Position.z;
+
+    return true;
 }
