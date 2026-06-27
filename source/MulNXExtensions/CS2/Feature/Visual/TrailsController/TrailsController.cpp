@@ -63,6 +63,7 @@ void TrailsController::Menu(MulNX::UINode* node) {
 
     ImGui::Checkbox("投掷物提示小窗", this->sv_grenade_trajectory_prac_pipreview);
     bool changed = false;
+    MulNX::UI::Checkbox("锁定隐藏投掷物轨迹", this->runFlag2);
     changed |= ImGui::SliderFloat("生存期 (s)", this->sv_grenade_trajectory_time_spectator, 0.0f, 10.0f);
     changed |= ImGui::SliderFloat("宽度", &propCopy.width, 0.1f, 5.0f);
     changed |= ImGui::SliderFloat("透明度", &propCopy.alpha, 0.0f, 1.0f);
@@ -81,7 +82,7 @@ void TrailsController::Menu(MulNX::UINode* node) {
 bool TrailsController::Init() {
     this->pParticleMgr = this->FindModule<ParticleManager>("ParticleManager");
 
-    this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message&) {
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message&) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Projectile::Func_BaseCSGrenadeProjectile_DrawStuff).Data();
         this->hkFunc_BaseCSGrenadeProjectile_DrawStuff = this->CreateHook("C_BaseCSGrenadeProjectile_DrawStuff", target, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pProjectile = (CS2::C_BaseCSGrenadeProjectile*)ctx->rcx;
@@ -95,7 +96,6 @@ bool TrailsController::Init() {
 
         this->sv_grenade_trajectory_prac_pipreview = this->CS2Con->GetCVarByName("sv_grenade_trajectory_prac_pipreview")->GetPtr<bool>();
         this->sv_grenade_trajectory_time_spectator = this->CS2Con->GetCVarByName("sv_grenade_trajectory_time_spectator")->GetPtr<float>();
-        *this->sv_grenade_trajectory_time_spectator = 0;
 
         this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
             this->Menu(node);
@@ -113,7 +113,9 @@ bool TrailsController::Init() {
         .SubscribeAsync("Trails/ClearAll")
         .SubscribeAsync("Trails/Prop");
 
+    this->runFlag2.store(true);
     this->SendTask("Update", "CSControl", [this]() {
+        if (this->runFlag2.load())*this->sv_grenade_trajectory_time_spectator = 0;
         this->Update();
         return true;
         });
