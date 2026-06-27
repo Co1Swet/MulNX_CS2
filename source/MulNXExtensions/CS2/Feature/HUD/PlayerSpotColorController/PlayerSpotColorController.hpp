@@ -8,7 +8,7 @@ class PlayerSpotColorController :public CSViewPlayerModuleBase {
 
     std::atomic<bool>TColorMulti = true;
     std::atomic<bool>CTColorMulti = true;
-public:
+
+    void Menu(MulNX::UINode* node);
     bool Init()override;
-    void IDraw(MulNX::UINode* node);
 };

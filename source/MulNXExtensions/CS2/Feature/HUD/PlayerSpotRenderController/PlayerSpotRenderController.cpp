@@ -1,6 +1,5 @@
 #include "PlayerSpotRenderController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Feature/HUD/PlayerSpotColorController/PlayerSpotColorController.hpp>
 
 enum TeamSytle :uint64_t {
     CT = 9,
@@ -8,16 +7,13 @@ enum TeamSytle :uint64_t {
     Enemy = 17
 };
 
-void PlayerSpotRenderController::HubWindow(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("雷达玩家标记控制");
-    MulNX::UI::Checkbox("隐藏数字显示", this->hideNumLabel);
-    MulNX::UI::Checkbox("强制敌人渲染为红色", this->forceEnemyRed);
-    MulNX::UI::Checkbox("强制队友显示", this->forceTeammateDraw);
-    this->pColorController->IDraw(node);
+void PlayerSpotRenderController::Menu(MulNX::UINode* node) {
+    MulNX::UI::Checkbox("隐藏雷达玩家头像数字显示", this->hideNumLabel);
+    MulNX::UI::Checkbox("强制雷达敌人渲染为红色", this->forceEnemyRed);
+    MulNX::UI::Checkbox("强制雷达队友显示", this->forceTeammateDraw);
 }
 
 bool PlayerSpotRenderController::Init() {
-    this->pColorController = this->FindModule<PlayerSpotColorController>("PlayerSpotColorController");
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改绘制状态
         auto Pos_Spot_CmpToSetShow = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetShow).Data();
@@ -77,6 +73,8 @@ bool PlayerSpotRenderController::Init() {
         this->hkFunc_FinallyUpdatePlayerState->Attach();
         this->LogSucc(I18n("hook.attached", "Func_FinallyUpdatePlayerState"));
         });
+
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
 
     return true;
 }

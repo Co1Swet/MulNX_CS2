@@ -1,9 +1,8 @@
 #include "TeamCounterController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void TeamCounterController::HubWindow(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("TeamCounter");
-    MulNX::UI::Checkbox("是否隐藏敌方血条", this->runFlag1);
+void TeamCounterController::Menu(MulNX::UINode* node) {
+    MulNX::UI::Checkbox("隐藏敌方血条", this->runFlag1);
 }
 
 bool TeamCounterController::Init() {
@@ -29,6 +28,8 @@ bool TeamCounterController::Init() {
         this->hkTeamCounterWriteHP->Attach();
 
         });
+
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
 
     return true;
 }

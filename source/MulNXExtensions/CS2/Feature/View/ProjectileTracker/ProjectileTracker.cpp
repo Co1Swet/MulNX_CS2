@@ -10,11 +10,8 @@ static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController
     return name.empty() ? "未知玩家" : name;
 }
 
-void ProjectileTracker::HubWindow(MulNX::UINode* node) {
-    std::shared_lock lock(this->smutex);
-    auto w = MulNX::UI::RAIIWindow("投掷物");
-    MulNX::UI::Checkbox("启用投掷物追踪", this->Enable);
-    node->CallUINode("TrailsController");
+void ProjectileTracker::Menu(MulNX::UINode* node) {
+    MulNX::UI::Checkbox("启用投掷物追踪", this->runFlag1);
 }
 
 bool ProjectileTracker::Init() {
@@ -27,6 +24,8 @@ bool ProjectileTracker::Init() {
         .SubscribeSync("Hook/AddEntity", [this](MulNX::Message& msg) {return this->OnEntityAdd(msg);})
         .SubscribeSync("Hook/RemoveEntity", [this](MulNX::Message& msg) {return this->OnEntityRemove(msg);})
         ;
+
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
 
     return true;
 }
@@ -94,7 +93,7 @@ bool ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pPro
 
 void ProjectileTracker::Main() {
     this->Update();
-    if (!this->Enable.load(std::memory_order_acquire))return;
+    if (!this->runFlag1.load(std::memory_order_acquire))return;
     std::unique_lock lock(this->smutex);
     try {
         for (auto it=this->bufferProjectiles.begin(); it != this->bufferProjectiles.end();) {
@@ -152,7 +151,7 @@ void ProjectileTracker::Main() {
 }
 
 bool ProjectileTracker::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
-    if (!this->Enable.load(std::memory_order_acquire))return false;
+    if (!this->runFlag1.load(std::memory_order_acquire))return false;
     if (!this->pTargetWatchProjectile.load(std::memory_order_acquire)) return false;
     auto view = this->currentView.Read();
     *viewSetup->pViewOrigin() = view->position;

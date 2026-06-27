@@ -13,6 +13,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
 
     ImGui::Begin(I18n("声音控制").c_str());
     node->CallUINode("SoundMenu");
+    node->CallUINode("SpeakingController");
     ImGui::End();
 
     ImGui::Begin(I18n("2D视觉").c_str());
@@ -21,6 +22,10 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     MulNX::UI::Checkbox("ESP", this->Core->ModuleManager()->FindModule("ESPBox")->showWindow);
     node->CallUINode("ESPSkeleton");
     node->CallUINode("GameHudMenu");
+    node->CallUINode("BombSpotController");
+    node->CallUINode("PlayerSpotRenderController");
+    node->CallUINode("PlayerSpotColorController");
+    node->CallUINode("TeamCounterController");
     ImGui::End();
 
     ImGui::Begin(I18n("高级功能").c_str());
@@ -33,6 +38,8 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
 
     ImGui::Begin(I18n("3D视觉").c_str());
     node->CallUINode("SkinController");
+    node->CallUINode("TeamIDController");
+    node->CallUINode("TrailsController");
     node->CallUINode("SkyController");
     ImGui::End();
 
@@ -43,6 +50,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     ImGui::End();
 
     ImGui::Begin(I18n("视角视图").c_str());
+    node->CallUINode("ProjectileTracker");
     node->CallUINode("AdvancedViewController");
     ImGui::End();
 

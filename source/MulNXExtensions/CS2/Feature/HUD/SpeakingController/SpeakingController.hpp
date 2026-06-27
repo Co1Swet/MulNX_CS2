@@ -11,7 +11,6 @@ private:
     void OnItPlayer(int index, CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn)override;
     void OnItEnd()override;
 
-    void HubWindow(MulNX::UINode* node)override;
-public:
+    void Menu(MulNX::UINode* node);
     bool Init()override;
 };

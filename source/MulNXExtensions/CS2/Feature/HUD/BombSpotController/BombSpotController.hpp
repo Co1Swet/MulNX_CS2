@@ -3,7 +3,7 @@
 
 class BombSpotController :public CSViewPlayerModuleBase {
     std::unique_ptr<MulNX::Hook>hkPos_Spot_WriteBombState = nullptr;
-    void HubWindow(MulNX::UINode* node)override;
+    void Menu(MulNX::UINode* node);
 public:
     bool Init()override;
 };

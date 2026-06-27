@@ -4,8 +4,7 @@
 
 using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);
 
-void TeamIDController::HubWindow(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("Team ID控制");
+void TeamIDController::Menu(MulNX::UINode* node) {
     MulNX::UI::Checkbox("Team ID隐藏敌方", this->runFlag1);
 }
 
@@ -100,6 +99,7 @@ bool TeamIDController::Init() {
         this->SetTColor(255, 0, 0, 255);
         });
 
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
 
     return true;
 }

@@ -4,7 +4,7 @@
 #include <set>
 
 class TeamIDController final : public CSViewPlayerModuleBase {
-    void HubWindow(MulNX::UINode* node);
+    void Menu(MulNX::UINode* node);
 
     // Hook 句柄
     std::unique_ptr<MulNX::Hook> hkLoadFromFile = nullptr;

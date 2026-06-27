@@ -4,7 +4,6 @@
 #include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
 
 class ProjectileTracker final : public CSViewPlayerModuleBase, public CSViewControlMixin<ProjectileTracker> {
-    std::atomic<bool>Enable = false;
     std::set<CS2::C_BaseCSGrenadeProjectile*> bufferProjectiles;
     std::atomic<CS2::C_BaseCSGrenadeProjectile*> pTargetWatchProjectile = nullptr;
 
@@ -13,7 +12,7 @@ class ProjectileTracker final : public CSViewPlayerModuleBase, public CSViewCont
 
     bool HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile);
 
-    void HubWindow(MulNX::UINode* node)override;
+    void Menu(MulNX::UINode* node);
     void HubTeam(MulNX::UINode* node)override {};
     void HubPlayer(MulNX::UINode* node)override {};
     void Main();

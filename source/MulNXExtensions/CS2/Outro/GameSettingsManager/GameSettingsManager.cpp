@@ -1,13 +1,7 @@
 #include "GameSettingsManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {
-    static bool enableInject = false;
-    ImGui::Checkbox("开始注入", &enableInject);
-    if (enableInject) {
-        this->AsyncCommand("spec_player 5");
-    }
-    
+bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {    
     ImGui::Checkbox("作弊模式", this->settings.sv_cheats);
     ImGui::SliderInt("FPS上限", this->settings.fps_max, 0, 1000);
     ImGui::SliderFloat("游戏速度", this->settings.host_timescale, 0.001f, 10.000f);

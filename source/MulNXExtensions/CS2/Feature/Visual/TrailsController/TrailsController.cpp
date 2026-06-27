@@ -1,6 +1,7 @@
 #include "TrailsController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/CSController/CSController.hpp>
+#include <Intro/HookConsole/HookConsole.hpp>
 #include <Buildup/ParticleManager/ParticleManager.hpp>
 #include <Buildup/PlayerHub/PlayerHub.hpp>
 
@@ -60,14 +61,15 @@ void TrailsController::Menu(MulNX::UINode* node) {
     std::shared_lock lock(this->smutex);
     ParticleProp propCopy = this->prop;
 
+    ImGui::Checkbox("投掷物提示小窗", this->sv_grenade_trajectory_prac_pipreview);
     bool changed = false;
-    changed |= ImGui::SliderFloat("生存期 (s)", &propCopy.lifetime, 0.5f, 10.0f);
+    changed |= ImGui::SliderFloat("生存期 (s)", this->sv_grenade_trajectory_time_spectator, 0.0f, 10.0f);
     changed |= ImGui::SliderFloat("宽度", &propCopy.width, 0.1f, 5.0f);
     changed |= ImGui::SliderFloat("透明度", &propCopy.alpha, 0.0f, 1.0f);
 
     if (changed) {
         MulNX::Message msg("Trails/Prop"_hash);
-        msg.p1.low<float>() = propCopy.lifetime;
+        msg.p1.low<float>() = *this->sv_grenade_trajectory_time_spectator;
         msg.p1.high<float>() = propCopy.width;
         msg.p2.low<float>() = propCopy.alpha;
         this->PublishAsync(std::move(msg));
@@ -79,21 +81,26 @@ void TrailsController::Menu(MulNX::UINode* node) {
 bool TrailsController::Init() {
     this->pParticleMgr = this->FindModule<ParticleManager>("ParticleManager");
 
-    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message&) {
-        auto target = this->CS2->client.GetTextRegion()
-            .FindRegion(MulNX::CS2::Signatures::Projectile::Func_BaseCSGrenadeProjectile_DrawStuff)
-            .Data();
-        this->hkFunc_BaseCSGrenadeProjectile_DrawStuff = this->CreateHook(
-            "C_BaseCSGrenadeProjectile_DrawStuff", target,
-            [this](MulNX::Hook* hk, RegContext* ctx) {
-                auto pProjectile = (CS2::C_BaseCSGrenadeProjectile*)ctx->rcx;
-                char flag = *(char*)&ctx->rdx;
-                if (*pProjectile->m_nSnapshotTrajectoryEffectIndex() == -1)
-                    return this->HandleOnCreate(pProjectile);
-                hk->CallMaybeAs<DrawStuff_t>(pProjectile, flag);
-                return this->HandleOnUpdate(pProjectile);
+    this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message&) {
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Projectile::Func_BaseCSGrenadeProjectile_DrawStuff).Data();
+        this->hkFunc_BaseCSGrenadeProjectile_DrawStuff = this->CreateHook("C_BaseCSGrenadeProjectile_DrawStuff", target, [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto pProjectile = (CS2::C_BaseCSGrenadeProjectile*)ctx->rcx;
+            char flag = *(char*)&ctx->rdx;
+            if (*pProjectile->m_nSnapshotTrajectoryEffectIndex() == -1)
+                return this->HandleOnCreate(pProjectile);
+            hk->CallMaybeAs<DrawStuff_t>(pProjectile, flag);
+            return this->HandleOnUpdate(pProjectile);
             }).value();
         this->hkFunc_BaseCSGrenadeProjectile_DrawStuff.Attach();
+
+        this->sv_grenade_trajectory_prac_pipreview = this->CS2Con->GetCVarByName("sv_grenade_trajectory_prac_pipreview")->GetPtr<bool>();
+        this->sv_grenade_trajectory_time_spectator = this->CS2Con->GetCVarByName("sv_grenade_trajectory_time_spectator")->GetPtr<float>();
+        *this->sv_grenade_trajectory_time_spectator = 0;
+
+        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+            this->Menu(node);
+            return true;
+            });
         });
 
     (*this)
@@ -106,12 +113,7 @@ bool TrailsController::Init() {
         .SubscribeAsync("Trails/ClearAll")
         .SubscribeAsync("Trails/Prop");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        this->Menu(node);
-        return true;
-        });
-
-    this->SendTask("Update", "CSControl",[this]() {
+    this->SendTask("Update", "CSControl", [this]() {
         this->Update();
         return true;
         });
@@ -134,6 +136,7 @@ std::optional<TrailsController::ParticleColor> TrailsController::FindColor(CS2::
 
 MulNX::Hook::Then TrailsController::HandleOnCreate(CS2::C_BaseCSGrenadeProjectile* pProjectile) {
     std::shared_lock lock(this->smutex);
+    this->prop.lifetime = *this->sv_grenade_trajectory_time_spectator;
     try {
         auto pPawn = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pProjectile->m_hThrower()))->As<CS2::C_CSPlayerPawn>();
         auto pController = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pPawn->m_hController()))->As<CS2::CCSPlayerController>();
