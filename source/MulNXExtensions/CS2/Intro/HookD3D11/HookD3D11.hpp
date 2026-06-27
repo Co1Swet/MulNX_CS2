@@ -4,7 +4,6 @@
 #include <MulNXUtils/MemInsights/RetEditor/RetEditor.hpp>
 
 class HookD3D11 final : public CSModuleBase {
-    RetEditor present{};
     MulNX::Memory::DllModule gameoverlayrenderer64{};
 
     MulNX::UISystem* pUISystem = nullptr;

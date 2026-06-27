@@ -95,7 +95,6 @@ MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx)
         }
         // 开启新帧
         ImGui::NewFrame();
-        this->present.Render();
         return true;
         };
     this->pUISystem->FrameBehind = [this]() {
@@ -113,7 +112,6 @@ MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
     // 绿幕渲染
     this->pGraphicsManager->BuildNew();
     this->pGraphicsManager->OnPresent();
-    this->present.Check(hk, ctx);
     // UI 系统渲染
     this->pUISystem->HandleUpdate();    // 处理消息（坐标已在 HookWindow 中预缩放）
     this->pUISystem->Render();

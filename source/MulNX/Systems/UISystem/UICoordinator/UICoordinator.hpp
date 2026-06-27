@@ -6,8 +6,8 @@ namespace MulNX {
         std::unordered_map<std::string, size_t>nameToIndex{};
         std::vector<MulNX::UINode>UINodes{};
         struct Padding {
-            float top = 350;
-            float bottom = 200;
+            float top = 0;
+            float bottom = 0;
             float left = 0;
             float right = 0;
         };
