@@ -1,8 +1,8 @@
-#include "ESPController.hpp"
+#include "ESPBox.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookView/HookView.hpp>
 
-bool ESPController::Draw(MulNX::UINode* node) {
+bool ESPBox::Draw(MulNX::UINode* node) {
     if (this->showWindow.load(std::memory_order_acquire)) {
         for (int i = 1; i <= 10; ++i) {
             if (!this->CS2->GetPlayerMsg(i).Alive)continue;
@@ -27,7 +27,7 @@ bool ESPController::Draw(MulNX::UINode* node) {
     return true;
 }
 
-bool ESPController::Init() {
+bool ESPBox::Init() {
     this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node)->bool {
         return this->Draw(node);
         });

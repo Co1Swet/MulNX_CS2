@@ -47,7 +47,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<PlayerFlashController>("PlayerFlashController")
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<SkyController>("SkyController")
-            .CreateModule<ESPController>("ESPController")
+            .CreateModule<ESPBox>("ESPBox")
             .CreateModule<ESPSkeleton>("ESPSkeleton")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<EntityListScanner>("EntityListScanner")

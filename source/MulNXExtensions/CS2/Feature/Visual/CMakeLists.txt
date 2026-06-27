@@ -1,5 +1,5 @@
 add_library(CS2Visual STATIC
-    ESPController/ESPController.cpp
+    ESPBox/ESPBox.cpp
     GlowController/GlowController.cpp
     PlayerFlashController/PlayerFlashController.cpp
     SkinController/SkinController.cpp

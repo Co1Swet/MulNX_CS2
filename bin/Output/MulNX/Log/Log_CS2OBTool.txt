@@ -129,8 +129,8 @@
 [2026-06-26 02:49:12.1642350][提示][SkyController]将UI节点注册信息推送到了消息系统
 [2026-06-26 02:49:12.1642360][提示][SkyController]消息推送：将任务 SkyController::Update 注册到工作者 CSControl
 [2026-06-26 02:49:12.1642360][成功][SkyController]初始化成功！
-[2026-06-26 02:49:12.1642440][提示][ESPController]将UI节点注册信息推送到了消息系统
-[2026-06-26 02:49:12.1642450][成功][ESPController]初始化成功！
+[2026-06-26 02:49:12.1642440][提示][ESPBox]将UI节点注册信息推送到了消息系统
+[2026-06-26 02:49:12.1642450][成功][ESPBox]初始化成功！
 [2026-06-26 02:49:12.1642560][成功][SkinController]同步消息订阅：Hook/OnSetupView
 [2026-06-26 02:49:12.1642560][成功][SkinController]异步消息订阅：Skin/Apply
 [2026-06-26 02:49:12.1642570][成功][SkinController]同步消息订阅：Hook/LoadLibraryExW/client.dll
@@ -351,7 +351,7 @@
 [2026-06-26 02:49:20.8816660][成功][UICoordinator]接收到UI节点: FreeCameraController (索引 12)
 [2026-06-26 02:49:20.8816680][成功][UICoordinator]接收到UI节点: PlayerFlashController (索引 13)
 [2026-06-26 02:49:20.8816680][成功][UICoordinator]接收到UI节点: SkyController (索引 14)
-[2026-06-26 02:49:20.8816690][成功][UICoordinator]接收到UI节点: ESPController (索引 15)
+[2026-06-26 02:49:20.8816690][成功][UICoordinator]接收到UI节点: ESPBox (索引 15)
 [2026-06-26 02:49:20.8816690][成功][UICoordinator]接收到UI节点: EntityListScanner (索引 16)
 [2026-06-26 02:49:20.8816700][成功][UICoordinator]接收到UI节点: PlayerHub (索引 17)
 [2026-06-26 02:49:20.8816710][成功][UICoordinator]接收到UI节点: TrailsController (索引 18)
@@ -450,7 +450,7 @@
 [2026-06-26 02:50:15.3445070][提示][ModuleManager]已关闭模块：PlayerHub
 [2026-06-26 02:50:15.3445070][提示][ModuleManager]已关闭模块：EntityListScanner
 [2026-06-26 02:50:15.3445170][提示][ModuleManager]已关闭模块：SkinController
-[2026-06-26 02:50:15.3445170][提示][ModuleManager]已关闭模块：ESPController
+[2026-06-26 02:50:15.3445170][提示][ModuleManager]已关闭模块：ESPBox
 [2026-06-26 02:50:15.3519720][提示][SkyController]钩子已销毁：ForceUpdateSkybox
 [2026-06-26 02:50:15.3519750][提示][ModuleManager]已关闭模块：SkyController
 [2026-06-26 02:50:15.3519760][提示][ModuleManager]已关闭模块：DeathMsgController
