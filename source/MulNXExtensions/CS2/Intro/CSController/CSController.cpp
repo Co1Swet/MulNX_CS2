@@ -38,8 +38,8 @@ MulNX::CoTask CSController::InitTask() {
         try {
             this->Main();
         }
-        catch (const std::runtime_error& e) {
-            this->LogWarning("在更新数据时捕获到异常：" + std::string(e.what()));
+        catch (const MulNX::Exception& e) {
+            this->LogWarning(e);
         }
         return true;
         });

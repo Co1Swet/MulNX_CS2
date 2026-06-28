@@ -1,5 +1,5 @@
 #pragma once
-
+#include <MulNX/Common/Exception.hpp>
 #include <MulNX/Common/Common.hpp>
 
 #include "DllModule/DllModule.hpp"
@@ -19,26 +19,23 @@
 namespace MulNX {
     namespace Memory {
         namespace ReadWrite {
-            class bad_memory_access :public std::runtime_error {
+            class bad_memory_access :public MulNX::Exception {
             public:
-                explicit bad_memory_access(const std::string& msg)
-                    : std::runtime_error(msg) {}
+                using MulNX::Exception::Exception;
             };
 
             class bad_memory_read :public bad_memory_access {
             public:
-                explicit bad_memory_read(const std::string& msg)
-                    : bad_memory_access(msg) {}
+                using bad_memory_access::bad_memory_access;
             };
 
             class bad_memory_write :public bad_memory_access {
             public:
-                explicit bad_memory_write(const std::string& msg)
-                    : bad_memory_access(msg) {}
+                using bad_memory_access::bad_memory_access;
             };
 
             template<MulNX::Pod T>
-            static bool ReadImpl(uintptr_t address, T& target) {
+            bool ReadImpl(uintptr_t address, T& target) {
                 __try {
                     target = *reinterpret_cast<T*>(address);
                     return true;
@@ -49,20 +46,20 @@ namespace MulNX {
             }
 
             template<MulNX::Pod T>
-            T MRead(uintptr_t address) {
+            T MRead(uintptr_t address, std::source_location where = std::source_location::current()) {
                 T target;
                 if (!ReadImpl(address, target)) {
-                    throw bad_memory_read(std::format("read error at: 0x{:X}", address));
+                    throw bad_memory_read(std::format("read error at: 0x{:X}", address), where);
                 }
                 else {
                     return target;
                 }
             }
             template<MulNX::Pod T>
-            T MRead(T* address) {
+            T MRead(T* address, std::source_location where = std::source_location::current()) {
                 T target;
                 if (!ReadImpl(reinterpret_cast<uintptr_t>(address), target)) {
-                    throw bad_memory_read(std::format("read error at: 0x{:X}", reinterpret_cast<uintptr_t>(address)));
+                    throw bad_memory_read(std::format("read error at: 0x{:X}", reinterpret_cast<uintptr_t>(address)), where);
                 }
                 else {
                     return target;
@@ -70,7 +67,7 @@ namespace MulNX {
             }
 
             template<MulNX::Pod T>
-            static bool WriteImpl(uintptr_t address, const T& value) {
+            bool WriteImpl(uintptr_t address, const T& value) {
                 __try {
                     *reinterpret_cast<T*>(address) = value;
                     return true;
@@ -81,16 +78,16 @@ namespace MulNX {
             }
 
             template<MulNX::Pod T>
-            void MWrite(uintptr_t address, const T& value) {
+            void MWrite(uintptr_t address, const T& value, std::source_location where = std::source_location::current()) {
                 if (!WriteImpl(address, value)) {
-                    throw bad_memory_write(std::format("write error at: 0x{:X}", address));
+                    throw bad_memory_write(std::format("write error at: 0x{:X}", address), where);
                 }
             }
 
             template<MulNX::Pod T>
-            void MWrite(T* address, const T& value) {
+            void MWrite(T* address, const T& value, std::source_location where = std::source_location::current()) {
                 if (!WriteImpl(reinterpret_cast<uintptr_t>(address), value)) {
-                    throw bad_memory_write(std::format("write error at: 0x{:X}", reinterpret_cast<uintptr_t>(address)));
+                    throw bad_memory_write(std::format("write error at: 0x{:X}", reinterpret_cast<uintptr_t>(address)), where);
                 }
             }
         }
