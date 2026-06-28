@@ -26,6 +26,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     node->CallUINode("PlayerSpotRenderController");
     node->CallUINode("PlayerSpotColorController");
     node->CallUINode("TeamCounterController");
+    node->CallUINode("FlashRenderController");
     ImGui::End();
 
     ImGui::Begin(I18n("高级功能").c_str());

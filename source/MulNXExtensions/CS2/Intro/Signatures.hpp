@@ -28,6 +28,10 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern PosTeamID_xxIt("41 BC FF FF 00 00 48 8B ?? ?? 33 DB 48 8B FB 66 44 ?? ?? ?? ?? 0F 84 ?? ?? ?? 00");
                 inline const static MulNX::Memory::Pattern PosTeamCounterWriteHP("8B 43 04 89 47 0C 8B 43 08");
             }
+            namespace Flash {
+                inline const static MulNX::Memory::Pattern PosCallCmpDrawFlashUpHUD("48 8B F2 48 8B E9 E8 ?? ?? ?? ?? 84 C0 0F 85");
+                inline const static MulNX::Memory::Pattern PosCallCmpDrawFlashDownHUD("44 0F 28 94 24 ?? ?? ?? ?? 48 8B BC 24 ?? ?? ?? ?? 48 8B B4 24 ?? ?? ?? ?? 84 C0");
+            }
             namespace Spot {
                 inline const static MulNX::Memory::Pattern Pos_CmpToSetShow("38 5C 24 ?? 0F 84 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? F3 41 0F 10 8E ?? ?? ?? ?? F3 0F 10 41");// 从cvar定位
                 inline const static MulNX::Memory::Pattern Pos_WriteMaybeEnumToChangeRadarPlayerDraw("48 8B 6C 24 ?? 41 39 9E ?? ?? ?? ?? 74 ?? 33 D2");// 交叉引用

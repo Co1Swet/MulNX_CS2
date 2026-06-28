@@ -1,0 +1,46 @@
+#include "FlashRenderController.hpp"
+#include <MulNX/Base/UI/UI.hpp>
+#include <Intro/HookConsole/HookConsole.hpp>
+
+void FlashRenderController::Menu(MulNX::UINode* node) {
+    ImGui::SliderFloat("闪光绘制最大强度", this->r_spectator_flashbang_opacity, 0.0f, 1.0f);
+    MulNX::UI::Checkbox("是否在HUD上执行闪光绘制", this->runFlag1);
+    MulNX::UI::Checkbox("是否在HUD下执行闪光绘制", this->runFlag2);
+}
+
+bool FlashRenderController::Init() {
+    this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
+        auto up = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Flash::PosCallCmpDrawFlashUpHUD).Data();
+        this->hkDrawUp = this->CreateHook("PosCallCmpDrawFlashUpHUD", up + 11, [this](MulNX::Hook* hk, RegContext* ctx) {
+            if (this->runFlag1.load(std::memory_order_relaxed)) {
+                ctx->rax = 0ULL;
+            }
+            else {
+                ctx->rax = 1ULL;
+            }
+            return MulNX::Hook::Then::Continue;
+            }).value();
+        this->hkDrawUp.Attach();
+
+        auto down = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Flash::PosCallCmpDrawFlashDownHUD).Data();
+        this->hkDrawDown = this->CreateHook("PosCallCmpDrawFlashDownHUD", down, [this](MulNX::Hook* hk, RegContext* ctx) {
+            if (this->runFlag2.load(std::memory_order_relaxed)) {
+                ctx->rax = 1ULL;
+            }
+            else {
+                ctx->rax = 0ULL;
+            }
+            return MulNX::Hook::Then::Continue;
+            }).value();
+        this->hkDrawDown.Attach();
+
+        this->r_spectator_flashbang_opacity = this->CS2Con->GetCVarByName("r_spectator_flashbang_opacity")->GetPtr<float>();
+
+        });
+
+    this->runFlag1.store(true);
+
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+
+    return true;
+}

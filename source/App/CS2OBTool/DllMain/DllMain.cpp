@@ -51,6 +51,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<ESPSkeleton>("ESPSkeleton")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<EntityListScanner>("EntityListScanner")
+            .CreateModule<FlashRenderController>("FlashRenderController")
             // 玩家强相关
             .CreateModule<ProjectileTracker>("ProjectileTracker")
             .CreateModule<TrailsController>("TrailsController")

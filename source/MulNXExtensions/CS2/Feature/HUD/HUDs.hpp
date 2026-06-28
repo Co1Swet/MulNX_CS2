@@ -7,3 +7,4 @@
 #include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
 #include "SpeakingController/SpeakingController.hpp"
 #include "TeamCounterController/TeamCounterController.hpp"
+#include "FlashRenderController/FlashRenderController.hpp"
