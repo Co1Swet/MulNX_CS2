@@ -1,88 +1,105 @@
 +----------新的日志片段----------+
 日志系统已上线，欢迎使用MulNX
 
-[2026-06-27 14:32:06.9623360][成功][CS2Injector]核心就绪
-[2026-06-27 14:32:06.9623730][成功][Driver]驱动就绪
-[2026-06-27 14:32:06.9624590][成功][ModuleManager]sys.msg.async.subedModuleManager/ModuleInfo/Request
-[2026-06-27 14:32:06.9624680][提示][ModuleManager]module.send_task
-[2026-06-27 14:32:06.9624830][成功][ModuleManager]module.inited
-[2026-06-27 14:32:06.9625230][成功][IPCer]module.inited
-[2026-06-27 14:32:06.9628880][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
-[2026-06-27 14:32:06.9629570][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
-[2026-06-27 14:32:06.9629980][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Vedios
-[2026-06-27 14:32:06.9630380][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Data
-[2026-06-27 14:32:06.9631040][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Output
-[2026-06-27 14:32:06.9632530][成功][PathManager]module.inited
-[2026-06-27 14:32:06.9634560][成功][CrashDumper]module.inited
-[2026-06-27 14:32:06.9742200][成功][I18nManager]语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\lan.yaml
-[2026-06-27 14:32:06.9742370][成功][I18nManager]共加载键值对：201
-[2026-06-27 14:32:06.9748860][成功][I18nManager]初始化成功！
-[2026-06-27 14:32:06.9749400][成功][MessageManager]初始化成功！
-[2026-06-27 14:32:06.9749910][成功][UICoordinator]异步消息订阅：UISystem/ModulePush
-[2026-06-27 14:32:06.9749960][成功][UICoordinator]异步消息订阅：UINode/Swap
-[2026-06-27 14:32:06.9750120][提示][UICoordinator]将UI节点注册信息推送到了消息系统
-[2026-06-27 14:32:06.9750150][成功][UICoordinator]初始化成功！
-[2026-06-27 14:32:06.9753960][提示][UISystem]尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2Injector\UISystem\Config\ui.yaml
-[2026-06-27 14:32:06.9757560][成功][UISystem]字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16
-[2026-06-27 14:32:06.9757610][提示][UISystem]尝试加载字体：C:/Windows/Fonts/msyh.ttc
-[2026-06-27 14:32:06.9844290][成功][UISystem]字体加载成功：C:/Windows/Fonts/msyh.ttc
-[2026-06-27 14:32:06.9845860][提示][UISystem]尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml
-[2026-06-27 14:32:06.9989930][成功][UISystem]UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml
-[2026-06-27 14:32:06.9996890][成功][UISystem]异步消息订阅：UISystem/Start
-[2026-06-27 14:32:06.9996950][成功][UISystem]异步消息订阅：UISystem/Toggle
-[2026-06-27 14:32:06.9997000][成功][UISystem]异步消息订阅：UISystem/SaveStyle
-[2026-06-27 14:32:06.9997080][提示][UISystem]将UI节点注册信息推送到了消息系统
-[2026-06-27 14:32:06.9997130][成功][UISystem]初始化成功！
-[2026-06-27 14:32:06.9997570][成功][TaskSystem]异步消息订阅：Task/Create
-[2026-06-27 14:32:06.9998890][成功][TaskSystem]成功创建工作者：MulNXMain
-[2026-06-27 14:32:06.9998920][成功][TaskSystem]成功将任务：TaskSystem::Update 添加进入工作者：MulNXMain
-[2026-06-27 14:32:07.0003540][成功][TaskSystem]成功创建工作者：Messaging
-[2026-06-27 14:32:07.0003650][成功][TaskSystem]成功将任务：TaskSystem::CreateFor->MessageManager::HandleDispatch 添加进入工作者：Messaging
-[2026-06-27 14:32:07.0003780][成功][TaskSystem]初始化成功！
-[2026-06-27 14:32:07.0010200][成功][TaskSystem]成功创建工作者：Loging
-[2026-06-27 14:32:07.0011400][成功][TaskSystem]成功将任务：Logger::Log 添加进入工作者：Loging
-[2026-06-27 14:32:07.0011530][成功][Logger]初始化成功！
-[2026-06-27 14:32:07.0012090][提示][Debugger]将UI节点注册信息推送到了消息系统
-[2026-06-27 14:32:07.0012130][提示][Debugger]将UI节点注册信息推送到了消息系统
-[2026-06-27 14:32:07.0012300][提示][Debugger]消息推送：将任务 Debugger::Main 注册到工作者 MulNXMain
-[2026-06-27 14:32:07.0012450][成功][Debugger]异步消息订阅：Log/Info
-[2026-06-27 14:32:07.0012630][成功][Debugger]异步消息订阅：Log/Succ
-[2026-06-27 14:32:07.0012740][成功][Debugger]异步消息订阅：Log/Warning
-[2026-06-27 14:32:07.0012800][成功][Debugger]异步消息订阅：Log/Error
-[2026-06-27 14:32:07.0012860][成功][Debugger]异步消息订阅：Debugger/SetMaxInfoCount
-[2026-06-27 14:32:07.0012940][成功][Debugger]初始化成功！
-[2026-06-27 14:32:07.0013320][成功][HandleSystem]初始化成功！
-[2026-06-27 14:32:07.0013760][提示][InputSystem]消息推送：将任务 InputSystem::UpdateKeysState 注册到工作者 InputSystem
-[2026-06-27 14:32:07.0013800][成功][InputSystem]初始化成功！
-[2026-06-27 14:32:07.0025790][提示][ShortcutManager]配置文件名称: MulNX 官方快捷键配置
-[2026-06-27 14:32:07.0027890][提示][ShortcutManager]消息推送：将任务 ShortcutManager::Check 注册到工作者 MulNXMain
-[2026-06-27 14:32:07.0029030][成功][ShortcutManager]初始化成功！
-[2026-06-27 14:32:07.0029610][提示][GlobalVars]消息推送：将任务 GlobalVars::Main 注册到工作者 MulNXMain
-[2026-06-27 14:32:07.0029680][成功][GlobalVars]初始化成功！
-[2026-06-27 14:32:07.1918520][警告][Driver]发送了UI启动指令！渲染即将开始！
-[2026-06-27 14:32:07.1918650][成功][Win32Starter]初始化成功！
-[2026-06-27 14:32:07.1919170][成功][DLLInjectHelper]初始化成功！
-[2026-06-27 14:32:07.1964940][成功][CS2BootLoader]异步消息订阅：CS2BootLoader/Launch
-[2026-06-27 14:32:07.1965040][成功][CS2BootLoader]异步消息订阅：CS2BootLoader/PathUpdate
-[2026-06-27 14:32:07.1965100][成功][CS2BootLoader]异步消息订阅：CS2BootLoader/Save
-[2026-06-27 14:32:07.1965200][提示][CS2BootLoader]消息推送：将任务 CS2BootLoader::Update 注册到工作者 MulNXMain
-[2026-06-27 14:32:07.1965310][提示][CS2BootLoader]将UI节点注册信息推送到了消息系统
-[2026-06-27 14:32:07.1965540][成功][CS2BootLoader]初始化成功！
-[2026-06-27 14:32:07.1966100][成功][MulNXController]异步消息订阅：ModuleManager/ModuleInfo/Response
-[2026-06-27 14:32:07.1966140][提示][MulNXController]将UI节点注册信息推送到了消息系统
-[2026-06-27 14:32:07.1966200][提示][MulNXController]消息推送：将任务 MulNXController::Main 注册到工作者 MulNXMain
-[2026-06-27 14:32:07.1966240][成功][MulNXController]初始化成功！
-[2026-06-27 14:32:07.1966570][提示][UIDocker]将UI节点注册信息推送到了消息系统
-[2026-06-27 14:32:07.1966590][成功][UIDocker]初始化成功！
-[2026-06-27 14:32:07.1966670][成功][ModuleManager]所有模块初始化成功，模块总量：22
-[2026-06-27 14:32:07.1966690][成功][Driver]各模块初始化完毕，系统已启动
-[2026-06-27 14:32:07.1966740][警告][Driver]当前版本是否为测试版：true
-[2026-06-27 14:32:07.1966780][警告][Driver]当前版本号：B0.2.0C0.42.0
-[2026-06-27 14:32:07.1966820][警告][Driver]当前版本构建时间：Built: Jun 27 2026 22:23:36
-[2026-06-27 14:32:07.1966880][警告][Driver]初始化完成，自核心分配内存并创建开始，共耗时：234910（微秒）
-[2026-06-27 14:32:07.1966900][警告][Driver]版权所有 © Co1Swet
-[2026-06-27 14:32:07.1966900][警告][Driver]欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。
-[2026-06-27 14:32:07.1966900][警告][Driver]在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。
-[2026-06-27 14:32:07.1966900][警告][Driver]但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！
-[2026-06-27 14:32:07.2138500][成功][MessageManager]消息派发激活！
-[2026-06-27 14:32:07.2139440][成功][UICoor
+[2026-06-28 08:55:42.4434900][成功][CS2Injector] 核心就绪    (Core.cpp:17)
+[2026-06-28 08:55:42.4435240][成功][Driver] 驱动就绪    (Driver.cpp:9)
+[2026-06-28 08:55:42.4436010][成功][ModuleManager] sys.msg.async.subedModuleManager/ModuleInfo/Request    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4436080][提示][ModuleManager] module.send_task    (TaskMixin.hpp:23)
+[2026-06-28 08:55:42.4436250][成功][ModuleManager] module.inited    (Module.hpp:25)
+[2026-06-28 08:55:42.4436590][成功][IPCer] module.inited    (Module.hpp:25)
+[2026-06-28 08:55:42.4440810][提示][PathManager] 检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config    (PathManager.cpp:39)
+[2026-06-28 08:55:42.4441190][提示][PathManager] 检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log    (PathManager.cpp:39)
+[2026-06-28 08:55:42.4441530][提示][PathManager] 检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Vedios    (PathManager.cpp:39)
+[2026-06-28 08:55:42.4441840][提示][PathManager] 检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Data    (PathManager.cpp:39)
+[2026-06-28 08:55:42.4442640][提示][PathManager] 检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Output    (PathManager.cpp:39)
+[2026-06-28 08:55:42.4444420][成功][PathManager] module.inited    (Module.hpp:25)
+[2026-06-28 08:55:42.4445870][成功][CrashDumper] module.inited    (Module.hpp:25)
+[2026-06-28 08:55:42.4547090][成功][I18nManager] 语言文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\lan.yaml    (I18nManager.cpp:18)
+[2026-06-28 08:55:42.4547170][成功][I18nManager] 共加载键值对：201    (I18nManager.cpp:19)
+[2026-06-28 08:55:42.4552570][成功][I18nManager] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4552940][成功][MessageManager] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4553370][成功][UICoordinator] 异步消息订阅：UISystem/ModulePush    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4553410][成功][UICoordinator] 异步消息订阅：UINode/Swap    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4553500][提示][UICoordinator] 将UI节点注册信息推送到了消息系统    (UIMixin.hpp:35)
+[2026-06-28 08:55:42.4553520][成功][UICoordinator] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4556630][提示][UISystem] 尝试解析字体配置：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\CS2Injector\UISystem\Config\ui.yaml    (UISystem.cpp:100)
+[2026-06-28 08:55:42.4559590][成功][UISystem] 字体配置解析成功！字体路径：C:/Windows/Fonts/msyh.ttc  字体大小：16    (UISystem.cpp:104)
+[2026-06-28 08:55:42.4559650][提示][UISystem] 尝试加载字体：C:/Windows/Fonts/msyh.ttc    (UISystem.cpp:105)
+[2026-06-28 08:55:42.4635760][成功][UISystem] 字体加载成功：C:/Windows/Fonts/msyh.ttc    (UISystem.cpp:109)
+[2026-06-28 08:55:42.4637780][提示][UISystem] 尝试加载UI风格文件：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml    (UISystem.cpp:122)
+[2026-06-28 08:55:42.4770620][成功][UISystem] UI风格文件加载成功：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config\ImStyle.yaml    (UISystem.cpp:130)
+[2026-06-28 08:55:42.4776880][成功][UISystem] 异步消息订阅：UISystem/Start    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4776940][成功][UISystem] 异步消息订阅：UISystem/Toggle    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4776980][成功][UISystem] 异步消息订阅：UISystem/SaveStyle    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4777070][提示][UISystem] 将UI节点注册信息推送到了消息系统    (UIMixin.hpp:28)
+[2026-06-28 08:55:42.4777130][成功][UISystem] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4777600][成功][TaskSystem] 异步消息订阅：Task/Create    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4778870][成功][TaskSystem] 成功创建工作者：MulNXMain    (TaskSystem.cpp:84)
+[2026-06-28 08:55:42.4778900][成功][TaskSystem] 成功将任务：TaskSystem::Update 添加进入工作者：MulNXMain    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.4791510][成功][TaskSystem] 成功创建工作者：Messaging    (TaskSystem.cpp:84)
+[2026-06-28 08:55:42.4791580][成功][TaskSystem] 成功将任务：TaskSystem::CreateFor->MessageManager::HandleDispatch 添加进入工作者：Messaging    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.4791700][成功][TaskSystem] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4800970][成功][TaskSystem] 成功创建工作者：Loging    (TaskSystem.cpp:84)
+[2026-06-28 08:55:42.4801040][成功][TaskSystem] 成功将任务：Logger::Log 添加进入工作者：Loging    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.4801160][成功][Logger] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4801840][提示][Debugger] 将UI节点注册信息推送到了消息系统    (UIMixin.hpp:28)
+[2026-06-28 08:55:42.4801890][提示][Debugger] 将UI节点注册信息推送到了消息系统    (UIMixin.hpp:28)
+[2026-06-28 08:55:42.4802020][提示][Debugger] 消息推送：将任务 Debugger::Main 注册到工作者 MulNXMain    (TaskMixin.hpp:23)
+[2026-06-28 08:55:42.4802200][成功][Debugger] 异步消息订阅：Log/Info    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4802330][成功][Debugger] 异步消息订阅：Log/Succ    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4802390][成功][Debugger] 异步消息订阅：Log/Warning    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4802450][成功][Debugger] 异步消息订阅：Log/Error    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4802510][成功][Debugger] 异步消息订阅：Debugger/SetMaxInfoCount    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.4802580][成功][Debugger] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4802920][成功][HandleSystem] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4803370][提示][InputSystem] 消息推送：将任务 InputSystem::UpdateKeysState 注册到工作者 InputSystem    (TaskMixin.hpp:23)
+[2026-06-28 08:55:42.4803420][成功][InputSystem] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4815530][提示][ShortcutManager] 配置文件名称: MulNX 官方快捷键配置    (ShortcutManager.cpp:14)
+[2026-06-28 08:55:42.4817540][提示][ShortcutManager] 消息推送：将任务 ShortcutManager::Check 注册到工作者 MulNXMain    (TaskMixin.hpp:23)
+[2026-06-28 08:55:42.4818580][成功][ShortcutManager] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.4819230][提示][GlobalVars] 消息推送：将任务 GlobalVars::Main 注册到工作者 MulNXMain    (TaskMixin.hpp:23)
+[2026-06-28 08:55:42.4819300][成功][GlobalVars] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.6677660][警告][Driver] 发送了UI启动指令！渲染即将开始！    (Driver.cpp:36)
+[2026-06-28 08:55:42.6677850][成功][Win32Starter] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.6678360][成功][DLLInjectHelper] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.6720410][成功][CS2BootLoader] 异步消息订阅：CS2BootLoader/Launch    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.6720580][成功][CS2BootLoader] 异步消息订阅：CS2BootLoader/PathUpdate    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.6720640][成功][CS2BootLoader] 异步消息订阅：CS2BootLoader/Save    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.6720750][提示][CS2BootLoader] 消息推送：将任务 CS2BootLoader::Update 注册到工作者 MulNXMain    (TaskMixin.hpp:23)
+[2026-06-28 08:55:42.6720860][提示][CS2BootLoader] 将UI节点注册信息推送到了消息系统    (UIMixin.hpp:28)
+[2026-06-28 08:55:42.6721120][成功][CS2BootLoader] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.6721710][成功][MulNXController] 异步消息订阅：ModuleManager/ModuleInfo/Response    (MsgMixin.hpp:25)
+[2026-06-28 08:55:42.6721750][提示][MulNXController] 将UI节点注册信息推送到了消息系统    (UIMixin.hpp:28)
+[2026-06-28 08:55:42.6721820][提示][MulNXController] 消息推送：将任务 MulNXController::Main 注册到工作者 MulNXMain    (TaskMixin.hpp:23)
+[2026-06-28 08:55:42.6721860][成功][MulNXController] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.6722760][提示][UIDocker] 将UI节点注册信息推送到了消息系统    (UIMixin.hpp:35)
+[2026-06-28 08:55:42.6722780][成功][UIDocker] 初始化成功！    (Module.hpp:25)
+[2026-06-28 08:55:42.6722870][成功][ModuleManager] 所有模块初始化成功，模块总量：22    (ModuleManager.cpp:84)
+[2026-06-28 08:55:42.6722900][成功][Driver] 各模块初始化完毕，系统已启动    (Driver.cpp:20)
+[2026-06-28 08:55:42.6722950][警告][Driver] 当前版本是否为测试版：true    (Driver.cpp:21)
+[2026-06-28 08:55:42.6723000][警告][Driver] 当前版本号：B0.2.0C0.42.1    (Driver.cpp:22)
+[2026-06-28 08:55:42.6723030][警告][Driver] 当前版本构建时间：Built: Jun 28 2026 16:30:24    (Driver.cpp:23)
+[2026-06-28 08:55:42.6723110][警告][Driver] 初始化完成，自核心分配内存并创建开始，共耗时：229621（微秒）    (Driver.cpp:28)
+[2026-06-28 08:55:42.6723120][警告][Driver] 版权所有 © Co1Swet    (Driver.cpp:29)
+[2026-06-28 08:55:42.6723120][警告][Driver] 欢迎使用MulNX，这是一款运行于-insecure模式的综合内容增强工具。    (Driver.cpp:29)
+[2026-06-28 08:55:42.6723120][警告][Driver] 在MulNX中，存在一些“作弊”模块，常常用于验证程序实现正确性。    (Driver.cpp:29)
+[2026-06-28 08:55:42.6723120][警告][Driver] 但请注意，在正常情况下，您无法使用MulNX进行作弊，也奉劝您打消作弊想法，否则后果自负！    (Driver.cpp:29)
+[2026-06-28 08:55:42.6842990][成功][MessageManager] 消息派发激活！    (MessageManager.cpp:79)
+[2026-06-28 08:55:42.6844100][成功][UICoordinator] 接收到UI节点: UICoordinator (索引 0)    (UICoordinator.cpp:93)
+[2026-06-28 08:55:42.6844290][成功][UICoordinator] 接收到UI节点: UISystem (索引 1)    (UICoordinator.cpp:93)
+[2026-06-28 08:55:42.6844370][成功][UICoordinator] 接收到UI节点: Debugger (索引 2)    (UICoordinator.cpp:93)
+[2026-06-28 08:55:42.6844440][成功][UICoordinator] 接收到UI节点: DeDebugger (索引 3)    (UICoordinator.cpp:93)
+[2026-06-28 08:55:42.6844510][成功][UICoordinator] 接收到UI节点: CS2BootLoader (索引 4)    (UICoordinator.cpp:93)
+[2026-06-28 08:55:42.6844560][成功][UICoordinator] 接收到UI节点: MulNXController (索引 5)    (UICoordinator.cpp:93)
+[2026-06-28 08:55:42.6844650][成功][UICoordinator] 接收到UI节点: MainDraw (索引 6)    (UICoordinator.cpp:93)
+[2026-06-28 08:55:42.6844740][警告][UISystem] 接收到启动消息，UI系统开始启动    (UISystem.cpp:49)
+[2026-06-28 08:55:42.6990780][成功][TaskSystem] 成功将任务：ModuleManager::Update 添加进入工作者：MulNXMain    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.6990960][成功][TaskSystem] 成功将任务：Debugger::Main 添加进入工作者：MulNXMain    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.6993770][成功][TaskSystem] 成功创建工作者：InputSystem    (TaskSystem.cpp:84)
+[2026-06-28 08:55:42.6995630][成功][TaskSystem] 成功将任务：InputSystem::UpdateKeysState 添加进入工作者：InputSystem    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.6995780][成功][TaskSystem] 成功将任务：ShortcutManager::Check 添加进入工作者：MulNXMain    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.6995840][成功][TaskSystem] 成功将任务：GlobalVars::Main 添加进入工作者：MulNXMain    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.6995890][成功][TaskSystem] 成功将任务：CS2BootLoader::Update 添加进入工作者：MulNXMain    (TaskSystem.cpp:86)
+[2026-06-28 08:55:42.6995940][成功][TaskSystem] 成功将任务：MulNXController::Main 添加进入工作者：MulNXMain    (TaskSystem.cpp:86)
+[2026-06-28 08:55:48.3242350][提示][DLLInjectHelper] Remote initialization completed successfully    (DLLInjectHelper.cpp:76)
+[2026-06-28 08:55:48.3242700][提示][CS2BootLoader] CS2 launched and injected 

@@ -4,16 +4,16 @@
 namespace MulNX {
     class ModuleBase;
     class Logger;
-    class Log {
+    enum class Level {
+        Info,
+        Succ,
+        Warning,
+        Error
+    };
+    class LogEntry {
     public:
-        enum class Level {
-            Info,
-            Succ,
-            Warning,
-            Error
-        };
-
         const ModuleBase* pModule = nullptr;
+        std::source_location where;
         Level level;
         int64_t timestamp_us = 0; // 微秒，Unix epoch
         std::string raw;
@@ -31,41 +31,36 @@ namespace MulNX {
                 return true;
                 });
         }
-        void LogSucc(std::string&& msg) {
-            MulNX::Log log;
+        void Log(Level level, std::string&& msg, std::source_location where) {
+            MulNX::LogEntry log;
             log.pModule = This();
+            log.where = where;
             log.timestamp_us = MulNX::ToUnixUs(std::chrono::system_clock::now());
-            log.level = MulNX::Log::Level::Succ;
+            log.level = level;
             log.raw = std::move(msg);
 
             this->logger->logs.enqueue(std::move(log));
         }
-        void LogInfo(std::string&& msg) {
-            MulNX::Log log;
-            log.pModule = This();
-            log.timestamp_us = MulNX::ToUnixUs(std::chrono::system_clock::now());
-            log.level = MulNX::Log::Level::Info;
-            log.raw = std::move(msg);
-
-            this->logger->logs.enqueue(std::move(log));
+        void LogSucc(std::string&& msg, std::source_location where = std::source_location::current()) {
+            this->Log(Level::Succ, std::move(msg), where);
         }
-        void LogError(std::string&& msg) {
-            MulNX::Log log;
-            log.pModule = This();
-            log.timestamp_us = MulNX::ToUnixUs(std::chrono::system_clock::now());
-            log.level = MulNX::Log::Level::Error;
-            log.raw = std::move(msg);
-
-            this->logger->logs.enqueue(std::move(log));
+        void LogInfo(std::string&& msg, std::source_location where = std::source_location::current()) {
+            this->Log(Level::Info, std::move(msg), where);
         }
-        void LogWarning(std::string&& msg) {
-            MulNX::Log log;
-            log.pModule = This();
-            log.timestamp_us = MulNX::ToUnixUs(std::chrono::system_clock::now());
-            log.level = MulNX::Log::Level::Warning;
-            log.raw = std::move(msg);
-
-            this->logger->logs.enqueue(std::move(log));
+        void LogError(std::string&& msg, std::source_location where = std::source_location::current()) {
+            this->Log(Level::Error, std::move(msg), where);
+        }
+        void LogWarning(std::string&& msg, std::source_location where = std::source_location::current()) {
+            this->Log(Level::Warning, std::move(msg), where);
+        }
+        void LogInfo(const Exception& e) {
+            this->Log(Level::Info, e.what(), e.where);
+        }
+        void LogError(const Exception& e) {
+            this->Log(Level::Error, e.what(), e.where);
+        }
+        void LogWarning(const Exception& e) {
+            this->Log(Level::Warning, e.what(), e.where);
         }
         void LogLine() {
             this->LogInfo("+------------------------------------------------+");

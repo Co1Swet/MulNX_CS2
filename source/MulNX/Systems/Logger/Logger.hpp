@@ -15,10 +15,10 @@ namespace MulNX {
         std::string kWarning{};
         std::string kError{};
 
-        std::string PraseLevel(Log::Level level);
-        MulNX::MsgType MakeMsgType(Log::Level level);
+        std::string PraseLevel(Level level);
+        MulNX::MsgType MakeMsgType(Level level);
     public:
-        moodycamel::BlockingConcurrentQueue<Log>logs{};
+        moodycamel::BlockingConcurrentQueue<LogEntry>logs{};
         bool Init();
         void Log();
     };

@@ -1,6 +1,7 @@
 #pragma once
 #include <MulNX/Config/Config.hpp>
 #include <MulNX/Common/Message.hpp>
+#include <MulNX/Common/Exception.hpp>
 #include <MulNX/Systems/I18nManager/I18n.hpp>
 
 namespace MulNX {

@@ -26,18 +26,18 @@ bool MulNX::Logger::Init() {
     return true;
 }
 
-std::string MulNX::Logger::PraseLevel(Log::Level level) {
+std::string MulNX::Logger::PraseLevel(MulNX::Level level) {
     switch (level) {
-    case Log::Level::Info: {
+    case MulNX::Level::Info: {
         return this->kInfo;
     }
-    case Log::Level::Succ: {
+    case MulNX::Level::Succ: {
         return this->kSucc;
     }
-    case Log::Level::Warning: {
+    case MulNX::Level::Warning: {
         return this->kWarning;
     }
-    case Log::Level::Error: {
+    case MulNX::Level::Error: {
         return this->kError;
     }
     default: {
@@ -45,18 +45,18 @@ std::string MulNX::Logger::PraseLevel(Log::Level level) {
     }
     }
 }
-MulNX::MsgType MulNX::Logger::MakeMsgType(Log::Level level) {
+MulNX::MsgType MulNX::Logger::MakeMsgType(MulNX::Level level) {
     switch (level) {
-    case Log::Level::Info: {
+    case MulNX::Level::Info: {
         return "Log/Info"_hash;
     }
-    case Log::Level::Succ: {
+    case MulNX::Level::Succ: {
         return "Log/Succ"_hash;
     }
-    case Log::Level::Warning: {
+    case MulNX::Level::Warning: {
         return "Log/Warning"_hash;
     }
-    case Log::Level::Error: {
+    case MulNX::Level::Error: {
         return "Log/Error"_hash;
     }
     default: {
@@ -67,10 +67,10 @@ MulNX::MsgType MulNX::Logger::MakeMsgType(Log::Level level) {
 
 void MulNX::Logger::Log() {
     // 批量取出当前队列中所有日志
-    std::vector<MulNX::Log> batch;
+    std::vector<MulNX::LogEntry> batch;
     batch.reserve(256); // 预分配空间，减少扩容开销
 
-    MulNX::Log log;
+    MulNX::LogEntry log;
     while (this->logs.wait_dequeue_timed(log, 200)) {
         batch.push_back(std::move(log));
     }
@@ -79,7 +79,7 @@ void MulNX::Logger::Log() {
 
     // 按时间戳升序排序，还原真实事件顺序
     std::sort(batch.begin(), batch.end(),
-        [](const MulNX::Log& a, const MulNX::Log& b) {
+        [](const MulNX::LogEntry& a, const MulNX::LogEntry& b) {
             return a.timestamp_us < b.timestamp_us;
         });
 
@@ -89,6 +89,9 @@ void MulNX::Logger::Log() {
         std::string rawMsg = std::move(entry.raw);
         auto eventTime = MulNX::FromUnixUs(entry.timestamp_us);
         std::string levelStr = this->PraseLevel(entry.level);
+
+        auto file = std::filesystem::path(entry.where.file_name()).filename().string();
+        auto lineNum = entry.where.line();
 
         std::istringstream iss(rawMsg);
         std::string line;
@@ -100,7 +103,15 @@ void MulNX::Logger::Log() {
 
             std::string formatted = std::vformat(
                 this->lineFmt,
-                std::make_format_args(eventTime, levelStr, moduleName, line));
+                std::make_format_args(
+                    eventTime,                    // {0}
+                    levelStr,                     // {1}
+                    moduleName,                   // {2}
+                    line,                         // {3} 消息文本
+                    file,                         // {4} 文件名
+                    lineNum                       // {5} 行号
+                )
+            );
 
             this->target << formatted << '\n';
 
