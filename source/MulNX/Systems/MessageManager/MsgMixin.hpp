@@ -25,12 +25,22 @@ namespace MulNX {
             This()->LogSucc(I18n("sys.msg.async.subed{}", msgType));
             return *this;
         }
+        template<typename... Args>
+        auto& SubscribeAsync(const std::string& msgType) {
+            auto h = createHandler<Args...>(MulNX::HashString(msgType));
+            This()->MainMsgChannel->SubscribeAsync(msgType);
+            This()->LogSucc(I18n("sys.msg.async.subed{}", msgType));
+            return *this;
+        }
+
         void PublishAsync(MulNX::Message&& msg) {
             this->pMsgManager->PublishAsync(std::move(msg));
         }
         void PublishAsync(MulNX::MsgType msg) {
             this->pMsgManager->PublishAsync(MulNX::Message(msg));
         }
+
+
         // 同步消息
         auto& SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle) {
             this->pMsgManager->SubscribeSync(msgType, std::move(handle));

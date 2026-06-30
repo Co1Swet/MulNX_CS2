@@ -85,19 +85,15 @@ bool GlowController::Init() {
         });
 
     (*this)
-        .SubscribeAsync("Glow/Enable")
-        .SubscribeAsync("Glow/Disable")
-        .SubscribeAsync("Glow/Player/Set")
-        .SubscribeAsync("Glow/Player/Clear")
-        .SubscribeAsync("Glow/Player/ClearAll")
-        .SubscribeAsync("Glow/Team/Set")
-        .SubscribeAsync("Glow/Team/Clear")
-        .SubscribeAsync("Glow/Team/ClearAll")
-        .SubscribeAsync("Glow/ClearAll");
-
-    this->CS2Con->RegisterCmd("mulnx_glow_enable", [this](CCommand* cmd) {this->PublishAsync("Glow/Enable"_hash);})
-        .RegisterCmd("mulnx_glow_disable", [this](CCommand* cmd) {this->PublishAsync("Glow/Disable"_hash);})
-        ;
+        .SubscribeAsync<uint8_t>("Glow/Enable")
+        .SubscribeAsync<uint8_t>("Glow/Disable")
+        .SubscribeAsync<Steam64UID,uint32_t>("Glow/Player/Set")
+        .SubscribeAsync<Steam64UID>("Glow/Player/Clear")
+        .SubscribeAsync<uint8_t>("Glow/Player/ClearAll")
+        .SubscribeAsync<uint8_t,uint32_t>("Glow/Team/Set")
+        .SubscribeAsync<uint8_t>("Glow/Team/Clear")
+        .SubscribeAsync<uint8_t>("Glow/Team/ClearAll")
+        .SubscribeAsync<uint8_t>("Glow/ClearAll");
 
     return true;
 }

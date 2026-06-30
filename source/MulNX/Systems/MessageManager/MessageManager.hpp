@@ -5,6 +5,7 @@
 // 消息由发布者创建，经过发布后，生命周期的管理即委托给消息管理器
 
 #include <MulNX/Core/Module/Module.hpp>
+#include <MulNX/Base/Cmd/Cmd.hpp>
 #include "MessageChannel/MessageChannel.hpp"
 #include <unordered_map>
 #include <MulNXThirdParty/queue/blockingconcurrentqueue.h>
@@ -13,6 +14,7 @@ namespace MulNX {
     class MsgMeta {
     public:
         std::string RawString;
+        std::function<ParsedArgs(std::string)> handle;
     };
     class MessageManager final :public MulNX::Module<MessageManager> {
         friend MessageChannel;
