@@ -7,6 +7,7 @@ add_library(DemoSystem STATIC
     DemoJSONReader/DemoJSONReader.cpp
     RecordTaskMaker/RecordTaskMaker.cpp
     RecordTaskConfiger/RecordTaskConfiger.cpp
+    DemoPlaying/DemoPlaying.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

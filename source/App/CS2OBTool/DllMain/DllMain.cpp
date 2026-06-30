@@ -80,6 +80,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
             .CreateModule<RecordTaskMaker>("RecordTaskMaker")
             .CreateModule<DemoRecorder>("DemoRecorder")
+            .CreateModule<DemoPlaying>("DemoPlaying")
             // 较为上层
             .CreateModule<MiniMap>("MiniMap")
             .CreateModule<VirtualUser>("VirtualUser")

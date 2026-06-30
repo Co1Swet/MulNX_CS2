@@ -7,3 +7,4 @@
 #include "DemoRecorder/DemoRecorder.hpp"
 #include "RecordTaskMaker/RecordTaskMaker.hpp"
 #include "RecordTaskConfiger/RecordTaskConfiger.hpp"
+#include "DemoPlaying/DemoPlaying.hpp"
