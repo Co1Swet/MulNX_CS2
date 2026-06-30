@@ -4,8 +4,7 @@
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
 bool RecordTaskMaker::Window(MulNX::UINode* node) {
-    auto w = MulNX::UI::RAIIWindow("录制任务创建", this->showWindow);
-    if (!w) return true;
+    auto w = MulNX::UI::RAIIWindow("录制任务创建");
     node->CallUINode("DemoJSONReader");
     MulNX::UI::SmartButton btn{};
 
@@ -195,7 +194,7 @@ void RecordTaskMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/InfoLoad"_hash: {
         std::unique_lock lock(this->smutex);
-        auto demoInfo = std::move(*msg.asp.get<Demo::Info>());
+        auto demoInfo = *msg.asp.get<Demo::Info>();
         this->demos[demoInfo.demoFileName] = std::move(demoInfo);
         break;
     }

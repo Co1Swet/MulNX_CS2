@@ -42,3 +42,18 @@ CS2::C_CSPlayerPawn* CS2::Module::Client::TryGetObservingPawn() {
         return nullptr;
     }
 }
+
+std::optional<Steam64UID> CS2::Module::Client::TryGetObservingSteam64UID() {
+    try {
+        auto pPawn = this->TryGetObservingPawn();
+        if (!pPawn)return std::nullopt;
+        auto hController = MulNX::MRead(pPawn->m_hController());
+        auto pController = this->GetBaseEntityFromHandle(hController)->As<CS2::CCSPlayerController>();
+        if (!pController)return std::nullopt;
+        auto steam64 = MulNX::MRead(pController->m_steamID());
+        return steam64;
+    }
+    catch (...) {
+        return std::nullopt;
+    }
+}

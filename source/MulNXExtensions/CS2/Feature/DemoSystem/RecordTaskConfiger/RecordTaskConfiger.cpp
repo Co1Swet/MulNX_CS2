@@ -3,7 +3,6 @@
 
 bool RecordTaskConfiger::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow("录制参数调节");
-    if (!w)return true;
     ImGui::SliderInt("击杀前预留tick", &this->preRecordTicks, 1, 640);
     ImGui::SliderInt("击杀后保留tick", &this->postRecordTicks, 1, 640);
 

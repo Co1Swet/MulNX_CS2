@@ -7,8 +7,6 @@ class HookView;
 class TimeController;
 class HookConsole;
 
-using Steam64UID = uint64_t;
-
 class ICSModule {
 public:
     ~ICSModule() = default;

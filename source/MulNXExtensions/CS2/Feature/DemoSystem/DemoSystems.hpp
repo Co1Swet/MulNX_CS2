@@ -8,3 +8,4 @@
 #include "RecordTaskMaker/RecordTaskMaker.hpp"
 #include "RecordTaskConfiger/RecordTaskConfiger.hpp"
 #include "DemoPlaying/DemoPlaying.hpp"
+#include "DemoEventsRender/DemoEventsRender.hpp"

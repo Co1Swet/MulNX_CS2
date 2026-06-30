@@ -7,6 +7,7 @@
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
 using GameTime_t = float;
+using Steam64UID = uint64_t;
 
 namespace CS2 {
 

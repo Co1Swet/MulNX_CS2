@@ -31,8 +31,6 @@ bool DemoJSONReader::Init() {
         return true;
         });
 
-    this->showWindow.store(true, std::memory_order_release);
-
     return true;
 }
 
