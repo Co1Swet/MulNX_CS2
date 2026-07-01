@@ -66,10 +66,6 @@ bool DemoRecorder::Init() {
         return this->Window(node);
         });
 
-    this->CS2Con->RegisterCmd("mulnx_record_start", [this](CCommand* cmd) {this->StartRecord();})
-        .RegisterCmd("mulnx_record_stop", [this](CCommand* cmd) {this->PublishAsync("Media/Record/Stop"_hash);})
-        ;
-
     return true;
 }
 

@@ -26,12 +26,15 @@ namespace MulNX {
 
     template <Pod... Ts>
     consteval auto ComputeOffsets() noexcept {
+        constexpr size_t alignments[] = { alignof(Ts)... };
         constexpr size_t sizes[] = { sizeof(Ts)... };
         std::array<size_t, sizeof...(Ts)> offsets{};
-        size_t acc = 0;
+        size_t current = 0;
         for (size_t i = 0; i < sizeof...(Ts); ++i) {
-            offsets[i] = acc;
-            acc += sizes[i];
+            // 将当前偏移向上对齐到该类型的对齐值
+            current = (current + alignments[i] - 1) & ~(alignments[i] - 1);
+            offsets[i] = current;
+            current += sizes[i];
         }
         return offsets;
     }
@@ -46,4 +49,44 @@ namespace MulNX {
             std::chrono::microseconds(us)
         );
     }
+
+    // 类型名萃取（可定制）
+    template <typename T>
+    struct TypeName {
+        static std::string get() {
+            return std::string(typeid(T).name());
+        }
+    };
+
+    template <typename T>
+    std::string SingleTypeString() {
+        return TypeName<T>::get();
+    }
+
+    // 递归展开参数包，生成 "<T1> <T2> ..." 格式
+    template <typename... Args>
+    std::string GetTypeString() {
+        if constexpr (sizeof...(Args) == 0) {
+            return "";
+        }
+        else {
+            std::string result;
+            ((result += "<" + SingleTypeString<Args>() + "> "), ...);
+            if (!result.empty()) result.pop_back(); // 删除末尾空格
+            return result;
+        }
+    }
 }
+
+// 便捷宏 —— 定义别名的同时注册类型名
+#define MULNX_USING(alias, underlying) \
+    using alias = underlying;          \
+    template<> struct ::MulNX::TypeName<alias> { \
+        static std::string get() { return #alias; } \
+    }
+
+// 枚举注册宏 —— 必须传入完整的类型名（含命名空间）
+#define MULNX_ENUMCLASS(EnumType) \
+    template<> struct ::MulNX::TypeName<EnumType> { \
+        static std::string get() { return #EnumType; } \
+    }

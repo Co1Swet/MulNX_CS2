@@ -4,8 +4,8 @@
 MulNX::MessageChannel::MessageChannel(MessageManager* MsgManager) {
 	this->MsgManager = MsgManager;
 }
-MulNX::MessageChannel& MulNX::MessageChannel::SubscribeAsync(const std::string& MsgType) {
-    this->MsgManager->SubscribeAsync(this, MsgType);
+MulNX::MessageChannel& MulNX::MessageChannel::SubscribeAsync(const std::string& MsgType, std::function<void(MulNX::Message&, std::string_view)>&& makingHandler) {
+    this->MsgManager->SubscribeAsync(this, MsgType, std::move(makingHandler));
 	return *this;
 }
 bool MulNX::MessageChannel::PullMessage(Message& OutMsg) {

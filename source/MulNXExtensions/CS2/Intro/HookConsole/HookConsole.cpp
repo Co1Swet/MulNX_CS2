@@ -15,6 +15,36 @@ bool HookConsole::Init() {
         return true;
         });
 
+    this->SubscribeSync("System/Init/End", [this](MulNX::Message& msg) {
+        auto* pMsgManager = this->FindModule<MulNX::MessageManager>("MessageManager");
+        for (auto& [type, meta] : pMsgManager->GetMsgInfo()) {
+            if (!meta.isAsync)continue;
+            const auto& cmdName = meta.RawString;
+            auto callbackCCommand = [=](CCommand* pCmd)->void {
+                std::string_view raw(pCmd->pRawString);
+                raw = raw.substr(raw.find(' ') + 1);
+                MulNX::Message msg(type);
+                if (auto makingHandler = meta.makingHandler) {
+                    try {
+                        makingHandler(msg, raw);
+                    }
+                    catch (const std::exception& e) {
+                        this->LogError(std::format("转换CS2控制台命令 '{}' 时发生异常: {}", pCmd->pRawString, e.what()));
+                        return;
+                    }
+                }
+                this->PublishAsync(std::move(msg));
+                };
+
+            MulNXCS2CmdCallback CmdCallback(std::move(callbackCCommand));
+            auto full = "MulNX/" + meta.RawString;
+            MulNXCmd cmd(std::move(full), "one MulNX Cmd", std::move(CmdCallback));
+            this->CS2Cmds.push_back(std::move(cmd));
+        }
+
+        return;
+        });
+
     return true;
 }
 

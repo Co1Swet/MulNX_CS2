@@ -164,7 +164,7 @@ namespace MulNX {
             : control_(control) {
             if (control_ == nullptr) {
                 control_ = new ControlPack();
-                control_->ref_count.store(1, std::memory_order_relaxed);
+                control_->ref_count.store(1);
                 control_->ptr_ = ptr;
             }
         }
@@ -173,23 +173,23 @@ namespace MulNX {
         any_shared_ptr(const any_shared_ptr& other) noexcept
             :  control_(other.control_) {
             if (control_) {
-                control_->ref_count.fetch_add(1, std::memory_order_relaxed);
+                control_->ref_count.fetch_add(1);
                 control_->ptr_ = other.control_->ptr_;
             }
         }
         any_shared_ptr& operator=(const any_shared_ptr& other) noexcept {
             if (this != &other) {
                 // Decrease current object's ref count
-                if (control_ && control_->ref_count.fetch_sub(1, std::memory_order_relaxed) == 1) {
+                if (control_ && control_->ref_count.fetch_sub(1) == 1) {
                     delete control_->ptr_;
-                    if (control_->weak_count.load(std::memory_order_relaxed) == 0) {
+                    if (control_->weak_count.load() == 0) {
                         delete control_;
                     }
                 }
                 // Copy from other
                 control_ = other.control_;
                 if (control_) {
-                    control_->ref_count.fetch_add(1, std::memory_order_relaxed);
+                    control_->ref_count.fetch_add(1);
                 }
             }
             return *this;
@@ -208,9 +208,9 @@ namespace MulNX {
         }
 
         ~any_shared_ptr() {
-            if (control_ && control_->ref_count.fetch_sub(1, std::memory_order_relaxed) == 1) {
+            if (control_ && control_->ref_count.fetch_sub(1) == 1) {
                 delete control_->ptr_;
-                if (control_->weak_count.load(std::memory_order_relaxed) == 0) {
+                if (control_->weak_count.load() == 0) {
                     delete control_;
                 }
             }

@@ -16,6 +16,7 @@ bool MulNX::Core::Driver::Init() {
     this->Core->ModuleManager()->EntryInit(this->Core);
     // 初始化注册模块
     this->Core->ModuleManager()->ModulesInit();
+    this->PublishSync("System/Init/End"_hash);
     // 输出启动信息
     this->LogSucc(I18n("sys.started"));
     this->LogWarning(I18n("sys.version_is_testing", MulNXInfo::IsDebugVersion));

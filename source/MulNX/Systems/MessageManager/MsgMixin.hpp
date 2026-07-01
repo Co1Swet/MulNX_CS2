@@ -1,5 +1,6 @@
 #pragma once
 #include <MulNX/Core/Module/IModule.hpp>
+#include <MulNX/Base/Cmd/Cmd.hpp>
 
 namespace MulNX {
     class MessageManager;
@@ -22,14 +23,17 @@ namespace MulNX {
 
         auto& SubscribeAsync(const std::string& msgType) {
             This()->MainMsgChannel->SubscribeAsync(msgType);
-            This()->LogSucc(I18n("sys.msg.async.subed{}", msgType));
+            auto full = std::format("{}  Args: <void>", msgType);
+            This()->LogSucc(I18n("sys.msg.async.subed{}", full));
             return *this;
         }
         template<typename... Args>
         auto& SubscribeAsync(const std::string& msgType) {
-            auto h = createHandler<Args...>(MulNX::HashString(msgType));
-            This()->MainMsgChannel->SubscribeAsync(msgType);
-            This()->LogSucc(I18n("sys.msg.async.subed{}", msgType));
+            auto h = MulNX::CreateFiller<Args...>();
+            auto typeDesc = MulNX::GetTypeString<Args...>();
+            This()->MainMsgChannel->SubscribeAsync(msgType, std::move(h));
+            auto full=std::format("{}  Args: {}", msgType, typeDesc);
+            This()->LogSucc(I18n("sys.msg.async.subed{}", full));
             return *this;
         }
 

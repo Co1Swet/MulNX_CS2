@@ -15,7 +15,7 @@ namespace MulNX {
         moodycamel::ConcurrentQueue<MulNX::Message>Messages;
     public:
 		MessageChannel(MessageManager* MsgManager);
-        MessageChannel& SubscribeAsync(const std::string& MsgType);
+        MessageChannel& SubscribeAsync(const std::string& MsgType, std::function<void(MulNX::Message&, std::string_view)>&& makingHandler = nullptr);
 		bool PushMessage(Message&& Msg);
 		bool PullMessage(Message& OutMsg);
 		bool HasMessage()const;

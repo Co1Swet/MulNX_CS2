@@ -75,8 +75,8 @@ bool GlowController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto region = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::SetGlowColor);
         auto target = region.Data();
-        this->hkSetGlowColor = MulNX::Hook::Create(target, [this](MulNX::Hook* hk,RegContext* ctx) {
-                this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)&(ctx->rdx));
+        this->hkSetGlowColor = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
+            this->MySetGlowColor((CS2::CGlowProperty*)(ctx->rcx), (uint32_t*)&(ctx->rdx));
             return MulNX::Hook::Then::Continue;
             }).value();
         this->hkSetGlowColor->Attach();
@@ -89,15 +89,15 @@ bool GlowController::Init() {
         });
 
     (*this)
-        .SubscribeAsync<uint8_t>("Glow/Enable")
-        .SubscribeAsync<uint8_t>("Glow/Disable")
-        .SubscribeAsync<Steam64UID,uint32_t>("Glow/Player/Set")
+        .SubscribeAsync("Glow/Enable")
+        .SubscribeAsync("Glow/Disable")
+        .SubscribeAsync<Steam64UID, uint32_t>("Glow/Player/Set")
         .SubscribeAsync<Steam64UID>("Glow/Player/Clear")
-        .SubscribeAsync<uint8_t>("Glow/Player/ClearAll")
-        .SubscribeAsync<uint8_t,uint32_t>("Glow/Team/Set")
-        .SubscribeAsync<uint8_t>("Glow/Team/Clear")
-        .SubscribeAsync<uint8_t>("Glow/Team/ClearAll")
-        .SubscribeAsync<uint8_t>("Glow/ClearAll");
+        .SubscribeAsync("Glow/Player/ClearAll")
+        .SubscribeAsync<CS2::ui8TeamNum, uint32_t>("Glow/Team/Set")
+        .SubscribeAsync<CS2::ui8TeamNum>("Glow/Team/Clear")
+        .SubscribeAsync<CS2::ui8TeamNum>("Glow/Team/ClearAll")
+        .SubscribeAsync("Glow/ClearAll");
 
     return true;
 }

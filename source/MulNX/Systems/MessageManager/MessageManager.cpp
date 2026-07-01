@@ -8,11 +8,15 @@ bool MulNX::MessageManager::Init() {
     return true;
 }
 
-bool MulNX::MessageManager::AddMsgMeta(const std::string& type, size_t hashed) {
+bool MulNX::MessageManager::AddMsgMeta(const std::string& type, size_t hashed, const bool isAsync,
+    std::function<void(MulNX::Message&, std::string_view)>&& makingHandler) {
     std::unique_lock lock(this->smutex);
     auto& Meta = this->msgInfo[hashed];
+    
     if (Meta.RawString.empty()) {
         Meta.RawString = type;
+        Meta.isAsync = isAsync;
+        Meta.makingHandler = std::move(makingHandler);
     }
     else if (Meta.RawString == type) {
 
@@ -45,10 +49,11 @@ MulNX::MessageChannel* MulNX::MessageManager::GetMessageChannel(const MulNXHandl
 bool MulNX::MessageManager::PublishAsync(Message&& Msg) {
     return this->asyncMsgBuffer.enqueue(std::move(Msg));
 }
-bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const std::string& type) {
+bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const std::string& type,
+    std::function<void(MulNX::Message&, std::string_view)>&& makingHandler) {
     std::unique_lock lock(this->asyncMutex);
     MulNX::MsgType hashed = MulNX::HashString(type);
-    this->AddMsgMeta(type, hashed);
+    this->AddMsgMeta(type, hashed, true, std::move(makingHandler));
     this->asyncMap[hashed].push_back(pChannel);
     return true;
 }

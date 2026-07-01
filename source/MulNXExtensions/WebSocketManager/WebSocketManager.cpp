@@ -67,6 +67,11 @@ uint64_t parse_uint64_from_json_base64(const nlohmann::json& j) {
 bool WebSocketManager::Init() {
     this->SubscribeAsync("WebSocketManager/Post");
 
+    this->SubscribeSync("System/Init/End", [this](MulNX::Message& msg) {
+
+        return;
+        });
+
     // 关闭它自带的日志功能
     this->server.clear_access_channels(websocketpp::log::alevel::all);
     this->server.clear_error_channels(websocketpp::log::elevel::all);

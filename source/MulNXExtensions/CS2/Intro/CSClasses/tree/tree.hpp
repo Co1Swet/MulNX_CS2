@@ -1,13 +1,10 @@
 #pragma once 
-
-#include <stdfloat>
-#include <MulNX/Base/Math/Math.hpp>
-#include <MulNX/Config/Config.hpp>
+#include <MulNX/MulNX.hpp>
 #include <MulNXUtils/WinExt/vtable/vtable.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
-using GameTime_t = float;
-using Steam64UID = uint64_t;
+MULNX_USING(GameTime_t, float);
+MULNX_USING(Steam64UID, uint64_t);
 
 namespace CS2 {
 
@@ -355,3 +352,5 @@ namespace CS2 {
 
     };
 }
+
+MULNX_ENUMCLASS(CS2::ui8TeamNum);

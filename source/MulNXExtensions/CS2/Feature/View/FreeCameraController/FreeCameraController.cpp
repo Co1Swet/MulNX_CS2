@@ -24,7 +24,6 @@ bool FreeCameraController::Init() {
     this->kMovDown = this->Shortcut()->GetButton("CamMovDown").value();
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
     this->SubscribeAsync("FreeCamCtrl/Toggle");
-    this->CS2Con->RegisterCmd("mulnx_freeCamCtrl_toggle", [this](CCommand* cmd) {this->PublishAsync("FreeCamCtrl/Toggle"_hash);});
     return true;
 }
 
