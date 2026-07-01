@@ -70,7 +70,8 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     DXGI_SWAP_CHAIN_DESC sd;
     pSwapChain->GetDesc(&sd);
     MulNX::Message msg("Hook/hWnd"_hash);
-    msg.p1.as<HWND>() = sd.OutputWindow;
+    auto&& [hWnd] = msg.Access<HWND>();
+    hWnd = sd.OutputWindow;
     this->hCS2Wnd = sd.OutputWindow;
     this->PublishSync(msg);
 }

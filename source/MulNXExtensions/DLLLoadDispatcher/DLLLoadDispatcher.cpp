@@ -4,10 +4,10 @@ bool DLLLoadDispatcher::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW", [this](MulNX::Message& msg) {this->OnModuleLoaded(msg); });
 
     this->hkLoadLibraryExW = MulNX::Hook::Create((uint8_t*)LoadLibraryExW, [this](MulNX::Hook* hk, RegContext* ctx) {
-        LPCWSTR lpLibFileName = (LPCWSTR)ctx->rcx;
-        hk->CallMaybeOrigin(0, ctx);
         MulNX::Message msg("Hook/LoadLibraryExW"_hash);
-        msg.p1.as<LPCWSTR>() = lpLibFileName;
+        auto&& [lpLibFileName] = msg.Access<LPCWSTR>();
+        lpLibFileName = (LPCWSTR)ctx->rcx;
+        hk->CallMaybeOrigin(0, ctx);
         this->PublishSync(msg);
         return MulNX::Hook::Then::Return;
         }).value();
@@ -26,8 +26,8 @@ void DLLLoadDispatcher::Deinit() {
 }
 
 void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {
-    auto path = msg.p1.as<LPCWSTR>();
-    std::filesystem::path fsPath(path);
+    auto&& [lpLibFileName] = msg.Access<LPCWSTR>();
+    std::filesystem::path fsPath(lpLibFileName);
     std::unique_lock lock(this->smutex);
     if (this->loadedModules.find(fsPath) == this->loadedModules.end()) {
         this->loadedModules.insert(fsPath);

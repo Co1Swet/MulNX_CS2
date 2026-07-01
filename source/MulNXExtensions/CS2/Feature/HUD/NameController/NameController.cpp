@@ -21,7 +21,8 @@ void NameController::HubPlayer(MulNX::UINode* node) {
     ImGui::SameLine();
     if (ImGui::Button("设定（空则清除）")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Name/Player/Set"_hash);
-        msg.p1.as<Steam64UID>() = uid;
+        auto&& [uidRef] = msg.Access<Steam64UID>();
+        uidRef = uid;
         rp->str1 = this->newNameBuffer;
         this->PublishAsync(std::move(msg));
         this->newNameBuffer.clear();
@@ -60,7 +61,7 @@ bool NameController::Init() {
 void NameController::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "Name/Player/Set"_hash: {
-        auto uid = Msg.p1.as<Steam64UID>();
+        auto&& [uid] = Msg.Access<Steam64UID>();
         auto newName = Msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
         this->SetReplace(uid, newName);

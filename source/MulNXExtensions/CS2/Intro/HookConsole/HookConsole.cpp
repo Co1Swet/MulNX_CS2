@@ -89,9 +89,9 @@ void HookConsole::ProcessMsg(MulNX::Message& msg) {
 }
 
 MulNX::Hook::Then HookConsole::HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx) {
-    CCmd* pCmd = (CCmd*)ctx->r8;
     MulNX::Message msg("Hook/RegisterConCommand"_hash);
-    msg.p1.as<CCmd*>() = pCmd;
+    auto&& [pCmd] = msg.Access<CCmd*>();
+    pCmd = (CCmd*)ctx->r8;
     this->PublishSync(msg);
     return MulNX::Hook::Then::Continue;
 }

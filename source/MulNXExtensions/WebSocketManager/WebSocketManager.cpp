@@ -84,11 +84,11 @@ bool WebSocketManager::Init() {
     
     // 注册句柄
     this->server.set_message_handler(
-        [this](websocketpp::connection_hdl hdl, Server::message_ptr msg) {
+        [this](websocketpp::connection_hdl hdl, Server::message_ptr netMsg) {
             try {
 
                 // 先假设发了一个json
-                auto json = nlohmann::json::parse(msg->get_payload());
+                auto json = nlohmann::json::parse(netMsg->get_payload());
 
                 auto type = json["type"].get<std::string>();
                 uint64_t p1 = parse_uint64_from_json_base64(json["p1"]);
@@ -96,15 +96,13 @@ bool WebSocketManager::Init() {
                 std::string str1 = json["str1"].get<std::string>();
                 std::string str2 = json["str2"].get<std::string>();
 
-                auto [mmsg, rp] = MulNX::Message::Create<MulNX::NetExt>(MulNX::HashString(type));
-                mmsg.p1.as<uint64_t>() = p1;
-                mmsg.p2.as<uint64_t>() = p2;
+                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>(MulNX::HashString(type));
                 rp->str1 = std::move(str1);
                 rp->str2 = std::move(str2);
 
-                this->PublishAsync(std::move(mmsg));
+                this->PublishAsync(std::move(msg));
 
-                this->server.send(hdl, "已投入消息总线" + msg->get_payload(), msg->get_opcode());
+                this->server.send(hdl, "已投入消息总线" + netMsg->get_payload(), netMsg->get_opcode());
             }
             catch (const websocketpp::exception& e) {
                 this->LogError("网络回调接口错误: " + *e.what());

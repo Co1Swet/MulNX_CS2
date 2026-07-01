@@ -31,17 +31,17 @@ void ObserverController::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "spec_mode_changed_to"_hash: {
-        uint8_t newMode = msg.p1.low<uint8_t>();
+        auto&& [newMode] = msg.Access<uint8_t>();
         this->OnSpecModeChanged(newMode);
         break;
     }
     case "Observe/SpecSteam64UID"_hash: {
-        Steam64UID uid = msg.p1.as<Steam64UID>();
+        auto&& [uid] = msg.Access<Steam64UID>();
         this->SpecSteam64UID(uid);
         break;
     }
     case "Observe/SpecHandle"_hash: {
-        auto handle = msg.p1.low<CS2::CHandleBase>();
+        auto&& [handle] = msg.Access<CS2::CHandleBase>();
         this->SpecHandle(handle);
         break;
     }
@@ -63,7 +63,8 @@ void ObserverController::UpdateObserverState() {
         static uint8_t lastObservedSpecMode = detectedMode;
         if (lastObservedSpecMode != detectedMode) {
             MulNX::Message msg("spec_mode_changed_to"_hash);
-            msg.p1.low<uint8_t>() = detectedMode;
+            auto&& [newMode] = msg.Access<uint8_t>();
+            newMode = detectedMode;
             this->PublishAsync(std::move(msg));
             lastObservedSpecMode = detectedMode;
         }
@@ -164,7 +165,8 @@ void ObserverController::SpecSteam64UID(Steam64UID uid) {
             auto* pController = this->FindControllerBySteam64UID(uid);
             auto handle = MulNX::MRead(pController->m_hPlayerPawn());
             MulNX::Message msg("Observe/SpecHandle"_hash);
-            msg.p1.low<CS2::CHandleBase>() = handle;
+            auto&& [handleRef] = msg.Access<CS2::CHandleBase>();
+            handleRef = handle;
             this->PublishAsync(std::move(msg));
             break;
         }

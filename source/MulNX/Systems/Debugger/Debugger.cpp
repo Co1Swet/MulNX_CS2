@@ -16,9 +16,10 @@ void MulNX::Debugger::DeMe(MulNX::UINode* node) {
     ImGui::InputInt("##最大消息数量", &MaxDebugMsgs);
     ImGui::SameLine();
     if (ImGui::Button("应用")) {
-        MulNX::Message Msg("Debugger/SetMaxInfoCount"_hash);
-        Msg.p1.low<int>() = MaxDebugMsgs;
-        this->PublishAsync(std::move(Msg));
+        MulNX::Message msg("Debugger/SetMaxInfoCount"_hash);
+        auto&& [access] = msg.Access<int>();
+        access = MaxDebugMsgs;
+        this->PublishAsync(std::move(msg));
     }
 }
 
@@ -103,7 +104,8 @@ bool MulNX::Debugger::Init() {
 void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Debugger/SetMaxInfoCount"_hash: {
-        this->ResetMaxMsgCount(msg.p1.low<float>());
+        auto&& [count] = msg.Access<int>();
+        this->ResetMaxMsgCount(count);
         break;
     }
     case "Log/Error"_hash: if (this->ShowWhenError) this->showWindow = true;

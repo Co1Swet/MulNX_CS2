@@ -2,7 +2,7 @@
 
 bool HookDemo::Init() {
     this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
-        auto* pCmd = msg.p1.as<CCmd*>();
+        auto&& [pCmd] = msg.Access<CCmd*>();
         std::string_view name = pCmd->m_pszName;
         if (name == "playdemo") this->HookPlayDemo(pCmd);
         if (name == "demo_gototick")  this->HookDemoGotoTick(pCmd);
@@ -29,8 +29,9 @@ void HookDemo::HookDemoGotoTick(CCmd* pCmd) {
         auto cmd = (CCommand*)ctx->rdx;
         hk->CallMaybeOrigin(0, ctx);
         auto msg = MulNX::Message("Demo/GotoTick/Complete"_hash);
-        sscanf_s(cmd->pRawString, "demo_gototick %d", &msg.p1.low<int>());
-        this->LogInfo(std::format("跳转到tick: {}", msg.p1.low<int>()));
+        auto&& [jumpTick] = msg.Access<int>();
+        sscanf_s(cmd->pRawString, "demo_gototick %d", &jumpTick);
+        this->LogInfo(std::format("跳转到tick: {}", jumpTick));
         this->PublishAsync(std::move(msg));
         return MulNX::Hook::Then::Return;
         }).value();

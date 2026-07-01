@@ -11,13 +11,15 @@ void SkyController::Menu(MulNX::UINode* node) {
     if (ImGui::ColorEdit4("天空染色", (float*)&colorVec4)) {
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
         MulNX::Message msg("Sky/Color/Set"_hash);
-        msg.p1.low<uint32_t>() = newColorU32;
+        auto&& [colorRef] = msg.Access<uint32_t>();
+        colorRef = newColorU32;
         this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();
     if (ImGui::Button("重置颜色")) {
         MulNX::Message msg("Sky/Color/Set"_hash);
-        msg.p1.low<uint32_t>() = IM_COL32(255, 0, 0, 255);
+        auto&& [colorRef] = msg.Access<uint32_t>();
+        colorRef = IM_COL32(255, 0, 0, 255);
         this->PublishAsync(std::move(msg));
     }
 
@@ -25,13 +27,15 @@ void SkyController::Menu(MulNX::UINode* node) {
     float brightness = this->brightness.load();
     if (ImGui::SliderFloat("亮度倍率", &brightness, 0.1f, 10.0f, "%.2f")) {
         MulNX::Message msg("Sky/Brightness/Set"_hash);
-        msg.p1.low<float>() = brightness;
+        auto&& [brightnessRef] = msg.Access<float>();
+        brightnessRef = brightness;
         this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();
     if (ImGui::Button("重置亮度")) {
         MulNX::Message msg("Sky/Brightness/Set"_hash);
-        msg.p1.low<float>() = 2.0f;
+        auto&& [brightnessRef] = msg.Access<float>();
+        brightnessRef = 2.0f;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -69,12 +73,18 @@ bool SkyController::Init() {
 
 void SkyController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Sky/Color/Set"_hash:
-        this->skyColor.store(msg.p1.low<uint32_t>());
+    case "Sky/Color/Set"_hash: {
+        auto&& [color] = msg.Access<uint32_t>();
+        this->skyColor.store(color);
         break;
-    case "Sky/Brightness/Set"_hash:
-        this->brightness.store(msg.p1.low<float>());
+    }
+
+    case "Sky/Brightness/Set"_hash: {
+        auto&& [brightness] = msg.Access<float>();
+        this->brightness.store(brightness);
         break;
+    }
+
     default:
         break;
     }

@@ -19,15 +19,17 @@ void SmokeController::HubPlayer(MulNX::UINode* node) {
     if (ImGui::ColorEdit4("烟雾颜色修改", (float*)&colorVec4)) {
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
         MulNX::Message msg("Smoke/Player/Set"_hash);
-        msg.p1.as<Steam64UID>() = uid;
-        msg.p2.low<uint32_t>() = newColorU32;
+        auto&& [uidRef, newColorRef] = msg.Access<Steam64UID, uint32_t>();
+        uidRef = uid;
+        newColorRef = newColorU32;
         this->PublishAsync(std::move(msg));
     }
 
     ImGui::SameLine();
     if (ImGui::Button("重置烟雾颜色")) {
         MulNX::Message msg("Smoke/Player/Clear"_hash);
-        msg.p1.as<Steam64UID>() = uid;
+        auto&& [uidRef] = msg.Access<Steam64UID>();
+        uidRef = uid;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -49,15 +51,17 @@ void SmokeController::HubTeam(MulNX::UINode* node) {
     if (ImGui::ColorEdit4("烟雾颜色修改", (float*)&colorVec4)) {
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
         MulNX::Message msg("Smoke/Team/Set"_hash);
-        msg.p1.low<uint32_t>() = newColorU32;
-        msg.p1.high<CS2::ui8TeamNum>() = team;
+        auto&& [colorRef, teamRef] = msg.Access<uint32_t, CS2::ui8TeamNum>();
+        colorRef = newColorU32;
+        teamRef = team;
         this->PublishAsync(std::move(msg));
     }
 
     ImGui::SameLine();
     if (ImGui::Button("重置烟雾颜色")) {
         MulNX::Message msg("Smoke/Team/Clear"_hash);
-        msg.p1.high<CS2::ui8TeamNum>() = team;
+        auto&& [teamRef] = msg.Access<CS2::ui8TeamNum>();
+        teamRef = team;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -95,14 +99,13 @@ bool SmokeController::Init() {
 void SmokeController::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "Smoke/Player/Set"_hash: {
-        auto uid = Msg.p1.as<Steam64UID>();
-        auto color = Msg.p2.low<uint32_t>();
+        auto&& [uid, color] = Msg.Access<Steam64UID, uint32_t>();
         std::unique_lock lock(this->smutex);
         this->playerColors[uid] = color;
         break;
     }
     case "Smoke/Player/Clear"_hash: {
-        auto uid = Msg.p1.as<Steam64UID>();
+        auto&& [uid] = Msg.Access<Steam64UID>();
         std::unique_lock lock(this->smutex);
         this->playerColors.erase(uid);
         break;
@@ -113,14 +116,13 @@ void SmokeController::ProcessMsg(MulNX::Message& Msg) {
         break;
     }
     case "Smoke/Team/Set"_hash: {
-        auto team = Msg.p1.high<CS2::ui8TeamNum>();
-        auto color = Msg.p1.low<uint32_t>();
+        auto&& [color, team] = Msg.Access<uint32_t, CS2::ui8TeamNum>();
         std::unique_lock lock(this->smutex);
         this->teamColors[team] = color;
         break;
     }
     case "Smoke/Team/Clear"_hash: {
-        auto team = Msg.p1.high<CS2::ui8TeamNum>();
+        auto&& [team] = Msg.Access<CS2::ui8TeamNum>();
         std::unique_lock lock(this->smutex);
         this->teamColors.erase(team);
         break;
@@ -184,7 +186,7 @@ void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
             return;
         }
     }
-    catch (const std::exception& e) {
-        return;
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
     }
 }

@@ -7,7 +7,8 @@ bool HookWindow::Init() {
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
     this->SubscribeSync("Hook/hWnd", [this](MulNX::Message& msg) {
-        this->hCS2Wnd = msg.p1.as<HWND>();
+        auto&& [hWnd] = msg.Access<HWND>();
+        this->hCS2Wnd = hWnd;
         // 文件拖拽钩子
         HANDLE hProp = GetPropW(this->hCS2Wnd, L"OleDropTargetInterface");
         IDropTarget* pTarget = static_cast<IDropTarget*>(hProp);

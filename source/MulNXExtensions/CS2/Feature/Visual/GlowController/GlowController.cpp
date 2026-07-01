@@ -24,15 +24,17 @@ void GlowController::HubPlayer(MulNX::UINode* node) {
         // 颜色被修改后，转换回 uint32_t 并保存到 playerColors
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
         MulNX::Message msg("Glow/Player/Set"_hash);
-        msg.p1.as<Steam64UID>() = uid;
-        msg.p2.low<uint32_t>() = newColorU32;
+        auto&& [uidRef, newColorRef] = msg.Access<Steam64UID, uint32_t>();
+        uidRef = uid;
+        newColorRef = newColorU32;
         this->PublishAsync(std::move(msg));
     }
 
     ImGui::SameLine();
     if (ImGui::Button("重置发光颜色")) {
         MulNX::Message msg("Glow/Player/Clear"_hash);
-        msg.p1.as<Steam64UID>() = uid;
+        auto&& [uidRef] = msg.Access<Steam64UID>();
+        uidRef = uid;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -54,15 +56,17 @@ void GlowController::HubTeam(MulNX::UINode* node) {
     if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4)) {
         uint32_t newColorU32 = ImGui::ColorConvertFloat4ToU32(colorVec4);
         MulNX::Message msg("Glow/Team/Set"_hash);
-        msg.p1.low<uint32_t>() = newColorU32;
-        msg.p1.high<CS2::ui8TeamNum>() = team;
+        auto&& [teamRef, newColorRef] = msg.Access<CS2::ui8TeamNum, uint32_t>();
+        teamRef = team;
+        newColorRef = newColorU32;
         this->PublishAsync(std::move(msg));
     }
 
     ImGui::SameLine();
     if (ImGui::Button("重置发光颜色")) {
         MulNX::Message msg("Glow/Team/Clear"_hash);
-        msg.p1.high<CS2::ui8TeamNum>() = team;
+        auto&& [teamRef] = msg.Access<CS2::ui8TeamNum>();
+        teamRef = team;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -109,14 +113,13 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
         break;
     }
     case "Glow/Player/Set"_hash: {
-        auto uid = Msg.p1.as<Steam64UID>();
-        auto color = Msg.p2.low<uint32_t>();
+        auto&& [uid, color] = Msg.Access<Steam64UID, uint32_t>();
         std::unique_lock lock(this->smutex);
         this->playerColors[uid] = color;
         break;
     }
     case "Glow/Player/Clear"_hash: {
-        auto uid = Msg.p1.as<Steam64UID>();
+        auto&& [uid] = Msg.Access<Steam64UID>();
         std::unique_lock lock(this->smutex);
         this->playerColors.erase(uid);
         break;
@@ -127,14 +130,13 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
         break;
     }
     case "Glow/Team/Set"_hash: {
-        auto team = Msg.p1.high<CS2::ui8TeamNum>();
-        auto color = Msg.p1.low<uint32_t>();
+        auto&& [team, color] = Msg.Access<CS2::ui8TeamNum, uint32_t>();
         std::unique_lock lock(this->smutex);
         this->teamColors[team] = color;
         break;
     }
     case "Glow/Team/Clear"_hash: {
-        auto team = Msg.p1.high<CS2::ui8TeamNum>();
+        auto&& [team] = Msg.Access<CS2::ui8TeamNum>();
         std::unique_lock lock(this->smutex);
         this->teamColors.erase(team);
         break;

@@ -23,10 +23,11 @@ void TrailsController::HubPlayer(MulNX::UINode* node) {
 
     if (ImGui::ColorEdit3("轨迹颜色", &currentColor.r)) {
         MulNX::Message msg("Trails/Player/Set"_hash);
-        msg.p1.as<Steam64UID>() = uid;
-        uint32_t colorU32 = ImGui::ColorConvertFloat4ToU32(
-            ImVec4(currentColor.r, currentColor.g, currentColor.b, 1.0f));
-        msg.p2.low<uint32_t>() = colorU32;
+        auto&& [uidRef, r, g, b] = msg.Access<Steam64UID, float, float, float>();
+        uidRef = uid;
+        r = currentColor.r;
+        g = currentColor.g;
+        b = currentColor.b;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -49,10 +50,11 @@ void TrailsController::HubTeam(MulNX::UINode* node) {
 
     if (ImGui::ColorEdit3("队伍默认轨迹颜色", &displayColor.r)) {
         MulNX::Message msg("Trails/Team/Set"_hash);
-        uint32_t colorU32 = ImGui::ColorConvertFloat4ToU32(
-            ImVec4(displayColor.r, displayColor.g, displayColor.b, 1.0f));
-        msg.p1.high<CS2::ui8TeamNum>() = team;
-        msg.p1.low<uint32_t>() = colorU32;
+        auto&& [teamRef, r, g, b] = msg.Access<CS2::ui8TeamNum, float, float, float>();
+        teamRef = team;
+        r = displayColor.r * 255.0f;
+        g = displayColor.g * 255.0f;
+        b = displayColor.b * 255.0f;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -70,9 +72,10 @@ void TrailsController::Menu(MulNX::UINode* node) {
 
     if (changed) {
         MulNX::Message msg("Trails/Prop"_hash);
-        msg.p1.low<float>() = *this->sv_grenade_trajectory_time_spectator;
-        msg.p1.high<float>() = propCopy.width;
-        msg.p2.low<float>() = propCopy.alpha;
+        auto&& [lifetime, width, alpha] = msg.Access<float, float, float>();
+        lifetime = *this->sv_grenade_trajectory_time_spectator;
+        width = propCopy.width;
+        alpha = propCopy.alpha;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -175,15 +178,13 @@ MulNX::Hook::Then TrailsController::HandleOnUpdate(CS2::C_BaseCSGrenadeProjectil
 void TrailsController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Trails/Player/Set"_hash: {
-        auto uid = msg.p1.as<Steam64UID>();
-        uint32_t colorU32 = msg.p2.low<uint32_t>();
-        ImVec4 v4 = ImGui::ColorConvertU32ToFloat4(colorU32); // [0,1]
+        auto&& [uid, r, g, b] = msg.Access<Steam64UID, float, float, float>();
         std::unique_lock lock(this->smutex);
-        this->playerColors[uid] = { v4.x * 255.0f, v4.y * 255.0f, v4.z * 255.0f };
+        this->playerColors[uid] = { r, g, b };
         break;
     }
     case "Trails/Player/Clear"_hash: {
-        auto uid = msg.p1.as<Steam64UID>();
+        auto&& [uid] = msg.Access<Steam64UID>();
         std::unique_lock lock(this->smutex);
         this->playerColors.erase(uid);
         break;
@@ -194,18 +195,16 @@ void TrailsController::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Trails/Team/Set"_hash: {
-        auto team = msg.p1.high<CS2::ui8TeamNum>();
-        uint32_t colorU32 = msg.p1.low<uint32_t>();
-        ImVec4 v4 = ImGui::ColorConvertU32ToFloat4(colorU32);
+        auto&& [team, r, g, b] = msg.Access<CS2::ui8TeamNum, float, float, float>();
         std::unique_lock lock(this->smutex);
         if (team == CS2::ui8TeamNum::T)
-            this->TColor = { v4.x * 255.0f, v4.y * 255.0f, v4.z * 255.0f };
+            this->TColor = { r, g, b };
         else if (team == CS2::ui8TeamNum::CT)
-            this->CTColor = { v4.x * 255.0f, v4.y * 255.0f, v4.z * 255.0f };
+            this->CTColor = { r, g, b };
         break;
     }
     case "Trails/Team/Clear"_hash: {
-        auto team = msg.p1.high<CS2::ui8TeamNum>();
+        auto&& [team] = msg.Access<CS2::ui8TeamNum>();
         std::unique_lock lock(this->smutex);
         // 重置为 0-255 默认颜色
         if (team == CS2::ui8TeamNum::T)
@@ -228,10 +227,8 @@ void TrailsController::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Trails/Prop"_hash: {
-        ParticleProp newProp;
-        newProp.lifetime = msg.p1.low<float>();
-        newProp.width = msg.p1.high<float>();
-        newProp.alpha = msg.p2.low<float>();
+        auto&& [lifetime, width, alpha] = msg.Access<float, float, float>();
+        ParticleProp newProp{ lifetime, width, alpha };
         std::unique_lock lock(this->smutex);
         this->prop = newProp;
         break;

@@ -31,7 +31,7 @@ bool ProjectileTracker::Init() {
 }
 
 void ProjectileTracker::OnEntityAdd(MulNX::Message& msg) {
-    auto pEntity = msg.p1.as<CS2::C_BaseEntity*>();
+    auto&& [pEntity] = msg.Access<CS2::C_BaseEntity*>();
     std::string name;
     try {
         name = pEntity->GetName();
@@ -46,7 +46,7 @@ void ProjectileTracker::OnEntityAdd(MulNX::Message& msg) {
 }
 
 void ProjectileTracker::OnEntityRemove(MulNX::Message& msg) {
-    auto pEntity = msg.p1.as<CS2::C_BaseEntity*>();
+    auto&& [pEntity] = msg.Access<CS2::C_BaseEntity*>();
     std::string name;
     try {
         name = pEntity->GetName();

@@ -22,7 +22,8 @@ bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
         std::string str = "跳转##" + std::to_string(time);
         if (ImGui::Button(str.c_str())) {
             MulNX::Message Msg("DemoHelper/JumpTIme"_hash);
-            Msg.p1.low<float>() = time;
+            auto&& [jumpTime] = Msg.Access<float>();
+            jumpTime = time;
             this->PublishAsync(std::move(Msg));
         }
     }
@@ -77,9 +78,9 @@ void DemoHelper::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "DemoHelper/JumpTIme"_hash: {
-        float data = msg.p1.low<float>();
-        this->LogInfo(std::format("跳转到{}", data));
-        this->CS2Time->JumpReal(data);
+        auto&& [jumpTime] = msg.Access<float>();
+        this->LogInfo(std::format("跳转到{}", jumpTime));
+        this->CS2Time->JumpReal(jumpTime);
         break;
     }
     }

@@ -24,6 +24,18 @@ namespace MulNX {
     template<typename T, size_t min, size_t max>
     concept PodSizeIn = Pod<T> && sizeof(T) > min && sizeof(T) <= max;
 
+    template <Pod... Ts>
+    consteval auto ComputeOffsets() noexcept {
+        constexpr size_t sizes[] = { sizeof(Ts)... };
+        std::array<size_t, sizeof...(Ts)> offsets{};
+        size_t acc = 0;
+        for (size_t i = 0; i < sizeof...(Ts); ++i) {
+            offsets[i] = acc;
+            acc += sizes[i];
+        }
+        return offsets;
+    }
+
     inline int64_t ToUnixUs(std::chrono::system_clock::time_point tp) {
         return std::chrono::duration_cast<std::chrono::microseconds>(
             tp.time_since_epoch()).count();

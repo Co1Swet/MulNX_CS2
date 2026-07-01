@@ -8,7 +8,6 @@ bool VirtualUser::Init() {
         .SubscribeAsync("Core/Tick30min")
 #endif // _DEBUG
         .SubscribeAsync("Core/Tick60")
-        .SubscribeAsync("Command/SpecPlayer")
         .SubscribeAsync("Game/NewRound");
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {
@@ -53,10 +52,6 @@ void VirtualUser::ProcessMsg(MulNX::Message& Msg) {
         break;
     }
 #endif // _DEBUG
-    case "Command/SpecPlayer"_hash: {
-        this->Core->ModuleManager()->FindModule<ObserverController>("ObserverController")->SpecPlayer(Msg.p1.low<int>());
-        break;
-    }
     default: {
         break;
     }

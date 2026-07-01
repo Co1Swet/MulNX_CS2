@@ -168,7 +168,8 @@ MulNX::CoTask DemoRecorder::Main() {
 
         // 等待跳转完成
         auto gotoCplt = co_await this->WaitMsg("Demo/GotoTick/Complete"_hash);
-        if (int jmped = gotoCplt.p1.low<int>();jmped != this->currentRecordTaskStartTick - 64) {
+        auto&& [jmped] = gotoCplt.Access<int>();
+        if (jmped != this->currentRecordTaskStartTick - 64) {
             this->LogError(std::format("期望跳到tick:{}而接收到了跳转到tick:{}，已丢弃此片段",
                 this->currentRecordTaskStartTick - 64, jmped));
             continue;
@@ -181,7 +182,8 @@ MulNX::CoTask DemoRecorder::Main() {
 
         // 设置观察目标
         MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
-        specMsg.p1.as<Steam64UID>() = uid;
+        auto&& [uidRef] = specMsg.Access<Steam64UID>();
+        uidRef = uid;
         this->PublishAsync(std::move(specMsg));
 
         this->LogInfo("Jumped to tick " + std::to_string(this->currentRecordTaskStartTick)
