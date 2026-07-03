@@ -1,23 +1,17 @@
 #include "VideoCapturer.hpp"
 #include <MulNXExtensions/MediaSystem/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
 
 bool VideoCapturer::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->SendTask("Capture","Capture", [this]() -> bool {
-            this->Captuer();
-            return true; // 保持keep，反复轮询
-        });
-
+    this->pVEncodeHelper  = this->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->SendTask("Capture", "Capture", [this]() -> bool { this->Captuer(); return true; });
     return true;
 }
 
 void VideoCapturer::ReleaseStagingTexture() {
-    if (this->pStagingTex) {
-        this->pStagingTex->Release();
-        this->pStagingTex = nullptr;
-    }
-    this->stagingWidth = 0;
-    this->stagingHeight = 0;
+    if (this->pStagingTex) { this->pStagingTex->Release(); this->pStagingTex = nullptr; }
+    this->stagingWidth = this->stagingHeight = 0;
     this->stagingFormat = DXGI_FORMAT_UNKNOWN;
 }
 
@@ -25,21 +19,17 @@ void VideoCapturer::Reset() {
     std::unique_lock lock(this->smutex);
     this->srcPixelFormat = AV_PIX_FMT_NONE;
     this->ReleaseStagingTexture();
+    this->readbackBuf.clear();
+    this->readbackBuf.shrink_to_fit();
     this->recordStartTime.reset();
+    this->hwCapture = false;
     this->runFlag1.store(false);
 }
 
-std::optional<av::VideoFrame> VideoCapturer::TryPop() {
-    av::VideoFrame outFrame;
-    if (this->buffer.try_dequeue(outFrame)) {
-        return outFrame;
-    }
-    return std::nullopt;
-}
-
-void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
+void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime, bool hwPath) {
     std::unique_lock lock(this->smutex);
     this->recordStartTime = startTime;
+    this->hwCapture = hwPath;
     this->runFlag1.store(true, std::memory_order_release);
 }
 
@@ -50,96 +40,107 @@ void VideoCapturer::StopCapture() {
 
 void VideoCapturer::ClearBuffer() {
     av::VideoFrame discard;
-    while (this->buffer.try_dequeue(discard)) {
-        // drain stale video data
-    }
-    std::unique_lock lock(this->smutex);
+    while (this->buffer.try_dequeue(discard));
+}
+
+std::optional<av::VideoFrame> VideoCapturer::TryPop() {
+    av::VideoFrame f;
+    return this->buffer.try_dequeue(f) ? std::optional(std::move(f)) : std::nullopt;
 }
 
 void VideoCapturer::Captuer() {
     this->Update();
-
     if (!this->runFlag1.load(std::memory_order_acquire)) {
-        this->pVCD3D11Manager->runFlag1.store(false, std::memory_order_release);
+        if (this->pVCD3D11Manager) this->pVCD3D11Manager->runFlag1.store(false, std::memory_order_release);
         return;
     }
-    this->pVCD3D11Manager->runFlag1.store(true, std::memory_order_release);
-    if(!this->pVCD3D11Manager->buffer1.hasNewFrame.load(std::memory_order_acquire)){
-        return;
-    }
+    if (this->pVCD3D11Manager) this->pVCD3D11Manager->runFlag1.store(true, std::memory_order_release);
+    if (!this->pVCD3D11Manager || !this->pVCD3D11Manager->ringReady.load(std::memory_order_acquire)) return;
 
     std::unique_lock lock(this->smutex);
+    int readIdx = this->pVCD3D11Manager->readIdx.load(std::memory_order_acquire);
+    RingSlot& slot = this->pVCD3D11Manager->ring[readIdx];
+    if (!slot.hasNewFrame.load(std::memory_order_acquire)) return;
+    if (!this->recordStartTime.has_value()) return;
 
+    int64_t ptsUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        slot.captureTime.load(std::memory_order_acquire) - *this->recordStartTime).count();
+    if (ptsUs < 0) ptsUs = 0;
+
+    bool ok = this->hwCapture ? this->ReadbackHw(readIdx, ptsUs) : this->ReadbackSw(readIdx, ptsUs);
+    // ReadbackSw/ReadbackHw 内部已在 ReleaseSync(0) 前完成 hasNewFrame=false 和 readIdx 推进
+}
+
+bool VideoCapturer::ReadbackSw(int slotIdx, int64_t ptsUs) {
+    RingSlot& slot = this->pVCD3D11Manager->ring[slotIdx];
     D3D11_TEXTURE2D_DESC desc;
-    this->pVCD3D11Manager->buffer1.shareTex.pTex->GetDesc(&desc);
-    
-    av::PixelFormat srcFormat = DXGIFormatToAvPixelFormat(desc.Format);
-    if (srcFormat == AV_PIX_FMT_NONE) {
-        this->LogError("当前后备缓冲区格式不受支持，无法录制");
-        return;
-    }
+    slot.shareTex.pTex->GetDesc(&desc);
 
-    if (!this->pStagingTex || this->stagingWidth != desc.Width || this->stagingHeight != desc.Height || this->stagingFormat != desc.Format) {
+    av::PixelFormat srcFmt = DXGIFormatToAvPixelFormat(desc.Format);
+    if (srcFmt == AV_PIX_FMT_NONE) return false;
+
+    if (!this->pStagingTex || this->stagingWidth != (int)desc.Width ||
+        this->stagingHeight != (int)desc.Height || this->stagingFormat != desc.Format) {
         this->ReleaseStagingTexture();
-
-        D3D11_TEXTURE2D_DESC stagingDesc = {};
-        stagingDesc.Width = desc.Width;
-        stagingDesc.Height = desc.Height;
-        stagingDesc.MipLevels = 1;
-        stagingDesc.ArraySize = 1;
-        stagingDesc.Format = desc.Format;
-        stagingDesc.SampleDesc.Count = 1;
-        stagingDesc.Usage = D3D11_USAGE_STAGING;
-        stagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        stagingDesc.BindFlags = 0;
-
-        HRESULT hr = this->pVCD3D11Manager->pDevice->CreateTexture2D(&stagingDesc, nullptr, &this->pStagingTex);
-        if (FAILED(hr)) {
-            this->LogError("创建 D3D11 staging 纹理失败，录制中断");
-            return;
-        }
-
-        this->stagingWidth = desc.Width;
-        this->stagingHeight = desc.Height;
-        this->stagingFormat = desc.Format;
-        this->srcPixelFormat = srcFormat;
+        D3D11_TEXTURE2D_DESC sd = {};
+        sd.Width = desc.Width; sd.Height = desc.Height; sd.MipLevels = sd.ArraySize = 1;
+        sd.Format = desc.Format; sd.SampleDesc.Count = 1;
+        sd.Usage = D3D11_USAGE_STAGING; sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        if (FAILED(this->pVCD3D11Manager->pDevice->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
+            return false;
+        this->stagingWidth = (int)desc.Width; this->stagingHeight = (int)desc.Height;
+        this->stagingFormat = desc.Format; this->srcPixelFormat = srcFmt;
     }
 
-    this->pVCD3D11Manager->buffer1.shareTex.pMutex->AcquireSync(1, INFINITE); // 等待新帧就绪（key = 1）
-    if (desc.SampleDesc.Count > 1) {
-        this->pVCD3D11Manager->pContext->ResolveSubresource(this->pStagingTex, 0, this->pVCD3D11Manager->buffer1.shareTex.pTex.Get(), 0, desc.Format);
-    }
-    else {
-        this->pVCD3D11Manager->pContext->CopyResource(this->pStagingTex, this->pVCD3D11Manager->buffer1.shareTex.pTex.Get());
-    }
-    this->pVCD3D11Manager->buffer1.hasNewFrame.store(false);
-    this->pVCD3D11Manager->buffer1.shareTex.pMutex->ReleaseSync(0); // 释放资源（key = 0）
+    slot.shareTex.pMutex->AcquireSync(1, INFINITE);
+    if (desc.SampleDesc.Count > 1)
+        this->pVCD3D11Manager->pContext->ResolveSubresource(this->pStagingTex, 0, slot.shareTex.pTex.Get(), 0, desc.Format);
+    else
+        this->pVCD3D11Manager->pContext->CopyResource(this->pStagingTex, slot.shareTex.pTex.Get());
+    slot.hasNewFrame.store(false, std::memory_order_release);
+    this->pVCD3D11Manager->readIdx.store(
+        (slotIdx + 1) % this->pVCD3D11Manager->ringCapacity, std::memory_order_release);
+    slot.shareTex.pMutex->ReleaseSync(0);
 
-    D3D11_MAPPED_SUBRESOURCE mapped = {};
-    HRESULT hr = this->pVCD3D11Manager->pContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &mapped);
-    if (FAILED(hr) || !mapped.pData) {
-        this->LogError("Map D3D11 staging 纹理失败，录制帧跳过");
-        return;
-    }
-
-    size_t rowBytes = static_cast<size_t>(this->stagingWidth) * 4;
-    std::vector<uint8_t> rawData(rowBytes * this->stagingHeight);
-    uint8_t* dstRow = rawData.data();
-    for (UINT row = 0; row < static_cast<UINT>(this->stagingHeight); ++row) {
-        const uint8_t* srcRow = reinterpret_cast<const uint8_t*>(mapped.pData) + static_cast<size_t>(mapped.RowPitch) * row;
-        memcpy(dstRow, srcRow, rowBytes);
-        dstRow += rowBytes;
-    }
+    D3D11_MAPPED_SUBRESOURCE map = {};
+    if (FAILED(this->pVCD3D11Manager->pContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &map)) || !map.pData)
+        return false;
+    size_t rowBytes = (size_t)this->stagingWidth * 4;
+    size_t total   = rowBytes * (size_t)this->stagingHeight;
+    if (this->readbackBuf.size() < total) this->readbackBuf.resize(total);
+    for (UINT r = 0; r < (UINT)this->stagingHeight; ++r)
+        memcpy(this->readbackBuf.data() + rowBytes * r,
+               (const uint8_t*)map.pData + (size_t)map.RowPitch * r, rowBytes);
     this->pVCD3D11Manager->pContext->Unmap(this->pStagingTex, 0);
 
-    av::VideoFrame srcFrame(rawData.data(), rawData.size(), srcFormat, this->stagingWidth, this->stagingHeight);
-    if (this->recordStartTime.has_value()) {
-        auto now = this->pVCD3D11Manager->buffer1.captureTime.load(std::memory_order_acquire);
-        int64_t pts = std::chrono::duration_cast<std::chrono::microseconds>(now - *this->recordStartTime).count();
-        srcFrame.setTimeBase({ 1, 1000000 });
-        srcFrame.setPts(av::Timestamp(pts, srcFrame.timeBase()));
-    }
-    this->buffer.enqueue(std::move(srcFrame));
+    av::VideoFrame frame(this->readbackBuf.data(), total, this->srcPixelFormat,
+                         this->stagingWidth, this->stagingHeight);
+    frame.setTimeBase({ 1, 1000000 });
+    frame.setPts(av::Timestamp(ptsUs, frame.timeBase()));
+    this->buffer.enqueue(std::move(frame));
+    return true;
+}
 
-    return;
+bool VideoCapturer::ReadbackHw(int slotIdx, int64_t ptsUs) {
+    RingSlot& slot = this->pVCD3D11Manager->ring[slotIdx];
+    if (!this->pVEncodeHelper || !this->pVEncodeHelper->IsHwAccel()) return false;
+
+    auto ohwf = this->pVEncodeHelper->AllocHwFrame();
+    if (!ohwf) return false;
+
+    ID3D11Texture2D* poolTex = reinterpret_cast<ID3D11Texture2D*>(ohwf->raw()->data[0]);
+    if (!poolTex) return false;
+
+    // 持有共享纹理（key=1 可读），将捕获纹理拷入帧池纹理
+    slot.shareTex.pMutex->AcquireSync(1, INFINITE);
+    this->pVCD3D11Manager->pContext->CopyResource(poolTex, slot.shareTex.pTex.Get());
+    slot.hasNewFrame.store(false, std::memory_order_release);
+    this->pVCD3D11Manager->readIdx.store(
+        (slotIdx + 1) % this->pVCD3D11Manager->ringCapacity, std::memory_order_release);
+    slot.shareTex.pMutex->ReleaseSync(0);
+
+    ohwf->setTimeBase({ 1, 1000000 });
+    ohwf->setPts(av::Timestamp(ptsUs, ohwf->timeBase()));
+    this->buffer.enqueue(std::move(*ohwf));
+    return true;
 }
