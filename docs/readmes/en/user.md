@@ -110,7 +110,6 @@ Full version number format: `Bx.y.zCx.y.z` (example: `B0.2.0C0.27.0`)
 
 ## Developer & Support
 
-- **Developer**: Independent developer, the project has not received assistance from any individual or organization
 - **Bilibili homepage** (including tutorial videos): <https://space.bilibili.com/3546957930826262>
 - **QQ group**: `1082590843`
 - **Special note**: The developer is also an official streamer of Perfect World Esports (Perfect World is the official distributor of Valve's CS2 in mainland China)
