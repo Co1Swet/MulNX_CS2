@@ -39,7 +39,7 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
 
     ImGui::Begin(I18n("3D视觉").c_str());
     node->CallUINode("SkinController");
-    node->CallUINode("TeamIDController");
+    node->CallUINode("TeamIDRenderController");
     node->CallUINode("TrailsController");
     node->CallUINode("SkyController");
     ImGui::End();

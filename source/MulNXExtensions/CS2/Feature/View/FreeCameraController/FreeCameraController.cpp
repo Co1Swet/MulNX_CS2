@@ -23,7 +23,7 @@ bool FreeCameraController::Init() {
     this->kMovUp = this->Shortcut()->GetButton("CamMovUp").value();
     this->kMovDown = this->Shortcut()->GetButton("CamMovDown").value();
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
-    this->SubscribeAsync("FreeCamCtrl/Toggle");
+    this->SubscribeAsync<void>("FreeCamCtrl/Toggle");
     return true;
 }
 

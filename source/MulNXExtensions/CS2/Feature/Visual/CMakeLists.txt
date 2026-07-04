@@ -4,7 +4,8 @@ add_library(CS2Visual STATIC
     PlayerFlashController/PlayerFlashController.cpp
     SkinController/SkinController.cpp
     SmokeController/SmokeController.cpp
-    TeamIDController/TeamIDController.cpp
+    TeamIDColorController/TeamIDColorController.cpp
+    TeamIDRenderController/TeamIDRenderController.cpp
     TrailsController/TrailsController.cpp
     SkyController/SkyController.cpp
     ESPSkeleton/ESPSkeleton.cpp
