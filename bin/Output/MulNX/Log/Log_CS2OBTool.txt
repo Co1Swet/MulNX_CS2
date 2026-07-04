@@ -9,7 +9,7 @@
 [2026-06-26 02:49:12.1472070][成功][IPCer]module.inited
 [2026-06-26 02:49:12.1474830][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Config
 [2026-06-26 02:49:12.1475150][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Log
-[2026-06-26 02:49:12.1475630][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Vedios
+[2026-06-26 02:49:12.1475630][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Videos
 [2026-06-26 02:49:12.1475930][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Data
 [2026-06-26 02:49:12.1476200][提示][PathManager]检测到共享目录已创建：C:\Users\lenovo\Desktop\核心科技\MulNX_CS2\bin\MulNX\Output
 [2026-06-26 02:49:12.1477160][成功][PathManager]module.inited

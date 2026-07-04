@@ -21,7 +21,7 @@ bool MediaRecorder::Init() {
     this->pVCD3D11Manager   = this->Core->ModuleManager()->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->pMediaParamManager= this->Core->ModuleManager()->FindModule<MediaParamManager>("MediaParamManager");
 
-    this->dirVedios = this->Path()->PathGetForShared("Vedios");
+    this->dirVideos = this->Path()->PathGetForShared("Videos");
     (*this).SubscribeAsync("Media/Record/Start").SubscribeAsync("Media/Record/Stop");
 
     this->SendTask("Main", "Media", [this]() { this->Main(); return true; });

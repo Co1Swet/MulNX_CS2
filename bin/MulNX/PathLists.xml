@@ -3,7 +3,7 @@
     <Shared>
         <Path Name="Config"/>
         <Path Name="Log"/>
-        <Path Name="Vedios"/>
+        <Path Name="Videos"/>
         <Path Name="Data"/>
         <Path Name="Output"/>
     </Shared>
