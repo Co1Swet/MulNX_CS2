@@ -89,15 +89,15 @@ bool GlowController::Init() {
         });
 
     (*this)
-        .SubscribeAsync("Glow/Enable")
-        .SubscribeAsync("Glow/Disable")
+        .SubscribeAsync<void>("Glow/Enable")
+        .SubscribeAsync<void>("Glow/Disable")
         .SubscribeAsync<Steam64UID, uint32_t>("Glow/Player/Set")
         .SubscribeAsync<Steam64UID>("Glow/Player/Clear")
-        .SubscribeAsync("Glow/Player/ClearAll")
+        .SubscribeAsync<void>("Glow/Player/ClearAll")
         .SubscribeAsync<CS2::ui8TeamNum, uint32_t>("Glow/Team/Set")
         .SubscribeAsync<CS2::ui8TeamNum>("Glow/Team/Clear")
         .SubscribeAsync<CS2::ui8TeamNum>("Glow/Team/ClearAll")
-        .SubscribeAsync("Glow/ClearAll");
+        .SubscribeAsync<void>("Glow/ClearAll");
 
     return true;
 }

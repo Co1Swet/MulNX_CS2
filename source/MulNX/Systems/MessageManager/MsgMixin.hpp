@@ -29,11 +29,19 @@ namespace MulNX {
         }
         template<typename... Args>
         auto& SubscribeAsync(const std::string& msgType) {
-            auto h = MulNX::CreateFiller<Args...>();
-            auto typeDesc = MulNX::GetTypeString<Args...>();
-            This()->MainMsgChannel->SubscribeAsync(msgType, std::move(h));
-            auto full=std::format("{}  Args: {}", msgType, typeDesc);
-            This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+            if constexpr (sizeof...(Args) == 1 && std::is_same_v<void, std::tuple_element_t<0, std::tuple<Args...>>>) {
+                auto h = [](MulNX::Message& msg, std::string_view raw) {return; };
+                This()->MainMsgChannel->SubscribeAsync(msgType, std::move(h));
+                auto full = std::format("{} Also Externed With Args: <void>", msgType);
+                This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+            }
+            else {
+                auto h = MulNX::CreateFiller<Args...>();
+                auto typeDesc = MulNX::GetTypeString<Args...>();
+                This()->MainMsgChannel->SubscribeAsync(msgType, std::move(h));
+                auto full = std::format("{} Also Externed With Args: {}", msgType, typeDesc);
+                This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+            }
             return *this;
         }
 
