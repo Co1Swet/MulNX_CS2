@@ -2,13 +2,6 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
 
-using GetPlayerController_t = void* (__fastcall*)(void* event, uint32_t keyHash);
-struct CKV3MemberName {
-    uint32_t hash;
-    int      index;
-    const char* str;
-};
-
 bool DeathMsgController::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);
     if (!w)return true;
@@ -36,7 +29,7 @@ bool DeathMsgController::Init() {
         auto target = this->CS2->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::Hud::HandlePlayerDeath);
         this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
-            void* event = reinterpret_cast<void*>(ctx->rdx);
+            auto event = std::bit_cast<CS2::CGameEvent*>(ctx->rdx);
             return this->HandleOnPlayerDeath(event);
             }).value();
         this->hkHandlePlayerDeath->Attach();
@@ -56,16 +49,14 @@ void DeathMsgController::ProcessMsg(MulNX::Message& msg) {
 
 }
 
-MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(void* event) {
-    auto GetPlayerController = IVClass::Assume(event)->GetVFunc<CS2::CCSPlayerController * (const CKV3MemberName&)>(16);
+MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(CS2::CGameEvent* event) {
+    CS2::CKV3MemberName attacker{ this->attacker_hash, -1, nullptr };
+    CS2::CKV3MemberName userid{ this->userid_hash, -1, nullptr };
+    CS2::CKV3MemberName assister{ this->assister_hash, -1, nullptr };
 
-    CKV3MemberName attacker{ this->attacker_hash, -1, nullptr };
-    CKV3MemberName userid{ this->userid_hash, -1, nullptr };
-    CKV3MemberName assister{ this->assister_hash, -1, nullptr };
-
-    auto pKillerController = GetPlayerController(attacker);
-    auto pBeKillerController = GetPlayerController(userid);
-    auto pAssisterController = GetPlayerController(assister);
+    auto pKillerController = event->GetPlayerController(attacker);
+    auto pBeKillerController = event->GetPlayerController(userid);
+    auto pAssisterController = event->GetPlayerController(assister);
 
     try {
         auto killerSteamID = MulNX::MRead(pKillerController->m_steamID());
@@ -74,14 +65,6 @@ MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(void* event) {
         if (pAssisterController) {
             assisterSteamID = MulNX::MRead(pAssisterController->m_steamID());
         }
-        auto eventTick = this->CS2Time->GetDemoTick();
-
-        auto [msg, rp] = MulNX::Message::Create<KillEvent>("Game/KillEvent"_hash);
-        rp->DemoTick = eventTick;
-        rp->attackerSteamId = killerSteamID;
-        rp->victimSteamId = beKillerSteamID;
-        rp->assisterSteamId = assisterSteamID;
-        this->PublishAsync(std::move(msg));
 
         if (!this->enable.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
 

@@ -10,6 +10,7 @@ add_library(CS2Intro STATIC
     HookEntitySystem/HookEntitySystem.cpp
     HookConsole/HookConsole.cpp
     HookView/HookView.cpp
+    HookGameEvents/HookGameEvents.cpp
 )
 target_include_directories(CS2Intro PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(CS2Intro PUBLIC

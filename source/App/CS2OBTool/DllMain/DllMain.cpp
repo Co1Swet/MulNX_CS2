@@ -34,6 +34,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<HookConsole>("HookConsole")
             .CreateModule<ConsoleOutput>("ConsoleOutput")
             .CreateModule<HookEntitySystem>("HookEntitySystem")
+            .CreateModule<HookGameEvents>("HookGameEvents")
             .CreateModule<ParticleManager>("ParticleManager")
             .CreateModule<MaterialSystem>("MaterialSystem")
             .CreateModule<SceneSystem>("SceneSystem")

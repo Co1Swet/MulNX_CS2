@@ -5,3 +5,4 @@
 #include "HookConsole/HookConsole.hpp"
 #include "HookEntitySystem/HookEntitySystem.hpp"
 #include "HookView/HookView.hpp"
+#include "HookGameEvents/HookGameEvents.hpp"
