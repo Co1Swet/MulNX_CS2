@@ -1,4 +1,5 @@
 #pragma once
+#include "CS2Hash/CS2Hash.hpp"
 #include "ConsoleOutput/ConsoleOutput.hpp"
 #include "EntityListScanner/EntityListScanner.hpp"
 #include "ParticleManager/ParticleManager.hpp"

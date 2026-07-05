@@ -1,6 +1,7 @@
 #include "DeathMsgController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
+#include <Buildup/CS2Hash/CS2Hash.hpp>
 
 bool DeathMsgController::Window(MulNX::UINode* node) {
     auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);
@@ -11,25 +12,10 @@ bool DeathMsgController::Window(MulNX::UINode* node) {
 
 bool DeathMsgController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto pattern = MulNX::CS2::Signatures::Utils::CSHashString;
-        uint8_t* callSite = this->CS2->client.GetTextRegion()
-            .FindRegion(pattern).Data();
-
-        // call 指令位于 callSite + 12 (0x0C) 处
-        uint8_t* callAddr = callSite + 12;
-        // E8 后面 4 字节是相对偏移
-        int32_t relOffset = *reinterpret_cast<int32_t*>(callAddr + 1);
-        // 目标地址 = call 指令下一条指令地址 + relOffset
-        this->CSHashString = reinterpret_cast<HashFunc_t>(callAddr + 5 + relOffset);
-
-        this->CSHashString(&this->attacker_hash, "attacker");
-        this->CSHashString(&this->userid_hash, "userid");
-        this->CSHashString(&this->assister_hash, "assister");
-
         auto target = this->CS2->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::Hud::HandlePlayerDeath);
         this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto event = std::bit_cast<CS2::CGameEvent*>(ctx->rdx);
+            auto event = reinterpret_cast<CS2::CGameEvent*>(ctx->rdx);
             return this->HandleOnPlayerDeath(event);
             }).value();
         this->hkHandlePlayerDeath->Attach();
@@ -50,9 +36,9 @@ void DeathMsgController::ProcessMsg(MulNX::Message& msg) {
 }
 
 MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(CS2::CGameEvent* event) {
-    CS2::CKV3MemberName attacker{ this->attacker_hash, -1, nullptr };
-    CS2::CKV3MemberName userid{ this->userid_hash, -1, nullptr };
-    CS2::CKV3MemberName assister{ this->assister_hash, -1, nullptr };
+    static CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
+    static CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
+    static CS2::CKV3MemberName assister{ this->CS2Hashs->assister, -1, nullptr };
 
     auto pKillerController = event->GetPlayerController(attacker);
     auto pBeKillerController = event->GetPlayerController(userid);

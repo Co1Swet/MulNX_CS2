@@ -6,7 +6,6 @@ add_library(CS2HUD STATIC
     PlayerSpotColorController/PlayerSpotColorController.cpp
     TeamCounterController/TeamCounterController.cpp
     PlayerSpotRenderController/PlayerSpotRenderController.cpp
-    SpeakingController/SpeakingController.cpp
     FlashRenderController/FlashRenderController.cpp
 )
 

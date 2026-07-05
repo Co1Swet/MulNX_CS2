@@ -2,6 +2,7 @@
 #include <MulNX/MulNX.hpp>
 #include <MulNXUtils/WinExt/vtable/vtable.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
+#include "PawnsServices.hpp"
 
 MULNX_USING(GameTime_t, float);
 MULNX_USING(Steam64UID, uint64_t);
@@ -259,6 +260,7 @@ namespace CS2 {
     class CBasePlayerController;
     class C_BasePlayerPawn :public C_BaseCombatCharacter {
     public:
+        CPlayer_ItemServices** pItemServices() { return Schema<CPlayer_ItemServices*>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_pItemServices); }
         CPlayer_ObserverServices** pObserverServices() { return Schema<CPlayer_ObserverServices*>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_pObserverServices); }
         DirectX::XMFLOAT3* vOldOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_vOldOrigin); }
         //DirectX::XMFLOAT3 GetEyePos(){}
@@ -294,6 +296,7 @@ namespace CS2 {
     public:
         DirectX::XMFLOAT3* angEyeAngles() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_angEyeAngles); }
         EntitySpottedState_t* m_entitySpottedState() { return Schema<EntitySpottedState_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_entitySpottedState); }
+        int32_t* m_ArmorValue() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_ArmorValue); }
     };
 
     class CBasePlayerController :public C_BaseEntity {

@@ -6,6 +6,7 @@ class PlayerHub;
 class HookView;
 class TimeController;
 class HookConsole;
+class CS2Hash;
 
 class ICSModule {
 public:
@@ -49,6 +50,7 @@ public:
     PlayerHub* Hub = nullptr;
     HookConsole* CS2Con = nullptr;
     CS2Paths* CS2Paths = nullptr;
+    CS2Hash* CS2Hashs = nullptr;
 protected:
     bool participateIt = false;
     CSModuleMixin() {
@@ -58,8 +60,9 @@ protected:
             this->CS2Time = This()->FindModule<TimeController>("TimeController");
             this->Hub = This()->FindModule<PlayerHub>("PlayerHub");
             this->CS2Con = This()->FindModule<HookConsole>("HookConsole");
+            this->CS2Hashs = This()->FindModule<CS2Hash>("CS2Hash");
 
-            this->CS2Paths = CS2Paths->Get();
+            this->CS2Paths = CS2Paths::Get();
 
             return true;
             });

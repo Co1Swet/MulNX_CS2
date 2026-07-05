@@ -6,5 +6,6 @@ add_library(CS2Buildup STATIC
     PlayerHub/PlayerHub.cpp
     SceneSystem/SceneSystem.cpp
     MaterialSystem/MaterialSystem.cpp
+    CS2Hash/CS2Hash.cpp
 )
 target_link_libraries(CS2Buildup PUBLIC CS2Intro)

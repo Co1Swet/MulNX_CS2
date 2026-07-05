@@ -35,6 +35,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<ConsoleOutput>("ConsoleOutput")
             .CreateModule<HookEntitySystem>("HookEntitySystem")
             .CreateModule<HookGameEvents>("HookGameEvents")
+            .CreateModule<CS2Hash>("CS2Hash")
             .CreateModule<ParticleManager>("ParticleManager")
             .CreateModule<MaterialSystem>("MaterialSystem")
             .CreateModule<SceneSystem>("SceneSystem")
@@ -42,6 +43,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<HookView>("HookView")
             .CreateModule<PlayerHub>("PlayerHub")
             // CS2功能模块
+            .CreateModule<HitSoundFix>("HitSoundFix")
             .CreateModule<FreeCameraController>("FreeCameraController")
             .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<ObserverController>("ObserverController")
