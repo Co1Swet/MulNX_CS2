@@ -1,5 +1,6 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
+#include <MulNXExtensions/MediaSystem/MotionBlurProcessor/MotionBlurProcessor.hpp>
 #include <atomic>
 #include <vector>
 
@@ -9,10 +10,9 @@ public:
     ComPtr<IDXGIKeyedMutex> pMutex;
 };
 
-// 环形队列的单个槽位：一对跨设备共享纹理 + 新帧标志 + 捕获时刻(PTS)
 struct RingSlot {
-    MidTex rawTex;      // 原设备（游戏）上的共享纹理
-    MidTex shareTex;    // 录制设备上的共享纹理
+    MidTex rawTex;
+    MidTex shareTex;
     std::atomic<bool> hasNewFrame{ false };
     std::atomic<std::chrono::steady_clock::time_point> captureTime;
     static_assert(std::atomic<std::chrono::steady_clock::time_point>::is_always_lock_free, "captureTime must be lock-free");
@@ -38,34 +38,32 @@ struct RingSlot {
 class VCD3D11Manager final : public MediaModuleBase {
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
 
-    // 可选的捕获帧率上限（0=不限制，全帧捕获）
     std::atomic<int> captureFpsCap{ 0 };
 
-    // 基于时间槽的帧率限制状态（录制启动时由 MediaRecorder 设置）
     std::chrono::steady_clock::time_point recordStartTime;
-    int64_t minIntervalUs = 16667;     // captureFpsCap 换算（µs）
-    int64_t lastSlot = -1;             // 上次捕获所在时间槽序号
+    int64_t minIntervalUs = 16667;
+    int64_t lastSlot = -1;
+    int64_t mbAccumSlot = -1;
 
     void OnPresentFirst(MulNX::Message& msg);
     void CopyTexture();
     bool CreateSlot(const D3D11_TEXTURE2D_DESC& desc, RingSlot& slot);
 
+    MotionBlurProcessor mbProcessor;
+
 public:
     bool Init() override;
 
-    // 环形队列
     std::vector<RingSlot> ring;
     int ringCapacity = 6;
     std::atomic<int> writeIdx{ 0 };
     std::atomic<int> readIdx{ 0 };
     std::atomic<uint64_t> droppedFrames{ 0 };
     std::atomic<bool> ringReady{ false };
-    // runFlag1 沿用基类 ModuleComponents::runFlag1，由 VideoCapturer 置位以启用拷贝
 
     ComPtr<ID3D11Device> pDevice;
     ComPtr<ID3D11DeviceContext> pContext;
 
-    // 源纹理参数（创建环形队列时记录，供编码器配置使用）
     int srcWidth = 0;
     int srcHeight = 0;
     DXGI_FORMAT srcDxgiFormat = DXGI_FORMAT_UNKNOWN;

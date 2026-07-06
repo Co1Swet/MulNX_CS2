@@ -69,6 +69,17 @@ void MediaSystem::RecordParamsUI() {
     ImGui::InputInt("高度(0=原生)", &p.height);
     ImGui::InputInt("捕获帧率(0=不限)", &p.captureFpsCap);
     if (p.captureFpsCap < 0) p.captureFpsCap = 0;
+
+    if (p.captureFpsCap <= 0)
+        ImGui::BeginDisabled();
+    ImGui::Checkbox("运动模糊", &p.enableMotionBlur);
+    if (p.enableMotionBlur) {
+        ImGui::Indent();
+        ImGui::SliderFloat("模糊强度 (快门角度)", &p.motionBlurShutter, 0.1f, 1.0f, "%.2f");
+        ImGui::Unindent();
+    }
+    if (p.captureFpsCap <= 0)
+        ImGui::EndDisabled();
 }
 
 bool MediaSystem::Init() {

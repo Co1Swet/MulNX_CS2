@@ -82,15 +82,21 @@ bool VEncodeHelper::SetupHwContext(ID3D11Device* device, int w, int h) {
         this->hwInputPixFmt = AV_PIX_FMT_D3D11;
     } else if (enc.find("nvenc") != std::string::npos) {
         this->hwInputPixFmt = AV_PIX_FMT_CUDA;
-        if (av_hwdevice_ctx_create_derived(&this->hwTargetDeviceRef, AV_HWDEVICE_TYPE_CUDA, this->hwD3D11DeviceRef, 0) < 0) {
-            this->hwInputPixFmt = AV_PIX_FMT_NV12; return false;
+        int ret = av_hwdevice_ctx_create_derived(&this->hwTargetDeviceRef, AV_HWDEVICE_TYPE_CUDA, this->hwD3D11DeviceRef, 0);
+        if (ret < 0) {
+            this->LogWarning(std::format("CUDA 上下文衍生失败({}), 尝试使用 D3D11VA 直传模式", ret));
+            this->hwInputPixFmt = AV_PIX_FMT_D3D11;
+            this->hwTargetDeviceRef = nullptr;
+            this->hwTargetFramesRef = nullptr;
+            return true;
         }
         this->hwTargetFramesRef = av_hwframe_ctx_alloc(this->hwTargetDeviceRef);
         if (!this->hwTargetFramesRef) { av_buffer_unref(&this->hwTargetDeviceRef); this->hwInputPixFmt = AV_PIX_FMT_NV12; return false; }
         auto* cfc = reinterpret_cast<AVHWFramesContext*>(this->hwTargetFramesRef->data);
         cfc->format = AV_PIX_FMT_CUDA; cfc->sw_format = AV_PIX_FMT_NV12;
         cfc->width = w; cfc->height = h; cfc->initial_pool_size = 6;
-        if (av_hwframe_ctx_init(this->hwTargetFramesRef) < 0) {
+        if ((ret = av_hwframe_ctx_init(this->hwTargetFramesRef)) < 0) {
+            this->LogWarning(std::format("CUDA FrameCtx失败({})", ret));
             av_buffer_unref(&this->hwTargetFramesRef); av_buffer_unref(&this->hwTargetDeviceRef);
             this->hwInputPixFmt = AV_PIX_FMT_NV12; return false;
         }
@@ -132,7 +138,7 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
         this->encoder.setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
 
     if (auto* raw = this->encoder.raw()) {
-        raw->color_range    = AVCOL_RANGE_JPEG;
+        raw->color_range    = AVCOL_RANGE_MPEG; // 采用 Limited Range (16-235) 匹配硬件默认转换行为，解决发灰问题
         raw->colorspace     = AVCOL_SPC_BT709;
         raw->color_primaries = AVCOL_PRI_BT709;
         raw->color_trc      = AVCOL_TRC_BT709;

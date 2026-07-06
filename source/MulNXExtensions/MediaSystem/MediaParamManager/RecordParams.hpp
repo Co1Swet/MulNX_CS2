@@ -22,6 +22,10 @@ struct RecordParams {
     int  height             = 0;           // 0=原生
     int  captureFpsCap      = 60;          // 0=不限制
     int  ringSlots          = 6;
+
+    // ── 运动模糊 ──
+    bool enableMotionBlur   = false;       // 全时采样累积式运动模糊（不舍弃多余帧）
+    float motionBlurShutter = 1.0f;        // 虚拟快门角度/模糊强度 0.1~1.0
 };
 
 struct EncoderCaps {
