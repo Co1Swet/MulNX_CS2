@@ -6,6 +6,9 @@ Win32Starter::Win32Starter() {
 }
 
 bool Win32Starter::Init() {
+    // 关闭控制台
+    FreeConsole();
+
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
 
     // Make process DPI aware and obtain main monitor scale
