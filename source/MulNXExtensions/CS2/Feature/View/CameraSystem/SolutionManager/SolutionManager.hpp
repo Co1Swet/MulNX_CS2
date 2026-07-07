@@ -36,7 +36,7 @@ public:
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    void HandleUpdate();
+    bool HandleUpdate(CameraSystemIO* IO);
 
     bool Solution_Create(const std::string& Name);
     //保存所有解决方案到文件
@@ -55,5 +55,5 @@ public:
     //通过名称设置当前播放的解决方案
     void Playing_Solution(const std::string& SolutionName);
     //调用播放
-    void Playing_Call();
+    bool Playing_Call(CameraSystemIO* IO);
 };

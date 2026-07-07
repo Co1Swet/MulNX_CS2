@@ -87,7 +87,7 @@ bool ElementManager::UINodeFunc(MulNX::UINode* node) {
     for (auto& [name, elem] : this->elements) {
         elem->DrawBase(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     }
-    if (this->needDrawCamera.load(std::memory_order_acquire)) {
+    if (this->needDrawCamera.load(std::memory_order_acquire) && this->Config.PreviewDraw) {
         auto frame = this->drawCamera.Read();
         this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.elem.preview_draw_label").c_str());
     }
@@ -152,30 +152,27 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void ElementManager::HandleUpdate() {
+bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
-    if (this->OnPreview) {
-        CameraSystemIO IO;
-        IO.ElementTime = this->CS2Time->GetReal();
-        IO.FrameGameTime = this->CS2Time->GetReal();
-        if (this->Preview_Call(&IO)) {
-            //自由摄像机轨道预览
-            if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {
-                if (this->Config.PreviewOverride) {
-                    this->CS2View->CameraSystemIOOverride(&IO);
-                }
-                if (this->Config.PreviewDraw) {
-                    auto frame = this->drawCamera.Write();
-                    *frame = IO.Frame;
-                    this->needDrawCamera.store(true, std::memory_order_release);
-                }
-                else {
-                    this->needDrawCamera.store(false, std::memory_order_release);
-                }
+    if (!this->OnPreview) return false;
+    IO->ElementTime = this->CS2Time->GetReal();
+    IO->FrameGameTime = this->CS2Time->GetReal();
+    if (this->Preview_Call(IO)) {
+        //自由摄像机轨道预览
+        if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {
+            if (this->Config.PreviewDraw) {
+                auto frame = this->drawCamera.Write();
+                *frame = IO->Frame;
+                this->needDrawCamera.store(true, std::memory_order_release);
+            }
+            else {
+                this->needDrawCamera.store(false, std::memory_order_release);
             }
         }
-        //其它类型预览
+        return this->Config.PreviewOverride;
     }
+    return false;
+    //其它类型预览
 }
 //ElementBase，Create和Get已在头文件中实现
 
@@ -356,7 +353,6 @@ void ElementManager::Preview_Enable() {
 }
 void ElementManager::Preview_Disable() {
     this->OnPreview = false;
-    this->CS2View->ClearViewOverride();
     this->PublishAsync("CameraSystem/Preview/Ended"_hash);
     this->LogInfo("已关闭预览");
 }

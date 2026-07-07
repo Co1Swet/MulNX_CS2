@@ -39,7 +39,7 @@ public:
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    void HandleUpdate();
+    bool HandleUpdate(CameraSystemIO* IO);
 
     ElementBase* Element_Create(const ElementType type, const std::string& name);
     // 保存所有元素到磁盘文件

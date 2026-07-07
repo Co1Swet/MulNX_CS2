@@ -133,12 +133,32 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void CameraSystem::HandleUpdate() {
+bool CameraSystem::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
     this->Update();
+    CameraSystemIO IO;
+    bool needOverride = false;
+
     this->CamDrawer.Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
-    this->EManager->HandleUpdate();
-    this->SManager->HandleUpdate();
+    if (this->EManager->HandleUpdate(&IO))needOverride = true;
+    if (this->SManager->HandleUpdate(&IO))needOverride = true;
     this->PManager->HandleUpdate();
     this->WManager->HandleUpdate();
-    return;
+
+    if (!needOverride)return true;
+
+    const auto& pos = IO.Frame.view.position;
+    const auto& fov = IO.Frame.view.FOV;
+    const auto& rot = IO.Frame.view.rotation;
+    const auto& dof = IO.Frame.view.dof;
+
+    *viewSetup->pViewOrigin() = pos;
+    *viewSetup->pViewAngles() = rot;
+
+    if (fov > 0.01f) {
+        *viewSetup->pFov() = fov;
+    }
+
+    this->CS2View->SetDOF(dof);
+
+    return true;
 }

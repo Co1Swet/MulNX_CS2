@@ -18,6 +18,7 @@
 // Call系列函数返回false应当意味着没有可用Frame产出（保证有值产出时性能）
 // 具体的播放启停原理需要其它手段协助（允许启停的卡顿，当然也很微小，但还是要尽最大可能让有值可用时性能最高）
 #include <Intro/CSModuleBase.hpp>
+#include <Intro/HookView/CSViewControlModuleBase.hpp>
 #include "CameraDrawer/CameraDrawer.hpp"
 
 class ElementManager;
@@ -26,8 +27,7 @@ class ProjectManager;
 class WorkspaceManager;
 
 // 摄像机系统
-class CameraSystem final :public CSModuleBase {
-private:
+class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem> {
     // 四大管理器
     ElementManager* EManager = nullptr;
     SolutionManager* SManager = nullptr;
@@ -35,10 +35,10 @@ private:
     WorkspaceManager* WManager = nullptr;
     void ProcessMsg(MulNX::Message& msg)override;
     bool Menu(MulNX::UINode* node);
+    bool Init()override;
+    bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num)override;
 public:
     CameraDrawer CamDrawer{};
-    bool Init()override;    
-    void HandleUpdate();
 };
 
 template <typename T>

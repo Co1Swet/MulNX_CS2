@@ -89,7 +89,7 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
     ).c_str());
 }
 bool SolutionManager::UINodeFunc(MulNX::UINode* node) {
-    if (this->needDrawCamera.load(std::memory_order_acquire)) {
+    if (this->needDrawCamera.load(std::memory_order_acquire) && this->Config.PlayingDraw) {
         auto frame = this->drawCamera.Read();
         this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.sol.playing_draw_label").c_str());
     }
@@ -119,7 +119,7 @@ void SolutionManager::Solution_DebugWindow() {
         ImGui::Text(I18n("ui.button.no_selected").c_str());
         return;
     }
-    
+
     ImGui::Text(I18n("camsys.sol.current_info",
         this->CurrentSolution->name,
         this->CurrentSolution->elements.size(),
@@ -261,14 +261,12 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void SolutionManager::HandleUpdate() {
+bool SolutionManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
-    
     if (this->CurrentSolution) {
         this->CurrentSolution->Refresh();//刷新当前调试的解决方案确保操作反馈及时（当前播放的解决方案由Playing_Call负责更新）
     }
-    this->Playing_Call();
-    if (!this->Config.SolutionShortcutEnable)return;
+    if (!this->Config.SolutionShortcutEnable)return this->Playing_Call(IO);
     //遍历
     for (const auto& [name, pSolution] : this->solutions) {
         //快捷键播放处理
@@ -279,7 +277,7 @@ void SolutionManager::HandleUpdate() {
         }
         //后续其它任务待补充
     }
-    return;
+    return this->Playing_Call(IO);
 }
 //创建，得到，删除
 
@@ -442,46 +440,41 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 }
 void SolutionManager::Playing_Disable() {
     this->Playing = false;
-    this->CS2View->ClearViewOverride();
     this->PublishAsync("CameraSystem/Play/Ended"_hash);
     this->LogInfo("已关闭播放");
 }
-void SolutionManager::Playing_Call() {
+bool SolutionManager::Playing_Call(CameraSystemIO* IO) {
     if (!this->Playing) {
-        return;
+        return false;
     }
     //调用插值
     //理论上如果超出解决方案工作时间区，就不再调用
     if (!this->Playing_pSolution) {
         this->Playing_Disable();
-        return;
+        return false;
     }
-    CameraSystemIO IO;
 
-    IO.SolutionTime = this->CS2Time->GetReal();
-    IO.FrameGameTime = this->CS2Time->GetReal();
-    IO.isPlaying = this->Playing;
+    IO->SolutionTime = this->CS2Time->GetReal();
+    IO->FrameGameTime = this->CS2Time->GetReal();
+    IO->isPlaying = this->Playing;
 
-    if (!this->Playing_pSolution->Call(&IO)) {
-        this->CS2View->ClearViewOverride();
+    if (!this->Playing_pSolution->Call(IO)) {
         // 这里不关闭播放，因为解决方案可能还有内容
         // 不应该由管理器因为仅仅没有结果就关闭
-        if (IO.isPlaying == false) {
+        if (IO->isPlaying == false) {
             // 如果解决方案自己关闭了播放
             this->Playing_Disable();
-            return;
+            return false;
         }
-        return;
-    }
-    if (this->Config.PlayingOverride) {
-        this->CS2View->CameraSystemIOOverride(&IO);
+        return false;
     }
     if (this->Config.PlayingDraw) {
         auto frame = this->drawCamera.Write();
-        *frame = IO.Frame;
+        *frame = IO->Frame;
         this->needDrawCamera.store(true, std::memory_order_release);
     }
     else {
         this->needDrawCamera.store(false, std::memory_order_release);
     }
+    return this->Config.PlayingOverride;
 }
