@@ -5,13 +5,14 @@
 namespace MulNX {
     namespace CS2 {
         namespace Signatures {
-            inline const static MulNX::Memory::Pattern CallIsPlayingDemo("48 8b 0d ?? ?? ?? ?? 48 8b 01 ff 90 50 01 00 00 0f 57 ff 84 c0 74 63 ba ff ff ff ff");
+            inline const static MulNX::Memory::Pattern Pos_CViewRenderer_VFuncsSubFunc_MaybeWriteView_CallIsPlayingDemo("48 8b 0d ?? ?? ?? ?? 48 8b 01 ff 90 50 01 00 00 0f 57 ff 84 c0 74 57 ba ff ff ff ff");
             namespace Render {
                 inline const static MulNX::Memory::Pattern CSHashString("FF D0 8B F0 48 85 FF 74 2A");
             }
             namespace Utils {
-                inline const static MulNX::Memory::Pattern CSHashString("48 8B 58 ?? 0F 29 B4 24 C0 20 00 00 E8 ?? ?? ?? ??");
+                inline const static MulNX::Memory::Pattern CSHashString("48 83 EC 28 45 8B D0 4C 8B C9 48 83 FA 04 0F 82 ?? ?? ?? ?? 0F B6 09 48 89 5C 24 20 8D 41 BF 3C 19 77 03 80 C1 20");
                 inline const static MulNX::Memory::Pattern Pos_Call_CInputService_ProcessCommands("E8 ?? ?? ?? ?? 4C 8B BC 24 ?? ?? 00 00 45 84 ED");
+                inline const static MulNX::Memory::Pattern Pos_CGameEventManager_FireEvents_AcquiredLock("C7 44 24 ?? 00 00 00 00 33 D2 49 8B CE");
                 inline const static MulNX::Memory::Pattern RegenerateWeaponSkins("48 83 EC ?? E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10");
                 inline const static MulNX::Memory::Pattern SetGlowColor("40 53 48 83 EC 20 48 8B D9 48 83 C1 40 39 11 ?? ?? 89 11 ?? ?? ?? ?? ?? 48 8B 4B 18 48 85 C9 ?? ?? 48 83");
                 inline const static MulNX::Memory::Pattern GetDecoratedPlayerName("44 89 44 24 18 48 89 54 24 10 55 53 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 28 f5 ff ff");
@@ -53,6 +54,9 @@ namespace MulNX {
             }
             namespace Sound {
                 inline const static MulNX::Memory::Pattern EmitHurtFeedbackSound("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 49 8B E8");
+                inline const static MulNX::Memory::Pattern Pos_CallGetPawnUpdateCirclePos("48 85 C0 0F 84 ?? ?? 00 00 48 89 6C 24 40 48 8D 54 24");
+                inline const static MulNX::Memory::Pattern Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque("48 3B C3 75 1A 0F 28 DE");
+                inline const static MulNX::Memory::Pattern Pos_CallGetPawnMaybeOtherAsyncSoundEnque("48 3B C6 0F 85 ?? ?? ?? ?? 0F 28 DE");
             }
         }
     }

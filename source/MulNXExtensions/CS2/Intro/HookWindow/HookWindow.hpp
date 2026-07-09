@@ -2,7 +2,7 @@
 #include <Intro/CSModuleBase.hpp>
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
 
-class HookWindow final : public CSModuleBase {
+class HookWindow final : public MulNX::Module<HookWindow> {
 private:
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;

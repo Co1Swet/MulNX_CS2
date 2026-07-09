@@ -18,18 +18,17 @@ bool HookView::Menu(MulNX::UINode* node) {
 bool HookView::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        this->controlView.dofs.pNearBlurry = this->CS2Con->GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
-        this->controlView.dofs.pNearCrisp = this->CS2Con->GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
-        this->controlView.dofs.pFarCrisp = this->CS2Con->GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
-        this->controlView.dofs.pFarBlurry = this->CS2Con->GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
+        // this->controlView.dofs.pNearBlurry = this->CS2Con->GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
+        // this->controlView.dofs.pNearCrisp = this->CS2Con->GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
+        // this->controlView.dofs.pFarCrisp = this->CS2Con->GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
+        // this->controlView.dofs.pFarBlurry = this->CS2Con->GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
 
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::CallIsPlayingDemo);
-        this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* Hook, RegContext* ctx) {
-            this->HandleOverrideView((CS2::CViewSetup*)ctx->rsi);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Pos_CViewRenderer_VFuncsSubFunc_MaybeWriteView_CallIsPlayingDemo);
+        this->hkPosCallIsPlayingDemo = this->CreateHook("Pos_CViewRenderer_VFuncsSubFunc_MaybeWriteView_CallIsPlayingDemo where r14 is *CViewSetup", target.Data(), [this](MulNX::Hook* Hook, RegContext* ctx) {
+            this->HandleOverrideView((CS2::CViewSetup*)ctx->r14);
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->hkPosCallIsPlayingDemo->Attach();
-        this->LogSucc(I18n("hook.attached", "Position On SomeWhere Call IsPlayingDemo, where rsi is pCViewSetup"));
 
         this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
         });
@@ -38,7 +37,7 @@ bool HookView::Init() {
 }
 
 void HookView::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
-    
+
 }
 
 void HookView::HandleOverrideView(CS2::CViewSetup* viewSetup) {

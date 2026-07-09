@@ -2,7 +2,7 @@
 #include <Intro/CSModuleBase.hpp>
 
 class CS2Hash final :public CSModuleBase {
-    using HashFunc_t = uint32_t * (*)(uint32_t* pResult, const char* pStr);
+    using HashFunc_t = uint32_t(__fastcall*)(const char* str, size_t len, uint32_t seed);
     HashFunc_t CSHashString{ nullptr };
 
     bool Init()override;

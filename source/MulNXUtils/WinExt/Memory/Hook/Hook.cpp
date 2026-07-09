@@ -1,4 +1,5 @@
 #include "Hook.hpp"
+#include <MulNX/Config/Config.hpp>
 #include <Windows.h>
 #include <thread>
 #include <format>
@@ -109,6 +110,7 @@ std::optional<std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool 
 
 std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
     bool extraStackAdjust, bool callRawFirst, uintptr_t userJmpTarget, int len) {
+    if (target == nullptr)MulNX::ErrorTerminate("不能为nullptr创建Hook！");
     // 创建Hook实例
     auto HookInstance = std::make_unique<Hook>();
     HookInstance->callback = std::move(callback);

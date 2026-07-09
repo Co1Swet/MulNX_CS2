@@ -70,7 +70,7 @@ namespace CS2 {
         DirectX::XMFLOAT3* angRotation() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_angRotation); }
         DirectX::XMFLOAT3* vecWrappedLocalOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecWrappedLocalOrigin); }
         DirectX::XMFLOAT3* angWrappedLocalRotation() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_angWrappedLocalRotation); }
-        DirectX::XMFLOAT3* vRenderOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vRenderOrigin); }
+        //DirectX::XMFLOAT3* vRenderOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vRenderOrigin); }
         bool* bDebugAbsOriginChanges() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_bDebugAbsOriginChanges); }
     };
 

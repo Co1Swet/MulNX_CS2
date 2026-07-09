@@ -1,7 +1,6 @@
 #pragma once
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <Intro/CSModuleBase.hpp>
-#include <Feature/View/CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 
 class Dofs {
 public:
@@ -25,7 +24,7 @@ public:
 class ICSViewControlModule;
 class HookView final :public CSModuleBase {
     // 视角控制钩子
-    std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo = nullptr;
+    WrapHook hkPosCallIsPlayingDemo{};
     ControlView controlView{};
     void HandleCameraSystemPlay(CS2::CViewSetup* viewSetup);
     void HandleOverrideView(CS2::CViewSetup* viewSetup);

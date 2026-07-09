@@ -21,9 +21,9 @@ bool HitSoundFix::Init() {
 }
 
 void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
-    static CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
-    static CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
-    static CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
+    CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
+    CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
+    CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
 
     try {
         auto pOBingPawn = this->CS2->client.TryGetObservingPawn();
@@ -57,7 +57,7 @@ void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
 
         if (soundName) {
             // 参数顺序：声源 = 受害者，过滤实体 = 观战者（即攻击者）
-            this->EmitHurtFeedbackSound(pVictimPawn, pOBingPawn, soundName);
+            this->EmitHurtFeedbackSound(pVictimPawn, nullptr, soundName);
         }
     }
     catch(MulNX::Exception& e) {

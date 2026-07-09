@@ -4,7 +4,7 @@
 bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);
     (*this)
-        .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
+        //.SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeAsync("Game/Command")
         .SubscribeAsync("Game/Command/NoReport")
@@ -76,7 +76,7 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
     this->GetNextCvarIterator = IVClass::Assume(VEngineCvar007)->GetVFunc<void* (uint64_t&, uint64_t)>(13);
     this->GetCVarByIndex = IVClass::Assume(VEngineCvar007)->GetVFunc<C_ConVar * (uint64_t)>(43);
 
-    this->hkVEngineCvar007_RegisterConCommand = MulNX::Hook::Create((uint8_t*)IVClass::Assume(VEngineCvar007)->GetVFuncPtr(44), [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkVEngineCvar007_RegisterConCommand = MulNX::Hook::Create((uint8_t*)IVClass::Assume(VEngineCvar007)->GetVFuncPtr(46), [this](MulNX::Hook* hk, RegContext* ctx) {
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnRegisterConCommand(hk, ctx);});
         auto pOrigCmd = ctx->r8;
 

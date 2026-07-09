@@ -18,6 +18,6 @@ namespace CS2 {
 
 class HookGameEvents final :public CSModuleBase {
     WrapHook hkCGameEventManager_FireEvent{};
-    WrapHook hkCGameEventManager_FireEventClientSide{};
+    WrapHook hkPos_CGameEventManager_FireEvents_AcquiredLock{};
     bool Init()override;
 };

@@ -3,21 +3,20 @@
 bool CS2Hash::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto pattern = MulNX::CS2::Signatures::Utils::CSHashString;
-        uint8_t* callSite = this->CS2->client.GetTextRegion().FindRegion(pattern).Data();
+        
+        auto region = this->CS2->client.GetTextRegion().FindRegion(pattern);
+        if (!region.IsValid())MulNX::ErrorTerminate("找不到hash函数");
 
-        // call 指令位于 callSite + 12 (0x0C) 处
-        uint8_t* callAddr = callSite + 12;
-        // E8 后面 4 字节是相对偏移
-        int32_t relOffset = *reinterpret_cast<int32_t*>(callAddr + 1);
-        // 目标地址 = call 指令下一条指令地址 + relOffset
-        this->CSHashString = reinterpret_cast<HashFunc_t>(callAddr + 5 + relOffset);
+        this->CSHashString = reinterpret_cast<HashFunc_t>(region.Data());
 
-        this->CSHashString(&this->attacker, "attacker");
-        this->CSHashString(&this->userid, "userid");
-        this->CSHashString(&this->assister, "assister");
-        this->CSHashString(&this->hitgroup, "hitgroup");
+        // 使用新版哈希函数：参数为 (字符串, 长度, 种子)，返回哈希值
+        this->attacker = this->CSHashString("attacker", 8, 0x3141592E);
+        this->userid = this->CSHashString("userid", 6, 0x31415920);
+        this->assister = this->CSHashString("assister", 8, 0x3141592E);
+        // hitgroup 实际使用子串 "roup"，长度 4，种子 0x1717BDDE
+        this->hitgroup = this->CSHashString("roup", 4, 0x1717BDDE);
 
-        this->LogSucc("找到CS2的哈希函数，计算哈希值完毕");
+        this->LogSucc("找到CS2哈希函数并计算哈希值");
         });
 
     return true;
