@@ -70,8 +70,9 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
     // demo
     this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(68);
     // cmd
-    this->hkSource2EngineToClient001_ExecuteCmd = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->Source2EngineToClient001)->GetVFuncPtr(50), [](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkSource2EngineToClient001_ExecuteCmd = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->Source2EngineToClient001)->GetVFuncPtr(51), [](MulNX::Hook* hk, RegContext* ctx) {
         static std::mutex mtx;
+        auto pRaw = (char*)ctx->rdx;
         std::lock_guard lock(mtx);
         hk->CallMaybeOrigin(0, ctx);
         return MulNX::Hook::Then::Return;

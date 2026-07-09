@@ -4,7 +4,7 @@
 bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);
     (*this)
-        //.SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
+        .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
         .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeAsync("Game/Command")
         .SubscribeAsync("Game/Command/NoReport")
@@ -57,7 +57,7 @@ HookConsole& HookConsole::RegisterCmd(std::string&& name, std::function<void(CCo
     return *this;
 }
 void HookConsole::OnEngine2Load(MulNX::Message& msg) {
-    this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int, double, int64_t)>(50);
+    this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int, double, int64_t)>(51);
     auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
     this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
         if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
@@ -74,9 +74,9 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
 
     this->GetFirstCvarIterator = IVClass::Assume(VEngineCvar007)->GetVFunc<void* (uint64_t&)>(12);
     this->GetNextCvarIterator = IVClass::Assume(VEngineCvar007)->GetVFunc<void* (uint64_t&, uint64_t)>(13);
-    this->GetCVarByIndex = IVClass::Assume(VEngineCvar007)->GetVFunc<C_ConVar * (uint64_t)>(43);
+    this->GetCVarByIndex = IVClass::Assume(VEngineCvar007)->GetVFunc<C_ConVar * (uint64_t)>(41);
 
-    this->hkVEngineCvar007_RegisterConCommand = MulNX::Hook::Create((uint8_t*)IVClass::Assume(VEngineCvar007)->GetVFuncPtr(46), [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkVEngineCvar007_RegisterConCommand = MulNX::Hook::Create((uint8_t*)IVClass::Assume(VEngineCvar007)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnRegisterConCommand(hk, ctx);});
         auto pOrigCmd = ctx->r8;
 

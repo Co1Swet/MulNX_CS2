@@ -206,7 +206,7 @@ bool SolutionManager::Init() {
     this->EManager = this->Core->ModuleManager()->FindModule<ElementManager>("ElementManager");
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->SendUINode("MenuSolution", [this](MulNX::UINode* node) {return this->MenuSolution(node);});
 
     auto* PathManager = this->Path();

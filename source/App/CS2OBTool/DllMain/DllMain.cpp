@@ -36,21 +36,29 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<CS2Hash>("CS2Hash")
             .CreateModule<TimeController>("TimeController")
             .CreateModule<PlayerHub>("PlayerHub")
-            // .CreateModule<ConsoleOutput>("ConsoleOutput")
-            // .CreateModule<HookEntitySystem>("HookEntitySystem")
-            // .CreateModule<HookGameEvents>("HookGameEvents")
-            
-            // .CreateModule<ParticleManager>("ParticleManager")
-            // .CreateModule<MaterialSystem>("MaterialSystem")
-            // .CreateModule<SceneSystem>("SceneSystem")
-            
-            // // CS2功能模块
-            // .CreateModule<HitSoundFix>("HitSoundFix")
+            .CreateModule<DemoPlaying>("DemoPlaying") // 承担了时间适配器责任
+            // 稍微不那么底层的基础支持
+            .CreateModule<ConsoleOutput>("ConsoleOutput")
+            .CreateModule<HookEntitySystem>("HookEntitySystem")
+            .CreateModule<HookGameEvents>("HookGameEvents")
+            .CreateModule<ParticleManager>("ParticleManager")
+            .CreateModule<MaterialSystem>("MaterialSystem")
+            .CreateModule<SceneSystem>("SceneSystem")
+
+            // CS2 摄像机系统
+            .CreateModule<CameraSystem>("CameraSystem")
+            .CreateModule<WorkspaceManager>("WorkspaceManager")
+            .CreateModule<ProjectManager>("ProjectManager")
+            .CreateModule<SolutionManager>("SolutionManager")
+            .CreateModule<ElementManager>("ElementManager")
+
+            // CS2功能模块
+            //.CreateModule<HitSoundFix>("HitSoundFix")
             // //.CreateModule<SoundCircleFix>("SoundCircleFix")
-            // .CreateModule<FreeCameraController>("FreeCameraController")
-            // .CreateModule<AdvancedViewController>("AdvancedViewController")
-            // .CreateModule<ObserverController>("ObserverController")
-            // .CreateModule<PlayerFlashController>("PlayerFlashController")
+            //.CreateModule<FreeCameraController>("FreeCameraController")
+            //.CreateModule<AdvancedViewController>("AdvancedViewController")
+            //.CreateModule<ObserverController>("ObserverController")
+            //.CreateModule<PlayerFlashController>("PlayerFlashController")
             // .CreateModule<DeathMsgController>("DeathMsgController")
             // .CreateModule<SkyController>("SkyController")
             // .CreateModule<ESPBox>("ESPBox")
@@ -72,12 +80,7 @@ void StartImpl(HMODULE& hModule) {
             // .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
             // .CreateModule<BombSpotController>("BombSpotController")
             // .CreateModule<TeamCounterController>("TeamCounterController")
-            // // 摄像机系统
-            // .CreateModule<CameraSystem>("CameraSystem")
-            // .CreateModule<WorkspaceManager>("WorkspaceManager")
-            // .CreateModule<ProjectManager>("ProjectManager")
-            // .CreateModule<SolutionManager>("SolutionManager")
-            // .CreateModule<ElementManager>("ElementManager")
+            
             // // Demos
             // .CreateModule<HookDemo>("HookDemo")
             // .CreateModule<DemoSystem>("DemoSystem")
@@ -87,34 +90,33 @@ void StartImpl(HMODULE& hModule) {
             // .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
             // .CreateModule<RecordTaskMaker>("RecordTaskMaker")
             // .CreateModule<DemoRecorder>("DemoRecorder")
-            // .CreateModule<DemoPlaying>("DemoPlaying")
             // .CreateModule<DemoEventsRender>("DemoEventsRender")
             // // 较为上层
             // .CreateModule<MiniMap>("MiniMap")
             // .CreateModule<VirtualUser>("VirtualUser")
             // .CreateModule<GameCfgManager>("GameCfgManager")
             // .CreateModule<GameSettingsManager>("GameSettingsManager")
-            // // 音视频
-            // .CreateModule<MediaSystem>("MediaSystem")
-            // .CreateModule<MediaParamManager>("MediaParamManager")
-            // .CreateModule<VCD3D11Manager>("VCD3D11Manager")
-            // .CreateModule<AudioCapturer>("AudioCapturer")
-            // .CreateModule<VideoCapturer>("VideoCapturer")
-            // .CreateModule<AEncodeHelper>("AEncodeHelper")
-            // .CreateModule<VEncodeHelper>("VEncodeHelper")
-            // .CreateModule<MediaRecorder>("MediaRecorder")
-            // .CreateModule<MediaProcesser>("MediaProcesser")
-            // // 管理
-            // .CreateModule<MulNXController>("MulNXController")
-            // .CreateModule<UIDocker>("UIDocker")
+            // 音视频
+            .CreateModule<MediaSystem>("MediaSystem")
+            .CreateModule<MediaParamManager>("MediaParamManager")
+            .CreateModule<VCD3D11Manager>("VCD3D11Manager")
+            .CreateModule<AudioCapturer>("AudioCapturer")
+            .CreateModule<VideoCapturer>("VideoCapturer")
+            .CreateModule<AEncodeHelper>("AEncodeHelper")
+            .CreateModule<VEncodeHelper>("VEncodeHelper")
+            .CreateModule<MediaRecorder>("MediaRecorder")
+            .CreateModule<MediaProcesser>("MediaProcesser")
+            // 管理
+            .CreateModule<MulNXController>("MulNXController")
+            .CreateModule<UIDocker>("UIDocker")
             ;
         // 启动核心
         core->EntryInit(core.get());
         if (MulNXInfo::IsDebugVersion) {
-            //auto pHookConsole = core->ModuleManager()->FindModule<HookConsole>("HookConsole");
+            auto pHookConsole = core->ModuleManager()->FindModule<HookConsole>("HookConsole");
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
             rp->str1 = "111";
-            //pHookConsole->PublishAsync(std::move(msg));
+            pHookConsole->PublishAsync(std::move(msg));
             std::thread([]() {
                 MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
                 }).detach();

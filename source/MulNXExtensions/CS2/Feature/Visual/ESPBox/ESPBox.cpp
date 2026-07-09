@@ -32,5 +32,9 @@ bool ESPBox::Init() {
         return this->Draw(node);
         });
 
+    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+        MulNX::UI::Checkbox("方框ESP", this->runFlag1);
+        });
+
     return true;
 }
