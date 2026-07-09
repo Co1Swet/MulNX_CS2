@@ -127,22 +127,6 @@ public:
 // size: 8*8 Bytes
 class CCmd {
 public:
-    int padddd;
-    char* n1;
-    char* n2;
-    char* n3;
-    char* n4;
-    char* n5;
-    char* n6;
-    char* n7;
-    char* n8;
-    char* n9;
-    char* n10;
-    char* n11;
-    char* n12;
-    char* n13;
-    char* n14;
-
     const char* m_pszName;
     const char* m_pszHelpString;
     int64_t m_nFlags;

@@ -1,4 +1,5 @@
 #include "Region.hpp"
+#include <MulNX/Config/Config.hpp>
 
 MulNX::Memory::Region::Region(uintptr_t Base, size_t Size) :
     Base(Base), Size(Size),
@@ -54,6 +55,9 @@ MulNX::Memory::Region MulNX::Memory::Region::FindRegion(const Pattern& pattern) 
         //继续寻找下一个匹配头
         Current = FoundHead.value() + 1;
     }
+#ifdef MULNX_STRICT
+    MulNX::ErrorTerminate("找不到地址");
+#endif
     return Region::InValid();//未找到匹配
 }
 

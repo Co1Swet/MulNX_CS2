@@ -144,7 +144,7 @@ bool CameraSystem::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
     this->PManager->HandleUpdate();
     this->WManager->HandleUpdate();
 
-    if (!needOverride)return true;
+    if (!needOverride)return false;
 
     const auto& pos = IO.Frame.view.position;
     const auto& fov = IO.Frame.view.FOV;

@@ -27,15 +27,15 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     node->CallUINode("PlayerSpotColorController");
     node->CallUINode("TeamCounterController");
     node->CallUINode("FlashRenderController");
+    MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->Core->ModuleManager()->FindModule("DeathMsgController")->showWindow);
     ImGui::End();
 
-    // ImGui::Begin(I18n("高级功能").c_str());
-    // MulNX::UI::Checkbox("小地图窗口", this->Core->ModuleManager()->FindModule("MiniMap")->showWindow);
-    // MulNX::UI::Checkbox("游戏配置管理器窗口", this->Core->ModuleManager()->FindModule("GameCfgManager")->showWindow);
-    // MulNX::UI::Checkbox("Demo", this->Core->ModuleManager()->FindModule("DemoSystem")->showWindow);
-    // MulNX::UI::Checkbox("玩家信息管理窗口", this->Core->ModuleManager()->FindModule("PlayerHub")->showWindow);
-    // MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->Core->ModuleManager()->FindModule("DeathMsgController")->showWindow);
-    // ImGui::End();
+    ImGui::Begin(I18n("高级功能").c_str());
+    //MulNX::UI::Checkbox("小地图窗口", this->Core->ModuleManager()->FindModule("MiniMap")->showWindow);
+    //MulNX::UI::Checkbox("游戏配置管理器窗口", this->Core->ModuleManager()->FindModule("GameCfgManager")->showWindow);
+    MulNX::UI::Checkbox("Demo", this->Core->ModuleManager()->FindModule("DemoSystem")->showWindow);
+    MulNX::UI::Checkbox("玩家信息管理窗口", this->Core->ModuleManager()->FindModule("PlayerHub")->showWindow);
+    ImGui::End();
 
     ImGui::Begin(I18n("3D视觉").c_str());
     node->CallUINode("SkinController");
@@ -68,11 +68,5 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     node->CallUINode("MulNXController");
     ImGui::End();
 
-    node->CallUINode("GameCfgManager");
-    node->CallUINode("MiniMap");
-    node->CallUINode("DemoSystem");
-    node->CallUINode("PlayerHub");
-    node->CallUINode("DeathMsgController");
     node->CallUINode("MediaSystem");
-    node->CallUINode("EntityListScanner");
 }

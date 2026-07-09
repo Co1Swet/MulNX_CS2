@@ -11,10 +11,10 @@ bool TeamIDRenderController::Init() {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_CmpForHide);
         auto jmp = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_xxIt);
         this->hkPosTeamID_CmpForHide = MulNX::Hook::Create(target.Data() + 3, [this](MulNX::Hook* hk, RegContext* ctx) {
-            return this->HandleForShowTeamID((CS2::C_CSPlayerPawn*)ctx->rdi);
+            return this->HandleForShowTeamID((CS2::C_CSPlayerPawn*)ctx->rbx);
             }, false, false, (uintptr_t)jmp.Begin()).value();
         this->hkPosTeamID_CmpForHide->Attach();
-        this->LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rdi is C_CSPlayerPawn*"));
+        this->LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rbx is C_CSPlayerPawn*"));
         });
 
     this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});

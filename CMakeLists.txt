@@ -38,6 +38,7 @@ string(APPEND CMAKE_EXE_LINKER_FLAGS_MINSIZEREL " /DEBUG /OPT:REF /OPT:ICF /INCR
 add_compile_definitions(NOMINMAX) # 防止windows的min max宏破坏程序
 add_compile_definitions(WIN32_LEAN_AND_MEAN) # 至少能让它少引入点东西
 add_compile_definitions(ASIO_STANDALONE) # 独立版本的asio，不引入boost
+add_compile_definitions(MULNX_STRICT) # MulNX的严格模式宏
 
 add_subdirectory("source")
 

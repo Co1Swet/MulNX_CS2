@@ -12,8 +12,7 @@ bool DeathMsgController::Window(MulNX::UINode* node) {
 
 bool DeathMsgController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion()
-            .FindRegion(MulNX::CS2::Signatures::Hud::HandlePlayerDeath);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::HandlePlayerDeath).FindFuncStart();
         this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             auto event = reinterpret_cast<CS2::CGameEvent*>(ctx->rdx);
             return this->HandleOnPlayerDeath(event);
@@ -21,7 +20,7 @@ bool DeathMsgController::Init() {
         this->hkHandlePlayerDeath->Attach();
         this->LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
 
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+        this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
         this->SendTask("Update", "CSControl", [this]()->bool {
             this->Update();
             return true;

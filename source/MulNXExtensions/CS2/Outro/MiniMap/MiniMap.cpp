@@ -5,7 +5,7 @@
 
 
 bool MiniMap::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
     this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;

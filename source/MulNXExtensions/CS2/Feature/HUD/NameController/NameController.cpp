@@ -34,7 +34,7 @@ bool NameController::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
-        auto FnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::GetDecoratedPlayerName);
+        auto FnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::GetDecoratedPlayerName).FindFuncStart();
         this->hkGetDecoratedPlayerName = MulNX::Hook::Create(FnGetDecoratedPlayerName.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             // 这里注意，这里的名称获取，是需要进一步调用GetPlayerName的
             // 我们借助这一个比较稳定的特征，创建延迟Hook

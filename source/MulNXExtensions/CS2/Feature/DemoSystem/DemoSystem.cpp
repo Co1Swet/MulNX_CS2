@@ -121,7 +121,7 @@ bool DemoSystem::Init() {
         .SubscribeAsync("Window/Drag/FileDrop")
         ;
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {
         return this->Window(node);
         });
 

@@ -28,16 +28,20 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
             .CreateModule<WebSocketManager>("WebSocketManager")
             .CreateModule<TimeLiner>("TimeLiner")
+            // 以上为通用逻辑
+
             // 底层CS2支持
             .CreateModule<CSController>("CSController")
-            // CS2关键接口
+
+            // CS2 关键底层支持
             .CreateModule<HookConsole>("HookConsole")
             .CreateModule<HookView>("HookView")
             .CreateModule<CS2Hash>("CS2Hash")
             .CreateModule<TimeController>("TimeController")
             .CreateModule<PlayerHub>("PlayerHub")
             .CreateModule<DemoPlaying>("DemoPlaying") // 承担了时间适配器责任
-            // 稍微不那么底层的基础支持
+
+            // CS2 基础支持
             .CreateModule<ConsoleOutput>("ConsoleOutput")
             .CreateModule<HookEntitySystem>("HookEntitySystem")
             .CreateModule<HookGameEvents>("HookGameEvents")
@@ -52,51 +56,60 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<SolutionManager>("SolutionManager")
             .CreateModule<ElementManager>("ElementManager")
 
-            // CS2功能模块
-            //.CreateModule<HitSoundFix>("HitSoundFix")
-            // //.CreateModule<SoundCircleFix>("SoundCircleFix")
-            //.CreateModule<FreeCameraController>("FreeCameraController")
-            //.CreateModule<AdvancedViewController>("AdvancedViewController")
-            //.CreateModule<ObserverController>("ObserverController")
-            //.CreateModule<PlayerFlashController>("PlayerFlashController")
-            // .CreateModule<DeathMsgController>("DeathMsgController")
-            // .CreateModule<SkyController>("SkyController")
-            // .CreateModule<ESPBox>("ESPBox")
-            // .CreateModule<ESPSkeleton>("ESPSkeleton")
-            // .CreateModule<SkinController>("SkinController")
-            // .CreateModule<EntityListScanner>("EntityListScanner")
-            // .CreateModule<FlashRenderController>("FlashRenderController")
-            // // 玩家强相关
-            // .CreateModule<ProjectileTracker>("ProjectileTracker")
-            // .CreateModule<TrailsController>("TrailsController")
-            // .CreateModule<NameController>("NameController")
-            // .CreateModule<GlowController>("GlowController")
-            // .CreateModule<SmokeController>("SmokeController")
-            // .CreateModule<SpeakingController>("SpeakingController")
-            // .CreateModule<KeyboardOverlay>("KeyboardOverlay")
-            // .CreateModule<TeamIDColorController>("TeamIDColorController")
-            // .CreateModule<TeamIDRenderController>("TeamIDRenderController")
-            // .CreateModule<PlayerSpotRenderController>("PlayerSpotRenderController")
-            // .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
-            // .CreateModule<BombSpotController>("BombSpotController")
-            // .CreateModule<TeamCounterController>("TeamCounterController")
+            // CS2 视角控制功能模块
+            .CreateModule<FreeCameraController>("FreeCameraController")
+            .CreateModule<AdvancedViewController>("AdvancedViewController")
+            .CreateModule<ObserverController>("ObserverController")
+
+            // CS2 视觉功能模块
+            .CreateModule<ESPBox>("ESPBox")
+            .CreateModule<ESPSkeleton>("ESPSkeleton")
+            .CreateModule<GlowController>("GlowController")
+            .CreateModule<PlayerFlashController>("PlayerFlashController")
+            .CreateModule<DeathMsgController>("DeathMsgController")
+            .CreateModule<SkyController>("SkyController")
             
-            // // Demos
-            // .CreateModule<HookDemo>("HookDemo")
-            // .CreateModule<DemoSystem>("DemoSystem")
-            // .CreateModule<DemoAnalyzer>("DemoAnalyzer")
-            // .CreateModule<DemoHelper>("DemoHelper")
-            // .CreateModule<DemoJSONReader>("DemoJSONReader")
-            // .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
-            // .CreateModule<RecordTaskMaker>("RecordTaskMaker")
-            // .CreateModule<DemoRecorder>("DemoRecorder")
-            // .CreateModule<DemoEventsRender>("DemoEventsRender")
-            // // 较为上层
-            // .CreateModule<MiniMap>("MiniMap")
-            // .CreateModule<VirtualUser>("VirtualUser")
-            // .CreateModule<GameCfgManager>("GameCfgManager")
-            // .CreateModule<GameSettingsManager>("GameSettingsManager")
-            // 音视频
+            // CS2 视觉（HUD）功能模块
+            .CreateModule<TeamIDColorController>("TeamIDColorController")
+            .CreateModule<TeamIDRenderController>("TeamIDRenderController")
+            .CreateModule<PlayerSpotRenderController>("PlayerSpotRenderController")
+            .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
+            .CreateModule<BombSpotController>("BombSpotController")
+            .CreateModule<TeamCounterController>("TeamCounterController")
+            //.CreateModule<NameController>("NameController")
+            .CreateModule<FlashRenderController>("FlashRenderController")
+            .CreateModule<SkinController>("SkinController")
+            .CreateModule<TrailsController>("TrailsController")
+            .CreateModule<ProjectileTracker>("ProjectileTracker")
+            .CreateModule<SmokeController>("SmokeController")
+
+            // CS2 声音功能模块
+            .CreateModule<SpeakingController>("SpeakingController")
+            .CreateModule<HitSoundFix>("HitSoundFix")
+            //.CreateModule<SoundCircleFix>("SoundCircleFix")
+            
+            // CS2 Demo 相关模块
+            .CreateModule<HookDemo>("HookDemo")
+            .CreateModule<DemoSystem>("DemoSystem")
+            .CreateModule<DemoAnalyzer>("DemoAnalyzer")
+            .CreateModule<DemoHelper>("DemoHelper")
+            .CreateModule<DemoJSONReader>("DemoJSONReader")
+            .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
+            .CreateModule<RecordTaskMaker>("RecordTaskMaker")
+            .CreateModule<DemoRecorder>("DemoRecorder")
+            .CreateModule<DemoEventsRender>("DemoEventsRender")
+
+            // CS2 外围功能
+            .CreateModule<KeyboardOverlay>("KeyboardOverlay")
+            .CreateModule<MiniMap>("MiniMap")
+            .CreateModule<VirtualUser>("VirtualUser")
+            .CreateModule<GameCfgManager>("GameCfgManager")
+            .CreateModule<GameSettingsManager>("GameSettingsManager")
+
+            // CS2 杂项功能
+            .CreateModule<EntityListScanner>("EntityListScanner")
+
+            // 音视频系统
             .CreateModule<MediaSystem>("MediaSystem")
             .CreateModule<MediaParamManager>("MediaParamManager")
             .CreateModule<VCD3D11Manager>("VCD3D11Manager")

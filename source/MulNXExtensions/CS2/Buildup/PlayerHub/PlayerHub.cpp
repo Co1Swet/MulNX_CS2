@@ -140,6 +140,6 @@ bool PlayerHub::Window(MulNX::UINode* node) {
 }
 
 bool PlayerHub::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
     return true;
 }
