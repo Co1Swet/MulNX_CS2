@@ -30,7 +30,20 @@ bool SoundCircleFix::Init() {
             }).value();
         this->hkPos_CallGetPawnMaybeOtherAsyncSoundEnque.Attach();
 
-        return;
+        // auto testpos = this->CS2->client.GetBaseAddress() + 0xA100FA;
+        // static auto testhk = MulNX::Hook::Create((uint8_t*)testpos, [this](MulNX::Hook*, RegContext* ctx) {
+        //     auto pOBing = this->CS2->client.TryGetObservingPawn();
+        //     if (!pOBing) return MulNX::Hook::Then::Continue;
+
+        //     using LocalEnqueueFn = __int64(__fastcall*)(uintptr_t, int, __int64, char);
+        //     auto LocalEnqueue = reinterpret_cast<LocalEnqueueFn>(
+        //         this->CS2->client.GetBaseAddress() + 0xE33370);
+        //     LocalEnqueue(reinterpret_cast<uintptr_t>(pOBing), 0x44C, 0x2F, 1);
+
+        //     return MulNX::Hook::Then::Continue;
+        //     }, true).value();
+        // testhk->Attach();
+
         });
 
     this->runFlag1 = true;
