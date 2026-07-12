@@ -6,7 +6,6 @@
 void TimeLiner::Menu() {
     MulNX::UI::RAIIWindow w("时间轴");
 
-    // 没有绑定适配器时，仅绘制静态时间轴
     if (!pTimeAdapter) {
         ImGui::Text("未连接时间适配器");
         return;

@@ -7,4 +7,7 @@ public:
 
     virtual float GetTime() = 0;
     virtual bool SetTime(float time) = 0;
+
+    virtual void OnSetOn(float time) {};
+    virtual void OnSetOff() {};
 };
