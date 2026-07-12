@@ -6,8 +6,8 @@
 void TimeLiner::Menu() {
     MulNX::UI::RAIIWindow w("时间轴");
 
-    if (!pTimeAdapter) {
-        ImGui::Text("未连接时间适配器");
+    if (!this->pActiveTimeAdapter) {
+        ImGui::Text("无活跃时间适配器");
         return;
     }
 
@@ -49,7 +49,7 @@ void TimeLiner::Menu() {
         float ratio = (mouse.x - this->currentLeftX) / (this->currentRightX - this->currentLeftX);
         ratio = std::clamp(ratio, 0.0f, 1.0f);
         float time = minTime + ratio * (maxTime - minTime);
-        if (pTimeAdapter->SetTime(time)) {
+        if (this->pActiveTimeAdapter->SetTime(time)) {
             m_clickRatio = ratio;  // 立即更新显示位置
         }
     }
@@ -67,15 +67,29 @@ void TimeLiner::Menu() {
 
 bool TimeLiner::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Menu();});
+    this->SubscribeSync("System/Init/End", [this](auto&&...) {this->pActiveTimeAdapter = this->pTimeAdapter1;});
 
     return true;
 }
 
 void TimeLiner::UpdateTime() {
+
+    ITimeAdapter* pAdapterNext = nullptr;
+    if (this->pActiveTimeAdapter == this->pTimeAdapter1)pAdapterNext = this->pTimeAdapter2;
+    else pAdapterNext = this->pTimeAdapter1;
+
+    MulNX::KeyCheckPack kcp{ true,false,false,true,'C',1 };
+    if (this->pInputSystem->CheckWithPack(kcp)) {
+        auto now = this->pActiveTimeAdapter->GetTime();
+        this->pActiveTimeAdapter->OnSetOff();
+        pAdapterNext->OnSetOn(now);
+        this->pActiveTimeAdapter = pAdapterNext;
+    }
+
     // 从适配器获取范围与当前时间，计算比例
-    this->minTime = pTimeAdapter->GetMinTime();
-    this->maxTime = pTimeAdapter->GetMaxTime();
-    this->curTime = pTimeAdapter->GetTime();
+    this->curTime = this->pActiveTimeAdapter->GetTime();
+    this->minTime = this->pActiveTimeAdapter->GetMinTime();
+    this->maxTime = this->pActiveTimeAdapter->GetMaxTime();
 }
 
 void TimeLiner::UpdatePos() {
@@ -99,4 +113,8 @@ ImVec2 TimeLiner::Map(float time, int layer) const {
     float x = this->currentLeftX + ratio * (this->currentRightX - this->currentLeftX);
     float y = this->currentBaseY - layer * 20.0f; // 层高固定为20像素
     return ImVec2(x, y);
+}
+
+float TimeLiner::GetTime() {
+    return this->pActiveTimeAdapter->GetTime();
 }

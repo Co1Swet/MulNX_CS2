@@ -7,6 +7,7 @@
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaSystem/Media.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
+#include <MulNXExtensions/TimeLiner/FlowClock/FlowClock.hpp>
 
 static HANDLE hInitCompleteEvent = nullptr;
 BOOL APIENTRY DllMain(HMODULE, DWORD, LPVOID) { return TRUE; }
@@ -28,6 +29,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
             .CreateModule<WebSocketManager>("WebSocketManager")
             .CreateModule<TimeLiner>("TimeLiner")
+            .CreateModule<FlowClock>("FlowClock")
             // 以上为通用逻辑
 
             // 底层CS2支持

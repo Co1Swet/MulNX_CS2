@@ -2,7 +2,7 @@
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
 bool DemoPlaying::Init() {
-    this->FindModule<TimeLiner>("TimeLiner")->pTimeAdapter = this;
+    this->FindModule<TimeLiner>("TimeLiner")->pTimeAdapter1 = this;
 
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
         auto demo = this->CS2->GetDemo();

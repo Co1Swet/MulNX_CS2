@@ -155,8 +155,8 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
 bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
     if (!this->OnPreview) return false;
-    IO->ElementTime = this->CS2Time->GetReal();
-    IO->FrameGameTime = this->CS2Time->GetReal();
+    IO->ElementTime = this->pTimeline->GetTime();
+    IO->FrameGameTime = this->pTimeline->GetTime();
     if (this->Preview_Call(IO)) {
         //自由摄像机轨道预览
         if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {

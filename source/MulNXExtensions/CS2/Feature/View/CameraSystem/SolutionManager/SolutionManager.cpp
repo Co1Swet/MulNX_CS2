@@ -426,8 +426,8 @@ void SolutionManager::Playing_Solution(const std::string& name) {
 
     switch (this->Playing_pSolution->playmode) {
     case PlaybackMode::Orchestration:
-        this->Playing_pSolution->SetSolutionOffset(this->CS2Time->GetReal());//偏移时间轴播放
-        this->LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->CS2Time->GetReal()));
+        this->Playing_pSolution->SetSolutionOffset(this->pTimeline->GetTime());//偏移时间轴播放
+        this->LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->pTimeline->GetTime()));
         break;
     case PlaybackMode::Activation:
         this->Playing_pSolution->SetSolutionOffset(0);
@@ -454,8 +454,8 @@ bool SolutionManager::Playing_Call(CameraSystemIO* IO) {
         return false;
     }
 
-    IO->SolutionTime = this->CS2Time->GetReal();
-    IO->FrameGameTime = this->CS2Time->GetReal();
+    IO->SolutionTime = this->pTimeline->GetTime();
+    IO->FrameGameTime = this->pTimeline->GetTime();
     IO->isPlaying = this->Playing;
 
     if (!this->Playing_pSolution->Call(IO)) {

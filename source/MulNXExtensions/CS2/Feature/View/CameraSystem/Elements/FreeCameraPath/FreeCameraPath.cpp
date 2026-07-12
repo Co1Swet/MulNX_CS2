@@ -41,7 +41,7 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
     static auto kAdd = EManager->Shortcut()->GetButton("place camera").value();
     if (ImGui::Button(I18n("free_campath.add").c_str()) || EManager->pInputSystem->CheckWithPack(kAdd)) {
         MulNX::Math::CameraKeyframe keyframe;
-        keyframe.time = EManager->CS2Time->GetReal();
+        keyframe.time = EManager->pTimeline->GetTime();
         auto view = EManager->CS2View->GetView();
         keyframe.PositionAndFOV = view.ToPositionAndFOV();
         keyframe.RotationQuat = view.ToRotationQuat();
@@ -59,7 +59,7 @@ void FreeCameraPath::DebugUI(ElementManager* EManager) {
 
     if (ImGui::Button(I18n("text.preview").c_str())) {
         EManager->Preview_SetElement(this->Name);
-        EManager->Preview_SetPreviewSchema(EManager->CS2Time->GetReal());
+        EManager->Preview_SetPreviewSchema(EManager->pTimeline->GetTime());
         EManager->Preview_Enable();
     }
 

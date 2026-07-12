@@ -19,6 +19,7 @@
 // 具体的播放启停原理需要其它手段协助（允许启停的卡顿，当然也很微小，但还是要尽最大可能让有值可用时性能最高）
 #include <Intro/CSModuleBase.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
+#include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 #include "CameraDrawer/CameraDrawer.hpp"
 
 class ElementManager;
@@ -42,7 +43,7 @@ public:
 };
 
 template <typename T>
-class CamSysModuleMixin {
+class CamSysModuleMixin :public TimeMixin<T> {
     T* This() { return static_cast<T*>(this); }
 public:
     CameraSystem* CamSys = nullptr;
