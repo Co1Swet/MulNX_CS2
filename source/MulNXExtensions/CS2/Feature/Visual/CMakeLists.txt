@@ -9,6 +9,7 @@ add_library(CS2Visual STATIC
     TrailsController/TrailsController.cpp
     SkyController/SkyController.cpp
     ESPSkeleton/ESPSkeleton.cpp
+    SpecTargetUI/SpecTargetUI.cpp
 )
 
 target_link_libraries(CS2Visual PUBLIC

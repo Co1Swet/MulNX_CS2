@@ -7,8 +7,6 @@
 
 using DrawStuff_t = void(*)(CS2::C_BaseCSGrenadeProjectile*, char);
 
-// ==================== UI 实现（即时生效） ====================
-
 void TrailsController::HubPlayer(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
     auto&& [uid] = umsg->Access<Steam64UID>();
@@ -25,9 +23,9 @@ void TrailsController::HubPlayer(MulNX::Message* umsg) {
         MulNX::Message msg("Trails/Player/Set"_hash);
         auto&& [uidRef, r, g, b] = msg.Access<Steam64UID, float, float, float>();
         uidRef = uid;
-        r = currentColor.r;
-        g = currentColor.g;
-        b = currentColor.b;
+        r = currentColor.r * 255.0f;
+        g = currentColor.g * 255.0f;
+        b = currentColor.b * 255.0f;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -80,8 +78,6 @@ void TrailsController::Menu() {
     }
 }
 
-// ==================== 初始化 ====================
-
 bool TrailsController::Init() {
     this->pParticleMgr = this->FindModule<ParticleManager>("ParticleManager");
 
@@ -126,12 +122,11 @@ bool TrailsController::Init() {
     return true;
 }
 
-// ==================== Hook 处理（颜色已是 0-255 浮点） ====================
-
 std::optional<TrailsController::ParticleColor> TrailsController::FindColor(CS2::C_CSPlayerPawn* pPawn, CS2::CCSPlayerController* pController) {
     if (pController) {
         auto steamID = MulNX::MRead(pController->m_steamID());
-        if (auto it = this->playerColors.find(steamID); it != this->playerColors.end()) {
+        auto it = this->playerColors.find(steamID);
+        if (it != this->playerColors.end()) {
             return it->second;   // 直接使用 0-255 范围的颜色
         }
     }
@@ -172,8 +167,6 @@ MulNX::Hook::Then TrailsController::HandleOnUpdate(CS2::C_BaseCSGrenadeProjectil
         *pProjectile->m_nSnapshotTrajectoryEffectIndex(), 0x3, &this->prop, 0);
     return MulNX::Hook::Then::Return;
 }
-
-// ==================== 消息处理（颜色转为 0-255 浮点存储） ====================
 
 void TrailsController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {

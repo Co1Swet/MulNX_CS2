@@ -9,3 +9,4 @@
 #include "TrailsController/TrailsController.hpp"
 #include "GlowController/GlowController.hpp"
 #include "SkyController/SkyController.hpp"
+#include "SpecTargetUI/SpecTargetUI.hpp"

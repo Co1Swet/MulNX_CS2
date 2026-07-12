@@ -61,9 +61,12 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<ObserverController>("ObserverController")
 
-            // CS2 视觉功能模块
+            // CS2 视觉叠加功能模块
             .CreateModule<ESPBox>("ESPBox")
             .CreateModule<ESPSkeleton>("ESPSkeleton")
+            .CreateModule<SpecTargetUI>("SpecTargetUI")
+
+            // CS2 视觉功能模块
             .CreateModule<GlowController>("GlowController")
             .CreateModule<PlayerFlashController>("PlayerFlashController")
             .CreateModule<DeathMsgController>("DeathMsgController")
