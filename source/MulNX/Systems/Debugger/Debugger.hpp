@@ -5,7 +5,6 @@
 
 namespace MulNX {
     class Debugger final :public MulNX::Module<Debugger> {
-    private:
         MulNX::Logger* pLogger = nullptr;
         std::string kInfo{};
         std::string kSucc{};
@@ -19,8 +18,8 @@ namespace MulNX {
 		bool NeedAutoScroll = false;
 
         void Main();
-        bool Window(MulNX::UINode* node);
-        void DeMe(MulNX::UINode* node);
+        bool Window();
+        void DeMe();
         void ResetMaxMsgCount(const int Max);
 
 		bool Init()override;

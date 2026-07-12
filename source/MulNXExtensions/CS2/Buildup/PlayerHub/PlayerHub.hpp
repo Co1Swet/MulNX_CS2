@@ -10,5 +10,5 @@ public:
     std::atomic<CS2::ui8TeamNum> currentTeam;
 
     bool Init()override;
-    bool Window(MulNX::UINode* node);
+    bool Window(MulNX::UICoordinator* uico);
 };

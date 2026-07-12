@@ -1,27 +1,7 @@
 #include "MiniMap.hpp"
-
-#include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-
-bool MiniMap::Init() {
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->SendTask("Main", "MulNXMain", [this]()->bool {
-        this->Main();
-        return true;
-        });
-    return true;
-}
-
-void MiniMap::Main() {
-    if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'M',1 })) {
-        this->showWindow = !this->showWindow;
-    }
-
-    return;
-}
-
-bool MiniMap::UINodeFunc(MulNX::UINode* ThisNode) {
+bool MiniMap::UINodeFunc() {
     auto w = MulNX::UI::RAIIWindow("小地图窗口", this->showWindow);
     if (!w)return true;
 
@@ -131,4 +111,21 @@ bool MiniMap::UINodeFunc(MulNX::UINode* ThisNode) {
     style.Colors[ImGuiCol_ChildBg] = oldChildBg;
     style.Colors[ImGuiCol_Border] = oldBorder;
     return true;
+}
+
+bool MiniMap::Init() {
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
+    this->SendTask("Main", "MulNXMain", [this]()->bool {
+        this->Main();
+        return true;
+        });
+    return true;
+}
+
+void MiniMap::Main() {
+    if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'M',1 })) {
+        this->showWindow = !this->showWindow;
+    }
+
+    return;
 }

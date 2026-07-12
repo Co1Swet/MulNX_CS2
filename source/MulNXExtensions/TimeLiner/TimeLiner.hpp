@@ -9,7 +9,7 @@ class TimeLiner :public MulNX::Module<TimeLiner> {
     float currentBaseY = 0.0f;
 
     float m_clickRatio = 0.0f;
-    void Menu(MulNX::UINode* node);
+    void Menu();
     bool Init()override;
     void UpdateTime();
     void UpdatePos();

@@ -3,7 +3,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
 
-bool DemoHelper::UINodeFunc(MulNX::UINode* node) {
+bool DemoHelper::Window() {
     auto w = MulNX::UI::RAIIWindow("Demo辅助");
     std::shared_lock lock(this->smutex);
 
@@ -63,7 +63,7 @@ bool DemoHelper::Init() {
         .SubscribeAsync("DemoHelper/JumpTIme")
         ;
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
     this->SendTask("Main", "DemoSys", [this]()->bool {
         this->Main();
         return true;

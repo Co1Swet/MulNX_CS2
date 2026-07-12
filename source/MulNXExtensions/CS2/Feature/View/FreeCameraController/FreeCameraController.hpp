@@ -13,7 +13,7 @@ class FreeCameraController final :public CSModuleBase, public CSViewControlMixin
     MulNX::KeyCheckPack kMovDown;
 
     std::chrono::steady_clock::time_point LastUpdateTime = std::chrono::steady_clock::now();
-    void Menu(MulNX::UINode* node);
+    void Menu();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
 

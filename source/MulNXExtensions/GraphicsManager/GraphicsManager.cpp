@@ -1,7 +1,7 @@
 #include "GraphicsManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool MulNX::GraphicsManager::Menu(MulNX::UINode* node) {
+bool MulNX::GraphicsManager::Menu() {
     MulNX::UI::Checkbox(I18n("graph.chroma_key.enable").c_str(), this->enabled);
     MulNX::UI::SliderFloat(I18n("graph.chroma_key.threshold").c_str(), this->m_GreenThreshold, 0, 1);
     return true;
@@ -9,7 +9,7 @@ bool MulNX::GraphicsManager::Menu(MulNX::UINode* node) {
 
 bool MulNX::GraphicsManager::Init() {
     this->pShaderCompiler = this->Core->ModuleManager()->FindModule<MulNX::ShaderCompiler>("ShaderCompiler");
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node)->bool {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
     return true;
 }
 

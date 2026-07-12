@@ -36,7 +36,7 @@ namespace MulNX {
         std::atomic<bool>enabled{ false };
         std::atomic<float>m_GreenThreshold{ 0.5 };// 绿幕阈值
 
-        bool Menu(MulNX::UINode* node);
+        bool Menu();
     public:
         bool Init()override;
 

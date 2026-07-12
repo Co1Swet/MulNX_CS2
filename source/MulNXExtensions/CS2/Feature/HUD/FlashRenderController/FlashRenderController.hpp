@@ -6,6 +6,6 @@ class FlashRenderController final :public CSModuleBase {
     WrapHook hkDrawUp{};
     WrapHook hkDrawDown{};
 
-    void Menu(MulNX::UINode* node);
+    void Menu();
     bool Init()override;
 };

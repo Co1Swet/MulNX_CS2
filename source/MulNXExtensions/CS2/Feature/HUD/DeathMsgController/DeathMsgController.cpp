@@ -3,7 +3,7 @@
 #include <Buildup/TimeController/TimeController.hpp>
 #include <Buildup/CS2Hash/CS2Hash.hpp>
 
-bool DeathMsgController::Window(MulNX::UINode* node) {
+bool DeathMsgController::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);
     if (!w)return true;
     MulNX::UI::Checkbox(I18n("dthmsg.enable").c_str(), this->enable);
@@ -20,7 +20,7 @@ bool DeathMsgController::Init() {
         this->hkHandlePlayerDeath->Attach();
         this->LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
 
-        this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+        this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
         this->SendTask("Update", "CSControl", [this]()->bool {
             this->Update();
             return true;

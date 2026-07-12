@@ -34,8 +34,8 @@ public:
     // 使用智能指针存储多态对象，以存储不同类型的元素
     std::unordered_map<std::string, std::shared_ptr<ElementBase>> elements;
 
-    bool MenuElement(MulNX::UINode* node);
-    bool UINodeFunc(MulNX::UINode* node);
+    bool MenuElement();
+    bool UINodeFunc();
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;

@@ -24,8 +24,8 @@ public:
     ProjectConfig Config{};
 
     void Project_DebugWindow();
-    bool MenuProject(MulNX::UINode* node);
-    bool UINodeFunc(MulNX::UINode* node);
+    bool MenuProject();
+    bool UINodeFunc();
 
     bool Init()override;
     void HandleUpdate();

@@ -9,8 +9,8 @@ class GlowController final :public CSViewPlayerModuleBase {
     
     bool Init()override;
     void ProcessMsg(MulNX::Message& Msg)override;
-    void HubPlayer(MulNX::UINode* node)override;
-    void HubTeam(MulNX::UINode* node)override;
+    void HubPlayer()override;
+    void HubTeam()override;
 
     void MySetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t* color);
 };

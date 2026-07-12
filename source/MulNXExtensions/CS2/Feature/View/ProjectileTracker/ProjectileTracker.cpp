@@ -10,7 +10,7 @@ static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController
     return name.empty() ? "未知玩家" : name;
 }
 
-void ProjectileTracker::Menu(MulNX::UINode* node) {
+void ProjectileTracker::Menu() {
     MulNX::UI::Checkbox("启用投掷物追踪", this->runFlag1);
 }
 
@@ -25,7 +25,7 @@ bool ProjectileTracker::Init() {
         .SubscribeSync("Hook/RemoveEntity", [this](MulNX::Message& msg) {return this->OnEntityRemove(msg);})
         ;
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

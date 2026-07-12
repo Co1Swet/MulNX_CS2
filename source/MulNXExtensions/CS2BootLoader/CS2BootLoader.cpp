@@ -7,7 +7,7 @@
 #include <fstream>
 #include <TlHelp32.h>
 
-bool CS2BootLoader::Window(MulNX::UINode* node) {
+bool CS2BootLoader::Window() {
     auto w = MulNX::UI::RAIIWindow("CS2 Boot Loader", this->showWindow);
     if (!w)return true;
     std::unique_lock lock(this->smutex);
@@ -82,7 +82,7 @@ bool CS2BootLoader::Init() {
         return true;
         });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
 
     return true;
 }

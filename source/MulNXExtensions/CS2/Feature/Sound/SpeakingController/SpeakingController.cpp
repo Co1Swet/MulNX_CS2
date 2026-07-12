@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 
-void SpeakingController::Menu(MulNX::UINode* node) {
+void SpeakingController::Menu() {
     MulNX::UI::Checkbox("自动激活玩家语音", this->runFlag1);
     MulNX::UI::Checkbox("仅播放当前观战玩家的阵营语音(默认激活所有玩家语音)", this->onlyCurOBingSameTeam);
 }
@@ -12,7 +12,7 @@ bool SpeakingController::Init() {
         return;
         });
     this->participateIt = true;
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
     return true;
 }
 void SpeakingController::OnItBegin() {

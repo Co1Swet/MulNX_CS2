@@ -1,7 +1,7 @@
 #include "SkyController.hpp"
 #include <Buildup/MaterialSystem/MaterialSystem.hpp>
 
-void SkyController::Menu(MulNX::UINode* node) {
+void SkyController::Menu() {
     ImGui::SeparatorText("天空");
     MulNX::UI::Checkbox("启用天空修改", this->runFlag1);
 
@@ -58,10 +58,7 @@ bool SkyController::Init() {
         .SubscribeAsync("Sky/Color/Set")
         .SubscribeAsync("Sky/Brightness/Set");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        this->Menu(node);
-        return true;
-        });
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     this->SendTask("Update", "CSControl", [this]() {
         this->Update();

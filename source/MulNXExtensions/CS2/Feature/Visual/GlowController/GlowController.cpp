@@ -3,7 +3,7 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Buildup/PlayerHub/PlayerHub.hpp>
 
-void GlowController::HubPlayer(MulNX::UINode* node) {
+void GlowController::HubPlayer() {
     std::shared_lock lock(this->smutex);
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
@@ -38,7 +38,7 @@ void GlowController::HubPlayer(MulNX::UINode* node) {
         this->PublishAsync(std::move(msg));
     }
 }
-void GlowController::HubTeam(MulNX::UINode* node) {
+void GlowController::HubTeam() {
     std::shared_lock lock(this->smutex);
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 

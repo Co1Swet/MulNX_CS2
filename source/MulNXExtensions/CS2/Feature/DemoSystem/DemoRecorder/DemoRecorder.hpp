@@ -18,7 +18,7 @@ class DemoRecorder final : public CSModuleBase {
 
     MulNX::CoTask Main();
     std::atomic<uint64_t> num = 0;
-    bool Window(MulNX::UINode* node);
+    bool Window();
 public:
     bool Init() override;
     void ProcessMsg(MulNX::Message& msg) override;

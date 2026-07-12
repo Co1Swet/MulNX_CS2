@@ -6,7 +6,7 @@
 #include <MulNX/Systems/I18nManager/I18nManager.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 
-void MulNX::Debugger::DeMe(MulNX::UINode* node) {
+void MulNX::Debugger::DeMe() {
     MulNX::UI::Checkbox("调试器窗口", this->showWindow);
     ImGui::Checkbox("当有错误信息时弹出调试器", &this->ShowWhenError);
     ImGui::Checkbox("自动滚动到最新消息", &this->AutoScroll);
@@ -23,7 +23,7 @@ void MulNX::Debugger::DeMe(MulNX::UINode* node) {
     }
 }
 
-bool MulNX::Debugger::Window(MulNX::UINode* node) {
+bool MulNX::Debugger::Window() {
     auto w = MulNX::UI::RAIIWindow("调试器", this->showWindow);
     if (!w)return true;
     std::shared_lock lock(this->smutex);
@@ -78,8 +78,8 @@ bool MulNX::Debugger::Window(MulNX::UINode* node) {
 bool MulNX::Debugger::Init() {
     this->pLogger = this->Core->ModuleManager()->FindModule<MulNX::Logger>("Logger");
 
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
-    this->SendUINode("DeDebugger", [this](MulNX::UINode* node) {return this->DeMe(node);});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
+    this->SendUINode("DeDebugger", [this](auto&&...) {return this->DeMe();});
 
     this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
@@ -109,15 +109,15 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Log/Error"_hash: if (this->ShowWhenError) this->showWindow = true;
-    case "Log/Info"_hash: 
-    case "Log/Succ"_hash: 
+    case "Log/Info"_hash:
+    case "Log/Succ"_hash:
     case "Log/Warning"_hash: {
         auto fmtted = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
         this->DebugMsg.push_back(fmtted);
         break;
     }
-    
+
     }
 }
 void MulNX::Debugger::Main() {

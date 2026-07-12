@@ -1,7 +1,7 @@
 #include "SkinController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void SkinController::Window(MulNX::UINode* node) {
+void SkinController::Window() {
     ImGui::SeparatorText(I18n("skin.changer").c_str());
     MulNX::UI::SliderInt(I18n("skin.target.index").c_str(), this->targetIndex, 0, 10000);
     MulNX::UI::Checkbox(I18n("skin.target.legacy").c_str(), this->legacyModel);
@@ -40,7 +40,7 @@ bool SkinController::Init() {
         else {
             MulNX::ErrorTerminate(I18n("skin.controller.hook.fail"));
         }
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
         });
 
     return true;

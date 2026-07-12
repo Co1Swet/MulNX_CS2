@@ -12,8 +12,7 @@ private:
     int LastClickedPlayer = 0;
     // 是否随窗口大小联动
     bool FollowWindow = true;
-public:
     bool Init()override;
     void Main();
-    bool UINodeFunc(MulNX::UINode* node);
+    bool UINodeFunc();
 };

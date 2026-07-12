@@ -3,9 +3,9 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookView/HookView.hpp>
 
-bool CameraSystem::Menu(MulNX::UINode* node) {
+bool CameraSystem::Menu(MulNX::UICoordinator* uico) {
     std::shared_lock lock(this->smutex);
-    node->CallUINode("MenuWorkspace");
+    uico->CallUINode("MenuWorkspace");
 
     if (!this->WManager->InWorkspace) {
         // 如果不在工作区，显示提示信息
@@ -42,21 +42,21 @@ bool CameraSystem::Menu(MulNX::UINode* node) {
         ImGui::Separator();
         switch (SelectedTab) {
         case 0:// 项目菜单
-            node->CallUINode("MenuProject");
+            uico->CallUINode("MenuProject");
             break;
         case 1:// 解决方案菜单
             if (!InProject) {
                 ImGui::Text(I18n("camsys.please_enter_proj").c_str());
                 break;
             }
-            node->CallUINode("MenuSolution");
+            uico->CallUINode("MenuSolution");
             break;
         case 2:// 元素菜单
             if (!InProject) {
                 ImGui::Text(I18n("camsys.please_enter_proj").c_str());
                 break;
             }
-            node->CallUINode("MenuElement");
+            uico->CallUINode("MenuElement");
             break;
         }
     }
@@ -97,7 +97,7 @@ bool CameraSystem::Init() {
         auto Workspaces = this->PathGet("Workspaces");
         PathManager->KeyBindStatic("CurrentWorkspace", Workspaces);
     }
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto uico,auto&&...) {return this->Menu(uico);});
     (*this)
         .SubscribeAsync("Global/Save")
         .SubscribeAsync("Global/Save/Strong")

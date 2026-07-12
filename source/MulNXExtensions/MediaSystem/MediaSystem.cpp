@@ -3,7 +3,7 @@
 #include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-bool MediaSystem::Window(MulNX::UINode* node) {
+bool MediaSystem::Window() {
     auto w = MulNX::UI::RAIIWindow("音视频");
     this->RecordParamsUI();
 
@@ -76,7 +76,7 @@ bool MediaSystem::Init() {
     av::set_logging_level(AV_LOG_WARNING);
     this->pMediaParamManager = this->Core->ModuleManager()->FindModule<MediaParamManager>("MediaParamManager");
     this->LogSucc("FFmpeg 初始化成功");
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) { return this->Window(node); });
+    this->SendUIRoot(this->GetName(), [this](auto&&...) { return this->Window(); });
     this->dirVideos = this->Path()->PathGetForShared("Videos");
 
     return true;

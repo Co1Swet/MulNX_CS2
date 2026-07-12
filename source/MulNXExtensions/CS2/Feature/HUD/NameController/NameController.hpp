@@ -13,8 +13,8 @@ class NameController final :public CSViewPlayerModuleBase {
 public:
     bool Init()override;
     void ProcessMsg(MulNX::Message& Msg)override;
-    void HubPlayer(MulNX::UINode* node)override;
-    void HubTeam(MulNX::UINode* node)override {};
+    void HubPlayer()override;
+    void HubTeam()override {};
 
     bool SetReplace(Steam64UID uid, const std::string& newName);
 };

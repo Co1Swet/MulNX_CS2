@@ -3,7 +3,7 @@
 #include <CameraSystem/ElementManager/ElementManager.hpp>
 #include <CameraSystem/SolutionManager/SolutionManager.hpp>
 
-bool ProjectManager::MenuProject(MulNX::UINode* node) {
+bool ProjectManager::MenuProject() {
     // 项目总设置
     if (ImGui::CollapsingHeader(I18n("camsys.proj.settings").c_str())) {
         ImGui::Checkbox(I18n("camsys.proj.shortcut_enable").c_str(), &this->Config.ProjectShortcutEnable);
@@ -39,7 +39,7 @@ bool ProjectManager::MenuProject(MulNX::UINode* node) {
     }
     return true;
 }
-bool ProjectManager::UINodeFunc(MulNX::UINode* node) {
+bool ProjectManager::UINodeFunc() {
     if (this->showWindow.load(std::memory_order_acquire)) {
         //项目调试窗口
         this->Project_DebugWindow();
@@ -113,8 +113,8 @@ bool ProjectManager::Init() {
     this->SManager = this->Core->ModuleManager()->FindModule<SolutionManager>("SolutionManager");
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->SendUINode("MenuProject", [this](MulNX::UINode* node) {return this->MenuProject(node);});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
+    this->SendUINode("MenuProject", [this](auto&&...) {return this->MenuProject();});
 
     auto* PathManager = this->Path();
     if (PathManager->CreateKey("CurrentProject", {},

@@ -3,9 +3,9 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
-bool RecordTaskMaker::Window(MulNX::UINode* node) {
+bool RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("录制任务创建");
-    node->CallUINode("DemoJSONReader");
+    uico->CallUINode("DemoJSONReader");
     MulNX::UI::SmartButton btn{};
 
     std::shared_lock lock(this->smutex);
@@ -179,7 +179,7 @@ bool RecordTaskMaker::Init() {
         .SubscribeAsync("Demo/SetOperating")
         .SubscribeAsync("Demo/InfoLoad");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUINode(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
 
     this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();

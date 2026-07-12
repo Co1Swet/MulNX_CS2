@@ -5,7 +5,7 @@
 #include <CameraSystem/ProjectManager/ProjectManager.hpp>
 #include <MulNXThirdParty/All_pugixml.hpp>
 
-bool WorkspaceManager::MenuWorkspace(MulNX::UINode* node) {
+bool WorkspaceManager::MenuWorkspace() {
     std::shared_lock lock(this->CamSys->smutex);
     // 顶部：工作区信息（始终显示）
     auto c = MulNX::UI::RAIIChild("工作区面板", ImVec2(0, 150), true);
@@ -61,7 +61,7 @@ bool WorkspaceManager::Init() {
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
-    this->SendUINode("MenuWorkspace", [this](MulNX::UINode* node) {return this->MenuWorkspace(node);});
+    this->SendUINode("MenuWorkspace", [this](auto&&...) {return this->MenuWorkspace();});
 
     (*this)
         .SubscribeAsync("CamereSystem/Workspace/Set")

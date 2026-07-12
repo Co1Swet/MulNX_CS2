@@ -18,7 +18,6 @@ public:
 };
 
 class AdvancedViewController final :public CSModuleBase, public CSViewControlMixin<AdvancedViewController> {
-private:
     std::atomic<bool> OverrideSelfView = false;
     std::atomic<bool> AlwaysCaulate = false;
 
@@ -50,7 +49,7 @@ private:
     MulNX::Math::ViewBuffer viewBuffer{};
     bool HandleOverrideView(CS2::CViewSetup* viewSetup);
     bool Init()override;
-    bool Menu(MulNX::UINode* node);
+    bool Menu();
 
     bool HandleUpdate(CS2::CViewSetup* viewSetup,const int& num)override;
     CS2::C_CSPlayerPawn* GetSelfViewTargetPawn();

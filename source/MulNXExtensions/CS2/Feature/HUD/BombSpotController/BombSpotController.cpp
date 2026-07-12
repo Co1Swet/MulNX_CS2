@@ -1,7 +1,7 @@
 #include "BombSpotController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void BombSpotController::Menu(MulNX::UINode* node) {
+void BombSpotController::Menu() {
     MulNX::UI::Checkbox("当观战CT时强制渲染C4为红色", this->runFlag1);
 }
 
@@ -39,7 +39,7 @@ bool BombSpotController::Init() {
         });
     this->runFlag2 = true;
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

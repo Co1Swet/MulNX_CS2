@@ -1,7 +1,7 @@
 #include "TeamIDRenderController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void TeamIDRenderController::Menu(MulNX::UINode* node) {
+void TeamIDRenderController::Menu() {
     MulNX::UI::Checkbox("Team ID隐藏敌方", this->runFlag1);
 }
 
@@ -17,7 +17,7 @@ bool TeamIDRenderController::Init() {
         this->LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rbx is C_CSPlayerPawn*"));
         });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

@@ -3,7 +3,7 @@
 #include <Feature/DemoSystem/DemoStruct.hpp>
 
 class RecordTaskConfiger final :public CSModuleBase {
-    bool Window(MulNX::UINode* node);
+    bool Window();
     void ProcessMsg(MulNX::Message& msg)override;
 public:
     bool Init()override;

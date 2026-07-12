@@ -12,9 +12,9 @@ class ProjectileTracker final : public CSViewPlayerModuleBase, public CSViewCont
 
     bool HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile);
 
-    void Menu(MulNX::UINode* node);
-    void HubTeam(MulNX::UINode* node)override {};
-    void HubPlayer(MulNX::UINode* node)override {};
+    void Menu();
+    void HubTeam()override {};
+    void HubPlayer()override {};
     void Main();
     MulNX::NewestBuffer<MulNX::Math::View> currentView{};
     void OnEntityAdd(MulNX::Message& msg);

@@ -1,7 +1,7 @@
 #include "GameSettingsManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {    
+bool GameSettingsManager::Menu() {    
     ImGui::Checkbox("作弊模式", this->settings.sv_cheats);
     ImGui::SliderInt("FPS上限", this->settings.fps_max, 0, 1000);
     ImGui::SliderFloat("游戏速度", this->settings.host_timescale, 0.001f, 10.000f);
@@ -36,7 +36,7 @@ bool GameSettingsManager::Menu(MulNX::UINode* ThisNode) {
     return true;
 }
 
-bool GameSettingsManager::SoundMenu(MulNX::UINode* node) {
+bool GameSettingsManager::SoundMenu() {
     ImGui::Checkbox("游戏窗口失去焦点时静音", this->settings.snd_mute_losefocus);
 
     ImGui::SeparatorText("音乐设置");
@@ -53,7 +53,7 @@ bool GameSettingsManager::SoundMenu(MulNX::UINode* node) {
     return true;
 }
 
-bool GameSettingsManager::DofMenu(MulNX::UINode* node) {
+bool GameSettingsManager::DofMenu() {
     ImGui::SeparatorText("景深控制");
     ImGui::Checkbox("启用景深", this->settings.r_dof_override);
 
@@ -83,7 +83,7 @@ bool GameSettingsManager::DofMenu(MulNX::UINode* node) {
     return true;
 }
 
-bool GameSettingsManager::GameHudMenu(MulNX::UINode* node) {
+bool GameSettingsManager::GameHudMenu() {
     ImGui::SeparatorText("游戏HUD设置");
 
     ImGui::Checkbox("显示HUD", this->settings.cl_drawhud);
@@ -116,10 +116,10 @@ bool GameSettingsManager::Init() {
         *this->settings.cl_demo_predict = false;
         *this->settings.cl_spec_show_bindings = false;
 
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
-        this->SendUINode("SoundMenu", [this](MulNX::UINode* node) {return this->SoundMenu(node);});
-        this->SendUINode("DofMenu", [this](MulNX::UINode* node) {return this->DofMenu(node);});
-        this->SendUINode("GameHudMenu", [this](MulNX::UINode* node) {return this->GameHudMenu(node);});
+        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+        this->SendUINode("SoundMenu", [this](auto&&...) {return this->SoundMenu();});
+        this->SendUINode("DofMenu", [this](auto&&...) {return this->DofMenu();});
+        this->SendUINode("GameHudMenu", [this](auto&&...) {return this->GameHudMenu();});
         return false;
         });
 

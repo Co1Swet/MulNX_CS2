@@ -1,7 +1,7 @@
 #include "TeamCounterController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void TeamCounterController::Menu(MulNX::UINode* node) {
+void TeamCounterController::Menu() {
     MulNX::UI::Checkbox("隐藏敌方血条", this->runFlag1);
 }
 
@@ -29,7 +29,7 @@ bool TeamCounterController::Init() {
 
         });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

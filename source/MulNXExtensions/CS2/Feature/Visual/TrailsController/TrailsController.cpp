@@ -9,7 +9,7 @@ using DrawStuff_t = void(*)(CS2::C_BaseCSGrenadeProjectile*, char);
 
 // ==================== UI 实现（即时生效） ====================
 
-void TrailsController::HubPlayer(MulNX::UINode* node) {
+void TrailsController::HubPlayer() {
     std::shared_lock lock(this->smutex);
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
@@ -32,7 +32,7 @@ void TrailsController::HubPlayer(MulNX::UINode* node) {
     }
 }
 
-void TrailsController::HubTeam(MulNX::UINode* node) {
+void TrailsController::HubTeam() {
     std::shared_lock lock(this->smutex);
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
     if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT) {
@@ -59,7 +59,7 @@ void TrailsController::HubTeam(MulNX::UINode* node) {
     }
 }
 
-void TrailsController::Menu(MulNX::UINode* node) {
+void TrailsController::Menu() {
     std::shared_lock lock(this->smutex);
     ParticleProp propCopy = this->prop;
 
@@ -100,10 +100,7 @@ bool TrailsController::Init() {
         this->sv_grenade_trajectory_prac_pipreview = this->CS2Con->GetCVarByName("sv_grenade_trajectory_prac_pipreview")->GetPtr<bool>();
         this->sv_grenade_trajectory_time_spectator = this->CS2Con->GetCVarByName("sv_grenade_trajectory_time_spectator")->GetPtr<float>();
 
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-            this->Menu(node);
-            return true;
-            });
+        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
         });
 
     (*this)

@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <fstream>
 
-bool MulNX::UISystem::Menu(MulNX::UINode* node) {
+bool MulNX::UISystem::Menu() {
     ImGui::Text(I18n("ui.style.info").c_str());
     if (ImGui::Button(I18n("ui.style.save").c_str())) {
         this->PublishAsync("UISystem/SaveStyle"_hash);
@@ -36,7 +36,7 @@ bool MulNX::UISystem::Init() {
         .SubscribeAsync("UISystem/Toggle")
         .SubscribeAsync("UISystem/SaveStyle");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

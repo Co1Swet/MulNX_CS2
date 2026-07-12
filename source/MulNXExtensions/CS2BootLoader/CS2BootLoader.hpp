@@ -15,9 +15,8 @@ class CS2BootLoader final : public MulNX::Module<CS2BootLoader> {
     bool LaunchAndInject();
     bool IsGameRunning();
 
-    bool Window(MulNX::UINode* node);
+    bool Window();
     void ProcessMsg(MulNX::Message& msg);
-public:
     bool Init()override;
     void Deinit()override;
 };

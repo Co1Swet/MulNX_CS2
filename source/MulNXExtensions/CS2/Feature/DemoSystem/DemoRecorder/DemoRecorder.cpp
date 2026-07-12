@@ -4,7 +4,7 @@
 #include <Buildup/TimeController/TimeController.hpp>
 #include <Feature/DemoSystem/DemoJSONReader/DemoJSONReader.hpp>
 
-bool DemoRecorder::Window(MulNX::UINode* node) {
+bool DemoRecorder::Window() {
     auto w = MulNX::UI::RAIIWindow("Demo Recorder");
     std::shared_lock lock(this->smutex);
 
@@ -62,8 +62,8 @@ bool DemoRecorder::Init() {
         return true;
         });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        return this->Window(node);
+    this->SendUINode(this->GetName(), [this](auto&&...) {
+        return this->Window();
         });
 
     return true;

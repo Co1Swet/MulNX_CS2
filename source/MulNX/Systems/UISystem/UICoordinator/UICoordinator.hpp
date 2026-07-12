@@ -15,7 +15,7 @@ namespace MulNX {
 
         bool Init()override;
         void ProcessMsg(MulNX::Message& msg)override;
-        void Window(MulNX::UINode* node);
+        void Window();
     public:
         void HandleUpdate();
         void Render();

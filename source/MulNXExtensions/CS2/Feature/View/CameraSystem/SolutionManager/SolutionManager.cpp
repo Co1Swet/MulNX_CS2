@@ -6,7 +6,7 @@
 #include <CameraSystem/ElementManager/ElementManager.hpp>
 #include <CameraSystem/ProjectManager/ProjectManager.hpp>
 
-bool SolutionManager::MenuSolution(MulNX::UINode* node) {
+bool SolutionManager::MenuSolution() {
     ImGui::Text(I18n(
         "camsys.sol.play_status",
         this->Playing ? I18n("text.opened") : I18n("text.closed"),
@@ -88,7 +88,7 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
         solution->totalDurationTime
     ).c_str());
 }
-bool SolutionManager::UINodeFunc(MulNX::UINode* node) {
+bool SolutionManager::UINodeFunc() {
     if (this->needDrawCamera.load(std::memory_order_acquire) && this->Config.PlayingDraw) {
         auto frame = this->drawCamera.Read();
         this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.sol.playing_draw_label").c_str());
@@ -206,8 +206,8 @@ bool SolutionManager::Init() {
     this->EManager = this->Core->ModuleManager()->FindModule<ElementManager>("ElementManager");
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->SendUINode("MenuSolution", [this](MulNX::UINode* node) {return this->MenuSolution(node);});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
+    this->SendUINode("MenuSolution", [this](auto&&...) {return this->MenuSolution();});
 
     auto* PathManager = this->Path();
     if (PathManager->CreateKey("Solutions", "Solutions",

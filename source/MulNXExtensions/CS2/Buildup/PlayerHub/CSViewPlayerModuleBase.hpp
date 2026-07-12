@@ -4,8 +4,8 @@
 class ICSViewPlayerModule {
 public:
     virtual ~ICSViewPlayerModule() = default;
-    virtual void HubPlayer(MulNX::UINode* node) {};
-    virtual void HubTeam(MulNX::UINode* node) {};
+    virtual void HubPlayer() {};
+    virtual void HubTeam() {};
 };
 
 template <typename T>

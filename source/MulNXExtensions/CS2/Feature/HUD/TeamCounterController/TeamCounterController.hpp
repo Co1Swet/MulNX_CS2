@@ -3,7 +3,7 @@
 
 class TeamCounterController final :public CSViewPlayerModuleBase {
     std::unique_ptr<MulNX::Hook>hkTeamCounterWriteHP = nullptr;
-    void Menu(MulNX::UINode* node);
+    void Menu();
 public:
     bool Init()override;
 };

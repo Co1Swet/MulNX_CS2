@@ -3,7 +3,7 @@
 
 class ESPSkeleton final :public CSModuleBase {
     std::vector<std::vector<int>> chains;
-    void Draw(MulNX::UINode* node);
+    void Draw();
     void DrawSkelgton(CS2::C_CSPlayerPawn* pPawn);
     bool Init()override;
 };

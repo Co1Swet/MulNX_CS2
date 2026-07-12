@@ -3,7 +3,7 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Intro/HookView/HookView.hpp>
 
-void FreeCameraController::Menu(MulNX::UINode* node) {
+void FreeCameraController::Menu() {
     bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
     ImGui::Text(I18n("freCamCon.status", currentEnable ? "ON" : "OFF").c_str());
 
@@ -22,7 +22,7 @@ void FreeCameraController::Menu(MulNX::UINode* node) {
 bool FreeCameraController::Init() {
     this->kMovUp = this->Shortcut()->GetButton("CamMovUp").value();
     this->kMovDown = this->Shortcut()->GetButton("CamMovDown").value();
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
     this->SubscribeAsync<void>("FreeCamCtrl/Toggle");
     return true;
 }

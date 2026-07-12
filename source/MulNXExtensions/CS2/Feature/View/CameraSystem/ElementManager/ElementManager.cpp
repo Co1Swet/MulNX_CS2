@@ -7,7 +7,7 @@
 #include <CameraSystem/SolutionManager/SolutionManager.hpp>
 #include <CameraSystem/ProjectManager/ProjectManager.hpp>
 
-bool ElementManager::MenuElement(MulNX::UINode* node) {
+bool ElementManager::MenuElement() {
     // 展示预览功能相关状态
     ImGui::TextUnformatted(I18n(
         "camsys.elem.preview_status",
@@ -82,7 +82,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> eleme
     ImGui::Text(I18n("camsys.elem.type_duration", element->TypeGet_String(), std::to_string(element->DurationTime)).c_str());
 }
 
-bool ElementManager::UINodeFunc(MulNX::UINode* node) {
+bool ElementManager::UINodeFunc() {
     std::unique_lock lock(this->CamSys->smutex);
     for (auto& [name, elem] : this->elements) {
         elem->DrawBase(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
@@ -111,8 +111,8 @@ bool ElementManager::Init() {
     this->SManager = this->Core->ModuleManager()->FindModule<SolutionManager>("SolutionManager");
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
-    this->SendUINode("MenuElement", [this](MulNX::UINode* node) {return this->MenuElement(node);});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
+    this->SendUINode("MenuElement", [this](auto&&...) {return this->MenuElement();});
 
     auto* PathManager = this->Path();
     if (PathManager->CreateKey("Elements", "Elements",

@@ -7,7 +7,7 @@ using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_
 
 using GetPlayerName_t = const char* (*)(CS2::CCSPlayerController*);
 
-void NameController::HubPlayer(MulNX::UINode* node) {
+void NameController::HubPlayer() {
     std::shared_lock lock(this->smutex);
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
     auto it = this->nameReplaceInfo.find(uid);

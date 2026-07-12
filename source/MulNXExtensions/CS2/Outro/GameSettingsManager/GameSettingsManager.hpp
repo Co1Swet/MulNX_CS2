@@ -80,10 +80,10 @@ private:
     float CrispRadius;
     float BlurDistance;
     C_GameSettings settings{};
-    bool Menu(MulNX::UINode* node);
-    bool SoundMenu(MulNX::UINode* node);
-    bool DofMenu(MulNX::UINode* node);
-    bool GameHudMenu(MulNX::UINode* node);
+    bool Menu();
+    bool SoundMenu();
+    bool DofMenu();
+    bool GameHudMenu();
 public:
     bool Init()override;
 };

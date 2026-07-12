@@ -7,26 +7,27 @@
 #include <MulNXExtensions/MediaSystem/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 
-void MediaRecorder::CaptureCallback(MulNX::UINode* node) {
+void MediaRecorder::CaptureCallback() {
     ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList*, const ImDrawCmd* cmd) {
         static_cast<MediaRecorder*>(cmd->UserCallbackData)->PublishSync("Hook/BeforePresent"_hash);
-    }, this, 0);
+        }, this, 0);
 }
 
 bool MediaRecorder::Init() {
-    this->pVideoCapturer    = this->Core->ModuleManager()->FindModule<VideoCapturer>("VideoCapturer");
-    this->pAudioCapturer    = this->Core->ModuleManager()->FindModule<AudioCapturer>("AudioCapturer");
-    this->pVEncodeHelper    = this->Core->ModuleManager()->FindModule<VEncodeHelper>("VEncodeHelper");
-    this->pAEncodeHelper    = this->Core->ModuleManager()->FindModule<AEncodeHelper>("AEncodeHelper");
-    this->pVCD3D11Manager   = this->Core->ModuleManager()->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->pMediaParamManager= this->Core->ModuleManager()->FindModule<MediaParamManager>("MediaParamManager");
+    this->pVideoCapturer = this->Core->ModuleManager()->FindModule<VideoCapturer>("VideoCapturer");
+    this->pAudioCapturer = this->Core->ModuleManager()->FindModule<AudioCapturer>("AudioCapturer");
+    this->pVEncodeHelper = this->Core->ModuleManager()->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->pAEncodeHelper = this->Core->ModuleManager()->FindModule<AEncodeHelper>("AEncodeHelper");
+    this->pVCD3D11Manager = this->Core->ModuleManager()->FindModule<VCD3D11Manager>("VCD3D11Manager");
+    this->pMediaParamManager = this->Core->ModuleManager()->FindModule<MediaParamManager>("MediaParamManager");
 
     this->dirVideos = this->Path()->PathGetForShared("Videos");
-    (*this).SubscribeAsync("Media/Record/Start").SubscribeAsync("Media/Record/Stop");
+    (*this)
+        .SubscribeAsync("Media/Record/Start")
+        .SubscribeAsync("Media/Record/Stop");
 
     this->SendTask("Main", "Media", [this]() { this->Main(); return true; });
-    this->SendUIRoot("捕获以上所有根触发的UI渲染",
-        [this](MulNX::UINode* node) { this->CaptureCallback(node); return true; });
+    this->SendUIRoot("捕获以上所有根触发的UI渲染", [this](auto&&...) { return this->CaptureCallback(); });
     return true;
 }
 
@@ -71,8 +72,8 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->pVCD3D11Manager->SetRecordStart(this->recordStartTime);
 
         this->pVEncodeHelper->SetOn(&this->ofctx, rp, srcW, srcH, srcFmt,
-                                     this->pVCD3D11Manager->pDevice.Get(),
-                                     rp.captureFpsCap > 0 ? rp.captureFpsCap : 0);
+            this->pVCD3D11Manager->pDevice.Get(),
+            rp.captureFpsCap > 0 ? rp.captureFpsCap : 0);
         this->pAEncodeHelper->SetOn(&this->ofctx, this->pAudioCapturer->GetSampleRate());
 
         this->ofctx.writeHeader();
@@ -82,11 +83,12 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->pVideoCapturer->StartCapture(this->recordStartTime, hwPath);
         this->LogSucc(std::format("开始录制: {} ({}x{} {}{})", outFile,
             rp.width > 0 ? rp.width : srcW, rp.height > 0 ? rp.height : srcH,
-            rp.captureFpsCap > 0 ? std::to_string(rp.captureFpsCap)+"fps " : "",
+            rp.captureFpsCap > 0 ? std::to_string(rp.captureFpsCap) + "fps " : "",
             hwPath ? "零拷贝" : "CPU读回"));
         this->runFlag1 = true;
         return true;
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         this->LogError(std::format("启动失败: {}", e.what()));
         this->ofctx.close();
         return false;
@@ -100,7 +102,7 @@ void MediaRecorder::Main() {
 }
 
 static int64_t PtsUs(const av::Timestamp& ts) {
-    return ts.isValid() ? ts.timestamp({1,1000000}) : INT64_MAX;
+    return ts.isValid() ? ts.timestamp({ 1,1000000 }) : INT64_MAX;
 }
 
 void MediaRecorder::Encode() {
@@ -145,7 +147,8 @@ bool MediaRecorder::StopRecording() {
                     this->ofctx.writePacket(*p);
         while (auto p = this->pAEncodeHelper->TrySetOff())
             this->ofctx.writePacket(*p);
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         this->LogWarning(std::format("停止时异常: {}", e.what()));
     }
 

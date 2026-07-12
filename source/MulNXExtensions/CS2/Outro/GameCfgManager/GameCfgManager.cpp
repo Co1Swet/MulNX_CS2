@@ -1,9 +1,7 @@
 #include"GameCfgManager.hpp"
-
-#include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-bool GameCfgManager::UINodeFunc(MulNX::UINode* ThisNode) {
+bool GameCfgManager::Window() {
     auto w = MulNX::UI::RAIIWindow("配置管理器", this->showWindow);
     if (!w)return true;
     //顶部工具栏
@@ -112,7 +110,7 @@ bool GameCfgManager::Init() {
     this->GamePath = this->CS2Paths->config;
 	//初始化Cfg文件列表
     this->UpdateCfgList();
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->UINodeFunc(node);});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
     return true;
 }
 

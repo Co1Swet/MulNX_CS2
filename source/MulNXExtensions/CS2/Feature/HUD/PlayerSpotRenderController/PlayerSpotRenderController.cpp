@@ -7,7 +7,7 @@ enum TeamSytle :uint64_t {
     Enemy = 17
 };
 
-void PlayerSpotRenderController::Menu(MulNX::UINode* node) {
+void PlayerSpotRenderController::Menu() {
     MulNX::UI::Checkbox("隐藏雷达玩家头像数字显示", this->hideNumLabel);
     MulNX::UI::Checkbox("强制雷达敌人渲染为红色", this->forceEnemyRed);
     MulNX::UI::Checkbox("强制雷达队友显示", this->forceTeammateDraw);
@@ -74,7 +74,7 @@ bool PlayerSpotRenderController::Init() {
         this->LogSucc(I18n("hook.attached", "Func_FinallyUpdatePlayerState"));
         });
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

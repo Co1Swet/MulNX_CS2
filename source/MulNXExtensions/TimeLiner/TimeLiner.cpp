@@ -3,7 +3,7 @@
 #include "TimeLineModuleBase.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void TimeLiner::Menu(MulNX::UINode* node) {
+void TimeLiner::Menu() {
     MulNX::UI::RAIIWindow w("时间轴");
 
     // 没有绑定适配器时，仅绘制静态时间轴
@@ -67,7 +67,7 @@ void TimeLiner::Menu(MulNX::UINode* node) {
 }
 
 bool TimeLiner::Init() {
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

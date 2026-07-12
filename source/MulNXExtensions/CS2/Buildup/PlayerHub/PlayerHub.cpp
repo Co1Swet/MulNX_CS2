@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
 
-bool PlayerHub::Window(MulNX::UINode* node) {
+bool PlayerHub::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("玩家信息管理", this->showWindow);
     if (!w) return false;
     try {
@@ -65,7 +65,7 @@ bool PlayerHub::Window(MulNX::UINode* node) {
                 this->currentSteamId.store(info.steamID, std::memory_order_release);
                 this->currentTeam.store(info.teamNum, std::memory_order_release);
                 for (auto& mod : this->PlayerViewModules) {
-                    mod->HubPlayer(node);
+                    mod->HubPlayer();
                 }
                 ImGui::Separator();
                 if (ImGui::Button("关闭"))
@@ -79,7 +79,7 @@ bool PlayerHub::Window(MulNX::UINode* node) {
                 this->currentSteamId.store(0, std::memory_order_release);
                 this->currentTeam.store(team, std::memory_order_release);
                 for (auto& mod : this->PlayerViewModules) {
-                    mod->HubTeam(node);
+                    mod->HubTeam();
                 }
                 ImGui::Separator();
                 if (ImGui::Button("关闭"))
@@ -140,6 +140,6 @@ bool PlayerHub::Window(MulNX::UINode* node) {
 }
 
 bool PlayerHub::Init() {
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUIRoot(this->GetName(), [this](auto* uico, auto&&...) {return this->Window(uico);});
     return true;
 }

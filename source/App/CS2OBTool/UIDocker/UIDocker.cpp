@@ -2,31 +2,31 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 bool UIDocker::Init() {
-    this->SendUIRoot("MainDraw", [this](MulNX::UINode* node) {this->MainDraw(node);});
+    this->SendUIRoot("MainDraw", [this](auto uico, auto&&...) {this->MainDraw(uico);});
     return true;
 }
 
-void UIDocker::MainDraw(MulNX::UINode* node) {
+void UIDocker::MainDraw(MulNX::UICoordinator* uico) {
     ImGui::Begin(I18n("ui.main").c_str());
     ImGui::Text(I18n("homepage").c_str());
     ImGui::End();
 
     ImGui::Begin(I18n("声音控制").c_str());
-    node->CallUINode("SoundMenu");
-    node->CallUINode("SpeakingController");
+    uico->CallUINode("SoundMenu");
+    uico->CallUINode("SpeakingController");
     ImGui::End();
 
     ImGui::Begin(I18n("2D视觉").c_str());
-    node->CallUINode("GraphicsManager");
-    node->CallUINode("PlayerFlashController");
-    node->CallUINode("ESPBox");
-    node->CallUINode("ESPSkeleton");
-    node->CallUINode("GameHudMenu");
-    node->CallUINode("BombSpotController");
-    node->CallUINode("PlayerSpotRenderController");
-    node->CallUINode("PlayerSpotColorController");
-    node->CallUINode("TeamCounterController");
-    node->CallUINode("FlashRenderController");
+    uico->CallUINode("GraphicsManager");
+    uico->CallUINode("PlayerFlashController");
+    uico->CallUINode("ESPBox");
+    uico->CallUINode("ESPSkeleton");
+    uico->CallUINode("GameHudMenu");
+    uico->CallUINode("BombSpotController");
+    uico->CallUINode("PlayerSpotRenderController");
+    uico->CallUINode("PlayerSpotColorController");
+    uico->CallUINode("TeamCounterController");
+    uico->CallUINode("FlashRenderController");
     MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->Core->ModuleManager()->FindModule("DeathMsgController")->showWindow);
     ImGui::End();
 
@@ -38,35 +38,33 @@ void UIDocker::MainDraw(MulNX::UINode* node) {
     ImGui::End();
 
     ImGui::Begin(I18n("3D视觉").c_str());
-    node->CallUINode("SkinController");
-    node->CallUINode("TeamIDRenderController");
-    node->CallUINode("TrailsController");
-    node->CallUINode("SkyController");
+    uico->CallUINode("SkinController");
+    uico->CallUINode("TeamIDRenderController");
+    uico->CallUINode("TrailsController");
+    uico->CallUINode("SkyController");
     ImGui::End();
 
     ImGui::Begin(I18n("镜头参数").c_str());
-    node->CallUINode("HookView");
-    node->CallUINode("FreeCameraController");
-    node->CallUINode("DofMenu");
+    uico->CallUINode("HookView");
+    uico->CallUINode("FreeCameraController");
+    uico->CallUINode("DofMenu");
     ImGui::End();
 
     ImGui::Begin(I18n("视角视图").c_str());
-    node->CallUINode("ProjectileTracker");
-    node->CallUINode("AdvancedViewController");
+    uico->CallUINode("ProjectileTracker");
+    uico->CallUINode("AdvancedViewController");
     ImGui::End();
 
     ImGui::Begin(I18n("ui.camera_system").c_str());
-    node->CallUINode("CameraSystem");
+    uico->CallUINode("CameraSystem");
     ImGui::End();
 
     ImGui::Begin(I18n("ui.game_settings").c_str());
-    node->CallUINode("GameSettingsManager");
+    uico->CallUINode("GameSettingsManager");
     ImGui::End();
 
     ImGui::Begin(I18n("ui.mulnx_control").c_str());
-    node->CallUINode("VirtualUser");
-    node->CallUINode("MulNXController");
+    uico->CallUINode("VirtualUser");
+    uico->CallUINode("MulNXController");
     ImGui::End();
-
-    node->CallUINode("MediaSystem");
 }

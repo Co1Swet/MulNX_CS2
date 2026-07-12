@@ -10,8 +10,6 @@ class PlayerSpotRenderController :public CSViewPlayerModuleBase {
     std::atomic<bool>hideNumLabel = true;
     std::atomic<bool>forceTeammateDraw = true;
     std::atomic<bool>forceEnemyRed = true;
-
-    void Menu(MulNX::UINode* node);
-public:
+    void Menu();
     bool Init()override;
 };

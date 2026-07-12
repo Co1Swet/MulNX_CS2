@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Systems/Systems.hpp>
 
-void MulNX::UICoordinator::Window(MulNX::UINode* node) {
+void MulNX::UICoordinator::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.settings").c_str());
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -72,9 +72,7 @@ bool MulNX::UICoordinator::Init() {
         .SubscribeAsync("UISystem/ModulePush")
         .SubscribeAsync("UINode/Swap");     // 订阅交换消息
     // 向 UISystem 注册本模块的根窗口回调
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {
-        return this->Window(node);
-        });
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
     return true;
 }
 
@@ -162,7 +160,7 @@ void MulNX::UICoordinator::Render() {
 
     for (auto& node : UINodes) {
         if (node.drawAsARoot) {
-            node.Draw();
+            node.Render(this, nullptr);
         }
     }
 }
@@ -170,6 +168,6 @@ void MulNX::UICoordinator::Render() {
 void MulNX::UICoordinator::CallUINode(std::string&& name) {
     auto it = nameToIndex.find(name);
     if (it != nameToIndex.end()) {
-        UINodes[it->second].Draw();
+        UINodes[it->second].Render(this, nullptr);
     }
 }

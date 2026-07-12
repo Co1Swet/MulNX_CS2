@@ -5,7 +5,7 @@
 
 using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);
 
-void TeamIDColorController::HubTeam(MulNX::UINode* node) {
+void TeamIDColorController::HubTeam() {
     std::shared_lock lock(this->smutex);
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 

@@ -3,14 +3,14 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
 
-bool DemoSystem::Window(MulNX::UINode* node) {
+bool DemoSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("Demo", this->showWindow);
     if (!w) return true;
 
-    node->CallUINode("RecordTaskMaker");
-    node->CallUINode("RecordTaskConfiger");
-    node->CallUINode("DemoHelper");
-    node->CallUINode("DemoRecorder");
+    uico->CallUINode("RecordTaskMaker");
+    uico->CallUINode("RecordTaskConfiger");
+    uico->CallUINode("DemoHelper");
+    uico->CallUINode("DemoRecorder");
 
     std::unique_lock lock(this->smutex);
 
@@ -121,8 +121,8 @@ bool DemoSystem::Init() {
         .SubscribeAsync("Window/Drag/FileDrop")
         ;
 
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {
-        return this->Window(node);
+    this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {
+        return this->Window(uico);
         });
 
     this->SendTask("Update", "DemoSys", [this]() {

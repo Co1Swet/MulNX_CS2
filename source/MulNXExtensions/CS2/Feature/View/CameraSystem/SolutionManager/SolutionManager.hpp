@@ -29,8 +29,8 @@ public:
     
     //数据存储
     std::unordered_map<std::string, std::unique_ptr<Solution>> solutions{};
-    bool MenuSolution(MulNX::UINode* node);
-    bool UINodeFunc(MulNX::UINode* node);
+    bool MenuSolution();
+    bool UINodeFunc();
     void Solution_ShowInLine(Solution* solution);
     void Solution_DebugWindow();
 

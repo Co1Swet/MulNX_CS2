@@ -2,7 +2,6 @@
 #include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
 
 class SpeakingController :public CSViewPlayerModuleBaseT<SpeakingController> {
-private:
     int* tv_listen_voice_indices = nullptr;
     int bufferMask = 0;
     CS2::ui8TeamNum targetTeam{};
@@ -11,6 +10,6 @@ private:
     void OnItPlayer(int index, CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn)override;
     void OnItEnd()override;
 
-    void Menu(MulNX::UINode* node);
+    void Menu();
     bool Init()override;
 };

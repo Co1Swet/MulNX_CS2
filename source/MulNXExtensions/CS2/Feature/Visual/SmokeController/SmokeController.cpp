@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/PlayerHub/PlayerHub.hpp>
 
-void SmokeController::HubPlayer(MulNX::UINode* node) {
+void SmokeController::HubPlayer() {
     std::shared_lock lock(this->smutex);
     auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
 
@@ -34,7 +34,7 @@ void SmokeController::HubPlayer(MulNX::UINode* node) {
     }
 }
 
-void SmokeController::HubTeam(MulNX::UINode* node) {
+void SmokeController::HubTeam() {
     std::shared_lock lock(this->smutex);
     auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
 

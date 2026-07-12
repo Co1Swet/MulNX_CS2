@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 
-void FlashRenderController::Menu(MulNX::UINode* node) {
+void FlashRenderController::Menu() {
     ImGui::SliderFloat("闪光绘制最大强度", this->r_spectator_flashbang_opacity, 0.0f, 1.0f);
     MulNX::UI::Checkbox("是否在HUD上执行闪光绘制", this->runFlag1);
     MulNX::UI::Checkbox("是否在HUD下执行闪光绘制", this->runFlag2);
@@ -41,7 +41,7 @@ bool FlashRenderController::Init() {
 
     this->runFlag1.store(true);
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

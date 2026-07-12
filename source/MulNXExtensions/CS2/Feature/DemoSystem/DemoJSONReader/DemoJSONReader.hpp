@@ -3,7 +3,7 @@
 
 class DemoJSONReader final : public CSModuleBase {
     std::filesystem::path dirData;
-    bool Window(MulNX::UINode* node);
+    bool Window();
 public:
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;

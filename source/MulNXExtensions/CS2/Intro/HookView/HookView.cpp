@@ -3,7 +3,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 
-bool HookView::Menu(MulNX::UINode* node) {
+bool HookView::Menu() {
 
     MulNX::UI::SliderFloat("roll调整", this->controlView.InputRoll, -179.99f, 179.99f);
     static auto* pGlobalFOV = this->CS2Con->GetCvar("fov_cs_debug")->GetPtr<float>();
@@ -30,7 +30,7 @@ bool HookView::Init() {
             }, true).value();
         this->hkPosCallIsPlayingDemo->Attach();
 
-        this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
         });
 
     return true;

@@ -1,7 +1,7 @@
 #include "RecordTaskConfiger.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool RecordTaskConfiger::Window(MulNX::UINode* node) {
+bool RecordTaskConfiger::Window() {
     auto w = MulNX::UI::RAIIWindow("录制参数调节");
     ImGui::SliderInt("击杀前预留tick", &this->preRecordTicks, 1, 640);
     ImGui::SliderInt("击杀后保留tick", &this->postRecordTicks, 1, 640);
@@ -18,7 +18,7 @@ bool RecordTaskConfiger::Window(MulNX::UINode* node) {
 
 bool RecordTaskConfiger::Init() {
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Window(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
 
     this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();

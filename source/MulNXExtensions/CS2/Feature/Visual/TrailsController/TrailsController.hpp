@@ -20,8 +20,8 @@ class TrailsController final :public CSViewPlayerModuleBase {
     MulNX::Hook::Then HandleOnCreate(CS2::C_BaseCSGrenadeProjectile* pProjectile);
     MulNX::Hook::Then HandleOnUpdate(CS2::C_BaseCSGrenadeProjectile* pProjectile);
     bool Init()override;
-    void HubPlayer(MulNX::UINode* node)override;
-    void HubTeam(MulNX::UINode* node)override;
-    void Menu(MulNX::UINode* node);
+    void HubPlayer()override;
+    void HubTeam()override;
+    void Menu();
     void ProcessMsg(MulNX::Message& msg)override;
 };

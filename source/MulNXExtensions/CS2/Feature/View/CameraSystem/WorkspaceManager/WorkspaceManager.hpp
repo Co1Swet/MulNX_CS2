@@ -10,7 +10,7 @@ private:
     MulNX::IPCer* pIPCer = nullptr;
 
     std::unique_ptr<Workspace> CurrentWorkspace = nullptr;
-    bool MenuWorkspace(MulNX::UINode* node);
+    bool MenuWorkspace();
     void ProcessMsg(MulNX::Message& msg)override;
 public:
     std::atomic<bool> InWorkspace = false;

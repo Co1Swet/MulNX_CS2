@@ -1,13 +1,13 @@
 #include "PlayerFlashController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool PlayerFlashController::Menu(MulNX::UINode* node) {
+bool PlayerFlashController::Menu() {
     MulNX::UI::Checkbox("强制移除闪光效果", this->bForceNoFlash);
     return true;
 }
 
 bool PlayerFlashController::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node);});
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
     this->participateIt = true;
     return true;
 }

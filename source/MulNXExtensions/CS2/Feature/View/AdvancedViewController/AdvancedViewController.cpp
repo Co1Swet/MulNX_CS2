@@ -3,7 +3,7 @@
 #include <Buildup/TimeController/TimeController.hpp>
 #include <Intro/HookView/HookView.hpp>
 
-bool AdvancedViewController::Menu(MulNX::UINode* node) {
+bool AdvancedViewController::Menu() {
     if (ImGui::CollapsingHeader("高级视角控制")) {
         MulNX::UI::Checkbox("启用高级视角控制", this->runFlag1);
         MulNX::UI::Checkbox("覆盖自视角", this->OverrideSelfView);
@@ -79,7 +79,7 @@ bool AdvancedViewController::Menu(MulNX::UINode* node) {
 }
 
 bool AdvancedViewController::Init() {
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {return this->Menu(node); });
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu(); });
 
     return true;
 }

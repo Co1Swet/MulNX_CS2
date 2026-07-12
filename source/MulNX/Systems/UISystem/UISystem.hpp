@@ -13,7 +13,7 @@ namespace MulNX {
         void LoadStyle();
         void SaveStyle();
 
-        bool Menu(MulNX::UINode* node);
+        bool Menu();
         bool Init()override;
         void ProcessMsg(MulNX::Message& Msg)override;
     public:

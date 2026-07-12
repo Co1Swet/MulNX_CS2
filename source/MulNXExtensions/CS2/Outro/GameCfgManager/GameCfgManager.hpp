@@ -10,7 +10,8 @@ private:
 
     std::vector<std::string>ToolCfgs{};
     std::vector<std::string>GameCfgs{};
-public:
+
+    bool Window();
     bool Init()override;
 
     //Cfg文件操作接口
@@ -26,6 +27,4 @@ public:
     bool MoveToTool(const std::string& CfgName);
     //从工具目录删除Cfg文件
     bool DeleteCfg(const std::string& CfgName);
-
-    bool UINodeFunc(MulNX::UINode* node);
 };

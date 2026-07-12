@@ -9,7 +9,7 @@ class RecordTaskMaker final :public CSModuleBase {
     std::string currentDemoName;
 
     bool showBekillEvent = true;
-    bool Window(MulNX::UINode* node);
+    bool Window(MulNX::UICoordinator* uico);
     void ProcessMsg(MulNX::Message& msg)override;
 public:
     bool Init()override;

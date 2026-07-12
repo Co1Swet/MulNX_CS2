@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookView/HookView.hpp>
 
-bool ESPBox::Draw(MulNX::UINode* node) {
+bool ESPBox::Draw() {
     if (this->showWindow.load(std::memory_order_acquire)) {
         for (int i = 1; i <= 10; ++i) {
             if (!this->CS2->GetPlayerMsg(i).Alive)continue;
@@ -28,11 +28,9 @@ bool ESPBox::Draw(MulNX::UINode* node) {
 }
 
 bool ESPBox::Init() {
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node)->bool {
-        return this->Draw(node);
-        });
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Draw();});
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->SendUINode(this->GetName(), [this](auto&&...) {
         MulNX::UI::Checkbox("方框ESP", this->runFlag1);
         });
 

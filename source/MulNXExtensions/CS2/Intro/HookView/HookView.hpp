@@ -29,7 +29,7 @@ class HookView final :public CSModuleBase {
     void HandleCameraSystemPlay(CS2::CViewSetup* viewSetup);
     void HandleOverrideView(CS2::CViewSetup* viewSetup);
 
-    bool Menu(MulNX::UINode* node);
+    bool Menu();
 public:
     bool Init()override;
     std::vector<ICSViewControlModule*>viewControlModules{};

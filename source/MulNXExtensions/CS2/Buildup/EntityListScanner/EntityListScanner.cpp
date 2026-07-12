@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 
-void EntityListScanner::Window(MulNX::UINode* node) {
+void EntityListScanner::Window() {
     auto w = MulNX::UI::RAIIWindow("实体列表探测器");
 
     for (int i = 0;i < 30;++i) {
@@ -34,8 +34,6 @@ void EntityListScanner::Window(MulNX::UINode* node) {
 }
 
 bool EntityListScanner::Init() {
-    this->SendUIRoot(this->GetName(), [this](MulNX::UINode* node) {
-        return this->Window(node);
-        });
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
     return true;
 }

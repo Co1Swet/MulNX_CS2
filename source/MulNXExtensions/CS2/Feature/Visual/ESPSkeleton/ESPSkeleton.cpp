@@ -18,7 +18,7 @@ void ESPSkeleton::DrawSkelgton(CS2::C_CSPlayerPawn* pPawn) {
     }
 }
 
-void ESPSkeleton::Draw(MulNX::UINode* node) {
+void ESPSkeleton::Draw() {
     if (!this->runFlag1.load())return;
     try {
         for (int i = 0;i < this->CS2->client.dwGameEntitySystem_highestEntityIndex() && i < 30;++i) {
@@ -49,8 +49,8 @@ bool ESPSkeleton::Init() {
             this->chains.push_back(std::move(indices));
     }
 
-    this->SendUIRoot("DrawSkeleton", [this](MulNX::UINode* node) {return this->Draw(node);});
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
+    this->SendUIRoot("DrawSkeleton", [this](auto&&...) {return this->Draw();});
+    this->SendUINode(this->GetName(), [this](auto&&...) {
         MulNX::UI::Checkbox("骨骼绘制", this->runFlag1);
         });
 

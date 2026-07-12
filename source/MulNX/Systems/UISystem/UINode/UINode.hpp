@@ -6,7 +6,7 @@ namespace MulNX {
     class UINode {
     public:
         std::string name{};
-        std::function<void(UINode*)>MyFunc = nullptr;
+        std::function<void(UICoordinator*, MulNX::Message* msg)>Render = nullptr;
 
         MulNXHandle hSelf{};
         MulNXHandle HModule{};
@@ -14,8 +14,6 @@ namespace MulNX {
         bool drawAsARoot = false;
 
         UICoordinator* pCoordinator = nullptr;
-
-        void Draw();
 
         bool CallUINode(std::string&& Name);
 

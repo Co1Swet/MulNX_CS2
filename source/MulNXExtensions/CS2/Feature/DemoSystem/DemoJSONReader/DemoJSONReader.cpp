@@ -4,7 +4,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-bool DemoJSONReader::Window(MulNX::UINode* node) {
+bool DemoJSONReader::Window() {
     
     std::shared_lock lock(this->smutex, std::defer_lock);
     if (this->smutex.try_lock_shared()) {
@@ -22,9 +22,7 @@ bool DemoJSONReader::Init() {
     this->dirData = this->Path()->PathGetForShared("Data");
     this->SubscribeAsync("Demo/JSON/Load");
 
-    this->SendUINode(this->GetName(), [this](MulNX::UINode* node) {
-        return this->Window(node);
-        });
+    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
 
     this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
