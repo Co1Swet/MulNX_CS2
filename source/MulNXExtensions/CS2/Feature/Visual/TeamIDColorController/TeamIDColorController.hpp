@@ -1,9 +1,9 @@
 #pragma once
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <Intro/CSModuleBase.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <map>
 
-class TeamIDColorController final : public CSViewPlayerModuleBase {
+class TeamIDColorController final : public CSModuleBase {
     class WashColor {
     public:
         char pad[0x10];
@@ -32,7 +32,7 @@ class TeamIDColorController final : public CSViewPlayerModuleBase {
     void SetCTColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
     void ResetCTColor() { this->SetCTColor(0x96, 0xC8, 0xFA, 0xFF); } // 默认颜色 rgb(150, 200, 250)
 
-    void HubTeam() override;
+    void HubTeam(MulNX::Message* umsg);
     bool Init() override;
     void ProcessMsg(MulNX::Message& Msg) override;
 };

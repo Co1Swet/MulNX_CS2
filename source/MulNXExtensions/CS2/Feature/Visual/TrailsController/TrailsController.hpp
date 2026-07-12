@@ -1,8 +1,8 @@
 #pragma once
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <Intro/CSModuleBase.hpp>
 
 class ParticleManager;
-class TrailsController final :public CSViewPlayerModuleBase {
+class TrailsController final :public CSModuleBase {
     struct ParticleColor { float r, g, b; };
     struct ParticleProp { float lifetime, width, alpha; };
 
@@ -20,8 +20,8 @@ class TrailsController final :public CSViewPlayerModuleBase {
     MulNX::Hook::Then HandleOnCreate(CS2::C_BaseCSGrenadeProjectile* pProjectile);
     MulNX::Hook::Then HandleOnUpdate(CS2::C_BaseCSGrenadeProjectile* pProjectile);
     bool Init()override;
-    void HubPlayer()override;
-    void HubTeam()override;
+    void HubPlayer(MulNX::Message* umsg);
+    void HubTeam(MulNX::Message* umsg);
     void Menu();
     void ProcessMsg(MulNX::Message& msg)override;
 };

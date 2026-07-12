@@ -9,9 +9,9 @@ using DrawStuff_t = void(*)(CS2::C_BaseCSGrenadeProjectile*, char);
 
 // ==================== UI 实现（即时生效） ====================
 
-void TrailsController::HubPlayer() {
+void TrailsController::HubPlayer(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
-    auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
+    auto&& [uid] = umsg->Access<Steam64UID>();
 
     // 从存储的 0-255 浮点转为 0-1 显示
     ParticleColor currentColor{ 1.0f, 1.0f, 1.0f }; // 默认白 (255/255)
@@ -32,9 +32,9 @@ void TrailsController::HubPlayer() {
     }
 }
 
-void TrailsController::HubTeam() {
+void TrailsController::HubTeam(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
-    auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
+    auto&& [team] = umsg->Access<CS2::ui8TeamNum>();
     if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT) {
         ImGui::Text("请选择有效队伍 (T 或 CT)");
         return;
@@ -119,6 +119,9 @@ bool TrailsController::Init() {
         this->Update();
         return true;
         });
+
+    this->UIRegisterCallback("UI.Player.Info", [this](auto, auto msg) {this->HubPlayer(msg);});
+    this->UIRegisterCallback("UI.Team.Info", [this](auto, auto msg) {this->HubTeam(msg);});
 
     return true;
 }

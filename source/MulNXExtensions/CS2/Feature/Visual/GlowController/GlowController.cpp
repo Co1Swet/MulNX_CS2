@@ -3,9 +3,9 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Buildup/PlayerHub/PlayerHub.hpp>
 
-void GlowController::HubPlayer() {
+void GlowController::HubPlayer(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
-    auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
+    auto&& [uid] = umsg->Access<Steam64UID>();
 
     // 1. 获取当前为该玩家设置的颜色（若存在），否则使用默认白色
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255); // 默认白色
@@ -97,6 +97,8 @@ bool GlowController::Init() {
         .SubscribeAsync<CS2::ui8TeamNum>("Glow/Team/Clear")
         .SubscribeAsync<CS2::ui8TeamNum>("Glow/Team/ClearAll")
         .SubscribeAsync<void>("Glow/ClearAll");
+
+    this->UIRegisterCallback("UI.Player.Info", [this](auto,auto msg) {return this->HubPlayer(msg);});
 
     return true;
 }

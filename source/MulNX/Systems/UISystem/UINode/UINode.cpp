@@ -2,10 +2,6 @@
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Systems/Systems.hpp>
 
-bool MulNX::UINode::CallUINode(std::string&& Name) {
-    this->pCoordinator->CallUINode(std::move(Name));
-    return true;
-}
 MulNX::UINode MulNX::UINode::Create(MulNX::ModuleBase* MB) {
     MulNX::UINode node;
     node.hSelf = MulNXHandle::CreateHandle();

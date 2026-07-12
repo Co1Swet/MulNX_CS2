@@ -1,7 +1,7 @@
 #pragma once
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <Intro/CSModuleBase.hpp>
 
-class SpeakingController :public CSViewPlayerModuleBaseT<SpeakingController> {
+class SpeakingController :public CSModuleBase {
     int* tv_listen_voice_indices = nullptr;
     int bufferMask = 0;
     CS2::ui8TeamNum targetTeam{};

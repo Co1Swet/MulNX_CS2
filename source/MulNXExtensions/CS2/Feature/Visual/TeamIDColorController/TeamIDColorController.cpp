@@ -5,9 +5,9 @@
 
 using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);
 
-void TeamIDColorController::HubTeam() {
+void TeamIDColorController::HubTeam(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
-    auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
+    auto&& [team] = umsg->Access<CS2::ui8TeamNum>();
 
     ImVec4& colorVec4 = (team == CS2::ui8TeamNum::T) ? this->bufferTColor : this->bufferCTColor;
     if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT) {
@@ -124,6 +124,8 @@ bool TeamIDColorController::Init() {
         this->Update();
         return true;
         });
+
+    this->UIRegisterCallback("UI.Team.Info", [this](auto, auto msg) {this->HubTeam(msg);});
 
     return true;
 }

@@ -7,9 +7,9 @@ using GetDecoratedPlayerName_t = const char* (*)(CS2::CCSPlayerController* This_
 
 using GetPlayerName_t = const char* (*)(CS2::CCSPlayerController*);
 
-void NameController::HubPlayer() {
+void NameController::UIPlayer(MulNX::Message* msg) {
     std::shared_lock lock(this->smutex);
-    auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
+    auto [uid] = msg->Access<Steam64UID>();
     auto it = this->nameReplaceInfo.find(uid);
     if (it != this->nameReplaceInfo.end()) {
         ImGui::TextUnformatted(std::format("替换名称: {}", this->nameReplace[it->second]).c_str());
@@ -54,6 +54,8 @@ bool NameController::Init() {
 
 
         });
+
+    this->UIRegisterCallback("UI.Player.Info", [this](auto, auto msg) {return this->UIPlayer(msg);});
 
     return true;
 }

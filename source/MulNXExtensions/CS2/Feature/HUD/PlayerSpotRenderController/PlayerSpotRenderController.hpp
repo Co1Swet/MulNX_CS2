@@ -1,8 +1,8 @@
 #pragma once
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <Intro/CSModuleBase.hpp>
 #include <MulNXUtils/MemInsights/BitMaskEditor/BitMaskEditor.hpp>
 
-class PlayerSpotRenderController :public CSViewPlayerModuleBase {
+class PlayerSpotRenderController :public CSModuleBase {
     std::unique_ptr<MulNX::Hook>hkPos_Spot_CmpToSetShow = nullptr;
     std::unique_ptr<MulNX::Hook>hkFunc_FinallyUpdatePlayerState = nullptr;
     std::unique_ptr<MulNX::Hook>hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = nullptr;

@@ -1,7 +1,6 @@
 #pragma once
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <Intro/CSModuleBase.hpp>
 
-class KeyboardOverlay final : public CSViewPlayerModuleBase {
-public:
+class KeyboardOverlay final : public CSModuleBase {
     bool Init()override;
 };

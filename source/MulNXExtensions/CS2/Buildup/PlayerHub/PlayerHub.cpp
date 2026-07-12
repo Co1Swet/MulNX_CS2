@@ -1,6 +1,5 @@
 #include "PlayerHub.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
 
 bool PlayerHub::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("玩家信息管理", this->showWindow);
@@ -64,9 +63,10 @@ bool PlayerHub::Window(MulNX::UICoordinator* uico) {
             if (ImGui::BeginPopup(popupName.c_str())) {
                 this->currentSteamId.store(info.steamID, std::memory_order_release);
                 this->currentTeam.store(info.teamNum, std::memory_order_release);
-                for (auto& mod : this->PlayerViewModules) {
-                    mod->HubPlayer();
-                }
+                MulNX::Message msg;
+                auto&& [rUID] = msg.Access<Steam64UID>();
+                rUID = info.steamID;
+                uico->CallbackCall("UI.Player.Info"_hash, &msg);
                 ImGui::Separator();
                 if (ImGui::Button("关闭"))
                     ImGui::CloseCurrentPopup();
@@ -78,9 +78,10 @@ bool PlayerHub::Window(MulNX::UICoordinator* uico) {
             if (ImGui::BeginPopup(name)) {
                 this->currentSteamId.store(0, std::memory_order_release);
                 this->currentTeam.store(team, std::memory_order_release);
-                for (auto& mod : this->PlayerViewModules) {
-                    mod->HubTeam();
-                }
+                MulNX::Message msg;
+                auto&& [rTeam] = msg.Access<CS2::ui8TeamNum>();
+                rTeam = team;
+                uico->CallbackCall("UI.Team.Info"_hash, &msg);
                 ImGui::Separator();
                 if (ImGui::Button("关闭"))
                     ImGui::CloseCurrentPopup();

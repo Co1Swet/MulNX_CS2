@@ -1,9 +1,8 @@
 #pragma once
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
 
-class ProjectileTracker final : public CSViewPlayerModuleBase, public CSViewControlMixin<ProjectileTracker> {
+class ProjectileTracker final : public CSModuleBase, public CSViewControlMixin<ProjectileTracker> {
     std::set<CS2::C_BaseCSGrenadeProjectile*> bufferProjectiles;
     std::atomic<CS2::C_BaseCSGrenadeProjectile*> pTargetWatchProjectile = nullptr;
 
@@ -13,8 +12,6 @@ class ProjectileTracker final : public CSViewPlayerModuleBase, public CSViewCont
     bool HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile);
 
     void Menu();
-    void HubTeam()override {};
-    void HubPlayer()override {};
     void Main();
     MulNX::NewestBuffer<MulNX::Math::View> currentView{};
     void OnEntityAdd(MulNX::Message& msg);

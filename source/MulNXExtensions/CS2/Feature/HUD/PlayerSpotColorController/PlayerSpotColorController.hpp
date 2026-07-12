@@ -1,7 +1,7 @@
 #pragma once
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <Intro/CSModuleBase.hpp>
 
-class PlayerSpotColorController :public CSViewPlayerModuleBase {
+class PlayerSpotColorController :public CSModuleBase {
     std::unique_ptr<MulNX::Hook>hkPos_CmpToSetColor = nullptr;
     std::unique_ptr<MulNX::Hook>hkPos_CmpToSetTColor = nullptr;
     std::unique_ptr<MulNX::Hook>hkPos_CmpToSetCTColor = nullptr;

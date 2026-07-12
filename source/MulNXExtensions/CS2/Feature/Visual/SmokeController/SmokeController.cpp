@@ -2,9 +2,9 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/PlayerHub/PlayerHub.hpp>
 
-void SmokeController::HubPlayer() {
+void SmokeController::HubPlayer(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
-    auto uid = this->Hub->currentSteamId.load(std::memory_order_acquire);
+    auto&& [uid] = umsg->Access<Steam64UID>();
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);
     auto it = this->playerColors.find(uid);
@@ -34,9 +34,9 @@ void SmokeController::HubPlayer() {
     }
 }
 
-void SmokeController::HubTeam() {
+void SmokeController::HubTeam(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
-    auto team = this->Hub->currentTeam.load(std::memory_order_acquire);
+    auto&& [team] = umsg->Access<CS2::ui8TeamNum>();
 
     uint32_t currentColorU32 = IM_COL32(255, 255, 255, 255);
     auto it = this->teamColors.find(team);
@@ -92,6 +92,9 @@ bool SmokeController::Init() {
         .SubscribeAsync("Smoke/Team/Clear")
         .SubscribeAsync("Smoke/Team/ClearAll")
         .SubscribeAsync("Smoke/ClearAll");
+
+    this->UIRegisterCallback("UI.Player.Info", [this](auto, auto msg) {this->HubPlayer(msg);});
+    this->UIRegisterCallback("UI.Team.Info", [this](auto, auto msg) {this->HubTeam(msg);});
 
     return true;
 }

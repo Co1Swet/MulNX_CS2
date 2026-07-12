@@ -70,6 +70,7 @@ void MulNX::UICoordinator::Window() {
 bool MulNX::UICoordinator::Init() {
     (*this)
         .SubscribeAsync("UISystem/ModulePush")
+        .SubscribeAsync("UISystem/UICallback")
         .SubscribeAsync("UINode/Swap");     // 订阅交换消息
     // 向 UISystem 注册本模块的根窗口回调
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
@@ -80,18 +81,22 @@ void MulNX::UICoordinator::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "UISystem/ModulePush"_hash: {
         MulNX::UINode* pNode = msg.asp.get<MulNX::UINode>();
-        if (!pNode) break;
-
         size_t index = UINodes.size();
         UINodes.emplace_back(std::move(*pNode));
         auto& node = UINodes.back();
         nameToIndex[node.name] = index;
-        node.pCoordinator = this;
-
+        
         this->LogSucc(std::format("接收到UI节点: {} (索引 {})", node.name, index));
         break;
     }
+    case "UISystem/UICallback"_hash: {
+        MulNX::UINode node = std::move(*msg.asp.get<MulNX::UINode>());
+        auto&& [target, str] = msg.Access<uint64_t, const char*>();
+        this->UICallbacks[target].push_back(std::move(node));
 
+        this->LogSucc(std::format("UI节点: {} 回调于： {}", node.name, str));
+        break;
+    }
     case "UINode/Swap"_hash: {
         auto pNet = msg.asp.get<MulNX::NetExt>();
         if (!pNet) break;
@@ -165,9 +170,17 @@ void MulNX::UICoordinator::Render() {
     }
 }
 
-void MulNX::UICoordinator::CallUINode(std::string&& name) {
-    auto it = nameToIndex.find(name);
-    if (it != nameToIndex.end()) {
-        UINodes[it->second].Render(this, nullptr);
+void MulNX::UICoordinator::CallUINode(const std::string& name) {
+    auto it = this->nameToIndex.find(name);
+    if (it != this->nameToIndex.end()) {
+        this->UINodes[it->second].Render(this, nullptr);
+    }
+}
+
+void MulNX::UICoordinator::CallbackCall(uint64_t hash, Message* msg) {
+    auto it = this->UICallbacks.find(hash);
+    if (it == this->UICallbacks.end())return;
+    for (auto& callback : it->second) {
+        callback.Render(this, msg);
     }
 }

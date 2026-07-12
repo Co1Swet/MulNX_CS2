@@ -1,9 +1,8 @@
 #pragma once
-#include <Buildup/PlayerHub/CSViewPlayerModuleBase.hpp>
+#include <Intro/CSModuleBase.hpp>
 
-class TeamCounterController final :public CSViewPlayerModuleBase {
+class TeamCounterController final :public CSModuleBase {
     std::unique_ptr<MulNX::Hook>hkTeamCounterWriteHP = nullptr;
     void Menu();
-public:
     bool Init()override;
 };
