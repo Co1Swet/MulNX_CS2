@@ -2,8 +2,6 @@
 #include <nlohmann/json.hpp>
 
 bool WebSocketManager::Init() {
-    this->SubscribeAsync("WebSocketManager/Post");
-
     // 关闭它自带的日志功能
     this->server.clear_access_channels(websocketpp::log::alevel::all);
     this->server.clear_error_channels(websocketpp::log::elevel::all);
@@ -67,33 +65,6 @@ void WebSocketManager::Main() {
     this->Update();
 }
 
-void WebSocketManager::ProcessMsg(MulNX::Message& Msg) {
-    switch (Msg.type) {
-    case "WebSocketManager/Post"_hash: {
-        MulNX::any_shared_ptr pPayLoad = Msg.asp;
-        auto& ios = this->server.get_io_service();
-        ios.post([this, pPayLoad]()mutable {
-
-            // 提取要广播的消息内容
-            std::string payLoad = std::move(*pPayLoad.get<std::string>());
-
-            // 遍历所有连接并发送
-            for (auto hdl : connectionHandles) {
-                try {
-                    this->server.send(hdl, payLoad, websocketpp::frame::opcode::text);
-                }
-                catch (const websocketpp::exception& e) {
-                    this->LogError("网络消息发送失败！内容：" + payLoad);
-                }
-            }
-
-            });
-
-        break;
-    }
-    }
-}
-
 void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message_ptr netMsg) {
     std::string error{};
     try {
@@ -134,4 +105,18 @@ void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message
     }
     this->server.send(hdl, error, netMsg->get_opcode());
     this->LogError(std::move(error));
+}
+
+void WebSocketManager::PostWebMsg(std::string& msg) {
+    auto& ios = this->server.get_io_service();
+    ios.post([this, msg]()mutable {
+        // 遍历所有连接并发送
+        for (auto hdl : connectionHandles) {
+            try {
+                this->server.send(hdl, msg, websocketpp::frame::opcode::text);
+            }
+            catch (const websocketpp::exception& e) {
+                this->LogError("网络消息发送失败！内容：" + msg);
+            }
+        }});
 }

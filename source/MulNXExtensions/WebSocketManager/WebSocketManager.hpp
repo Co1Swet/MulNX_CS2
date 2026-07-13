@@ -13,9 +13,10 @@ class WebSocketManager final :public MulNX::Module<WebSocketManager> {
 
     std::unordered_map<MulNX::MsgType, std::function<void(MulNX::Message&, std::string_view)>>trans{};
     bool Init()override;
-    void ProcessMsg(MulNX::Message& Msg)override;
     void Main();
     void Deinit()override;
 
     void OnWebMsg(websocketpp::connection_hdl hdl, Server::message_ptr netMsg);
+public:
+    void PostWebMsg(std::string& msg);
 };
