@@ -31,9 +31,6 @@ bool AdvancedViewController::Menu() {
         ImGui::SliderFloat("偏航 (Yaw)", &this->localRotationOffset.y, -180.0f, 180.0f);
         ImGui::SliderFloat("滚转 (Roll)", &this->localRotationOffset.z, -180.0f, 180.0f);
 
-        // 平滑系数
-        MulNX::UI::SliderFloat("平滑系数", this->viewBuffer.SMOOTH_FACTOR, 0.0f, 1.0f);
-
         // 上向反转选项
         MulNX::UI::Checkbox("反转上向", this->InvertUp);
         // 绘制选项：原始骨骼点与坐标轴
@@ -79,7 +76,7 @@ bool AdvancedViewController::Menu() {
 }
 
 bool AdvancedViewController::Init() {
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu(); });
+    this->UIRegisterCallback("UI.View", [this](auto&&...) {return this->Menu(); });
 
     return true;
 }
@@ -91,20 +88,26 @@ bool AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup, const int&
     // 通过时间桥判断是否需要更新视角，防止抖动
     static auto lastTime = this->CS2Time->GetReal();
     auto currentTime = this->CS2Time->GetReal();
-    if (currentTime > lastTime || lastTime - currentTime > 0.015f || this->AlwaysCaulate.load(std::memory_order_acquire)) {
-        auto result = this->HandleSelfViewUpdate(viewSetup);
-        if (result.has_value()) {
-            auto newView = result.value();
-            this->viewBuffer.Push(newView);
-        }
-        else {
-            this->hasAxisInfo.store(false, std::memory_order_release);
-            this->LogWarning(std::format("HandleSelfViewUpdate failed with code: 0x{:X}", result.error()));
-        }
-        lastTime = currentTime;
+    if (currentTime > lastTime || lastTime - currentTime > 0.015f || this->AlwaysCaulate.load(std::memory_order_acquire)) {}
+    else return false;
+
+    auto result = this->HandleSelfViewUpdate(viewSetup);
+    if (!result) {
+        this->hasAxisInfo.store(false, std::memory_order_release);
+        this->LogWarning(std::format("HandleSelfViewUpdate failed with code: 0x{:X}", result.error()));
+        return false;
     }
 
-    return this->HandleOverrideView(viewSetup);
+    auto newView = result.value();
+
+    lastTime = currentTime;
+
+    if (!this->OverrideSelfView.load(std::memory_order_acquire))return false;
+    // 输出平滑后的值
+    *viewSetup->pViewOrigin() = newView.position;
+    *viewSetup->pViewAngles() = newView.rotation;
+
+    return true;
 }
 
 std::expected<MulNX::Math::Point3, int> AdvancedViewController::GetPoint3(CS2::CViewSetup* viewSetup) {
@@ -282,12 +285,4 @@ std::expected<MulNX::Math::View, int> AdvancedViewController::HandleSelfViewUpda
     catch (...) {
         return std::unexpected(0xFFFF);
     }
-}
-
-bool AdvancedViewController::HandleOverrideView(CS2::CViewSetup* viewSetup) {
-    if (!this->OverrideSelfView.load(std::memory_order_acquire))return false;
-    // 输出平滑后的值
-    *viewSetup->pViewOrigin() = this->viewBuffer.Get().position;
-    *viewSetup->pViewAngles() = this->viewBuffer.Get().rotation;
-    return true;
 }

@@ -20,16 +20,6 @@ namespace MulNX {
             DirectX::XMVECTOR ToDOFPack();
         };
 
-        class ViewBuffer {
-            MulNX::Math::View view;
-            bool initialized = false;
-        public:
-            // 平滑系数
-            std::atomic<float> SMOOTH_FACTOR{ 0.2f };
-            void Push(MulNX::Math::View newView);
-            MulNX::Math::View& Get() { return this->view; }
-        };
-
         // 包含三个点，用于构建坐标系
         class Point3 {
         public:

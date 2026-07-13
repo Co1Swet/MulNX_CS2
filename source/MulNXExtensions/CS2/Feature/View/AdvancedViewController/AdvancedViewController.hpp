@@ -46,8 +46,6 @@ class AdvancedViewController final :public CSModuleBase, public CSViewControlMix
     std::atomic<bool> ShowCoordinateAxes{ true };
     // 绘制坐标轴的长度（世界单位）
     std::atomic<float> AxisLength{ 30.0f };
-    MulNX::Math::ViewBuffer viewBuffer{};
-    bool HandleOverrideView(CS2::CViewSetup* viewSetup);
     bool Init()override;
     bool Menu();
 

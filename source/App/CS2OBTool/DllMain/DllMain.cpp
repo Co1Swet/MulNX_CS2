@@ -62,6 +62,8 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<FreeCameraController>("FreeCameraController")
             .CreateModule<AdvancedViewController>("AdvancedViewController")
             .CreateModule<ObserverController>("ObserverController")
+            .CreateModule<ProjectileTracker>("ProjectileTracker")
+            .CreateModule<ViewSmoother>("ViewSmoother")
 
             // CS2 视觉叠加功能模块
             .CreateModule<ESPBox>("ESPBox")
@@ -85,7 +87,6 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<FlashRenderController>("FlashRenderController")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<TrailsController>("TrailsController")
-            .CreateModule<ProjectileTracker>("ProjectileTracker")
             .CreateModule<SmokeController>("SmokeController")
 
             // CS2 声音功能模块

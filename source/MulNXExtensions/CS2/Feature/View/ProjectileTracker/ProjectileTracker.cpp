@@ -25,7 +25,7 @@ bool ProjectileTracker::Init() {
         .SubscribeSync("Hook/RemoveEntity", [this](MulNX::Message& msg) {return this->OnEntityRemove(msg);})
         ;
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.View", [this](auto&&...) {return this->Menu();});
 
     return true;
 }

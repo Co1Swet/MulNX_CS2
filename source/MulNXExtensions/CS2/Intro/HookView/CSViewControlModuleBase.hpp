@@ -5,7 +5,7 @@
 class ICSViewControlModule {
 public:
     virtual bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) = 0;
-    virtual MulNX::ModuleBase* ViewControlToBase() = 0;
+    MulNX::ModuleBase* pBaseFromViewControl = nullptr;
 };
 
 template<typename T>
@@ -13,12 +13,11 @@ class CSViewControlMixin :public ICSViewControlModule {
     T* This() { return static_cast<T*>(this); }
 protected:
     CSViewControlMixin() {
+        this->pBaseFromViewControl = This();
         This()->delayInits->push_back([this]() {
             auto pHookView = This()->FindModule<HookView>("HookView");
             pHookView->viewControlModules.push_back(This());
             return true;
             });
     }
-public:
-    MulNX::ModuleBase* ViewControlToBase()override { return static_cast<MulNX::ModuleBase*>(This()); }
 };

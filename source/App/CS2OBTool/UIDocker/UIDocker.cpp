@@ -51,8 +51,7 @@ void UIDocker::MainDraw(MulNX::UICoordinator* uico) {
     ImGui::End();
 
     ImGui::Begin(I18n("视角视图").c_str());
-    uico->CallUINode("ProjectileTracker");
-    uico->CallUINode("AdvancedViewController");
+    uico->CallbackCall("UI.View"_hash, nullptr);
     ImGui::End();
 
     ImGui::Begin(I18n("ui.camera_system").c_str());
