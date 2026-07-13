@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>MulNX WS 测试 (长短模式)</title>
+    <title>MulNX WS 测试 (type/payload)</title>
     <style>
         body {
             font-family: sans-serif;
@@ -12,7 +12,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: auto;
             background: white;
             padding: 20px;
@@ -27,17 +27,18 @@
         }
 
         input,
-        select,
         textarea {
             width: 100%;
             padding: 6px;
             box-sizing: border-box;
             font-family: monospace;
+            margin-bottom: 12px;
         }
 
         button {
             padding: 6px 12px;
             margin-right: 8px;
+            margin-bottom: 12px;
         }
 
         .log-box {
@@ -48,36 +49,13 @@
             overflow: auto;
             font-size: 12px;
         }
-
-        .row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-
-        .col {
-            flex: 1;
-            min-width: 180px;
-        }
-
-        .sub-row {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .sub-row select,
-        .sub-row input {
-            flex: 1;
-        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h3>WebSocket 测试 (长短模式 Base64)</h3>
-        <div class="row">
+        <h3>WebSocket 测试</h3>
+        <div style="display:flex; gap:8px;">
             <input id="url" value="ws://localhost:55202" style="flex:3" />
             <button id="connectBtn">连接</button>
             <button id="disconnectBtn" disabled>断开</button>
@@ -85,43 +63,18 @@
         </div>
 
         <hr />
-        <div class="row">
-            <div class="col"><label>type</label><input id="msgType" value="TestCommand" /></div>
-            <div class="col"><label>str1</label><input id="str1" value="hello" /></div>
-            <div class="col"><label>str2</label><input id="str2" value="world" /></div>
+        <label for="msgType">type</label>
+        <input id="msgType" value="TestCommand" />
+
+        <label for="payload">payload</label>
+        <textarea id="payload" rows="3">hello world</textarea>
+
+        <div>
+            <strong>发送的 JSON：</strong>
+            <pre id="jsonPreview" style="background:#f0f0f0; padding:6px; min-height:30px;"></pre>
         </div>
 
-        <!-- p1 控制区 -->
-        <div class="row">
-            <div class="col">
-                <label>p1 长度模式</label>
-                <select id="p1LenMode">
-                    <option value="long">长模式 (64位)</option>
-                    <option value="short">短模式 (32位+32位)</option>
-                </select>
-            </div>
-            <div class="col" id="p1InputPanel"></div>
-        </div>
-
-        <!-- p2 控制区 -->
-        <div class="row">
-            <div class="col">
-                <label>p2 长度模式</label>
-                <select id="p2LenMode">
-                    <option value="long">长模式 (64位)</option>
-                    <option value="short">短模式 (32位+32位)</option>
-                </select>
-            </div>
-            <div class="col" id="p2InputPanel"></div>
-        </div>
-
-        <div class="row">
-            <textarea id="jsonPreview" rows="3" readonly style="background:#f0f0f0;"></textarea>
-        </div>
-
-        <div class="row">
-            <button id="sendMsgBtn">📨 发送 JSON</button>
-        </div>
+        <button id="sendMsgBtn">📨 发送 JSON</button>
 
         <h4>📡 日志</h4>
         <div id="log" class="log-box"></div>
@@ -131,7 +84,6 @@
         (function () {
             "use strict";
 
-            // DOM 元素
             const urlInput = document.getElementById('url');
             const connectBtn = document.getElementById('connectBtn');
             const disconnectBtn = document.getElementById('disconnectBtn');
@@ -139,12 +91,7 @@
             const sendMsgBtn = document.getElementById('sendMsgBtn');
             const logEl = document.getElementById('log');
             const msgType = document.getElementById('msgType');
-            const str1Input = document.getElementById('str1');
-            const str2Input = document.getElementById('str2');
-            const p1LenMode = document.getElementById('p1LenMode');
-            const p2LenMode = document.getElementById('p2LenMode');
-            const p1InputPanel = document.getElementById('p1InputPanel');
-            const p2InputPanel = document.getElementById('p2InputPanel');
+            const payload = document.getElementById('payload');
             const jsonPreview = document.getElementById('jsonPreview');
 
             let ws = null;
@@ -155,179 +102,18 @@
                 logEl.scrollTop = logEl.scrollHeight;
             }
 
-            // Base64 编码
-            function bytesToBase64(bytes) {
-                let binary = '';
-                for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-                return btoa(binary);
-            }
-
-            // ----- 打包工具 -----
-            function packLong(mode, value) {
-                const buf = new ArrayBuffer(8);
-                const view = new DataView(buf);
-                if (mode === 'double') {
-                    view.setFloat64(0, parseFloat(value), true);
-                } else if (mode === 'uint64') {
-                    view.setBigUint64(0, BigInt(value), true);
-                } else if (mode === 'hex') {
-                    const hex = value.replace(/^0x/i, '');
-                    if (hex.length !== 16) throw new Error('手动Hex需要16个字符');
-                    for (let i = 0; i < 8; i++) {
-                        view.setUint8(i, parseInt(hex.substr(i * 2, 2), 16));
-                    }
-                }
-                return new Uint8Array(buf);
-            }
-
-            function packShort(lowType, lowVal, highType, highVal) {
-                const buf = new ArrayBuffer(8);
-                const view = new DataView(buf);
-                // 低4字节 (offset 0)
-                if (lowType === 'float') {
-                    view.setFloat32(0, parseFloat(lowVal), true);
-                } else if (lowType === 'uint32') {
-                    view.setUint32(0, parseInt(lowVal) >>> 0, true);
-                } else if (lowType === 'int32') {
-                    view.setInt32(0, parseInt(lowVal) | 0, true);
-                }
-                // 高4字节 (offset 4)
-                if (highType === 'float') {
-                    view.setFloat32(4, parseFloat(highVal), true);
-                } else if (highType === 'uint32') {
-                    view.setUint32(4, parseInt(highVal) >>> 0, true);
-                } else if (highType === 'int32') {
-                    view.setInt32(4, parseInt(highVal) | 0, true);
-                }
-                return new Uint8Array(buf);
-            }
-
-            // 获取当前 p1/p2 字节
-            function getParamBytes(prefix) {
-                const lenMode = document.getElementById(prefix + 'LenMode').value;
-                if (lenMode === 'long') {
-                    const typeSelect = document.getElementById(prefix + 'LongType');
-                    const mode = typeSelect.value;
-                    const input = document.getElementById(prefix + 'LongVal');
-                    return packLong(mode, input.value);
-                } else {
-                    const lowType = document.getElementById(prefix + 'ShortLowType').value;
-                    const lowVal = document.getElementById(prefix + 'ShortLowVal').value;
-                    const highType = document.getElementById(prefix + 'ShortHighType').value;
-                    const highVal = document.getElementById(prefix + 'ShortHighVal').value;
-                    return packShort(lowType, lowVal, highType, highVal);
-                }
-            }
-
-            // 更新 JSON 预览
             function updatePreview() {
-                try {
-                    const p1Bytes = getParamBytes('p1');
-                    const p2Bytes = getParamBytes('p2');
-                    const msg = {
-                        type: msgType.value,
-                        p1: bytesToBase64(p1Bytes),
-                        p2: bytesToBase64(p2Bytes),
-                        str1: str1Input.value,
-                        str2: str2Input.value
-                    };
-                    jsonPreview.value = JSON.stringify(msg, null, 2);
-                } catch (e) {
-                    jsonPreview.value = `// 错误: ${e.message}`;
-                }
+                const obj = {
+                    type: msgType.value,
+                    payload: payload.value
+                };
+                jsonPreview.textContent = JSON.stringify(obj, null, 2);
             }
 
-            // 渲染输入面板
-            function renderPanel(prefix) {
-                const container = document.getElementById(prefix + 'InputPanel');
-                const lenMode = document.getElementById(prefix + 'LenMode').value;
-                container.innerHTML = '';
-
-                if (lenMode === 'long') {
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-          <select id="${prefix}LongType" style="width:100%; margin-bottom:4px;">
-            <option value="double">double</option>
-            <option value="uint64">uint64</option>
-            <option value="hex">手动Hex (16字符)</option>
-          </select>
-          <input id="${prefix}LongVal" placeholder="值" value="3.1415926535" />
-        `;
-                    container.appendChild(div);
-                    // 监听类型变化调整默认值
-                    const sel = document.getElementById(prefix + 'LongType');
-                    const inp = document.getElementById(prefix + 'LongVal');
-                    sel.addEventListener('change', () => {
-                        if (sel.value === 'double') inp.value = '3.1415926535';
-                        else if (sel.value === 'uint64') inp.value = '18446744073709551615';
-                        else if (sel.value === 'hex') inp.value = '0x0000000000000000';
-                        updatePreview();
-                    });
-                } else { // 短模式
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-          <div style="margin-bottom:4px; font-size:12px;">低32位 (offset 0)</div>
-          <div class="sub-row">
-            <select id="${prefix}ShortLowType">
-              <option value="float">float</option>
-              <option value="uint32">uint32</option>
-              <option value="int32">int32</option>
-            </select>
-            <input id="${prefix}ShortLowVal" placeholder="low" value="1.2" />
-          </div>
-          <div style="margin:8px 0 4px; font-size:12px;">高32位 (offset 4)</div>
-          <div class="sub-row">
-            <select id="${prefix}ShortHighType">
-              <option value="float">float</option>
-              <option value="uint32">uint32</option>
-              <option value="int32">int32</option>
-            </select>
-            <input id="${prefix}ShortHighVal" placeholder="high" value="3.4" />
-          </div>
-        `;
-                    container.appendChild(div);
-                    // 监听类型变化调整默认值（可选）
-                    const lowType = document.getElementById(prefix + 'ShortLowType');
-                    const lowVal = document.getElementById(prefix + 'ShortLowVal');
-                    const highType = document.getElementById(prefix + 'ShortHighType');
-                    const highVal = document.getElementById(prefix + 'ShortHighVal');
-                    const updateShortDefaults = () => {
-                        lowVal.placeholder = lowType.value;
-                        highVal.placeholder = highType.value;
-                        if (lowType.value === 'float') lowVal.value = '1.2';
-                        else if (lowType.value === 'uint32') lowVal.value = '123456';
-                        else lowVal.value = '-123';
-                        if (highType.value === 'float') highVal.value = '3.4';
-                        else if (highType.value === 'uint32') highVal.value = '789012';
-                        else highVal.value = '-456';
-                        updatePreview();
-                    };
-                    lowType.addEventListener('change', updateShortDefaults);
-                    highType.addEventListener('change', updateShortDefaults);
-                    updateShortDefaults();
-                }
-
-                // 为所有输入绑定更新事件
-                container.querySelectorAll('input, select').forEach(el => {
-                    el.addEventListener('input', updatePreview);
-                    el.addEventListener('change', updatePreview);
-                });
-            }
-
-            // 初始化面板
-            function rebuildAllPanels() {
-                renderPanel('p1');
-                renderPanel('p2');
-                updatePreview();
-            }
-
-            p1LenMode.addEventListener('change', () => { renderPanel('p1'); updatePreview(); });
-            p2LenMode.addEventListener('change', () => { renderPanel('p2'); updatePreview(); });
             msgType.addEventListener('input', updatePreview);
-            str1Input.addEventListener('input', updatePreview);
-            str2Input.addEventListener('input', updatePreview);
+            payload.addEventListener('input', updatePreview);
+            updatePreview();
 
-            // WebSocket 连接
             connectBtn.addEventListener('click', () => {
                 const url = urlInput.value.trim();
                 if (!url) return;
@@ -336,13 +122,7 @@
                 connectBtn.disabled = true;
                 disconnectBtn.disabled = false;
                 ws.onopen = () => log('✅ 已连接');
-                ws.onmessage = (ev) => {
-                    if (ev.data instanceof ArrayBuffer) {
-                        log('📩 二进制', ev.data.byteLength, '字节');
-                    } else {
-                        log('📩', ev.data);
-                    }
-                };
+                ws.onmessage = (ev) => log('📩', ev.data);
                 ws.onerror = () => log('❌ 错误');
                 ws.onclose = (ev) => {
                     log(`断开 (${ev.code})`);
@@ -357,14 +137,13 @@
 
             sendMsgBtn.addEventListener('click', () => {
                 if (!ws || ws.readyState !== WebSocket.OPEN) return log('未连接');
-                const json = jsonPreview.value;
-                if (json.startsWith('//')) return log('无效JSON');
+                const json = JSON.stringify({
+                    type: msgType.value,
+                    payload: payload.value
+                });
                 ws.send(json);
                 log('📤 发送:', json);
             });
-
-            // 启动
-            rebuildAllPanels();
         })();
     </script>
 </body>

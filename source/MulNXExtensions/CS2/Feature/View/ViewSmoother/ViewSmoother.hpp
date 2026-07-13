@@ -3,7 +3,6 @@
 
 class ViewBuffer {
     MulNX::Math::View view;
-    bool initialized = false;
 public:
     // 平滑系数
     std::atomic<float> smooth_buffer{ 0.2f };
