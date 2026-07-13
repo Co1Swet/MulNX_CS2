@@ -111,6 +111,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<VirtualUser>("VirtualUser")
             .CreateModule<GameCfgManager>("GameCfgManager")
             .CreateModule<GameSettingsManager>("GameSettingsManager")
+            .CreateModule<HSI>("HSI")
 
             // CS2 杂项功能
             .CreateModule<EntityListScanner>("EntityListScanner")

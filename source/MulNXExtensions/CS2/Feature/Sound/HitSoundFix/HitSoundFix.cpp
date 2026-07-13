@@ -9,12 +9,8 @@ bool HitSoundFix::Init() {
         this->EmitHurtFeedbackSound = std::bit_cast<EmitHurtFeedbackSound_t>(pFunc.Data());
         });
 
-    this->SubscribeSync("Hook/FireEventClientSide", [this](MulNX::Message& msg) {
-        auto&& [pEvent] = msg.Access<CS2::CGameEvent*>();
-        if (!pEvent)return;
-        auto name = std::string_view(pEvent->GetEventName());
-        if (name != "player_hurt") return;
-       
+    this->SubscribeSync("Hook/FireEventClientSide/player_hurt", [this](MulNX::Message& msg) {
+        auto&& [pEvent] = msg.Access<CS2::CGameEvent*>();       
         this->HandleOnPlayerHurt(pEvent);
         });
     return true;

@@ -10,7 +10,9 @@ namespace CS2 {
     class CGameEvent {        
     public:
         auto GetEventName() { return IVClass::Assume(this)->GetVFunc<const char* ()>(1)(); }
+        auto GetID() { return IVClass::Assume(this)->GetVFunc<int()>(2)(); }
         auto GetInt(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<int(const CKV3MemberName&)>(7)(key); }
+        auto GetString(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<const char*(const CKV3MemberName&)>(10)(key); }
         auto GetPlayerController(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<CS2::CCSPlayerController * (const CKV3MemberName&)>(16)(key); }
         auto GetPlayerPawn(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<CS2::C_CSPlayerPawn * (const CKV3MemberName&)>(17)(key); }
     };
