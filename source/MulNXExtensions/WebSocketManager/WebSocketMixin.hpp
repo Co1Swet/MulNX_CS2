@@ -12,7 +12,7 @@ protected:
             return true;
             });
     }
-    void WebPost(std::string& msg) {
+    void WebPost(std::string&& msg) {
         this->pWebSocketManager->PostWebMsg(msg);
     }
 };

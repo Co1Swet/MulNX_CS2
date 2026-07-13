@@ -1,5 +1,9 @@
 #include "CS2Hash.hpp"
 
+uint32_t CS2Hash::WrapHash(const std::string& str) {
+    return this->CSHashString(str.c_str(), str.length(), str.length() ^ 0x31415926);
+}
+
 bool CS2Hash::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto pattern = MulNX::CS2::Signatures::Utils::CSHashString;
@@ -15,6 +19,15 @@ bool CS2Hash::Init() {
         this->assister = this->CSHashString("assister", 8, 0x3141592E);
         // hitgroup 实际使用子串 "roup"，长度 4，种子 0x1717BDDE
         this->hitgroup = this->CSHashString("roup", 4, 0x1717BDDE);
+
+        this->assistedflash = this->WrapHash("assistedflash");
+        this->weapon = this->WrapHash("weapon");
+        this->headshot = this->WrapHash("headshot");
+        this->penetrated = this->WrapHash("penetrated");
+        this->noscope = this->WrapHash("noscope");
+        this->thrusmoke = this->WrapHash("thrusmoke");
+        this->attackerblind = this->WrapHash("attackerblind");
+        this->attackerinair = this->WrapHash("attackerinair");
 
         this->LogSucc("找到CS2哈希函数并计算哈希值");
         });
