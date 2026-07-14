@@ -42,7 +42,7 @@ class CSController final :public MulNX::Module<CSController> {
     std::atomic<bool> Source2EngineToClient001ForceReturn = false;
     std::atomic<bool> Source2EngineToClient001ForceReturnValue = true;
 
-    void Window(MulNX::UINode* node);
+    void Window();
 
     void OnClientLoad(MulNX::Message& msg);
     void OnEngine2Load(MulNX::Message& msg);

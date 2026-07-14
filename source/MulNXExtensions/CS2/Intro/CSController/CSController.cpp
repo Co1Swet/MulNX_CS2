@@ -3,7 +3,7 @@
 #include <Intro/CSModuleBase.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 
-void CSController::Window(MulNX::UINode* node) {
+void CSController::Window() {
     auto w = MulNX::UI::RAIIWindow("实验性功能");
     MulNX::UI::Checkbox("Source2EngineToClient001 强制返回？", this->Source2EngineToClient001ForceReturn);
     MulNX::UI::Checkbox("Source2EngineToClient001 返回值", this->Source2EngineToClient001ForceReturnValue);
@@ -26,7 +26,7 @@ bool CSController::Init() {
         return true;
         });
     
-    // this->SendUIRoot("RTEST", [this](MulNX::UINode* node) {return this->Window(node);});
+    // this->SendUIRoot("RTEST", [this](auto&&...) {return this->Window(node);});
     
     return true;
 }

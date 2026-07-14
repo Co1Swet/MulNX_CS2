@@ -59,6 +59,8 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern Pos_CallGetPawnUpdateCirclePos("48 85 C0 0F 84 ?? ?? 00 00 48 89 6C 24 ?? 48 8D 54 24 ?? 48 89 74 24 ?? 48 8B C8");
                 inline const static MulNX::Memory::Pattern Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque("48 3B C3 75 1A 0F 28 DE");
                 inline const static MulNX::Memory::Pattern Pos_CallGetPawnMaybeOtherAsyncSoundEnque("48 3B C6 0F 85 ?? ?? ?? ?? 0F 28 DE");
+
+                inline const static MulNX::Memory::Pattern Func_ProcessVoiceBan("48 63 F8 85 F6 75");
             }
         }
     }

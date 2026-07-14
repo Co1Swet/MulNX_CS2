@@ -93,6 +93,8 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<SpeakingController>("SpeakingController")
             .CreateModule<HitSoundFix>("HitSoundFix")
             .CreateModule<SoundCircleFix>("SoundCircleFix")
+            .CreateModule<AntiVoiceBan>("AntiVoiceBan")
+            .CreateModule<PlayerVolumeController>("PlayerVolumeController")
             
             // CS2 Demo 相关模块
             .CreateModule<HookDemo>("HookDemo")
@@ -136,7 +138,7 @@ void StartImpl(HMODULE& hModule) {
         if (MulNXInfo::IsDebugVersion) {
             auto pHookConsole = core->ModuleManager()->FindModule<HookConsole>("HookConsole");
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
-            rp->str1 = "111";
+            rp->str1 = "voicebug";
             pHookConsole->PublishAsync(std::move(msg));
             std::thread([]() {
                 MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
