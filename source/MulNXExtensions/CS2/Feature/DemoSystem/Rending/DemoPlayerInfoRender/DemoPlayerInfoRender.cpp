@@ -5,17 +5,35 @@ void DemoPlayerInfoRender::Menu(MulNX::Message* umsg) {
     auto&& [uid] = umsg->Access<Steam64UID>();
     this->Update();
     auto it = this->crosshairShareCodes.find(uid);
-    if (it == this->crosshairShareCodes.end()) {
-        ImGui::Text("无准星信息");
-        return;
-    }
-    std::string& code = it->second;
+    if (it != this->crosshairShareCodes.end()) {
+        std::string& code = it->second;
 
-    ImGui::InputText("##sharecode", code.data(), code.size() + 1,
+        ImGui::InputText("Demo准星", code.data(), code.size() + 1,
+            ImGuiInputTextFlags_ReadOnly);
+        ImGui::SameLine();
+        if (ImGui::Button("复制到剪贴板")) {
+            ImGui::SetClipboardText(code.c_str());
+        }
+    }
+    else {
+        ImGui::Text("无Demo准星信息");
+    }
+    
+
+    auto pPawn = this->CS2->client.TryGetObservingPawn();
+    if (!pPawn)return;
+    auto pCtrler = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pPawn->m_hController()))
+        ->As<CS2::CCSPlayerController>();
+    if (!pCtrler)return;
+    auto Symbol = MulNX::MRead(pCtrler->m_szCrosshairCodes());
+
+    auto str = MulNX::Memory::ReadString(Symbol.pStr).value_or("读取失败");
+
+    ImGui::InputText("内存准星", str.data(), str.size() + 1,
         ImGuiInputTextFlags_ReadOnly);
     ImGui::SameLine();
-    if (ImGui::Button("复制到剪贴板")) {
-        ImGui::SetClipboardText(code.c_str());
+    if (ImGui::Button("复制内存准星到剪贴板")) {
+        ImGui::SetClipboardText(str.c_str());
     }
 }
 

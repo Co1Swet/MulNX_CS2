@@ -52,7 +52,7 @@ bool PlayerHub::Window(MulNX::UICoordinator* uico) {
             ImGui::OpenPopupOnItemClick(std::format("PlayerPopup_{:X}", info.steamID).c_str(),
                 ImGuiPopupFlags_MouseButtonLeft);
 
-            auto naturalName = MulNX::Memory::ReadString(info.controller->m_iszPlayerName());
+            auto naturalName = MulNX::Memory::ReadString(info.controller->m_iszPlayerName()).value();
             ImGui::TextUnformatted(std::format("自然名字: {}", naturalName).c_str());
             ImGui::Separator();
             };

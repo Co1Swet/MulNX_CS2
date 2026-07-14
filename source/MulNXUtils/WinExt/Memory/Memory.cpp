@@ -1,15 +1,21 @@
 #include "Memory.hpp"
-
 #include <stdexcept>
 
-std::string MulNX::Memory::ReadString(const char* target) {
+std::expected<std::string, MulNX::Exception> MulNX::Memory::ReadString(const char* target, std::source_location where) {
     if (target == nullptr) {
         return {};
     }
     auto* it = const_cast<char*>(target);
     std::string result;
     while (true) {
-        char c = MRead(it++);
+        char c = '\0';
+        try {
+            c = MulNX::MRead(it++);
+        }
+        catch (MulNX::Exception& e) {
+            e.where = where;
+            return std::unexpected(e);
+        }
         if (c == '\0') {
             break;
         }

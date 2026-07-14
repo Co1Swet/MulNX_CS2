@@ -18,7 +18,7 @@ void EntityListScanner::Window() {
             if (!pawn)continue;
 
             auto id = MulNX::MRead(controller->m_steamID());
-            auto userName = MulNX::Memory::ReadString(controller->m_iszPlayerName());
+            auto userName = MulNX::Memory::ReadString(controller->m_iszPlayerName()).value();
 
             auto info = std::format("检测到实体列表第{}项，是玩家{}，steam ID为{}", i, userName, id);
             ImGui::Text(info.c_str());

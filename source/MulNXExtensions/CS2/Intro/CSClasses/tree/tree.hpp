@@ -2,37 +2,13 @@
 #include <MulNX/MulNX.hpp>
 #include <MulNXUtils/WinExt/vtable/vtable.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
+#include "../Utils/Utils.hpp"
 #include "PawnsServices.hpp"
 
 MULNX_USING(GameTime_t, float);
 MULNX_USING(Steam64UID, uint64_t);
 
 namespace CS2 {
-
-    template<typename T>
-    struct C_UtlVectorEmbeddedNetworkVar {
-        size_t m_nSize;
-        T* m_pData;
-        // 后面未知
-    };
-
-
-    enum class ui8TeamNum :uint8_t {
-        T = 2,
-        CT = 3
-    };
-
-    class CViewSetup {
-    public:
-        // 定位关键数据
-        int* pWidth() { return reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(this) + 0x434); }
-        int* pHeight() { return reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(this) + 0x43C); }
-
-        float* pFov() { return reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(this) + 0x498); }
-        DirectX::XMFLOAT3* pViewOrigin() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + 0x4a0); }
-        DirectX::XMFLOAT3* pViewAngles() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + 0x4b8); }
-    };
-
     class CHandleBase {
     public:
         uint32_t value;
@@ -310,6 +286,7 @@ namespace CS2 {
     class CCSPlayerController :public CBasePlayerController {
     public:
         CHandle<C_CSPlayerPawn>* m_hPlayerPawn() { return Schema<CHandle<C_CSPlayerPawn>>(this, cs2_dumper::schemas::client_dll::CCSPlayerController::m_hPlayerPawn); }
+        CUtlSymbolLarge* m_szCrosshairCodes() { return Schema<CUtlSymbolLarge>(this, cs2_dumper::schemas::client_dll::CCSPlayerController::m_szCrosshairCodes); }
     };
 
     // 源于武器装备继承树

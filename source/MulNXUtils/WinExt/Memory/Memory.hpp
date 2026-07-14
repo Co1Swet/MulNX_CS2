@@ -92,7 +92,7 @@ namespace MulNX {
             }
         }
         // 逐字节读取直到遇到空字符
-        std::string ReadString(const char* target);
+        std::expected<std::string, MulNX::Exception> ReadString(const char* target, std::source_location where = std::source_location::current());
         // 安全读取宽字符串（UTF-16），逐字符读取直到遇到空字符或达到缓冲字符数
         bool ReadWString(const uintptr_t Address, wchar_t* Buffer, size_t BufferCount);
     }

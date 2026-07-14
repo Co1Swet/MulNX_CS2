@@ -14,7 +14,7 @@ void SpecTargetUI::Window(MulNX::UICoordinator* uico) {
         ->As<CS2::CCSPlayerController>();
     if (!pCon)return;
 
-    auto playerName = MulNX::Memory::ReadString(pCon->m_iszPlayerName());
+    auto playerName = MulNX::Memory::ReadString(pCon->m_iszPlayerName()).value_or("读取失败");
     auto uid = MulNX::MRead(pCon->m_steamID());
 
     ImGui::Text(std::format("当前正在观战玩家： {}", playerName).c_str());

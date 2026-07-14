@@ -6,7 +6,7 @@ static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController
     if (!pController) return "未知玩家";
     auto namePtr = pController->m_iszPlayerName();
     if (!namePtr) return "未知玩家";
-    auto name = MulNX::Memory::ReadString(namePtr);
+    auto name = MulNX::Memory::ReadString(namePtr).value_or("读取失败");
     return name.empty() ? "未知玩家" : name;
 }
 

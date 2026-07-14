@@ -16,8 +16,9 @@ std::string CS2::C_BaseEntity::GetName() {
     if (!pClassInfo) return{};
     auto* pName= MulNX::MRead(pClassInfo->pName());
     if (!pName) return{};
-    auto className = MulNX::Memory::ReadString(pName);
-    return className;
+    auto classNameOrE = MulNX::Memory::ReadString(pName);
+    if (classNameOrE.has_value())return classNameOrE.value();
+    return {};
 }
 
 bool CS2::C_BaseEntity::IsPlayerController() {
