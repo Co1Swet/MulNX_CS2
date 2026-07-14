@@ -30,8 +30,9 @@ bool ESPBox::Draw() {
 bool ESPBox::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Draw();});
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {
+    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
         MulNX::UI::Checkbox("方框ESP", this->runFlag1);
+        return true;
         });
 
     return true;

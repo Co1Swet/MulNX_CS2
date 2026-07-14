@@ -50,8 +50,9 @@ bool ESPSkeleton::Init() {
     }
 
     this->SendUIRoot("DrawSkeleton", [this](auto&&...) {return this->Draw();});
-    this->SendUINode(this->GetName(), [this](auto&&...) {
+    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
         MulNX::UI::Checkbox("骨骼绘制", this->runFlag1);
+        return true;
         });
 
     return true;

@@ -3,7 +3,8 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookView/HookView.hpp>
 
-bool CameraSystem::Menu(MulNX::UICoordinator* uico) {
+bool CameraSystem::Window(MulNX::UICoordinator* uico) {
+    auto w = MulNX::UI::RAIIWindow(I18n("ui.camera_system").c_str());
     std::shared_lock lock(this->smutex);
     uico->CallUINode("MenuWorkspace");
 
@@ -60,7 +61,7 @@ bool CameraSystem::Menu(MulNX::UICoordinator* uico) {
             break;
         }
     }
-    
+
     return true;
 }
 
@@ -97,7 +98,7 @@ bool CameraSystem::Init() {
         auto Workspaces = this->PathGet("Workspaces");
         PathManager->KeyBindStatic("CurrentWorkspace", Workspaces);
     }
-    this->SendUINode(this->GetName(), [this](auto uico,auto&&...) {return this->Menu(uico);});
+    this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
     (*this)
         .SubscribeAsync("Global/Save")
         .SubscribeAsync("Global/Save/Strong")

@@ -119,7 +119,7 @@ bool GameSettingsManager::Init() {
         this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
         this->SendUINode("SoundMenu", [this](auto&&...) {return this->SoundMenu();});
         this->SendUINode("DofMenu", [this](auto&&...) {return this->DofMenu();});
-        this->SendUINode("GameHudMenu", [this](auto&&...) {return this->GameHudMenu();});
+        this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->GameHudMenu();});
         return false;
         });
 

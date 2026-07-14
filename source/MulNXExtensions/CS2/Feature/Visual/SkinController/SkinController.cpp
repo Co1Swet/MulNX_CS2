@@ -40,7 +40,7 @@ bool SkinController::Init() {
         else {
             MulNX::ErrorTerminate(I18n("skin.controller.hook.fail"));
         }
-        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
+        this->UIRegisterCallback("UI.3DVision", [this](auto&&...) {return this->Window();});
         });
 
     return true;

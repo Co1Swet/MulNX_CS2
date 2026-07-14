@@ -138,7 +138,7 @@ void StartImpl(HMODULE& hModule) {
         if (MulNXInfo::IsDebugVersion) {
             auto pHookConsole = core->ModuleManager()->FindModule<HookConsole>("HookConsole");
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
-            rp->str1 = "voicebug";
+            rp->str1 = "111";
             pHookConsole->PublishAsync(std::move(msg));
             std::thread([]() {
                 MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);

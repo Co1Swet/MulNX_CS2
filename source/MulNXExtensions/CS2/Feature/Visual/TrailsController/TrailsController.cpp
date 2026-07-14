@@ -96,7 +96,7 @@ bool TrailsController::Init() {
         this->sv_grenade_trajectory_prac_pipreview = this->CS2Con->GetCVarByName("sv_grenade_trajectory_prac_pipreview")->GetPtr<bool>();
         this->sv_grenade_trajectory_time_spectator = this->CS2Con->GetCVarByName("sv_grenade_trajectory_time_spectator")->GetPtr<float>();
 
-        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+        
         });
 
     (*this)
@@ -116,6 +116,7 @@ bool TrailsController::Init() {
         return true;
         });
 
+    this->UIRegisterCallback("UI.3DVision", [this](auto&&...) {return this->Menu();});
     this->UIRegisterCallback("UI.Player.Info", [this](auto, auto msg) {this->HubPlayer(msg);});
     this->UIRegisterCallback("UI.Team.Info", [this](auto, auto msg) {this->HubTeam(msg);});
 

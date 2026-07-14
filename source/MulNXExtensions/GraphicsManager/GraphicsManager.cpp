@@ -9,7 +9,7 @@ bool MulNX::GraphicsManager::Menu() {
 
 bool MulNX::GraphicsManager::Init() {
     this->pShaderCompiler = this->Core->ModuleManager()->FindModule<MulNX::ShaderCompiler>("ShaderCompiler");
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
     return true;
 }
 

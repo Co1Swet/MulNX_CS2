@@ -17,7 +17,7 @@ bool TeamIDRenderController::Init() {
         this->LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rbx is C_CSPlayerPawn*"));
         });
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.3DVision", [this](auto&&...) {return this->Menu();});
 
     return true;
 }

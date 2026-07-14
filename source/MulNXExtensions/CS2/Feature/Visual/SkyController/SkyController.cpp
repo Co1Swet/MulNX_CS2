@@ -58,7 +58,7 @@ bool SkyController::Init() {
         .SubscribeAsync("Sky/Color/Set")
         .SubscribeAsync("Sky/Brightness/Set");
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.3DVision", [this](auto&&...) {return this->Menu();});
 
     this->SendTask("Update", "CSControl", [this]() {
         this->Update();
