@@ -8,7 +8,9 @@ add_library(DemoSystem STATIC
     RecordTaskMaker/RecordTaskMaker.cpp
     RecordTaskConfiger/RecordTaskConfiger.cpp
     DemoPlaying/DemoPlaying.cpp
-    DemoEventsRender/DemoEventsRender.cpp
+    
+    Rending/DemoEventsRender/DemoEventsRender.cpp
+    Rending/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

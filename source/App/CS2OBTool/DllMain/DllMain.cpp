@@ -104,6 +104,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<RecordTaskMaker>("RecordTaskMaker")
             .CreateModule<DemoRecorder>("DemoRecorder")
             .CreateModule<DemoEventsRender>("DemoEventsRender")
+            .CreateModule<DemoPlayerInfoRender>("DemoPlayerInfoRender")
 
             // CS2 外围功能
             .CreateModule<KeyboardOverlay>("KeyboardOverlay")

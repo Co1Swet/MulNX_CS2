@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include <vector>
 #include <map>
@@ -42,6 +41,7 @@ namespace Demo {
     struct Player {
         Steam64UID steamId;
         std::string name;
+        std::string crosshairShareCode;
         bool isTeamA;
 
         int killCount;

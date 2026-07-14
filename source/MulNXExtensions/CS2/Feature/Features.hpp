@@ -1,5 +1,5 @@
 #pragma once
-#include "DemoSystem/DemoSystems.hpp"
+#include "DemoSystem/Demos.hpp"
 #include "HUD/HUDs.hpp"
 #include "Sound/Sounds.hpp"
 #include "View/Views.hpp"

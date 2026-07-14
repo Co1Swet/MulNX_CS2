@@ -21,7 +21,7 @@ bool DemoEventsRender::Init() {
 void DemoEventsRender::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/InfoLoad"_hash: {
-        auto info = std::move(*msg.asp.get<Demo::Info>());
+        auto info = *msg.asp.get<Demo::Info>();
         m_demos[info.demoFileName] = std::move(info);
         break;
     }
