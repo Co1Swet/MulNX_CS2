@@ -273,6 +273,7 @@ namespace CS2 {
         DirectX::XMFLOAT3* angEyeAngles() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_angEyeAngles); }
         EntitySpottedState_t* m_entitySpottedState() { return Schema<EntitySpottedState_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_entitySpottedState); }
         int32_t* m_ArmorValue() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_ArmorValue); }
+        bool* m_bPrevHelmet() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_bPrevHelmet); }
     };
 
     class CBasePlayerController :public C_BaseEntity {
