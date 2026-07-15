@@ -2,6 +2,6 @@
 #include <Intro/CSModuleBase.hpp>
 
 class ESPBox final :public CSModuleBase {
-    bool Draw();
+    void Draw();
     bool Init()override;
 };
