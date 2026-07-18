@@ -7,3 +7,4 @@ targets:
   - materialsystem2.dll
   - scenesystem.dll
   - gameoverlayrenderer64.dll
+  - soundsystem.dll

@@ -1,5 +1,5 @@
 // Generated using https://github.com/a2x/cs2-dumper
-// 2026-07-15 03:55:33.722210800 UTC
+// 2026-07-18 14:53:47.421581200 UTC
 
 #pragma once
 
@@ -10,7 +10,7 @@ namespace cs2_dumper {
     namespace schemas {
         // Module: client.dll
         // Class count: 563
-        // Enum count: 14
+        // Enum count: 18
         namespace client_dll {
             // Alignment: 4
             // Member count: 5
