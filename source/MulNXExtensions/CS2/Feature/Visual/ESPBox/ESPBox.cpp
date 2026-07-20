@@ -5,6 +5,7 @@
 void ESPBox::Draw() {
     if (!this->runFlag1.load(std::memory_order_acquire))return;
 
+    std::shared_lock lock(this->CS2->smutex);
     for (int i = 1; i <= 10; ++i) {
         if (!this->CS2->GetPlayerMsg(i).Alive)continue;
         const DirectX::XMFLOAT3 EyePos3D = this->CS2->GetPlayerMsg(i).EyePosition;

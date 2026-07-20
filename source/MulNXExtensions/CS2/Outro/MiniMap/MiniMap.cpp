@@ -1,7 +1,7 @@
 #include "MiniMap.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool MiniMap::UINodeFunc() {
+bool MiniMap::Window() {
     auto w = MulNX::UI::RAIIWindow("小地图窗口", this->showWindow);
     if (!w)return true;
 
@@ -16,13 +16,6 @@ bool MiniMap::UINodeFunc() {
     style.Colors[ImGuiCol_ChildBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);  // 完全透明子窗口背景
     style.Colors[ImGuiCol_Border] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);   // 透明边框
 
-    if (false) {
-        // 恢复样式
-        style.Colors[ImGuiCol_WindowBg] = oldWindowBg;
-        style.Colors[ImGuiCol_ChildBg] = oldChildBg;
-        style.Colors[ImGuiCol_Border] = oldBorder;
-        return true;
-    }
     // 计算地图绘制区域：如果随窗口联动则使用剩余内容区域的正方形
     ImVec2 mapSizeVec;
     if (this->FollowWindow) {
@@ -55,9 +48,9 @@ bool MiniMap::UINodeFunc() {
     ImVec2 mousePos = ImGui::GetIO().MousePos;
     bool mouseInMap = (mousePos.x >= TopLeft.x && mousePos.x <= BottomRight.x && mousePos.y >= TopLeft.y && mousePos.y <= BottomRight.y);
 
+    std::shared_lock lk(this->CS2->smutex);
     // 绘制玩家并处理点击
     for (int i = 1; i <= 10; ++i) {
-        std::shared_lock lk(this->CS2->smutex);
         D_Player& Player = this->CS2->GetPlayerMsg(i);
         if (!Player.Alive)continue;
         ImVec2 PositionInMiniMap = ImVec2(centerScreen.x + Player.Position.x * worldToPixel, centerScreen.y - Player.Position.y * worldToPixel);
@@ -114,7 +107,12 @@ bool MiniMap::UINodeFunc() {
 }
 
 bool MiniMap::Init() {
-    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) { this->Window();});
+
+    this->UIRegisterCallback("UI.Advanced", [this](auto&&...) {
+        MulNX::UI::Checkbox("小地图", this->showWindow);
+        });
+
     this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;
@@ -123,7 +121,7 @@ bool MiniMap::Init() {
 }
 
 void MiniMap::Main() {
-    if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'M',1 })) {
+    if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'M',3 })) {
         this->showWindow = !this->showWindow;
     }
 

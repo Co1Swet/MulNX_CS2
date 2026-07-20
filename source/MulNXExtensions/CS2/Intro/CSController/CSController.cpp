@@ -169,6 +169,5 @@ void CSController::Main() {
 }
 
 D_Player& CSController::GetPlayerMsg(int Index) {
-    std::shared_lock lock(this->smutex);
     return this->CS2EBGameData.Players[Index];
 }

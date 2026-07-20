@@ -111,6 +111,10 @@ bool GameCfgManager::Init() {
 	//初始化Cfg文件列表
     this->UpdateCfgList();
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
+    this->UIRegisterCallback("UI.Advanced", [this](auto&&...) {
+        MulNX::UI::Checkbox("游戏配置管理器", this->showWindow);
+        });
+    
     return true;
 }
 

@@ -142,5 +142,8 @@ bool PlayerHub::Window(MulNX::UICoordinator* uico) {
 
 bool PlayerHub::Init() {
     this->SendUIRoot(this->GetName(), [this](auto* uico, auto&&...) {return this->Window(uico);});
+    this->UIRegisterCallback("UI.Advanced", [this](auto&&...) {
+        MulNX::UI::Checkbox("玩家信息管理", this->showWindow);
+        });
     return true;
 }

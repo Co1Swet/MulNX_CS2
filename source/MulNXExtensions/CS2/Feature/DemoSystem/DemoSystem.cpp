@@ -121,6 +121,10 @@ bool DemoSystem::Init() {
         .SubscribeAsync("Window/Drag/FileDrop")
         ;
 
+    this->UIRegisterCallback("UI.Advanced", [this](auto&&...) {
+        MulNX::UI::Checkbox("Demo系统", this->showWindow);
+        });
+
     this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {
         return this->Window(uico);
         });
