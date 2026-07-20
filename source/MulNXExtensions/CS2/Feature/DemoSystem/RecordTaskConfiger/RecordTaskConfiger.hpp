@@ -18,4 +18,7 @@ public:
     int preTicksShotingTime = 40;
     int postTicksShotingTime = 40;
     float ShotingTimeRate = 0.2;
+
+    // 邻近拼合阈值（tick）
+    float mergeThresholdTicks = 480.0f;
 };
