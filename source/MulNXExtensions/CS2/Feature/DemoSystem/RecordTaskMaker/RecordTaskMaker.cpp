@@ -216,7 +216,7 @@ bool RecordTaskMaker::Init() {
         .SubscribeAsync("Demo/SetOperating")
         .SubscribeAsync("Demo/InfoLoad");
 
-    this->SendUINode(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
+    this->UIRegisterCallback("UI.Demos", [this](auto uico, auto&&...) {return this->Window(uico);});
 
     this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();

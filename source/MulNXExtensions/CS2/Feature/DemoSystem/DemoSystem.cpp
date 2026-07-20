@@ -7,9 +7,7 @@ bool DemoSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("Demo", this->showWindow);
     if (!w) return true;
 
-    uico->CallUINode("RecordTaskMaker");
-    uico->CallUINode("RecordTaskConfiger");
-    uico->CallUINode("DemoHelper");
+    uico->CallbackCall("UI.Demos"_hash, nullptr);
     uico->CallUINode("DemoRecorder");
 
     std::unique_lock lock(this->smutex);

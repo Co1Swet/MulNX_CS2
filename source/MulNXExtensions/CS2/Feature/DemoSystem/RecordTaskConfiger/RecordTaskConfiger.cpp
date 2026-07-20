@@ -20,7 +20,7 @@ bool RecordTaskConfiger::Window() {
 
 bool RecordTaskConfiger::Init() {
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
+    this->UIRegisterCallback("UI.Demos", [this](auto&&...) {return this->Window();});
 
     this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();

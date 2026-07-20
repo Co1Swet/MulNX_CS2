@@ -63,7 +63,7 @@ bool DemoHelper::Init() {
         .SubscribeAsync("DemoHelper/JumpTIme")
         ;
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
+    this->UIRegisterCallback("UI.Demos", [this](auto&&...) {return this->Window();});
     this->SendTask("Main", "DemoSys", [this]()->bool {
         this->Main();
         return true;

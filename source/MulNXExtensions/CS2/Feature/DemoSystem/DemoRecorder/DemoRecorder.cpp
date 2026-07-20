@@ -62,7 +62,7 @@ bool DemoRecorder::Init() {
         return true;
         });
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {
+    this->UIRegisterCallback("UI.Demos", [this](auto&&...) {
         return this->Window();
         });
 
