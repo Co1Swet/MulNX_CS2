@@ -18,6 +18,7 @@ void NameController::UIPlayer(MulNX::Message* msg) {
         ImGui::TextUnformatted("未设置替换名称");
     }
     ImGui::InputText("新名称 (最多127字符)", &this->newNameBuffer);
+    MulNX::UI::Checkbox("屏蔽名称前缀（所有人）", this->noClantag);
     ImGui::SameLine();
     if (ImGui::Button("设定（空则清除）")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Name/Player/Set"_hash);
@@ -144,7 +145,9 @@ MulNX::Hook::Then NameController::HandleGetDecoratedPlayerName(MulNX::Hook* hk, 
     }
     else if (*currentComponentName == 'c') {
         // clantag
-        *ppName = "MulNX";
+        if (this->noClantag.load()) {
+            *ppName = nullptr;
+        }
     }
     else if (*currentComponentName == 'p') {
         // puppeteer

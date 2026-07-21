@@ -6,6 +6,16 @@ class HookMixin {
     T* This() { return static_cast<T*>(this); }
     std::vector<std::pair<std::string, std::unique_ptr<MulNX::Hook>>>hooks;
 protected:
+    HookMixin() {
+        This()->beforeDeinits->push_back([this]() {
+            for (auto& [name, hook] : this->hooks) {
+                hook = nullptr;
+                This()->LogInfo(I18n("hook.destroyed", name));
+            }
+            return true;
+            });
+    }
+
     void RegisterAttachHook(std::unique_ptr<MulNX::Hook> hk, std::string&& name,
         std::source_location loc = std::source_location::current()) {
         auto res = hk->Attach();

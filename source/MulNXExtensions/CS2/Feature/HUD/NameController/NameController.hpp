@@ -4,6 +4,7 @@
 class NameController final :public CSModuleBase {
     std::array<char[128], 64>nameReplace{};
     std::map<uint64_t, int>nameReplaceInfo{};
+    std::atomic<bool>noClantag = false;
 
     std::string newNameBuffer;
     bool Init()override;
