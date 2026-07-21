@@ -118,7 +118,9 @@ void StartImpl(HMODULE& hModule) {
 
             // CS2 杂项功能
             .CreateModule<EntityListScanner>("EntityListScanner")
-
+#ifdef _DEBUG
+            .CreateModule<CS2Test>("CS2Test")
+#endif
             // 音视频系统
             .CreateModule<MediaSystem>("MediaSystem")
             .CreateModule<MediaParamManager>("MediaParamManager")
@@ -135,15 +137,6 @@ void StartImpl(HMODULE& hModule) {
             ;
         // 启动核心
         core->EntryInit(core.get());
-        if (MulNXInfo::IsDebugVersion) {
-            auto pHookConsole = core->ModuleManager()->FindModule<HookConsole>("HookConsole");
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
-            rp->str1 = "111";
-            pHookConsole->PublishAsync(std::move(msg));
-            std::thread([]() {
-                MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
-                }).detach();
-        }
         SetEvent(hInitCompleteEvent);
         core->Driver()->WaitEnd();
     }

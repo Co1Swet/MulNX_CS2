@@ -4,3 +4,4 @@
 #include "MiniMap/MiniMap.hpp"
 #include "VirtualUser/VirtualUser.hpp"
 #include "HSI/HSI.hpp"
+#include "CS2Test/CS2Test.hpp"
