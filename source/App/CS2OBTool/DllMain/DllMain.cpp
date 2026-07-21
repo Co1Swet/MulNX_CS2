@@ -83,7 +83,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
             .CreateModule<BombSpotController>("BombSpotController")
             .CreateModule<TeamCounterController>("TeamCounterController")
-            //.CreateModule<NameController>("NameController")
+            .CreateModule<NameController>("NameController")
             .CreateModule<FlashRenderController>("FlashRenderController")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<TrailsController>("TrailsController")

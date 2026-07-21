@@ -29,4 +29,11 @@ namespace CS2 {
         DirectX::XMFLOAT3* pViewOrigin() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + 0x4a0); }
         DirectX::XMFLOAT3* pViewAngles() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + 0x4b8); }
     };
+
+    class CBufferString {
+    public:
+        int length;
+        int allocatedSize;
+        char m_szString[32];
+    };
 }

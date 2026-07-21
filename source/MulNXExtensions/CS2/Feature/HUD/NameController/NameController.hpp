@@ -7,7 +7,6 @@ class NameController final :public CSModuleBase {
     std::unique_ptr<MulNX::Hook>hkGetDecoratedPlayerName = nullptr;
     std::unique_ptr<MulNX::Hook>hkGetPlayerName = nullptr;
     bool bGetPlayerNameHooked = false;
-    void HandleVHook(CS2::CCSPlayerController* pPlayerController);
 
     std::string newNameBuffer;
     bool Init()override;
