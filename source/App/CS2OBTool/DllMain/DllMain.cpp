@@ -42,6 +42,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<TimeController>("TimeController")
             .CreateModule<PlayerHub>("PlayerHub")
             .CreateModule<DemoPlaying>("DemoPlaying") // 承担了时间适配器责任
+            .CreateModule<NameController>("NameController")
 
             // CS2 基础支持
             .CreateModule<ConsoleOutput>("ConsoleOutput")
@@ -83,7 +84,6 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
             .CreateModule<BombSpotController>("BombSpotController")
             .CreateModule<TeamCounterController>("TeamCounterController")
-            .CreateModule<NameController>("NameController")
             .CreateModule<FlashRenderController>("FlashRenderController")
             .CreateModule<SkinController>("SkinController")
             .CreateModule<TrailsController>("TrailsController")

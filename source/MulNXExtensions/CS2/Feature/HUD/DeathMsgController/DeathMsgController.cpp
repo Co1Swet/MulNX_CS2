@@ -20,11 +20,16 @@ bool DeathMsgController::Init() {
         this->hkHandlePlayerDeath->Attach();
         this->LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
 
-        this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
-        this->SendTask("Update", "CSControl", [this]()->bool {
-            this->Update();
-            return true;
-            });
+        
+        });
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
+    this->SendTask("Update", "CSControl", [this]()->bool {
+        this->Update();
+        return true;
+        });
+
+    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
+        MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->showWindow);
         });
 
     return true;

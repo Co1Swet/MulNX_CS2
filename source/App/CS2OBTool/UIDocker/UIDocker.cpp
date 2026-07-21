@@ -18,7 +18,6 @@ void UIDocker::MainDraw(MulNX::UICoordinator* uico) {
 
     ImGui::Begin(I18n("2D视觉").c_str());
     uico->CallbackCall("UI.2DVision"_hash, nullptr);
-    MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->Core->ModuleManager()->FindModule("DeathMsgController")->showWindow);
     ImGui::End();
 
     ImGui::Begin(I18n("高级功能").c_str());

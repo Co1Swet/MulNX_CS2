@@ -26,7 +26,7 @@ bool CSController::Init() {
         return true;
         });
     
-    // this->SendUIRoot("RTEST", [this](auto&&...) {return this->Window(node);});
+    //this->SendUIRoot("RTEST", [this](auto&&...) {return this->Window();});
     
     return true;
 }

@@ -90,7 +90,7 @@ bool NameController::Init() {
         auto hkGetPlayerName = MulNX::Hook::Create(pCCSPlayerController_GetPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
             // 调用原始函数获取原始名字
-            const char* originalName = reinterpret_cast<GetPlayerName_t>(hk->pMaybeRawFunc)(playerController);
+            ctx->rax = (uint64_t)reinterpret_cast<GetPlayerName_t>(hk->pMaybeRawFunc)(playerController);
             // 获取 SteamID
             uint64_t steamId = *playerController->m_steamID();
             // 而在这里，我们则需要加锁，因为我们要访问替换表了
