@@ -70,49 +70,23 @@ bool NameController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
         auto pFnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::GetDecoratedPlayerName).Data();
-        this->hkGetDecoratedPlayerName = MulNX::Hook::Create(pFnGetDecoratedPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto ppName = (const char**)&ctx->rax;
-
-            auto pProvider = (ctx->r12);
-            // (int* (__fastcall*)(void*, int*))(vtable[7]);
-            auto GetUserId = IVClass::Assume(pProvider)->GetVFunc<int* (int*)>(7);
-            int userId = -1;
-            GetUserId(&userId);
-            if (userId == -1)return MulNX::Hook::Then::SkipAllAndContinue;
-            auto pCtrler = this->CS2->client.GetBaseEntity(userId+1)->As<CS2::CBasePlayerController>();
-            auto steamId = MulNX::MRead(pCtrler->m_steamID());
-
-            const char* currentName = *(const char**)ctx->rdi;
-            if (*currentName == 'c') {
-                // clantag
-                *ppName = "MulNX";
+        auto hkGetDecoratedPlayerName = MulNX::Hook::Create(pFnGetDecoratedPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
+            try {
+                return this->HandleGetDecoratedPlayerName(hk, ctx);
             }
-            else if (*currentName == 'p') {
-                // puppeteer
+            catch (MulNX::Exception& e) {
+                this->LogError(e);
             }
-            else if (*currentName == 'o') {
-                // original_controller
-                std::shared_lock lock(this->smutex);
-                auto it = this->nameReplaceInfo.find(steamId);
-                // 根据映射表决定返回值
-                if (it != this->nameReplaceInfo.end()) {
-                    *ppName = this->nameReplace[it->second];
-                }
-            }
-
-            // auto pZ2 = (char*)ctx->rbx; 
-            
-            return MulNX::Hook::Then::SkipAllAndContinue; // 继续执行原始函数，获取装饰名并写入 pBuffer
+            return MulNX::Hook::Then::SkipAllAndContinue;
             }, false, true).value();
-        this->hkGetDecoratedPlayerName->Attach();
-        this->LogSucc(I18n("hook.attached", "GetDecoratedPlayerName"));
+        this->RegisterAttachHook(std::move(hkGetDecoratedPlayerName), "GetDecoratedPlayerName");
 
         // fn has 3rd reference to string "WWWWWWWWWWWWWWWW"
         uint8_t** vtable = (uint8_t**)Afx::BinUtils::FindClassVtable(this->CS2->client.hModule, ".?AVCCSPlayerController@@", 0, 0);
         if (!vtable)MulNX::ErrorTerminate("找不到pCCSPlayerController::vtable");
         
         auto pCCSPlayerController_GetPlayerName = vtable[226];
-        this->hkGetPlayerName = MulNX::Hook::Create(pCCSPlayerController_GetPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
+        auto hkGetPlayerName = MulNX::Hook::Create(pCCSPlayerController_GetPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
             // 调用原始函数获取原始名字
             const char* originalName = reinterpret_cast<GetPlayerName_t>(hk->pMaybeRawFunc)(playerController);
@@ -129,8 +103,7 @@ bool NameController::Init() {
 
             return MulNX::Hook::Then::Return; // 已调用原始函数，不再重复执行
             }).value();
-        this->hkGetPlayerName->Attach();
-        this->LogSucc(I18n("hook.attached", "GetPlayerName"));
+        this->RegisterAttachHook(std::move(hkGetPlayerName), "GetPlayerName");
 
         this->SendTask("Update", "CSControl", [this]() {
             this->Update();
@@ -143,6 +116,42 @@ bool NameController::Init() {
     this->UIRegisterCallback("UI.Player.Info", [this](auto, auto msg) {return this->UIPlayer(msg);});
 
     return true;
+}
+
+MulNX::Hook::Then NameController::HandleGetDecoratedPlayerName(MulNX::Hook* hk, RegContext* ctx) {
+    auto ppName = (const char**)&ctx->rax;
+
+    auto pProvider = (ctx->r12);
+    // (int* (__fastcall*)(void*, int*))(vtable[7]);
+    auto GetUserId = IVClass::Assume(pProvider)->GetVFunc<int* (int*)>(7);
+    int userId = -1;
+    GetUserId(&userId);
+    if (userId == -1)return MulNX::Hook::Then::SkipAllAndContinue;
+
+    auto pCtrler = this->CS2->client.GetBaseEntity(userId + 1)->As<CS2::CBasePlayerController>();
+    auto steamId = MulNX::MRead(pCtrler->m_steamID());
+
+    const char* currentComponentName = *(const char**)ctx->rdi;
+
+    if (*currentComponentName == 'o') {
+        // original_controller
+        std::shared_lock lock(this->smutex);
+        auto it = this->nameReplaceInfo.find(steamId);
+        // 根据映射表决定返回值
+        if (it != this->nameReplaceInfo.end()) {
+            *ppName = this->nameReplace[it->second];
+        }
+    }
+    else if (*currentComponentName == 'c') {
+        // clantag
+        *ppName = "MulNX";
+    }
+    else if (*currentComponentName == 'p') {
+        // puppeteer
+    }
+    
+
+    return MulNX::Hook::Then::SkipAllAndContinue; // 继续执行原始函数，获取装饰名并写入 pBuffer
 }
 
 void NameController::ProcessMsg(MulNX::Message& Msg) {

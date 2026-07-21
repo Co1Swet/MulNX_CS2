@@ -3,8 +3,17 @@
 
 template<typename T>
 class HookMixin {
-protected:
     T* This() { return static_cast<T*>(this); }
+    std::vector<std::pair<std::string, std::unique_ptr<MulNX::Hook>>>hooks;
+protected:
+    void RegisterAttachHook(std::unique_ptr<MulNX::Hook> hk, std::string&& name,
+        std::source_location loc = std::source_location::current()) {
+        auto res = hk->Attach();
+        if (res == MulNX::Hook::Result::AttachError)
+            throw MulNX::Exception("Hook AttachError: " + name, loc);
+        This()->LogSucc(I18n("hook.attached", name));
+        this->hooks.push_back({ std::move(name),std::move(hk) });
+    }
 
     class WrapHook {
         T* pMod = nullptr;
