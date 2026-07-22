@@ -7,8 +7,14 @@ bin/**/*.json
 bin/**/*.dem
 bin/**/*.mp4
 
-bin/Tools/dxgi.dll
-bin/Tools/reshade-shaders/**
-bin/Tools/ReShade.ini
-bin/Tools/ReShade.log
-bin/Tools/ReShadePreset.ini
+bin/MulNX/Tools/dxgi.dll
+bin/MulNX/Tools/reshade-shaders/**
+bin/MulNX/Tools/ReShade.ini
+bin/MulNX/Tools/ReShade.log
+bin/MulNX/Tools/ReShadePreset.ini
+
+bin/Output/MulNX/Tools/dxgi.dll
+bin/Output/MulNX/Tools/reshade-shaders/**
+bin/Output/MulNX/Tools/ReShade.ini
+bin/Output/MulNX/Tools/ReShade.log
+bin/Output/MulNX/Tools/ReShadePreset.ini
