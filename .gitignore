@@ -6,3 +6,9 @@ bin/**/*.zip
 bin/**/*.json
 bin/**/*.dem
 bin/**/*.mp4
+
+bin/Tools/dxgi.dll
+bin/Tools/reshade-shaders/**
+bin/Tools/ReShade.ini
+bin/Tools/ReShade.log
+bin/Tools/ReShadePreset.ini

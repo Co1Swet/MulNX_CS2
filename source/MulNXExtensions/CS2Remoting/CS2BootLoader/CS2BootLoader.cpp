@@ -1,15 +1,17 @@
 #include "CS2BootLoader.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
-#include <MulNXExtensions/DLLInjectHelper/DLLInjectHelper.hpp>
+#include <MulNXExtensions/CS2Remoting/CS2HelperController/CS2HelperController.hpp>
 #include <commdlg.h>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 #include <TlHelp32.h>
 
-bool CS2BootLoader::Window() {
-    auto w = MulNX::UI::RAIIWindow("CS2 Boot Loader", this->showWindow);
+bool CS2BootLoader::Window(MulNX::UICoordinator* uico) {
+    auto w = MulNX::UI::RAIIWindow("CS2 Boot Loader");
     if (!w)return true;
+    uico->CallbackCall("CS2BootLoad"_hash, nullptr);
+
     std::unique_lock lock(this->smutex);
 
     // 显示当前游戏路径
@@ -55,19 +57,13 @@ bool CS2BootLoader::Window() {
 }
 
 bool CS2BootLoader::Init() {
-    this->pInjectHelper = this->Core->ModuleManager()->FindModule<DLLInjectHelper>("DLLInjectHelper");
+    this->pHelperController = this->Core->ModuleManager()->FindModule<CS2HelperController>("CS2HelperController");
 
     auto configPath = this->PathGet("Config");
     auto config = YAML::LoadFile((configPath / "config.yaml").string());
     this->gamePath = config["path"].as<std::string>();
     this->launchOptions = config["launchOptions"].as<std::string>();
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
-
-    auto rootPath = this->Path()->GetRoot();
-
-    this->helperPath = rootPath / "CS2InternalHelper" / "CS2InternalHelper.dll";
-
-    LoadLibraryW(this->helperPath.wstring().c_str());
 
     this->showWindow = true;
 
@@ -82,7 +78,7 @@ bool CS2BootLoader::Init() {
         return true;
         });
 
-    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
+    this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
 
     return true;
 }
@@ -187,20 +183,7 @@ bool CS2BootLoader::LaunchAndInject() {
         return false;
     }
 
-    // 注入 DLL
-    bool helperInjected = this->pInjectHelper->InjectDll(pi.hProcess, this->helperPath.wstring());
-    if (!helperInjected) {
-        TerminateProcess(pi.hProcess, 0);  // 注入失败则终止进程
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-        return false;
-    }
-    if (!this->pInjectHelper->InitDLL(pi.hProcess, L"CS2InternalHelper.dll", "HelperInit")) {
-        TerminateProcess(pi.hProcess, 0);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-        return false;
-    }
+    if (!this->pHelperController->Remoting(pi))return false;
 
     // 恢复游戏主线程
     ResumeThread(pi.hThread);

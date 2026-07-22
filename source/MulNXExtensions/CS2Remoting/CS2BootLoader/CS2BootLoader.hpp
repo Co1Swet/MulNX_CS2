@@ -1,12 +1,10 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 
-class DLLInjectHelper;
 class CS2BootLoader final : public MulNX::Module<CS2BootLoader> {
-    DLLInjectHelper* pInjectHelper = nullptr;
+    class CS2HelperController* pHelperController = nullptr;
 
     std::filesystem::path gamePath;
-    std::filesystem::path helperPath;
     std::string launchOptions;
 
     std::vector<std::string> patternsCheckDangerous;
@@ -15,7 +13,7 @@ class CS2BootLoader final : public MulNX::Module<CS2BootLoader> {
     bool LaunchAndInject();
     bool IsGameRunning();
 
-    bool Window();
+    bool Window(MulNX::UICoordinator* uico);
     void ProcessMsg(MulNX::Message& msg);
     bool Init()override;
     void Deinit()override;
