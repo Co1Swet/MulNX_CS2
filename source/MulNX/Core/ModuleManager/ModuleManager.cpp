@@ -2,6 +2,7 @@
 #include <MulNX/Common/Message.hpp>
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Systems/Systems.hpp>
+#include <ranges>
 
 bool MulNX::Core::ModuleManager::Init() {
     (*this)
@@ -56,17 +57,17 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
 
     return *this;
 }
-MulNX::ModuleBase* MulNX::Core::ModuleManager::FindModule(const std::string& Name) {
+MulNX::ModuleBase* MulNX::Core::ModuleManager::FindModule(const std::string& name) {
     std::shared_lock lock(this->smutex);
-    auto it = this->NameToHandleMap.find(Name);
+    auto it = this->NameToHandleMap.find(name);
     if (it == this->NameToHandleMap.end()) {
-        MulNX::ErrorTerminate("查找模块错误 0x1");
+        MulNX::ErrorTerminate(std::format("查找模块错误 : {}", name));
         return nullptr;
     }
     MulNXHandle HModule = it->second;
     auto it2 = this->modules.find(HModule);
     if (it2 == this->modules.end()) {
-        MulNX::ErrorTerminate("查找模块错误 0x2");
+        MulNX::ErrorTerminate(std::format("查找模块错误 : {}", name));
         return nullptr;
     }
     return it2->second.get();
@@ -89,7 +90,7 @@ void MulNX::Core::ModuleManager::DeinitModules() {
     std::unique_lock lock(this->smutex);
     for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
         if (it->second->GetName() == "TaskSystem")continue;
-        for (auto& de : *it->second->beforeDeinits) {
+        for (auto& de : *it->second->beforeDeinits|std::views::reverse) {
             if (!de())MulNX::ErrorTerminate(std::format("预关停模块失败：{}", it->second->GetName()));
         }
         it->second->Deinit();

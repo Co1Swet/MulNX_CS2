@@ -21,18 +21,18 @@ bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {
     return true;
 }
 void MulNX::ModuleBase::Update() {
-    std::vector<AwaitCondition*> toResume;
+    std::vector<std::coroutine_handle<>> toResume;
     for (auto it = this->conditionWaiters.begin(); it != this->conditionWaiters.end(); ) {
-        if ((*it)->condition()) {
-            toResume.push_back(*it);
+        if (it->first()) {
+            toResume.push_back(it->second);
             it = this->conditionWaiters.erase(it);
         }
         else {
             ++it;
         }
     }
-    for (auto& cw : toResume) {
-        cw->h.resume();
+    for (auto& h : toResume) {
+        h.resume();
     }
     MulNX::MessageChannel* Channel = this->MainMsgChannel;
     // 注意这里，msg掌握潜在的asp对象，直到协程使用asp，仍保持有效，直到离开作用域，msg析构引起asp析构
@@ -49,28 +49,22 @@ void MulNX::ModuleBase::Update() {
 
         auto waiters = std::move(it->second);
 
-        for (auto& w : waiters) {
-            w->result = &msg;
-            w->h.resume();//  由于模块代码内聚，这里应当是不出现已经处理的情况
+        for (auto& [check, h] : waiters) {
+            check(&msg);
+            h.resume();//  由于模块代码内聚，这里应当是不出现已经处理的情况
         }
         continue;
+    }
+    for (auto& [type, waiters] : this->msgWaiters) {
+        for (auto& [check, waiter] : waiters) {
+            if (check(nullptr)) {
+                waiter.resume();
+            }
+        }
     }
     return;
 }
 // 在 ModuleBase 类声明中添加
 MulNX::ModuleBase::~ModuleBase() {
-    // 销毁所有挂起的条件等待协程
-    for (auto& cw : conditionWaiters) {
-        if (cw->h) {
-            cw->h.destroy();
-        }
-    }
-    // 销毁所有挂起的消息等待协程
-    for (auto& [type, vec] : msgWaiters) {
-        for (auto& w : vec) {
-            if (w->h) {
-                w->h.destroy();
-            }
-        }
-    }
+    
 }

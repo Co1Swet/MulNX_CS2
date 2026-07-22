@@ -18,7 +18,7 @@ bool CSController::Init() {
         .SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {return this->OnPanoramaLoad(msg);})
         ;
 
-    this->InitTask().resume();
+    this->InitTask().Fire();
 
     this->SendTask("Update", "CSControl", [this]()->bool {
         this->Update();

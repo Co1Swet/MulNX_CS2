@@ -55,7 +55,7 @@ bool DemoRecorder::Init() {
         .SubscribeAsync("Demo/GotoTick/Complete")
         ;
 
-    this->Main().resume();
+    this->Main().Fire();
 
     this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
@@ -161,10 +161,11 @@ MulNX::CoTask DemoRecorder::Main() {
 
         // 暂停并跳转
         this->AsyncCommand(std::format("demo_gototick {}", this->currentRecordTaskStartTick - 64));
-
+        
         // 等待跳转完成
-        auto gotoCplt = co_await this->WaitMsg("Demo/GotoTick/Complete"_hash);
-        auto&& [jmped] = gotoCplt.Access<int>();
+        MulNX::Message* gotoCplt = nullptr;
+        co_await this->WaitMsgForever("Demo/GotoTick/Complete"_hash, gotoCplt);
+        auto&& [jmped] = gotoCplt->Access<int>();
         if (jmped != this->currentRecordTaskStartTick - 64) {
             this->LogError(std::format("期望跳到tick:{}而接收到了跳转到tick:{}，已丢弃此片段",
                 this->currentRecordTaskStartTick - 64, jmped));

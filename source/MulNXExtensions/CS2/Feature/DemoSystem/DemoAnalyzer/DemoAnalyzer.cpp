@@ -61,7 +61,7 @@ void DemoAnalyzer::HandleAnalyzeRequest(std::filesystem::path demoPath) {
     }
 
     this->LogInfo("开始分析: " + demoPath.string());
-    this->AnalyzeDemoWithCSDA(std::move(demoPath)).resume();
+    this->AnalyzeDemoWithCSDA(std::move(demoPath)).Fire();
 }
 
 MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(std::filesystem::path demoPath) {

@@ -21,8 +21,6 @@ namespace MulNX {
     protected:
         // 自用更新入口
         void Update();  
-        auto WaitUntil(std::function<bool()>&& condition) { return AwaitCondition(this, std::move(condition)); }
-        auto WaitMsg(MulNX::MsgType type) { return AwaitMessage(this, type); }
     public:
         ~ModuleBase();
         // 设置模块名称

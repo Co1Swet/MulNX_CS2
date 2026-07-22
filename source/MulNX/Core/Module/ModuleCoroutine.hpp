@@ -1,53 +1,102 @@
 #pragma once
 #include "IModule.hpp"
 #include <MulNX/Common/coroutine.hpp>
+#include <map>
 
 namespace MulNX {
-    class ModuleCoroutine: public IModule {
+    class ModuleCoroutine : public IModule {
+        friend class ModuleBase;
+        friend class Impl_WaitForCondition;
+        friend class Impl_WaitForMessage;
+        std::vector<std::pair<std::function<bool()>, std::coroutine_handle<>>>conditionWaiters;
+        std::map<MsgType, std::vector<std::pair<std::function<bool(Message*)>, std::coroutine_handle<>>>>msgWaiters;
     protected:
-        // 协程：状态
-        struct AwaitCondition;
-        // 等待容器
-        std::vector<AwaitCondition*> conditionWaiters;
-        // 等待对象
-        struct AwaitCondition {
-            ModuleCoroutine* pModuleBase;
-            std::coroutine_handle<> h;
-            std::function<bool()> condition;
-            AwaitCondition(ModuleCoroutine* pModuleBase, std::function<bool()>&& cond) :
-                pModuleBase(pModuleBase), condition(std::move(cond)) {}
+        ModuleCoroutine() {
+            this->beforeDeinits->push_back([this]() {
+                // 销毁所有挂起的条件等待协程
+                for (auto& [condition, waiter] : conditionWaiters) {
+                    waiter.destroy();
+                }
+                // 销毁所有挂起的消息等待协程
+                for (auto& [type, vec] : msgWaiters) {
+                    for (auto& [check, h] : vec) {
+                        h.destroy();
+                    }
+                }
+                return true;
+                });
+        }
+    private:
+        struct Impl_WaitForCondition {
+            ModuleCoroutine* pModule;
+            std::function<bool()> tempCondition;
+            Impl_WaitForCondition(ModuleCoroutine* pModule, std::function<bool()>&& condition) :
+                pModule(pModule), tempCondition(condition) {}
             bool await_ready() {
-                return condition();   // 若已满足，不挂起
+                return this->tempCondition();
             }
             void await_suspend(std::coroutine_handle<> h) {
-                // 把句柄和条件函数打包，注册到模块的条件容器
-                this->h = h;
-                this->pModuleBase->conditionWaiters.push_back(this);
-                // 悬空返回，协程挂起
+                this->pModule->conditionWaiters.push_back({ std::move(this->tempCondition), std::move(h) });
             }
             void await_resume() {}
         };
-        // 协程：消息
-        struct AwaitMessage;
-        // 等待容器
-        std::unordered_map<size_t, std::vector<AwaitMessage*>> msgWaiters;
-        // 等待对象
-        struct AwaitMessage {
-            ModuleCoroutine* pModuleBase;
-            MulNX::MsgType type;
-            std::coroutine_handle<> h;
-            MulNX::Message* result = nullptr;  // 恢复后从这取消息
-            AwaitMessage(ModuleCoroutine* pModuleBase, MulNX::MsgType type) :
-                pModuleBase(pModuleBase), type(type) {}
-            bool await_ready() { return false; }  // 总是挂起，或检查缓存
+    protected:
+        auto WaitUntil(std::function<bool()>&& condition) {
+            return Impl_WaitForCondition{ this,std::move(condition) };
+        }
+    private:
+        struct Impl_WaitForMessage {
+            ModuleCoroutine* pModule;
+            MsgType tempType;
+            std::function<bool(MulNX::Message*)> tempOnUpdate;
+            Impl_WaitForMessage(ModuleCoroutine* pModule, MsgType type,
+                std::function<bool(MulNX::Message*)>&& onUpdate) :
+                pModule(pModule), tempType(type), tempOnUpdate(std::move(onUpdate)){
+                
+            }
+            bool await_ready() {
+                return false;
+            }
             void await_suspend(std::coroutine_handle<> h) {
-                // 注册到模块
-                this->h = h;
-                this->pModuleBase->msgWaiters[type].push_back(this);
+                this->pModule->msgWaiters[this->tempType].push_back({ std::move(this->tempOnUpdate),std::move(h) });
             }
-            MulNX::Message& await_resume() {
-                return *this->result;
-            }
+            void await_resume() {}
         };
+    protected:
+        auto WaitMsg(MsgType type, std::function<bool(MulNX::Message*)>&& onUpdate = nullptr) {
+            return Impl_WaitForMessage{ this,type,std::move(onUpdate) };
+        }
+        CoTask WaitMsgForever(MsgType type, Message*& outMsg) {
+            auto onUpdate = [&](MulNX::Message* msg)->bool {
+                if (msg == nullptr) {
+                    return false;
+                }
+                else {
+                    outMsg = msg;
+                    return true;
+                }
+                };
+            co_await this->WaitMsg(type, std::move(onUpdate));
+            co_return;
+        }
+        CoTask WaitMsgTimed(MsgType type, Message*& outMsg, int millisecond) {
+            auto now = std::chrono::system_clock::now();
+            auto target = now + std::chrono::milliseconds(millisecond);
+            auto onUpdate = [&, target](MulNX::Message* msg) -> bool {
+                if (msg == nullptr) {
+                    if (target < std::chrono::system_clock::now()) {
+                        outMsg = nullptr;
+                        return true;
+                    }
+                    return false;
+                }
+                else {
+                    outMsg = msg;
+                    return true;
+                }
+                };
+            co_await this->WaitMsg(type, std::move(onUpdate));
+            co_return;
+        }
     };
 }
