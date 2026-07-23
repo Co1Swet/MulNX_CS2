@@ -14,7 +14,7 @@ class CSViewControlMixin :public ICSViewControlModule {
 protected:
     CSViewControlMixin() {
         this->pBaseFromViewControl = This();
-        This()->delayInits->push_back([this]() {
+        This()->preInits.push_back([this]() {
             auto pHookView = This()->FindModule<HookView>("HookView");
             pHookView->viewControlModules.push_back(This());
             return true;

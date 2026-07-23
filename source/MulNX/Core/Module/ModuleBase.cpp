@@ -1,23 +1,32 @@
 #include "ModuleBase.hpp"
 #include <MulNX/Core/Core.hpp>
-#include <MulNX/Core/ModuleManager/ModuleManager.hpp>
-#include <MulNX/Systems/Systems.hpp>
+#include <MulNX/Systems/MessageManager/MessageChannel/MessageChannel.hpp>
 #include <ranges>
 
 // 初始化
 bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {
     this->Core = core;
-    for (const auto& init : *this->delayInits) {
+    for (const auto& init : this->preInits) {
         if (!init())return false;
     }
-    this->delayInits.reset();
+    this->preInits.clear();
     if (!this->Init()) {
         return false;
     }
-    for (const auto& init : *this->backInits | std::views::reverse) {
+    for (const auto& init : this->postInits | std::views::reverse) {
         if (!init())return false;
     }
-    this->backInits.reset();
+    this->postInits.clear();
+    return true;
+}
+bool MulNX::ModuleBase::EntryDeinit() {
+    for (const auto& deinit : this->preDeinits) {
+        if (!deinit())return false;
+    }
+    this->Deinit();
+    for (const auto& deinit : this->postDeinits | std::views::reverse) {
+        if (!deinit())return false;
+    }
     return true;
 }
 void MulNX::ModuleBase::Update() {
@@ -63,8 +72,4 @@ void MulNX::ModuleBase::Update() {
         }
     }
     return;
-}
-// 在 ModuleBase 类声明中添加
-MulNX::ModuleBase::~ModuleBase() {
-    
 }

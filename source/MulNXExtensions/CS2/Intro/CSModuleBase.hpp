@@ -54,7 +54,7 @@ public:
 protected:
     bool participateIt = false;
     CSModuleMixin() {
-        This()->delayInits->push_back([this]() -> bool {
+        This()->preInits.push_back([this]() -> bool {
             this->CS2 = This()->FindModule<CSController>("CSController");
             this->CS2View = This()->FindModule<HookView>("HookView");
             this->CS2Time = This()->FindModule<TimeController>("TimeController");
@@ -67,7 +67,7 @@ protected:
             return true;
             });
 
-        This()->backInits->push_back([this]()->bool {
+        This()->postInits.push_back([this]()->bool {
             if (this->participateIt) {
                 this->CS2->ParticipateItCSModules.push_back(this);
             }

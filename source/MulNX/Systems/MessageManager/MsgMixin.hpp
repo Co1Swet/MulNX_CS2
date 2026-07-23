@@ -7,12 +7,12 @@ namespace MulNX {
 
     template<typename T>
     class MsgMixin {
-    private:
+        T* This() { return static_cast<T*>(this); }
         MessageManager* pMsgManager = nullptr;
     public:
-        T* This() { return static_cast<T*>(this); }
+        
         MsgMixin() {
-            This()->delayInits->push_back([this]() {
+            This()->preInits.push_back([this]() {
                 this->pMsgManager = static_cast<MessageManager*>(This()->FindModule("MessageManager"));
                 This()->MainMsgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());
                 return true;

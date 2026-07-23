@@ -66,7 +66,7 @@ void HookConsole::OnEngine2Load(MulNX::Message& msg) {
             this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
         return MulNX::Hook::Then::Continue;
         }, true).value();
-    this->hkPos_Call_CInputService_ProcessCommands->Attach();
+    this->RegisterAttachHook(this->hkPos_Call_CInputService_ProcessCommands, "Pos_Call_CInputService_ProcessCommands");
 }
 
 void HookConsole::OnTier0Load(MulNX::Message& msg) {

@@ -21,8 +21,13 @@ namespace MulNX {
         friend MulNX::Core::Driver;
     public:
         Module() {
-            this->backInits->push_back([this]() {
+            this->postInits.push_back([this]() {
                 this->LogSucc(I18n("module.inited"));
+                return true;
+                });
+
+            this->postDeinits.push_back([this]() {
+                this->LogInfo(I18n("module.deinited"));
                 return true;
                 });
         }

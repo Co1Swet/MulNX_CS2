@@ -49,7 +49,7 @@ public:
     CameraSystem* CamSys = nullptr;
 protected:
     CamSysModuleMixin() {
-        This()->delayInits->push_back([this]() -> bool {
+        This()->preInits.push_back([this]() -> bool {
             this->CamSys = This()->FindModule<CameraSystem>("CameraSystem");
             return true;
             });

@@ -15,7 +15,8 @@ class TrailsController final :public CSModuleBase {
     ParticleProp prop{ 4.0f, 1.0f, 1.0f };
 
     ParticleManager* pParticleMgr = nullptr;
-    WrapHook hkFunc_BaseCSGrenadeProjectile_DrawStuff;
+    std::unique_ptr<MulNX::Hook> hkFunc_BaseCSGrenadeProjectile_DrawStuff;
+    
     std::optional<ParticleColor> FindColor(CS2::C_CSPlayerPawn* pPawn, CS2::CCSPlayerController* pController);
     MulNX::Hook::Then HandleOnCreate(CS2::C_BaseCSGrenadeProjectile* pProjectile);
     MulNX::Hook::Then HandleOnUpdate(CS2::C_BaseCSGrenadeProjectile* pProjectile);

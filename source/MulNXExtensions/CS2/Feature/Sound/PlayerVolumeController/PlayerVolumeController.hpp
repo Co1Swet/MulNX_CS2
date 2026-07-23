@@ -3,7 +3,7 @@
 
 class PlayerVolumeController final :public CSModuleBase {
     MulNX::Memory::DllModule soundsystem{};
-    WrapHook hkSoundSystem001_SetPlayerVoiceVolume{};
-    WrapHook hkSoundSystem001_GetPlayerVoiceVolume{};
+    std::unique_ptr<MulNX::Hook> hkSoundSystem001_SetPlayerVoiceVolume{};
+    std::unique_ptr<MulNX::Hook> hkSoundSystem001_GetPlayerVoiceVolume{};
     bool Init()override;
 };

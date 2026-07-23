@@ -40,7 +40,7 @@ bool FileRedirector::Init() {
 
         return MulNX::Hook::Then::Continue;
         }).value();
-    this->hkCreateFileW->Attach();
+    this->RegisterAttachHook(this->hkCreateFileW, "CreateFileW");
 
     return true;
 }

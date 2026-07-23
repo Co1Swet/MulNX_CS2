@@ -12,7 +12,7 @@ namespace MulNX {
         T* This() { return static_cast<T*>(this); }
     public:
         TaskMixin() {
-            This()->delayInits->push_back([this]() {
+            This()->preInits.push_back([this]() {
                 this->pTaskSys = static_cast<TaskSystem*>(This()->FindModule("TaskSystem"));
                 return true;
                 });

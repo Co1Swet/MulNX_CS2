@@ -2,8 +2,8 @@
 #include <Intro/CSModuleBase.hpp>
 
 class BombSpotController :public CSModuleBase {
-    std::unique_ptr<MulNX::Hook>hkPos_Spot_WriteBombState = nullptr;
-    WrapHook hkPos_CallGetPawnMaybeSetAllHUD{};
+    std::unique_ptr<MulNX::Hook> hkPos_Spot_WriteBombState = nullptr;
+    std::unique_ptr<MulNX::Hook> hkPos_CallGetPawnMaybeSetAllHUD = nullptr;
     void Menu();
     bool Init()override;
 };

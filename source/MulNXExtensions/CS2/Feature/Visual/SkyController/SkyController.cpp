@@ -47,11 +47,11 @@ bool SkyController::Init() {
         int32_t disp = *reinterpret_cast<int32_t*>(leaAddr + 3);
         auto targetAddr = leaAddr + 7 + disp;
 
-        this->hkForceUpdateSkybox = this->CreateHook("ForceUpdateSkybox", targetAddr, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkForceUpdateSkybox = MulNX::Hook::Create(targetAddr, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pEnvSky = (CS2::C_EnvSky*)ctx->rcx;
             return this->HandleForceUpdateSkybox(pEnvSky);
             }).value();
-        this->hkForceUpdateSkybox.Attach();
+        this->RegisterAttachHook(this->hkForceUpdateSkybox, "ForceUpdateSkybox");
         });
 
     (*this)

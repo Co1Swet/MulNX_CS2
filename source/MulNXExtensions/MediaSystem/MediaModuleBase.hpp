@@ -32,7 +32,7 @@ class MediaModuleMixin {
     T* This() { return static_cast<T*>(this); }
 protected:
     MediaModuleMixin() {
-        This()->delayInits->push_back([this]() -> bool {
+        This()->preInits.push_back([this]() -> bool {
             return true;
             });
     }

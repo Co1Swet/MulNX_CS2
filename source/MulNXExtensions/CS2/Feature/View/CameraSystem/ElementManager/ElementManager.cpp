@@ -57,6 +57,8 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> eleme
     ImGui::Text(I18n("camsys.elem.name_label").c_str());
     ImGui::SameLine();
 
+    if (element->Name.empty())return;
+
     if (ImGui::Selectable(element->Name.data(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
         if (ImGui::IsMouseDoubleClicked(0)) {
             this->CurrentElement.store(element, std::memory_order_release);

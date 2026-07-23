@@ -11,19 +11,19 @@ bool HookD3D11::Init() {
         this->gameoverlayrenderer64 = MulNX::Memory::DllModule(L"gameoverlayrenderer64.dll");
         auto target = this->gameoverlayrenderer64.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Render::CSHashString).Data();
 
-        this->hkPosCallPresent = this->CreateHook("PosCallPresent", target, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkPosCallPresent = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             
             auto pSwapChain = (IDXGISwapChain*)ctx->rcx;
 
             static int i = 0;
             if (++i < 64)return MulNX::Hook::Then::Continue;
-            this->hkPosCallPresent.Detach();
+            this->hkPosCallPresent->Detach();
 
             this->HookD3D11SwapChain(pSwapChain);
 
             return MulNX::Hook::Then::Continue;
-            },true).value();
-        this->hkPosCallPresent.Attach();
+            }, true).value();
+        this->RegisterAttachHook(this->hkPosCallPresent, "PosCallPresent");
         });
 
         
@@ -31,14 +31,14 @@ bool HookD3D11::Init() {
 }
 void HookD3D11::HookD3D11DeviceAndContext() {
     // ---- Hook ClearDepthStencilView (vtable index 53) ----
-    this->hkClearDepthStencilView = this->CreateHook("ClearDepthStencilView", (uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
         ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
         ID3D11DepthStencilView* pDSV = (ID3D11DepthStencilView*)ctx->rdx;
         UINT ClearFlags = *(UINT*)(&ctx->r8);
         this->pGraphicsManager->OnClearDepthStencilView(pCtx, pDSV, ClearFlags);
         return MulNX::Hook::Then::Continue;
         }).value();
-    this->hkClearDepthStencilView.Attach();
+    this->RegisterAttachHook(this->hkClearDepthStencilView, "ClearDepthStencilView");
 }
 void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     IDXGIDevice* dxgiDevice = nullptr;
@@ -54,18 +54,18 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // 0~4：Steam钩子（OBS游戏捕获钩子会与其交互，进行画面捕获）
     // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
-    this->hkPresent = this->CreateHook("Present", (uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
         this->PublishSync("Hook/Present/First"_hash);
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11AndImGuiInit(hk, ctx);});
         return MulNX::Hook::Then::Continue;
         }).value();
-    this->hkPresent->Attach();
+    this->RegisterAttachHook(this->hkPresent, "Present");
     // ---- Hook ResizeBuffers (vtable index 13) ----
-    this->hkResizeBuffers = this->CreateHook("ResizeBuffers", (uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(13), [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkResizeBuffers = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(13), [this](MulNX::Hook* hk, RegContext* ctx) {
         this->pGraphicsManager->ReleaseOld();
         return MulNX::Hook::Then::Continue;
         }).value();
-    this->hkResizeBuffers->Attach();
+    this->RegisterAttachHook(this->hkResizeBuffers, "ResizeBuffers");
 
     DXGI_SWAP_CHAIN_DESC sd;
     pSwapChain->GetDesc(&sd);

@@ -17,18 +17,19 @@ namespace MulNX {
     protected:
         virtual bool Init() = 0;
         virtual void ProcessMsg(MulNX::Message& Msg) {};
-    public:
-        MulNX::Core::Core* Core = nullptr;
-        std::unique_ptr<std::vector<std::function<bool()>>>delayInits = std::make_unique<std::vector<std::function<bool()>>>();
-        std::unique_ptr<std::vector<std::function<bool()>>>backInits = std::make_unique<std::vector<std::function<bool()>>>();
-        std::unique_ptr<std::vector<std::function<bool()>>>beforeDeinits = std::make_unique<std::vector<std::function<bool()>>>();
-
-        IModule() = default;
-        virtual ~IModule() = default;
         // 模块需要自行保证此函数的线程安全性，此函数常常用于抛出信号停止自己的线程
         // 如有资源释放尽量走析构函数
         virtual void Deinit() {};
-
+    public:
+        MulNX::Core::Core* Core = nullptr;
+        std::vector<std::function<bool()>>preInits{};
+        std::vector<std::function<bool()>>postInits{};
+        std::vector<std::function<bool()>>preDeinits{};
+        std::vector<std::function<bool()>>postDeinits{};
+        
+        IModule() = default;
+        virtual ~IModule() = default;
+        
         IModule* FindModule(const std::string& name);
         template<typename T>
         T* FindModule(const std::string& Name) {

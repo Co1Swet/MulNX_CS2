@@ -12,7 +12,7 @@ namespace MulNX {
         std::map<MsgType, std::vector<std::pair<std::function<bool(Message*)>, std::coroutine_handle<>>>>msgWaiters;
     protected:
         ModuleCoroutine() {
-            this->beforeDeinits->push_back([this]() {
+            this->preDeinits.push_back([this]() {
                 // 销毁所有挂起的条件等待协程
                 for (auto& [condition, waiter] : conditionWaiters) {
                     waiter.destroy();

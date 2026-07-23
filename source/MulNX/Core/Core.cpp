@@ -12,8 +12,8 @@ MulNX::Core::Core::Core(std::string&& name) :
     // 创建模块管理器
     this->pModuleManager = std::make_unique<MulNX::Core::ModuleManager>();
     this->pModuleManager->SetName("ModuleManager");
-    this->backInits->clear();
-    this->delayInits->push_back([this]() {
+    this->postInits.clear();
+    this->preInits.push_back([this]() {
         this->LogSucc("核心就绪");
         return true;
         });

@@ -22,11 +22,11 @@ namespace MulNX {
         // 自用更新入口
         void Update();  
     public:
-        ~ModuleBase();
         // 设置模块名称
         void SetName(std::string&& Name) { this->ModuleName = std::move(Name); }
         std::string GetName()const { return this->ModuleName; };
         // 初始化入口
         bool EntryInit(MulNX::Core::Core* core);
+        bool EntryDeinit();
     };
 }

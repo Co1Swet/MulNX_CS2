@@ -4,8 +4,8 @@
 #include <MulNX/Systems/Systems.hpp>
 
 MulNX::Core::Driver::Driver() {
-    this->backInits->clear();
-    this->delayInits->push_back([this]() {
+    this->postInits.clear();
+    this->preInits.push_back([this]() {
         this->LogSucc("驱动就绪");
         return true;
         });

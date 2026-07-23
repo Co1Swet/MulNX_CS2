@@ -3,14 +3,14 @@
 
 namespace MulNX {
     class GlobalVars;
-    template<typename Derived>
+    template<typename T>
     class GlobalVarMixin {
+        T* This() { return static_cast<T*>(this); }
     protected:
         GlobalVars* pGlobalVars = nullptr;
     public:
-        Derived* This() { return static_cast<Derived*>(this); }
         GlobalVarMixin() {
-            This()->delayInits->push_back([this]() {
+            This()->preInits.push_back([this]() {
                 this->pGlobalVars = static_cast<GlobalVars*>(This()->FindModule("GlobalVars"));
                 return true;
                 });

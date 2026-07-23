@@ -7,7 +7,7 @@ class TimeMixin {
 public:
     TimeLiner* pTimeline = nullptr;
     TimeMixin() {
-        This()->delayInits->push_back([this]() {
+        This()->preInits.push_back([this]() {
             this->pTimeline = static_cast<TimeLiner*>(This()->FindModule("TimeLiner"));
             return true;
             });

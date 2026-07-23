@@ -24,18 +24,17 @@ bool BombSpotController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkPos_Spot_WriteBombState->Attach();
-        this->LogSucc(I18n("hook.attached", "Pos_Spot_WriteBombState where rdx is BombColor*"));
+        this->RegisterAttachHook(this->hkPos_Spot_WriteBombState, "Pos_Spot_WriteBombState where rdx is BombColor*");
 
         auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
-        this->hkPos_CallGetPawnMaybeSetAllHUD = this->CreateHook("Pos_CallGetPawnMaybeSetAllHUD", Pos_CallGetPawnMaybeSetAllHUD + 14, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkPos_CallGetPawnMaybeSetAllHUD = MulNX::Hook::Create(Pos_CallGetPawnMaybeSetAllHUD + 14, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->runFlag2.load())return MulNX::Hook::Then::Continue;
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             auto pRet = (CS2::C_BaseEntity*)ctx->rax;
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkPos_CallGetPawnMaybeSetAllHUD.Attach();
+        this->RegisterAttachHook(this->hkPos_CallGetPawnMaybeSetAllHUD, "Pos_CallGetPawnMaybeSetAllHUD");
         });
     this->runFlag2 = true;
 

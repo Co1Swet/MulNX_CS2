@@ -3,8 +3,8 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 
 class HookDemo final :public CSModuleBase {
-    WrapHook hkPlaydemo{};
-    WrapHook hkDemoGotoTick{};
+    std::unique_ptr<MulNX::Hook> hkPlaydemo{};
+    std::unique_ptr<MulNX::Hook> hkDemoGotoTick{};
     void HookPlayDemo(CCmd* cmd);
     void HookDemoGotoTick(CCmd* cmd);
     void BeforePlay(std::string_view rawArg);

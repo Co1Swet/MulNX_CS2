@@ -88,13 +88,11 @@ bool MulNX::Core::ModuleManager::ModulesInit() {
 
 void MulNX::Core::ModuleManager::DeinitModules() {
     std::unique_lock lock(this->smutex);
-    for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
-        if (it->second->GetName() == "TaskSystem")continue;
-        for (auto& de : *it->second->beforeDeinits|std::views::reverse) {
-            if (!de())MulNX::ErrorTerminate(std::format("预关停模块失败：{}", it->second->GetName()));
+    for (auto& [hModule, pModule] : this->modules | std::views::reverse) {
+        if (pModule->GetName() == "TaskSystem")continue;
+        if (!pModule->EntryDeinit()) {
+            MulNX::ErrorTerminate("在模块关闭时出现错误，模块名：" + pModule->GetName());
         }
-        it->second->Deinit();
-        this->LogInfo(I18n("module.deinited", it->second->GetName()));
     }
     this->LogSucc(I18n("sys.bye"));
 }

@@ -25,7 +25,7 @@ bool TeamCounterController::Init() {
             }
             return MulNX::Hook::Then::JmpUserSettedTarget;
             }, false, false, (uintptr_t)target + 11).value();
-        this->hkTeamCounterWriteHP->Attach();
+        this->RegisterAttachHook(this->hkTeamCounterWriteHP, "PosTeamCounterWriteHP");
 
         });
 

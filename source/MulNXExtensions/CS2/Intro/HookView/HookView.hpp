@@ -24,7 +24,7 @@ public:
 class ICSViewControlModule;
 class HookView final :public CSModuleBase {
     // 视角控制钩子
-    WrapHook hkPosCallIsPlayingDemo{};
+    std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo{};
     ControlView controlView{};
     void HandleCameraSystemPlay(CS2::CViewSetup* viewSetup);
     void HandleOverrideView(CS2::CViewSetup* viewSetup);

@@ -71,7 +71,7 @@ bool NameController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
         auto pFnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::GetDecoratedPlayerName).Data();
-        auto hkGetDecoratedPlayerName = MulNX::Hook::Create(pFnGetDecoratedPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkGetDecoratedPlayerName = MulNX::Hook::Create(pFnGetDecoratedPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 return this->HandleGetDecoratedPlayerName(hk, ctx);
             }
@@ -80,14 +80,14 @@ bool NameController::Init() {
             }
             return MulNX::Hook::Then::SkipAllAndContinue;
             }, false, true).value();
-        this->RegisterAttachHook(std::move(hkGetDecoratedPlayerName), "GetDecoratedPlayerName");
+        this->RegisterAttachHook(this->hkGetDecoratedPlayerName, "GetDecoratedPlayerName");
 
         // fn has 3rd reference to string "WWWWWWWWWWWWWWWW"
         uint8_t** vtable = (uint8_t**)Afx::BinUtils::FindClassVtable(this->CS2->client.hModule, ".?AVCCSPlayerController@@", 0, 0);
         if (!vtable)MulNX::ErrorTerminate("找不到pCCSPlayerController::vtable");
         
         auto pCCSPlayerController_GetPlayerName = vtable[226];
-        auto hkGetPlayerName = MulNX::Hook::Create(pCCSPlayerController_GetPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkGetPlayerName = MulNX::Hook::Create(pCCSPlayerController_GetPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
             // 调用原始函数获取原始名字
             ctx->rax = (uint64_t)reinterpret_cast<GetPlayerName_t>(hk->pMaybeRawFunc)(playerController);
@@ -104,7 +104,7 @@ bool NameController::Init() {
 
             return MulNX::Hook::Then::Return; // 已调用原始函数，不再重复执行
             }).value();
-        this->RegisterAttachHook(std::move(hkGetPlayerName), "GetPlayerName");
+        this->RegisterAttachHook(this->hkGetPlayerName, "GetPlayerName");
 
         this->SendTask("Update", "CSControl", [this]() {
             this->Update();

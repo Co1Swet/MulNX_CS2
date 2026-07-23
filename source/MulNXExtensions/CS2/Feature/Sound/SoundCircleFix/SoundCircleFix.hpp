@@ -2,8 +2,8 @@
 #include <Intro/CSModuleBase.hpp>
 
 class SoundCircleFix final :public CSModuleBase {
-    WrapHook hkPos_CallGetPawnUpdateCirclePos{};
-    WrapHook hkPos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque{};
-    WrapHook hkPos_CallGetPawnMaybeOtherAsyncSoundEnque{};
+    std::unique_ptr<MulNX::Hook> hkPos_CallGetPawnUpdateCirclePos{};
+    std::unique_ptr<MulNX::Hook> hkPos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque{};
+    std::unique_ptr<MulNX::Hook> hkPos_CallGetPawnMaybeOtherAsyncSoundEnque{};
     bool Init()override;
 };

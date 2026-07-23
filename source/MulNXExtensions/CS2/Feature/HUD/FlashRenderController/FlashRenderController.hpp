@@ -3,8 +3,8 @@
 
 class FlashRenderController final :public CSModuleBase {
     float* r_spectator_flashbang_opacity = nullptr;
-    WrapHook hkDrawUp{};
-    WrapHook hkDrawDown{};
+    std::unique_ptr<MulNX::Hook> hkDrawUp{};
+    std::unique_ptr<MulNX::Hook> hkDrawDown{};
 
     void Menu();
     bool Init()override;

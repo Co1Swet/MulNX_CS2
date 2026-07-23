@@ -1,0 +1,10 @@
+name: testbug
+KCP:
+  usable: false
+  ctrl: false
+  shift: false
+  alt: false
+  vkCode: 0
+  comboClick: 0
+OnNewRound:
+  []

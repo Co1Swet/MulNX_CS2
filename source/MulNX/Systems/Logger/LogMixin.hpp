@@ -21,12 +21,11 @@ namespace MulNX {
 
     template<typename T>
     class LogMixin {
-    private:
+        T* This() { return static_cast<T*>(this); }
         Logger* logger = nullptr;
     public:
-        T* This() { return static_cast<T*>(this); }
         LogMixin() {
-            This()->delayInits->push_back([this]() {
+            This()->preInits.push_back([this]() {
                 this->logger = static_cast<Logger*>(This()->FindModule("Logger"));
                 return true;
                 });

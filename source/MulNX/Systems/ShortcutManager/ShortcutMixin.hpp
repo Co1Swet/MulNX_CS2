@@ -9,7 +9,7 @@ namespace MulNX {
         ShortcutManager* pShortcutManager = nullptr;
     public:
         ShortcutMixin() {
-            This()->delayInits->push_back([this]() {
+            This()->preInits.push_back([this]() {
                 this->pShortcutManager = static_cast<ShortcutManager*>(This()->FindModule("ShortcutManager"));
                 return true;
                 });

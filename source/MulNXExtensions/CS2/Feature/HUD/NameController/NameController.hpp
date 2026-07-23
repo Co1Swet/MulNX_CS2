@@ -6,6 +6,9 @@ class NameController final :public CSModuleBase {
     std::map<uint64_t, int>nameReplaceInfo{};
     std::atomic<bool>noClantag = false;
 
+    std::unique_ptr<MulNX::Hook>hkGetDecoratedPlayerName = nullptr;
+    std::unique_ptr<MulNX::Hook>hkGetPlayerName = nullptr;
+
     std::string newNameBuffer;
     bool Init()override;
     void ProcessMsg(MulNX::Message& Msg)override;

@@ -5,11 +5,11 @@ bool AntiVoiceBan::Init() {
         auto target = this->CS2->client.GetTextRegion()
             .FindRegion(MulNX::CS2::Signatures::Sound::Func_ProcessVoiceBan).FindFuncStart().Data();
 
-        this->hkProcessVoiceBan = this->CreateHook("ProcessVoiceBan", target, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkProcessVoiceBan = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->r8 = 0;
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkProcessVoiceBan.Attach();
+        this->RegisterAttachHook(this->hkProcessVoiceBan, "ProcessVoiceBan");
         });
 
     return true;

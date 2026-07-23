@@ -123,7 +123,7 @@ module:
   inited: 初始化成功！
   send_ui: 将UI节点注册信息推送到了消息系统
   send_task: 消息推送：将任务 {} 注册到工作者 {}
-  deinited: 已关闭模块：{}
+  deinited: 模块已关闭！
 
 sys:
   inited_info: 所有模块初始化成功，模块总量：{}

@@ -83,7 +83,7 @@ bool TrailsController::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message&) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Projectile::Func_BaseCSGrenadeProjectile_DrawStuff).Data();
-        this->hkFunc_BaseCSGrenadeProjectile_DrawStuff = this->CreateHook("C_BaseCSGrenadeProjectile_DrawStuff", target, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkFunc_BaseCSGrenadeProjectile_DrawStuff = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pProjectile = (CS2::C_BaseCSGrenadeProjectile*)ctx->rcx;
             char flag = *(char*)&ctx->rdx;
             if (*pProjectile->m_nSnapshotTrajectoryEffectIndex() == -1)
@@ -91,12 +91,10 @@ bool TrailsController::Init() {
             hk->CallMaybeAs<DrawStuff_t>(pProjectile, flag);
             return this->HandleOnUpdate(pProjectile);
             }).value();
-        this->hkFunc_BaseCSGrenadeProjectile_DrawStuff.Attach();
+        this->RegisterAttachHook(this->hkFunc_BaseCSGrenadeProjectile_DrawStuff, "C_BaseCSGrenadeProjectile_DrawStuff");
 
         this->sv_grenade_trajectory_prac_pipreview = this->CS2Con->GetCVarByName("sv_grenade_trajectory_prac_pipreview")->GetPtr<bool>();
         this->sv_grenade_trajectory_time_spectator = this->CS2Con->GetCVarByName("sv_grenade_trajectory_time_spectator")->GetPtr<float>();
-
-        
         });
 
     (*this)

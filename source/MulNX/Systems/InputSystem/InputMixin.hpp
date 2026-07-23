@@ -3,15 +3,14 @@
 
 namespace MulNX {
     class InputSystem;
-    template<typename Derived>
+    template<typename T>
     class InputMixin {
+        T* This() { return static_cast<T*>(this); }
     public:
-        Derived* This() { return static_cast<Derived*>(this); }
-
         InputSystem* pInputSystem = nullptr;
         
         InputMixin() {
-            This()->delayInits->push_back([this]() {
+            This()->preInits.push_back([this]() {
                 this->pInputSystem = static_cast<InputSystem*>(This()->FindModule("InputSystem"));
                 return true;
                 });
