@@ -1,6 +1,7 @@
 #pragma once
 #include <Intro/CSController/CSController.hpp>
 #include <MulNXUtils/WinExt/HookMixin.hpp>
+#include <Intro/HookConsole/CSConMixin.hpp>
 
 class PlayerHub;
 class HookView;
@@ -19,7 +20,7 @@ public:
 };
 
 template <typename T>
-class CSModuleMixin : public ICSModule, public HookMixin<T> {
+class CSModuleMixin : public ICSModule, public HookMixin<T>, public CSConMixin<T> {
     class CS2Paths {
     public:
         // Counter-Strike Global Offensive

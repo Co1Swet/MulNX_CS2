@@ -1,13 +1,12 @@
 #include "GameSettingsManager.hpp"
-#include <MulNX/Base/UI/UI.hpp>
 
 bool GameSettingsManager::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.game_settings").c_str());
     
-    ImGui::Checkbox("作弊模式", this->settings.sv_cheats);
-    ImGui::SliderInt("FPS上限", this->settings.fps_max, 0, 1000);
-    ImGui::SliderFloat("游戏速度", this->settings.host_timescale, 0.001f, 10.000f);
-    ImGui::Checkbox("真实视角", this->settings.cl_demo_predict);
+    ConvarCheckbox<"sv_cheats">("作弊模式");
+    ConvarSliderFloat<"fps_max">("FPS上限", 0, 1000);
+    ConvarSliderFloat<"host_timescale">("游戏速度", 0.001f, 10.000f);
+    ConvarCheckbox<"cl_demo_predict">("真实视角");
 
     ImGui::SeparatorText("CS2控制台");
     if (ImGui::Button("解限所有CS2控制台变量")) {
@@ -39,25 +38,25 @@ bool GameSettingsManager::Window() {
 }
 
 bool GameSettingsManager::SoundMenu() {
-    ImGui::Checkbox("游戏窗口失去焦点时静音", this->settings.snd_mute_losefocus);
+    ConvarCheckbox<"snd_mute_losefocus">("游戏窗口失去焦点时静音");
 
     ImGui::SeparatorText("音乐设置");
-    ImGui::SliderFloat("主菜单音量", this->settings.snd_menumusic_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("回合开始音量", this->settings.snd_roundstart_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("回合开始行动音量", this->settings.snd_roundaction_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("回合结束音量", this->settings.snd_roundend_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("MVP音量", this->settings.snd_mvp_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("炸弹/人质音量", this->settings.snd_mapobjective_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("十秒警告音量", this->settings.snd_tensecondwarning_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::SliderFloat("死亡视角音量", this->settings.snd_deathcamera_volume, 0.0f, 1.0f, "%.2f");
-    ImGui::Checkbox("当双方团队成员都存活时关闭MVP音乐", this->settings.snd_mute_mvp_music_live_players);
+    ConvarSliderFloat<"snd_menumusic_volume">("主菜单音量", 0.0f, 1.0f);
+    ConvarSliderFloat<"snd_roundstart_volume">("回合开始音量", 0.0f, 1.0f);
+    ConvarSliderFloat<"snd_roundaction_volume">("回合开始行动音量", 0.0f, 1.0f);
+    ConvarSliderFloat<"snd_roundend_volume">("回合结束音量", 0.0f, 1.0f);
+    ConvarSliderFloat<"snd_mvp_volume">("MVP音量", 0.0f, 1.0f);
+    ConvarSliderFloat<"snd_mapobjective_volume">("炸弹/人质音量", 0.0f, 1.0f);
+    ConvarSliderFloat<"snd_tensecondwarning_volume">("十秒警告音量", 0.0f, 1.0f);
+    ConvarSliderFloat<"snd_deathcamera_volume">("死亡视角音量", 0.0f, 1.0f);
+    ConvarCheckbox<"snd_mute_mvp_music_live_players">("当双方团队成员都存活时关闭MVP音乐");
 
     return true;
 }
 
 bool GameSettingsManager::DofMenu() {
     ImGui::SeparatorText("景深控制");
-    ImGui::Checkbox("启用景深", this->settings.r_dof_override);
+    ConvarCheckbox<"r_dof_override">("启用景深");
 
     bool DOFChange = false;
     DOFChange |= ImGui::SliderFloat("聚焦距离", &this->FocusDistance, 0, 5000);
@@ -67,20 +66,20 @@ bool GameSettingsManager::DofMenu() {
         MulNX::Math::DOFParam Param;
         MulNX::Math::CalculateDOFParameters(this->FocusDistance, this->CrispRadius, this->BlurDistance, Param);
 
-        *this->settings.r_dof_override_near_blurry = Param.NearBlurry;// 近模糊
-        *this->settings.r_dof_override_near_crisp = Param.NearCrisp;// 近清晰
-        *this->settings.r_dof_override_far_crisp = Param.FarCrisp;// 远清晰
-        *this->settings.r_dof_override_far_blurry = Param.FarBlurry;// 远模糊
+        *this->r_dof_override_near_blurry = Param.NearBlurry;// 近模糊
+        *this->r_dof_override_near_crisp = Param.NearCrisp;// 近清晰
+        *this->r_dof_override_far_crisp = Param.FarCrisp;// 远清晰
+        *this->r_dof_override_far_blurry = Param.FarBlurry;// 远模糊
     }
 
     ImGui::SeparatorText("调整上方参数，自动计算并应用以下参数：");
 
-    ImGui::SliderFloat("r_dof_override_far_blurry", this->settings.r_dof_override_far_blurry, 0, 5000);
-    ImGui::SliderFloat("r_dof_override_far_crisp", this->settings.r_dof_override_far_crisp, 0, 5000);
-    ImGui::SliderFloat("r_dof_override_near_crisp", this->settings.r_dof_override_near_crisp, 0, 5000);
-    ImGui::SliderFloat("r_dof_override_near_blurry", this->settings.r_dof_override_near_blurry, 0, 5000);
+    ImGui::SliderFloat("r_dof_override_far_blurry", this->r_dof_override_far_blurry, 0, 5000);
+    ImGui::SliderFloat("r_dof_override_far_crisp", this->r_dof_override_far_crisp, 0, 5000);
+    ImGui::SliderFloat("r_dof_override_near_crisp", this->r_dof_override_near_crisp, 0, 5000);
+    ImGui::SliderFloat("r_dof_override_near_blurry", this->r_dof_override_near_blurry, 0, 5000);
     ImGui::Separator();
-    ImGui::SliderFloat("r_dof_override_tilt_to_ground", this->settings.r_dof_override_tilt_to_ground, 0, 5000);
+    ConvarSliderFloat<"r_dof_override_tilt_to_ground">("r_dof_override_tilt_to_ground", 0, 5000);
 
     return true;
 }
@@ -88,19 +87,19 @@ bool GameSettingsManager::DofMenu() {
 bool GameSettingsManager::GameHudMenu() {
     ImGui::SeparatorText("游戏HUD设置");
 
-    ImGui::Checkbox("显示HUD", this->settings.cl_drawhud);
-    ImGui::Checkbox("只渲染击杀信息", this->settings.cl_draw_only_deathnotices);
-    ImGui::SliderInt("展示FPS", this->settings.cl_showfps, 0, 3, "%d");
-    ImGui::SliderInt("展示Tick", this->settings.cl_showtick, 0, 3, "%d");
-    ImGui::SliderInt("TrueView控制", this->settings.cl_trueview_show_status, 0, 2);
-    ImGui::SliderInt("观战X光", this->settings.spec_show_xray, 0, 100);
+    ConvarCheckbox<"cl_drawhud">("显示HUD");
+    ConvarCheckbox<"cl_draw_only_deathnotices">("只渲染击杀信息");
+    ConvarSliderInt<"cl_showfps">("展示FPS", 0, 3);
+    ConvarSliderInt<"cl_showtick">("展示Tick", 0, 3);
+    ConvarSliderInt<"cl_trueview_show_status">("TrueView控制", 0, 2);
+    ConvarSliderInt<"spec_show_xray">("观战X光", 0, 100);
 
-    ImGui::Checkbox("强制雷达渲染", this->settings.cl_drawhud_force_radar);
-    ImGui::Checkbox("在观战时使用方形雷达", this->settings.cl_radar_square_when_spectating);
-    ImGui::Checkbox("永远使用方形雷达", this->settings.cl_radar_square_always);
-    ImGui::Checkbox("雷达在观战时显示所有人", this->settings.cl_radar_show_all_players_when_spectating);
+    ConvarCheckbox<"cl_drawhud_force_radar">("强制雷达渲染");
+    ConvarCheckbox<"cl_radar_square_when_spectating">("在观战时使用方形雷达");
+    ConvarCheckbox<"cl_radar_square_always">("永远使用方形雷达");
+    ConvarCheckbox<"cl_radar_show_all_players_when_spectating">("雷达在观战时显示所有人");
 
-    ImGui::Checkbox("准星", this->settings.crosshair);
+    ConvarCheckbox<"crosshair">("准星");
     if (ImGui::Button("切换Demo进度条UI显示")) {
         this->AsyncCommand("demoui");
     }
@@ -109,14 +108,18 @@ bool GameSettingsManager::GameHudMenu() {
 
 bool GameSettingsManager::Init() {
     this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
-        this->settings.Init(this->CS2Con);
 
-        *this->settings.cl_trueview_show_status = 0;
-        *this->settings.cl_radar_show_all_players_when_spectating = false;
-        *this->settings.cl_radar_square_always = false;
-        *this->settings.cl_radar_square_when_spectating = false;
-        *this->settings.cl_demo_predict = false;
-        *this->settings.cl_spec_show_bindings = false;
+        this->r_dof_override_near_blurry = this->CS2Con->GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
+        this->r_dof_override_near_crisp = this->CS2Con->GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
+        this->r_dof_override_far_crisp = this->CS2Con->GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
+        this->r_dof_override_far_blurry = this->CS2Con->GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
+
+        *this->CS2Con->GetCvar("cl_trueview_show_status")->GetPtr<int>() = 0;
+        *this->CS2Con->GetCvar("cl_radar_show_all_players_when_spectating")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCvar("cl_radar_square_always")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCvar("cl_radar_square_when_spectating")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCvar("cl_demo_predict")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCvar("cl_spec_show_bindings")->GetPtr<bool>() = false;
 
         this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
         this->UIRegisterCallback("UI.Sound", [this](auto&&...) {return this->SoundMenu();});
