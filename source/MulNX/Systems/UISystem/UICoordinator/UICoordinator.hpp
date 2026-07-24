@@ -21,7 +21,6 @@ namespace MulNX {
     public:
         void HandleUpdate();
         void Render();
-        void CallUINode(const std::string& name);
         void CallbackCall(uint64_t hash, Message* msg);
     };
 }

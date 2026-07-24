@@ -10,7 +10,7 @@ bool VirtualUser::Init() {
         .SubscribeAsync("Core/Tick60")
         .SubscribeAsync("Game/NewRound");
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {
+    this->UIRegisterCallback("UI.MulNXControl", [this](auto&&...) {
         MulNX::UI::Checkbox("启用自动化增强（Alt+O可快速切换）", this->Enabled);
         return true;
         });

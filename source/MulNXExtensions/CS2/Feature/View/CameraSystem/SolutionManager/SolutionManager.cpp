@@ -207,7 +207,6 @@ bool SolutionManager::Init() {
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
-    this->SendUINode("MenuSolution", [this](auto&&...) {return this->MenuSolution();});
 
     auto* PathManager = this->Path();
     if (PathManager->CreateKey("Solutions", "Solutions",

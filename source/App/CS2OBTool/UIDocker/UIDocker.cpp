@@ -12,8 +12,7 @@ void UIDocker::MainDraw(MulNX::UICoordinator* uico) {
     ImGui::End();
 
     ImGui::Begin(I18n("声音控制").c_str());
-    uico->CallUINode("SoundMenu");
-    uico->CallUINode("SpeakingController");
+    uico->CallbackCall("UI.Sound"_hash, nullptr);
     ImGui::End();
 
     ImGui::Begin(I18n("2D视觉").c_str());
@@ -28,22 +27,7 @@ void UIDocker::MainDraw(MulNX::UICoordinator* uico) {
     uico->CallbackCall("UI.3DVision"_hash, nullptr);
     ImGui::End();
 
-    ImGui::Begin(I18n("镜头参数").c_str());
-    uico->CallUINode("HookView");
-    uico->CallUINode("FreeCameraController");
-    uico->CallUINode("DofMenu");
-    ImGui::End();
-
     ImGui::Begin(I18n("视角视图").c_str());
     uico->CallbackCall("UI.View"_hash, nullptr);
-    ImGui::End();
-
-    ImGui::Begin(I18n("ui.game_settings").c_str());
-    uico->CallUINode("GameSettingsManager");
-    ImGui::End();
-
-    ImGui::Begin(I18n("ui.mulnx_control").c_str());
-    uico->CallUINode("VirtualUser");
-    uico->CallUINode("MulNXController");
     ImGui::End();
 }

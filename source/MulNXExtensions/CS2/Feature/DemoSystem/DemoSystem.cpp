@@ -8,7 +8,6 @@ bool DemoSystem::Window(MulNX::UICoordinator* uico) {
     if (!w) return true;
 
     uico->CallbackCall("UI.Demos"_hash, nullptr);
-    uico->CallUINode("DemoRecorder");
 
     std::unique_lock lock(this->smutex);
 

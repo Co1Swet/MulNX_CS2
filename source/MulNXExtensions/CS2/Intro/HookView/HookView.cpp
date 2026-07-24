@@ -3,7 +3,11 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 
-bool HookView::Menu() {
+void HookView::Window(MulNX::UICoordinator* uico) {
+    auto w = MulNX::UI::RAIIWindow(I18n("镜头参数").c_str());
+    if (!w)return;
+
+    uico->CallbackCall("UI.CameraSetting"_hash, nullptr);
 
     MulNX::UI::SliderFloat("roll调整", this->controlView.InputRoll, -179.99f, 179.99f);
     static auto* pGlobalFOV = this->CS2Con->GetCvar("fov_cs_debug")->GetPtr<float>();
@@ -12,7 +16,6 @@ bool HookView::Menu() {
         this->controlView.InputRoll.store(0, std::memory_order_release);
         *pGlobalFOV = 0;
     }
-    return true;
 }
 
 bool HookView::Init() {
@@ -30,14 +33,10 @@ bool HookView::Init() {
             }, true).value();
         this->RegisterAttachHook(this->hkPosCallIsPlayingDemo, "Pos_CViewRenderer_VFuncsSubFunc_MaybeWriteView_CallIsPlayingDemo where r14 is *CViewSetup");
 
-        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+        this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
         });
 
     return true;
-}
-
-void HookView::HandleCameraSystemPlay(CS2::CViewSetup* viewSetup) {
-
 }
 
 void HookView::HandleOverrideView(CS2::CViewSetup* viewSetup) {
@@ -53,7 +52,6 @@ void HookView::HandleOverrideView(CS2::CViewSetup* viewSetup) {
     viewSetup->pViewAngles()->z = this->controlView.InputRoll.load(std::memory_order_acquire);
 
     int num = 0;
-    this->HandleCameraSystemPlay(viewSetup);
     for (auto& viewCtrlModule : this->viewControlModules) {
         if (viewCtrlModule->HandleUpdate(viewSetup, num))++num;
     }

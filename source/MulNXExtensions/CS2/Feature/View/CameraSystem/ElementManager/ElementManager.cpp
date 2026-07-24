@@ -114,7 +114,6 @@ bool ElementManager::Init() {
     this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
-    this->SendUINode("MenuElement", [this](auto&&...) {return this->MenuElement();});
 
     auto* PathManager = this->Path();
     if (PathManager->CreateKey("Elements", "Elements",

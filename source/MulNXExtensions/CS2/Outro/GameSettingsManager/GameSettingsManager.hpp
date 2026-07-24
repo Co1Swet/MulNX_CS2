@@ -75,15 +75,13 @@ struct C_GameSettings {
 #undef GAME_SETTINGS_CVARS
 
 class GameSettingsManager final :public CSModuleBase {
-private:
     float FocusDistance;
     float CrispRadius;
     float BlurDistance;
     C_GameSettings settings{};
-    bool Menu();
+    bool Window();
     bool SoundMenu();
     bool DofMenu();
     bool GameHudMenu();
-public:
     bool Init()override;
 };

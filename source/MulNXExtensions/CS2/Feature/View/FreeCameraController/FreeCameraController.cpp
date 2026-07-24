@@ -22,7 +22,7 @@ void FreeCameraController::Menu() {
 bool FreeCameraController::Init() {
     this->kMovUp = this->Shortcut()->GetButton("CamMovUp").value();
     this->kMovDown = this->Shortcut()->GetButton("CamMovDown").value();
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {return this->Menu();});
     this->SubscribeAsync<void>("FreeCamCtrl/Toggle");
     return true;
 }

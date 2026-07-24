@@ -15,10 +15,9 @@ void MulNX::UICoordinator::Window() {
 
     ImGui::Separator();
 
-    if (ImGui::BeginTable("Nodes", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+    if (ImGui::BeginTable("Nodes", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
         ImGui::TableSetupColumn("Index", ImGuiTableColumnFlags_WidthFixed, 50.0f);
         ImGui::TableSetupColumn("Name");
-        ImGui::TableSetupColumn("Root");
         ImGui::TableSetupColumn("Actions");
         ImGui::TableHeadersRow();
 
@@ -33,9 +32,6 @@ void MulNX::UICoordinator::Window() {
             ImGui::TextUnformatted(displayNode.name.c_str());
 
             ImGui::TableSetColumnIndex(2);
-            ImGui::Text("%s", displayNode.drawAsARoot ? "Yes" : "No");
-
-            ImGui::TableSetColumnIndex(3);
             ImGui::PushID(static_cast<int>(i));
 
             // 上移按钮
@@ -64,7 +60,13 @@ void MulNX::UICoordinator::Window() {
         }
         ImGui::EndTable();
     }
-    this->CallUINode("UISystem");
+
+    ImGui::Text(I18n("ui.style.info").c_str());
+    if (ImGui::Button(I18n("ui.style.save").c_str())) {
+        this->PublishAsync("UISystem/SaveStyle"_hash);
+    }
+    ImGui::Separator();
+    ImGui::ShowStyleEditor();
 }
 
 bool MulNX::UICoordinator::Init() {
@@ -72,7 +74,7 @@ bool MulNX::UICoordinator::Init() {
         .SubscribeAsync("UISystem/ModulePush")
         .SubscribeAsync("UISystem/UICallback")
         .SubscribeAsync("UINode/Swap");     // 订阅交换消息
-    // 向 UISystem 注册本模块的根窗口回调
+
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
     return true;
 }
@@ -164,16 +166,7 @@ void MulNX::UICoordinator::Render() {
     ImGui::PopStyleVar(2);
 
     for (auto& node : UINodes) {
-        if (node.drawAsARoot) {
-            node.Render(this, nullptr);
-        }
-    }
-}
-
-void MulNX::UICoordinator::CallUINode(const std::string& name) {
-    auto it = this->nameToIndex.find(name);
-    if (it != this->nameToIndex.end()) {
-        this->UINodes[it->second].Render(this, nullptr);
+        node.Render(this, nullptr);
     }
 }
 

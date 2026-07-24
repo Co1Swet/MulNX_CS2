@@ -12,7 +12,7 @@ bool SpeakingController::Init() {
         return;
         });
     this->participateIt = true;
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.Sound", [this](auto&&...) {return this->Menu();});
     return true;
 }
 void SpeakingController::OnItBegin() {

@@ -1,7 +1,9 @@
 #include "GameSettingsManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool GameSettingsManager::Menu() {    
+bool GameSettingsManager::Window() {
+    auto w = MulNX::UI::RAIIWindow(I18n("ui.game_settings").c_str());
+    
     ImGui::Checkbox("作弊模式", this->settings.sv_cheats);
     ImGui::SliderInt("FPS上限", this->settings.fps_max, 0, 1000);
     ImGui::SliderFloat("游戏速度", this->settings.host_timescale, 0.001f, 10.000f);
@@ -116,9 +118,9 @@ bool GameSettingsManager::Init() {
         *this->settings.cl_demo_predict = false;
         *this->settings.cl_spec_show_bindings = false;
 
-        this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
-        this->SendUINode("SoundMenu", [this](auto&&...) {return this->SoundMenu();});
-        this->SendUINode("DofMenu", [this](auto&&...) {return this->DofMenu();});
+        this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
+        this->UIRegisterCallback("UI.Sound", [this](auto&&...) {return this->SoundMenu();});
+        this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {return this->DofMenu();});
         this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->GameHudMenu();});
         return false;
         });

@@ -7,16 +7,6 @@
 #include <Windows.h>
 #include <fstream>
 
-bool MulNX::UISystem::Menu() {
-    ImGui::Text(I18n("ui.style.info").c_str());
-    if (ImGui::Button(I18n("ui.style.save").c_str())) {
-        this->PublishAsync("UISystem/SaveStyle"_hash);
-    }
-    ImGui::Separator();
-    ImGui::ShowStyleEditor();
-    return true;
-}
-
 bool MulNX::UISystem::Init() {
     this->pCoordinator = this->FindModule<UICoordinator>("UICoordinator");
 
@@ -35,8 +25,6 @@ bool MulNX::UISystem::Init() {
         .SubscribeAsync("UISystem/Start")
         .SubscribeAsync("UISystem/Toggle")
         .SubscribeAsync("UISystem/SaveStyle");
-
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Menu();});
 
     return true;
 }

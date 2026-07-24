@@ -114,7 +114,6 @@ bool ProjectManager::Init() {
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
-    this->SendUINode("MenuProject", [this](auto&&...) {return this->MenuProject();});
 
     auto* PathManager = this->Path();
     if (PathManager->CreateKey("CurrentProject", {},

@@ -3,9 +3,10 @@
 #include <MulNX/Systems/Debugger/Debugger.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-bool MulNXController::UINodeFunc(MulNX::UICoordinator* uico) {
+bool MulNXController::Window(MulNX::UICoordinator* uico) {
+    auto w = MulNX::UI::RAIIWindow(I18n("ui.mulnx_control").c_str());
     MulNX::UI::Checkbox("调试模式（Debug Mode），提供更多功能，但可能影响性能和稳定性", this->pGlobalVars->DebugMode);
-    uico->CallUINode("DeDebugger");
+    uico->CallbackCall("UI.MulNXControl"_hash, nullptr);
     if (ImGui::Button("尝试拉取所有模块信息")) {
         MulNX::Message Msg("ModuleManager/ModuleInfo/Request"_hash);
         this->PublishAsync(std::move(Msg));
@@ -23,7 +24,9 @@ bool MulNXController::UINodeFunc(MulNX::UICoordinator* uico) {
 bool MulNXController::Init() {
     (*this)
         .SubscribeAsync("ModuleManager/ModuleInfo/Response");
-    this->SendUINode(this->GetName(), [this](auto uico, auto&&...) {return this->UINodeFunc(uico);});
+    
+    this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
+
     this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();
         return true;

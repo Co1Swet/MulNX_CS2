@@ -26,12 +26,11 @@ class HookView final :public CSModuleBase {
     // 视角控制钩子
     std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo{};
     ControlView controlView{};
-    void HandleCameraSystemPlay(CS2::CViewSetup* viewSetup);
     void HandleOverrideView(CS2::CViewSetup* viewSetup);
 
-    bool Menu();
-public:
+    void Window(MulNX::UICoordinator* uico);
     bool Init()override;
+public:
     std::vector<ICSViewControlModule*>viewControlModules{};
     float GetWinWidth()const;
     float GetWinHeight()const;

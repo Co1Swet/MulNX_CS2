@@ -6,7 +6,7 @@
 bool CameraSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.camera_system").c_str());
     std::shared_lock lock(this->smutex);
-    uico->CallUINode("MenuWorkspace");
+    this->WManager->MenuWorkspace();
 
     if (!this->WManager->InWorkspace) {
         // 如果不在工作区，显示提示信息
@@ -43,21 +43,21 @@ bool CameraSystem::Window(MulNX::UICoordinator* uico) {
         ImGui::Separator();
         switch (SelectedTab) {
         case 0:// 项目菜单
-            uico->CallUINode("MenuProject");
+            this->PManager->MenuProject();
             break;
         case 1:// 解决方案菜单
             if (!InProject) {
                 ImGui::Text(I18n("camsys.please_enter_proj").c_str());
                 break;
             }
-            uico->CallUINode("MenuSolution");
+            this->SManager->MenuSolution();
             break;
         case 2:// 元素菜单
             if (!InProject) {
                 ImGui::Text(I18n("camsys.please_enter_proj").c_str());
                 break;
             }
-            uico->CallUINode("MenuElement");
+            this->EManager->MenuElement();
             break;
         }
     }

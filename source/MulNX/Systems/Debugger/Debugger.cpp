@@ -79,7 +79,7 @@ bool MulNX::Debugger::Init() {
     this->pLogger = this->Core->ModuleManager()->FindModule<MulNX::Logger>("Logger");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
-    this->SendUINode("DeDebugger", [this](auto&&...) {return this->DeMe();});
+    this->UIRegisterCallback("UI.MulNXControl", [this](auto&&...) {return this->DeMe();});
 
     this->SendTask("Main", "MulNXMain", [this]()->bool {
         this->Main();

@@ -10,8 +10,4 @@ void UIDocker::MainDraw(MulNX::UICoordinator* uico) {
     ImGui::Begin(I18n("ui.main").c_str());
     ImGui::Text(I18n("homepage").c_str());
     ImGui::End();
-
-    ImGui::Begin(I18n("ui.mulnx_control").c_str());
-    uico->CallUINode("MulNXController");
-    ImGui::End();
 }

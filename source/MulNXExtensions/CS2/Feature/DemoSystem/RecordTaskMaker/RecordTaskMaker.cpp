@@ -5,7 +5,6 @@
 
 bool RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("录制任务创建");
-    uico->CallUINode("DemoJSONReader");
     MulNX::UI::SmartButton btn{};
 
     std::shared_lock lock(this->smutex);

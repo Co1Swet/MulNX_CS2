@@ -5,13 +5,12 @@
 #include <nlohmann/json.hpp>
 
 bool DemoJSONReader::Window() {
-    
     std::shared_lock lock(this->smutex, std::defer_lock);
     if (this->smutex.try_lock_shared()) {
         lock = std::shared_lock(this->smutex, std::adopt_lock);
     }
     else {
-        ImGui::Text("正在读取...");
+        ImGui::Text("正在读取JSON文件，请稍候...");
         return true;
     }
 
@@ -22,7 +21,7 @@ bool DemoJSONReader::Init() {
     this->dirData = this->Path()->PathGetForShared("Data");
     this->SubscribeAsync("Demo/JSON/Load");
 
-    this->SendUINode(this->GetName(), [this](auto&&...) {return this->Window();});
+    this->UIRegisterCallback("UI.Demos", [this](auto&&...) {return this->Window();});
 
     this->SendTask("Update", "DemoSys", [this]()->bool {
         this->Update();
