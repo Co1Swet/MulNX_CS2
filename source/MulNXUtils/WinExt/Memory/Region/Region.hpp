@@ -1,7 +1,7 @@
 #pragma once
-
 #include "../Pattern/Pattern.hpp"
 #include <Windows.h>
+#include <source_location>
 
 namespace MulNX {
     namespace Memory {
@@ -30,7 +30,7 @@ namespace MulNX {
             DWORD protection() const { return Protection; }
             bool TryResize(size_t NewSize);
 
-            Region FindRegion(const Pattern& pattern)const;
+            Region FindRegion(const Pattern& pattern, std::source_location loc = std::source_location::current())const;
 
             Region FindFuncStart();
         };

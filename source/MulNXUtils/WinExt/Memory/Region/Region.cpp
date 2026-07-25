@@ -42,7 +42,7 @@ bool MulNX::Memory::Region::TryResize(size_t NewSize) {
     return true;
 }
 
-MulNX::Memory::Region MulNX::Memory::Region::FindRegion(const Pattern& pattern) const {
+MulNX::Memory::Region MulNX::Memory::Region::FindRegion(const Pattern& pattern, std::source_location loc) const {
     for (const uint8_t* Current = this->Begin(); Current < this->End();) {
         auto FoundHead = this->FindHead(Current, *pattern.First());
         if (!FoundHead.has_value()) {
@@ -56,7 +56,7 @@ MulNX::Memory::Region MulNX::Memory::Region::FindRegion(const Pattern& pattern) 
         Current = FoundHead.value() + 1;
     }
 #ifdef MULNX_STRICT
-    MulNX::ErrorTerminate("找不到地址");
+    MulNX::ErrorTerminate("找不到地址", loc);
 #endif
     return Region::InValid();//未找到匹配
 }

@@ -22,6 +22,9 @@ void MulNX::ErrorTerminate(const std::string& Msg,
         << "\n列号: " << loc.column()
         << "\n\n";
 
+    oss << "版本号： " << MulNXVersion
+        << "\n";
+
     oss << "MulNX将在您点击确定后关闭当前进程";
 
     std::string Full = oss.str();
