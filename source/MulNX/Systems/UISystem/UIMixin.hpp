@@ -19,6 +19,12 @@ namespace MulNX {
             This()->PublishAsync(std::move(msg));
             This()->LogInfo(I18n("module.send_ui"));
         }
+        void UIRegisterBackground(std::string&& name, std::function<void(UICoordinator*, Message*)>&& func) {
+            auto [msg, rp] = this->CreateUINode(std::move(name), std::move(func));
+            msg.type = "UISystem/ModulePush/Background"_hash;
+            This()->PublishAsync(std::move(msg));
+            This()->LogInfo(I18n("module.send_ui") + " 并作为背景");
+        }
         void UIRegisterCallback(const char* name, std::function<void(UICoordinator*, Message*)>&& func) {
             MulNX::UINode UINode = MulNX::UINode::Create(This());
             UINode.name = std::string(name);

@@ -27,7 +27,7 @@ bool MediaRecorder::Init() {
         .SubscribeAsync("Media/Record/Stop");
 
     this->SendTask("Main", "Media", [this]() { this->Main(); return true; });
-    this->SendUIRoot("捕获以上所有根触发的UI渲染", [this](auto&&...) { return this->CaptureCallback(); });
+    this->UIRegisterBackground("捕获以上所有根触发的UI渲染", [this](auto&&...) { return this->CaptureCallback(); });
     return true;
 }
 

@@ -61,14 +61,14 @@ void MulNX::UISystem::HandleUpdate() {
     }
 }
 int MulNX::UISystem::Render() {
-    if (!this->runFlag2.load()) {
+    if (!this->runFlag1.load()) {
         this->WantCaptureMouse.store(false, std::memory_order_release);
         this->WantTextInput.store(false, std::memory_order_release);
         return 0;
     }
     
-    if (!this->FrameBefore())return 0;
-    this->pCoordinator->Render();
+    this->FrameBefore();
+    this->pCoordinator->Render(this->runFlag2.load(std::memory_order_acquire));
     this->FrameBehind();
 
     ImGuiIO& io = ImGui::GetIO();

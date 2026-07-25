@@ -36,6 +36,7 @@ add_library(MulNX
     Systems/UISystem/UISystem.cpp
     Systems/UISystem/UINode/UINode.cpp
     Systems/UISystem/UICoordinator/UICoordinator.cpp
+    Systems/UISystem/UICoordinator/UIPack/UIPack.cpp
 )
 target_link_libraries(MulNX PUBLIC
     MulNXThirdParty
