@@ -22,14 +22,12 @@ void VideoCapturer::Reset() {
     this->readbackBuf.clear();
     this->readbackBuf.shrink_to_fit();
     this->recordStartTime.reset();
-    this->hwCapture = false;
     this->runFlag1.store(false);
 }
 
-void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime, bool hwPath) {
+void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
     std::unique_lock lock(this->smutex);
     this->recordStartTime = startTime;
-    this->hwCapture = hwPath;
     this->runFlag1.store(true, std::memory_order_release);
 }
 
@@ -51,11 +49,11 @@ std::optional<av::VideoFrame> VideoCapturer::TryPop() {
 void VideoCapturer::Captuer() {
     this->Update();
     if (!this->runFlag1.load(std::memory_order_acquire)) {
-        if (this->pVCD3D11Manager) this->pVCD3D11Manager->runFlag1.store(false, std::memory_order_release);
+        this->pVCD3D11Manager->runFlag1.store(false, std::memory_order_release);
         return;
     }
-    if (this->pVCD3D11Manager) this->pVCD3D11Manager->runFlag1.store(true, std::memory_order_release);
-    if (!this->pVCD3D11Manager || !this->pVCD3D11Manager->ringReady.load(std::memory_order_acquire)) return;
+    this->pVCD3D11Manager->runFlag1.store(true, std::memory_order_release);
+    if (!this->pVCD3D11Manager->ringReady.load(std::memory_order_acquire)) return;
 
     std::unique_lock lock(this->smutex);
     int readIdx = this->pVCD3D11Manager->readIdx.load(std::memory_order_acquire);
@@ -67,7 +65,7 @@ void VideoCapturer::Captuer() {
         slot.captureTime.load(std::memory_order_acquire) - *this->recordStartTime).count();
     if (ptsUs < 0) ptsUs = 0;
 
-    bool ok = this->hwCapture ? this->ReadbackHw(readIdx, ptsUs) : this->ReadbackSw(readIdx, ptsUs);
+    bool ok = this->ReadbackSw(readIdx, ptsUs);
     // ReadbackSw/ReadbackHw 内部已在 ReleaseSync(0) 前完成 hasNewFrame=false 和 readIdx 推进
 }
 
@@ -118,29 +116,5 @@ bool VideoCapturer::ReadbackSw(int slotIdx, int64_t ptsUs) {
     frame.setTimeBase({ 1, 1000000 });
     frame.setPts(av::Timestamp(ptsUs, frame.timeBase()));
     this->buffer.enqueue(std::move(frame));
-    return true;
-}
-
-bool VideoCapturer::ReadbackHw(int slotIdx, int64_t ptsUs) {
-    RingSlot& slot = this->pVCD3D11Manager->ring[slotIdx];
-    if (!this->pVEncodeHelper || !this->pVEncodeHelper->IsHwAccel()) return false;
-
-    auto ohwf = this->pVEncodeHelper->AllocHwFrame();
-    if (!ohwf) return false;
-
-    ID3D11Texture2D* poolTex = reinterpret_cast<ID3D11Texture2D*>(ohwf->raw()->data[0]);
-    if (!poolTex) return false;
-
-    // 持有共享纹理（key=1 可读），将捕获纹理拷入帧池纹理
-    slot.shareTex.pMutex->AcquireSync(1, INFINITE);
-    this->pVCD3D11Manager->pContext->CopyResource(poolTex, slot.shareTex.pTex.Get());
-    slot.hasNewFrame.store(false, std::memory_order_release);
-    this->pVCD3D11Manager->readIdx.store(
-        (slotIdx + 1) % this->pVCD3D11Manager->ringCapacity, std::memory_order_release);
-    slot.shareTex.pMutex->ReleaseSync(0);
-
-    ohwf->setTimeBase({ 1, 1000000 });
-    ohwf->setPts(av::Timestamp(ptsUs, ohwf->timeBase()));
-    this->buffer.enqueue(std::move(*ohwf));
     return true;
 }

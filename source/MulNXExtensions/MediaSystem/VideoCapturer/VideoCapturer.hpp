@@ -17,18 +17,15 @@ class VideoCapturer final :public MediaModuleBase {
     av::PixelFormat srcPixelFormat = AV_PIX_FMT_NONE;
     std::vector<uint8_t> readbackBuf;
 
-    bool hwCapture = false;   // 是否走 hw 零拷贝路径
-
     void ReleaseStagingTexture();
     void Captuer();
     bool ReadbackSw(int slotIdx, int64_t ptsUs);
-    bool ReadbackHw(int slotIdx, int64_t ptsUs);
 
 public:
     bool Init()override;
     void Reset();
     void ClearBuffer();
-    void StartCapture(const std::chrono::steady_clock::time_point& startTime, bool hwPath);
+    void StartCapture(const std::chrono::steady_clock::time_point& startTime);
     void StopCapture();
     std::optional<av::VideoFrame> TryPop();
 };

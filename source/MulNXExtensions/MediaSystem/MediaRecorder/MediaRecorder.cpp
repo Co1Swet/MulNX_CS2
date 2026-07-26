@@ -79,12 +79,10 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->ofctx.writeHeader();
         this->LogInfo(std::format("输出头已写入, 流数={}", this->ofctx.streamsCount()));
 
-        bool hwPath = this->pVEncodeHelper->IsHwAccel();
-        this->pVideoCapturer->StartCapture(this->recordStartTime, hwPath);
-        this->LogSucc(std::format("开始录制: {} ({}x{} {}{})", outFile,
+        this->pVideoCapturer->StartCapture(this->recordStartTime);
+        this->LogSucc(std::format("开始录制: {} ({}x{})", outFile,
             rp.width > 0 ? rp.width : srcW, rp.height > 0 ? rp.height : srcH,
-            rp.captureFpsCap > 0 ? std::to_string(rp.captureFpsCap) + "fps " : "",
-            hwPath ? "零拷贝" : "CPU读回"));
+            rp.captureFpsCap > 0 ? std::to_string(rp.captureFpsCap) + "fps " : ""));
         this->runFlag1 = true;
         return true;
     }

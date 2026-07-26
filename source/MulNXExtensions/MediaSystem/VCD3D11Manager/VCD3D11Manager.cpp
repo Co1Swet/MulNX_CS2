@@ -15,10 +15,6 @@ void VCD3D11Manager::SetCaptureFpsCap(int cap) {
     if (cap > 0) this->minIntervalUs = 1'000'000 / cap;
 }
 
-void VCD3D11Manager::SetRingCapacity(int n) {
-    if (n >= 2) this->ringCapacity = n;
-}
-
 void VCD3D11Manager::SetRecordStart(std::chrono::steady_clock::time_point t) {
     this->recordStartTime = t;
     this->lastSlot = -1;

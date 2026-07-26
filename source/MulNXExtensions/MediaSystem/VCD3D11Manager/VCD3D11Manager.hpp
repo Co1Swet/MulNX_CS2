@@ -1,7 +1,5 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
-#include <atomic>
-#include <vector>
 
 class MidTex {
 public:
@@ -71,6 +69,5 @@ public:
     DXGI_FORMAT srcDxgiFormat = DXGI_FORMAT_UNKNOWN;
 
     void SetCaptureFpsCap(int cap);
-    void SetRingCapacity(int n);
     void SetRecordStart(std::chrono::steady_clock::time_point t);
 };
