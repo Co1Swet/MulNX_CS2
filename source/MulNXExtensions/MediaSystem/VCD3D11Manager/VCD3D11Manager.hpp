@@ -48,9 +48,8 @@ class VCD3D11Manager final : public MediaModuleBase {
     void CopyTexture();
     bool CreateSlot(const D3D11_TEXTURE2D_DESC& desc, RingSlot& slot);
 
-public:
     bool Init() override;
-
+public:
     // 环形队列
     std::vector<RingSlot> ring;
     int ringCapacity = 6;

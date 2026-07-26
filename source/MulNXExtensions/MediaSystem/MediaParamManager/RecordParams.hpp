@@ -21,13 +21,4 @@ struct RecordParams {
     int  width              = 0;           // 0=原生
     int  height             = 0;           // 0=原生
     int  captureFpsCap      = 60;          // 0=不限制
-    int  ringSlots          = 6;
 };
-
-struct EncoderCaps {
-    std::vector<std::string> hwEncoders;
-    std::vector<std::string> swEncoders;
-    bool d3d11vaAvailable = false;
-};
-
-EncoderCaps DetectEncoderCaps();

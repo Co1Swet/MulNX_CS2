@@ -40,10 +40,6 @@ bool MediaSystem::Window() {
 void MediaSystem::RecordParamsUI() {
     if (!this->pMediaParamManager) return;
     RecordParams& p = this->pMediaParamManager->Params();
-    const EncoderCaps& caps = this->pMediaParamManager->Caps();
-
-    ImGui::TextDisabled("编码器");
-    ImGui::Text("硬编:%d  软编:%d", (int)caps.hwEncoders.size(), (int)caps.swEncoders.size());
 
     const char* modes[] = { "自动", "H264", "HEVC" };
     int mi = (int)p.mode;

@@ -1,5 +1,4 @@
 #include "VCD3D11Manager.hpp"
-#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 
 bool VCD3D11Manager::Init() {
     this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
@@ -122,12 +121,9 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         static_cast<unsigned>(bbDesc.Format),
         static_cast<unsigned>(rtvDesc.Format)));
 
-    // 创建环形队列（容量优先取自 MediaParamManager，未找到则用默认）
+    // 创建环形队列
     int n = this->ringCapacity;
-    auto* params = this->FindModule<MediaParamManager>("MediaParamManager");
-    if (params && params->Params().ringSlots >= 2) {
-        n = params->Params().ringSlots;
-    }
+
     if (n < 2) n = 6;
     this->ring.clear();
     this->ring.resize(n);
