@@ -1,5 +1,5 @@
 #include "VideoCapturer.hpp"
-#include <MulNXExtensions/MediaSystem/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
 
 bool VideoCapturer::Init() {

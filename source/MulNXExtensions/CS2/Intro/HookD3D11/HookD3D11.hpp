@@ -4,7 +4,7 @@
 #include <MulNXUtils/MemInsights/RetEditor/RetEditor.hpp>
 
 class HookD3D11 final : public MulNX::Module<HookD3D11>, public HookMixin<HookD3D11> {
-    MulNX::Memory::DllModule gameoverlayrenderer64{};
+    MulNX::Memory::DllModule rendersystemdx11{};
 
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;

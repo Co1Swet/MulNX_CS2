@@ -1,10 +1,10 @@
 #include "MediaRecorder.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/MediaSystem/VideoCapturer/VideoCapturer.hpp>
+#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <MulNXExtensions/MediaSystem/Videos/VideoCapturer/VideoCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
-#include <MulNXExtensions/MediaSystem/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 
 void MediaRecorder::CaptureCallback() {
@@ -44,9 +44,6 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 
 bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
     if (this->runFlag1) { this->LogWarning("已在录制中"); return false; }
-    if (!this->pVCD3D11Manager || !this->pVideoCapturer || !this->pVEncodeHelper) {
-        this->LogError("模块缺失"); return false;
-    }
 
     RecordParams rp;
     if (this->pMediaParamManager) rp = this->pMediaParamManager->Params();

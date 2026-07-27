@@ -7,7 +7,7 @@ namespace MulNX {
         namespace Signatures {
             inline const static MulNX::Memory::Pattern Pos_CViewRenderer_VFuncsSubFunc_MaybeWriteView_CallIsPlayingDemo("48 8b 0d ?? ?? ?? ?? 48 8b 01 ff 90 50 01 00 00 0f 57 ff 84 c0 74 57 ba ff ff ff ff");
             namespace Render {
-                inline const static MulNX::Memory::Pattern CSHashString("FF D0 8B F0 48 85 FF 74 2A");
+                inline const static MulNX::Memory::Pattern Pos_Call_Present("FF 50 40 80 7C 24 ?? 00 44 8B E0 74 10");
             }
             namespace Utils {
                 inline const static MulNX::Memory::Pattern CSHashString("48 83 EC 28 45 8B D0 4C 8B C9 48 83 FA 04 0F 82 ?? ?? ?? ?? 0F B6 09 48 89 5C 24 20 8D 41 BF 3C 19 77 03 80 C1 20");

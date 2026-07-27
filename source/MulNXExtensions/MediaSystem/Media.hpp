@@ -1,10 +1,9 @@
 #pragma once
 #include "MediaSystem.hpp"
-#include "VCD3D11Manager/VCD3D11Manager.hpp"
 #include "MediaRecorder/MediaRecorder.hpp"
 #include "MediaProcesser/MediaProcesser.hpp"
-#include "VideoCapturer/VideoCapturer.hpp"
 #include "VEncodeHelper/VEncodeHelper.hpp"
 #include "AudioCapturer/AudioCapturer.hpp"
 #include "AEncodeHelper/AEncodeHelper.hpp"
 #include "MediaParamManager/MediaParamManager.hpp"
+#include "Videos/Videos.hpp"

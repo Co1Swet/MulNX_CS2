@@ -7,9 +7,9 @@ bool HookD3D11::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
-    this->SubscribeSync("Hook/LoadLibraryExW/gameoverlayrenderer64.dll", [this](MulNX::Message& msg) {
-        this->gameoverlayrenderer64 = MulNX::Memory::DllModule(L"gameoverlayrenderer64.dll");
-        auto target = this->gameoverlayrenderer64.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Render::CSHashString).Data();
+    this->SubscribeSync("Hook/LoadLibraryExW/rendersystemdx11.dll", [this](MulNX::Message& msg) {
+        this->rendersystemdx11 = MulNX::Memory::DllModule(L"rendersystemdx11.dll");
+        auto target = this->rendersystemdx11.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Render::Pos_Call_Present).Data();
 
         this->hkPosCallPresent = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             
