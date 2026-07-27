@@ -1,10 +1,12 @@
 #include "VideoCapturer.hpp"
 #include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <MulNXExtensions/MediaSystem/Videos/BufferCopier/BufferCopier.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
 
 bool VideoCapturer::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->pVEncodeHelper  = this->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->pBufferCopier = this->FindModule<BufferCopier>("BufferCopier");
     this->SendTask("Capture", "Capture", [this]() -> bool { this->Captuer(); return true; });
     return true;
 }
@@ -49,20 +51,25 @@ std::optional<av::VideoFrame> VideoCapturer::TryPop() {
 void VideoCapturer::Captuer() {
     this->Update();
     if (!this->runFlag1.load(std::memory_order_acquire)) {
-        this->pVCD3D11Manager->runFlag1.store(false, std::memory_order_release);
+        this->pBufferCopier->runFlag1.store(false, std::memory_order_release);
         return;
     }
-    this->pVCD3D11Manager->runFlag1.store(true, std::memory_order_release);
-    if (!this->pVCD3D11Manager->ringReady.load(std::memory_order_acquire)) return;
+    this->pBufferCopier->runFlag1.store(true, std::memory_order_release);
 
     std::unique_lock lock(this->smutex);
-    int readIdx = this->pVCD3D11Manager->readIdx.load(std::memory_order_acquire);
-    RingSlot& slot = this->pVCD3D11Manager->ring[readIdx];
-    if (!slot.hasNewFrame.load(std::memory_order_acquire)) return;
+    int readIdx;
+    if (auto h = this->pVCD3D11Manager->TryGetReadSide()) {
+        readIdx = h.value();
+    }
+    else return;
+
+    scope_exit([&]() {this->pVCD3D11Manager->ReleaseReadSide(readIdx);});
+
+    auto& slot = this->pVCD3D11Manager->ring[readIdx].shareTex;
     if (!this->recordStartTime.has_value()) return;
 
     int64_t ptsUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        slot.captureTime.load(std::memory_order_acquire) - *this->recordStartTime).count();
+        slot.captureTime->load(std::memory_order_acquire) - *this->recordStartTime).count();
     if (ptsUs < 0) ptsUs = 0;
 
     bool ok = this->ReadbackSw(readIdx, ptsUs);
@@ -84,7 +91,7 @@ bool VideoCapturer::ReadbackSw(int slotIdx, int64_t ptsUs) {
         sd.Width = desc.Width; sd.Height = desc.Height; sd.MipLevels = sd.ArraySize = 1;
         sd.Format = desc.Format; sd.SampleDesc.Count = 1;
         sd.Usage = D3D11_USAGE_STAGING; sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        if (FAILED(this->pVCD3D11Manager->pDevice->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
+        if (FAILED(this->pVCD3D11Manager->pReadSideDevice->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
             return false;
         this->stagingWidth = (int)desc.Width; this->stagingHeight = (int)desc.Height;
         this->stagingFormat = desc.Format; this->srcPixelFormat = srcFmt;
@@ -92,27 +99,25 @@ bool VideoCapturer::ReadbackSw(int slotIdx, int64_t ptsUs) {
 
     slot.shareTex.pMutex->AcquireSync(1, INFINITE);
     if (desc.SampleDesc.Count > 1)
-        this->pVCD3D11Manager->pContext->ResolveSubresource(this->pStagingTex, 0, slot.shareTex.pTex.Get(), 0, desc.Format);
+        this->pVCD3D11Manager->pReadSideContext->ResolveSubresource(this->pStagingTex, 0, slot.shareTex.pTex.Get(), 0, desc.Format);
     else
-        this->pVCD3D11Manager->pContext->CopyResource(this->pStagingTex, slot.shareTex.pTex.Get());
-    slot.hasNewFrame.store(false, std::memory_order_release);
-    this->pVCD3D11Manager->readIdx.store(
-        (slotIdx + 1) % this->pVCD3D11Manager->ringCapacity, std::memory_order_release);
+        this->pVCD3D11Manager->pReadSideContext->CopyResource(this->pStagingTex, slot.shareTex.pTex.Get());
+
     slot.shareTex.pMutex->ReleaseSync(0);
 
     D3D11_MAPPED_SUBRESOURCE map = {};
-    if (FAILED(this->pVCD3D11Manager->pContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &map)) || !map.pData)
+    if (FAILED(this->pVCD3D11Manager->pReadSideContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &map)) || !map.pData)
         return false;
     size_t rowBytes = (size_t)this->stagingWidth * 4;
-    size_t total   = rowBytes * (size_t)this->stagingHeight;
+    size_t total = rowBytes * (size_t)this->stagingHeight;
     if (this->readbackBuf.size() < total) this->readbackBuf.resize(total);
     for (UINT r = 0; r < (UINT)this->stagingHeight; ++r)
         memcpy(this->readbackBuf.data() + rowBytes * r,
-               (const uint8_t*)map.pData + (size_t)map.RowPitch * r, rowBytes);
-    this->pVCD3D11Manager->pContext->Unmap(this->pStagingTex, 0);
+            (const uint8_t*)map.pData + (size_t)map.RowPitch * r, rowBytes);
+    this->pVCD3D11Manager->pReadSideContext->Unmap(this->pStagingTex, 0);
 
     av::VideoFrame frame(this->readbackBuf.data(), total, this->srcPixelFormat,
-                         this->stagingWidth, this->stagingHeight);
+        this->stagingWidth, this->stagingHeight);
     frame.setTimeBase({ 1, 1000000 });
     frame.setPts(av::Timestamp(ptsUs, frame.timeBase()));
     this->buffer.enqueue(std::move(frame));

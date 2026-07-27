@@ -5,7 +5,8 @@
 
 class VideoCapturer final :public MediaModuleBase {
     class VCD3D11Manager* pVCD3D11Manager = nullptr;
-    class VEncodeHelper*  pVEncodeHelper  = nullptr;
+    class VEncodeHelper* pVEncodeHelper = nullptr;
+    class BufferCopier* pBufferCopier = nullptr;
     moodycamel::ConcurrentQueue<av::VideoFrame> buffer;
 
     std::optional<std::chrono::steady_clock::time_point> recordStartTime;

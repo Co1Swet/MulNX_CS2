@@ -5,19 +5,9 @@ bool VCD3D11Manager::Init() {
 
     (*this)
         .SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {this->OnPresentFirst(msg);})
-        .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->CopyTexture();});
-    
+        ;
+        
     return true;
-}
-
-void VCD3D11Manager::SetCaptureFpsCap(int cap) {
-    this->captureFpsCap.store(cap < 0 ? 0 : cap, std::memory_order_release);
-    if (cap > 0) this->minIntervalUs = 1'000'000 / cap;
-}
-
-void VCD3D11Manager::SetRecordStart(std::chrono::steady_clock::time_point t) {
-    this->recordStartTime = t;
-    this->lastSlot = -1;
 }
 
 bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot& slot) {
@@ -34,7 +24,7 @@ bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot
     hr = pDXGIRes->GetSharedHandle(&hSharedHandle);
     if (FAILED(hr)) { this->LogError("槽位获取共享句柄失败"); return false; }
 
-    hr = this->pDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&slot.shareTex.pTex));
+    hr = this->pReadSideDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&slot.shareTex.pTex));
     if (FAILED(hr)) { this->LogError("槽位在捕获设备上打开共享资源失败"); return false; }
 
     hr = slot.rawTex.pTex.As(&slot.rawTex.pMutex);
@@ -71,7 +61,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         flags,
         &originalLevel, 1,
         D3D11_SDK_VERSION,
-        &this->pDevice, nullptr, &this->pContext
+        &this->pReadSideDevice, nullptr, &this->pReadSideContext
     );
     if (FAILED(hr)) {
         this->LogError("捕获用D3D11设备创建失败");
@@ -122,10 +112,8 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         static_cast<unsigned>(bbDesc.Format),
         static_cast<unsigned>(rtvDesc.Format)));
 
-    // 创建环形队列
-    int n = this->ringCapacity;
 
-    if (n < 2) n = 6;
+    int n = 6;
     this->ring.clear();
     this->ring.resize(n);
     int created = 0;
@@ -138,85 +126,33 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     }
     if (created < 2) {
         this->LogError("环形队列有效槽位不足(<2)，录制将不可用");
-        this->ringReady.store(false);
         return;
     }
-    this->ringCapacity = created;
-    this->writeIdx.store(0);
-    this->readIdx.store(0);
-    this->droppedFrames.store(0);
-    this->ringReady.store(true, std::memory_order_release);
+
     this->LogSucc(std::format("共享纹理环形队列就绪，槽位数={}", created));
+
+    this->forWriter.enqueue(1);
+    this->forWriter.enqueue(2);
+    this->forWriter.enqueue(3);
+    this->forWriter.enqueue(4);
+    this->forWriter.enqueue(5);
+    this->forWriter.enqueue(6);
 }
 
-void VCD3D11Manager::CopyTexture() {
-    if (!this->runFlag1.load(std::memory_order_acquire)) return;
-    if (!this->ringReady.load(std::memory_order_acquire)) return;
+std::optional<int> VCD3D11Manager::TryGetReadSide() {
+    int out;
+    if (!this->forReader.wait_dequeue_timed(out, 200))return std::nullopt;
+    else return out;
+}
+void VCD3D11Manager::ReleaseReadSide(int index) {
+    this->forWriter.enqueue(index);
+}
 
-    // 基于时间槽的帧率上限：捕获落在当前时间槽的首帧，并量化 PTS 为槽边界
-    int cap = this->captureFpsCap.load(std::memory_order_acquire);
-    int64_t quantizedPtsUs = -1; // -1 表示不量化，使用实际 now
-    if (cap > 0) {
-        auto now = std::chrono::steady_clock::now();
-        int64_t elapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(
-            now - this->recordStartTime).count();
-        int64_t slot = elapsedUs / this->minIntervalUs;
-        if (slot == this->lastSlot) {
-            return; // 同一时间槽内不再重复捕获
-        }
-        this->lastSlot = slot;
-        quantizedPtsUs = slot * this->minIntervalUs;
-    }
-
-    ComPtr<ID3D11Texture2D> backBuffer;
-    HRESULT hr = this->pGraphicsManager->pSwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
-    if (FAILED(hr)) return;
-
-    int target = this->writeIdx.load(std::memory_order_acquire);
-    RingSlot& slot = this->ring[target];
-
-    // 非阻塞获取写锁（key=0 表示可写）；若录制端正在读该槽位则放弃本帧，避免阻塞 Present
-    hr = slot.rawTex.pMutex->AcquireSync(0, 0);
-    if (hr != S_OK) {
-        // WAIT_TIMEOUT = 未拿到锁(录制端在读)，FAILED = 其他错误，均丢弃当前新帧
-        this->droppedFrames.fetch_add(1, std::memory_order_relaxed);
-        return;
-    }
-
-    // 若该槽位仍有未读数据，覆盖即丢弃最旧帧
-    if (slot.hasNewFrame.load(std::memory_order_relaxed)) {
-        this->droppedFrames.fetch_add(1, std::memory_order_relaxed);
-    }
-
-    // 获取后备缓冲描述以确定是否 MSAA
-    D3D11_TEXTURE2D_DESC bbDescR;
-    backBuffer->GetDesc(&bbDescR);
-
-    // 执行拷贝，并在拷贝完成时刻打 PTS
-    if (bbDescR.SampleDesc.Count > 1) {
-        this->pGraphicsManager->pd3dContext->ResolveSubresource(
-            slot.rawTex.pTex.Get(), 0, backBuffer.Get(), 0,
-            static_cast<DXGI_FORMAT>(this->srcDxgiFormat));
-    } else {
-        this->pGraphicsManager->pd3dContext->CopyResource(
-            slot.rawTex.pTex.Get(), backBuffer.Get());
-    }
-    // 确保 GPU 拷贝命令已提交，否则 ReleaseSync 后读者可能读到未完成的数据（雪花屏）
-    this->pGraphicsManager->pd3dContext->Flush();
-
-    // PTS：有帧率上限时量化为时间槽边界，否则取实际 now
-    if (quantizedPtsUs >= 0) {
-        slot.captureTime.store(this->recordStartTime + std::chrono::microseconds(quantizedPtsUs),
-                               std::memory_order_release);
-    } else {
-        slot.captureTime.store(std::chrono::steady_clock::now(), std::memory_order_release);
-    }
-
-    hr = slot.rawTex.pMutex->ReleaseSync(1);
-    if (FAILED(hr)) {
-        this->LogError("ReleaseSync(1) 失败");
-    }
-    slot.hasNewFrame.store(true, std::memory_order_release);
-
-    this->writeIdx.store((target + 1) % this->ringCapacity, std::memory_order_release);
+int VCD3D11Manager::GetWriteSide() {
+    int out;
+    this->forWriter.wait_dequeue(out);
+    return out;
+}
+void VCD3D11Manager::ReleaseWriteSide(int index) {
+    this->forReader.enqueue(index);
 }

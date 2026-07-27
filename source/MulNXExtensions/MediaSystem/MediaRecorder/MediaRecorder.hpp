@@ -8,6 +8,7 @@ class MediaRecorder final :public MediaModuleBase {
     class AudioCapturer*    pAudioCapturer    = nullptr;
     class VCD3D11Manager*   pVCD3D11Manager   = nullptr;
     class MediaParamManager* pMediaParamManager = nullptr;
+    class BufferCopier* pBufferCopier = nullptr;
 
     std::filesystem::path dirVideos;
     av::FormatContext ofctx;

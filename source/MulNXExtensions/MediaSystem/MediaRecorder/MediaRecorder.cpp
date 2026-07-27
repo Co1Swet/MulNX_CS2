@@ -2,6 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <MulNXExtensions/MediaSystem/Videos/VideoCapturer/VideoCapturer.hpp>
+#include <MulNXExtensions/MediaSystem/Videos/BufferCopier/BufferCopier.hpp>
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
@@ -14,12 +15,13 @@ void MediaRecorder::CaptureCallback() {
 }
 
 bool MediaRecorder::Init() {
-    this->pVideoCapturer = this->Core->ModuleManager()->FindModule<VideoCapturer>("VideoCapturer");
-    this->pAudioCapturer = this->Core->ModuleManager()->FindModule<AudioCapturer>("AudioCapturer");
-    this->pVEncodeHelper = this->Core->ModuleManager()->FindModule<VEncodeHelper>("VEncodeHelper");
-    this->pAEncodeHelper = this->Core->ModuleManager()->FindModule<AEncodeHelper>("AEncodeHelper");
-    this->pVCD3D11Manager = this->Core->ModuleManager()->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->pMediaParamManager = this->Core->ModuleManager()->FindModule<MediaParamManager>("MediaParamManager");
+    this->pVideoCapturer = this->FindModule<VideoCapturer>("VideoCapturer");
+    this->pAudioCapturer = this->FindModule<AudioCapturer>("AudioCapturer");
+    this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
+    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
+    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
+    this->pBufferCopier = this->FindModule<BufferCopier>("BufferCopier");
 
     this->dirVideos = this->Path()->PathGetForShared("Videos");
     (*this)
@@ -56,7 +58,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->LogError("源纹理参数无效"); return false;
     }
 
-    this->pVCD3D11Manager->SetCaptureFpsCap(rp.captureFpsCap);
+    this->pBufferCopier->SetCaptureFpsCap(rp.captureFpsCap);
     this->pAudioCapturer->ClearBuffer();
     this->pVideoCapturer->ClearBuffer();
     this->pVideoCapturer->Reset();
@@ -66,10 +68,10 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
     try {
         this->ofctx.openOutput(outFile);
         this->recordStartTime = std::chrono::steady_clock::now();
-        this->pVCD3D11Manager->SetRecordStart(this->recordStartTime);
+        this->pBufferCopier->SetRecordStart(this->recordStartTime);
 
         this->pVEncodeHelper->SetOn(&this->ofctx, rp, srcW, srcH, srcFmt,
-            this->pVCD3D11Manager->pDevice.Get(),
+            this->pVCD3D11Manager->pReadSideDevice.Get(),
             rp.captureFpsCap > 0 ? rp.captureFpsCap : 0);
         this->pAEncodeHelper->SetOn(&this->ofctx, this->pAudioCapturer->GetSampleRate());
 
@@ -148,15 +150,13 @@ bool MediaRecorder::StopRecording() {
     }
 
     this->ofctx.writeTrailer();
-    uint64_t dropped = this->pVCD3D11Manager->droppedFrames.load();
-    if (dropped > 0)
-        this->LogWarning(std::format("丢帧: {}", dropped));
-    else
-        this->LogSucc("无丢帧");
-    this->pVCD3D11Manager->droppedFrames.store(0);
+
     this->pVideoCapturer->Reset();
     this->pAEncodeHelper->Reset();
     this->pVEncodeHelper->Reset();
     this->ofctx.close();
+
+    this->LogSucc("录制结束");
+
     return true;
 }
