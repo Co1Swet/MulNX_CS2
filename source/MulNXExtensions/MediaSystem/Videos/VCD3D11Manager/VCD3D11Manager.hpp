@@ -44,6 +44,9 @@ class VCD3D11Manager final : public MediaModuleBase {
     int64_t minIntervalUs = 16667;     // captureFpsCap 换算（µs）
     int64_t lastSlot = -1;             // 上次捕获所在时间槽序号
 
+    moodycamel::BlockingConcurrentQueue<int> forReader{};
+    moodycamel::BlockingConcurrentQueue<int> forWriter{};
+
     void OnPresentFirst(MulNX::Message& msg);
     void CopyTexture();
     bool CreateSlot(const D3D11_TEXTURE2D_DESC& desc, RingSlot& slot);
@@ -69,4 +72,7 @@ public:
 
     void SetCaptureFpsCap(int cap);
     void SetRecordStart(std::chrono::steady_clock::time_point t);
+
+    std::optional<MidTex&> TryGetReadSide();
+    std::optional<MidTex&> TryGetWriteSide();
 };
