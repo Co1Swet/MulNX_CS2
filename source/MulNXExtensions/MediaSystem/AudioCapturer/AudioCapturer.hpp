@@ -15,10 +15,10 @@ private:
     HANDLE hEvent = nullptr;
 
     void Main();
-public:
+
     bool Init()override;
     void Deinit()override;
-
+public:
     std::optional<av::AudioSamples> TryPop();
     void ClearBuffer();
     // audio info accessors

@@ -52,7 +52,7 @@ void ViewBuffer::Push(MulNX::Math::View&& newView) {
 }
 
 void ViewSmoother::Menu() {
-    MulNX::UI::Checkbox("启用视角平滑", this->runFlag1);
+    MulNX::UI::Checkbox("启用视角平滑", this->enable);
     MulNX::UI::SliderFloat("指数平滑系数（越低越平滑）", this->buffer.smooth_buffer, 0.0f, 1.0f);
 }
 
@@ -63,7 +63,7 @@ bool ViewSmoother::Init() {
 }
 
 bool ViewSmoother::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
-    if (!this->runFlag1.load(std::memory_order_acquire))return false;
+    if (!this->enable.load(std::memory_order_acquire))return false;
 
     MulNX::Math::View view;
     view.position = *viewSetup->pViewOrigin();

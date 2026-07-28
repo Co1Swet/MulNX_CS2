@@ -10,9 +10,8 @@ bool CS2HelperController::Init() {
     LoadLibraryW(this->helperPath.wstring().c_str());
 
     this->UIRegisterCallback("CS2BootLoad", [this](auto&&...) {
-        MulNX::UI::Checkbox("当reshade被安装时，加载reshade", this->runFlag1);
+        MulNX::UI::Checkbox("当reshade被安装时，加载reshade", this->injectReshade);
         });
-    this->runFlag1 = true;
 
     return true;
 }
@@ -37,7 +36,7 @@ bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi) {
     auto dirFfmpeg = Tools / "ffmpeg";
 
     auto reshadedll = Tools / "dxgi.dll";
-    if (std::filesystem::exists(reshadedll) && this->runFlag1) {
+    if (std::filesystem::exists(reshadedll) && this->injectReshade) {
         this->DoInject(pi, reshadedll);
     }
     

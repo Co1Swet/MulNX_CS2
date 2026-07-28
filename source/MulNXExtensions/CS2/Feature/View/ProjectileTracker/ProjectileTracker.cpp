@@ -11,7 +11,7 @@ static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController
 }
 
 void ProjectileTracker::Menu() {
-    MulNX::UI::Checkbox("启用投掷物追踪", this->runFlag1);
+    MulNX::UI::Checkbox("启用投掷物追踪", this->enable);
 }
 
 bool ProjectileTracker::Init() {
@@ -93,7 +93,7 @@ bool ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pPro
 
 void ProjectileTracker::Main() {
     this->Update();
-    if (!this->runFlag1.load(std::memory_order_acquire))return;
+    if (!this->enable.load(std::memory_order_acquire))return;
     std::unique_lock lock(this->smutex);
     try {
         for (auto it=this->bufferProjectiles.begin(); it != this->bufferProjectiles.end();) {
@@ -151,7 +151,7 @@ void ProjectileTracker::Main() {
 }
 
 bool ProjectileTracker::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
-    if (!this->runFlag1.load(std::memory_order_acquire))return false;
+    if (!this->enable.load(std::memory_order_acquire))return false;
     if (!this->pTargetWatchProjectile.load(std::memory_order_acquire)) return false;
     auto view = this->currentView.Read();
     *viewSetup->pViewOrigin() = view->position;

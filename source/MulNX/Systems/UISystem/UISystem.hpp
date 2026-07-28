@@ -5,9 +5,11 @@
 
 namespace MulNX {
     class UISystem final :public MulNX::Module<UISystem> {
-    private:
         UICoordinator* pCoordinator = nullptr;        
         std::string strImguiIniPath;
+
+        std::atomic<bool> rendEnable = false;
+        std::atomic<bool> ifDrawMid = false;
 
         void LoadFont();
         void LoadStyle();

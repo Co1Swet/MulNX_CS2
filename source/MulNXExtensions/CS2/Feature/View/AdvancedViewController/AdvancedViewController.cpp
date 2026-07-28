@@ -5,7 +5,7 @@
 
 bool AdvancedViewController::Menu() {
     if (ImGui::CollapsingHeader("高级视角控制")) {
-        MulNX::UI::Checkbox("启用高级视角控制", this->runFlag1);
+        MulNX::UI::Checkbox("启用高级视角控制", this->enable);
         MulNX::UI::Checkbox("覆盖自视角", this->OverrideSelfView);
         MulNX::UI::Checkbox("始终计算视角", this->AlwaysCaulate);
 
@@ -82,8 +82,7 @@ bool AdvancedViewController::Init() {
 }
 
 bool AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
-    // 如果启用了高级视角控制，尝试更新视角数据，注意这里只是更新，不涉及具体的视角控制逻辑，视角控制逻辑在后面根据状态分流执行
-    if (!this->runFlag1.load(std::memory_order_acquire)) return false;
+    if (!this->enable.load(std::memory_order_acquire)) return false;
 
     // 通过时间桥判断是否需要更新视角，防止抖动
     static auto lastTime = this->CS2Time->GetReal();

@@ -5,6 +5,7 @@
 class ProjectileTracker final : public CSModuleBase, public CSViewControlMixin<ProjectileTracker> {
     std::set<CS2::C_BaseCSGrenadeProjectile*> bufferProjectiles;
     std::atomic<CS2::C_BaseCSGrenadeProjectile*> pTargetWatchProjectile = nullptr;
+    std::atomic<bool> enable = false;
 
     // void HandleGrenadeAdd(CS2::C_BaseCSGrenade* pGrenade, std::string&& name);
     // void HandleGrenadeRemove(CS2::C_BaseCSGrenade* pGrenade);

@@ -18,6 +18,7 @@ public:
 };
 
 class AdvancedViewController final :public CSModuleBase, public CSViewControlMixin<AdvancedViewController> {
+    std::atomic<bool> enable = false;
     std::atomic<bool> OverrideSelfView = false;
     std::atomic<bool> AlwaysCaulate = false;
 

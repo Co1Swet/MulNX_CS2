@@ -54,7 +54,7 @@ bool MulNX::TaskSystem::Init() {
         });
 
     this->ImCreateTask("CreateFor->MessageManager::HandleDispatch", "Messaging", [this]() {
-        this->pMessageManager->runFlag1.store(true, std::memory_order_release);
+        this->pMessageManager->dispatchEnable.store(true, std::memory_order_release);
         if (this->pMessageManager->HandleDispatch())return true;
         this->pMessageManager->LogWarning("消息派发终止！");
         return false;
@@ -98,7 +98,7 @@ void MulNX::TaskSystem::Deinit() {
         worker.reset();
     }
     auto worker = std::move(this->workers["Messaging"]);
-    this->pMessageManager->runFlag1.store(false, std::memory_order_release);
+    this->pMessageManager->dispatchEnable.store(false, std::memory_order_release);
     worker->t.request_stop();
     worker->t.join();
 }

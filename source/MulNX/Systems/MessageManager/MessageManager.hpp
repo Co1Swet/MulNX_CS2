@@ -31,10 +31,11 @@ namespace MulNX {
         std::shared_mutex syncMutex;
         std::unordered_map<MulNX::MsgType, std::vector<SyncMsgCallback>>syncMap{};
 
+        bool Init()override;
         bool AddMsgMeta(const std::string& type, size_t hashed, const bool isAsync = false,
             std::function<void(MulNX::Message&, std::string_view)>&& makingHandler = nullptr);
     public:
-        bool Init()override;
+        std::atomic<bool> dispatchEnable = false;
 
         // 创建私有消息队列（但是生命周期仍然委托给消息管理器）
         MulNXHandle CreateMessageChannel();
@@ -42,7 +43,7 @@ namespace MulNX {
         bool SubscribeAsync(MessageChannel* const pChannel, const std::string& type,
             std::function<void(MulNX::Message&, std::string_view)>&& makingHandler = nullptr);
         bool PublishAsync(Message&& msg);
-        bool DispathAsyncMsg();// 单次派发，返回true意味着还有消息
+        bool DispatchAsyncMsg();// 单次派发，返回true意味着还有消息
         bool HandleDispatch();// 派发所有剩余消息
 
         bool SubscribeSync(const std::string& type, SyncMsgCallback&& handle);

@@ -32,14 +32,14 @@ bool MulNX::UISystem::Init() {
 void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "UISystem/Start"_hash: {
-        this->runFlag1.store(true);
-        this->runFlag2.store(true);
+        this->rendEnable.store(true);
+        this->ifDrawMid.store(true);
         this->LogWarning("接收到启动消息，UI系统开始启动");
 
         break;
     }
     case "UISystem/Toggle"_hash: {
-        this->runFlag2.store(!this->runFlag2.load());
+        this->ifDrawMid.store(!this->ifDrawMid.load());
         break;
     }
     case "UISystem/SaveStyle"_hash: {
@@ -61,14 +61,14 @@ void MulNX::UISystem::HandleUpdate() {
     }
 }
 int MulNX::UISystem::Render() {
-    if (!this->runFlag1.load()) {
+    if (!this->rendEnable.load()) {
         this->WantCaptureMouse.store(false, std::memory_order_release);
         this->WantTextInput.store(false, std::memory_order_release);
         return 0;
     }
     
     this->FrameBefore();
-    this->pCoordinator->Render(this->runFlag2.load(std::memory_order_acquire));
+    this->pCoordinator->Render(this->ifDrawMid.load(std::memory_order_acquire));
     this->FrameBehind();
 
     ImGuiIO& io = ImGui::GetIO();

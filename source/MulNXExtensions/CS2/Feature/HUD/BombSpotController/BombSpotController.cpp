@@ -2,16 +2,15 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 void BombSpotController::Menu() {
-    MulNX::UI::Checkbox("当观战CT时强制渲染C4为红色", this->runFlag1);
+    MulNX::UI::Checkbox("当观战CT时强制渲染C4为红色", this->forceBombRedWhenSpecCT);
 }
 
 bool BombSpotController::Init() {
-    this->runFlag1 = true;
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改雷包颜色
         auto Pos_Spot_WriteBombState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_WriteBombState);
         this->hkPos_Spot_WriteBombState = MulNX::Hook::Create(Pos_Spot_WriteBombState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->runFlag1.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
+            if (!this->forceBombRedWhenSpecCT.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             if (!pOBing)return MulNX::Hook::Then::Continue;
             try {
@@ -28,7 +27,6 @@ bool BombSpotController::Init() {
 
         auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
         this->hkPos_CallGetPawnMaybeSetAllHUD = MulNX::Hook::Create(Pos_CallGetPawnMaybeSetAllHUD + 14, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->runFlag2.load())return MulNX::Hook::Then::Continue;
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             auto pRet = (CS2::C_BaseEntity*)ctx->rax;
             if (pOBing)ctx->rax = (uint64_t)pOBing;
@@ -36,8 +34,7 @@ bool BombSpotController::Init() {
             }).value();
         this->RegisterAttachHook(this->hkPos_CallGetPawnMaybeSetAllHUD, "Pos_CallGetPawnMaybeSetAllHUD");
         });
-    this->runFlag2 = true;
-
+        
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
 
     return true;

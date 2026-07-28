@@ -21,6 +21,7 @@ namespace CS2 {
 }
 
 class SkyController final : public CSModuleBase {
+    std::atomic<bool> enable = false;
     std::unique_ptr<MulNX::Hook> hkForceUpdateSkybox{};
 
     std::atomic<uint32_t> skyColor{ IM_COL32(0, 0, 0, 255) };  // 普通染色（RGBA）

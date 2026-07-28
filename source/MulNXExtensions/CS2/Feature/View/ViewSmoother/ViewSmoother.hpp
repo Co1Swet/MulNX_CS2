@@ -11,6 +11,7 @@ public:
 };
 
 class ViewSmoother final :public CSModuleBase, public CSViewControlMixin<ViewSmoother> {
+    std::atomic<bool> enable = false;
     ViewBuffer buffer;
     void Menu();
     bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num)override;

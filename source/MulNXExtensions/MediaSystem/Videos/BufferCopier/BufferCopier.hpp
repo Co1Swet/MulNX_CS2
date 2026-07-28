@@ -17,6 +17,7 @@ class BufferCopier final :public MediaModuleBase {
 
     void CopyTexture();
 public:
+    std::atomic<bool> shouldCopy = false;
     void SetCaptureFpsCap(int cap);
     void SetRecordStart(std::chrono::steady_clock::time_point t);
 };

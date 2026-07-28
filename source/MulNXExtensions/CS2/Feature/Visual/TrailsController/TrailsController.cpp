@@ -63,7 +63,7 @@ void TrailsController::Menu() {
 
     ImGui::Checkbox("投掷物提示小窗", this->sv_grenade_trajectory_prac_pipreview);
     bool changed = false;
-    MulNX::UI::Checkbox("锁定隐藏投掷物轨迹", this->runFlag2);
+    MulNX::UI::Checkbox("锁定隐藏投掷物轨迹", this->forceHadeProjectileNoTrails);
     changed |= ImGui::SliderFloat("生存期 (s)", this->sv_grenade_trajectory_time_spectator, 0.0f, 10.0f);
     changed |= ImGui::SliderFloat("宽度", &propCopy.width, 0.1f, 5.0f);
     changed |= ImGui::SliderFloat("透明度", &propCopy.alpha, 0.0f, 1.0f);
@@ -107,9 +107,8 @@ bool TrailsController::Init() {
         .SubscribeAsync("Trails/ClearAll")
         .SubscribeAsync("Trails/Prop");
 
-    this->runFlag2.store(true);
     this->SendTask("Update", "CSControl", [this]() {
-        if (this->runFlag2.load())*this->sv_grenade_trajectory_time_spectator = 0;
+        if (this->forceHadeProjectileNoTrails.load())*this->sv_grenade_trajectory_time_spectator = 0;
         this->Update();
         return true;
         });

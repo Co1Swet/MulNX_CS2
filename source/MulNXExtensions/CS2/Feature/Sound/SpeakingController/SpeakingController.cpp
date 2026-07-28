@@ -3,7 +3,7 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 
 void SpeakingController::Menu() {
-    MulNX::UI::Checkbox("自动激活玩家语音", this->runFlag1);
+    MulNX::UI::Checkbox("自动激活玩家语音", this->autoActiveTeamVoice);
     MulNX::UI::Checkbox("仅播放当前观战玩家的阵营语音(默认激活所有玩家语音)", this->onlyCurOBingSameTeam);
 }
 bool SpeakingController::Init() {
@@ -16,7 +16,7 @@ bool SpeakingController::Init() {
     return true;
 }
 void SpeakingController::OnItBegin() {
-    if (!this->runFlag1)return;
+    if (!this->autoActiveTeamVoice)return;
     this->bufferMask = 0;
     auto curOBing = this->CS2->client.TryGetObservingPawn();
     if (!curOBing)return;
@@ -28,7 +28,7 @@ void SpeakingController::OnItBegin() {
     }
 }
 void SpeakingController::OnItPlayer(int index, CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn) {
-    if (!this->runFlag1)return;
+    if (!this->autoActiveTeamVoice)return;
     if (!this->onlyCurOBingSameTeam) {
         this->bufferMask |= (1 << index - 1);
         return;
@@ -43,6 +43,6 @@ void SpeakingController::OnItPlayer(int index, CS2::CCSPlayerController* control
     }
 }
 void SpeakingController::OnItEnd() {
-    if (!this->runFlag1)return;
+    if (!this->autoActiveTeamVoice)return;
     *this->tv_listen_voice_indices = this->bufferMask;
 }

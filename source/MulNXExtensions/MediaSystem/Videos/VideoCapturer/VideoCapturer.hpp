@@ -10,6 +10,7 @@ class VideoCapturer final :public MediaModuleBase {
     moodycamel::ConcurrentQueue<av::VideoFrame> buffer;
 
     std::optional<std::chrono::steady_clock::time_point> recordStartTime;
+    std::atomic<bool> vCapturing = false;
 
     // CPU 读回
     ID3D11Texture2D* pStagingTex = nullptr;
@@ -22,8 +23,8 @@ class VideoCapturer final :public MediaModuleBase {
     void Captuer();
     bool ReadbackSw(int slotIdx, int64_t ptsUs);
 
-public:
     bool Init()override;
+public:
     void Reset();
     void ClearBuffer();
     void StartCapture(const std::chrono::steady_clock::time_point& startTime);

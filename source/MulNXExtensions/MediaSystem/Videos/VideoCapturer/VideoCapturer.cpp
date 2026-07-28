@@ -24,18 +24,18 @@ void VideoCapturer::Reset() {
     this->readbackBuf.clear();
     this->readbackBuf.shrink_to_fit();
     this->recordStartTime.reset();
-    this->runFlag1.store(false);
+    this->vCapturing.store(false);
 }
 
 void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
     std::unique_lock lock(this->smutex);
     this->recordStartTime = startTime;
-    this->runFlag1.store(true, std::memory_order_release);
+    this->vCapturing.store(true, std::memory_order_release);
 }
 
 void VideoCapturer::StopCapture() {
     std::unique_lock lock(this->smutex);
-    this->runFlag1.store(false);
+    this->vCapturing.store(false);
 }
 
 void VideoCapturer::ClearBuffer() {
@@ -50,11 +50,11 @@ std::optional<av::VideoFrame> VideoCapturer::TryPop() {
 
 void VideoCapturer::Captuer() {
     this->Update();
-    if (!this->runFlag1.load(std::memory_order_acquire)) {
-        this->pBufferCopier->runFlag1.store(false, std::memory_order_release);
+    if (!this->vCapturing.load(std::memory_order_acquire)) {
+        this->pBufferCopier->shouldCopy.store(false, std::memory_order_release);
         return;
     }
-    this->pBufferCopier->runFlag1.store(true, std::memory_order_release);
+    this->pBufferCopier->shouldCopy.store(true, std::memory_order_release);
 
     std::unique_lock lock(this->smutex);
     int readIdx;

@@ -6,7 +6,6 @@
 #include <avcpp/averror.h>
 #include <avcpp/audioresampler.h>
 #include <libavutil/channel_layout.h>
-#include <vector>
 #include <wrl/client.h>
 
 using Microsoft::WRL::ComPtr;
@@ -77,15 +76,10 @@ bool AudioCapturer::Init() {
             return;
         }
 
-        this->runFlag1.store(true);
-
         // Schedule Main via ISys task (no explicit thread)
         this->SendTask("Main", "AudioCapturer", [this]() {
-            while (this->runFlag1.load()) {
-                this->runFlag1.store(false);
-                std::unique_lock lock(this->smutex);
-                this->Main();
-            }
+            std::unique_lock lock(this->smutex);
+            this->Main();
             return false;
             });
 

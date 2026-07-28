@@ -3,6 +3,7 @@
 
 class ParticleManager;
 class TrailsController final :public CSModuleBase {
+    std::atomic<bool> forceHadeProjectileNoTrails = true;
     struct ParticleColor { float r, g, b; };
     struct ParticleProp { float lifetime, width, alpha; };
 

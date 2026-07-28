@@ -10,6 +10,8 @@ class MediaRecorder final :public MediaModuleBase {
     class MediaParamManager* pMediaParamManager = nullptr;
     class BufferCopier* pBufferCopier = nullptr;
 
+    std::atomic<bool> recording = false;
+
     std::filesystem::path dirVideos;
     av::FormatContext ofctx;
     std::chrono::steady_clock::time_point recordStartTime;

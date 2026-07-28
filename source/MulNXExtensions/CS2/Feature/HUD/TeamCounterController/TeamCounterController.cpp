@@ -2,15 +2,14 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 void TeamCounterController::Menu() {
-    MulNX::UI::Checkbox("隐藏敌方血条", this->runFlag1);
+    MulNX::UI::Checkbox("隐藏敌方血条", this->hadeEnemyHP);
 }
 
 bool TeamCounterController::Init() {
-    this->runFlag1.store(true);
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamCounterWriteHP).Data();
         this->hkTeamCounterWriteHP = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->runFlag1.load())return MulNX::Hook::Then::Continue;
+            if (!this->hadeEnemyHP.load())return MulNX::Hook::Then::Continue;
             uint8_t teamByte = *(uint8_t*)((char*)ctx->rbx + 0x10);   // 0 = T, 非0 = CT
             try {
                 auto pOBPawn = this->CS2->client.TryGetObservingPawn();

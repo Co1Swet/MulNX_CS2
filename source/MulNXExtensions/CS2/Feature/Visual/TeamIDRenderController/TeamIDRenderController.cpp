@@ -2,11 +2,10 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 void TeamIDRenderController::Menu() {
-    MulNX::UI::Checkbox("Team ID隐藏敌方", this->runFlag1);
+    MulNX::UI::Checkbox("Team ID隐藏敌方", this->hadeEnemyTeamID);
 }
 
 bool TeamIDRenderController::Init() {
-    this->runFlag1.store(true);
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_CmpForHide);
         auto jmp = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_xxIt);
@@ -23,7 +22,7 @@ bool TeamIDRenderController::Init() {
 }
 
 MulNX::Hook::Then TeamIDRenderController::HandleForShowTeamID(CS2::C_CSPlayerPawn* pCSPlayerPawn) {
-    if (!this->runFlag1.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
+    if (!this->hadeEnemyTeamID.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
     try {
         auto pOBPawn = this->CS2->client.TryGetObservingPawn();
         if (!pOBPawn)return MulNX::Hook::Then::Continue;

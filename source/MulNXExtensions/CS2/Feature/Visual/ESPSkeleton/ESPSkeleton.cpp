@@ -19,7 +19,7 @@ void ESPSkeleton::DrawSkelgton(CS2::C_CSPlayerPawn* pPawn) {
 }
 
 void ESPSkeleton::Draw() {
-    if (!this->runFlag1.load())return;
+    if (!this->enable.load())return;
     try {
         for (int i = 0;i < this->CS2->client.dwGameEntitySystem_highestEntityIndex() && i < 30;++i) {
             auto pController = this->CS2->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
@@ -51,7 +51,7 @@ bool ESPSkeleton::Init() {
 
     this->UIRegisterBackground("DrawSkeleton", [this](auto&&...) {return this->Draw();});
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
-        MulNX::UI::Checkbox("骨骼绘制", this->runFlag1);
+        MulNX::UI::Checkbox("骨骼绘制", this->enable);
         return true;
         });
 

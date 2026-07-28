@@ -3,7 +3,7 @@
 
 void SkyController::Menu() {
     ImGui::SeparatorText("天空");
-    MulNX::UI::Checkbox("启用天空修改", this->runFlag1);
+    MulNX::UI::Checkbox("启用天空修改", this->enable);
 
     // ========== 普通染色（RGBA） ==========
     uint32_t currentColorU32 = this->skyColor.load();
@@ -88,7 +88,7 @@ void SkyController::ProcessMsg(MulNX::Message& msg) {
 }
 
 MulNX::Hook::Then SkyController::HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky) {
-    if (!this->runFlag1.load()) return MulNX::Hook::Then::Continue;
+    if (!this->enable.load()) return MulNX::Hook::Then::Continue;
 
     *pEnvSky->m_vTintColor() = this->skyColor.load();
     *pEnvSky->m_flBrightnessScale() = this->brightness.load();

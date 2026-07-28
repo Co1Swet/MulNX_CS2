@@ -3,7 +3,7 @@
 #include <Intro/HookView/HookView.hpp>
 
 void ESPBox::Draw() {
-    if (!this->runFlag1.load(std::memory_order_acquire))return;
+    if (!this->enable.load(std::memory_order_acquire))return;
 
     std::shared_lock lock(this->CS2->smutex);
     for (int i = 1; i <= 10; ++i) {
@@ -30,7 +30,7 @@ bool ESPBox::Init() {
     this->UIRegisterBackground(this->GetName(), [this](auto&&...) {return this->Draw();});
 
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
-        MulNX::UI::Checkbox("方框ESP", this->runFlag1);
+        MulNX::UI::Checkbox("方框ESP", this->enable);
         return true;
         });
 

@@ -45,7 +45,7 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 }
 
 bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
-    if (this->runFlag1) { this->LogWarning("已在录制中"); return false; }
+    if (this->recording) { this->LogWarning("已在录制中"); return false; }
 
     RecordParams rp;
     if (this->pMediaParamManager) rp = this->pMediaParamManager->Params();
@@ -82,7 +82,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->LogSucc(std::format("开始录制: {} ({}x{})", outFile,
             rp.width > 0 ? rp.width : srcW, rp.height > 0 ? rp.height : srcH,
             rp.captureFpsCap > 0 ? std::to_string(rp.captureFpsCap) + "fps " : ""));
-        this->runFlag1 = true;
+        this->recording = true;
         return true;
     }
     catch (const std::exception& e) {
@@ -94,7 +94,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
 
 void MediaRecorder::Main() {
     this->Update();
-    if (!this->runFlag1) return;
+    if (!this->recording) return;
     this->Encode();
 }
 
@@ -128,8 +128,8 @@ void MediaRecorder::Encode() {
 }
 
 bool MediaRecorder::StopRecording() {
-    if (!this->runFlag1) return false;
-    this->runFlag1 = false;
+    if (!this->recording) return false;
+    this->recording = false;
     this->pVideoCapturer->StopCapture();
 
     try {

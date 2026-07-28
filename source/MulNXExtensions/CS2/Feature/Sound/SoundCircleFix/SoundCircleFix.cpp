@@ -4,7 +4,7 @@ bool SoundCircleFix::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto Pos_CallGetPawnUpdateCirclePos = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnUpdateCirclePos).Data();
         this->hkPos_CallGetPawnUpdateCirclePos = MulNX::Hook::Create(Pos_CallGetPawnUpdateCirclePos, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->runFlag1.load())return MulNX::Hook::Then::Continue;
+            if (!this->enable.load())return MulNX::Hook::Then::Continue;
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::Continue;
@@ -14,7 +14,7 @@ bool SoundCircleFix::Init() {
         auto Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque).Data();
         Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque -= 5;
         this->hkPos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque = MulNX::Hook::Create(Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->runFlag1.load())return MulNX::Hook::Then::SkipAllAndContinue;
+            if (!this->enable.load())return MulNX::Hook::Then::SkipAllAndContinue;
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::SkipAllAndContinue;
@@ -23,7 +23,7 @@ bool SoundCircleFix::Init() {
 
         auto Pos_CallGetPawnMaybeOtherAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnMaybeOtherAsyncSoundEnque).Data();
         this->hkPos_CallGetPawnMaybeOtherAsyncSoundEnque = MulNX::Hook::Create(Pos_CallGetPawnMaybeOtherAsyncSoundEnque, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->runFlag1.load())return MulNX::Hook::Then::Continue;
+            if (!this->enable.load())return MulNX::Hook::Then::Continue;
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::Continue;
@@ -45,8 +45,6 @@ bool SoundCircleFix::Init() {
         // testhk->Attach();
 
         });
-
-    this->runFlag1 = true;
 
     return true;
 }

@@ -7,6 +7,7 @@ bool BufferCopier::Init() {
 
     (*this)
         .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->CopyTexture();})
+        .SubscribeSync("MediaSync/BeforeCopyBackbuffer", [this](MulNX::Message& msg) {})
         ;
 
     return true;
@@ -23,7 +24,7 @@ void BufferCopier::SetRecordStart(std::chrono::steady_clock::time_point t) {
 }
 
 void BufferCopier::CopyTexture() {
-    if (!this->runFlag1.load(std::memory_order_acquire)) return;
+    if (!this->shouldCopy.load(std::memory_order_acquire)) return;
 
     // 基于时间槽的帧率上限：捕获落在当前时间槽的首帧，并量化 PTS 为槽边界
     int cap = this->captureFpsCap.load(std::memory_order_acquire);

@@ -58,7 +58,7 @@ bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const
     return true;
 }
 
-bool MulNX::MessageManager::DispathAsyncMsg() {
+bool MulNX::MessageManager::DispatchAsyncMsg() {
     MulNX::Message Msg;
     if(!this->asyncMsgBuffer.wait_dequeue_timed(Msg, 100000))return false;
     std::shared_lock lock(this->asyncMutex);
@@ -82,8 +82,8 @@ bool MulNX::MessageManager::HandleDispatch() {
         return true;
     }
     this->LogSucc("消息派发激活！");
-    while (this->runFlag1.load(std::memory_order_acquire)) {
-        this->DispathAsyncMsg();
+    while (this->dispatchEnable.load(std::memory_order_acquire)) {
+        this->DispatchAsyncMsg();
         continue;
     }
     return false;
