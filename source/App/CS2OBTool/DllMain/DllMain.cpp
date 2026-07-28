@@ -76,7 +76,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<PlayerFlashController>("PlayerFlashController")
             .CreateModule<DeathMsgController>("DeathMsgController")
             .CreateModule<SkyController>("SkyController")
-            
+
             // CS2 视觉（HUD）功能模块
             .CreateModule<TeamIDColorController>("TeamIDColorController")
             .CreateModule<TeamIDRenderController>("TeamIDRenderController")
@@ -95,7 +95,7 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<SoundCircleFix>("SoundCircleFix")
             .CreateModule<AntiVoiceBan>("AntiVoiceBan")
             .CreateModule<PlayerVolumeController>("PlayerVolumeController")
-            
+
             // CS2 Demo 相关模块
             .CreateModule<HookDemo>("HookDemo")
             .CreateModule<DemoSystem>("DemoSystem")
@@ -133,6 +133,10 @@ void StartImpl(HMODULE& hModule) {
             .CreateModule<VEncodeHelper>("VEncodeHelper")
             .CreateModule<MediaRecorder>("MediaRecorder")
             .CreateModule<MediaProcesser>("MediaProcesser")
+
+            // CS2 录制合作
+            .CreateModule<HookRecordCmd>("HookRecordCmd")
+
             // 管理
             .CreateModule<MulNXController>("MulNXController")
             .CreateModule<UIDocker>("UIDocker")

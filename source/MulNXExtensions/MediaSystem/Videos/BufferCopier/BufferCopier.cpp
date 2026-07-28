@@ -45,13 +45,12 @@ void BufferCopier::CopyTexture() {
     if (FAILED(hr)) return;
 
     auto h = this->pVCD3D11Manager->GetWriteSide();
-    scope_exit([&]() {
+    auto OnExit = scope_exit([&]() {
         this->pVCD3D11Manager->ReleaseWriteSide(h);
         });
 
     auto& slot = this->pVCD3D11Manager->ring[h].rawTex;
 
-    // 非阻塞获取写锁（key=0 表示可写）；若录制端正在读该槽位则放弃本帧，避免阻塞 Present
     hr = slot.pMutex->AcquireSync(0, INFINITE);
     if (hr != S_OK) {
         MulNX::ErrorTerminate("锁获取出错");

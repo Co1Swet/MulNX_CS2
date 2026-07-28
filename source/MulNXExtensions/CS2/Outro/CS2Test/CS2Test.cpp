@@ -7,6 +7,14 @@ bool CS2Test::Init() {
     this->AsyncCommand("playdemo 111");
     this->AsyncCommand("tv_listen_voice_indices -1");
 
+
+    this->SendUIRoot("MyCS2Test", [this](auto&&...) {
+        auto w = MulNX::UI::RAIIWindow("MyCS2Test");
+        if (ImGui::Button("尝试CS2录制")) {
+            this->AsyncCommand("startmovie mymulnx wav");
+        }
+        });
+
     // this->SubscribeSync("Hook/FireEventClientSide/player_death", [this](MulNX::Message& msg) {
     //     this->runFlag1.store(true);
     //     this->LogWarning("开始记录声音事件");
