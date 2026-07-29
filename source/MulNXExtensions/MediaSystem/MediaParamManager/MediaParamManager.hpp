@@ -1,12 +1,24 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
-#include <MulNXExtensions/MediaSystem/MediaParamManager/RecordParams.hpp>
 
-class MediaParamManager :public MediaModuleBase{
-    RecordParams params;
+enum class EncodeMode { Auto, H264, HEVC };
+enum class RateControl { CBR, VBR, CQ };
+
+class MediaParamManager :public MediaModuleBase {
     bool Init()override;
 public:
-    // 当前生效的录制参数（可被 UI/消息修改）
-    RecordParams& Params() { return this->params; }
-    const RecordParams& Params() const { return this->params; }
+    // ── 编码器 ──
+    EncodeMode  mode = EncodeMode::Auto;
+    RateControl rc = RateControl::VBR;
+    int         bitrate = 20'000'000;  // bps, CBR/VBR 时有效
+    int         cq = 23;          // CQ 质量 0-51, 越小越好
+    int         maxBFrames = 0;           // 0=无 B 帧
+    int         gopSize = 0;           // 0=自动 = fps×2
+    std::string preset = "p4";        // 编码器预设（nvenc: p1-p7, x264: ultrafast~placebo）
+    std::string profile = "high";      // high / main / baseline
+
+    // ── 捕获 ──
+    int  width = 0;           // 0=原生
+    int  height = 0;           // 0=原生
+    std::atomic<int> captureFpsCap = 60;          // 0=不限制
 };

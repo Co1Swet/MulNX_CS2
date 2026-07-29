@@ -1,9 +1,13 @@
 #include "VEncodeHelper.hpp"
+#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 
-bool VEncodeHelper::Init() { return true; }
+bool VEncodeHelper::Init() {
+    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
+    return true;
+}
 
-bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
-    const av::Codec& codec, int fps, int srcW, int srcH) {
+bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec, int fps, int srcW, int srcH) {
+    auto& rp = *this->pMediaParamManager;
     this->width = (rp.width > 0) ? rp.width : srcW;
     this->height = (rp.height > 0) ? rp.height : srcH;
     this->chosenEncoder = codec.name();
@@ -45,9 +49,9 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
     return true;
 }
 
-void VEncodeHelper::SetOn(av::FormatContext* oCtx, const RecordParams& rp,
-    int srcW, int srcH, av::PixelFormat srcFmt,
+void VEncodeHelper::SetOn(av::FormatContext* oCtx, int srcW, int srcH, av::PixelFormat srcFmt,
     ID3D11Device* device, int fps) {
+    auto& rp = *this->pMediaParamManager;
     this->ptsCounter = 0;
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
 
@@ -56,7 +60,7 @@ void VEncodeHelper::SetOn(av::FormatContext* oCtx, const RecordParams& rp,
     // 纯软件
     av::Codec codec = av::findEncodingCodec("libopenh264");
     if (codec.isNull()) codec = av::findEncodingCodec(targetId);
-    if (!codec.isNull() && codec.canEncode() && this->OpenEncoder(oCtx, rp, codec, fps, srcW, srcH)) {
+    if (!codec.isNull() && codec.canEncode() && this->OpenEncoder(oCtx, codec, fps, srcW, srcH)) {
         this->LogSucc(std::format("软件编码: {} ({}x{})", this->chosenEncoder, this->width, this->height));
         return;
     }

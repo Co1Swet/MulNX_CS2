@@ -47,8 +47,7 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
     if (this->recording) { this->LogWarning("已在录制中"); return false; }
 
-    RecordParams rp;
-    if (this->pMediaParamManager) rp = this->pMediaParamManager->Params();
+    auto& rp = *this->pMediaParamManager;
 
     std::string outFile = pathNoExt + ".mp4";
     int srcW = this->pVCD3D11Manager->srcWidth;
@@ -58,7 +57,6 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->LogError("源纹理参数无效"); return false;
     }
 
-    this->pBufferCopier->SetCaptureFpsCap(rp.captureFpsCap);
     this->pAudioCapturer->ClearBuffer();
     this->pVideoCapturer->ClearBuffer();
     MulNX::Message msg("MediaSync/Reset"_hash);
@@ -72,9 +70,9 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->recordStartTime = std::chrono::steady_clock::now();
         this->pBufferCopier->SetRecordStart(this->recordStartTime);
 
-        this->pVEncodeHelper->SetOn(&this->ofctx, rp, srcW, srcH, srcFmt,
+        this->pVEncodeHelper->SetOn(&this->ofctx, srcW, srcH, srcFmt,
             this->pVCD3D11Manager->pReadSideDevice.Get(),
-            rp.captureFpsCap > 0 ? rp.captureFpsCap : 0);
+            rp.captureFpsCap > 0 ? rp.captureFpsCap.load() : 0);
         this->pAEncodeHelper->SetOn(&this->ofctx, this->pAudioCapturer->GetSampleRate());
 
         this->ofctx.writeHeader();

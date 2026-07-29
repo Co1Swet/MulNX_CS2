@@ -1,8 +1,8 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
-#include <MulNXExtensions/MediaSystem/MediaParamManager/RecordParams.hpp>
 
 class VEncodeHelper final :public MediaModuleBase {
+    class MediaParamManager* pMediaParamManager = nullptr;
     av::Stream vstream;
     av::VideoEncoderContext encoder;
     av::VideoRescaler rescaler;
@@ -13,14 +13,12 @@ class VEncodeHelper final :public MediaModuleBase {
     int64_t ptsCounter = 0;
     AVRational timeBase{ 1, 1000000 };
 
-    bool OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
-                     const av::Codec& codec, int fps, int srcW, int srcH);
+    bool OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec, int fps, int srcW, int srcH);
     void CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt);
 public:
     bool Init() override;
 
-    void SetOn(av::FormatContext* oCtx, const RecordParams& rp,
-               int srcW, int srcH, av::PixelFormat srcFmt,
+    void SetOn(av::FormatContext* oCtx, int srcW, int srcH, av::PixelFormat srcFmt,
                ID3D11Device* device, int fps);
     std::optional<av::Packet> Encode(av::VideoFrame srcFrame);
 

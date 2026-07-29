@@ -1,9 +1,11 @@
 #include "BufferCopier.hpp"
 #include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 
 bool BufferCopier::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
 
     (*this)
         .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->CopyTexture();})
@@ -11,11 +13,6 @@ bool BufferCopier::Init() {
         ;
 
     return true;
-}
-
-void BufferCopier::SetCaptureFpsCap(int cap) {
-    this->captureFpsCap.store(cap < 0 ? 0 : cap, std::memory_order_release);
-    if (cap > 0) this->minIntervalUs = 1'000'000 / cap;
 }
 
 void BufferCopier::SetRecordStart(std::chrono::steady_clock::time_point t) {
@@ -27,7 +24,7 @@ void BufferCopier::CopyTexture() {
     if (!this->shouldCopy.load(std::memory_order_acquire)) return;
 
     // 基于时间槽的帧率上限：捕获落在当前时间槽的首帧，并量化 PTS 为槽边界
-    int cap = this->captureFpsCap.load(std::memory_order_acquire);
+    int cap = this->pMediaParamManager->captureFpsCap.load(std::memory_order_acquire);
     int64_t quantizedPtsUs = -1; // -1 表示不量化，使用实际 now
     if (cap > 0) {
         auto now = std::chrono::steady_clock::now();
