@@ -9,7 +9,7 @@ bool VideoCapturer::Init() {
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pBufferCopier = this->FindModule<BufferCopier>("BufferCopier");
     this->pTextureMapper = this->FindModule<TextureMapper>("TextureMapper");
-    this->SendTask("Capture", "Capture", [this]() -> bool { this->Captuer(); return true; });
+    this->SendTask("VMap", "VMap", [this]() -> bool { this->Captuer(); return true; });
     return true;
 }
 
@@ -61,7 +61,7 @@ void VideoCapturer::Captuer() {
     if (!this->recordStartTime.has_value()) return;
 
     int64_t ptsUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        slot.captureTime->load(std::memory_order_acquire) - *this->recordStartTime).count();
+        slot.pFrameInfo->captureTime - *this->recordStartTime).count();
     if (ptsUs < 0) ptsUs = 0;
 
     auto oFrame = this->pTextureMapper->MapFrame(slot);

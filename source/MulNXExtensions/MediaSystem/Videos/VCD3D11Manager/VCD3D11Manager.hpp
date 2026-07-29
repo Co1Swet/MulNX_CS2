@@ -3,7 +3,7 @@
 
 class MidTex {
 public:
-    std::atomic<std::chrono::steady_clock::time_point>* captureTime;
+    MulNX::VFrameExInfo* pFrameInfo = nullptr;
     ComPtr<ID3D11Texture2D> pTex;
     ComPtr<IDXGIKeyedMutex> pMutex;
 };
@@ -12,23 +12,24 @@ public:
 struct RingSlot {
     MidTex rawTex;      // 原设备（游戏）上的共享纹理
     MidTex shareTex;    // 录制设备上的共享纹理
-    std::atomic<std::chrono::steady_clock::time_point> captureTime;
-    static_assert(std::atomic<std::chrono::steady_clock::time_point>::is_always_lock_free, "captureTime must be lock-free");
+    MulNX::VFrameExInfo frameInfo;
 
     RingSlot() {
-        this->rawTex.captureTime = &this->captureTime;
-        this->shareTex.captureTime = &this->captureTime;
+        this->rawTex.pFrameInfo = &this->frameInfo;
+        this->shareTex.pFrameInfo = &this->frameInfo;
     }
     RingSlot(const RingSlot&) = delete;
     RingSlot& operator=(const RingSlot&) = delete;
-    RingSlot(RingSlot&& o) noexcept
-        : rawTex(std::move(o.rawTex)), shareTex(std::move(o.shareTex)),
-          captureTime(o.captureTime.load(std::memory_order_relaxed)) {}
-    RingSlot& operator=(RingSlot&& o) noexcept {
-        if (this != &o) {
-            rawTex = std::move(o.rawTex);
-            shareTex = std::move(o.shareTex);
-            captureTime.store(o.captureTime.load(std::memory_order_relaxed), std::memory_order_relaxed);
+    RingSlot(RingSlot&& other) noexcept :
+        rawTex(std::move(other.rawTex)),
+        shareTex(std::move(other.shareTex)),
+        frameInfo(std::move(other.frameInfo)) {}
+    
+    RingSlot& operator=(RingSlot&& other) noexcept {
+        if (this != &other) {
+            this->rawTex = std::move(other.rawTex);
+            this->shareTex = std::move(other.shareTex);
+            this->frameInfo = std::move(other.frameInfo);
         }
         return *this;
     }

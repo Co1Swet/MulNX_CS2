@@ -30,7 +30,7 @@ namespace MulNX {
     class VFrameExInfo {
     public:
         // 记录在Present线程执行copy时，绝对的世界时间，在常规录制模式多使用
-        std::chrono::steady_clock::time_point steadyTimestamp{};
+        std::chrono::steady_clock::time_point captureTime{};
         // 一个帧率，在高级录制里使用，用于计算pts
         int frameRate;
         // 一个逻辑帧数字，在高级录制被填充，用于计算pts

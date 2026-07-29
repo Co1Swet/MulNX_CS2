@@ -75,11 +75,10 @@ void BufferCopier::CopyTexture() {
 
     // PTS：有帧率上限时量化为时间槽边界，否则取实际 now
     if (quantizedPtsUs >= 0) {
-        slot.captureTime->store(this->recordStartTime + std::chrono::microseconds(quantizedPtsUs),
-            std::memory_order_release);
+        slot.pFrameInfo->captureTime = this->recordStartTime + std::chrono::microseconds(quantizedPtsUs);
     }
     else {
-        slot.captureTime->store(std::chrono::steady_clock::now(), std::memory_order_release);
+        slot.pFrameInfo->captureTime = std::chrono::steady_clock::now();
     }
 
     hr = slot.pMutex->ReleaseSync(1);

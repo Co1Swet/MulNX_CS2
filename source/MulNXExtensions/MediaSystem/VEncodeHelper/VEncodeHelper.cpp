@@ -3,8 +3,8 @@
 bool VEncodeHelper::Init() { return true; }
 
 bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
-                                const av::Codec& codec, int fps, int srcW, int srcH) {
-    this->width  = (rp.width  > 0) ? rp.width  : srcW;
+    const av::Codec& codec, int fps, int srcW, int srcH) {
+    this->width = (rp.width > 0) ? rp.width : srcW;
     this->height = (rp.height > 0) ? rp.height : srcH;
     this->chosenEncoder = codec.name();
 
@@ -22,10 +22,10 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
         this->encoder.setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
 
     if (auto* raw = this->encoder.raw()) {
-        raw->color_range    = AVCOL_RANGE_JPEG;
-        raw->colorspace     = AVCOL_SPC_BT709;
+        raw->color_range = AVCOL_RANGE_MPEG;
+        raw->colorspace = AVCOL_SPC_BT709;
         raw->color_primaries = AVCOL_PRI_BT709;
-        raw->color_trc      = AVCOL_TRC_BT709;
+        raw->color_trc = AVCOL_TRC_BT709;
     }
 
     av::Dictionary opts;
@@ -34,7 +34,8 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
         std::error_code ec;
         this->encoder.open(opts, ec);
         if (ec) { this->LogWarning(std::format("{} 打开失败: {}", this->chosenEncoder, ec.message())); return false; }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         this->LogWarning(std::format("{} 打开异常: {}", this->chosenEncoder, e.what())); return false;
     }
 
@@ -45,8 +46,8 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const RecordParams& rp,
 }
 
 void VEncodeHelper::SetOn(av::FormatContext* oCtx, const RecordParams& rp,
-                          int srcW, int srcH, av::PixelFormat srcFmt,
-                          ID3D11Device* device, int fps) {
+    int srcW, int srcH, av::PixelFormat srcFmt,
+    ID3D11Device* device, int fps) {
     this->ptsCounter = 0;
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
 
@@ -70,7 +71,7 @@ void VEncodeHelper::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
         this->rescaler.dstPixelFormat() == this->dstPixFmt)
         return;
     this->rescaler = av::VideoRescaler(this->width, this->height, this->dstPixFmt,
-                                        srcW, srcH, srcFmt, av::SwsFlagBicubic);
+        srcW, srcH, srcFmt, av::SwsFlagBicubic);
 }
 
 std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
@@ -104,7 +105,8 @@ std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
         pkt.setStreamIndex(this->vstream.index());
         pkt.setTimeBase(this->vstream.timeBase());
         return pkt;
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         this->LogError(std::string("编码失败: ") + e.what());
         return std::nullopt;
     }
@@ -119,7 +121,8 @@ std::optional<av::Packet> VEncodeHelper::TrySetOff() {
             pkt.setTimeBase(this->vstream.timeBase());
             return pkt;
         }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         this->LogError(std::string("刷新失败: ") + e.what());
     }
     return std::nullopt;
