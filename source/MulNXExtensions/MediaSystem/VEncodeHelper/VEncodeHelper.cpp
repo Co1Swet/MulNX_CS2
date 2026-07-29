@@ -1,8 +1,10 @@
 #include "VEncodeHelper.hpp"
 #include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
+#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool VEncodeHelper::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
+    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
 
     this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
         this->Reset();
@@ -11,10 +13,12 @@ bool VEncodeHelper::Init() {
     return true;
 }
 
-bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec, int fps, int srcW, int srcH) {
+bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
     auto& rp = *this->pMediaParamManager;
-    this->width = (rp.width > 0) ? rp.width : srcW;
-    this->height = (rp.height > 0) ? rp.height : srcH;
+
+    this->width = rp.width > 0 ? rp.width : this->pVCD3D11Manager->srcWidth;
+    this->height = rp.height > 0 ? rp.width : this->pVCD3D11Manager->srcHeight;
+
     this->chosenEncoder = codec.name();
 
     this->encoder = av::VideoEncoderContext(codec);
@@ -23,8 +27,10 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec,
     this->encoder.setPixelFormat(this->dstPixFmt);
     this->encoder.setTimeBase(this->timeBase);
 
-    int gop = rp.gopSize > 0 ? rp.gopSize : (fps > 0 ? fps * 2 : 120);
+    int gop = rp.gopSize > 0 ? rp.gopSize :
+        (rp.targetFPS > 0 ? rp.targetFPS * 2 : 120);
     this->encoder.setGopSize(gop);
+
     this->encoder.setMaxBFrames(rp.maxBFrames);
     this->encoder.setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate);
     if (rp.rc == RateControl::CQ && rp.cq > 0)
@@ -38,14 +44,17 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec,
     }
 
     av::Dictionary opts;
-
     try {
         std::error_code ec;
         this->encoder.open(opts, ec);
-        if (ec) { this->LogWarning(std::format("{} 打开失败: {}", this->chosenEncoder, ec.message())); return false; }
+        if (ec) {
+            this->LogError(std::format("{} 打开失败: {}", this->chosenEncoder, ec.message()));
+            return false;
+        }
     }
     catch (const std::exception& e) {
-        this->LogWarning(std::format("{} 打开异常: {}", this->chosenEncoder, e.what())); return false;
+        this->LogError(std::format("{} 打开异常: {}", this->chosenEncoder, e.what()));
+        return false;
     }
 
     this->vstream = oCtx->addStream(this->encoder);
@@ -54,22 +63,27 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec,
     return true;
 }
 
-void VEncodeHelper::SetOn(av::FormatContext* oCtx, int srcW, int srcH, av::PixelFormat srcFmt,
-    ID3D11Device* device, int fps) {
-    auto& rp = *this->pMediaParamManager;
+void VEncodeHelper::SetOn(av::FormatContext* oCtx) {
+    
     this->ptsCounter = 0;
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
 
-    AVCodecID targetId = (rp.mode == EncodeMode::HEVC) ? AV_CODEC_ID_HEVC : AV_CODEC_ID_H264;
-
     // 纯软件
     av::Codec codec = av::findEncodingCodec("libopenh264");
-    if (codec.isNull()) codec = av::findEncodingCodec(targetId);
-    if (!codec.isNull() && codec.canEncode() && this->OpenEncoder(oCtx, codec, fps, srcW, srcH)) {
-        this->LogSucc(std::format("软件编码: {} ({}x{})", this->chosenEncoder, this->width, this->height));
+    if (codec.isNull()){
+        this->LogError("libopenh264 缺失");
         return;
     }
-    this->LogError("没有可用的 H264/HEVC 编码器");
+    if (!codec.canEncode()) {
+        this->LogError("编码器无法编码");
+        return;
+    }
+    if (!this->OpenEncoder(oCtx, codec)) {
+        this->LogError("编码器打开失败");
+    }
+
+    this->LogSucc(std::format("软件编码: {} ({}x{})",
+        this->chosenEncoder, this->width.load(), this->height.load()));
 }
 
 void VEncodeHelper::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
@@ -105,6 +119,7 @@ std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
         if (inPts >= 0) pts = inPts;
         if (pts < this->ptsCounter) pts = this->ptsCounter;
         this->ptsCounter = pts + 1;
+
         dst.setTimeBase(this->timeBase);
         dst.setPts(av::Timestamp(pts, this->timeBase));
         dst.setStreamIndex(this->vstream.index());

@@ -67,9 +67,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->recordStartTime = std::chrono::steady_clock::now();
         this->pBufferCopier->SetRecordStart(this->recordStartTime);
 
-        this->pVEncodeHelper->SetOn(&this->ofctx, srcW, srcH, srcFmt,
-            this->pVCD3D11Manager->pReadSideDevice.Get(),
-            rp.captureFpsCap > 0 ? rp.captureFpsCap.load() : 0);
+        this->pVEncodeHelper->SetOn(&this->ofctx);
         this->pAEncodeHelper->SetOn(&this->ofctx, this->pAudioCapturer->GetSampleRate());
 
         this->ofctx.writeHeader();
@@ -78,7 +76,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->pVideoCapturer->StartCapture(this->recordStartTime);
         this->LogSucc(std::format("开始录制: {} ({}x{})", outFile,
             rp.width > 0 ? rp.width : srcW, rp.height > 0 ? rp.height : srcH,
-            rp.captureFpsCap > 0 ? std::to_string(rp.captureFpsCap) + "fps " : ""));
+            rp.targetFPS > 0 ? std::to_string(rp.targetFPS) + "fps " : ""));
         this->recording = true;
         return true;
     }

@@ -63,8 +63,7 @@ void MediaSystem::RecordParamsUI() {
     ImGui::TextDisabled("画面");
     ImGui::InputInt("宽度(0=原生)", &p.width);
     ImGui::InputInt("高度(0=原生)", &p.height);
-    MulNX::UI::SliderInt("捕获帧率(0=不限)", p.captureFpsCap, 0, 1200);
-    if (p.captureFpsCap < 0) p.captureFpsCap = 0;
+    MulNX::UI::SliderInt("捕获帧率(0=不限)", p.targetFPS, 0, 1200);
 }
 
 bool MediaSystem::Init() {

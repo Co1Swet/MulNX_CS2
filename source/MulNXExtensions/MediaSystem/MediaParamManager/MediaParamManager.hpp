@@ -17,8 +17,8 @@ public:
     std::string preset = "p4";        // 编码器预设（nvenc: p1-p7, x264: ultrafast~placebo）
     std::string profile = "high";      // high / main / baseline
 
-    // ── 捕获 ──
+    
     int  width = 0;           // 0=原生
     int  height = 0;           // 0=原生
-    std::atomic<int> captureFpsCap = 60;          // 0=不限制
+    std::atomic<int> targetFPS = 60;          // 0=不限制
 };

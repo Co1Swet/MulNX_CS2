@@ -24,7 +24,7 @@ void BufferCopier::CopyTexture() {
     if (!this->shouldCopy.load(std::memory_order_acquire)) return;
 
     // 基于时间槽的帧率上限：捕获落在当前时间槽的首帧，并量化 PTS 为槽边界
-    int cap = this->pMediaParamManager->captureFpsCap.load(std::memory_order_acquire);
+    int cap = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
     int64_t quantizedPtsUs = -1; // -1 表示不量化，使用实际 now
     if (cap > 0) {
         auto now = std::chrono::steady_clock::now();
