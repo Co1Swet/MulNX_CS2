@@ -61,6 +61,8 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
     this->pBufferCopier->SetCaptureFpsCap(rp.captureFpsCap);
     this->pAudioCapturer->ClearBuffer();
     this->pVideoCapturer->ClearBuffer();
+    MulNX::Message msg("MediaSync/Reset"_hash);
+    this->PublishSync(msg);
     this->pVideoCapturer->Reset();
     this->pAEncodeHelper->Reset();
     this->pVEncodeHelper->Reset();
@@ -151,6 +153,8 @@ bool MediaRecorder::StopRecording() {
 
     this->ofctx.writeTrailer();
 
+    MulNX::Message msg("MediaSync/Reset"_hash);
+    this->PublishSync(msg);
     this->pVideoCapturer->Reset();
     this->pAEncodeHelper->Reset();
     this->pVEncodeHelper->Reset();

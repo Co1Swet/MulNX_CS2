@@ -5,12 +5,12 @@ bool HookRecordCmd::Init() {
     this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
         auto&& [pCmd] = msg.Access<CCmd*>();
 
-        this->LogInfo(pCmd->m_pszName);
-        if (std::string(pCmd->m_pszName).find("startmovie") != std::string::npos) {
+        // this->LogInfo(pCmd->m_pszName);
+
+        if (strcmp(pCmd->m_pszName, "startmovie") == 0) {
             pCmd->m_nFlags = 8;
         }
-
-        if (std::string(pCmd->m_pszName).find("endmovie") != std::string::npos) {
+        if (strcmp(pCmd->m_pszName, "endmovie") == 0) {
             pCmd->m_nFlags = 8;
         }
 
