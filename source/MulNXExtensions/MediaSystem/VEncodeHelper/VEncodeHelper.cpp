@@ -3,6 +3,11 @@
 
 bool VEncodeHelper::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
+
+    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
+        this->Reset();
+        });
+
     return true;
 }
 

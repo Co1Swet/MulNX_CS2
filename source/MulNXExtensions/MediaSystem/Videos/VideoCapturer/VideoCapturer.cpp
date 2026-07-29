@@ -9,7 +9,16 @@ bool VideoCapturer::Init() {
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pBufferCopier = this->FindModule<BufferCopier>("BufferCopier");
     this->pTextureMapper = this->FindModule<TextureMapper>("TextureMapper");
-    this->SendTask("VMap", "VMap", [this]() -> bool { this->Captuer(); return true; });
+
+    this->SendTask("VMap", "VMap", [this]() {
+        this->Captuer();
+        return true;
+        });
+
+    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
+        this->Reset();
+        });
+
     return true;
 }
 
@@ -17,6 +26,8 @@ void VideoCapturer::Reset() {
     std::unique_lock lock(this->smutex);
     this->recordStartTime.reset();
     this->vCapturing.store(false);
+    av::VideoFrame discard;
+    while (this->buffer.try_dequeue(discard));
 }
 
 void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
@@ -28,11 +39,6 @@ void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& st
 void VideoCapturer::StopCapture() {
     std::unique_lock lock(this->smutex);
     this->vCapturing.store(false);
-}
-
-void VideoCapturer::ClearBuffer() {
-    av::VideoFrame discard;
-    while (this->buffer.try_dequeue(discard));
 }
 
 std::optional<av::VideoFrame> VideoCapturer::TryPop() {

@@ -41,6 +41,8 @@ class VCD3D11Manager final : public MediaModuleBase {
     moodycamel::BlockingConcurrentQueue<int> forReader{};
     moodycamel::BlockingConcurrentQueue<int> forWriter{};
 
+    av::PixelFormat DXGIFormatToAvPixelFormat(DXGI_FORMAT format);
+
     void OnPresentFirst(MulNX::Message& msg);
     bool CreateSlot(const D3D11_TEXTURE2D_DESC& desc, RingSlot& slot);
 
@@ -55,7 +57,9 @@ public:
     // 源纹理参数（创建环形队列时记录，供编码器配置使用）
     int srcWidth = 0;
     int srcHeight = 0;
+
     DXGI_FORMAT srcDxgiFormat = DXGI_FORMAT_UNKNOWN;
+    av::PixelFormat srcAVFormat = AV_PIX_FMT_NONE;
 
     std::optional<int> TryGetReadSide();
     void ReleaseReadSide(int index);

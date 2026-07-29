@@ -10,7 +10,7 @@
 
 void MediaRecorder::CaptureCallback() {
     ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList*, const ImDrawCmd* cmd) {
-        static_cast<MediaRecorder*>(cmd->UserCallbackData)->PublishSync("Hook/BeforePresent"_hash);
+        static_cast<MediaRecorder*>(cmd->UserCallbackData)->PublishSync("MediaSync/PresentCallback"_hash);
         }, this, 0);
 }
 
@@ -22,14 +22,17 @@ bool MediaRecorder::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
     this->pBufferCopier = this->FindModule<BufferCopier>("BufferCopier");
-
-    this->dirVideos = this->Path()->PathGetForShared("Videos");
+    
     (*this)
         .SubscribeAsync("Media/Record/Start")
         .SubscribeAsync("Media/Record/Stop");
 
     this->SendTask("Main", "Media", [this]() { this->Main(); return true; });
-    this->UIRegisterBackground("捕获以上所有根触发的UI渲染", [this](auto&&...) { return this->CaptureCallback(); });
+
+    this->UIRegisterBackground("捕获以上所有根触发的UI渲染", [this](auto&&...) {
+        return this->CaptureCallback();
+        });
+    
     return true;
 }
 
@@ -52,18 +55,12 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
     std::string outFile = pathNoExt + ".mp4";
     int srcW = this->pVCD3D11Manager->srcWidth;
     int srcH = this->pVCD3D11Manager->srcHeight;
-    av::PixelFormat srcFmt = DXGIFormatToAvPixelFormat(this->pVCD3D11Manager->srcDxgiFormat);
+    av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
     if (srcW <= 0 || srcH <= 0 || srcFmt == AV_PIX_FMT_NONE) {
         this->LogError("源纹理参数无效"); return false;
     }
 
-    this->pAudioCapturer->ClearBuffer();
-    this->pVideoCapturer->ClearBuffer();
-    MulNX::Message msg("MediaSync/Reset"_hash);
-    this->PublishSync(msg);
-    this->pVideoCapturer->Reset();
-    this->pAEncodeHelper->Reset();
-    this->pVEncodeHelper->Reset();
+    this->PublishSync("MediaSync/Reset"_hash);
 
     try {
         this->ofctx.openOutput(outFile);
@@ -151,13 +148,9 @@ bool MediaRecorder::StopRecording() {
 
     this->ofctx.writeTrailer();
 
-    MulNX::Message msg("MediaSync/Reset"_hash);
-    this->PublishSync(msg);
-    this->pVideoCapturer->Reset();
-    this->pAEncodeHelper->Reset();
-    this->pVEncodeHelper->Reset();
-    this->ofctx.close();
+    this->PublishSync("MediaSync/Reset"_hash);
 
+    this->ofctx.close();
     this->LogSucc("录制结束");
 
     return true;

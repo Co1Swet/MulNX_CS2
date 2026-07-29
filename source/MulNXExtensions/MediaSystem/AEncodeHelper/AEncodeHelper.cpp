@@ -1,6 +1,10 @@
 #include "AEncodeHelper.hpp"
 
-bool AEncodeHelper::Init(){
+bool AEncodeHelper::Init() {
+    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
+        this->Reset();
+        });
+    
     return true;
 }
 

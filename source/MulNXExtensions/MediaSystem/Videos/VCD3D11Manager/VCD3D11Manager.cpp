@@ -10,6 +10,19 @@ bool VCD3D11Manager::Init() {
     return true;
 }
 
+av::PixelFormat VCD3D11Manager::DXGIFormatToAvPixelFormat(DXGI_FORMAT format) {
+    switch (format) {
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+        return AV_PIX_FMT_RGBA;
+    case DXGI_FORMAT_B8G8R8A8_UNORM:
+    case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+        return AV_PIX_FMT_BGRA;
+    default:
+        return AV_PIX_FMT_NONE;
+    }
+}
+
 bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot& slot) {
     HRESULT hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &slot.rawTex.pTex);
     if (FAILED(hr)) {
@@ -106,7 +119,10 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     // 记录源参数：宽高用后备缓冲，像素格式用 RTV 格式（保证可被 DXGIFormatToAvPixelFormat 识别）
     this->srcWidth = (int)bbDesc.Width;
     this->srcHeight = (int)bbDesc.Height;
+
     this->srcDxgiFormat = rtvDesc.Format;
+    this->srcAVFormat = this->DXGIFormatToAvPixelFormat(this->srcDxgiFormat);
+
     this->LogInfo(std::format("源纹理: {}x{} bbFormat={:#x} rtvFormat={:#x}",
         this->srcWidth, this->srcHeight,
         static_cast<unsigned>(bbDesc.Format),

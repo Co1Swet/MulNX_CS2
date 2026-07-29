@@ -15,7 +15,7 @@ static GUID REFERENCE_GUID = GUID_NULL;
 bool AudioCapturer::Init() {
     this->SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {
         // start capture thread
-        this->capturing.store(true);
+        this->keepWork.store(true);
 
         ComPtr<IMMDeviceEnumerator> enumerator;
         if (FAILED(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&enumerator)))) {
@@ -85,6 +85,9 @@ bool AudioCapturer::Init() {
 
         });
 
+    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
+        this->ClearBuffer();
+        });
 
     return true;
 }
@@ -96,7 +99,7 @@ void AudioCapturer::Main() {
 
     int sampleRate = wfx ? wfx->nSamplesPerSec : 0;
     int channels = wfx->nChannels;
-    while (this->capturing.load()) {
+    while (this->keepWork.load()) {
         // Wait for WASAPI event (infinite or timeout)
         DWORD wait = WaitForSingleObject(hEvent, 2000);
         if (wait == WAIT_TIMEOUT) continue;
@@ -219,7 +222,7 @@ void AudioCapturer::Main() {
 }
 
 void AudioCapturer::Deinit() {
-    this->capturing.store(false);
+    this->keepWork.store(false);
     std::unique_lock lock(this->smutex);
     if (this->audioClient) {
         audioClient->Stop();

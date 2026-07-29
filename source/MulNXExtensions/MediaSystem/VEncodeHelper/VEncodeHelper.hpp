@@ -13,15 +13,14 @@ class VEncodeHelper final :public MediaModuleBase {
     int64_t ptsCounter = 0;
     AVRational timeBase{ 1, 1000000 };
 
+    bool Init() override;
     bool OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec, int fps, int srcW, int srcH);
     void CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt);
+    void Reset();
 public:
-    bool Init() override;
-
     void SetOn(av::FormatContext* oCtx, int srcW, int srcH, av::PixelFormat srcFmt,
                ID3D11Device* device, int fps);
     std::optional<av::Packet> Encode(av::VideoFrame srcFrame);
 
     std::optional<av::Packet> TrySetOff();
-    void Reset();
 };

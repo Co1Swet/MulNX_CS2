@@ -12,10 +12,10 @@ class MediaRecorder final :public MediaModuleBase {
 
     std::atomic<bool> recording = false;
 
-    std::filesystem::path dirVideos;
     av::FormatContext ofctx;
     std::chrono::steady_clock::time_point recordStartTime;
 
+    
     bool StartRecording(const std::string& filename);
     bool StopRecording();
     void CaptureCallback();

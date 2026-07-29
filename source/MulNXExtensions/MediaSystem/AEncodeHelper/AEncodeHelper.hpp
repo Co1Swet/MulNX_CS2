@@ -9,13 +9,13 @@ class AEncodeHelper final :public MediaModuleBase {
     std::deque<av::AudioSamples> audioFifo;
 
     int64_t aptsCounter = 0;
+    void Reset();
 public:
     bool Init()override;
 
     void SetOn(av::FormatContext* oCtx, int sampleRate);
     std::optional<av::Packet> TrySetOff();
-    void Reset();
-
+    
     bool CheckResampler(av::AudioSamples& converted, av::AudioSamples&& asamples);
     std::optional<av::Packet> Encode(av::AudioSamples&& asamples);
 };

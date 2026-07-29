@@ -13,19 +13,6 @@
 #include <avcpp/videorescaler.h>
 #include <avcpp/audioresampler.h>
 
-inline av::PixelFormat DXGIFormatToAvPixelFormat(DXGI_FORMAT format) {
-    switch (format) {
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
-        return AV_PIX_FMT_RGBA;
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
-        return AV_PIX_FMT_BGRA;
-    default:
-        return AV_PIX_FMT_NONE;
-    }
-}
-
 namespace MulNX {
     class VFrameExInfo {
     public:

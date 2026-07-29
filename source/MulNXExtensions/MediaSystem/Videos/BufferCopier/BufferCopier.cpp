@@ -8,7 +8,7 @@ bool BufferCopier::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
 
     (*this)
-        .SubscribeSync("Hook/BeforePresent", [this](MulNX::Message& msg) {this->CopyTexture();})
+        .SubscribeSync("MediaSync/PresentCallback", [this](MulNX::Message& msg) {this->CopyTexture();})
         .SubscribeSync("MediaSync/BeforeCopyBackbuffer", [this](MulNX::Message& msg) {})
         ;
 
@@ -63,7 +63,7 @@ void BufferCopier::CopyTexture() {
     if (bbDescR.SampleDesc.Count > 1) {
         this->pGraphicsManager->pd3dContext->ResolveSubresource(
             slot.pTex.Get(), 0, backBuffer.Get(), 0,
-            static_cast<DXGI_FORMAT>(this->pVCD3D11Manager->srcDxgiFormat));
+            this->pVCD3D11Manager->srcDxgiFormat);
     }
     else {
         this->pGraphicsManager->pd3dContext->CopyResource(

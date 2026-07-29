@@ -23,7 +23,8 @@ std::optional<av::VideoFrame> TextureMapper::MapFrame(MidTex& tex) {
     D3D11_TEXTURE2D_DESC desc;
     tex.pTex->GetDesc(&desc);
 
-    av::PixelFormat srcFmt = DXGIFormatToAvPixelFormat(desc.Format);
+    av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
+    
     if (srcFmt == AV_PIX_FMT_NONE) return std::nullopt;
 
     if (!this->pStagingTex || this->stagingWidth != (int)desc.Width ||
