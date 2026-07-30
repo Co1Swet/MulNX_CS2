@@ -103,10 +103,6 @@ void MediaRecorder::Main() {
 }
 
 void MediaRecorder::Encode() {
-    auto PtsUs = [](const av::Timestamp& ts)->int64_t {
-        return ts.isValid() ? ts.timestamp({ 1,1000000 }) : INT64_MAX;
-        };
-
     std::vector<av::Packet> packets;
 
     while (auto p = this->pVEncodeHelper->Encode()) {
@@ -120,8 +116,6 @@ void MediaRecorder::Encode() {
     }
 
     if (packets.empty()) return;
-    std::sort(packets.begin(), packets.end(),
-        [&](const av::Packet& l, const av::Packet& r) { return PtsUs(l.dts()) < PtsUs(r.dts()); });
 
     for (auto& pkt : packets) {
         try { this->ofctx.writePacket(pkt); }

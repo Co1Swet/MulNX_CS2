@@ -21,8 +21,11 @@ bool VEncodeHelper::Init() {
 bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
     auto& rp = *this->pMediaParamManager;
 
-    this->width = rp.width > 0 ? rp.width : this->pVCD3D11Manager->srcWidth;
-    this->height = rp.height > 0 ? rp.width : this->pVCD3D11Manager->srcHeight;
+    this->width = rp.width > 0 ? rp.width :
+        this->pVCD3D11Manager->srcWidth;
+    
+    this->height = rp.height > 0 ? rp.height :
+        this->pVCD3D11Manager->srcHeight;
 
     this->chosenEncoder = codec.name();
 
