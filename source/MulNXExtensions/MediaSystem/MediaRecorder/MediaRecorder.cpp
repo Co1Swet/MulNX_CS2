@@ -13,7 +13,6 @@ void MediaRecorder::CaptureCallback() {
 }
 
 bool MediaRecorder::Init() {
-    this->pAudioCapturer = this->FindModule<AudioCapturer>("AudioCapturer");
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
@@ -23,7 +22,10 @@ bool MediaRecorder::Init() {
         .SubscribeAsync("Media/Record/Start")
         .SubscribeAsync("Media/Record/Stop");
 
-    this->SendTask("Main", "AVEncoding", [this]() { this->Main(); return true; });
+    this->SendTask("Main", "AVEncoding", [this]() {
+        this->Main();
+        return true;
+        });
 
     this->UIRegisterBackground("捕获以上所有根触发的UI渲染", [this](auto&&...) {
         return this->CaptureCallback();
@@ -73,8 +75,6 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         rInfo.startTime = std::chrono::steady_clock::now();
         this->PublishSync(SetOnMsg);
 
-        this->pAEncodeHelper->SetOn(&this->ofctx, this->pAudioCapturer->GetSampleRate());
-
         this->ofctx.writeHeader();
         this->LogInfo(std::format("输出头已写入, 流数={}", this->ofctx.streamsCount()));
 
@@ -96,35 +96,6 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
     }
 }
 
-void MediaRecorder::Main() {
-    this->Update();
-    if (!this->recording) return;
-    this->Encode();
-}
-
-void MediaRecorder::Encode() {
-    std::vector<av::Packet> packets;
-
-    while (auto p = this->pVEncodeHelper->Encode()) {
-        packets.push_back(std::move(*p));
-    }
-        
-    while (auto a = this->pAudioCapturer->TryPop()) {
-        if (a->samplesCount() > 0)
-            if (auto p = this->pAEncodeHelper->Encode(std::move(*a)))
-                packets.push_back(std::move(*p));
-    }
-
-    if (packets.empty()) return;
-
-    for (auto& pkt : packets) {
-        try { this->ofctx.writePacket(pkt); }
-        catch (const std::exception& e) {
-            this->LogWarning(std::format("写包失败: {}", e.what()));
-        }
-    }
-}
-
 bool MediaRecorder::StopRecording() {
     if (!this->recording) return false;
     this->recording = false;
@@ -134,15 +105,17 @@ bool MediaRecorder::StopRecording() {
     try {
         while (auto p = this->pVEncodeHelper->Encode()) {
             this->ofctx.writePacket(*p);
-        }                
-        while (auto p = this->pVEncodeHelper->TrySetOff())
+        }
+        while (auto p = this->pVEncodeHelper->TrySetOff()) {
             this->ofctx.writePacket(*p);
-        while (auto a = this->pAudioCapturer->TryPop())
-            if (a->samplesCount() > 0)
-                if (auto p = this->pAEncodeHelper->Encode(std::move(*a)))
-                    this->ofctx.writePacket(*p);
-        while (auto p = this->pAEncodeHelper->TrySetOff())
+        }
+            
+        while (auto p = this->pAEncodeHelper->Encode()) {
             this->ofctx.writePacket(*p);
+        }
+        while (auto p = this->pAEncodeHelper->TrySetOff()) {
+            this->ofctx.writePacket(*p);
+        }
     }
     catch (const std::exception& e) {
         this->LogWarning(std::format("停止时异常: {}", e.what()));
@@ -156,4 +129,33 @@ bool MediaRecorder::StopRecording() {
     this->LogSucc("录制结束");
 
     return true;
+}
+
+void MediaRecorder::Main() {
+    this->Update();
+    if (!this->recording) return;
+    this->Encode();
+}
+
+void MediaRecorder::Encode() {
+    std::vector<av::Packet> packets;
+
+    while (auto p = this->pVEncodeHelper->Encode()) {
+        packets.push_back(std::move(*p));
+    }
+        
+    while (auto p = this->pAEncodeHelper->Encode()) {
+        packets.push_back(std::move(*p));
+    }
+
+    if (packets.empty()) return;
+
+    for (auto& pkt : packets) {
+        try {
+            this->ofctx.writePacket(pkt);
+        }
+        catch (const std::exception& e) {
+            this->LogWarning(std::format("写包失败: {}", e.what()));
+        }
+    }
 }

@@ -2,6 +2,7 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
 class AEncodeHelper final :public MediaModuleBase {
+    class AudioCapturer* pAudioCapturer = nullptr;
     av::Stream astream;
     av::AudioEncoderContext aencoder;
     av::AudioResampler aresampler;
@@ -10,12 +11,12 @@ class AEncodeHelper final :public MediaModuleBase {
 
     int64_t aptsCounter = 0;
     void Reset();
-public:
-    bool Init()override;
-
-    void SetOn(av::FormatContext* oCtx, int sampleRate);
-    std::optional<av::Packet> TrySetOff();
-    
+    void SetOn(av::FormatContext* oCtx);
     bool CheckResampler(av::AudioSamples& converted, av::AudioSamples&& asamples);
-    std::optional<av::Packet> Encode(av::AudioSamples&& asamples);
+
+    bool Init()override;
+public:
+    std::optional<av::Packet> TrySetOff();
+    moodycamel::ConcurrentQueue<av::AudioSamples> bufferAudioSampleses;
+    std::optional<av::Packet> Encode();
 };

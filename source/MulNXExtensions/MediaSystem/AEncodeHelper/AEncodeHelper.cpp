@@ -1,15 +1,24 @@
 #include "AEncodeHelper.hpp"
+#include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 
 bool AEncodeHelper::Init() {
+    this->pAudioCapturer = this->FindModule<AudioCapturer>("AudioCapturer");
+
     this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
         this->Reset();
         });
-    
+
+    this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
+        auto&& [info] = msg.Access<MulNX::AVStartInfo>();
+        this->SetOn(info.pOutCtx);
+        });
+
     return true;
 }
 
-void AEncodeHelper::SetOn(av::FormatContext* oCtx, int sampleRate) {
+void AEncodeHelper::SetOn(av::FormatContext* oCtx) {
     this->audioFifo.clear(); // 清空音频缓冲
+    int sampleRate = this->pAudioCapturer->GetSampleRate();
 
     av::Codec acodec = av::findEncodingCodec(AV_CODEC_ID_AAC);
     if (!acodec.canEncode()) {
@@ -157,6 +166,10 @@ std::optional<av::Packet> AEncodeHelper::TrySetOff() {
 }
 
 void AEncodeHelper::Reset() {
+    av::AudioSamples temp;
+    while (this->bufferAudioSampleses.try_dequeue(temp)) {
+        
+    }
     this->aptsCounter = 0;
 }
 
@@ -197,8 +210,11 @@ bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples
     return true;
 }
 
-std::optional<av::Packet> AEncodeHelper::Encode(av::AudioSamples&& asamples) {
+std::optional<av::Packet> AEncodeHelper::Encode() {
     if (!this->aencoder.isOpened())return std::nullopt;
+    av::AudioSamples asamples;
+    if (!this->bufferAudioSampleses.try_dequeue(asamples))return std::nullopt;
+    if (asamples.samplesCount() <= 0)return std::nullopt;
 
     av::AudioSamples converted;
     if (!this->CheckResampler(converted, std::move(asamples)))return std::nullopt;

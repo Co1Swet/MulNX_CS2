@@ -1,4 +1,5 @@
 #include "AudioCapturer.hpp"
+#include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <mmdeviceapi.h>
 
 #include <avcpp/sampleformat.h>
@@ -13,6 +14,8 @@ using Microsoft::WRL::ComPtr;
 static GUID REFERENCE_GUID = GUID_NULL;
 
 bool AudioCapturer::Init() {
+    this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
+
     this->SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {
         // start capture thread
         this->keepWork.store(true);
@@ -76,19 +79,13 @@ bool AudioCapturer::Init() {
             return;
         }
 
-        // Schedule Main via ISys task (no explicit thread)
         this->SendTask("Main", "AudioCapturer", [this]() {
             std::unique_lock lock(this->smutex);
             this->Main();
             return false;
             });
-
         });
-
-    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
-        this->ClearBuffer();
-        });
-
+    
     return true;
 }
 
@@ -169,7 +166,7 @@ void AudioCapturer::Main() {
                     if (captured.channelsLayout() != targetLayout) needNormalize = true;
 
                     if (!needNormalize) {
-                        this->buffer.enqueue(std::move(captured));
+                        this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(captured));
                     }
                     else {
                         std::error_code rerr;
@@ -179,23 +176,23 @@ void AudioCapturer::Main() {
                             tmpRes.push(captured);
                             av::AudioSamples out = tmpRes.pop(0);
                             if (out.isValid() && out.samplesCount() > 0) {
-                                this->buffer.enqueue(std::move(out));
+                                this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(out));
                             }
                             else {
                                 // fallback to original if conversion produced no data
-                                this->buffer.enqueue(std::move(captured));
+                                this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(captured));
                             }
                         }
                         else {
                             this->LogWarning(std::string("AudioCapturer: resampler init failed: ") + (rerr ? rerr.message() : "unknown"));
-                            this->buffer.enqueue(std::move(captured));
+                            this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(captured));
                         }
                     }
                 }
                 catch (const std::exception& e) {
                     this->LogWarning(std::string("AudioCapturer: normalization failed: ") + e.what());
                     // best effort: if normalization fails, enqueue original raw data
-                    try { this->buffer.enqueue(std::move(samples)); }
+                    try { this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(samples)); }
                     catch (...) {}
                 }
             }
@@ -234,20 +231,5 @@ void AudioCapturer::Deinit() {
     // Wake Main if it's waiting on the event so it can exit and clean up
     if (this->hEvent) {
         SetEvent(this->hEvent);
-    }
-}
-
-std::optional<av::AudioSamples> AudioCapturer::TryPop() {
-    av::AudioSamples out;
-    if (this->buffer.try_dequeue(out)) {
-        return std::move(out);
-    }
-    return std::nullopt;
-}
-
-void AudioCapturer::ClearBuffer() {
-    av::AudioSamples discard;
-    while (this->buffer.try_dequeue(discard)) {
-        // drain stale audio data
     }
 }

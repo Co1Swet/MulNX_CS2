@@ -4,7 +4,6 @@
 class MediaRecorder final :public MediaModuleBase {
     class AEncodeHelper*    pAEncodeHelper    = nullptr;
     class VEncodeHelper*    pVEncodeHelper    = nullptr;
-    class AudioCapturer*    pAudioCapturer    = nullptr;
     class VCD3D11Manager*   pVCD3D11Manager   = nullptr;
     class MediaParamManager* pMediaParamManager = nullptr;
 
@@ -13,7 +12,6 @@ class MediaRecorder final :public MediaModuleBase {
     av::FormatContext ofctx;
     std::chrono::steady_clock::time_point recordStartTime;
 
-    
     bool StartRecording(const std::string& filename);
     bool StopRecording();
     void CaptureCallback();
