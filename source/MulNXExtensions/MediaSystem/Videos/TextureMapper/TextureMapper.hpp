@@ -13,6 +13,7 @@ class TextureMapper final :public MediaModuleBase {
 
     bool Init()override;
     void ReleaseStagingTexture();
+    bool CheckStagingTexture(D3D11_TEXTURE2D_DESC& desc);
 public:
     std::optional<av::VideoFrame> MapFrame(MidTex& tex);
 };

@@ -14,31 +14,49 @@ void TextureMapper::ReleaseStagingTexture() {
     this->readbackBuf.clear();
     this->readbackBuf.shrink_to_fit();
     this->srcPixelFormat = AV_PIX_FMT_NONE;
-    if (this->pStagingTex) { this->pStagingTex->Release(); this->pStagingTex = nullptr; }
-    this->stagingWidth = this->stagingHeight = 0;
+    if (this->pStagingTex) {
+        this->pStagingTex->Release();
+        this->pStagingTex = nullptr;
+    }
+    this->stagingWidth = 0;
+    this->stagingHeight = 0;
     this->stagingFormat = DXGI_FORMAT_UNKNOWN;
+}
+
+bool TextureMapper::CheckStagingTexture(D3D11_TEXTURE2D_DESC& desc) {
+    av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
+    if (srcFmt == AV_PIX_FMT_NONE) return false;
+
+    if (!this->pStagingTex || this->stagingWidth != (int)desc.Width ||
+        this->stagingHeight != (int)desc.Height || this->stagingFormat != desc.Format) {
+        this->ReleaseStagingTexture();
+
+        D3D11_TEXTURE2D_DESC sd = {};
+        sd.Width = desc.Width;
+        sd.Height = desc.Height;
+        sd.MipLevels = sd.ArraySize = 1;
+        sd.Format = desc.Format;
+        sd.SampleDesc.Count = 1;
+        sd.Usage = D3D11_USAGE_STAGING;
+        sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+        if (FAILED(this->pVCD3D11Manager->pReadSideDevice->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
+            return false;
+        
+        this->stagingWidth = (int)desc.Width;
+        this->stagingHeight = (int)desc.Height;
+        this->stagingFormat = desc.Format;
+        this->srcPixelFormat = srcFmt;
+    }
+
+    return true;
 }
 
 std::optional<av::VideoFrame> TextureMapper::MapFrame(MidTex& tex) {
     D3D11_TEXTURE2D_DESC desc;
     tex.pTex->GetDesc(&desc);
 
-    av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
-    
-    if (srcFmt == AV_PIX_FMT_NONE) return std::nullopt;
-
-    if (!this->pStagingTex || this->stagingWidth != (int)desc.Width ||
-        this->stagingHeight != (int)desc.Height || this->stagingFormat != desc.Format) {
-        this->ReleaseStagingTexture();
-        D3D11_TEXTURE2D_DESC sd = {};
-        sd.Width = desc.Width; sd.Height = desc.Height; sd.MipLevels = sd.ArraySize = 1;
-        sd.Format = desc.Format; sd.SampleDesc.Count = 1;
-        sd.Usage = D3D11_USAGE_STAGING; sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        if (FAILED(this->pVCD3D11Manager->pReadSideDevice->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
-            return std::nullopt;
-        this->stagingWidth = (int)desc.Width; this->stagingHeight = (int)desc.Height;
-        this->stagingFormat = desc.Format; this->srcPixelFormat = srcFmt;
-    }
+    if (!this->CheckStagingTexture(desc))return std::nullopt;
 
     tex.pMutex->AcquireSync(1, INFINITE);
     if (desc.SampleDesc.Count > 1)

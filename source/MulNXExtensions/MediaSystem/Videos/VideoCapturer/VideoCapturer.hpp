@@ -13,9 +13,9 @@ class VideoCapturer final :public MediaModuleBase {
     std::optional<std::chrono::steady_clock::time_point> recordStartTime;
     std::atomic<bool> vCapturing = false;
 
-    void Captuer();
     bool Init()override;
 
+    void Captuer();
     void Reset();
 public:
     void StartCapture(const std::chrono::steady_clock::time_point& startTime);

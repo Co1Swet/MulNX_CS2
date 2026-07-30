@@ -5,7 +5,7 @@
 #include <MulNXExtensions/CS2/CS2s.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
-#include <MulNXExtensions/MediaSystem/Media.hpp>
+#include <MulNXExtensions/MediaSystem/Medias.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <MulNXExtensions/TimeLiner/FlowClock/FlowClock.hpp>
 

@@ -8,7 +8,7 @@ bool MediaProcesser::Init() {
         .SubscribeAsync("Media/Concat/End")
         ;
 
-    this->SendTask("Update", "Media", [this]() {
+    this->SendTask("Update", "AVEncoding", [this]() {
         this->Update();
         return true;
         });
