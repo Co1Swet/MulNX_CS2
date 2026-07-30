@@ -1,12 +1,6 @@
 #include "AudioCapturer.hpp"
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <mmdeviceapi.h>
-
-#include <avcpp/sampleformat.h>
-#include <avcpp/av.h>
-#include <avcpp/averror.h>
-#include <avcpp/audioresampler.h>
-#include <libavutil/channel_layout.h>
 #include <wrl/client.h>
 
 using Microsoft::WRL::ComPtr;
@@ -79,13 +73,40 @@ bool AudioCapturer::Init() {
             return;
         }
 
+        this->smutex.lock();
         this->SendTask("Main", "AudioCapturer", [this]() {
-            std::unique_lock lock(this->smutex);
-            this->Main();
+            if (this->keepWork.load()) {
+                this->Main();
+                return true;
+            }
+            // Stop audio client and free resources in Main when exiting loop
+            if (this->audioClient) {
+                audioClient->Stop();
+            }
+            if (this->wfx) {
+                CoTaskMemFree(wfx);
+                wfx = nullptr;
+            }
+            if (hEvent) {
+                CloseHandle(hEvent);
+                this->hEvent = nullptr;
+            }
+
+            this->smutex.unlock();
             return false;
             });
         });
-    
+
+    this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
+        auto&& [info] = msg.Access<MulNX::AVStartInfo>();
+        this->recordStartTime = info.startTime;
+        this->needCaptuer = !info.advancedMode;
+        });
+
+    this->SubscribeSync("MediaSync/SetOff", [this](MulNX::Message& msg) {
+        this->needCaptuer = false;
+        });
+
     return true;
 }
 
@@ -94,128 +115,135 @@ void AudioCapturer::Main() {
     // Use event created during Init
     HANDLE hEvent = this->hEvent;
 
-    int sampleRate = wfx ? wfx->nSamplesPerSec : 0;
     int channels = wfx->nChannels;
-    while (this->keepWork.load()) {
-        // Wait for WASAPI event (infinite or timeout)
-        DWORD wait = WaitForSingleObject(hEvent, 2000);
-        if (wait == WAIT_TIMEOUT) continue;
-        if (wait != WAIT_OBJECT_0) break;
 
-        BYTE* data = nullptr;
-        UINT32 framesAvailable = 0;
-        DWORD flags = 0;
-        hr = captureClient->GetBuffer(&data, &framesAvailable, &flags, nullptr, nullptr);
-        if (FAILED(hr)) break;
+    // Wait for WASAPI event (infinite or timeout)
+    DWORD wait = WaitForSingleObject(hEvent, 2000);
+    if (wait == WAIT_TIMEOUT) return;
+    if (wait != WAIT_OBJECT_0) return;
 
-        if (framesAvailable > 0 && data) {
-            int samplesCount = static_cast<int>(framesAvailable);
-            size_t totalBytes = static_cast<size_t>(framesAvailable) * channels * (wfx->wBitsPerSample / 8);
-            std::vector<uint8_t> copied(data, data + totalBytes);
-            uint64_t chLayout = 0;
-            switch (channels) {
-            case 1: chLayout = AV_CH_LAYOUT_MONO; break;
-            case 2: chLayout = AV_CH_LAYOUT_STEREO; break;
-            case 4: chLayout = AV_CH_LAYOUT_QUAD; break;
-            case 6: chLayout = AV_CH_LAYOUT_5POINT1; break;
-            case 8: chLayout = AV_CH_LAYOUT_7POINT1; break;
-            default: chLayout = AV_CH_LAYOUT_STEREO; break;
-            }
+    BYTE* data = nullptr;
+    UINT32 framesAvailable = 0;
+    DWORD flags = 0;
+    hr = captureClient->GetBuffer(&data, &framesAvailable, &flags, nullptr, nullptr);
+    if (FAILED(hr)) return;
+    auto onExit = scope_exit([&]() {
+        captureClient->ReleaseBuffer(framesAvailable);
+        });
+    if (!this->needCaptuer)return;
 
-            av::SampleFormat fmt(wfx->wBitsPerSample == 32 ? "flt" : (wfx->wBitsPerSample == 16 ? "s16" : "u8"));
-            try {
-                // Use packed format buffer for interleaved WASAPI data
-                av::SampleFormat useFmt = fmt.isPlanar() ? fmt.packedSampleFormat() : fmt;
+    if (!(framesAvailable > 0 && data))return;
 
-                av::AudioSamples samples;
-                int initRes = samples.init(useFmt, samplesCount, chLayout, sampleRate);
-                if (initRes < 0) {
-                    continue;
-                }
+    int samplesCount = static_cast<int>(framesAvailable);
+    size_t totalBytes = static_cast<size_t>(framesAvailable) * channels * (wfx->wBitsPerSample / 8);
+    std::vector<uint8_t> copied(data, data + totalBytes);
+    uint64_t chLayout = 0;
+    switch (channels) {
+    case 1: chLayout = AV_CH_LAYOUT_MONO; break;
+    case 2: chLayout = AV_CH_LAYOUT_STEREO; break;
+    case 4: chLayout = AV_CH_LAYOUT_QUAD; break;
+    case 6: chLayout = AV_CH_LAYOUT_5POINT1; break;
+    case 8: chLayout = AV_CH_LAYOUT_7POINT1; break;
+    default: chLayout = AV_CH_LAYOUT_STEREO; break;
+    }
 
-                if (!useFmt.isPlanar()) {
-                    // single plane, contiguous interleaved
-                    size_t planeSize = samples.size(0);
-                    size_t copySize = std::min(planeSize, copied.size());
-                    memcpy(samples.data(0), copied.data(), copySize);
-                }
-                else {
-                    // planar: deinterleave into separate planes
-                    size_t bps = useFmt.bytesPerSample();
-                    int chCount = samples.channelsCount();
-                    for (int s = 0; s < samplesCount; ++s) {
-                        for (int ch = 0; ch < chCount; ++ch) {
-                            uint8_t* dst = samples.data(ch) + static_cast<size_t>(s) * bps;
-                            const uint8_t* src = copied.data() + (static_cast<size_t>(s) * chCount + ch) * bps;
-                            memcpy(dst, src, bps);
-                        }
-                    }
-                }
+    av::SampleFormat fmt(wfx->wBitsPerSample == 32 ? "flt" : (wfx->wBitsPerSample == 16 ? "s16" : "u8"));
+    try {
+        this->ProcessAudio(fmt, samplesCount, chLayout, std::move(copied));
+    }
+    catch (const std::exception& e) {
+        this->LogError(e.what());
+    }
+}
 
-                // perform normalization/resample/downmix here before enqueue
-                try {
-                    av::SampleFormat targetFmt(AV_SAMPLE_FMT_S16); // packed int16 (interleaved)
-                    uint64_t targetLayout = AV_CH_LAYOUT_STEREO;
-                    int targetRate = sampleRate;
+void AudioCapturer::ProcessAudio(const av::SampleFormat& fmt,
+    const int& samplesCount, const uint64_t& chLayout, std::vector<uint8_t>&& copied) {
 
-                    av::AudioSamples& captured = samples; // use local 'samples' filled above
-                    av::SampleFormat curFmt = useFmt;
-                    bool needNormalize = false;
-                    if (curFmt != targetFmt) needNormalize = true;
-                    if (captured.channelsCount() != 2) needNormalize = true;
-                    if (captured.channelsLayout() != targetLayout) needNormalize = true;
+    int sampleRate = wfx->nSamplesPerSec;
+    // Use packed format buffer for interleaved WASAPI data
+    av::SampleFormat useFmt = fmt.isPlanar() ? fmt.packedSampleFormat() : fmt;
 
-                    if (!needNormalize) {
-                        this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(captured));
-                    }
-                    else {
-                        std::error_code rerr;
-                        av::AudioResampler tmpRes;
-                        bool ok = tmpRes.init(targetLayout, targetRate, targetFmt, chLayout, sampleRate, curFmt, rerr);
-                        if (ok) {
-                            tmpRes.push(captured);
-                            av::AudioSamples out = tmpRes.pop(0);
-                            if (out.isValid() && out.samplesCount() > 0) {
-                                this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(out));
-                            }
-                            else {
-                                // fallback to original if conversion produced no data
-                                this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(captured));
-                            }
-                        }
-                        else {
-                            this->LogWarning(std::string("AudioCapturer: resampler init failed: ") + (rerr ? rerr.message() : "unknown"));
-                            this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(captured));
-                        }
-                    }
-                }
-                catch (const std::exception& e) {
-                    this->LogWarning(std::string("AudioCapturer: normalization failed: ") + e.what());
-                    // best effort: if normalization fails, enqueue original raw data
-                    try { this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(samples)); }
-                    catch (...) {}
-                }
-            }
-            catch (const std::exception&) {
-                // swallow conversion errors for robustness; host can log if needed
+    av::AudioSamples samples;
+    int initRes = samples.init(useFmt, samplesCount, chLayout, sampleRate);
+    if (initRes < 0) {
+        return;
+    }
+
+    if (!useFmt.isPlanar()) {
+        // single plane, contiguous interleaved
+        size_t planeSize = samples.size(0);
+        size_t copySize = std::min(planeSize, copied.size());
+        memcpy(samples.data(0), copied.data(), copySize);
+    }
+    else {
+        // planar: deinterleave into separate planes
+        size_t bps = useFmt.bytesPerSample();
+        int chCount = samples.channelsCount();
+        for (int s = 0; s < samplesCount; ++s) {
+            for (int ch = 0; ch < chCount; ++ch) {
+                uint8_t* dst = samples.data(ch) + static_cast<size_t>(s) * bps;
+                const uint8_t* src = copied.data() + (static_cast<size_t>(s) * chCount + ch) * bps;
+                memcpy(dst, src, bps);
             }
         }
-
-        captureClient->ReleaseBuffer(framesAvailable);
     }
 
-    // Stop audio client and free resources in Main when exiting loop
-    if (this->audioClient) {
-        audioClient->Stop();
+    // perform normalization/resample/downmix here before enqueue
+    try {
+        av::SampleFormat targetFmt(AV_SAMPLE_FMT_S16); // packed int16 (interleaved)
+        uint64_t targetLayout = AV_CH_LAYOUT_STEREO;
+        int targetRate = sampleRate;
+
+        av::AudioSamples& captured = samples; // use local 'samples' filled above
+        av::SampleFormat curFmt = useFmt;
+        bool needNormalize = false;
+        if (curFmt != targetFmt) needNormalize = true;
+        if (captured.channelsCount() != 2) needNormalize = true;
+        if (captured.channelsLayout() != targetLayout) needNormalize = true;
+
+        if (!needNormalize) {
+            this->CommitAudioSamples(std::move(captured));
+            return;
+        }
+
+        std::error_code rerr;
+        av::AudioResampler tmpRes;
+        bool ok = tmpRes.init(targetLayout, targetRate, targetFmt, chLayout, sampleRate, curFmt, rerr);
+        if (ok) {
+            tmpRes.push(captured);
+            av::AudioSamples out = tmpRes.pop(0);
+            if (out.isValid() && out.samplesCount() > 0) {
+                this->CommitAudioSamples(std::move(out));
+            }
+            else {
+                // fallback to original if conversion produced no data
+                this->CommitAudioSamples(std::move(captured));
+            }
+        }
+        else {
+            this->LogError(std::format("resampler init failed: {}", rerr ? rerr.message() : "unknown"));
+            this->CommitAudioSamples(std::move(captured));
+        }
     }
-    if (this->wfx) {
-        CoTaskMemFree(wfx);
-        wfx = nullptr;
+    catch (const std::exception& e) {
+        this->LogError(std::format("normalization failed: {}", e.what()));
+        // best effort: if normalization fails, enqueue original raw data
+        try {
+            this->CommitAudioSamples(std::move(samples));
+        }
+        catch (...) {}
     }
-    if (hEvent) {
-        CloseHandle(hEvent);
-        this->hEvent = nullptr;
-    }
+}
+void AudioCapturer::CommitAudioSamples(av::AudioSamples&& samples) {
+    // 计算相对微秒时间
+    int64_t ptsUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - this->recordStartTime.load()).count();
+    if (ptsUs < 0) ptsUs = 0;
+    // 设置时间基和 PTS（统一用微秒）
+    samples.setTimeBase({ 1, 1000000 });
+    samples.setPts(av::Timestamp(ptsUs, samples.timeBase()));
+    // 入队！
+    this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(samples));
 }
 
 void AudioCapturer::Deinit() {

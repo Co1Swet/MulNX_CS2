@@ -9,7 +9,6 @@ class AEncodeHelper final :public MediaModuleBase {
 
     std::deque<av::AudioSamples> audioFifo;
 
-    int64_t aptsCounter = 0;
     void Reset();
     void SetOn(av::FormatContext* oCtx);
     bool CheckResampler(av::AudioSamples& converted, av::AudioSamples&& asamples);
