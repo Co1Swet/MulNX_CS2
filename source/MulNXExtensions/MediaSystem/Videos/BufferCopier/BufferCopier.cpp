@@ -7,10 +7,18 @@ bool BufferCopier::Init() {
     this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
 
-    (*this)
-        .SubscribeSync("MediaSync/PresentCallback", [this](MulNX::Message& msg) {this->CopyTexture();})
-        .SubscribeSync("MediaSync/BeforeCopyBackbuffer", [this](MulNX::Message& msg) {})
-        ;
+    this->SubscribeSync("MediaSync/PresentCallback", [this](MulNX::Message& msg) {
+        this->CopyTexture();
+        });
+    
+    this->SubscribeSync("MediaSync/BeforeCopyBackbuffer", [this](MulNX::Message& msg) {
+
+        });
+    
+    this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
+        auto&& [t] = msg.Access<std::chrono::steady_clock::time_point>();
+        this->SetRecordStart(t);
+        });
 
     return true;
 }
@@ -29,7 +37,7 @@ void BufferCopier::CopyTexture() {
     if (cap > 0) {
         auto now = std::chrono::steady_clock::now();
         int64_t elapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(
-            now - this->recordStartTime).count();
+            now - this->recordStartTime.load()).count();
         int64_t slot = elapsedUs / this->minIntervalUs;
         if (slot == this->lastSlot) {
             return; // 同一时间槽内不再重复捕获
@@ -72,7 +80,7 @@ void BufferCopier::CopyTexture() {
 
     // PTS：有帧率上限时量化为时间槽边界，否则取实际 now
     if (quantizedPtsUs >= 0) {
-        slot.pFrameInfo->captureTime = this->recordStartTime + std::chrono::microseconds(quantizedPtsUs);
+        slot.pFrameInfo->captureTime = this->recordStartTime.load() + std::chrono::microseconds(quantizedPtsUs);
     }
     else {
         slot.pFrameInfo->captureTime = std::chrono::steady_clock::now();

@@ -17,8 +17,9 @@ class VideoCapturer final :public MediaModuleBase {
 
     void Captuer();
     void Reset();
-public:
+
     void StartCapture(const std::chrono::steady_clock::time_point& startTime);
+public:
     void StopCapture();
     std::optional<av::VideoFrame> TryPop();
 };

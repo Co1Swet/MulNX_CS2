@@ -2,7 +2,6 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <MulNXExtensions/MediaSystem/Videos/VideoCapturer/VideoCapturer.hpp>
-#include <MulNXExtensions/MediaSystem/Videos/BufferCopier/BufferCopier.hpp>
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
@@ -21,7 +20,6 @@ bool MediaRecorder::Init() {
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
-    this->pBufferCopier = this->FindModule<BufferCopier>("BufferCopier");
     
     (*this)
         .SubscribeAsync("Media/Record/Start")
@@ -64,8 +62,11 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
 
     try {
         this->ofctx.openOutput(outFile);
-        this->recordStartTime = std::chrono::steady_clock::now();
-        this->pBufferCopier->SetRecordStart(this->recordStartTime);
+
+        MulNX::Message SetOnMsg("MediaSync/SetOn"_hash);
+        auto&& [rTime] = SetOnMsg.Access<std::chrono::steady_clock::time_point>();
+        rTime = std::chrono::steady_clock::now();
+        this->PublishSync(SetOnMsg);
 
         this->pVEncodeHelper->SetOn(&this->ofctx);
         this->pAEncodeHelper->SetOn(&this->ofctx, this->pAudioCapturer->GetSampleRate());
@@ -73,10 +74,13 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->ofctx.writeHeader();
         this->LogInfo(std::format("输出头已写入, 流数={}", this->ofctx.streamsCount()));
 
-        this->pVideoCapturer->StartCapture(this->recordStartTime);
-        this->LogSucc(std::format("开始录制: {} ({}x{})", outFile,
-            rp.width > 0 ? rp.width : srcW, rp.height > 0 ? rp.height : srcH,
-            rp.targetFPS > 0 ? std::to_string(rp.targetFPS) + "fps " : ""));
+        this->LogSucc(std::format("开始录制: {} ({}x{})",
+            outFile,
+            rp.width > 0 ? rp.width : srcW,
+            rp.height > 0 ? rp.height : srcH,
+            rp.targetFPS > 0 ? std::to_string(rp.targetFPS) + "fps " : ""
+        ));
+
         this->recording = true;
         return true;
     }
@@ -93,11 +97,11 @@ void MediaRecorder::Main() {
     this->Encode();
 }
 
-static int64_t PtsUs(const av::Timestamp& ts) {
-    return ts.isValid() ? ts.timestamp({ 1,1000000 }) : INT64_MAX;
-}
-
 void MediaRecorder::Encode() {
+    auto PtsUs = [](const av::Timestamp& ts)->int64_t {
+        return ts.isValid() ? ts.timestamp({ 1,1000000 }) : INT64_MAX;
+        };
+
     std::vector<av::Packet> packets;
 
     while (auto f = this->pVideoCapturer->TryPop())
@@ -112,7 +116,7 @@ void MediaRecorder::Encode() {
 
     if (packets.empty()) return;
     std::sort(packets.begin(), packets.end(),
-        [](const av::Packet& l, const av::Packet& r) { return PtsUs(l.dts()) < PtsUs(r.dts()); });
+        [&](const av::Packet& l, const av::Packet& r) { return PtsUs(l.dts()) < PtsUs(r.dts()); });
 
     for (auto& pkt : packets) {
         try { this->ofctx.writePacket(pkt); }

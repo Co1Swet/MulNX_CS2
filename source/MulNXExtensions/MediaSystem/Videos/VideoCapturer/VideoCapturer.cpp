@@ -19,6 +19,11 @@ bool VideoCapturer::Init() {
         this->Reset();
         });
 
+    this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
+        auto&& [t] = msg.Access<std::chrono::steady_clock::time_point>();
+        this->StartCapture(t);
+        });
+
     return true;
 }
 
