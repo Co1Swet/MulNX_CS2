@@ -4,7 +4,6 @@
 class MediaRecorder final :public MediaModuleBase {
     class AEncodeHelper*    pAEncodeHelper    = nullptr;
     class VEncodeHelper*    pVEncodeHelper    = nullptr;
-    class VideoCapturer*    pVideoCapturer    = nullptr;
     class AudioCapturer*    pAudioCapturer    = nullptr;
     class VCD3D11Manager*   pVCD3D11Manager   = nullptr;
     class MediaParamManager* pMediaParamManager = nullptr;
@@ -23,4 +22,6 @@ class MediaRecorder final :public MediaModuleBase {
     void Main();
 
     bool Init()override;
+public:
+    moodycamel::ConcurrentQueue<av::Packet> bufferPackets{};
 };

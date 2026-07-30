@@ -23,6 +23,11 @@ namespace MulNX {
         // 一个逻辑帧数字，在高级录制被填充，用于计算pts
         int logicFrame;
     };
+
+    struct AVStartInfo {
+        av::FormatContext* pOutCtx = nullptr;
+        std::chrono::steady_clock::time_point startTime{};
+    };
 }
 
 template <typename T>

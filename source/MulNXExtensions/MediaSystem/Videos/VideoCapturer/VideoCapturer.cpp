@@ -20,8 +20,12 @@ bool VideoCapturer::Init() {
         });
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
-        auto&& [t] = msg.Access<std::chrono::steady_clock::time_point>();
-        this->StartCapture(t);
+        auto&& [info] = msg.Access<MulNX::AVStartInfo>();
+        this->StartCapture(info.startTime);
+        });
+
+    this->SubscribeSync("MediaSync/SetOff", [this](auto&&...) {
+        this->StopCapture();
         });
 
     return true;
@@ -31,8 +35,6 @@ void VideoCapturer::Reset() {
     std::unique_lock lock(this->smutex);
     this->recordStartTime.reset();
     this->vCapturing.store(false);
-    av::VideoFrame discard;
-    while (this->buffer.try_dequeue(discard));
 }
 
 void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
@@ -44,11 +46,6 @@ void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& st
 void VideoCapturer::StopCapture() {
     std::unique_lock lock(this->smutex);
     this->vCapturing.store(false);
-}
-
-std::optional<av::VideoFrame> VideoCapturer::TryPop() {
-    av::VideoFrame f;
-    return this->buffer.try_dequeue(f) ? std::optional(std::move(f)) : std::nullopt;
 }
 
 void VideoCapturer::Captuer() {
@@ -81,5 +78,5 @@ void VideoCapturer::Captuer() {
 
     frame.setTimeBase({ 1, 1000000 });
     frame.setPts(av::Timestamp(ptsUs, frame.timeBase()));
-    this->buffer.enqueue(std::move(frame));
+    this->pVEncodeHelper->bufferVFrames.enqueue(std::move(frame));
 }

@@ -16,8 +16,8 @@ bool BufferCopier::Init() {
         });
     
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
-        auto&& [t] = msg.Access<std::chrono::steady_clock::time_point>();
-        this->SetRecordStart(t);
+        auto&& [info] = msg.Access<MulNX::AVStartInfo>();
+        this->SetRecordStart(info.startTime);
         });
 
     return true;

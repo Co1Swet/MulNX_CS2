@@ -6,6 +6,5 @@ class MediaSystem final :public MulNX::Module<MediaSystem> {
     std::string outputFile = "record";
 
     void Window(MulNX::UICoordinator* uico);
-    void RecordParamsUI();
     bool Init()override;
 };

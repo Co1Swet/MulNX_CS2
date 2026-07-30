@@ -1,7 +1,6 @@
 #include "MediaRecorder.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
-#include <MulNXExtensions/MediaSystem/Videos/VideoCapturer/VideoCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
@@ -14,7 +13,6 @@ void MediaRecorder::CaptureCallback() {
 }
 
 bool MediaRecorder::Init() {
-    this->pVideoCapturer = this->FindModule<VideoCapturer>("VideoCapturer");
     this->pAudioCapturer = this->FindModule<AudioCapturer>("AudioCapturer");
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
@@ -30,7 +28,12 @@ bool MediaRecorder::Init() {
     this->UIRegisterBackground("捕获以上所有根触发的UI渲染", [this](auto&&...) {
         return this->CaptureCallback();
         });
-    
+
+    this->UIRegisterCallback("UI.MediaSys", [this](auto&&...) {
+        ImGui::Text("录制状态：");
+        ImGui::Text(this->recording ? "录制中": "空闲中");
+        });
+
     return true;
 }
 
@@ -65,11 +68,11 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->ofctx.openOutput(outFile);
 
         MulNX::Message SetOnMsg("MediaSync/SetOn"_hash);
-        auto&& [rTime] = SetOnMsg.Access<std::chrono::steady_clock::time_point>();
-        rTime = std::chrono::steady_clock::now();
+        auto&& [rInfo] = SetOnMsg.Access<MulNX::AVStartInfo>();
+        rInfo.pOutCtx = &this->ofctx;
+        rInfo.startTime = std::chrono::steady_clock::now();
         this->PublishSync(SetOnMsg);
 
-        this->pVEncodeHelper->SetOn(&this->ofctx);
         this->pAEncodeHelper->SetOn(&this->ofctx, this->pAudioCapturer->GetSampleRate());
 
         this->ofctx.writeHeader();
@@ -106,10 +109,10 @@ void MediaRecorder::Encode() {
 
     std::vector<av::Packet> packets;
 
-    while (auto f = this->pVideoCapturer->TryPop())
-        if (auto p = this->pVEncodeHelper->Encode(std::move(*f)))
-            packets.push_back(std::move(*p));
-
+    while (auto p = this->pVEncodeHelper->Encode()) {
+        packets.push_back(std::move(*p));
+    }
+        
     while (auto a = this->pAudioCapturer->TryPop()) {
         if (a->samplesCount() > 0)
             if (auto p = this->pAEncodeHelper->Encode(std::move(*a)))
@@ -131,12 +134,13 @@ void MediaRecorder::Encode() {
 bool MediaRecorder::StopRecording() {
     if (!this->recording) return false;
     this->recording = false;
-    this->pVideoCapturer->StopCapture();
+
+    this->PublishSync("MediaSync/SetOff"_hash);
 
     try {
-        while (auto f = this->pVideoCapturer->TryPop())
-            if (auto p = this->pVEncodeHelper->Encode(std::move(*f)))
-                this->ofctx.writePacket(*p);
+        while (auto p = this->pVEncodeHelper->Encode()) {
+            this->ofctx.writePacket(*p);
+        }                
         while (auto p = this->pVEncodeHelper->TrySetOff())
             this->ofctx.writePacket(*p);
         while (auto a = this->pAudioCapturer->TryPop())

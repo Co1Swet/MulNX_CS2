@@ -10,6 +10,11 @@ bool VEncodeHelper::Init() {
         this->Reset();
         });
 
+    this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
+        auto&& [info] = msg.Access<MulNX::AVStartInfo>();
+        this->SetOn(info.pOutCtx);
+        });
+
     return true;
 }
 
@@ -64,8 +69,6 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec)
 }
 
 void VEncodeHelper::SetOn(av::FormatContext* oCtx) {
-    
-    this->ptsCounter = 0;
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
 
     // 纯软件
@@ -97,8 +100,12 @@ void VEncodeHelper::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
         srcW, srcH, srcFmt, av::SwsFlagBicubic);
 }
 
-std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
+std::optional<av::Packet> VEncodeHelper::Encode() {
     if (!this->encoder.isOpened()) return std::nullopt;
+
+    av::VideoFrame srcFrame;
+    if (!this->bufferVFrames.try_dequeue(srcFrame))return std::nullopt;
+
     try {
         auto srcFmtRaw = srcFrame.pixelFormat();
         int64_t inPts = srcFrame.pts().isValid() ? srcFrame.pts().timestamp(this->timeBase) : -1;
@@ -115,13 +122,8 @@ std::optional<av::Packet> VEncodeHelper::Encode(av::VideoFrame srcFrame) {
             this->rescaler.rescale(dst, srcFrame);
         }
 
-        int64_t pts = this->ptsCounter;
-        if (inPts >= 0) pts = inPts;
-        if (pts < this->ptsCounter) pts = this->ptsCounter;
-        this->ptsCounter = pts + 1;
-
         dst.setTimeBase(this->timeBase);
-        dst.setPts(av::Timestamp(pts, this->timeBase));
+        dst.setPts(av::Timestamp(inPts, this->timeBase));
         dst.setStreamIndex(this->vstream.index());
 
         av::Packet pkt = this->encoder.encode(dst);
@@ -153,8 +155,11 @@ std::optional<av::Packet> VEncodeHelper::TrySetOff() {
 }
 
 void VEncodeHelper::Reset() {
-    this->ptsCounter = 0;
     if (this->encoder.isValid()) {
         if (auto* raw = this->encoder.raw()) { if (raw->hw_device_ctx) av_buffer_unref(&raw->hw_device_ctx); }
+    }
+    av::VideoFrame clear;
+    while (this->bufferVFrames.try_dequeue(clear)) {
+        
     }
 }

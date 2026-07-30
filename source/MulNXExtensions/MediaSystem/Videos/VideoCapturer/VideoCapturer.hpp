@@ -8,7 +8,6 @@ class VideoCapturer final :public MediaModuleBase {
     class VEncodeHelper* pVEncodeHelper = nullptr;
     class BufferCopier* pBufferCopier = nullptr;
     class TextureMapper* pTextureMapper = nullptr;
-    moodycamel::ConcurrentQueue<av::VideoFrame> buffer;
 
     std::optional<std::chrono::steady_clock::time_point> recordStartTime;
     std::atomic<bool> vCapturing = false;
@@ -19,7 +18,5 @@ class VideoCapturer final :public MediaModuleBase {
     void Reset();
 
     void StartCapture(const std::chrono::steady_clock::time_point& startTime);
-public:
     void StopCapture();
-    std::optional<av::VideoFrame> TryPop();
 };
