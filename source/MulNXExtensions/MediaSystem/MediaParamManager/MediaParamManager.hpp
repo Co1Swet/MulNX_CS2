@@ -5,6 +5,7 @@ enum class EncodeMode { Auto, H264, HEVC };
 enum class RateControl { CBR, VBR, CQ };
 
 class MediaParamManager :public MediaModuleBase {
+    void Menu();
     bool Init()override;
 public:
     // ── 编码器 ──

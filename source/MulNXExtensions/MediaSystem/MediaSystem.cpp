@@ -3,9 +3,10 @@
 #include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-bool MediaSystem::Window() {
+void MediaSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("音视频");
-    this->RecordParamsUI();
+
+    uico->CallbackCall("UI.MediaSys"_hash, nullptr);
 
     ImGui::Separator();
     ImGui::InputText("文件名", &this->outputFile);
@@ -34,45 +35,16 @@ bool MediaSystem::Window() {
     //     }
     //     s("Media/Concat/End"_hash);
     // }
-    return true;
-}
-
-void MediaSystem::RecordParamsUI() {
-    if (!this->pMediaParamManager) return;
-    auto& p = *this->pMediaParamManager;
-
-    const char* modes[] = { "自动", "H264", "HEVC" };
-    int mi = (int)p.mode;
-    if (ImGui::Combo("编码模式", &mi, modes, IM_ARRAYSIZE(modes))) p.mode = (EncodeMode)mi;
-
-    const char* rcs[] = { "CBR", "VBR", "CQ" };
-    int ri = (int)p.rc;
-    if (ImGui::Combo("码率控制", &ri, rcs, IM_ARRAYSIZE(rcs))) p.rc = (RateControl)ri;
-
-    if (p.rc == RateControl::CQ)
-        ImGui::SliderInt("CQ 质量", &p.cq, 0, 51, "%d");
-    else
-        ImGui::InputInt("码率(Kbps)", &p.bitrate, 1000, 10000);
-
-    ImGui::InputInt("关键帧间隔", &p.gopSize);
-    if (p.gopSize < 0) p.gopSize = 0;
-    ImGui::InputInt("B 帧数", &p.maxBFrames);
-    if (p.maxBFrames < 0) p.maxBFrames = 0;
-
-    ImGui::Separator();
-    ImGui::TextDisabled("画面");
-    ImGui::InputInt("宽度(0=原生)", &p.width);
-    ImGui::InputInt("高度(0=原生)", &p.height);
-    MulNX::UI::SliderInt("捕获帧率(0=不限)", p.targetFPS, 0, 1200);
 }
 
 bool MediaSystem::Init() {
     av::init();
     av::set_logging_level(AV_LOG_WARNING);
-    this->pMediaParamManager = this->Core->ModuleManager()->FindModule<MediaParamManager>("MediaParamManager");
-    this->LogSucc("FFmpeg 初始化成功");
-    this->SendUIRoot(this->GetName(), [this](auto&&...) { return this->Window(); });
-    this->dirVideos = this->Path()->PathGetForShared("Videos");
 
+    this->dirVideos = this->Path()->PathGetForShared("Videos");
+    this->LogSucc("FFmpeg 初始化成功");
+
+    this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) { this->Window(uico); });
+    
     return true;
 }

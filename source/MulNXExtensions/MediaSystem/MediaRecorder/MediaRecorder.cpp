@@ -46,9 +46,10 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 }
 
 bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
-    if (this->recording) { this->LogWarning("已在录制中"); return false; }
-
-    auto& rp = *this->pMediaParamManager;
+    if (this->recording) {
+        this->LogWarning("已在录制中");
+        return false;
+    }
 
     std::string outFile = pathNoExt + ".mp4";
     int srcW = this->pVCD3D11Manager->srcWidth;
@@ -74,6 +75,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         this->ofctx.writeHeader();
         this->LogInfo(std::format("输出头已写入, 流数={}", this->ofctx.streamsCount()));
 
+        auto& rp = *this->pMediaParamManager;
         this->LogSucc(std::format("开始录制: {} ({}x{})",
             outFile,
             rp.width > 0 ? rp.width : srcW,
