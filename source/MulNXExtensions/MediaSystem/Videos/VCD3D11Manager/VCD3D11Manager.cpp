@@ -147,12 +147,12 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
 
     this->LogSucc(std::format("共享纹理环形队列就绪，槽位数={}", created));
 
+    this->forWriter.enqueue(0);
     this->forWriter.enqueue(1);
     this->forWriter.enqueue(2);
     this->forWriter.enqueue(3);
     this->forWriter.enqueue(4);
     this->forWriter.enqueue(5);
-    this->forWriter.enqueue(6);
 }
 
 std::optional<int> VCD3D11Manager::TryGetReadSide() {

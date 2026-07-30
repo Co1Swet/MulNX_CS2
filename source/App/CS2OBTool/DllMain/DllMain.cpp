@@ -121,6 +121,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<CS2Test>("CS2Test")
 #endif
         // 音视频系统
+        .CreateModule<MediaRunningState>("MediaRunningState")
         .CreateModule<MediaSystem>("MediaSystem")
         .CreateModule<MediaParamManager>("MediaParamManager")
         .CreateModule<VCD3D11Manager>("VCD3D11Manager")

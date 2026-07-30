@@ -16,6 +16,7 @@ bool BufferCopier::Init() {
 
 void BufferCopier::CopyTexture() {
     if (!this->shouldCopy.load(std::memory_order_acquire)) return;
+    if (!this->pMediaState->recording)return;
 
     MulNX::Message msgBeforeCopyBackbuffer("MediaSync/BeforeCopyBackbuffer"_hash);
     this->PublishSync(msgBeforeCopyBackbuffer);

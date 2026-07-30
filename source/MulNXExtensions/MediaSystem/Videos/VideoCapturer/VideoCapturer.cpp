@@ -33,7 +33,7 @@ bool VideoCapturer::Init() {
 
 void VideoCapturer::Reset() {
     std::unique_lock lock(this->smutex);
-    this->recordStartTime.reset();
+    this->recordStartTime.store({});
     this->vCapturing.store(false);
 }
 
@@ -66,10 +66,9 @@ void VideoCapturer::Captuer() {
     auto onExit = scope_exit([&]() {this->pVCD3D11Manager->ReleaseReadSide(readIdx);});
 
     auto& slot = this->pVCD3D11Manager->ring[readIdx].shareTex;
-    if (!this->recordStartTime.has_value()) return;
 
     int64_t ptsUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        slot.pFrameInfo->captureTime - *this->recordStartTime).count();
+        slot.pFrameInfo->captureTime - this->recordStartTime.load()).count();
     if (ptsUs < 0) ptsUs = 0;
 
     auto oFrame = this->pTextureMapper->MapFrame(slot);

@@ -13,6 +13,7 @@ add_library(MediaSystem
     Videos/VCD3D11Manager/VCD3D11Manager.cpp
     Videos/BufferCopier/BufferCopier.cpp
     Videos/TextureMapper/TextureMapper.cpp
+    MediaRunningState/MediaRunningState.cpp
 )
 
 target_link_libraries(MediaSystem PUBLIC

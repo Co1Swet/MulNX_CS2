@@ -15,13 +15,20 @@ bool AEncodeHelper::Init() {
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
-        this->SetOn(info.pOutCtx);
+        this->SetOn(info);
         });
 
     return true;
 }
 
-void AEncodeHelper::SetOn(av::FormatContext* oCtx) {
+void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
+    if (info.advancedMode) {
+        this->LogInfo("高级录制模式，不打开音频捕获");
+        return;
+    }
+
+    auto* oCtx = info.pOutCtx;
+
     this->audioFifo.clear();
     int sampleRate = this->pAudioCapturer->GetSampleRate();
 

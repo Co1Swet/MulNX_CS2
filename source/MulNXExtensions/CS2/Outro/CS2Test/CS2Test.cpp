@@ -9,10 +9,7 @@ bool CS2Test::Init() {
 
 
     this->SendUIRoot("MyCS2Test", [this](auto&&...) {
-        auto w = MulNX::UI::RAIIWindow("MyCS2Test");
-        if (ImGui::Button("尝试CS2录制")) {
-            this->AsyncCommand("startmovie mymulnx wav");
-        }
+        
         });
 
     // this->SubscribeSync("Hook/FireEventClientSide/player_death", [this](MulNX::Message& msg) {

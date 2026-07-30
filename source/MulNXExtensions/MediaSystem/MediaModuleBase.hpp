@@ -1,5 +1,5 @@
 #pragma once
-#include <MulNX/MulNX.hpp>
+#include "MediaRunningState/MediaRunningState.hpp"
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
 #include <wrl/client.h>
 #include <d3d11.h>
@@ -37,8 +37,10 @@ template <typename T>
 class MediaModuleMixin {
     T* This() { return static_cast<T*>(this); }
 protected:
+    MediaRunningState* pMediaState = nullptr;
     MediaModuleMixin() {
         This()->preInits.push_back([this]() -> bool {
+            this->pMediaState = This()->FindModule<MediaRunningState>("MediaRunningState");
             return true;
             });
     }

@@ -20,6 +20,7 @@ bool MediaRecorder::Init() {
     
     (*this)
         .SubscribeAsync("Media/Record/Start")
+        .SubscribeAsync("Media/Record/StartAdvanced")
         .SubscribeAsync("Media/Record/Stop");
 
     this->SendTask("Main", "AVEncoding", [this]() {
@@ -33,7 +34,7 @@ bool MediaRecorder::Init() {
 
     this->UIRegisterCallback("UI.MediaSys", [this](auto&&...) {
         ImGui::Text("录制状态：");
-        ImGui::Text(this->recording ? "录制中": "空闲中");
+        ImGui::Text(this->pMediaState->recording ? "录制中": "空闲中");
         });
 
     return true;
@@ -42,7 +43,10 @@ bool MediaRecorder::Init() {
 void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Media/Record/Start"_hash:
-        this->StartRecording(msg.asp.get<MulNX::NetExt>()->str1);
+        this->StartRecording(msg.asp.get<MulNX::NetExt>()->str1, false);
+        break;
+    case "Media/Record/StartAdvanced"_hash:
+        this->StartRecording(msg.asp.get<MulNX::NetExt>()->str1, true);
         break;
     case "Media/Record/Stop"_hash:
         this->StopRecording();
@@ -50,8 +54,8 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
-    if (this->recording) {
+bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
+    if (this->pMediaState->recording) {
         this->LogWarning("已在录制中");
         return false;
     }
@@ -73,6 +77,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
         auto&& [rInfo] = SetOnMsg.Access<MulNX::AVStartInfo>();
         rInfo.pOutCtx = &this->ofctx;
         rInfo.startTime = std::chrono::steady_clock::now();
+        rInfo.advancedMode = advance;
         this->PublishSync(SetOnMsg);
 
         this->ofctx.writeHeader();
@@ -86,7 +91,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
             rp.targetFPS > 0 ? std::to_string(rp.targetFPS) + "fps " : ""
         ));
 
-        this->recording = true;
+        this->pMediaState->recording = true;
         return true;
     }
     catch (const std::exception& e) {
@@ -97,9 +102,6 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt) {
 }
 
 bool MediaRecorder::StopRecording() {
-    if (!this->recording) return false;
-    this->recording = false;
-
     this->PublishSync("MediaSync/SetOff"_hash);
 
     try {
@@ -133,11 +135,11 @@ bool MediaRecorder::StopRecording() {
 
 void MediaRecorder::Main() {
     this->Update();
-    if (!this->recording) return;
     this->Encode();
 }
 
 void MediaRecorder::Encode() {
+    if (!this->pMediaState->recording) return;
     std::vector<av::Packet> packets;
 
     while (auto p = this->pVEncodeHelper->Encode()) {
@@ -158,4 +160,8 @@ void MediaRecorder::Encode() {
             this->LogWarning(std::format("写包失败: {}", e.what()));
         }
     }
+}
+
+void MediaRecorder::WritePacket() {
+    
 }

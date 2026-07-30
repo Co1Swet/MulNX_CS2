@@ -10,7 +10,7 @@ class AEncodeHelper final :public MediaModuleBase {
     std::deque<av::AudioSamples> audioFifo;
 
     void Reset();
-    void SetOn(av::FormatContext* oCtx);
+    void SetOn(const MulNX::AVStartInfo& info);
     bool CheckResampler(av::AudioSamples& converted, av::AudioSamples&& asamples);
 
     bool Init()override;

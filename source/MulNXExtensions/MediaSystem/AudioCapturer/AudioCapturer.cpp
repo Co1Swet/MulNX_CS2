@@ -89,8 +89,14 @@ bool AudioCapturer::Init() {
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
-        this->recordStartTime = info.startTime;
-        this->needCaptuer = !info.advancedMode;
+        if (info.advancedMode) {
+            this->LogInfo("高级录制模式，不开启音频捕获");
+        }
+        else {
+            this->recordStartTime = info.startTime;
+            this->needCaptuer = !info.advancedMode;
+            this->LogInfo("已开启音频捕获");
+        }
         });
 
     this->SubscribeSync("MediaSync/SetOff", [this](MulNX::Message& msg) {
@@ -120,6 +126,7 @@ void AudioCapturer::Main() {
         captureClient->ReleaseBuffer(framesAvailable);
         });
     if (!this->needCaptuer)return;
+    if (!this->pMediaState->recording)return;
 
     if (!(framesAvailable > 0 && data))return;
 

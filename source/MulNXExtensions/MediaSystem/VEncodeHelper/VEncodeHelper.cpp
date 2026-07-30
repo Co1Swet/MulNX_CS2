@@ -111,7 +111,7 @@ std::optional<av::Packet> VEncodeHelper::Encode() {
 
     try {
         auto srcFmtRaw = srcFrame.pixelFormat();
-        int64_t inPts = srcFrame.pts().isValid() ? srcFrame.pts().timestamp(this->timeBase) : -1;
+        int64_t inPts = srcFrame.pts().timestamp(this->timeBase);
         int srcW = srcFrame.width(), srcH = srcFrame.height();
 
         av::VideoFrame dst;
@@ -142,6 +142,7 @@ std::optional<av::Packet> VEncodeHelper::Encode() {
 }
 
 std::optional<av::Packet> VEncodeHelper::TrySetOff() {
+    return std::nullopt;
     if (!this->encoder.isOpened()) return std::nullopt;
     try {
         av::Packet pkt = this->encoder.encode();
@@ -158,9 +159,6 @@ std::optional<av::Packet> VEncodeHelper::TrySetOff() {
 }
 
 void VEncodeHelper::Reset() {
-    if (this->encoder.isValid()) {
-        if (auto* raw = this->encoder.raw()) { if (raw->hw_device_ctx) av_buffer_unref(&raw->hw_device_ctx); }
-    }
     av::VideoFrame clear;
     while (this->bufferVFrames.try_dequeue(clear)) {
         
