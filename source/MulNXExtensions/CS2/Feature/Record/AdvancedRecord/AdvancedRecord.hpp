@@ -1,6 +1,15 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
+#include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class AdvancedRecord final :public CSModuleBase {
+class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<AdvancedRecord> {
+    class MediaParamManager* pMediaParamManager = nullptr;
+    // 基于时间槽的帧率限制状态
+    std::atomic<std::chrono::steady_clock::time_point> recordStartTime;
+    std::atomic<int64_t> minIntervalUs = 16667;     // captureFpsCap 换算（µs）
+    std::atomic<int64_t> lastSlot = -1;             // 上次捕获所在时间槽序号
+
     bool Init()override;
+    void SetRecordStart(std::chrono::steady_clock::time_point t);
+    void HandleBeforeCopyBackbuffer(MulNX::Message& msg);
 };

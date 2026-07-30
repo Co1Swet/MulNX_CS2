@@ -16,51 +16,43 @@ bool AudioCapturer::Init() {
 
         ComPtr<IMMDeviceEnumerator> enumerator;
         if (FAILED(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&enumerator)))) {
-            return;
+            MulNX::ErrorTerminate("enumerator 创建失败");
         }
 
         ComPtr<IMMDevice> device;
         if (FAILED(enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device))) {
-            return;
+            MulNX::ErrorTerminate("IMMDevice 获取失败");
         }
 
         if (FAILED(device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, reinterpret_cast<void**>(audioClient.GetAddressOf())))) {
-            return;
+            MulNX::ErrorTerminate("Device 激活失败");
         }
 
         HRESULT hr = S_OK;
-
         hr = audioClient->GetMixFormat(&wfx);
         if (FAILED(hr) || !wfx) {
-            return;
+            MulNX::ErrorTerminate("GetMixFormat(&wfx) 失败");
         }
 
         // Use loopback capture on default render device with event-driven mode
         this->hEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
         if (!this->hEvent) {
-            CoTaskMemFree(wfx);
-            return;
+            MulNX::ErrorTerminate("CreateEvent 失败");
         }
 
         hr = audioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_LOOPBACK | AUDCLNT_STREAMFLAGS_EVENTCALLBACK, 10000000, 0, wfx, &REFERENCE_GUID);
         if (FAILED(hr)) {
-            CoTaskMemFree(wfx);
-            CloseHandle(this->hEvent);
-            return;
+            MulNX::ErrorTerminate("audioClient 初始化失败");
         }
 
         if (FAILED(audioClient->GetService(IID_PPV_ARGS(&captureClient)))) {
-            CoTaskMemFree(wfx);
-            CloseHandle(this->hEvent);
-            return;
+            MulNX::ErrorTerminate("audioClient 服务获取失败");
         }
 
         // Set the event handle for event-driven capture
         hr = audioClient->SetEventHandle(hEvent);
         if (FAILED(hr)) {
-            CoTaskMemFree(wfx);
-            CloseHandle(this->hEvent);
-            return;
+            MulNX::ErrorTerminate("audioClient 句柄设置失败");
         }
 
         UINT32 bufferFrameCount = 0;
@@ -68,9 +60,7 @@ bool AudioCapturer::Init() {
 
         hr = audioClient->Start();
         if (FAILED(hr)) {
-            CoTaskMemFree(wfx);
-            CloseHandle(this->hEvent);
-            return;
+            MulNX::ErrorTerminate("audioClient 启动失败");
         }
 
         this->smutex.lock();
@@ -117,8 +107,7 @@ void AudioCapturer::Main() {
 
     int channels = wfx->nChannels;
 
-    // Wait for WASAPI event (infinite or timeout)
-    DWORD wait = WaitForSingleObject(hEvent, 2000);
+    DWORD wait = WaitForSingleObject(hEvent, 0);
     if (wait == WAIT_TIMEOUT) return;
     if (wait != WAIT_OBJECT_0) return;
 
