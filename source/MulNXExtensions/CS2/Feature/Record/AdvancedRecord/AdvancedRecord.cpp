@@ -1,27 +1,58 @@
 #include "AdvancedRecord.hpp"
 #include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 
+void AdvancedRecord::PublishNormal() {
+    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
+    rp->str1 = (this->dirVideos / this->outputFile).string();
+    this->PublishAsync(std::move(msg));
+}
+void AdvancedRecord::PublishAdvanced() {
+    this->frameCount = 0;
+    int fps = this->pMediaParamManager->targetFPS.load();
+    this->AsyncCommand(std::format("host_framerate {}; startmovie mymulnx wav framerate {}",
+        fps, fps));
+
+    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/StartAdvanced"_hash);
+    rp->str1 = (this->dirVideos / this->outputFile).string();
+    this->PublishAsync(std::move(msg));
+}
+void AdvancedRecord::PublishStop(bool isAdvanced) {
+    if (isAdvanced) {
+        this->AsyncCommand("host_framerate 0; endmovie");
+    }
+    this->PublishAsync("Media/Record/Stop"_hash);
+}
+
+void AdvancedRecord::Menu() {
+    ImGui::InputText("文件名", &this->outputFile);
+
+    static bool shouldStartAsAdvanced = false;
+    static bool startAsAdvanced = false;
+
+    ImGui::Checkbox("高级录制模式", &shouldStartAsAdvanced);
+
+    if (ImGui::Button("开始录制")) {
+        if (shouldStartAsAdvanced) {
+            this->PublishAdvanced();
+            startAsAdvanced = true;
+        }
+        else {
+            this->PublishNormal();
+            startAsAdvanced = false;
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("结束录制")) {
+        this->PublishStop(startAsAdvanced);
+    }
+}
+
 bool AdvancedRecord::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
     this->dirVideos = this->Path()->PathGetForShared("Videos");
 
-    this->UIRegisterCallback("UI.MediaSys", [this](auto&&...) {
-        MulNX::UI::SliderInt("高级录制帧率", this->advanceFPS, 1, 1000);
-
-        if (ImGui::Button("尝试CS2录制")) {
-            this->frameCount = 0;
-            this->AsyncCommand(std::format("host_framerate {}; startmovie mymulnx wav framerate {}",
-                this->advanceFPS.load(), this->advanceFPS.load()));
-            
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/StartAdvanced"_hash);
-            rp->str1 = (this->dirVideos / "CS2test").string();
-            this->PublishAsync(std::move(msg));
-        }
-        if (ImGui::Button("停止CS2录制")) {
-            this->AsyncCommand("host_framerate 0; endmovie");
-            this->PublishAsync("Media/Record/Stop"_hash);
-        }
-
+    this->UIRegisterCallback("UI.MediaSys/Control", [this](auto&&...) {
+        this->Menu();
         });
 
     this->SubscribeSync("MediaSync/BeforeCopyBackbuffer", [this](MulNX::Message& msg) {
@@ -76,7 +107,7 @@ bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
     info.needDrop = false;
 
     // 获取设定的固定帧率
-    int fps = this->advanceFPS.load();
+    int fps = this->pMediaParamManager->targetFPS.load();
     // 录制起始时间（原子读取）
     auto startTime = this->recordStartTime.load();
 

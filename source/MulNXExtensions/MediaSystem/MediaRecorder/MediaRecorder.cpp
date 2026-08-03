@@ -12,6 +12,23 @@ void MediaRecorder::CaptureCallback() {
         }, this, 0);
 }
 
+void MediaRecorder::Menu() {
+    ImGui::Text("录制状态：");
+    ImGui::SameLine();
+    switch (this->recordState.load()) {
+    case RecordState::Free:
+        ImGui::Text("空闲");
+        break;
+    case RecordState::Recording:
+        ImGui::Text("录制编解码中");
+        ImGui::Text(std::format("正在进行的录制是否是高级录制：{}",
+            this->pMediaState->advancedMode ? "是" : "否").c_str());
+        break;
+    }
+    ImGui::Text(std::format("捕获状态：{}",
+        this->pMediaState->MediaSystemGlobalWorkFlag ? "正在捕获" : "无新捕获").c_str());
+}
+
 bool MediaRecorder::Init() {
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
@@ -32,17 +49,8 @@ bool MediaRecorder::Init() {
         return this->CaptureCallback();
         });
 
-    this->UIRegisterCallback("UI.MediaSys", [this](auto&&...) {
-        ImGui::Text("录制状态：");
-        switch (this->recordState.load()) {
-        case RecordState::Free:
-            ImGui::Text("空闲");
-            break;
-        case RecordState::Recording:
-            ImGui::Text("录制中（忙碌）");
-            break;
-        }
-        return true;
+    this->UIRegisterCallback("UI.MediaSys/Control", [this](auto&&...) {
+        this->Menu();
         });
 
     return true;
@@ -111,6 +119,10 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
 }
 
 bool MediaRecorder::StopRecording() {
+    if(this->recordState.load() != RecordState::Recording) {
+        this->LogWarning("未在录制中");
+        return false;
+    }
     this->PublishSync("MediaSync/SetOff"_hash);
 
     try {
@@ -129,7 +141,7 @@ bool MediaRecorder::StopRecording() {
         }
     }
     catch (const std::exception& e) {
-        this->LogWarning(std::format("停止时异常: {}", e.what()));
+        this->LogError(std::format("停止时异常: {}", e.what()));
     }
 
     this->ofctx.writeTrailer();
@@ -138,6 +150,7 @@ bool MediaRecorder::StopRecording() {
 
     this->ofctx.close();
     this->LogSucc("录制结束");
+    this->recordState.store(RecordState::Free);
 
     return true;
 }

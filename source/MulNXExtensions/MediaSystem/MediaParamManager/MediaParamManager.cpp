@@ -26,10 +26,9 @@ void MediaParamManager::Menu() {
     }
 
     if (ImGui::CollapsingHeader("画面参数")) {
-        ImGui::TextDisabled("画面");
         ImGui::InputInt("宽度(0=原生)", &this->width);
         ImGui::InputInt("高度(0=原生)", &this->height);
-        MulNX::UI::SliderInt("捕获帧率(0=不限)", this->targetFPS, 0, 1200);
+        MulNX::UI::SliderInt("捕获帧率", this->targetFPS, 0, 1200);
     }
 }
 

@@ -20,6 +20,8 @@ class MediaRecorder final :public MediaModuleBase {
 
     moodycamel::ConcurrentQueue<av::Packet> bufferPackets{};
 
+    void Menu();
+
     bool StartRecording(const std::string& filename, bool advance);
     bool StopRecording();
     void CaptureCallback();
