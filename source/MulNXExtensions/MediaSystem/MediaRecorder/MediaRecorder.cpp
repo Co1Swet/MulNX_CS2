@@ -34,7 +34,15 @@ bool MediaRecorder::Init() {
 
     this->UIRegisterCallback("UI.MediaSys", [this](auto&&...) {
         ImGui::Text("录制状态：");
-        ImGui::Text(this->pMediaState->recording ? "录制中": "空闲中");
+        switch (this->recordState.load()) {
+        case RecordState::Free:
+            ImGui::Text("空闲");
+            break;
+        case RecordState::Recording:
+            ImGui::Text("录制中（忙碌）");
+            break;
+        }
+        return true;
         });
 
     return true;
@@ -55,7 +63,7 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 }
 
 bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
-    if (this->pMediaState->recording) {
+    if (this->recordState.load() != RecordState::Free) {
         this->LogWarning("已在录制中");
         return false;
     }
@@ -78,7 +86,6 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
         auto&& [rInfo] = SetOnMsg.Access<MulNX::AVStartInfo>();
         rInfo.pOutCtx = &this->ofctx;
         rInfo.startTime = std::chrono::steady_clock::now();
-        rInfo.advancedMode = advance;
         this->PublishSync(SetOnMsg);
 
         this->ofctx.writeHeader();
@@ -92,7 +99,8 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
             rp.targetFPS > 0 ? std::to_string(rp.targetFPS) + "fps " : ""
         ));
 
-        this->pMediaState->recording = true;
+        this->pMediaState->MediaSystemGlobalWorkFlag = true;
+        this->recordState.store(RecordState::Recording);
         return true;
     }
     catch (const std::exception& e) {
@@ -140,7 +148,7 @@ void MediaRecorder::Main() {
 }
 
 void MediaRecorder::Encode() {
-    if (!this->pMediaState->recording) return;
+    if (this->recordState.load() != RecordState::Recording) return;
     std::vector<av::Packet> packets;
 
     while (auto p = this->pVEncodeHelper->Encode()) {

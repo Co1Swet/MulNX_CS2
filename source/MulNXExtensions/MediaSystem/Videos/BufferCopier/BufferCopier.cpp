@@ -10,13 +10,21 @@ bool BufferCopier::Init() {
     this->SubscribeSync("MediaSync/PresentCallback", [this](MulNX::Message& msg) {
         this->CopyTexture();
         });
-    
+
+    this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
+        this->shouldCopy.store(true);
+        });
+
+    this->SubscribeSync("MediaSync/SetOff", [this](MulNX::Message& msg) {
+        this->shouldCopy.store(false);
+        });
+
     return true;
 }
 
 void BufferCopier::CopyTexture() {
-    if (!this->shouldCopy.load(std::memory_order_acquire)) return;
-    if (!this->pMediaState->recording)return;
+    if (!this->shouldCopy.load()) return;
+    if (!this->pMediaState->MediaSystemGlobalWorkFlag)return;
 
     MulNX::Message msgBeforeCopyBackbuffer("MediaSync/BeforeCopyBackbuffer"_hash);
     auto&& [info] = msgBeforeCopyBackbuffer.Access<MulNX::VFrameExInfo>();

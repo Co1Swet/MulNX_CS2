@@ -16,12 +16,8 @@
 namespace MulNX {
     class VFrameExInfo {
     public:
-        // 记录在Present线程执行copy时，绝对的世界时间，在常规录制模式多使用
+        // 记录在Present线程执行copy时，自然的挂钟时间，或高级录制下赋予Virtual Time
         std::chrono::steady_clock::time_point captureTime{};
-        // 一个帧率，在高级录制里使用，用于计算pts
-        int frameRate;
-        // 一个逻辑帧数字，在高级录制被填充，用于计算pts
-        int logicFrame;
         // 需要丢弃该帧
         bool needDrop;
         // 处于高级录制模式;
@@ -31,7 +27,6 @@ namespace MulNX {
     struct AVStartInfo {
         av::FormatContext* pOutCtx = nullptr;
         std::chrono::steady_clock::time_point startTime{};
-        bool advancedMode = false;
     };
 }
 

@@ -14,7 +14,7 @@ bool MediaRunningState::Init() {
 void MediaRunningState::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Media/Record/Stop"_hash:
-        this->recording = false;
+        this->MediaSystemGlobalWorkFlag = false;
         break;
     }
 }

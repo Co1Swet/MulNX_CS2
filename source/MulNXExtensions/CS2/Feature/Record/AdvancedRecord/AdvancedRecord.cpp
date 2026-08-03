@@ -18,7 +18,7 @@ bool AdvancedRecord::Init() {
             this->PublishAsync(std::move(msg));
         }
         if (ImGui::Button("停止CS2录制")) {
-            this->AsyncCommand("endmovie");
+            this->AsyncCommand("host_framerate 0; endmovie");
             this->PublishAsync("Media/Record/Stop"_hash);
         }
 

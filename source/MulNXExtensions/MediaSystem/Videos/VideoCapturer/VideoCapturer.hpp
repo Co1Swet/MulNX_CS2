@@ -10,7 +10,6 @@ class VideoCapturer final :public MediaModuleBase {
     class TextureMapper* pTextureMapper = nullptr;
 
     std::atomic<std::chrono::steady_clock::time_point> recordStartTime;
-    std::atomic<bool> vCapturing = false;
 
     bool Init()override;
 

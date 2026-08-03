@@ -34,27 +34,19 @@ bool VideoCapturer::Init() {
 void VideoCapturer::Reset() {
     std::unique_lock lock(this->smutex);
     this->recordStartTime.store({});
-    this->vCapturing.store(false);
 }
 
 void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
     std::unique_lock lock(this->smutex);
     this->recordStartTime = startTime;
-    this->vCapturing.store(true, std::memory_order_release);
 }
 
 void VideoCapturer::StopCapture() {
     std::unique_lock lock(this->smutex);
-    this->vCapturing.store(false);
 }
 
 void VideoCapturer::Captuer() {
     this->Update();
-    if (!this->vCapturing.load(std::memory_order_acquire)) {
-        this->pBufferCopier->shouldCopy.store(false, std::memory_order_release);
-        return;
-    }
-    this->pBufferCopier->shouldCopy.store(true, std::memory_order_release);
 
     std::unique_lock lock(this->smutex);
     int readIdx;
