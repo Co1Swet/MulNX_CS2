@@ -22,8 +22,10 @@ namespace MulNX {
         int frameRate;
         // 一个逻辑帧数字，在高级录制被填充，用于计算pts
         int logicFrame;
-
+        // 需要丢弃该帧
         bool needDrop;
+        // 处于高级录制模式;
+        bool isAdvancedMode;
     };
 
     struct AVStartInfo {

@@ -6,4 +6,5 @@ class MediaRunningState final :public MulNX::Module<MediaRunningState> {
     void ProcessMsg(MulNX::Message& msg)override;
 public:
     std::atomic<bool> recording = false;
+    std::atomic<bool> advancedMode = false;
 };

@@ -19,8 +19,9 @@ void BufferCopier::CopyTexture() {
     if (!this->pMediaState->recording)return;
 
     MulNX::Message msgBeforeCopyBackbuffer("MediaSync/BeforeCopyBackbuffer"_hash);
-    this->PublishSync(msgBeforeCopyBackbuffer);
     auto&& [info] = msgBeforeCopyBackbuffer.Access<MulNX::VFrameExInfo>();
+    info.isAdvancedMode = this->pMediaState->advancedMode.load(std::memory_order_acquire);
+    this->PublishSync(msgBeforeCopyBackbuffer);
     if (info.needDrop)return;
 
     ComPtr<ID3D11Texture2D> backBuffer;
@@ -44,7 +45,7 @@ void BufferCopier::CopyTexture() {
     D3D11_TEXTURE2D_DESC bbDescR;
     backBuffer->GetDesc(&bbDescR);
 
-    // 执行拷贝，并在拷贝完成时刻打 PTS
+    // 执行拷贝
     if (bbDescR.SampleDesc.Count > 1) {
         this->pGraphicsManager->pd3dContext->ResolveSubresource(
             slot.pTex.Get(), 0, backBuffer.Get(), 0,

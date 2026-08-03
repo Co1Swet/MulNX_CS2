@@ -9,15 +9,15 @@ bool AdvancedRecord::Init() {
         MulNX::UI::SliderInt("高级录制帧率", this->advanceFPS, 1, 1000);
 
         if (ImGui::Button("尝试CS2录制")) {
-            this->isAdvance = true;
             this->frameCount = 0;
-            this->AsyncCommand(std::format("startmovie mymulnx wav framerate {}", this->advanceFPS.load()));
+            this->AsyncCommand(std::format("host_framerate {}; startmovie mymulnx wav framerate {}",
+                this->advanceFPS.load(), this->advanceFPS.load()));
+            
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/StartAdvanced"_hash);
             rp->str1 = (this->dirVideos / "CS2test").string();
             this->PublishAsync(std::move(msg));
         }
         if (ImGui::Button("停止CS2录制")) {
-            this->isAdvance = false;
             this->AsyncCommand("endmovie");
             this->PublishAsync("Media/Record/Stop"_hash);
         }
@@ -71,7 +71,7 @@ void AdvancedRecord::HandleBeforeCopyBackbuffer(MulNX::Message& msg) {
 }
 
 bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
-    if (!this->isAdvance) return false;
+    if (!info.isAdvancedMode) return false;
 
     info.needDrop = false;
 

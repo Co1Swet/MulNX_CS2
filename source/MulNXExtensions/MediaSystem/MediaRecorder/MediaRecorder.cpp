@@ -59,6 +59,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
         this->LogWarning("已在录制中");
         return false;
     }
+    this->pMediaState->advancedMode = advance;
 
     std::string outFile = pathNoExt + ".mp4";
     int srcW = this->pVCD3D11Manager->srcWidth;

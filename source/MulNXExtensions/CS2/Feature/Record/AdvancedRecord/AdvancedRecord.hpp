@@ -10,7 +10,7 @@ class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<Advance
     std::atomic<int64_t> minIntervalUs = 16667;     // captureFpsCap 换算（µs）
     std::atomic<int64_t> lastSlot = -1;             // 上次捕获所在时间槽序号
 
-    std::atomic<bool> isAdvance = false;
+    std::atomic<bool> bufferAdvanced = false;
     std::atomic<int> advanceFPS = 30;
     std::atomic<int> frameCount = 0;
 
