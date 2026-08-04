@@ -4,7 +4,7 @@ bool TextureMapper::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
 
     this->SubscribeSync("MediaSync/Reset", [this](MulNX::Message& msg) {
-        this->ReleaseStagingTexture();
+        this->nextFrameRelease = true;
         });
 
     return true;
@@ -24,6 +24,11 @@ void TextureMapper::ReleaseStagingTexture() {
 }
 
 bool TextureMapper::CheckStagingTexture(D3D11_TEXTURE2D_DESC& desc) {
+    if (this->nextFrameRelease) {
+        this->ReleaseStagingTexture();
+        this->nextFrameRelease = false;
+    }
+
     av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
     if (srcFmt == AV_PIX_FMT_NONE) return false;
 
@@ -42,7 +47,7 @@ bool TextureMapper::CheckStagingTexture(D3D11_TEXTURE2D_DESC& desc) {
 
         if (FAILED(this->pVCD3D11Manager->pReadSideDevice->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
             return false;
-        
+
         this->stagingWidth = (int)desc.Width;
         this->stagingHeight = (int)desc.Height;
         this->stagingFormat = desc.Format;
@@ -78,6 +83,6 @@ std::optional<av::VideoFrame> TextureMapper::MapFrame(MidTex& tex) {
 
     av::VideoFrame frame(this->readbackBuf.data(), total, this->srcPixelFormat,
         this->stagingWidth, this->stagingHeight);
-    
+
     return frame;
 }
