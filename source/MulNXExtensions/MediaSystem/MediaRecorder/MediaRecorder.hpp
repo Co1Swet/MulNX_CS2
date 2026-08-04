@@ -22,6 +22,8 @@ class MediaRecorder final :public MediaModuleBase {
 
     void Menu();
 
+    void ReportCtxState();
+
     bool StartRecording(const std::string& filename, bool advance);
     bool StopRecording();
     void CaptureCallback();

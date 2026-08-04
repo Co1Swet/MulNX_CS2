@@ -2,87 +2,14 @@
 #include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
 #include <mmdeviceapi.h>
 #include <wrl/client.h>
-
 using Microsoft::WRL::ComPtr;
-
-static GUID REFERENCE_GUID = GUID_NULL;
 
 bool AudioCapturer::Init() {
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
 
     this->SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {
-        // start capture thread
-        this->keepWork.store(true);
-
-        ComPtr<IMMDeviceEnumerator> enumerator;
-        if (FAILED(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&enumerator)))) {
-            MulNX::ErrorTerminate("enumerator 创建失败");
-        }
-
-        ComPtr<IMMDevice> device;
-        if (FAILED(enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device))) {
-            MulNX::ErrorTerminate("IMMDevice 获取失败");
-        }
-
-        if (FAILED(device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, reinterpret_cast<void**>(audioClient.GetAddressOf())))) {
-            MulNX::ErrorTerminate("Device 激活失败");
-        }
-
-        HRESULT hr = S_OK;
-        hr = audioClient->GetMixFormat(&wfx);
-        if (FAILED(hr) || !wfx) {
-            MulNX::ErrorTerminate("GetMixFormat(&wfx) 失败");
-        }
-
-        // Use loopback capture on default render device with event-driven mode
-        this->hEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-        if (!this->hEvent) {
-            MulNX::ErrorTerminate("CreateEvent 失败");
-        }
-
-        hr = audioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_LOOPBACK | AUDCLNT_STREAMFLAGS_EVENTCALLBACK, 10000000, 0, wfx, &REFERENCE_GUID);
-        if (FAILED(hr)) {
-            MulNX::ErrorTerminate("audioClient 初始化失败");
-        }
-
-        if (FAILED(audioClient->GetService(IID_PPV_ARGS(&captureClient)))) {
-            MulNX::ErrorTerminate("audioClient 服务获取失败");
-        }
-
-        // Set the event handle for event-driven capture
-        hr = audioClient->SetEventHandle(hEvent);
-        if (FAILED(hr)) {
-            MulNX::ErrorTerminate("audioClient 句柄设置失败");
-        }
-
-        UINT32 bufferFrameCount = 0;
-        audioClient->GetBufferSize(&bufferFrameCount);
-
-        hr = audioClient->Start();
-        if (FAILED(hr)) {
-            MulNX::ErrorTerminate("audioClient 启动失败");
-        }
-
-        this->smutex.lock();
-        this->SendTask("Main", "AudioCapturer", [this]() {
-            if (this->keepWork.load()) {
-                this->Main();
-                return true;
-            }
-            // Stop audio client and free resources in Main when exiting loop
-            if (this->audioClient) {
-                audioClient->Stop();
-            }
-            if (this->wfx) {
-                CoTaskMemFree(wfx);
-                wfx = nullptr;
-            }
-            if (hEvent) {
-                CloseHandle(hEvent);
-                this->hEvent = nullptr;
-            }
-
-            this->smutex.unlock();
+        this->SendTask("OnFirstPresent", "AudioCapturer", [this]() {
+            this->OnFirstPresent();
             return false;
             });
         });
@@ -106,14 +33,93 @@ bool AudioCapturer::Init() {
     return true;
 }
 
+void AudioCapturer::OnFirstPresent() {
+    ComPtr<IMMDeviceEnumerator> enumerator;
+    if (FAILED(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&enumerator)))) {
+        MulNX::ErrorTerminate("enumerator 创建失败");
+    }
+
+    ComPtr<IMMDevice> device;
+    if (FAILED(enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device))) {
+        MulNX::ErrorTerminate("IMMDevice 获取失败");
+    }
+
+    if (FAILED(device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr,
+        reinterpret_cast<void**>(this->audioClient.GetAddressOf())))) {
+        MulNX::ErrorTerminate("Device 激活失败");
+    }
+
+    HRESULT hr = S_OK;
+    hr = this->audioClient->GetMixFormat(&this->wfx);
+    if (FAILED(hr) || !this->wfx) {
+        MulNX::ErrorTerminate("GetMixFormat(&wfx) 失败");
+    }
+
+    // Use loopback capture on default render device with event-driven mode
+    this->hEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    if (!this->hEvent) {
+        MulNX::ErrorTerminate("CreateEvent 失败");
+    }
+
+    static GUID REFERENCE_GUID = GUID_NULL;
+    hr = this->audioClient->Initialize(AUDCLNT_SHAREMODE_SHARED,
+        AUDCLNT_STREAMFLAGS_LOOPBACK | AUDCLNT_STREAMFLAGS_EVENTCALLBACK, 10000000, 0, this->wfx, &REFERENCE_GUID);
+    if (FAILED(hr)) {
+        MulNX::ErrorTerminate("audioClient 初始化失败");
+    }
+
+    if (FAILED(this->audioClient->GetService(IID_PPV_ARGS(&this->captureClient)))) {
+        MulNX::ErrorTerminate("audioClient 服务获取失败");
+    }
+
+    // Set the event handle for event-driven capture
+    hr = this->audioClient->SetEventHandle(this->hEvent);
+    if (FAILED(hr)) {
+        MulNX::ErrorTerminate("audioClient 句柄设置失败");
+    }
+
+    UINT32 bufferFrameCount = 0;
+    this->audioClient->GetBufferSize(&bufferFrameCount);
+
+    hr = this->audioClient->Start();
+    if (FAILED(hr)) {
+        MulNX::ErrorTerminate("audioClient 启动失败");
+    }
+
+    this->LogInfo(std::format("音频捕获已启动，采样率={}，通道数={}，位深={}",
+        this->wfx->nSamplesPerSec, this->wfx->nChannels, this->wfx->wBitsPerSample));
+
+    this->smutex.lock();
+    this->exitFlag.store(false);
+    this->SendTask("Main", "AudioCapturer", [this]() {
+        if (!this->exitFlag.load()) {
+            this->Main();
+            return true;
+        }
+
+        if (this->audioClient) {
+            this->audioClient->Stop();
+        }
+        if (this->wfx) {
+            CoTaskMemFree(this->wfx);
+            this->wfx = nullptr;
+        }
+        if (this->hEvent) {
+            CloseHandle(this->hEvent);
+            this->hEvent = nullptr;
+        }
+
+        this->smutex.unlock();
+        return false;
+        });
+}
+
 void AudioCapturer::Main() {
     HRESULT hr = S_OK;
-    // Use event created during Init
-    HANDLE hEvent = this->hEvent;
 
     int channels = wfx->nChannels;
 
-    DWORD wait = WaitForSingleObject(hEvent, 1000);
+    DWORD wait = WaitForSingleObject(this->hEvent, 1000);
     if (wait == WAIT_TIMEOUT) return;
     if (wait != WAIT_OBJECT_0) return;
 
@@ -127,11 +133,11 @@ void AudioCapturer::Main() {
         });
     if (!this->needCaptuer)return;
     if (!this->pMediaState->MediaSystemGlobalWorkFlag)return;
-
-    if (!(framesAvailable > 0 && data))return;
+    if (!data)return;
+    if (framesAvailable <= 0)return;
 
     int samplesCount = static_cast<int>(framesAvailable);
-    size_t totalBytes = static_cast<size_t>(framesAvailable) * channels * (wfx->wBitsPerSample / 8);
+    size_t totalBytes = static_cast<size_t>(framesAvailable) * channels * (this->wfx->wBitsPerSample / 8);
     std::vector<uint8_t> copied(data, data + totalBytes);
     uint64_t chLayout = 0;
     switch (channels) {
@@ -143,20 +149,20 @@ void AudioCapturer::Main() {
     default: chLayout = AV_CH_LAYOUT_STEREO; break;
     }
 
-    av::SampleFormat fmt(wfx->wBitsPerSample == 32 ? "flt" : (wfx->wBitsPerSample == 16 ? "s16" : "u8"));
     try {
-        this->ProcessAudio(fmt, samplesCount, chLayout, std::move(copied));
+        this->ProcessAudio(samplesCount, chLayout, std::move(copied));
     }
     catch (const std::exception& e) {
         this->LogError(e.what());
     }
 }
 
-void AudioCapturer::ProcessAudio(const av::SampleFormat& fmt,
-    const int& samplesCount, const uint64_t& chLayout, std::vector<uint8_t>&& copied) {
+void AudioCapturer::ProcessAudio(const int& samplesCount, const uint64_t& chLayout, std::vector<uint8_t>&& copied) {
 
-    int sampleRate = wfx->nSamplesPerSec;
+    int sampleRate = this->wfx->nSamplesPerSec;
     // Use packed format buffer for interleaved WASAPI data
+    av::SampleFormat fmt(this->wfx->wBitsPerSample == 32 ? "flt" :
+        (this->wfx->wBitsPerSample == 16 ? "s16" : "u8"));
     av::SampleFormat useFmt = fmt.isPlanar() ? fmt.packedSampleFormat() : fmt;
 
     av::AudioSamples samples;
@@ -188,46 +194,43 @@ void AudioCapturer::ProcessAudio(const av::SampleFormat& fmt,
     try {
         av::SampleFormat targetFmt(AV_SAMPLE_FMT_S16); // packed int16 (interleaved)
         uint64_t targetLayout = AV_CH_LAYOUT_STEREO;
-        int targetRate = sampleRate;
 
-        av::AudioSamples& captured = samples; // use local 'samples' filled above
         av::SampleFormat curFmt = useFmt;
         bool needNormalize = false;
-        if (curFmt != targetFmt) needNormalize = true;
-        if (captured.channelsCount() != 2) needNormalize = true;
-        if (captured.channelsLayout() != targetLayout) needNormalize = true;
+        if (curFmt != targetFmt)
+            needNormalize = true;
+        if (samples.channelsCount() != 2)
+            needNormalize = true;
+        if (samples.channelsLayout() != targetLayout)
+            needNormalize = true;
 
         if (!needNormalize) {
-            this->CommitAudioSamples(std::move(captured));
+            this->CommitAudioSamples(std::move(samples));
             return;
         }
 
         std::error_code rerr;
         av::AudioResampler tmpRes;
-        bool ok = tmpRes.init(targetLayout, targetRate, targetFmt, chLayout, sampleRate, curFmt, rerr);
+        bool ok = tmpRes.init(targetLayout, sampleRate, targetFmt, chLayout, sampleRate, curFmt, rerr);
         if (ok) {
-            tmpRes.push(captured);
+            tmpRes.push(samples);
             av::AudioSamples out = tmpRes.pop(0);
             if (out.isValid() && out.samplesCount() > 0) {
                 this->CommitAudioSamples(std::move(out));
             }
             else {
                 // fallback to original if conversion produced no data
-                this->CommitAudioSamples(std::move(captured));
+                this->CommitAudioSamples(std::move(samples));
             }
         }
         else {
             this->LogError(std::format("resampler init failed: {}", rerr ? rerr.message() : "unknown"));
-            this->CommitAudioSamples(std::move(captured));
+            this->CommitAudioSamples(std::move(samples));
         }
     }
     catch (const std::exception& e) {
         this->LogError(std::format("normalization failed: {}", e.what()));
-        // best effort: if normalization fails, enqueue original raw data
-        try {
-            this->CommitAudioSamples(std::move(samples));
-        }
-        catch (...) {}
+        this->CommitAudioSamples(std::move(samples));
     }
 }
 void AudioCapturer::CommitAudioSamples(av::AudioSamples&& samples) {
@@ -243,17 +246,6 @@ void AudioCapturer::CommitAudioSamples(av::AudioSamples&& samples) {
 }
 
 void AudioCapturer::Deinit() {
-    this->keepWork.store(false);
+    this->exitFlag.store(true);
     std::unique_lock lock(this->smutex);
-    if (this->audioClient) {
-        audioClient->Stop();
-    }
-    if (this->wfx) {
-        CoTaskMemFree(wfx);
-        wfx = nullptr;
-    }
-    // Wake Main if it's waiting on the event so it can exit and clean up
-    if (this->hEvent) {
-        SetEvent(this->hEvent);
-    }
 }

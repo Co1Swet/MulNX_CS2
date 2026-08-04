@@ -29,6 +29,21 @@ void MediaRecorder::Menu() {
         this->pMediaState->MediaSystemGlobalWorkFlag ? "正在捕获" : "无新捕获").c_str());
 }
 
+void MediaRecorder::ReportCtxState() {
+    if (!this->ofctx.isOpened()) {
+        this->LogInfo("输出上下文未打开");
+        return;
+    }
+    this->LogInfo(std::format("输出上下文状态: 流数={} , 码流数={}",
+        this->ofctx.streamsCount(),
+        this->ofctx.streams().size()));
+    for(auto&& st : this->ofctx.streams()) {
+        this->LogInfo(std::format("流索引={}",
+            st.index()));
+    }
+    this->LogInfo("报告完毕");
+}
+
 bool MediaRecorder::Init() {
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
@@ -123,6 +138,9 @@ bool MediaRecorder::StopRecording() {
         this->LogWarning("未在录制中");
         return false;
     }
+    this->LogInfo("准备停止录制");
+    this->ReportCtxState();
+
     this->PublishSync("MediaSync/SetOff"_hash);
 
     try {
@@ -144,7 +162,11 @@ bool MediaRecorder::StopRecording() {
         this->LogError(std::format("停止时异常: {}", e.what()));
     }
 
+    this->LogInfo("冲刷完毕，准备写入尾部");
+    this->ReportCtxState();
+
     this->ofctx.writeTrailer();
+    this->LogInfo("尾部写入完毕");
 
     this->PublishSync("MediaSync/Reset"_hash);
 

@@ -43,7 +43,7 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
         return;
     }
     av::SampleFormat targetFmt = supportedFmts.front();
-    this->LogWarning(std::string("音频编码器目标格式: ") + targetFmt.name());
+    this->LogWarning(std::format("音频编码器目标格式: {}", targetFmt.name()));
 
     this->aencoder = av::AudioEncoderContext(acodec);
     int outChannels = 2;
@@ -58,10 +58,11 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
 
     try {
         this->aencoder.open();
-        this->LogWarning(std::string("音频编码器已打开，frame_size=") + std::to_string(this->aencoder.frameSize()));
+        this->LogWarning(std::format("音频编码器已打开，frame_size={} , time_base={} , sample_rate={}",
+            this->aencoder.frameSize(), this->aencoder.timeBase(), this->aencoder.sampleRate()));
     }
     catch (const std::exception& e) {
-        this->LogError(std::string("音频编码器打开失败: ") + e.what());
+        this->LogError(std::format("音频编码器打开失败: {}", e.what()));
         this->aencoder = {};
         return;
     }
@@ -86,7 +87,7 @@ std::optional<av::Packet> AEncodeHelper::TrySetOff() {
 
     int frameSize = this->aencoder.frameSize();
     if (frameSize <= 0) return std::nullopt;
-    
+
     auto h = this->Encode();
     if (h.has_value())return h;
 
@@ -219,39 +220,41 @@ std::optional<av::Packet> AEncodeHelper::Encode() {
 
         if (take == available) {
             this->audioFifo.pop_front();
+            continue;
+        }
+
+        // 部分消费：保留剩余部分并修正其 PTS
+        int remain = available - take;
+        av::AudioSamples remainder;
+        if (remainder.init(front.sampleFormat(), remain, front.channelsLayout(), front.sampleRate()) < 0) {
+            this->audioFifo.pop_front();
+            this->LogError("分配剩余音频缓冲失败，丢弃剩余数据");
+            break;
+        }
+            
+        if (!front.isPlanar()) {
+            int bps = front.sampleFormat().bytesPerSample();
+            int ch = front.channelsCount();
+            memcpy(remainder.data(0),
+                reinterpret_cast<const uint8_t*>(front.data(0)) + take * ch * bps,
+                remain * ch * bps);
         }
         else {
-            // 部分消费：保留剩余部分并修正其 PTS
-            int remain = available - take;
-            av::AudioSamples remainder;
-            if (remainder.init(front.sampleFormat(), remain, front.channelsLayout(), front.sampleRate()) >= 0) {
-                if (!front.isPlanar()) {
-                    int bps = front.sampleFormat().bytesPerSample();
-                    int ch = front.channelsCount();
-                    memcpy(remainder.data(0),
-                        reinterpret_cast<const uint8_t*>(front.data(0)) + take * ch * bps,
-                        remain * ch * bps);
-                }
-                else {
-                    int bps = front.sampleFormat().bytesPerSample();
-                    for (int c = 0; c < front.channelsCount(); ++c) {
-                        memcpy(remainder.data(c),
-                            reinterpret_cast<const uint8_t*>(front.data(c)) + take * bps,
-                            remain * bps);
-                    }
-                }
-                // 计算新 PTS
-                int64_t originalUs = front.pts().timestamp({ 1, 1000000 });
-                int64_t takeUs = (int64_t)take * 1000000 / this->aencoder.sampleRate();
-                remainder.setTimeBase({ 1, 1000000 });
-                remainder.setPts(av::Timestamp(originalUs + takeUs, { 1, 1000000 }));
-                this->audioFifo.front() = std::move(remainder);
+            int bps = front.sampleFormat().bytesPerSample();
+            for (int c = 0; c < front.channelsCount(); ++c) {
+                memcpy(remainder.data(c),
+                    reinterpret_cast<const uint8_t*>(front.data(c)) + take * bps,
+                    remain * bps);
             }
-            else {
-                this->audioFifo.pop_front();
-            }
-            break; // 已取够
         }
+        // 计算新 PTS
+        int64_t originalUs = front.pts().timestamp({ 1, 1000000 });
+        int64_t takeUs = (int64_t)take * 1000000 / this->aencoder.sampleRate();
+        remainder.setTimeBase({ 1, 1000000 });
+        remainder.setPts(av::Timestamp(originalUs + takeUs, { 1, 1000000 }));
+        this->audioFifo.front() = std::move(remainder);
+
+        break; // 已取够
     }
 
     // 设置帧的 PTS（转换为编码器时间基）
