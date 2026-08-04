@@ -113,7 +113,7 @@ void AudioCapturer::Main() {
 
     int channels = wfx->nChannels;
 
-    DWORD wait = WaitForSingleObject(hEvent, 0);
+    DWORD wait = WaitForSingleObject(hEvent, 1000);
     if (wait == WAIT_TIMEOUT) return;
     if (wait != WAIT_OBJECT_0) return;
 

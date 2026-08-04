@@ -157,7 +157,12 @@ bool MediaRecorder::StopRecording() {
 
 void MediaRecorder::Main() {
     this->Update();
-    this->Encode();
+    try {
+        this->Encode();
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("编码异常: {}", e.what()));
+    }
 }
 
 void MediaRecorder::Encode() {
