@@ -27,7 +27,7 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern ifShowSpeaker("48 63 ?? 48 8D 0D ?? ?? ?? ?? C6 84 08 ?? ?? ?? ?? 01 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 84 C0 0F 85");
                 inline const static MulNX::Memory::Pattern PosTeamID_CmpForHide("0F 5B FF 0F 2F FE 0F 82 ?? ?? ?? 00 F3 0F 10 44 24");
                 inline const static MulNX::Memory::Pattern PosTeamID_xxIt("48 8B 75 ?? 33 FF 41 BC FF FF 00 00");
-                inline const static MulNX::Memory::Pattern PosTeamCounterWriteHP("8B 43 04 89 47 0C 8B 43 08");
+                inline const static MulNX::Memory::Pattern Func_TeamCounterFillPlayerSlotCache("41 57 F3 0F 10 8C 24 C8 00 00 00");
             }
             namespace Flash {
                 inline const static MulNX::Memory::Pattern PosCallCmpDrawFlashUpHUD("48 8B F2 48 8B E9 E8 ?? ?? ?? ?? 84 C0 0F 85");
