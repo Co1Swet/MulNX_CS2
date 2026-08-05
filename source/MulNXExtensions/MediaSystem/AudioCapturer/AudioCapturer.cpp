@@ -30,6 +30,12 @@ bool AudioCapturer::Init() {
         this->needCaptuer = false;
         });
 
+    this->SubscribeSync("MediaSync/StateReport", [this](auto&&...) {
+        this->LogInfo(std::format("音频捕获状态: {}", (this->needCaptuer.load() ? "已开启" : "已关闭")));
+        auto Long = this->lastCommitTime.load() - this->recordStartTime.load();
+        this->LogInfo(std::format("音频捕获时长: {}", Long.count()));
+        });
+
     return true;
 }
 
@@ -242,6 +248,7 @@ void AudioCapturer::CommitAudioSamples(av::AudioSamples&& samples) {
     samples.setTimeBase({ 1, 1000000 });
     samples.setPts(av::Timestamp(ptsUs, samples.timeBase()));
     // 入队！
+    this->lastCommitTime = std::chrono::steady_clock::now();
     this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(samples));
 }
 

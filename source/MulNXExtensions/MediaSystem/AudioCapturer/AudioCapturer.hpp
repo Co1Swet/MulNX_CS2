@@ -9,6 +9,7 @@ class AudioCapturer final :public MediaModuleBase {
     std::atomic<bool> needCaptuer = false;
 
     std::atomic<std::chrono::steady_clock::time_point> recordStartTime;
+    std::atomic<std::chrono::steady_clock::time_point> lastCommitTime;
 
     Microsoft::WRL::ComPtr<IAudioCaptureClient> captureClient;
     Microsoft::WRL::ComPtr<IAudioClient> audioClient;

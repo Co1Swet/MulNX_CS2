@@ -41,6 +41,7 @@ void MediaRecorder::ReportCtxState() {
         this->LogInfo(std::format("流索引={}",
             st.index()));
     }
+    this->PublishSync("MediaSync/StateReport"_hash);
     this->LogInfo("报告完毕");
 }
 
