@@ -1,4 +1,5 @@
 #include "FileRedirector.hpp"
+#include "FileListenMixin.hpp"
 
 bool FileRedirector::Init() {
     std::filesystem::path toolPath = this->Path()->PathGetForShared("Tools");
@@ -16,6 +17,11 @@ bool FileRedirector::Init() {
             prefixEnd = 4;
         else if (src.starts_with(L"\\??\\"))
             prefixEnd = 4;
+
+        for(auto* listener : this->listeners) {
+            auto res = listener->OnCreateFileW(hook, ctx);
+            if (res.has_value())return res.value();
+        }
 
         std::wstring_view cleanSrc = src.substr(prefixEnd);
 

@@ -7,6 +7,7 @@ add_library(CS2HUD STATIC
     TeamCounterController/TeamCounterController.cpp
     PlayerSpotRenderController/PlayerSpotRenderController.cpp
     FlashRenderController/FlashRenderController.cpp
+    VPKInjector/VPKInjector.cpp
 )
 
 target_link_libraries(CS2HUD PUBLIC

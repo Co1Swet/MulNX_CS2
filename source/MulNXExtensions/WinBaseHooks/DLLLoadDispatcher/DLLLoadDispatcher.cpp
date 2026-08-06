@@ -12,17 +12,15 @@ bool DLLLoadDispatcher::Init() {
         return MulNX::Hook::Then::Return;
         }).value();
     this->hkLoadLibraryExW->Attach();
-    this->LogSucc(I18n("hook.attached", "LoadLibraryExW"));
+    this->RegisterAttachHook(this->hkLoadLibraryExW, "LoadLibraryExW");
 
     auto pthFile = this->PathGet("Config") / "dllTargets.yaml";
     auto file= YAML::LoadFile(pthFile.string());
     for (const auto& target : file["targets"]) {
         this->targets.insert(target.as<std::string>());
+        this->LogInfo(std::format("已添加拦截目标：{}", target.as<std::string>()));
     }
     return true;
-}
-void DLLLoadDispatcher::Deinit() {
-    this->hkLoadLibraryExW->Detach();
 }
 
 void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {
@@ -39,6 +37,7 @@ void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {
 void DLLLoadDispatcher::DispatchModuleLoadMessage(const std::filesystem::path& modulePath) {
     auto filename = modulePath.filename().string();
     if (this->targets.find(filename) != this->targets.end()) {
+        this->LogWarning(std::format("检测到目标模块加载：{}", filename));
         auto full = "Hook/LoadLibraryExW/" + filename;
         this->PublishSync(MulNX::HashString(full));
     }

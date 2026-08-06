@@ -7,3 +7,4 @@
 #include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
 #include "TeamCounterController/TeamCounterController.hpp"
 #include "FlashRenderController/FlashRenderController.hpp"
+#include "VPKInjector/VPKInjector.hpp"

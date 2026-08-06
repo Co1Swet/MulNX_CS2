@@ -1,7 +1,6 @@
 #include "DllMain.hpp"
 #include <App/CS2OBTool/UIDocker/UIDocker.hpp>
-#include <MulNXExtensions/DLLLoadDispatcher/DLLLoadDispatcher.hpp>
-#include <MulNXExtensions/FileRedirector/FileRedirector.hpp>
+#include <MulNXExtensions/WinBaseHooks/WinBaseHooks.hpp>
 #include <MulNXExtensions/CS2/CS2s.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
@@ -77,6 +76,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<SkyController>("SkyController")
 
         // CS2 视觉（HUD）功能模块
+        .CreateModule<VPKInjector>("VPKInjector")
         .CreateModule<TeamIDColorController>("TeamIDColorController")
         .CreateModule<TeamIDRenderController>("TeamIDRenderController")
         .CreateModule<PlayerSpotRenderController>("PlayerSpotRenderController")
