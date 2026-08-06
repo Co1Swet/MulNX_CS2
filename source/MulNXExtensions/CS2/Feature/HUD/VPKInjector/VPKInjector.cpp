@@ -9,7 +9,7 @@ bool VPKInjector::Init() {
     return true;
 }
 
-std::optional<MulNX::Hook::Then> VPKInjector::OnCreateFileW(FileListenControl* pfc) {
+std::optional<MulNX::Hook::Then> VPKInjector::OnCreateFileW(CreateFileWControl* pfc) {
     auto cleanSrc = pfc->GetCleanSrc();
 
     const std::wstring_view kKey = L"Counter-Strike Global Offensive";

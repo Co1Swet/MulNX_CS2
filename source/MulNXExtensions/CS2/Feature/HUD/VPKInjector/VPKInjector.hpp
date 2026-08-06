@@ -7,5 +7,5 @@ class VPKInjector final :public CSModuleBase, public FileListenMixin<VPKInjector
     std::wstring pathMulNXPOV;
 
     bool Init()override;
-    std::optional<MulNX::Hook::Then> OnCreateFileW(FileListenControl* pfc)override;
+    std::optional<MulNX::Hook::Then> OnCreateFileW(CreateFileWControl* pfc)override;
 };

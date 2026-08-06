@@ -122,3 +122,54 @@ bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
 
     return true;  // 已自行处理，跳过常规的时间槽限帧逻辑
 }
+
+std::optional<MulNX::Hook::Then> AdvancedRecord::OnCreateFileW(CreateFileWControl* pfc) {
+    std::wstring_view clean = pfc->GetCleanSrc();
+
+    const std::wstring_view kMovieDir = L"game\\csgo\\movie\\";
+
+    // 找到 movie\ 在路径中的位置
+    size_t pos = std::wstring_view::npos;
+    if (clean.size() >= kMovieDir.size()) {
+        for (size_t i = 0; i <= clean.size() - kMovieDir.size(); ++i) {
+            if (_wcsnicmp(clean.data() + i, kMovieDir.data(), kMovieDir.size()) == 0) {
+                pos = i;
+                break;
+            }
+        }
+    }
+
+    if (pos == std::wstring_view::npos)
+        return std::nullopt;
+
+    // 取 movie\ 之后的部分，例如 "2026_08_06_13_22_57\mymulnx.wav"
+    std::wstring_view afterMovie = clean.substr(pos + kMovieDir.size());
+    if (afterMovie.empty())
+        return std::nullopt;
+
+    // 提取最后的文件名（去掉可能存在的子目录）
+    auto lastSlash = afterMovie.rfind(L'\\');
+    std::wstring_view filename = (lastSlash == std::wstring_view::npos)
+        ? afterMovie
+        : afterMovie.substr(lastSlash + 1);
+
+    if (filename.empty())
+        return std::nullopt;
+
+    // 目标路径：dirVideos / 文件名
+    std::filesystem::path targetPath = this->dirVideos / filename;
+
+    // 确保 Videos 目录存在
+    std::error_code ec;
+    std::filesystem::create_directories(targetPath.parent_path(), ec);
+
+    // 构造带 \\?\ 前缀的完整路径
+    std::wstring newFullPath = L"\\\\?\\" + targetPath.wstring();
+
+    // 线程局部存储，保证指针生命周期
+    thread_local std::wstring tls_redirectPath;
+    tls_redirectPath = std::move(newFullPath);
+
+    pfc->redirected = &tls_redirectPath;
+    return MulNX::Hook::Then::Continue;
+}

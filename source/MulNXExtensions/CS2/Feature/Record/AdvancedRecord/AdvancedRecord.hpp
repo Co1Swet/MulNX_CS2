@@ -1,8 +1,9 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
+#include <MulNXExtensions/WinBaseHooks/FileRedirector/FileListenMixin.hpp>
 
-class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<AdvancedRecord> {
+class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<AdvancedRecord>, public FileListenMixin<AdvancedRecord> {
     class MediaParamManager* pMediaParamManager = nullptr;
     std::filesystem::path dirVideos;
     std::string outputFile = "record";
@@ -22,4 +23,6 @@ class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<Advance
     void SetRecordStart(std::chrono::steady_clock::time_point t);
     void HandleBeforeCopyBackbuffer(MulNX::Message& msg);
     bool OnAdvanceRecord(MulNX::VFrameExInfo& info);
+
+    std::optional<MulNX::Hook::Then> OnCreateFileW(CreateFileWControl* pfc)override;
 };

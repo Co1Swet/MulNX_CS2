@@ -14,33 +14,42 @@ bool FileRedirector::Init() {
         else if (raw.starts_with(L"\\??\\"))
             prefixEnd = 4;
 
-        FileListenControl fc(raw, prefixEnd);
+        CreateFileWControl fc(raw, prefixEnd);
 
-        for (auto* listener : this->listeners) {
-            auto res = listener->OnCreateFileW(&fc);
-            if (fc.redirected.has_value()) {
-                if (fc.redirected.value() == nullptr) {
-                    ctx->rcx = 0;
-                }
-                else {
-                    ctx->rcx = std::bit_cast<uint64_t>(fc.redirected.value()->c_str());
-                }
-            }
-            else {
-                ctx->rcx = std::bit_cast<uint64_t>(lpFileName);
-            }
-            if (fc.retFileHandle.has_value()) {
-                ctx->rax = std::bit_cast<uint64_t>(fc.retFileHandle.value());
-            }
-            if (res.has_value())return res.value();
-        }
-
-        return MulNX::Hook::Then::Continue;
+        return this->OnCreateFileW(&fc, ctx, lpFileName);
         }).value();
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->RegisterAttachHook(this->hkCreateFileW, "CreateFileW");
         });
 
+    this->hkGetFileAttributesExW = MulNX::Hook::Create((uint8_t*)&GetFileAttributesExW, [this](MulNX::Hook* hk, RegContext* ctx) {
+
+        return MulNX::Hook::Then::Continue;
+        }).value();
+    this->RegisterAttachHook(this->hkGetFileAttributesExW, "GetFileAttributesExW");
+
     return true;
+}
+
+MulNX::Hook::Then FileRedirector::OnCreateFileW(CreateFileWControl* pfc, RegContext* ctx, LPCWSTR lpFileName) {
+    for (auto* listener : this->listeners) {
+        auto res = listener->OnCreateFileW(pfc);
+        if (pfc->redirected.has_value()) {
+            if (pfc->redirected.value() == nullptr) {
+                ctx->rcx = 0;
+            }
+            else {
+                ctx->rcx = std::bit_cast<uint64_t>(pfc->redirected.value()->c_str());
+            }
+        }
+        else {
+            ctx->rcx = std::bit_cast<uint64_t>(lpFileName);
+        }
+        if (pfc->retFileHandle.has_value()) {
+            ctx->rax = std::bit_cast<uint64_t>(pfc->retFileHandle.value());
+        }
+        if (res.has_value())return res.value();
+    }
+    return MulNX::Hook::Then::Continue;
 }
