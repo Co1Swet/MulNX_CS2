@@ -13,7 +13,8 @@ class FileRedirector final :public MulNX::Module<FileRedirector>, public HookMix
 
     bool Init()override;
 
-    MulNX::Hook::Then OnCreateFileW(CreateFileWControl* pfc, RegContext* ctx, LPCWSTR lpFileName);
+    MulNX::Hook::Then OnCreateFileW(CreateFileWControl* pfc, RegContext* ctx);
+    MulNX::Hook::Then OnGetFileAttributesExW(GetFileAttributesExWControl* pac, RegContext* ctx);
 public:
     std::vector<IFileListenModule*> listeners;
 };

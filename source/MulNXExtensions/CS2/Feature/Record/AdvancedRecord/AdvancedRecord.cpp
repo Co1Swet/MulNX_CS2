@@ -173,3 +173,47 @@ std::optional<MulNX::Hook::Then> AdvancedRecord::OnCreateFileW(CreateFileWContro
     pfc->redirected = &tls_redirectPath;
     return MulNX::Hook::Then::Continue;
 }
+
+std::optional<MulNX::Hook::Then> AdvancedRecord::OnGetFileAttributesExW(GetFileAttributesExWControl* pac) {
+    std::wstring_view clean = pac->GetCleanSrc();
+
+    const std::wstring_view kMovieDir = L"game\\csgo\\movie\\";
+
+    size_t pos = std::wstring_view::npos;
+    if (clean.size() >= kMovieDir.size()) {
+        for (size_t i = 0; i <= clean.size() - kMovieDir.size(); ++i) {
+            if (_wcsnicmp(clean.data() + i, kMovieDir.data(), kMovieDir.size()) == 0) {
+                pos = i;
+                break;
+            }
+        }
+    }
+
+    if (pos == std::wstring_view::npos)
+        return std::nullopt;
+
+    std::wstring_view afterMovie = clean.substr(pos + kMovieDir.size());
+    if (afterMovie.empty())
+        return std::nullopt;
+
+    auto lastSlash = afterMovie.rfind(L'\\');
+    std::wstring_view filename = (lastSlash == std::wstring_view::npos)
+        ? afterMovie
+        : afterMovie.substr(lastSlash + 1);
+
+    if (filename.empty())
+        return std::nullopt;
+
+    // 目标路径
+    std::filesystem::path targetPath = this->dirVideos / filename;
+    std::wstring newPath = L"\\\\?\\" + targetPath.wstring();
+
+    // 使用 WrapGetFileAttributesExW 手动查询目标文件
+    BOOL result = pac->WrapGetFileAttributesExW(newPath.c_str());
+
+    // 将结果设置到控制块
+    pac->retResult = result;
+
+    // 返回 Return，框架会直接将 retResult 写入 rax 并跳过原始调用
+    return MulNX::Hook::Then::Return;
+}

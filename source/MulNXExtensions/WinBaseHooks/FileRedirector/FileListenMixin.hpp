@@ -4,14 +4,25 @@
 class BaseFileControl {
     std::wstring_view raw{};
     size_t prefixEnd{};
+    LPCWSTR lpFileName = nullptr;
 public:
-    BaseFileControl(std::wstring_view raw, size_t prefixEnd) {
+    BaseFileControl(LPCWSTR lpFileName) {
+        std::wstring_view raw(lpFileName);
+        this->lpFileName = lpFileName;
+
+        size_t prefixEnd = 0;
+        if (raw.starts_with(L"\\\\?\\"))
+            prefixEnd = 4;
+        else if (raw.starts_with(L"\\??\\"))
+            prefixEnd = 4;
+
         this->raw = raw;
         this->prefixEnd = prefixEnd;
     }
 
     const std::wstring_view& GetRaw()const { return this->raw; }
     const size_t& GetPrefixEnd()const { return this->prefixEnd; }
+    const LPCWSTR& GetLpFileName()const { return this->lpFileName; }
     std::wstring_view GetCleanSrc()const { return this->raw.substr(this->prefixEnd); }
 };
 
@@ -31,7 +42,7 @@ public:
 
     std::optional<std::wstring*> redirected = std::nullopt;
     std::optional<BOOL>retResult = std::nullopt;
-    std::function<HANDLE(LPCWSTR)>WrapGetFileAttributesExW = nullptr;
+    std::function<BOOL(LPCWSTR)>WrapGetFileAttributesExW = nullptr;
 };
 
 class IFileListenModule {

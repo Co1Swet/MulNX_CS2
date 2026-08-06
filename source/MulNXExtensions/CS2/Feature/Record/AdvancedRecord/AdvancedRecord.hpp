@@ -25,4 +25,5 @@ class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<Advance
     bool OnAdvanceRecord(MulNX::VFrameExInfo& info);
 
     std::optional<MulNX::Hook::Then> OnCreateFileW(CreateFileWControl* pfc)override;
+    std::optional<MulNX::Hook::Then> OnGetFileAttributesExW(GetFileAttributesExWControl* pac)override;
 };
