@@ -26,9 +26,19 @@ bool FileRedirector::Init() {
         return this->OnGetFileAttributesExW(&ac, ctx);
         }).value();
 
+    this->hkCreateDirectoryW = MulNX::Hook::Create((uint8_t*)&CreateDirectoryW, [this](MulNX::Hook* hk, RegContext* ctx) {
+        LPCWSTR lpPathName = reinterpret_cast<LPCWSTR>(ctx->rcx);
+        if (!lpPathName)return MulNX::Hook::Then::Continue;
+
+        CreateDirectoryWControl pdc(lpPathName);
+
+        return this->OnCreateDirectoryW(&pdc, ctx);
+        }).value();
+
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->RegisterAttachHook(this->hkCreateFileW, "CreateFileW");
         this->RegisterAttachHook(this->hkGetFileAttributesExW, "GetFileAttributesExW");
+        this->RegisterAttachHook(this->hkCreateDirectoryW, "CreateDirectoryW");
         });
 
     return true;
@@ -72,6 +82,28 @@ MulNX::Hook::Then FileRedirector::OnGetFileAttributesExW(GetFileAttributesExWCon
         }
         if (pac->retResult.has_value()) {
             ctx->rax = *reinterpret_cast<uint64_t*>(&pac->retResult.value());
+        }
+        if (res.has_value())return res.value();
+    }
+    return MulNX::Hook::Then::Continue;
+}
+
+MulNX::Hook::Then FileRedirector::OnCreateDirectoryW(CreateDirectoryWControl* pdc, RegContext* ctx) {
+    for (auto* listener : this->listeners) {
+        auto res = listener->OnCreateDirectoryW(pdc);
+        if (pdc->redirected.has_value()) {
+            if (pdc->redirected.value() == nullptr) {
+                ctx->rcx = 0;
+            }
+            else {
+                ctx->rcx = std::bit_cast<uint64_t>(pdc->redirected.value()->c_str());
+            }
+        }
+        else {
+            ctx->rcx = std::bit_cast<uint64_t>(pdc->GetLpPathName());
+        }
+        if (pdc->retResult.has_value()) {
+            ctx->rax = *reinterpret_cast<uint64_t*>(&pdc->retResult.value());
         }
         if (res.has_value())return res.value();
     }

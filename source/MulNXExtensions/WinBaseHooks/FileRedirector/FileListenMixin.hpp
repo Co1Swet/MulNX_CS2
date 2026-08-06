@@ -4,11 +4,11 @@
 class BaseFileControl {
     std::wstring_view raw{};
     size_t prefixEnd{};
-    LPCWSTR lpFileName = nullptr;
+    LPCWSTR lpName = nullptr;
 public:
-    BaseFileControl(LPCWSTR lpFileName) {
-        std::wstring_view raw(lpFileName);
-        this->lpFileName = lpFileName;
+    BaseFileControl(LPCWSTR lpName) {
+        std::wstring_view raw(lpName);
+        this->lpName = lpName;
 
         size_t prefixEnd = 0;
         if (raw.starts_with(L"\\\\?\\"))
@@ -22,15 +22,18 @@ public:
 
     const std::wstring_view& GetRaw()const { return this->raw; }
     const size_t& GetPrefixEnd()const { return this->prefixEnd; }
-    const LPCWSTR& GetLpFileName()const { return this->lpFileName; }
+    const LPCWSTR& GetLpFileName()const { return this->lpName; }
+    const LPCWSTR& GetLpPathName()const { return this->lpName; }
     std::wstring_view GetCleanSrc()const { return this->raw.substr(this->prefixEnd); }
+
+    // 可以通过不返回std::nullopt的方式来传递修改
+    std::optional<std::wstring*> redirected = std::nullopt;
 };
 
 class CreateFileWControl final :public BaseFileControl {
 public:
     using BaseFileControl::BaseFileControl;
-    // 可以通过不返回std::nullopt的方式来传递修改
-    std::optional<std::wstring*> redirected = std::nullopt;
+
     std::optional<HANDLE> retFileHandle = std::nullopt;
     // 调用这个函数之后，应当填充retFileHandle，并返回MulNX::Hook::Then::Return，以防出现内存泄露
     std::function<HANDLE(LPCWSTR)>WrapCreateFileW = nullptr;
@@ -40,15 +43,23 @@ class GetFileAttributesExWControl final :public BaseFileControl {
 public:
     using BaseFileControl::BaseFileControl;
 
-    std::optional<std::wstring*> redirected = std::nullopt;
     std::optional<BOOL>retResult = std::nullopt;
     std::function<BOOL(LPCWSTR)>WrapGetFileAttributesExW = nullptr;
+};
+
+class CreateDirectoryWControl final :public BaseFileControl {
+public:
+    using BaseFileControl::BaseFileControl;
+
+    std::optional<BOOL>retResult = std::nullopt;
+    std::function<BOOL(LPCWSTR)>WrapCreateDirectoryW = nullptr;
 };
 
 class IFileListenModule {
 public:
     virtual std::optional<MulNX::Hook::Then> OnCreateFileW(CreateFileWControl* pfc) { return std::nullopt; };
     virtual std::optional<MulNX::Hook::Then> OnGetFileAttributesExW(GetFileAttributesExWControl* pac) { return std::nullopt; }
+    virtual std::optional<MulNX::Hook::Then> OnCreateDirectoryW(CreateDirectoryWControl* pdc) { return std::nullopt; }
 };
 
 template<typename T>

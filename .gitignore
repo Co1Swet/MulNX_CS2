@@ -6,6 +6,8 @@ bin/**/*.zip
 bin/**/*.json
 bin/**/*.dem
 bin/**/*.mp4
+bin/**/*.wav
+bin/**/*.png
 
 # bin/MulNX/Tools
 bin/MulNX/Tools/*[Rr]e[Ss]hade*

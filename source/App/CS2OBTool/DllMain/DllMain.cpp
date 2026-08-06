@@ -136,6 +136,7 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 录制合作
         .CreateModule<HookRecordCmd>("HookRecordCmd")
+        .CreateModule<RecordFileRedirect>("RecordFileRedirect")
         .CreateModule<AdvancedRecord>("AdvancedRecord")
 
         // 管理
