@@ -47,7 +47,7 @@ bool HookGameEvents::Init() {
             auto&& [pEvent] = msg.Access<CS2::CGameEvent*>();
             pEvent = event;
             this->PublishSync(msg);
-#if _DEBUG
+#ifdef _DEBUG
             auto name = event->GetEventName();
 #endif
             return MulNX::Hook::Then::Continue;

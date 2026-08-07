@@ -4,25 +4,25 @@
 using TeamCounter_UpdatePlayerCache = bool (*) (
     __int64 TeamCounterPlayerCache, // 0
     int a2, // 1
-    int currentHP, // 2
-    int maxHP, // 3
-    char a5, // 4
+    int iHealth, // 2
+    int iArmor, // 3
+    char bLeft, // 4 这个变量具体作用不清楚，当它置为1，teamcounter只有左半边的绘制，当它置为0，只有右半边，而且我观察到它闪烁，疑似依赖这个变量定位槽位
     char a6, // 5
-    char a7, // 6
-    char a8, // 7
-    char a9, // 8
-    char a10, // 9
-    char a11, // 10
-    char a12, // 11
-    int a13, // 12
+    char bDisableColor, // 6 很奇怪的效果
+    char bOverlayARedCycle, // 7 置1可以在头像上附加一个有四个向内延伸线的红圈，像瞄准镜
+    char bOverlayARedPerson, // 8 置1可以在头像上画一个红色人的“证件照”
+    char bIsSpeaking, // 9 顾名思义是那个说话时在头像上的小喇叭
+    char bIsControllingThisBot, // 10 置1叠加正在控制这个bot的标识
+    char bIsBeingSelected, // 11 正在被观战，会亮起玩家的颜色光
+    int unk12, // 12
     int n2, // 13
-    int a15, // 14
+    int iColorIndex, // 14   0蓝色 1绿色 2黄色 3橙色 4紫色 循环往复
     char bHasBomb, // 15
     char bHasDefuseKit, // 16
-    int a18, // 17
-    int a19, // 18
-    __int16 a20, // 19
-    float a21); // 20
+    int iMoney, // 17
+    int unk18, // 18
+    __int16 iWeaponIconIndex, // 19 应该是一个指向显示什么武器图标的短索引
+    float unk20); // 20 一个随不同Demo时间全员一致的浮点数，在0到1000变化
 
 void TeamCounterController::Menu() {
     MulNX::UI::Checkbox("隐藏敌方血条", this->hideEnemyHP);
@@ -48,7 +48,7 @@ bool TeamCounterController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->RegisterAttachHook(this->hkTeamCounterFillPlayerSlotCache, "Func_TeamCounterFillPlayerSlotCache");
+        this->RegisterAttachHook(this->hkTeamCounterFillPlayerSlotCache, "Func_TeamCounterFillPlayerSlotCache where r15 is *CCSPlayerController");
         });
 
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
@@ -56,7 +56,6 @@ bool TeamCounterController::Init() {
     return true;
 }
 void TeamCounterController::HandleTeamCounterFillPlayerSlotCacheHook(MulNX::Hook* hk, RegContext* ctx) {
-
     auto pOBPawn = this->CS2->client.TryGetObservingPawn();
     if (!pOBPawn)return;
     auto OBingTeam = MulNX::MRead(pOBPawn->iTeamNum());
@@ -66,7 +65,7 @@ void TeamCounterController::HandleTeamCounterFillPlayerSlotCacheHook(MulNX::Hook
 
     if (this->hideEnemyHP) {
         ctx->r8 = 0;
-        ctx->r9 = 0;
+        //ctx->r9 = 0;
     }
     if (this->hideEnemyDefuseOrKit) {
         char* p15 = hk->GetStackParam<char>(ctx, 15);
@@ -93,18 +92,23 @@ void TeamCounterController::HandleTeamCounterFillPlayerSlotCacheHook(MulNX::Hook
     int16_t* p19 = hk->GetStackParam<int16_t>(ctx, 19);
     float* p20 = hk->GetStackParam<float>(ctx, 20);
 
-    // *p4 = 0;
-    // *p5 = 0;
-    // *p6 = 0;
-    // *p7 = 0;
-    // *p8 = 0;
-    // *p9 = 0;
-    // *p10 = 0;
-    // *p11 = 0;
+    //*p18 = 0;
 
-    // *p12 = 0;
-    // *p13 = 0;
+    // *p19 = 3;
+
+    // *p4 = 1;
+    // *p5 = 1;
+    // *p6 = 2;
+    // *p7 = 1;
+    // *p8 = 1;
+    // *p9 = 1;
+    // *p10 = 1;
+    // *p11 = 1;
+
+    // *p12 = 1;
+    // *p13 = 0b1101;
     // *p14 = 0;
     // *p15 = 0;
     // *p16 = 0;
+
 }

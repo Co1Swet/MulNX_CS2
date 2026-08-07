@@ -8,3 +8,4 @@
 #include "TeamCounterController/TeamCounterController.hpp"
 #include "FlashRenderController/FlashRenderController.hpp"
 #include "VPKInjector/VPKInjector.hpp"
+#include "HookHealthAmmoCenter/HookHealthAmmoCenter.hpp"
