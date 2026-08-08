@@ -1,0 +1,234 @@
+@anchor{scaler_options}
+@chapter Scaler Options
+@c man begin SCALER OPTIONS
+
+The video scaler supports the following named options.
+
+Options may be set by specifying -@var{option} @var{value} in the
+FFmpeg tools, with a few API-only exceptions noted below.
+For programmatic use, they can be set explicitly in the
+@code{SwsContext} options or through the @file{libavutil/opt.h} API.
+
+@table @option
+
+@anchor{scaler}
+@item scaler, scaler_sub
+Choose the scaling algorithm to use. Default value is @samp{auto} for both.
+It accepts the following values:
+
+@table @samp
+@item auto
+Aumotic choice. For @samp{scaler_sub}, this means the same algorithm as
+@samp{scaler}. For @samp{scaler}, this defaults to the scaler flag selected
+by @samp{sws_flags}.
+
+@item bilinear
+Bilinear filter. (AKA triangle filter)
+
+@item bicubic
+2-tap cubic BC-spline (AKA Mitchell-Netravali spline). The B and C parameters
+can be configured by setting @code{param0} and @code{param1}, defaulting to
+0.0 and 0.6 respectively.
+
+@item point, neighbor
+Point sampling (AKA nearest neighbor).
+
+@item area
+Area averaging. Equivalent to @samp{bilinear} for upscaling.
+
+@item gaussian
+2-tap Gaussian filter approximation. The sharpness parameter can be configured
+by setting @code{param0}, defaulting to 3.0.
+
+@item sinc
+Unwindowed sinc filter.
+
+@item lanczos
+Lanczos resampling (sinc windowed sinc). The number of filter taps can
+be configured by setting @code{param0}, defaulting to 3.
+
+@item spline
+Unwindowed natural bicubic spline.
+@end table
+
+@anchor{sws_flags}
+@item sws_flags
+Set the scaler flags. This is also used to set the scaling
+algorithm, though this usage is deprecated in favor of setting @samp{scaler}.
+Only a single algorithm may be selected. Default value is @samp{bicubic}.
+
+It accepts the following values:
+@table @samp
+@item fast_bilinear
+Select fast bilinear scaling algorithm. (Deprecated)
+
+@item bilinear
+Select bilinear scaling algorithm. (Deprecated)
+
+@item bicubic
+Select bicubic scaling algorithm. (Deprecated)
+
+@item experimental
+Select experimental scaling algorithm. (Deprecated)
+
+@item neighbor
+Select nearest neighbor rescaling algorithm. (Deprecated)
+
+@item area
+Select averaging area rescaling algorithm. (Deprecated)
+
+@item bicublin
+Select bicubic scaling algorithm for the luma component, bilinear for
+chroma components. (Deprecated)
+
+@item gauss
+Select Gaussian rescaling algorithm. (Deprecated)
+
+@item sinc
+Select sinc rescaling algorithm. (Deprecated)
+
+@item lanczos
+Select Lanczos rescaling algorithm. The default width (alpha) is 3 and can be
+changed by setting @code{param0}. (Deprecated)
+
+@item spline
+Select natural bicubic spline rescaling algorithm. (Deprecated)
+
+@item print_info
+Enable printing/debug logging.
+
+@item accurate_rnd
+Enable accurate rounding.
+
+@item full_chroma_int
+Enable full chroma interpolation.
+
+@item full_chroma_inp
+Select full chroma input.
+
+@item bitexact
+Enable bitexact output.
+
+@item unstable
+Allow the use of experimental new code. May subtly affect the output or even
+produce wrong results. For testing only.
+@end table
+
+@item srcw @var{(API only)}
+Set source width.
+
+@item srch @var{(API only)}
+Set source height.
+
+@item dstw @var{(API only)}
+Set destination width.
+
+@item dsth @var{(API only)}
+Set destination height.
+
+@item src_format @var{(API only)}
+Set source pixel format (must be expressed as an integer).
+
+@item dst_format @var{(API only)}
+Set destination pixel format (must be expressed as an integer).
+
+@item src_range @var{(boolean)}
+If value is set to @code{1}, indicates source is full range. Default value is
+@code{0}, which indicates source is limited range.
+
+@item dst_range @var{(boolean)}
+If value is set to @code{1}, enable full range for destination. Default value
+is @code{0}, which enables limited range.
+
+@item gamma @var{(boolean)}
+If value is set to @code{1}, enable gamma correct scaling. Default value is @code{0}.
+
+@anchor{sws_params}
+@item param0, param1
+Set scaling algorithm parameters. The specified values are specific of
+some scaling algorithms and ignored by others. The specified values
+are floating point number values.
+
+@item sws_dither
+Set the dithering algorithm. Accepts one of the following
+values. Default value is @samp{auto}.
+
+@table @samp
+@item auto
+automatic choice
+
+@item none
+no dithering
+
+@item bayer
+bayer dither
+
+@item ed
+error diffusion dither
+
+@item a_dither
+arithmetic dither, based using addition
+
+@item x_dither
+arithmetic dither, based using xor (more random/less apparent patterning that
+a_dither).
+
+@end table
+
+@item alphablend
+Set the alpha blending to use when the input has alpha but the output does not.
+Default value is @samp{none}.
+
+@table @samp
+@item uniform_color
+Blend onto a uniform background color
+
+@item checkerboard
+Blend onto a checkerboard
+
+@item none
+No blending
+
+@end table
+
+@item sws_backends
+Set the allowed swscale backends. This is a flags option, so multiple backends
+may be combined.
+
+@table @samp
+@item auto
+Automatic selection. Equal to either @samp{stable} or @samp{all} depending on
+whether or not the @samp{unstable} flag is set. This is the default value.
+
+@item stable
+All stable backends.
+
+@item unstable
+All unstable backends.
+
+@item all
+All available backends.
+
+@item legacy
+Legacy swscale code.
+
+@item c
+Template-based reference code.
+
+@item memcpy
+Fast path using libc @code{memcpy}.
+
+@item x86
+x86 SIMD kernels.
+
+@item aarch64
+AArch64 NEON kernels.
+
+@item spirv
+Vulkan SPIR-V backend.
+
+@end table
+
+@end table
+
+@c man end SCALER OPTIONS

@@ -1,0 +1,301 @@
+/*
+ * copyright (c) 2021-2022 Wu Jianhua <jianhua.wu@intel.com>
+ * Copyright (c) Lynne
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+#include "libavutil/mem.h"
+#include "libavutil/opt.h"
+#include "vulkan_filter.h"
+
+#include "filters.h"
+#include "video.h"
+
+#define GBLUR_MAX_KERNEL_SIZE 127
+
+extern const unsigned char ff_gblur_comp_spv_data[];
+extern const unsigned int ff_gblur_comp_spv_len;
+
+typedef struct GBlurVulkanContext {
+    FFVulkanContext vkctx;
+
+    int initialized;
+    FFVkExecPool e;
+    AVVulkanDeviceQueueFamily *qf;
+
+    FFVulkanShader shd_hor;
+    FFVkBuffer params_hor;
+    FFVulkanShader shd_ver;
+    FFVkBuffer params_ver;
+
+    int size;
+    int sizeV;
+    int planes;
+    float sigma;
+    float sigmaV;
+} GBlurVulkanContext;
+
+static inline float gaussian(float sigma, float x)
+{
+    return 1.0 / (sqrt(2.0 * M_PI) * sigma) *
+           exp(-(x * x) / (2.0 * sigma * sigma));
+}
+
+static inline float gaussian_simpson_integration(float sigma, float a, float b)
+{
+    return (b - a) * (1.0 / 6.0) * ((gaussian(sigma, a) +
+           4.0 * gaussian(sigma, (a + b) * 0.5) + gaussian(sigma, b)));
+}
+
+static void init_gaussian_kernel(float *kernel, float sigma, float kernel_size)
+{
+    int x;
+    float sum;
+
+    sum = 0;
+    for (x = 0; x < kernel_size; x++) {
+        kernel[x] = gaussian_simpson_integration(sigma, x - 0.5f, x + 0.5f);
+        if (!x)
+            sum += kernel[x];
+        else
+            sum += kernel[x] * 2.0;
+    }
+    /* Normalized */
+    sum = 1.0 / sum;
+    for (x = 0; x < kernel_size; x++) {
+        kernel[x] *= sum;
+    }
+}
+
+static inline void init_kernel_size(void *log_ctx, int *out_size)
+{
+    int size = *out_size;
+
+    if (!(size & 1)) {
+        av_log(log_ctx, AV_LOG_WARNING, "The kernel size should be odd\n");
+        size++;
+    }
+
+    *out_size = (size >> 1) + 1;
+}
+
+static av_cold void init_gaussian_params(AVFilterContext *ctx)
+{
+    GBlurVulkanContext *s = ctx->priv;
+    if (s->sigmaV <= 0)
+        s->sigmaV = s->sigma;
+
+    init_kernel_size(ctx, &s->size);
+
+    if (s->sizeV <= 0)
+        s->sizeV = s->size;
+    else
+        init_kernel_size(ctx, &s->sizeV);
+}
+
+static int init_gblur_pipeline(GBlurVulkanContext *s,
+                               FFVulkanShader *shd, FFVkBuffer *params_buf,
+                               int ksize, float sigma)
+{
+    int err = 0;
+    uint8_t *kernel_mapped;
+
+    ff_vk_shader_add_push_const(shd, 0, sizeof(int),
+                                VK_SHADER_STAGE_COMPUTE_BIT);
+
+    const FFVulkanDescriptorSetBinding buf_desc = {
+        .type        = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        .stages      = VK_SHADER_STAGE_COMPUTE_BIT,
+    };
+    ff_vk_shader_add_descriptor_set(&s->vkctx, shd, &buf_desc, 1, 1);
+
+    RET(ff_vk_shader_link(&s->vkctx, shd,
+                          ff_gblur_comp_spv_data,
+                          ff_gblur_comp_spv_len, "main"));
+
+    RET(ff_vk_shader_register_exec(&s->vkctx, &s->e, shd));
+
+    RET(ff_vk_create_buf(&s->vkctx, params_buf, sizeof(float) * ksize, NULL, NULL,
+                         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT));
+    RET(ff_vk_map_buffer(&s->vkctx, params_buf, &kernel_mapped, 0));
+
+    init_gaussian_kernel((float *)kernel_mapped, sigma, ksize);
+
+    RET(ff_vk_unmap_buffer(&s->vkctx, params_buf, 1));
+    RET(ff_vk_shader_update_desc_buffer(&s->vkctx, &s->e.contexts[0], shd, 1, 0, 0,
+                                        params_buf, 0, params_buf->size,
+                                        VK_FORMAT_UNDEFINED));
+
+fail:
+    return err;
+}
+
+static av_cold int init_filter(AVFilterContext *ctx, AVFrame *in)
+{
+    int err = 0;
+    GBlurVulkanContext *s = ctx->priv;
+    FFVulkanContext *vkctx = &s->vkctx;
+    const int planes = av_pix_fmt_count_planes(s->vkctx.output_format);
+
+    s->qf = ff_vk_qf_find(vkctx, VK_QUEUE_COMPUTE_BIT, 0);
+    if (!s->qf) {
+        av_log(ctx, AV_LOG_ERROR, "Device has no compute queues\n");
+        err = AVERROR(ENOTSUP);
+        goto fail;
+    }
+
+    RET(ff_vk_exec_pool_init(vkctx, s->qf, &s->e, FF_VK_DEFAULT_EXEC_CONTEXTS, 0, 0, 0, NULL));
+
+    const FFVulkanDescriptorSetBinding desc[] = {
+        { /* input_img */
+            .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+            .elems      = planes,
+        },
+        { /* output_img */
+            .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+            .elems      = planes,
+        },
+    };
+
+    init_gaussian_params(ctx);
+
+    /* Horizontal */
+    ff_vk_shader_load(&s->shd_hor, VK_SHADER_STAGE_COMPUTE_BIT, NULL,
+                      (uint32_t []) { 32, 1, 1 }, 0);
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd_hor, desc, 2, 0);
+    RET(init_gblur_pipeline(s, &s->shd_hor, &s->params_hor, s->size, s->sigma));
+
+    /* Vertical */
+    ff_vk_shader_load(&s->shd_ver, VK_SHADER_STAGE_COMPUTE_BIT, NULL,
+                      (uint32_t []) { 1, 32, 1 }, 0);
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd_ver, desc, 2, 0);
+    RET(init_gblur_pipeline(s, &s->shd_ver, &s->params_ver, s->sizeV, s->sigmaV));
+
+    s->initialized = 1;
+
+fail:
+    return err;
+}
+
+static av_cold void gblur_vulkan_uninit(AVFilterContext *avctx)
+{
+    GBlurVulkanContext *s = avctx->priv;
+    FFVulkanContext *vkctx = &s->vkctx;
+
+    ff_vk_exec_pool_free(vkctx, &s->e);
+    ff_vk_shader_free(vkctx, &s->shd_hor);
+    ff_vk_shader_free(vkctx, &s->shd_ver);
+    ff_vk_free_buf(vkctx, &s->params_hor);
+    ff_vk_free_buf(vkctx, &s->params_ver);
+
+    ff_vk_uninit(&s->vkctx);
+
+    s->initialized = 0;
+}
+
+static int gblur_vulkan_filter_frame(AVFilterLink *link, AVFrame *in)
+{
+    int err;
+    AVFrame *tmp = NULL, *out = NULL;
+    AVFilterContext *ctx = link->dst;
+    GBlurVulkanContext *s = ctx->priv;
+    AVFilterLink *outlink = ctx->outputs[0];
+    const int planes = av_pix_fmt_count_planes(s->vkctx.output_format);
+
+    out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+    if (!out) {
+        err = AVERROR(ENOMEM);
+        goto fail;
+    }
+
+    tmp = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+    if (!tmp) {
+        err = AVERROR(ENOMEM);
+        goto fail;
+    }
+
+    if (!s->initialized)
+        RET(init_filter(ctx, in));
+
+    RET(ff_vk_filter_process_2pass(&s->vkctx, &s->e,
+                                   (FFVulkanShader *[2]){ &s->shd_hor, &s->shd_ver },
+                                   out, tmp, in, VK_NULL_HANDLE,
+                                   planes, &s->planes, sizeof(int)));
+
+    err = av_frame_copy_props(out, in);
+    if (err < 0)
+        goto fail;
+
+    av_frame_free(&in);
+    av_frame_free(&tmp);
+
+    return ff_filter_frame(outlink, out);
+
+fail:
+    av_frame_free(&in);
+    av_frame_free(&tmp);
+    av_frame_free(&out);
+    return err;
+}
+
+#define OFFSET(x) offsetof(GBlurVulkanContext, x)
+#define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
+static const AVOption gblur_vulkan_options[] = {
+    { "sigma",  "Set sigma",                OFFSET(sigma),  AV_OPT_TYPE_FLOAT, { .dbl = 0.5 }, 0.01, 1024.0,                FLAGS },
+    { "sigmaV", "Set vertical sigma",       OFFSET(sigmaV), AV_OPT_TYPE_FLOAT, { .dbl = 0   }, 0.0,  1024.0,                FLAGS },
+    { "planes", "Set planes to filter",     OFFSET(planes), AV_OPT_TYPE_INT,   { .i64 = 0xF }, 0,    0xF,                   FLAGS },
+    { "size",   "Set kernel size",          OFFSET(size),   AV_OPT_TYPE_INT,   { .i64 = 19  }, 1,    GBLUR_MAX_KERNEL_SIZE, FLAGS },
+    { "sizeV",  "Set vertical kernel size", OFFSET(sizeV),  AV_OPT_TYPE_INT,   { .i64 = 0   }, 0,    GBLUR_MAX_KERNEL_SIZE, FLAGS },
+    { NULL },
+};
+
+AVFILTER_DEFINE_CLASS(gblur_vulkan);
+
+static const AVFilterPad gblur_vulkan_inputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .filter_frame = &gblur_vulkan_filter_frame,
+        .config_props = &ff_vk_filter_config_input,
+    }
+};
+
+static const AVFilterPad gblur_vulkan_outputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .config_props = &ff_vk_filter_config_output,
+    }
+};
+
+const FFFilter ff_vf_gblur_vulkan = {
+    .p.name         = "gblur_vulkan",
+    .p.description  = NULL_IF_CONFIG_SMALL("Gaussian Blur in Vulkan"),
+    .p.priv_class   = &gblur_vulkan_class,
+    .p.flags        = AVFILTER_FLAG_HWDEVICE,
+    .priv_size      = sizeof(GBlurVulkanContext),
+    .init           = &ff_vk_filter_init,
+    .uninit         = &gblur_vulkan_uninit,
+    FILTER_INPUTS(gblur_vulkan_inputs),
+    FILTER_OUTPUTS(gblur_vulkan_outputs),
+    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_VULKAN),
+    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
+};

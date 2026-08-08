@@ -26,8 +26,8 @@ done
 echo "==================================="
 echo " 2. 源码完整性检查"
 echo "==================================="
-[ ! -d "ffmpeg_code" ] || [ ! -f "ffmpeg_code/Makefile" ] && { echo "错误：ffmpeg_code 缺失"; exit 1; }
-[ ! -d "openh264_code" ] && { echo "错误：openh264_code 缺失"; exit 1; }
+[ ! -d "ffmpegs" ] || [ ! -f "ffmpegs/Makefile" ] && { echo "错误：ffmpegs 缺失"; exit 1; }
+[ ! -d "openh264s" ] && { echo "错误：openh264s 缺失"; exit 1; }
 echo "通过"
 
 echo "==================================="
@@ -37,7 +37,7 @@ INSTALL_OPENH264="/opt/openh264"
 rm -rf "$INSTALL_OPENH264"
 mkdir -p "$INSTALL_OPENH264"
 
-cd "$BASE/openh264_code"
+cd "$BASE/openh264s"
 make clean 2>/dev/null || true
 make ENABLE64BIT=Yes OS=mingw_nt ARCH=x86_64
 
@@ -77,7 +77,7 @@ echo "==================================="
 echo " 4. 构建 FFmpeg（全局静态链接，一劳永逸）"
 echo "==================================="
 INSTALL_FFMPEG="$BASE/ffmpeg_install"
-BUILD_FFMPEG="$BASE/ffmpeg_code/build"
+BUILD_FFMPEG="$BASE/ffmpegs/build"
 
 rm -rf "$INSTALL_FFMPEG" "$BUILD_FFMPEG"
 mkdir -p "$BUILD_FFMPEG" "$INSTALL_FFMPEG"
@@ -110,7 +110,7 @@ cd "$BUILD_FFMPEG"
 
 echo "=== 清除绝对源路径 ==="
 find . -type f \( -name 'Makefile' -o -name '*.mak' -o -name '*.d' -o -name '*.pc' -o -name 'config.*' \) \
-    -exec sed -i 's|/opt/ffmpeg-build/ffmpeg_code|..|g' {} +
+    -exec sed -i 's|/opt/ffmpeg-build/ffmpegs|..|g' {} +
 [ -f ffbuild/config.mak ] && sed -i 's|^SRC_PATH=.*|SRC_PATH=..|' ffbuild/config.mak
 sed -i '1s|include .*|include ../Makefile|' Makefile
 mkdir -p ../tools

@@ -1,0 +1,104 @@
+61963e1df31cfa046f99d971a465d364 *tests/data/fate/cover-art-flac-remux.flac
+964133 tests/data/fate/cover-art-flac-remux.flac
+#extradata 0:       34, 0x8f1f0acf
+#tb 0: 1/44100
+#media_type 0: audio
+#codec_id 0: flac
+#sample_rate 0: 44100
+#channel_layout_name 0: 2 channels (FL+FC)
+#tb 1: 1/90000
+#media_type 1: video
+#codec_id 1: png
+#dimensions 1: 200x200
+#sar 1: 2834/2834
+#tb 2: 1/90000
+#media_type 2: video
+#codec_id 2: png
+#dimensions 2: 485x359
+#sar 2: 1/1
+#tb 3: 1/90000
+#media_type 3: video
+#codec_id 3: mjpeg
+#dimensions 3: 199x300
+#sar 3: 72/72
+#tb 4: 1/90000
+#media_type 4: video
+#codec_id 4: bmp
+#dimensions 4: 485x359
+#sar 4: 0/1
+#tb 5: 1/90000
+#media_type 5: video
+#codec_id 5: mjpeg
+#dimensions 5: 199x300
+#sar 5: 72/72
+#tb 6: 1/44100
+#media_type 6: audio
+#codec_id 6: pcm_s16le
+#sample_rate 6: 44100
+#channel_layout_name 6: 2 channels (FL+FC)
+0,          0,          0,     4096,       14, 0x2e2e0540
+1,          0,          0,        0,    66888, 0x1fd72743
+2,          0,          0,        0,   304403, 0xaf7c7667
+3,          0,          0,        0,    21671, 0x7d1c6030
+4,          0,          0,        0,   522758, 0x7a63572f
+5,          0,          0,        0,    21671, 0x7d1c6030
+6,          0,          0,     4096,    16384, 0x00000000
+0,       4096,       4096,     4096,     6128, 0x2072ccde
+6,       4096,       4096,     4096,    16384, 0x29cd639d
+0,       8192,       8192,     4096,     5361, 0xe7316a81
+6,       8192,       8192,     4096,    16384, 0xd52066e5
+0,      12288,      12288,     4096,     5015, 0x366ffd34
+6,      12288,      12288,     4096,    16384, 0x0c933408
+0,      16384,      16384,     1256,     1441, 0x44376426
+6,      16384,      16384,     1256,     5024, 0xde7bbab0
+[STREAM]
+index=0
+codec_name=flac
+DISPOSITION:attached_pic=0
+[/STREAM]
+[STREAM]
+index=1
+codec_name=png
+DISPOSITION:attached_pic=1
+TAG:comment=Illustration
+TAG:title=OpenMusic
+[/STREAM]
+[STREAM]
+index=2
+codec_name=png
+DISPOSITION:attached_pic=1
+TAG:comment=Cover (front)
+TAG:title=landscape
+[/STREAM]
+[STREAM]
+index=3
+codec_name=mjpeg
+DISPOSITION:attached_pic=1
+TAG:comment=Publisher/Studio logotype
+TAG:title=portrait
+[/STREAM]
+[STREAM]
+index=4
+codec_name=bmp
+DISPOSITION:attached_pic=1
+TAG:comment=Conductor
+TAG:title=White King Granulated Soap
+[/STREAM]
+[STREAM]
+index=5
+codec_name=mjpeg
+DISPOSITION:attached_pic=1
+TAG:comment=Publisher/Studio logotype
+TAG:title=White King Granulated Soap
+[/STREAM]
+[FORMAT]
+TAG:album=OpenMusic
+TAG:album_artist=Maxwell Strait
+TAG:artist=Maxwell Strait
+TAG:disc=1
+TAG:title=Inside
+TAG:compilation=1
+TAG:track=5/13
+TAG:genre=Rock
+TAG:Encoding Params=vers
+[/FORMAT]

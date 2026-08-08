@@ -1,0 +1,34 @@
+bf81f4500608ee48f8be81d391bed452 *tests/data/fate/autorotate.mov
+153258 tests/data/fate/autorotate.mov
+#extradata 0:       34, 0x9d7d073f
+#tb 0: 1/15360
+#media_type 0: video
+#codec_id 0: mpeg2video
+#dimensions 0: 272x480
+#sar 0: 1/1
+0,       -512,          0,      512,     6997, 0x55c700f6
+0,          0,        512,      512,     4847, 0xe74f522e, F=0x0
+0,        512,       1024,      512,     5281, 0xbd4a5dac, F=0x0
+0,       1024,       1536,      512,     3521, 0x0c07249d, F=0x0
+0,       1536,       2048,      512,     5128, 0xce8bfa02, F=0x0
+0,       2048,       2560,      512,     2759, 0x2369d21d, F=0x0
+0,       2560,       3072,      512,     2057, 0x5d7ea97b, F=0x0
+0,       3072,       3584,      512,     2114, 0x91d1f369, F=0x0
+0,       3584,       4096,      512,     1883, 0x3dd68028, F=0x0
+0,       4096,       4608,      512,     2025, 0xcf3dc34f, F=0x0
+0,       4608,       5120,      512,     1586, 0x3977edf0, F=0x0
+0,       5120,       5632,      512,     1633, 0x64c5e315, F=0x0
+0,       5632,       6144,      512,     3894, 0x32306d8d
+0,       6144,       6656,      512,     1490, 0xa541a35a, F=0x0
+0,       6656,       7168,      512,     1253, 0x7e93302b, F=0x0
+0,       7168,       7680,      512,     1573, 0x58fcd6b2, F=0x0
+[STREAM]
+[SIDE_DATA]
+side_data_type=CPB properties
+max_bitrate=0
+min_bitrate=0
+avg_bitrate=0
+buffer_size=49152
+vbv_delay=-1
+[/SIDE_DATA]
+[/STREAM]

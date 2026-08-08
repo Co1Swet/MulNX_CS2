@@ -1,0 +1,213 @@
+e3da79a8ab08184a51dd0bc2c752b3b3 *tests/data/fate/mov-mp4-iamf-stereo.mp4
+15130 tests/data/fate/mov-mp4-iamf-stereo.mp4
+#extradata 0:       34, 0xa77c0cd6
+#tb 0: 1/44100
+#media_type 0: audio
+#codec_id 0: flac
+#sample_rate 0: 44100
+#channel_layout_name 0: stereo
+0,          0,          0,     4096,     1323, 0xb9bc0f9a
+0,       4096,       4096,     4096,     1254, 0xf7e910bc
+0,       8192,       8192,     4096,     1320, 0xe4fe09c9
+0,      12288,      12288,     4096,     1280, 0x22e9127e
+0,      16384,      16384,     4096,     1331, 0x8bc61bbf
+0,      20480,      20480,     4096,     1267, 0x2c4708fa
+0,      24576,      24576,     4096,     1282, 0x0438152d
+0,      28672,      28672,     4096,     1313, 0x2e79ffa2
+0,      32768,      32768,     4096,     1323, 0xb9f70fce
+0,      36864,      36864,     4096,     1254, 0xf6f01051
+0,      40960,      40960,     4096,     1235, 0xcf181f77, S=1, Skip Samples,       10, 0x047700bf
+[STREAM_GROUP]
+index=0
+id=0x1
+nb_streams=1
+type=IAMF Audio Element
+[COMPONENT]
+nb_layers=1
+audio_element_type=0
+default_w=0
+[SUBCOMPONENT]
+channel_layout=stereo
+output_gain_flags=0
+output_gain=0/1
+[/SUBCOMPONENT]
+[/COMPONENT]
+DISPOSITION:default=0
+DISPOSITION:dub=0
+DISPOSITION:original=0
+DISPOSITION:comment=0
+DISPOSITION:lyrics=0
+DISPOSITION:karaoke=0
+DISPOSITION:forced=0
+DISPOSITION:hearing_impaired=0
+DISPOSITION:visual_impaired=0
+DISPOSITION:clean_effects=0
+DISPOSITION:attached_pic=0
+DISPOSITION:timed_thumbnails=0
+DISPOSITION:non_diegetic=0
+DISPOSITION:captions=0
+DISPOSITION:descriptions=0
+DISPOSITION:metadata=0
+DISPOSITION:dependent=0
+DISPOSITION:still_image=0
+DISPOSITION:multilayer=0
+TAG:language=und
+TAG:handler_name=SoundHandler
+[STREAM]
+index=0
+id=0x0
+DISPOSITION:default=1
+DISPOSITION:dub=0
+DISPOSITION:original=0
+DISPOSITION:comment=0
+DISPOSITION:lyrics=0
+DISPOSITION:karaoke=0
+DISPOSITION:forced=0
+DISPOSITION:hearing_impaired=0
+DISPOSITION:visual_impaired=0
+DISPOSITION:clean_effects=0
+DISPOSITION:attached_pic=0
+DISPOSITION:timed_thumbnails=0
+DISPOSITION:non_diegetic=0
+DISPOSITION:captions=0
+DISPOSITION:descriptions=0
+DISPOSITION:metadata=0
+DISPOSITION:dependent=0
+DISPOSITION:still_image=0
+DISPOSITION:multilayer=0
+[/STREAM]
+[/STREAM_GROUP]
+[STREAM_GROUP]
+index=1
+id=0x2
+nb_streams=1
+type=IAMF Mix Presentation
+[COMPONENT]
+nb_submixes=2
+[SUBCOMPONENT]
+en-us=Mix_Presentation
+[/SUBCOMPONENT]
+[SUBCOMPONENT]
+nb_elements=1
+nb_layouts=1
+default_mix_gain=256/256
+[PIECE]
+stream_id=1
+default_mix_gain=0/256
+headphones_rendering_mode=0
+[SUBPIECE]
+en-us=Scalable_Submix
+[/SUBPIECE]
+[SUBPIECE]
+name=element_mix_config
+nb_subblocks=0
+type=0
+parameter_id=100
+parameter_rate=48000
+duration=0
+constant_subblock_duration=0
+[/SUBPIECE]
+[/PIECE]
+[PIECE]
+name=output_mix_config
+nb_subblocks=0
+type=0
+parameter_id=100
+parameter_rate=48000
+duration=0
+constant_subblock_duration=0
+[/PIECE]
+[PIECE]
+sound_system=stereo
+integrated_loudness=256/256
+digital_peak=0/256
+true_peak=0/1
+dialogue_anchored_loudness=0/1
+album_anchored_loudness=0/1
+[/PIECE]
+[/SUBCOMPONENT]
+[SUBCOMPONENT]
+nb_elements=1
+nb_layouts=1
+default_mix_gain=0/256
+[PIECE]
+stream_id=1
+default_mix_gain=256/256
+headphones_rendering_mode=1
+[SUBPIECE]
+en-us=Binaural_submix
+[/SUBPIECE]
+[SUBPIECE]
+name=element_mix_config
+nb_subblocks=0
+type=0
+parameter_id=100
+parameter_rate=48000
+duration=0
+constant_subblock_duration=0
+[/SUBPIECE]
+[/PIECE]
+[PIECE]
+name=output_mix_config
+nb_subblocks=0
+type=0
+parameter_id=100
+parameter_rate=48000
+duration=0
+constant_subblock_duration=0
+[/PIECE]
+[PIECE]
+sound_system=binaural
+integrated_loudness=0/256
+digital_peak=0/256
+true_peak=0/1
+dialogue_anchored_loudness=0/1
+album_anchored_loudness=0/1
+[/PIECE]
+[/SUBCOMPONENT]
+[/COMPONENT]
+DISPOSITION:default=0
+DISPOSITION:dub=0
+DISPOSITION:original=0
+DISPOSITION:comment=0
+DISPOSITION:lyrics=0
+DISPOSITION:karaoke=0
+DISPOSITION:forced=0
+DISPOSITION:hearing_impaired=0
+DISPOSITION:visual_impaired=0
+DISPOSITION:clean_effects=0
+DISPOSITION:attached_pic=0
+DISPOSITION:timed_thumbnails=0
+DISPOSITION:non_diegetic=0
+DISPOSITION:captions=0
+DISPOSITION:descriptions=0
+DISPOSITION:metadata=0
+DISPOSITION:dependent=0
+DISPOSITION:still_image=0
+DISPOSITION:multilayer=0
+TAG:language=und
+TAG:handler_name=SoundHandler
+[STREAM]
+index=0
+id=0x0
+DISPOSITION:default=1
+DISPOSITION:dub=0
+DISPOSITION:original=0
+DISPOSITION:comment=0
+DISPOSITION:lyrics=0
+DISPOSITION:karaoke=0
+DISPOSITION:forced=0
+DISPOSITION:hearing_impaired=0
+DISPOSITION:visual_impaired=0
+DISPOSITION:clean_effects=0
+DISPOSITION:attached_pic=0
+DISPOSITION:timed_thumbnails=0
+DISPOSITION:non_diegetic=0
+DISPOSITION:captions=0
+DISPOSITION:descriptions=0
+DISPOSITION:metadata=0
+DISPOSITION:dependent=0
+DISPOSITION:still_image=0
+DISPOSITION:multilayer=0
+[/STREAM]
+[/STREAM_GROUP]

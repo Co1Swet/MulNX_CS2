@@ -1,0 +1,438 @@
+/*
+ * Copyright (c) Lynne
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+#include "libavutil/opt.h"
+#include "vulkan_filter.h"
+#include "scale_eval.h"
+#include "filters.h"
+#include "colorspace.h"
+#include "video.h"
+#include "libswscale/swscale.h"
+
+extern const unsigned char ff_scale_comp_spv_data[];
+extern const unsigned int ff_scale_comp_spv_len;
+
+extern const unsigned char ff_debayer_comp_spv_data[];
+extern const unsigned int ff_debayer_comp_spv_len;
+
+enum ScalerFunc {
+    F_BILINEAR = 0,
+    F_NEAREST,
+
+    F_NB,
+};
+
+enum DebayerFunc {
+    DB_BILINEAR = 0,
+    DB_BILINEAR_HQ,
+
+    DB_NB,
+};
+
+/* Output modes, must match scale.comp.glsl */
+enum ScaleMode {
+    MODE_COPY = 0,
+    MODE_NV12,
+    MODE_YUV420,
+    MODE_YUV444,
+};
+
+typedef struct ScaleVulkanContext {
+    FFVulkanContext vkctx;
+    SwsContext *sws;
+
+    int initialized;
+    FFVkExecPool e;
+    AVVulkanDeviceQueueFamily *qf;
+    FFVulkanShader shd;
+    VkSampler sampler;
+
+    /* Push constants / options */
+    struct {
+        float yuv_matrix[4][4];
+        int crop_x;
+        int crop_y;
+        int crop_w;
+        int crop_h;
+        float in_dims[2];
+    } opts;
+
+    char *out_format_string;
+    char *w_expr;
+    char *h_expr;
+
+    enum ScalerFunc scaler;
+    enum AVColorRange out_range;
+    enum DebayerFunc debayer;
+} ScaleVulkanContext;
+
+static av_cold int init_filter(AVFilterContext *ctx, AVFrame *in)
+{
+    int err;
+    VkFilter sampler_mode;
+    enum ScaleMode mode;
+    ScaleVulkanContext *s = ctx->priv;
+    FFVulkanContext *vkctx = &s->vkctx;
+    FFVulkanShader *shd = &s->shd;
+
+    int in_planes = av_pix_fmt_count_planes(s->vkctx.input_format);
+    int out_planes = av_pix_fmt_count_planes(s->vkctx.output_format);
+
+    switch (s->scaler) {
+    case F_NEAREST:
+        sampler_mode = VK_FILTER_NEAREST;
+        break;
+    case F_BILINEAR:
+        sampler_mode = VK_FILTER_LINEAR;
+        break;
+    };
+
+    if (s->vkctx.output_format == s->vkctx.input_format) {
+        mode = MODE_COPY;
+    } else {
+        switch (s->vkctx.output_format) {
+        case AV_PIX_FMT_NV12:    mode = MODE_NV12;   break;
+        case AV_PIX_FMT_YUV420P: mode = MODE_YUV420; break;
+        case AV_PIX_FMT_YUV444P: mode = MODE_YUV444; break;
+        default: return AVERROR(EINVAL);
+        }
+    }
+
+    RET(ff_vk_exec_pool_init(vkctx, s->qf, &s->e, FF_VK_DEFAULT_EXEC_CONTEXTS, 0, 0, 0, NULL));
+
+    RET(ff_vk_init_sampler(vkctx, &s->sampler, 0, sampler_mode));
+
+    SPEC_LIST_CREATE(sl, 3, 3*sizeof(int32_t))
+    SPEC_LIST_ADD(sl, 0, 32, out_planes);
+    SPEC_LIST_ADD(sl, 1, 32, mode);
+    SPEC_LIST_ADD(sl, 2, 32, s->out_range == AVCOL_RANGE_JPEG);
+
+    ff_vk_shader_load(&s->shd, VK_SHADER_STAGE_COMPUTE_BIT, sl,
+                      (uint32_t []) { 32, 32, 1 }, 0);
+
+    const FFVulkanDescriptorSetBinding desc[] = {
+        {
+            .name       = "input_img",
+            .type       = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .elems      = in_planes,
+            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+            .samplers   = DUP_SAMPLER(s->sampler),
+        },
+        {
+            .name       = "output_img",
+            .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .elems      = out_planes,
+            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+        },
+    };
+
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0);
+
+    ff_vk_shader_add_push_const(&s->shd, 0, sizeof(s->opts),
+                                VK_SHADER_STAGE_COMPUTE_BIT);
+
+    if (mode != MODE_COPY) {
+        const AVLumaCoefficients *lcoeffs;
+        double tmp_mat[3][3];
+
+        lcoeffs = av_csp_luma_coeffs_from_avcsp(in->colorspace);
+        if (!lcoeffs) {
+            av_log(ctx, AV_LOG_ERROR, "Unsupported colorspace\n");
+            err = AVERROR(EINVAL);
+            goto fail;
+        }
+
+        ff_fill_rgb2yuv_table(lcoeffs, tmp_mat);
+
+        for (int y = 0; y < 3; y++)
+            for (int x = 0; x < 3; x++)
+                s->opts.yuv_matrix[x][y] = tmp_mat[x][y];
+        s->opts.yuv_matrix[3][3] = 1.0;
+    }
+
+    s->opts.in_dims[0] = in->width;
+    s->opts.in_dims[1] = in->height;
+
+    RET(ff_vk_shader_link(vkctx, shd,
+                          ff_scale_comp_spv_data,
+                          ff_scale_comp_spv_len, "main"));
+
+    RET(ff_vk_shader_register_exec(vkctx, &s->e, &s->shd));
+
+    s->initialized = 1;
+
+fail:
+    return err;
+}
+
+static av_cold int init_debayer(AVFilterContext *ctx, AVFrame *in)
+{
+    int err;
+    ScaleVulkanContext *s = ctx->priv;
+    FFVulkanContext *vkctx = &s->vkctx;
+    FFVulkanShader *shd = &s->shd;
+
+    RET(ff_vk_exec_pool_init(vkctx, s->qf, &s->e, FF_VK_DEFAULT_EXEC_CONTEXTS, 0, 0, 0, NULL));
+
+    SPEC_LIST_CREATE(sl, 1, 1*sizeof(int32_t))
+    SPEC_LIST_ADD(sl, 0, 32, s->debayer);
+    ff_vk_shader_load(&s->shd, VK_SHADER_STAGE_COMPUTE_BIT, sl,
+                      (uint32_t []) { 32, 32, 1 }, 0);
+
+    ff_vk_shader_add_push_const(&s->shd, 0, sizeof(s->opts),
+                                VK_SHADER_STAGE_COMPUTE_BIT);
+
+    const FFVulkanDescriptorSetBinding desc[] = {
+        {
+            .name       = "src",
+            .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+        },
+        {
+            .name       = "dst",
+            .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
+        },
+    };
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0);
+
+    RET(ff_vk_shader_link(vkctx, shd,
+                          ff_debayer_comp_spv_data,
+                          ff_debayer_comp_spv_len, "main"));
+
+    RET(ff_vk_shader_register_exec(vkctx, &s->e, &s->shd));
+
+    shd->lg_size[0] <<= 1;
+    shd->lg_size[1] <<= 1;
+
+    s->initialized = 1;
+
+fail:
+    return err;
+}
+
+static int scale_vulkan_filter_frame(AVFilterLink *link, AVFrame *in)
+{
+    int err;
+    AVFilterContext *ctx = link->dst;
+    ScaleVulkanContext *s = ctx->priv;
+    AVFilterLink *outlink = ctx->outputs[0];
+
+    AVFrame *out = ff_get_video_buffer(outlink, outlink->w, outlink->h);
+    if (!out) {
+        err = AVERROR(ENOMEM);
+        goto fail;
+    }
+
+    s->opts.crop_x = in->crop_left;
+    s->opts.crop_y = in->crop_top;
+    s->opts.crop_w = in->width - (in->crop_left + in->crop_right);
+    s->opts.crop_h = in->height - (in->crop_top + in->crop_bottom);
+
+    err = av_frame_copy_props(out, in);
+    if (err < 0)
+        goto fail;
+
+    if (out->width != in->width || out->height != in->height) {
+        av_frame_side_data_remove_by_props(&out->side_data, &out->nb_side_data,
+                                           AV_SIDE_DATA_PROP_SIZE_DEPENDENT);
+    }
+
+    if (s->out_range != AVCOL_RANGE_UNSPECIFIED)
+        out->color_range = s->out_range;
+    if (s->vkctx.output_format != s->vkctx.input_format)
+        out->chroma_location = AVCHROMA_LOC_TOPLEFT;
+
+    if (!s->sws) {
+        if (!s->initialized) {
+            s->qf = ff_vk_qf_find(&s->vkctx, VK_QUEUE_COMPUTE_BIT, 0);
+            if (!s->qf) {
+                av_log(ctx, AV_LOG_ERROR, "Device has no compute queues\n");
+                err = AVERROR(ENOTSUP);
+                goto fail;
+            }
+
+            if (s->vkctx.input_format == AV_PIX_FMT_BAYER_RGGB16)
+                RET(init_debayer(ctx, in));
+            else
+                RET(init_filter(ctx, in));
+        }
+
+        RET(ff_vk_filter_process_simple(&s->vkctx, &s->e, &s->shd, out, in,
+                                        s->sampler, 1, &s->opts, sizeof(s->opts)));
+    } else {
+        err = sws_scale_frame(s->sws, out, in);
+        if (err < 0)
+            goto fail;
+    }
+
+    av_frame_free(&in);
+
+    return ff_filter_frame(outlink, out);
+
+fail:
+    av_frame_free(&in);
+    av_frame_free(&out);
+    return err;
+}
+
+static int scale_vulkan_config_output(AVFilterLink *outlink)
+{
+    int err;
+    AVFilterContext *avctx = outlink->src;
+    ScaleVulkanContext *s  = avctx->priv;
+    FFVulkanContext *vkctx = &s->vkctx;
+    AVFilterLink *inlink   = outlink->src->inputs[0];
+
+    err = ff_scale_eval_dimensions(s, s->w_expr, s->h_expr, inlink, outlink,
+                                   &vkctx->output_width,
+                                   &vkctx->output_height);
+    if (err < 0)
+        return err;
+
+    err = ff_scale_adjust_dimensions(inlink, &vkctx->output_width, &vkctx->output_height,
+                                     SCALE_FORCE_OAR_DISABLE, 1, 1.f);
+    if (err < 0)
+        return err;
+
+    outlink->w = vkctx->output_width;
+    outlink->h = vkctx->output_height;
+
+    if (s->out_format_string) {
+        s->vkctx.output_format = av_get_pix_fmt(s->out_format_string);
+        if (s->vkctx.output_format == AV_PIX_FMT_NONE) {
+            av_log(avctx, AV_LOG_ERROR, "Invalid output format.\n");
+            return AVERROR(EINVAL);
+        }
+    } else {
+        s->vkctx.output_format = s->vkctx.input_format;
+    }
+
+    if (s->vkctx.input_format == AV_PIX_FMT_BAYER_RGGB16) {
+        if (s->vkctx.output_format == s->vkctx.input_format) {
+            s->vkctx.output_format = AV_PIX_FMT_RGBA64;
+        } else if (!ff_vk_mt_is_np_rgb(s->vkctx.output_format)) {
+            av_log(avctx, AV_LOG_ERROR, "Unsupported output format for debayer\n");
+            return AVERROR(EINVAL);
+        }
+        if (inlink->w != outlink->w || inlink->w != outlink->w) {
+            av_log(avctx, AV_LOG_ERROR, "Scaling is not supported with debayering\n");
+            return AVERROR_PATCHWELCOME;
+        }
+    } else if ((inlink->w == outlink->w || inlink->h == outlink->h) &&
+               (s->vkctx.input_format != s->vkctx.output_format)) {
+        s->sws = sws_alloc_context();
+        if (!s->sws)
+            return AVERROR(ENOMEM);
+        av_opt_set(s->sws, "sws_flags", "unstable", 0);
+        av_opt_set(s->sws, "scaler",
+                   s->scaler == F_NEAREST ? "point" : "bilinear", 0);
+    } else if (s->vkctx.output_format != s->vkctx.input_format) {
+        if (!ff_vk_mt_is_np_rgb(s->vkctx.input_format)) {
+            av_log(avctx, AV_LOG_ERROR, "Unsupported input format for conversion\n");
+            return AVERROR(EINVAL);
+        }
+        if (s->vkctx.output_format != AV_PIX_FMT_NV12 &&
+            s->vkctx.output_format != AV_PIX_FMT_YUV420P &&
+            s->vkctx.output_format != AV_PIX_FMT_YUV444P) {
+            av_log(avctx, AV_LOG_ERROR, "Unsupported output format\n");
+            return AVERROR(EINVAL);
+        }
+    } else if (s->out_range != AVCOL_RANGE_UNSPECIFIED) {
+        av_log(avctx, AV_LOG_ERROR, "Cannot change range without converting format\n");
+        return AVERROR(EINVAL);
+    }
+
+    return ff_vk_filter_config_output(outlink);
+}
+
+static void scale_vulkan_uninit(AVFilterContext *avctx)
+{
+    ScaleVulkanContext *s = avctx->priv;
+    FFVulkanContext *vkctx = &s->vkctx;
+    FFVulkanFunctions *vk = &vkctx->vkfn;
+
+    ff_vk_exec_pool_free(vkctx, &s->e);
+    ff_vk_shader_free(vkctx, &s->shd);
+    sws_free_context(&s->sws);
+
+    if (s->sampler)
+        vk->DestroySampler(vkctx->hwctx->act_dev, s->sampler,
+                           vkctx->hwctx->alloc);
+
+    ff_vk_uninit(&s->vkctx);
+
+    s->initialized = 0;
+}
+
+#define OFFSET(x) offsetof(ScaleVulkanContext, x)
+#define FLAGS (AV_OPT_FLAG_FILTERING_PARAM | AV_OPT_FLAG_VIDEO_PARAM)
+static const AVOption scale_vulkan_options[] = {
+    { "w", "Output video width",  OFFSET(w_expr), AV_OPT_TYPE_STRING, {.str = "iw"}, .flags = FLAGS },
+    { "h", "Output video height", OFFSET(h_expr), AV_OPT_TYPE_STRING, {.str = "ih"}, .flags = FLAGS },
+    { "scaler", "Scaler function", OFFSET(scaler), AV_OPT_TYPE_INT, {.i64 = F_BILINEAR}, 0, F_NB, .flags = FLAGS, .unit = "scaler" },
+        { "bilinear", "Bilinear interpolation (fastest)", 0, AV_OPT_TYPE_CONST, {.i64 = F_BILINEAR}, 0, 0, .flags = FLAGS, .unit = "scaler" },
+        { "nearest", "Nearest (useful for pixel art)", 0, AV_OPT_TYPE_CONST, {.i64 = F_NEAREST}, 0, 0, .flags = FLAGS, .unit = "scaler" },
+    { "debayer", "Debayer algorithm to use", OFFSET(debayer), AV_OPT_TYPE_INT, {.i64 = DB_BILINEAR_HQ}, 0, DB_NB, .flags = FLAGS, .unit = "debayer" },
+        { "bilinear", "Bilinear debayering (fastest)", 0, AV_OPT_TYPE_CONST, {.i64 = DB_BILINEAR}, 0, 0, .flags = FLAGS, .unit = "debayer" },
+        { "bilinear_hq", "Bilinear debayering (high quality)", 0, AV_OPT_TYPE_CONST, {.i64 = DB_BILINEAR_HQ}, 0, 0, .flags = FLAGS, .unit = "debayer" },
+    { "format", "Output video format (software format of hardware frames)", OFFSET(out_format_string), AV_OPT_TYPE_STRING, .flags = FLAGS },
+    { "out_range", "Output colour range (from 0 to 2) (default 0)", OFFSET(out_range), AV_OPT_TYPE_INT, {.i64 = AVCOL_RANGE_UNSPECIFIED}, AVCOL_RANGE_UNSPECIFIED, AVCOL_RANGE_JPEG, .flags = FLAGS, .unit = "range" },
+        { "full", "Full range", 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, .unit = "range" },
+        { "limited", "Limited range", 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, .unit = "range" },
+        { "jpeg", "Full range", 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, .unit = "range" },
+        { "mpeg", "Limited range", 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, .unit = "range" },
+        { "tv", "Limited range", 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_MPEG }, 0, 0, FLAGS, .unit = "range" },
+        { "pc", "Full range", 0, AV_OPT_TYPE_CONST, { .i64 = AVCOL_RANGE_JPEG }, 0, 0, FLAGS, .unit = "range" },
+    { NULL },
+};
+
+AVFILTER_DEFINE_CLASS(scale_vulkan);
+
+static const AVFilterPad scale_vulkan_inputs[] = {
+    {
+        .name         = "default",
+        .type         = AVMEDIA_TYPE_VIDEO,
+        .filter_frame = &scale_vulkan_filter_frame,
+        .config_props = &ff_vk_filter_config_input,
+    },
+};
+
+static const AVFilterPad scale_vulkan_outputs[] = {
+    {
+        .name = "default",
+        .type = AVMEDIA_TYPE_VIDEO,
+        .config_props = &scale_vulkan_config_output,
+    },
+};
+
+const FFFilter ff_vf_scale_vulkan = {
+    .p.name         = "scale_vulkan",
+    .p.description  = NULL_IF_CONFIG_SMALL("Scale Vulkan frames"),
+    .p.priv_class   = &scale_vulkan_class,
+    .p.flags        = AVFILTER_FLAG_HWDEVICE,
+    .priv_size      = sizeof(ScaleVulkanContext),
+    .init           = &ff_vk_filter_init,
+    .uninit         = &scale_vulkan_uninit,
+    FILTER_INPUTS(scale_vulkan_inputs),
+    FILTER_OUTPUTS(scale_vulkan_outputs),
+    FILTER_SINGLE_PIXFMT(AV_PIX_FMT_VULKAN),
+    .flags_internal = FF_FILTER_FLAG_HWFRAME_AWARE,
+};
