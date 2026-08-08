@@ -1,0 +1,10 @@
+prefix=C:/Users/lenovo/Desktop/MulNXDev/MulNX_CS2/source/MulNXThirdParty/FFmpegBuild/msys2/msys64/opt/openh264
+libdir=C:/Users/lenovo/Desktop/MulNXDev/MulNX_CS2/source/MulNXThirdParty/FFmpegBuild/msys2/msys64/opt/openh264/lib
+includedir=${prefix}/include
+
+Name: OpenH264
+Description: OpenH264 is a codec library which supports H.264 encoding and decoding. It is suitable for use in real time applications such as WebRTC.
+Version: 2.4.1
+Libs: -L${libdir} -lopenh264 
+Libs.private: -lstdc++
+Cflags: -I${includedir}

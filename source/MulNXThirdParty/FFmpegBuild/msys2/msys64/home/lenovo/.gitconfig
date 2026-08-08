@@ -1,0 +1,3 @@
+[http]
+	sslCAInfo = /usr/ssl/certs/ca-bundle.crt
+	sslVerify = false

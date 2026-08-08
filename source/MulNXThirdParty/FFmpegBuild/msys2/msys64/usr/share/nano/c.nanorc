@@ -1,0 +1,50 @@
+## Syntax highlighting for C and C++ files.
+
+syntax c "\.([ch](pp|xx)?|C|cc|c\+\+|cu|H|hh|ii?)$"
+header "-\*-.*\<C(\+\+)?((;|[[:blank:]]).*)?-\*-"
+magic "^(C|C\+\+) (source|program)"
+comment "//"
+
+# Constants.
+color brightred "\<[[:upper:]_][[:upper:][:digit:]_]*\>"
+# Labels.
+color brightmagenta "^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*:[[:blank:]]*$"
+color normal ":[[:blank:]]*$"
+
+# Types and related keywords.
+color green "\<(bool|char|double|enum|float|int|short|(un)?signed|struct|union|void|((u_?)?int(8|16|32|64)|[[:lower:]][[:lower:]_]*)_t)\>"
+color green "\<(align(as|of)|auto|const(eval|expr|init)?|extern|inline|register|restrict|sizeof|static(_assert)?|thread_local|typedef|typeof(_unqual)?|volatile)\>"
+color green "\<(_(Align(as|of)|Atomic|BitInt|Bool|Complex|Decimal(32|64|128)|Generic|Imaginary|Noreturn|Static_assert|Thread_local))\>"
+color green "\<(class|explicit|final|friend|mutable|namespace|override|private|protected|public|template|this|typename|using|virtual)\>"
+color green "\<(char(8|16|32)_t|wchar_t|(const|dynamic|reinterpret|static)_cast|decltype|export|import|module|noexcept|requires|typeid)\>"
+
+# Flow control.
+color brightyellow "\<(if|else|for|while|do|switch|case|default)\>"
+color brightyellow "\<(try|throw|catch|operator|new|delete)\>"
+color magenta "\<(break|continue|goto|(co_)?return)\>"
+
+# Single-quoted stuff (characters, backslash escapes, hex and octal byte codes).
+color brightmagenta "'([^'\]|\\(["'\abfnrtv]|x[[:xdigit:]]{1,2}|[0-3]?[0-7]{1,2}))'"
+
+# Hexadecimal, binary, and boolean values.
+color pink "\<(0[Xx][[:xdigit:]]['[:xdigit:]]*|0[Bb][01]['01]*|true|false|nullptr)\>"
+
+# GCC builtins.
+color cyan "__attribute__[[:blank:]]*\(\([^)]*\)\)|__(aligned|asm|builtin|hidden|inline|packed|restrict|section|typeof|weak)__"
+
+# Strings and names of included files.
+color brightyellow ""([^"]|\\")*"|#[[:blank:]]*include[[:blank:]]*<[^>]+>"
+
+# Preprocessor directives.
+color brightcyan start="^[[:blank:]]*#[[:blank:]]*((el)?if(n?def)?|error|pragma|warning)\>" end="(\`|[^\])$"
+color brightcyan "^[[:blank:]]*#[[:blank:]]*((define|else|embed|endif|include(_next)?|line|undef)\>|$)"
+
+# Comments.
+color brightblue "//[^"]*$|(^|[[:blank:]])//.*"
+color brightblue start="/\*" end="\*/"
+
+# Reminders.
+color brightwhite,yellow "\<(FIXME|TODO|XXX)\>"
+
+# Trailing whitespace.
+color ,green "[[:space:]]+$"

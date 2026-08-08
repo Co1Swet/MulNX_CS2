@@ -1,0 +1,14 @@
+%FILES%
+mingw64/
+mingw64/bin/
+mingw64/bin/nasm.exe
+mingw64/bin/ndisasm.exe
+mingw64/share/
+mingw64/share/licenses/
+mingw64/share/licenses/nasm/
+mingw64/share/licenses/nasm/LICENSE
+mingw64/share/man/
+mingw64/share/man/man1/
+mingw64/share/man/man1/nasm.1.gz
+mingw64/share/man/man1/ndisasm.1.gz
+

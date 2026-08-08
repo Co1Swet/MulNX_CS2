@@ -1,0 +1,159 @@
+/**
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is part of the mingw-w64 runtime package.
+ * No warranty is given; refer to the file DISCLAIMER.PD within this package.
+ */
+#ifndef _INC_LOCALE
+#define _INC_LOCALE
+
+#include <_mingw_locale.h>
+
+#ifdef __cplusplus
+#include <stdio.h>
+#endif
+
+#pragma pack(push,_CRT_PACKING)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef NULL
+#ifdef __cplusplus
+#ifndef _WIN64
+#define NULL 0
+#else
+#define NULL 0LL
+#endif  /* W64 */
+#else
+#define NULL ((void *)0)
+#endif
+#endif
+
+/**
+ * Internal CRT stuff.
+ */
+
+#ifdef __CHAR_UNSIGNED__
+/* Pull in the constructor from 'charmax.c'.  */
+extern int __mingw_initcharmax;
+__MINGW_SELECTANY int* __mingw_reference_charmax = &__mingw_initcharmax;
+#endif
+
+_CRTIMP unsigned int __cdecl ___lc_codepage_func(void);
+
+/**
+ * Standard C declarations.
+ */
+
+#define LC_ALL 0
+#define LC_COLLATE 1
+#define LC_CTYPE 2
+#define LC_MONETARY 3
+#define LC_NUMERIC 4
+#define LC_TIME 5
+
+#define LC_MIN LC_ALL
+#define LC_MAX LC_TIME
+
+  struct lconv {
+    char *decimal_point;
+    char *thousands_sep;
+    char *grouping;
+    char *int_curr_symbol;
+    char *currency_symbol;
+    char *mon_decimal_point;
+    char *mon_thousands_sep;
+    char *mon_grouping;
+    char *positive_sign;
+    char *negative_sign;
+    char int_frac_digits;
+    char frac_digits;
+    char p_cs_precedes;
+    char p_sep_by_space;
+    char n_cs_precedes;
+    char n_sep_by_space;
+    char p_sign_posn;
+    char n_sign_posn;
+    /**
+     * These _W_* members are available since msvcr100.dll;
+     * they are also available in msvcrt.dll since Windows 7.
+     */
+#if __MSVCRT_VERSION__ >= 0xA00 || (__MSVCRT_VERSION__ == 0x600 && _WIN32_WINNT >= 0x601)
+    wchar_t* _W_decimal_point;
+    wchar_t* _W_thousands_sep;
+    wchar_t* _W_int_curr_symbol;
+    wchar_t* _W_currency_symbol;
+    wchar_t* _W_mon_decimal_point;
+    wchar_t* _W_mon_thousands_sep;
+    wchar_t* _W_positive_sign;
+    wchar_t* _W_negative_sign;
+#endif
+  };
+
+_CRTIMP char *__cdecl setlocale(int _Category,const char *_Locale);
+_CRTIMP struct lconv *__cdecl localeconv(void);
+
+/**
+ * Microsoft-specific declarations: thread locales.
+ *
+ * They are available since msvcr80.dll.
+ */
+
+/**
+ * FIXME: we expose `_configthreadlocale` for msvcrt.dll in order to avoid
+ *   breaking packages which use it unconditionally (e.g. libc++).
+ */
+#if __MSVCRT_VERSION__ >= 0x0800 || __MSVCRT_VERSION__ == 0x0600
+#define _ENABLE_PER_THREAD_LOCALE 0x1
+#define _DISABLE_PER_THREAD_LOCALE 0x2
+#define _ENABLE_PER_THREAD_LOCALE_GLOBAL 0x10
+#define _DISABLE_PER_THREAD_LOCALE_GLOBAL 0x20
+#define _ENABLE_PER_THREAD_LOCALE_NEW 0x100
+#define _DISABLE_PER_THREAD_LOCALE_NEW 0x200
+
+_CRTIMP int __cdecl _configthreadlocale(int _Flag);
+#endif
+
+/**
+ * Microsoft-specific declarations: locale objects.
+ *
+ * They are available since msvcr80.dll.
+ * They are also available in msvcrt.dll since Windows 8.
+ */
+
+/**
+ * FIXME: functions which use `_locale_t` objects are available in msvcrt.dll
+ *   since Windows Vista, while `_create_locale` etc. are only available since
+ *   Windows 8. We expose them for Vista and later in order to avoid breaking
+ *   packages which use them unconditionally (e.g. libc++).
+ */
+#if __MSVCRT_VERSION__ >= 0x0800 || (__MSVCRT_VERSION__ == 0x0600 && _WIN32_WINNT >= 0x0600)
+_CRTIMP _locale_t __cdecl _get_current_locale(void);
+_CRTIMP _locale_t __cdecl _create_locale(int _Category,const char *_Locale);
+_CRTIMP void __cdecl _free_locale(_locale_t _Locale);
+
+/**
+ * Aliases with two underscores are deprecated; do not use in new code.
+ */
+_CRTIMP _locale_t __cdecl __get_current_locale(void);
+_CRTIMP _locale_t __cdecl __create_locale(int _Category,const char *_Locale);
+_CRTIMP void __cdecl __free_locale(_locale_t _Locale);
+#endif
+
+/**
+ * mingw-w64's private functions.
+ */
+
+/* Get the code page that the CRT currently uses for filenames. */
+unsigned int __cdecl __mingw_filename_cp(void);
+
+/* Variant of _isleadbyte_l() function which takes codepage (instead of _locale_t). */
+int __cdecl __mingw_isleadbyte_cp(int c, unsigned int cp);
+
+#ifdef __cplusplus
+}
+#endif
+
+#pragma pack(pop)
+#endif

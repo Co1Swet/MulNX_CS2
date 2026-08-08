@@ -1,0 +1,14 @@
+prefix=/opt/ffmpeg-build/ffmpeg_install
+exec_prefix=${prefix}
+libdir=/opt/ffmpeg-build/ffmpeg_install/lib
+includedir=/opt/ffmpeg-build/ffmpeg_install/include
+
+Name: libavdevice
+Description: FFmpeg device handling library
+Version: 63.2.100
+Requires: 
+Requires.private: libavformat >= 63.5.101, libavcodec >= 63.7.100, libavutil >= 61.5.100
+Conflicts:
+Libs: -L${libdir}  -lavdevice 
+Libs.private: -lm -latomic
+Cflags: -I${includedir}

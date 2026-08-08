@@ -1,0 +1,292 @@
+                       The GNU Privacy Guard
+                      =======================
+                            Version 2.4
+
+          Copyright 1997-2019 Werner Koch
+          Copyright 1998-2021 Free Software Foundation, Inc.
+          Copyright 2003-2025 g10 Code GmbH
+
+
+* INTRODUCTION
+
+  Note that the 2.4 series will reach end-of-life on 2026-06-30.
+  Please use the current stable version instead; this is currently
+  the 2.6 series starting with version 2.5.9.
+
+  GnuPG is a complete and free implementation of the OpenPGP standard
+  as defined by RFC4880 (also known as PGP).  GnuPG enables encryption
+  and signing of data and communication, and features a versatile key
+  management system as well as access modules for public key
+  directories.
+
+  GnuPG, also known as GPG, is a command line tool with features for
+  easy integration with other applications.  A wealth of frontend
+  applications and libraries are available that make use of GnuPG.
+  Starting with version 2 GnuPG provides support for S/MIME and Secure
+  Shell in addition to OpenPGP.
+
+  GnuPG is Free Software (meaning that it respects your freedom). It
+  can be freely used, modified and distributed under the terms of the
+  GNU General Public License.
+
+* BUILD INSTRUCTIONS
+
+  GnuPG 2.4 depends on the following GnuPG related packages:
+
+    npth         (https://gnupg.org/ftp/gcrypt/npth/)
+    libgpg-error (https://gnupg.org/ftp/gcrypt/libgpg-error/)
+    libgcrypt    (https://gnupg.org/ftp/gcrypt/libgcrypt/)
+    libksba      (https://gnupg.org/ftp/gcrypt/libksba/)
+    libassuan    (https://gnupg.org/ftp/gcrypt/libassuan/)
+
+  You should get the latest versions of course, the GnuPG configure
+  script complains if a version is not sufficient.
+
+  Several other standard libraries are also required.  The configure
+  script prints diagnostic messages if one of these libraries is not
+  available and a feature will not be available.
+
+  You also need the Pinentry package for most functions of GnuPG;
+  however it is not a build requirement.  Pinentry is available at
+  https://gnupg.org/ftp/gcrypt/pinentry/ .
+
+  After building and installing the above packages in the order as
+  given above, you may continue with GnuPG installation (you may also
+  just try to build GnuPG to see whether your already installed
+  versions are sufficient).
+
+  As with all packages, you just have to do
+
+    mkdir build
+    cd build
+    ../configure
+    make
+    make check
+    make install
+
+  The "make check" is optional but highly recommended.  To run even
+  more tests you may add "--enable-all-tests" to the configure run.
+  Before running the "make install" you might need to become root.
+
+  If everything succeeds, you have a working GnuPG with support for
+  OpenPGP, S/MIME, ssh-agent, and smartcards.
+
+  In case of problem please ask on the gnupg-users@gnupg.org mailing
+  list for advise.
+
+  Instruction on how to build for Windows can be found in the file
+  doc/HACKING in the section "How to build an installer for Windows".
+  This requires some experience as developer.
+
+  You may run
+
+    gpgconf -L
+
+  to view the directories used by GnuPG.
+
+** Quick build method on Unix
+
+  To quickly build all required software without installing it, the
+  Speedo target may be used:
+
+    make -f build-aux/speedo.mk native
+
+  This target downloads all required libraries and does a native build
+  of GnuPG to PLAY/inst/.  GNU make and the patchelf tool are
+  required.  After the build the entire software including all
+  libraries can be installed into an arbitrary location using for
+  example:
+
+    make -f build-aux/speedo.mk install SYSROOT=/usr/local/gnupg24
+    ldconfig -n /usr/local/gnupg24/lib
+
+  and adding /usr/local/gnupg24/bin to PATH.
+
+
+** Specific build problems on some machines:
+
+*** Apple OSX 10.x using XCode
+
+  On some versions the correct location of a header file can't be
+  detected by configure.  To fix that you should run configure like
+  this
+
+    ./configure  gl_cv_absolute_stdint_h=/usr/include/stdint.h
+
+  Add other options as needed.
+
+
+*** Systems without a full C99 compiler
+
+  If you run into problems with your compiler complaining about dns.c
+  you may use
+
+    ./configure --disable-libdns
+
+  Add other options as needed.
+
+
+
+* RECOMMENDATIONS
+
+** Key database daemon
+
+  Since version 2.3.0 it is possible to store the keys in an SQLite
+  database instead of the keyring.kbx file.  This is in particular
+  useful for large keyrings or if many instances of gpg and gpgsm may
+  run concurrently.  This is implemented using another daemon process,
+  the "keyboxd".  To enable the use of the keyboxd put the option
+  "use-keyboxd" into the configuration file ~/.gnupg/common.conf or the
+  global /etc/gnupg/common.conf.  See also doc/examples/common.conf.
+  Only public keys and X.509 certificates are managed by the keyboxd;
+  private keys are still stored as separate files.
+
+  Since version 2.4.1 the keyboxd will be used by default for a fresh
+  install; i.e. if a ~/.gnupg directory did not yet exist.
+
+  Note that there is no automatic migration; if the use-keyboxd option
+  is enabled keys are not taken from pubring.kbx.  To migrate existing
+  keys to the keyboxd do this:
+
+  1. Disable the keyboxd (remove use-keyboxd from common.conf)
+  2. Export all public keys
+       gpg --export --export-options backup  > allkeys.gpg
+       gpgsm --export --armor                > allcerts.gpg
+  3. Enable the keyboxd (add use-keyboxd to common.conf)
+  4. Import all public keys
+       gpg --import --import-options restore < allkeys.gpg
+       gpgsm --import                        < allcerts.crt
+
+  In case the keyboxd is not able to startup due to a stale lockfile
+  created by another host, the command
+
+     gpgconf --unlock pubring.db
+
+  can be used to remove the lock file.
+
+** Socket directory
+
+  GnuPG uses Unix domain sockets to connect its components (on Windows
+  an emulation of these sockets is used).  Depending on the type of
+  the file system, it is sometimes not possible to use the GnuPG home
+  directory (i.e. ~/.gnupg) as the location for the sockets.  To solve
+  this problem GnuPG prefers the use of a per-user directory below the
+  the /run (or /var/run) hierarchy for the sockets.  It is thus
+  suggested to create per-user directories on system or session
+  startup.  For example, the following snippet can be used in
+  /etc/rc.local to create these directories:
+
+      [ ! -d /run/user ] && mkdir /run/user
+      awk -F: </etc/passwd '$3 >= 1000 && $3 < 65000 {print $3}' \
+        | ( while read uid rest; do
+              if [ ! -d "/run/user/$uid" ]; then
+                mkdir /run/user/$uid
+                chown $uid /run/user/$uid
+                chmod 700 /run/user/$uid
+              fi
+            done )
+
+** Conflicts with systemd socket activation
+
+  Some Linux distribution use the meanwhile deprecated --supervised
+  option with gpg-agent, dirmngr, and keyboxd.  The idea is that the
+  systemd process launches the daemons as soon as gpg or gpgsm try to
+  access them.  However, this creates a race condition with GnuPG's
+  own on-demand launching of these daemon.  It also conflicts with the
+  remote use gpg-agent because the no-autostart feature on the remote
+  site will not work as expected.
+
+  Thus the recommendation is not to use the --supervised option.  All
+  GnuPG components handle the startup of their daemons on their own.
+
+  The only problem is that for using GnuPG's ssh-agent protocol
+  support, the gpg-agent must have been started before ssh.  This can
+  either be done with an ssh wrapper running
+
+    gpg-connect-agent updatestartuptty /bye
+
+  for each new tty or by using that command directly after login when
+  the anyway required SSH_AUTH_SOCK envvar is set (see the example in
+  the gpg-agent man page).
+
+
+* DOCUMENTATION
+
+  The complete documentation is in the texinfo manual named
+  `gnupg.info'.  Run "info gnupg" to read it.  If you want a
+  printable copy of the manual, change to the "doc" directory and
+  enter "make pdf" For a HTML version enter "make html" and point your
+  browser to gnupg.html/index.html.  Standard man pages for all
+  components are provided as well.  An online version of the manual is
+  available at [[https://gnupg.org/documentation/manuals/gnupg/]] .  A
+  version of the manual pertaining to the current development snapshot
+  is at [[https://gnupg.org/documentation/manuals/gnupg-devel/]] .
+
+
+* Using the legacy version GnuPG 1.4
+
+  The 1.4 version of GnuPG is only intended to allow decryption of old
+  data material using legacy keys which are not anymore supported by
+  GnuPG 2.x.  To install both versions alongside, it is suggested to
+  rename the 1.4 version of "gpg" to "gpg1" as well as the
+  corresponding man page.  Newer releases of the 1.4 branch will
+  likely do this by default.
+
+
+* HOW TO GET MORE INFORMATION
+
+  A description of new features and changes since version 2.1 can be
+  found in the file "doc/whats-new-in-2.1.txt" and online at
+  "https://gnupg.org/faq/whats-new-in-2.1.html" .
+
+  The primary WWW page is "https://gnupg.org"
+  The primary FTP site is "https://gnupg.org/ftp/gcrypt/"
+
+  See [[https://gnupg.org/download/mirrors.html]] for a list of
+  mirrors and use them if possible.  You may also find GnuPG mirrored
+  on some of the regular GNU mirrors.
+
+  We have some mailing lists dedicated to GnuPG:
+
+     gnupg-announce@gnupg.org   For important announcements like new
+                                versions and such stuff.  This is a
+                                moderated list and has very low traffic.
+                                Do not post to this list.
+
+     gnupg-users@gnupg.org      For general user discussion and
+                                help.
+
+     gnupg-devel@gnupg.org      GnuPG developers main forum.
+
+  You subscribe to one of the list by sending mail with a subject of
+  "subscribe" to x-request@gnupg.org, where x is the name of the
+  mailing list (gnupg-announce, gnupg-users, etc.). See
+  https://gnupg.org/documentation/mailing-lists.html for archives
+  of the mailing lists.
+
+  Please direct bug reports to [[https://bugs.gnupg.org]] or post them
+  direct to the mailing list <gnupg-devel@gnupg.org>.
+
+  Please direct questions about GnuPG to the users mailing list or one
+  of the PGP newsgroups; please do not direct questions to one of the
+  authors directly as we are busy working on improvements and bug
+  fixes.  The mailing lists are watched by the authors and we try to
+  answer questions as time allows us.
+
+  Commercial grade support for GnuPG is available; for a listing of
+  offers see https://gnupg.org/service.html .  Maintaining and
+  improving GnuPG requires a lot of time.  Since 2001, g10 Code GmbH,
+  a German company owned and headed by GnuPG's principal author Werner
+  Koch, is bearing the majority of these costs.
+
+# This file is Free Software; as a special exception the authors gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved. For conditions
+# of the whole package, please see the file COPYING.  This file is
+# distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY, to the extent permitted by law; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# Local Variables:
+# mode:org
+# End:

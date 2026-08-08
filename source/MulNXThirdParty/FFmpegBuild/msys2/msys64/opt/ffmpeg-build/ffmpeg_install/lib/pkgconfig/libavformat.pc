@@ -1,0 +1,14 @@
+prefix=/opt/ffmpeg-build/ffmpeg_install
+exec_prefix=${prefix}
+libdir=/opt/ffmpeg-build/ffmpeg_install/lib
+includedir=/opt/ffmpeg-build/ffmpeg_install/include
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 63.5.101
+Requires: 
+Requires.private: libavcodec >= 63.7.100, libavutil >= 61.5.100
+Conflicts:
+Libs: -L${libdir}  -lavformat 
+Libs.private: -lm -latomic -lz -lsecur32 -lncrypt -lcrypt32 -lws2_32
+Cflags: -I${includedir}
