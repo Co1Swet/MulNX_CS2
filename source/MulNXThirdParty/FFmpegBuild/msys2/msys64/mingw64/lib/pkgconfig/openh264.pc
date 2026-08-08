@@ -1,10 +1,11 @@
-prefix=/mingw64
+prefix=/opt/openh264
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include/wels
 
 Name: OpenH264
-Description: Cisco OpenH264 Codec
+Description: Cisco OpenH264 Codec (static)
 Version: 2.4.1
-Libs: -L${libdir} -lopenh264 -lstdc++ -lpthread
+Libs: -L${libdir} -lopenh264
+Libs.private: -lstdc++ -lgcc -lgcc_eh -lwinpthread
 Cflags: -I${includedir}

@@ -98,3 +98,22 @@ ps aux | grep -E "make|gcc|g\+\+|nasm|ld|dlltool"
 cd /opt/ffmpeg-build && ./build_all.sh
 cd /opt/ffmpeg-build && ./build_all.sh
 cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh
+make -n | grep avutil-61.dll
+cd /opt/ffmpeg-build && ./build_all.sh
+make -j1 V=1 2>&1 | tee build.log
+file /mingw64/lib/libwinpthread.a
+ar t /mingw64/lib/libwinpthread.a | head -5
+file /mingw64/lib/libwinpthread.a
+ar t /mingw64/lib/libwinpthread.a | head -5
+cd /opt/ffmpeg-build && ./build_all.sh
+cd /opt/ffmpeg-build && ./build_all.sh

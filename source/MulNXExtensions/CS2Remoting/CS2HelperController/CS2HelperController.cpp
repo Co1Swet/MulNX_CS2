@@ -41,13 +41,13 @@ bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi) {
     }
     
     std::vector<std::string>ffmpegDllsName{
-        "avutil-60.dll",
-        "swresample-6.dll",
-        "swscale-9.dll",
-        "avcodec-62.dll",
-        "avformat-62.dll",
-        "avfilter-11.dll",
-        "avdevice-62.dll"
+        "avutil-61.dll",
+        "swresample-7.dll",
+        "swscale-10.dll",
+        "avcodec-63.dll",
+        "avformat-63.dll",
+        "avfilter-12.dll",
+        "avdevice-63.dll"
     };
 
     for (const auto& ffmpegDll : ffmpegDllsName) {

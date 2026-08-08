@@ -15,8 +15,8 @@ add_library(MulNXThirdParty
 )
 
 # Hint the bundled FFmpeg distribution to avcpp so it can resolve headers and libraries.
-set(PC_FFMPEG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg-master-lgpl-shared/include")
-set(PC_FFMPEG_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg-master-lgpl-shared/lib")
+set(PC_FFMPEG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/FFmpegBuilt/include")
+set(PC_FFMPEG_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/FFmpegBuilt/lib")
 
 add_subdirectory("yaml-cpp-master")
 add_subdirectory("zydis")

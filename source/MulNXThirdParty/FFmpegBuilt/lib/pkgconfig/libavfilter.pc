@@ -1,0 +1,14 @@
+prefix=/opt/ffmpeg-build/ffmpeg_install
+exec_prefix=${prefix}
+libdir=/opt/ffmpeg-build/ffmpeg_install/lib
+includedir=/opt/ffmpeg-build/ffmpeg_install/include
+
+Name: libavfilter
+Description: FFmpeg audio/video filtering library
+Version: 12.3.101
+Requires: 
+Requires.private: libswscale >= 10.2.100, libavutil >= 61.5.100
+Conflicts:
+Libs: -L${libdir}  -lavfilter 
+Libs.private: -lm -latomic -lz
+Cflags: -I${includedir}
