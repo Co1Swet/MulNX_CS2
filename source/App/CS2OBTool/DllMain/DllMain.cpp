@@ -115,6 +115,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<GameCfgManager>("GameCfgManager")
         .CreateModule<GameSettingsManager>("GameSettingsManager")
         .CreateModule<HSI>("HSI")
+        .CreateModule<AutoCfgLoad>("AutoCfgLoad")
 
         // CS2 杂项功能
         .CreateModule<EntityListScanner>("EntityListScanner")

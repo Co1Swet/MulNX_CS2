@@ -4,6 +4,7 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Buildup/ParticleManager/ParticleManager.hpp>
 #include <Buildup/PlayerHub/PlayerHub.hpp>
+#include <MulNXUtils/ColorTran/ColorTran.hpp>
 
 using DrawStuff_t = void(*)(CS2::C_BaseCSGrenadeProjectile*, char);
 
@@ -20,12 +21,14 @@ void TrailsController::HubPlayer(MulNX::Message* umsg) {
     }
 
     if (ImGui::ColorEdit3("轨迹颜色", &currentColor.r)) {
+        MulNX::ColorTran tran;
+        tran.PraseF1(currentColor.r, currentColor.g, currentColor.b, 1.0f);
+        uint32_t rgba = tran.ToU255RGBA();
+
         MulNX::Message msg("Trails/Player/Set"_hash);
-        auto&& [uidRef, r, g, b] = msg.Access<Steam64UID, float, float, float>();
+        auto&& [uidRef, color] = msg.Access<Steam64UID, uint32_t>();
         uidRef = uid;
-        r = currentColor.r * 255.0f;
-        g = currentColor.g * 255.0f;
-        b = currentColor.b * 255.0f;
+        color = rgba;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -46,13 +49,28 @@ void TrailsController::HubTeam(MulNX::Message* umsg) {
         pColor->b / 255.0f
     };
 
-    if (ImGui::ColorEdit3("队伍默认轨迹颜色", &displayColor.r)) {
-        MulNX::Message msg("Trails/Team/Set"_hash);
-        auto&& [teamRef, r, g, b] = msg.Access<CS2::ui8TeamNum, float, float, float>();
-        teamRef = team;
-        r = displayColor.r * 255.0f;
-        g = displayColor.g * 255.0f;
-        b = displayColor.b * 255.0f;
+    if (ImGui::ColorEdit3("队伍尾迹颜色", &displayColor.r)) {
+        MulNX::Message msg;
+        if (team == CS2::ui8TeamNum::T)
+            msg.type = "Trails/T/Set"_hash;
+        else if (team == CS2::ui8TeamNum::CT)
+            msg.type = "Trails/CT/Set"_hash;
+        else return;
+
+        auto&& [rgba] = msg.Access<uint32_t>();
+        MulNX::ColorTran tran;
+        tran.PraseF1(displayColor.r, displayColor.g, displayColor.b, 1.0f);
+        rgba = tran.ToU255RGBA();
+        this->PublishAsync(std::move(msg));
+    }
+
+    if (ImGui::Button("恢复尾迹颜色")) {
+        MulNX::Message msg;
+        if (team == CS2::ui8TeamNum::T)
+            msg.type = "Trails/T/Clear"_hash;
+        else if (team == CS2::ui8TeamNum::CT)
+            msg.type = "Trails/CT/Clear"_hash;
+        else return;
         this->PublishAsync(std::move(msg));
     }
 }
@@ -63,10 +81,10 @@ void TrailsController::Menu() {
 
     ImGui::Checkbox("投掷物提示小窗", this->sv_grenade_trajectory_prac_pipreview);
     bool changed = false;
-    MulNX::UI::Checkbox("锁定隐藏投掷物轨迹", this->forceHadeProjectileNoTrails);
+    MulNX::UI::Checkbox("启用投掷物轨迹", this->trailsEnable);
     changed |= ImGui::SliderFloat("生存期 (s)", this->sv_grenade_trajectory_time_spectator, 0.0f, 10.0f);
     changed |= ImGui::SliderFloat("宽度", &propCopy.width, 0.1f, 5.0f);
-    changed |= ImGui::SliderFloat("透明度", &propCopy.alpha, 0.0f, 1.0f);
+    // changed |= ImGui::SliderFloat("透明度()", &propCopy.alpha, 0.0f, 1.0f);
 
     if (changed) {
         MulNX::Message msg("Trails/Prop"_hash);
@@ -98,17 +116,20 @@ bool TrailsController::Init() {
         });
 
     (*this)
-        .SubscribeAsync("Trails/Player/Set")
-        .SubscribeAsync("Trails/Player/Clear")
-        .SubscribeAsync("Trails/Player/ClearAll")
-        .SubscribeAsync("Trails/Team/Set")
-        .SubscribeAsync("Trails/Team/Clear")
-        .SubscribeAsync("Trails/Team/ClearAll")
-        .SubscribeAsync("Trails/ClearAll")
-        .SubscribeAsync("Trails/Prop");
+        .SubscribeAsync<void>("Trails/Enable")
+        .SubscribeAsync<void>("Trails/Disable")
+        .SubscribeAsync<Steam64UID, uint32_t>("Trails/Player/Set")
+        .SubscribeAsync<Steam64UID>("Trails/Player/Clear")
+        .SubscribeAsync<void>("Trails/Player/ClearAll")
+        .SubscribeAsync<uint32_t>("Trails/T/Set")
+        .SubscribeAsync<uint32_t>("Trails/CT/Set")
+        .SubscribeAsync<void>("Trails/T/Clear")
+        .SubscribeAsync<void>("Trails/CT/Clear")
+        .SubscribeAsync<void>("Trails/Team/ClearAll")
+        .SubscribeAsync<void>("Trails/ClearAll")
+        .SubscribeAsync<float, float, float>("Trails/Prop");
 
     this->SendTask("Update", "CSControl", [this]() {
-        if (this->forceHadeProjectileNoTrails.load())*this->sv_grenade_trajectory_time_spectator = 0;
         this->Update();
         return true;
         });
@@ -134,7 +155,12 @@ std::optional<TrailsController::ParticleColor> TrailsController::FindColor(CS2::
 
 MulNX::Hook::Then TrailsController::HandleOnCreate(CS2::C_BaseCSGrenadeProjectile* pProjectile) {
     std::shared_lock lock(this->smutex);
-    this->prop.lifetime = *this->sv_grenade_trajectory_time_spectator;
+    if (this->trailsEnable) {
+        this->prop.lifetime = *this->sv_grenade_trajectory_time_spectator;
+    }
+    else {
+        this->prop.lifetime = 0;
+    }
     try {
         auto pPawn = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pProjectile->m_hThrower()))->As<CS2::C_CSPlayerPawn>();
         auto pController = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pPawn->m_hController()))->As<CS2::CCSPlayerController>();
@@ -168,10 +194,22 @@ MulNX::Hook::Then TrailsController::HandleOnUpdate(CS2::C_BaseCSGrenadeProjectil
 
 void TrailsController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
+    case "Trails/Enable"_hash: {
+        this->trailsEnable = true;
+        break;
+    }
+    case "Trails/Disable"_hash: {
+        this->trailsEnable = false;
+        break;
+    }
     case "Trails/Player/Set"_hash: {
-        auto&& [uid, r, g, b] = msg.Access<Steam64UID, float, float, float>();
+        auto&& [uid, rgba] = msg.Access<Steam64UID, uint32_t>();
         std::unique_lock lock(this->smutex);
-        this->playerColors[uid] = { r, g, b };
+        MulNX::ColorTran tran;
+        tran.PraseU255RGBA(rgba);
+        ParticleColor col;
+        tran.ToF255RGB(col.r, col.g, col.b);
+        this->playerColors[uid] = col;
         break;
     }
     case "Trails/Player/Clear"_hash: {
@@ -185,36 +223,47 @@ void TrailsController::ProcessMsg(MulNX::Message& msg) {
         this->playerColors.clear();
         break;
     }
-    case "Trails/Team/Set"_hash: {
-        auto&& [team, r, g, b] = msg.Access<CS2::ui8TeamNum, float, float, float>();
+    case "Trails/T/Set"_hash: {
+        auto&& [rgba] = msg.Access<uint32_t>();
         std::unique_lock lock(this->smutex);
-        if (team == CS2::ui8TeamNum::T)
-            this->TColor = { r, g, b };
-        else if (team == CS2::ui8TeamNum::CT)
-            this->CTColor = { r, g, b };
+        MulNX::ColorTran tran;
+        tran.PraseU255RGBA(rgba);
+        TrailsController::ParticleColor tColor;
+        tran.ToF255RGB(tColor.r, tColor.g, tColor.b);
+        this->TColor = tColor;
         break;
     }
-    case "Trails/Team/Clear"_hash: {
-        auto&& [team] = msg.Access<CS2::ui8TeamNum>();
+    case "Trails/CT/Set"_hash: {
+        auto&& [rgba] = msg.Access<uint32_t>();
         std::unique_lock lock(this->smutex);
-        // 重置为 0-255 默认颜色
-        if (team == CS2::ui8TeamNum::T)
-            this->TColor = { 255.0f, 51.0f, 51.0f };   // 红色
-        else if (team == CS2::ui8TeamNum::CT)
-            this->CTColor = { 51.0f, 102.0f, 255.0f };  // 蓝色
+        MulNX::ColorTran tran;
+        tran.PraseU255RGBA(rgba);
+        ParticleColor ctColor;
+        tran.ToF255RGB(ctColor.r, ctColor.g, ctColor.b);
+        this->CTColor = ctColor;
+        break;
+    }
+    case "Trails/T/Clear"_hash: {
+        std::unique_lock lock(this->smutex);
+        this->TColor = this->TRaw;
+        break;
+    }
+    case "Trails/CT/Clear"_hash: {
+        std::unique_lock lock(this->smutex);
+        this->CTColor = this->CTRaw;
         break;
     }
     case "Trails/Team/ClearAll"_hash: {
         std::unique_lock lock(this->smutex);
-        this->TColor = { 255.0f, 51.0f, 51.0f };
-        this->CTColor = { 51.0f, 102.0f, 255.0f };
+        this->TColor = this->TRaw;
+        this->CTColor = this->CTRaw;
         break;
     }
     case "Trails/ClearAll"_hash: {
         std::unique_lock lock(this->smutex);
         this->playerColors.clear();
-        this->TColor = { 255.0f, 51.0f, 51.0f };
-        this->CTColor = { 51.0f, 102.0f, 255.0f };
+        this->TColor = this->TRaw;
+        this->CTColor = this->CTRaw;
         break;
     }
     case "Trails/Prop"_hash: {

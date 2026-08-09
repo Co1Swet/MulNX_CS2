@@ -80,7 +80,8 @@ bool NameController::Init() {
             }
             return MulNX::Hook::Then::SkipAllAndContinue;
             }, false, true).value();
-        this->RegisterAttachHook(this->hkGetDecoratedPlayerName, "GetDecoratedPlayerName");
+        this->RegisterAttachHook(this->hkGetDecoratedPlayerName,
+            "PosInFunc_GetDecoratedPlayerName where r12 is *provider and rdi is **currentComponentName(char**) and rax is **tempRetName(char**)");
 
         // fn has 3rd reference to string "WWWWWWWWWWWWWWWW"
         uint8_t** vtable = (uint8_t**)Afx::BinUtils::FindClassVtable(this->CS2->client.hModule, ".?AVCCSPlayerController@@", 0, 0);

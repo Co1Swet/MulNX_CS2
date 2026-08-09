@@ -5,5 +5,6 @@ add_library(CS2Outro STATIC
     GameSettingsManager/GameSettingsManager.cpp
     HSI/HSI.cpp
     CS2Test/CS2Test.cpp
+    AutoCfgLoad/AutoCfgLoad.cpp
 )
 target_link_libraries(CS2Outro PUBLIC CS2Feature)
