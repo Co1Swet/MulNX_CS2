@@ -15,6 +15,7 @@ namespace CS2 {
 
 
     enum class ui8TeamNum :uint8_t {
+        unk = 0,
         T = 2,
         CT = 3
     };

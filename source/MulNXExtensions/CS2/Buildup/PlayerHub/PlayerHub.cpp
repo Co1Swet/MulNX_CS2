@@ -61,8 +61,6 @@ bool PlayerHub::Window(MulNX::UICoordinator* uico) {
         auto RenderPlayerPopup = [&](const PlayerInfo& info) {
             std::string popupName = std::format("PlayerPopup_{:X}", info.steamID);
             if (ImGui::BeginPopup(popupName.c_str())) {
-                this->currentSteamId.store(info.steamID, std::memory_order_release);
-                this->currentTeam.store(info.teamNum, std::memory_order_release);
                 MulNX::Message msg;
                 auto&& [rUID] = msg.Access<Steam64UID>();
                 rUID = info.steamID;
@@ -76,8 +74,6 @@ bool PlayerHub::Window(MulNX::UICoordinator* uico) {
 
         auto RenderTeamPopup = [&](const char* name, CS2::ui8TeamNum team) {
             if (ImGui::BeginPopup(name)) {
-                this->currentSteamId.store(0, std::memory_order_release);
-                this->currentTeam.store(team, std::memory_order_release);
                 MulNX::Message msg;
                 auto&& [rTeam] = msg.Access<CS2::ui8TeamNum>();
                 rTeam = team;

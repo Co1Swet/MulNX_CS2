@@ -66,6 +66,14 @@ namespace MulNX {
             return rgba;
         }
 
+        // 输出为 ABGR 格式 uint32_t (0xAABBGGRR)
+        inline uint32_t ToU255ABGR() const {
+            return (uint32_t(GetA()) << 24) |
+                (uint32_t(GetB()) << 16) |
+                (uint32_t(GetG()) << 8) |
+                (uint32_t(GetR()));
+        }
+
         // 输出 RGB 三个通道为 0～255 范围的浮点数
         inline void ToF255RGB(float& r, float& g, float& b) const {
             r = static_cast<float>(GetR());
