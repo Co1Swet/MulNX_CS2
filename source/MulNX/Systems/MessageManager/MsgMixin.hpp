@@ -45,10 +45,10 @@ namespace MulNX {
             return *this;
         }
 
-        void PublishAsync(MulNX::Message&& msg) {
+        void PublishAsync(MulNX::Message&& msg)const {
             this->pMsgManager->PublishAsync(std::move(msg));
         }
-        void PublishAsync(MulNX::MsgType msg) {
+        void PublishAsync(MulNX::MsgType msg)const {
             this->pMsgManager->PublishAsync(MulNX::Message(msg));
         }
 

@@ -44,6 +44,7 @@ class CSModuleMixin : public ICSModule, public HookMixin<T>, public CSConMixin<T
         }
     };
     T* This() { return static_cast<T*>(this); }
+    const T* This() const { return static_cast<const T*>(this); }
 public:
     CSController* CS2 = nullptr;
     HookView* CS2View = nullptr;
@@ -76,12 +77,12 @@ protected:
             });
     }
 
-    void AsyncCommand(std::string&& cmd) {
+    void AsyncCommand(std::string&& cmd)const {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command"_hash);
         rp->str1 = std::move(cmd);
         This()->PublishAsync(std::move(msg));
     }
-    void AsyncCommandNoReport(std::string&& cmd) {
+    void AsyncCommandNoReport(std::string&& cmd)const {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command/NoReport"_hash);
         rp->str1 = std::move(cmd);
         This()->PublishAsync(std::move(msg));

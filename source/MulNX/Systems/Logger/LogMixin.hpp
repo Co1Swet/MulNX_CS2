@@ -30,9 +30,9 @@ namespace MulNX {
                 return true;
                 });
         }
-        void Log(Level level, std::string&& msg, std::source_location where) {
+        void Log(Level level, std::string&& msg, std::source_location where)const {
             MulNX::LogEntry log;
-            log.pModule = This();
+            log.pModule = static_cast<const T*>(this);
             log.where = where;
             log.timestamp_us = MulNX::ToUnixUs(std::chrono::system_clock::now());
             log.level = level;
@@ -40,28 +40,28 @@ namespace MulNX {
 
             this->logger->logs.enqueue(std::move(log));
         }
-        void LogSucc(std::string&& msg, std::source_location where = std::source_location::current()) {
+        void LogSucc(std::string&& msg, std::source_location where = std::source_location::current())const {
             this->Log(Level::Succ, std::move(msg), where);
         }
-        void LogInfo(std::string&& msg, std::source_location where = std::source_location::current()) {
+        void LogInfo(std::string&& msg, std::source_location where = std::source_location::current())const {
             this->Log(Level::Info, std::move(msg), where);
         }
-        void LogError(std::string&& msg, std::source_location where = std::source_location::current()) {
+        void LogError(std::string&& msg, std::source_location where = std::source_location::current())const {
             this->Log(Level::Error, std::move(msg), where);
         }
-        void LogWarning(std::string&& msg, std::source_location where = std::source_location::current()) {
+        void LogWarning(std::string&& msg, std::source_location where = std::source_location::current())const {
             this->Log(Level::Warning, std::move(msg), where);
         }
-        void LogInfo(const Exception& e) {
+        void LogInfo(const Exception& e)const {
             this->Log(Level::Info, e.what(), e.where);
         }
-        void LogError(const Exception& e) {
+        void LogError(const Exception& e)const {
             this->Log(Level::Error, e.what(), e.where);
         }
-        void LogWarning(const Exception& e) {
+        void LogWarning(const Exception& e)const {
             this->Log(Level::Warning, e.what(), e.where);
         }
-        void LogLine() {
+        void LogLine()const {
             this->LogInfo("+------------------------------------------------+");
         }
     };
