@@ -110,6 +110,13 @@ namespace MulNX {
         inline uint8_t GetG() const { return (rgba >> 16) & 0xFF; }
         inline uint8_t GetB() const { return (rgba >> 8) & 0xFF; }
         inline uint8_t GetA() const { return rgba & 0xFF; }
+
+        // 大小端转换
+        static uint32_t U255RGBA_ABGR_Swap(uint32_t rgba) {
+            MulNX::ColorTran ct;
+            ct.PraseU255RGBA(rgba);
+            return ct.ToU255ABGR();
+        }
     };
 
 } // namespace MulNX

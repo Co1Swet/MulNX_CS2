@@ -1,4 +1,5 @@
-#include"AutoCfgLoad.hpp"
+#include "AutoCfgLoad.hpp"
+#include <Buildup/TimeController/TimeController.hpp>
 
 bool AutoCfgLoad::Init() {
     this->SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {
@@ -15,12 +16,24 @@ bool AutoCfgLoad::Init() {
         .SubscribeAsync<void>("CSCfg/Match")
         ;
 
-    this->SendTask("Update", "CSControl", [this]() {
-        this->Update();
+    this->SendTask("Main", "CSControl", [this]() {
+        this->Main();
         return true;
         });
 
     return true;
+}
+
+void AutoCfgLoad::Main() {
+    this->Update();
+    
+    auto cur = this->CS2Time->GetDemoTick();
+    if (std::abs(cur - this->lastDemoTick) < 64)return;
+    if (cur > 150 && this->nextNewRoundIsNewDemo) {
+        this->nextNewRoundIsNewDemo = false;
+        this->FireAsyncCfg(this->PathGet("EveryPlayDemo"));
+    }
+    this->lastDemoTick = this->CS2Time->GetDemoTick();
 }
 
 void AutoCfgLoad::ProcessMsg(MulNX::Message& msg) {
@@ -31,6 +44,7 @@ void AutoCfgLoad::ProcessMsg(MulNX::Message& msg) {
             first = false;
             this->FireAsyncCfg(this->PathGet("FirstPlayDemo"));
         }
+        this->nextNewRoundIsNewDemo = true;
         break;
     }
     case "CSCfg/User1"_hash: {

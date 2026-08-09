@@ -4,24 +4,7 @@
 #include <Buildup/PlayerHub/PlayerHub.hpp>
 #include <MulNXUtils/ColorTran/ColorTran.hpp>
 
-// ---------- 内部颜色格式转换辅助 ----------
-
-// 内部存储格式：RGBA (0xRRGGBBAA)
-// 游戏需要的格式：IM_COL32 (0xAABBGGRR)，与 ColorTran 的 ABGR 对应
-static uint32_t RGBAtoGameColor(uint32_t rgba) {
-    MulNX::ColorTran ct;
-    ct.PraseU255RGBA(rgba);          // 按 RGBA 解析
-    return ct.ToU255ABGR();          // 输出为 ABGR (即 IM_COL32 格式)
-}
-
-static uint32_t GameColorToRGBA(uint32_t gameColor) {
-    MulNX::ColorTran ct;
-    ct.PraseU255ABGR(gameColor);     // 按 ABGR 解析
-    return ct.ToU255RGBA();          // 输出为 RGBA
-}
-
 // ---------- UI 回调 ----------
-
 void GlowController::HubPlayer(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);
     auto&& [uid] = umsg->Access<Steam64UID>();
@@ -36,13 +19,13 @@ void GlowController::HubPlayer(MulNX::Message* umsg) {
     }
 
     // 转为 ImGui 可用的 IM_COL32 格式 (AABBGGRR)
-    uint32_t currentGameColor = RGBAtoGameColor(currentRGBA);
+    uint32_t currentGameColor = MulNX::ColorTran::U255RGBA_ABGR_Swap(currentRGBA);
     ImVec4 colorVec4 = ImGui::ColorConvertU32ToFloat4(currentGameColor);
 
     if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4)) {
         // 从 ImGui 获取新的游戏格式颜色，转换回内部 RGBA
         uint32_t newGameColor = ImGui::ColorConvertFloat4ToU32(colorVec4);
-        uint32_t newRGBA = GameColorToRGBA(newGameColor);
+        uint32_t newRGBA = MulNX::ColorTran::U255RGBA_ABGR_Swap(newGameColor);
 
         MulNX::Message msg("Glow/Player/Set"_hash);
         auto&& [uidRef, colorRef] = msg.Access<Steam64UID, uint32_t>();
@@ -83,12 +66,12 @@ void GlowController::HubTeam(MulNX::Message* umsg) {
         ImGui::Text("当前队伍没有自定义发光颜色，使用默认颜色");
 
     // 转为 ImGui 格式显示
-    uint32_t currentGameColor = RGBAtoGameColor(currentRGBA);
+    uint32_t currentGameColor = MulNX::ColorTran::U255RGBA_ABGR_Swap(currentRGBA);
     ImVec4 colorVec4 = ImGui::ColorConvertU32ToFloat4(currentGameColor);
 
     if (ImGui::ColorEdit4("发光颜色修改", (float*)&colorVec4)) {
         uint32_t newGameColor = ImGui::ColorConvertFloat4ToU32(colorVec4);
-        uint32_t newRGBA = GameColorToRGBA(newGameColor);
+        uint32_t newRGBA = MulNX::ColorTran::U255RGBA_ABGR_Swap(newGameColor);
 
         MulNX::Message msg;
         if (team == CS2::ui8TeamNum::T)
@@ -115,7 +98,6 @@ void GlowController::HubTeam(MulNX::Message* umsg) {
 }
 
 // ---------- 初始化 ----------
-
 bool GlowController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::SetGlowColor);
@@ -161,7 +143,6 @@ bool GlowController::Init() {
 }
 
 // ---------- 消息处理 ----------
-
 void GlowController::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "Glow/Enable"_hash: {
@@ -225,7 +206,6 @@ void GlowController::ProcessMsg(MulNX::Message& Msg) {
 }
 
 // ---------- 钩子处理：注入颜色 ----------
-
 void GlowController::HandleSetGlowColor(CS2::CGlowProperty* pGlowProperty, uint32_t* color) {
     if (this->disableGlow.load()) {
         *color = 0;
@@ -268,12 +248,12 @@ void GlowController::HandleSetGlowColor(CS2::CGlowProperty* pGlowProperty, uint3
 
     if (team == CS2::ui8TeamNum::T) {
         if (auto oT = this->TColor.load()) {
-            *color = RGBAtoGameColor(*oT);
+            *color = MulNX::ColorTran::U255RGBA_ABGR_Swap(*oT);
         }
     }
     else if (team == CS2::ui8TeamNum::CT) {
         if (auto oCT = this->CTColor.load()) {
-            *color = RGBAtoGameColor(*oCT);
+            *color = MulNX::ColorTran::U255RGBA_ABGR_Swap(*oCT);
         }
     }
 
@@ -288,6 +268,6 @@ void GlowController::HandleSetGlowColor(CS2::CGlowProperty* pGlowProperty, uint3
     std::shared_lock lock(this->smutex);
     auto itPlayer = this->playerColors.find(uid);
     if (itPlayer != this->playerColors.end()) {
-        *color = RGBAtoGameColor(itPlayer->second);   // 内部 RGBA → 游戏格式
+        *color = MulNX::ColorTran::U255RGBA_ABGR_Swap(itPlayer->second);   // 内部 RGBA → 游戏格式
     }
 }
