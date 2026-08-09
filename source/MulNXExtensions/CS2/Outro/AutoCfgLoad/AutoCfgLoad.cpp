@@ -12,6 +12,7 @@ bool AutoCfgLoad::Init() {
         .SubscribeAsync<void>("CSCfg/User2")
         .SubscribeAsync<void>("CSCfg/Tournament")
         .SubscribeAsync<void>("CSCfg/POV")
+        .SubscribeAsync<void>("CSCfg/Match")
         ;
 
     this->SendTask("Update", "CSControl", [this]() {
@@ -46,6 +47,10 @@ void AutoCfgLoad::ProcessMsg(MulNX::Message& msg) {
     }
     case "CSCfg/POV"_hash: {
         this->FireAsyncCfg(this->PathGet("POV"));
+        break;
+    }
+    case "CSCfg/Match"_hash: {
+        this->FireAsyncCfg(this->PathGet("Match"));
         break;
     }
     }

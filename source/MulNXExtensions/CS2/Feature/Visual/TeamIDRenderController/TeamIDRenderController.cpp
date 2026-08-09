@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 void TeamIDRenderController::Menu() {
-    MulNX::UI::Checkbox("Team ID隐藏敌方", this->hadeEnemyTeamID);
+    MulNX::UI::Checkbox("Team ID隐藏敌方", this->hideEnemyTeamID);
 }
 
 bool TeamIDRenderController::Init() {
@@ -16,13 +16,31 @@ bool TeamIDRenderController::Init() {
         this->LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rbx is C_CSPlayerPawn*"));
         });
 
+    (*this)
+        .SubscribeAsync<void>("TeamID/HideEnemy/Enable")
+        .SubscribeAsync<void>("TeamID/HideEnemy/Disable")
+        ;
+
     this->UIRegisterCallback("UI.3DVision", [this](auto&&...) {return this->Menu();});
+    this->SendTask("Update", "CSControl", [this]() {
+        this->Update();
+        return true;
+        });
 
     return true;
 }
-
+void TeamIDRenderController::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "TeamID/HideEnemy/Enable"_hash:
+        this->hideEnemyTeamID = true;
+        break;
+    case "TeamID/HideEnemy/Disable"_hash:
+        this->hideEnemyTeamID = false;
+        break;
+    }
+}
 MulNX::Hook::Then TeamIDRenderController::HandleForShowTeamID(CS2::C_CSPlayerPawn* pCSPlayerPawn) {
-    if (!this->hadeEnemyTeamID.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
+    if (!this->hideEnemyTeamID.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
     try {
         auto pOBPawn = this->CS2->client.TryGetObservingPawn();
         if (!pOBPawn)return MulNX::Hook::Then::Continue;
