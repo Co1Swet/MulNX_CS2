@@ -8,7 +8,7 @@ bool AutoCfgLoad::Init() {
         });
 
     (*this)
-        .SubscribeAsync("Demo/SetOperating")
+        .SubscribeAsync("Demo/NewPlay")
         .SubscribeAsync<void>("CSCfg/User1")
         .SubscribeAsync<void>("CSCfg/User2")
         .SubscribeAsync<void>("CSCfg/Tournament")
@@ -38,7 +38,7 @@ void AutoCfgLoad::Main() {
 
 void AutoCfgLoad::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Demo/SetOperating"_hash: {
+    case "Demo/NewPlay"_hash: {
         static bool first = true;
         if (first) {
             first = false;

@@ -1,8 +1,9 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
+#include <MulNXUtils/WinExt/HookMixin.hpp>
 
-class HookWindow final : public MulNX::Module<HookWindow> {
+class HookWindow final : public MulNX::Module<HookWindow>, public HookMixin<HookWindow> {
 private:
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
@@ -15,5 +16,4 @@ private:
     std::unique_ptr<MulNX::Hook> hkDrop = nullptr;
     void HandleProcessDropFiles(IDataObject* pDataObj);
     bool Init()override;
-    void Deinit()override;
 };

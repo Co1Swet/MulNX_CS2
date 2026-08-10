@@ -11,7 +11,6 @@ bool DLLLoadDispatcher::Init() {
         this->PublishSync(msg);
         return MulNX::Hook::Then::Return;
         }).value();
-    this->hkLoadLibraryExW->Attach();
     this->RegisterAttachHook(this->hkLoadLibraryExW, "LoadLibraryExW");
 
     auto pthFile = this->PathGet("Config") / "dllTargets.yaml";

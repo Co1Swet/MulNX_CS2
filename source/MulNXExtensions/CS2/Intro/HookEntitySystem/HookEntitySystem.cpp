@@ -22,7 +22,6 @@ bool HookEntitySystem::Init() {
                 this->PublishSync(msg);
                 return MulNX::Hook::Then::Return;
                 }).value();
-            this->hkAddEntity->Attach();
             this->RegisterAttachHook(this->hkAddEntity, "AddEntity");
 
             auto pRemoveEntity = vtable[16];
@@ -33,7 +32,6 @@ bool HookEntitySystem::Init() {
                 this->PublishSync(msg);
                 return MulNX::Hook::Then::Continue;
                 }).value();
-            this->hkRemoveEntity->Attach();
             this->RegisterAttachHook(this->hkRemoveEntity, "RemoveEntity");
 
             return false;

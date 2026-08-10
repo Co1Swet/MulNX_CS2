@@ -99,8 +99,7 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
         return MulNX::Hook::Then::Return;
         }
     ).value();
-    this->hkVEngineCvar007_RegisterConCommand->Attach();
-    this->LogSucc(I18n("hook.attached", "VEngineCvar007::RegisterConCommand"));
+    this->RegisterAttachHook(this->hkVEngineCvar007_RegisterConCommand, "VEngineCvar007::RegisterConCommand");
 }
 
 void HookConsole::ProcessMsg(MulNX::Message& msg) {

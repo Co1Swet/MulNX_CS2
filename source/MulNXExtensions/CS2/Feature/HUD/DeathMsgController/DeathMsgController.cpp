@@ -17,10 +17,7 @@ bool DeathMsgController::Init() {
             auto event = reinterpret_cast<CS2::CGameEvent*>(ctx->rdx);
             return this->HandleOnPlayerDeath(event);
             }).value();
-        this->hkHandlePlayerDeath->Attach();
-        this->LogSucc(I18n("hook.attached", "UI::OnPlayerDeath"));
-
-        
+        this->RegisterAttachHook(this->hkHandlePlayerDeath, "UI::OnPlayerDeath");
         });
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
     this->SendTask("Update", "CSControl", [this]()->bool {

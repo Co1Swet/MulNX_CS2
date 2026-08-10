@@ -94,4 +94,6 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
     auto [msg2, rp2] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
     rp2->str1 = demoPath.stem().string();  // 例如 "111"
     this->PublishAsync(std::move(msg2));
+
+    this->PublishAsync("Demo/NewPlay"_hash);
 }

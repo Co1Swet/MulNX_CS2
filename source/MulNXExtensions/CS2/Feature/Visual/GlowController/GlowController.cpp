@@ -110,8 +110,7 @@ bool GlowController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkSetGlowColor->Attach();
-        this->LogSucc(I18n("hook.attached", "SetGlowColor"));
+        this->RegisterAttachHook(this->hkSetGlowColor, "SetGlowColor");
         });
 
     this->SendTask("Update", "CSControl", [this]() {

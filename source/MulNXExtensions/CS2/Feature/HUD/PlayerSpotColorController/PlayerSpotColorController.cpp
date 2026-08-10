@@ -16,8 +16,7 @@ bool PlayerSpotColorController::Init() {
                 ctx->rbx = 0;
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkPos_CmpToSetColor->Attach();
-        this->LogSucc(I18n("hook.attached", "Pos_CmpToSetColor"));
+        this->RegisterAttachHook(this->hkPos_CmpToSetColor, "Pos_CmpToSetColor");
 
         // 让T显示五颜色
         auto Pos_CmpToSetTColor = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetTColor);
@@ -26,8 +25,7 @@ bool PlayerSpotColorController::Init() {
                 ctx->rax = 2;
             return MulNX::Hook::Then::SkipAllAndContinue;
             }, false, true).value();
-        this->hkPos_CmpToSetTColor->Attach();
-        this->LogSucc(I18n("hook.attached", "Pos_CmpToSetTColor"));
+        this->RegisterAttachHook(this->hkPos_CmpToSetTColor, "Pos_CmpToSetTColor");
 
         // 让CT显示五颜色
         auto Pos_CmpToSetCTColor = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetCTColor);
@@ -36,9 +34,7 @@ bool PlayerSpotColorController::Init() {
                 ctx->rax = 3;
             return MulNX::Hook::Then::SkipAllAndContinue;
             }, false, true).value();
-        this->hkPos_CmpToSetCTColor->Attach();
-        this->LogSucc(I18n("hook.attached", "Pos_CmpToSetCTColor"));
-
+        this->RegisterAttachHook(this->hkPos_CmpToSetCTColor, "Pos_CmpToSetCTColor");
         });
 
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});

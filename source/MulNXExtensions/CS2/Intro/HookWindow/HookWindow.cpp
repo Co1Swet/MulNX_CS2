@@ -16,20 +16,15 @@ bool HookWindow::Init() {
             this->HandleProcessDropFiles((IDataObject*)ctx->rdx);
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkDrop->Attach();
-        this->LogSucc(I18n("hook.attached", "OleDropTargetInterface::Drop"));
+        this->RegisterAttachHook(this->hkDrop, "OleDropTargetInterface::Drop");
         // 窗口过程钩子
         this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->hCS2Wnd, GWLP_WNDPROC), [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
             }).value();
-        this->hkWndProc->Attach();
-        this->LogSucc(I18n("hook.attached", "WndProc"));
+        this->RegisterAttachHook(this->hkWndProc, "WndProc");
         ImGui_ImplWin32_Init(this->hCS2Wnd);
         });
     return true;
-}
-void HookWindow::Deinit() {
-    this->hkWndProc->Detach();
 }
 void HookWindow::FixMouse(UINT& uMsg, LPARAM& lParam) {
     if (!MulNX::Win32::IsMouseMessage(uMsg)) return;

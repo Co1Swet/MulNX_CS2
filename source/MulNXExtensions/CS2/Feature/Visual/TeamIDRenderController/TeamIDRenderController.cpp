@@ -12,8 +12,8 @@ bool TeamIDRenderController::Init() {
         this->hkPosTeamID_CmpForHide = MulNX::Hook::Create(target.Data() + 3, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleForShowTeamID((CS2::C_CSPlayerPawn*)ctx->rbx);
             }, false, false, (uintptr_t)jmp.Begin()).value();
-        this->hkPosTeamID_CmpForHide->Attach();
-        this->LogSucc(I18n("hook.attached", "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rbx is C_CSPlayerPawn*"));
+        this->RegisterAttachHook(this->hkPosTeamID_CmpForHide,
+            "cl_teamid_overhead_maxdist_spec is read here for the comparison to decide Team ID display where rbx is C_CSPlayerPawn*");
         });
 
     (*this)

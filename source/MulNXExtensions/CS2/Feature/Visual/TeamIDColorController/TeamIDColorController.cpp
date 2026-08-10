@@ -63,8 +63,7 @@ bool TeamIDColorController::Init() {
             return MulNX::Hook::Then::Continue;
             }
         ).value();
-        this->hkLoadFromFile->Attach();
-        this->LogSucc(I18n("hook.attached", "CLayoutFile::LoadFromFile"));
+        this->RegisterAttachHook(this->hkLoadFromFile, "CLayoutFile::LoadFromFile");
 
         // 获取 CStylePropertyWashColor 的虚表
         void** vtable = (void**)Afx::BinUtils::FindClassVtable(
@@ -94,8 +93,7 @@ bool TeamIDColorController::Init() {
             return MulNX::Hook::Then::Continue;
             }
         ).value();
-        this->hkWashColorParse->Attach();
-        this->LogSucc(I18n("hook.attached", "CStylePropertyWashColor::Parse"));
+        this->RegisterAttachHook(this->hkWashColorParse, "CStylePropertyWashColor::Parse");
 
         // Hook Clone
         this->hkWashColorClone = MulNX::Hook::Create((uint8_t*)cloneFunc, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
@@ -109,8 +107,7 @@ bool TeamIDColorController::Init() {
             return MulNX::Hook::Then::Continue;
             }
         ).value();
-        this->hkWashColorClone->Attach();
-        this->LogSucc(I18n("hook.attached", "CStylePropertyWashColor::Clone"));
+        this->RegisterAttachHook(this->hkWashColorClone, "CStylePropertyWashColor::Clone");
         });
 
     (*this)

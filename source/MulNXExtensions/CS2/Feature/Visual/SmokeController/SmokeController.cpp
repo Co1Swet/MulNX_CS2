@@ -68,15 +68,12 @@ void SmokeController::HubTeam(MulNX::Message* umsg) {
 
 bool SmokeController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-
         auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Projectile::SetSmokeProps).Data();
-
         this->hkSetSmokeProps = MulNX::Hook::Create(target, [this](MulNX::Hook* hook, RegContext* ctx) {
             this->MySetSmokeProps((CS2::C_SmokeGrenadeProjectile*)(ctx->rcx));
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkSetSmokeProps->Attach();
-        this->LogSucc(I18n("hook.attached", "SetSmokeProps"));
+        this->RegisterAttachHook(this->hkSetSmokeProps, "SetSmokeProps");
 
         this->SendTask("Update", "CSControl", [this]() {
             this->Update();

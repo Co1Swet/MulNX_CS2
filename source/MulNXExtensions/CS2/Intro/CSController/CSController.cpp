@@ -57,8 +57,7 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
         return MulNX::Hook::Then::Return;
         }
     ).value();
-    this->hkSource2Client002_Init->Attach();
-    this->LogSucc(I18n("hook.attached", "Source2Client002::Init"));
+    this->RegisterAttachHook(this->hkSource2Client002_Init, "Source2Client002::Init");
 
     auto back = this->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::ifShowSpeaker).Rdata();
     this->retAddrForShowSpeaker = reinterpret_cast<uintptr_t>(back) - 4;
@@ -77,8 +76,7 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
         hk->CallMaybeOrigin(0, ctx);
         return MulNX::Hook::Then::Return;
         }).value();
-    this->hkSource2EngineToClient001_ExecuteCmd->Attach();
-    this->LogSucc(I18n("hook.attached", "Source2EngineToClient001::ExecuteCmd"));
+    this->RegisterAttachHook(this->hkSource2EngineToClient001_ExecuteCmd, "Source2EngineToClient001::ExecuteCmd");
 
     // for show speaker
     this->hkSource2EngineToClient001_IsPlayingDemo = MulNX::Hook::Create((uint8_t*)IVClass::Assume(Source2EngineToClient001)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -95,9 +93,7 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
         // }
         return MulNX::Hook::Then::Return;
         }).value();
-    this->hkSource2EngineToClient001_IsPlayingDemo->Attach();
-    this->LogSucc(I18n("hook.attached", "Source2EngineToClient001::IsPlayingDemo"));
-
+    this->RegisterAttachHook(this->hkSource2EngineToClient001_IsPlayingDemo, "Source2EngineToClient001::IsPlayingDemo");
     --this->needToLoadModules;
 }
 void CSController::OnTier0Load(MulNX::Message& msg) {

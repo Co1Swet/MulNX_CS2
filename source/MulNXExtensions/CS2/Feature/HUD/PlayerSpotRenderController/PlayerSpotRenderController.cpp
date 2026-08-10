@@ -32,8 +32,7 @@ bool PlayerSpotRenderController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }, false, false, (uintptr_t)(Pos_Spot_CmpToSetShow + 10)).value();
-        this->hkPos_Spot_CmpToSetShow->Attach();
-        this->LogSucc(I18n("hook.attached", "Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*"));
+        this->RegisterAttachHook(this->hkPos_Spot_CmpToSetShow, "Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*");
 
         // 修改小地图上玩家图标的绘制样式
         auto Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_WriteMaybeEnumToChangeRadarPlayerDraw);
@@ -56,8 +55,7 @@ bool PlayerSpotRenderController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw->Attach();
-        this->LogSucc(I18n("hook.attached", "Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw"));
+        this->RegisterAttachHook(this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw, "Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw");
 
         // 修改玩家图标的具体绘制组件可见性
         auto pFunc_FinallyUpdatePlayerState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Func_FinallyUpdatePlayerState).FindFuncStart();
@@ -70,8 +68,7 @@ bool PlayerSpotRenderController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }).value();
-        this->hkFunc_FinallyUpdatePlayerState->Attach();
-        this->LogSucc(I18n("hook.attached", "Func_FinallyUpdatePlayerState"));
+        this->RegisterAttachHook(this->hkFunc_FinallyUpdatePlayerState, "Func_FinallyUpdatePlayerState");
         });
 
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
