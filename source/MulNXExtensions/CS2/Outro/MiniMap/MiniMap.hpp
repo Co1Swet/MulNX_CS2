@@ -1,7 +1,8 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
+#include <Intro/BackgroundEntityScan/EntityIterationMixin.hpp>
 
-class MiniMap final :public CSModuleBase {
+class MiniMap final :public CSModuleBase, public EntityIterationMixin<MiniMap> {
     // 可配置项：地图像素大小（正方形），世界->像素 缩放，中心玩家索引，是否自动适配
     float MapSize = 200.0f; // 默认 200x200
     float Zoom = 0.15f;     // world units -> pixels

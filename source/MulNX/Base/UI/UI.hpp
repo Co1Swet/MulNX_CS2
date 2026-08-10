@@ -24,7 +24,8 @@ namespace MulNX {
         void ShowTime(int tick);
 
         class RAIIWindow {
-            bool showed;
+            bool showed;// 指示是否调用
+            bool render;// 指示是否应该渲染，ImGui::Begin返回值
         public:
             RAIIWindow() = delete;
             RAIIWindow(const char* name);

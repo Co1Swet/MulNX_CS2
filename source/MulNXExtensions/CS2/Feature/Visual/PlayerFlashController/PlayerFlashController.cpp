@@ -8,7 +8,6 @@ bool PlayerFlashController::Menu() {
 
 bool PlayerFlashController::Init() {
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
-    this->participateIt = true;
     return true;
 }
 

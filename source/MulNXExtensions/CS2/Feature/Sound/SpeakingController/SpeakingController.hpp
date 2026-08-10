@@ -1,7 +1,8 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
+#include <Intro/BackgroundEntityScan/EntityIterationMixin.hpp>
 
-class SpeakingController :public CSModuleBase {
+class SpeakingController :public CSModuleBase, public EntityIterationMixin<SpeakingController> {
     int* tv_listen_voice_indices = nullptr;
     int bufferMask = 0;
     CS2::ui8TeamNum targetTeam{};

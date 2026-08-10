@@ -10,25 +10,6 @@
 #include <MulNXUtils/MemInsights/RetEditor/RetEditor.hpp>
 #include <MulNXUtils/WinExt/HookMixin.hpp>
 
-//1到10为玩家，0为本地
-class D_Player {
-public:
-    DirectX::XMFLOAT3 Position;
-    DirectX::XMFLOAT3 EyePosition;
-    DirectX::XMFLOAT3 Rotation;
-    int HP;
-    int Team;
-    bool Alive;
-    int IndexInEntityList;
-    int IndexInMap;
-};
-
-class D_GameData {
-public:
-    D_Player Players[11];
-
-};
-
 class CSController final :public MulNX::Module<CSController>, public HookMixin<CSController> {
     std::unique_ptr<MulNX::Hook>hkSource2Client002_Init = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
@@ -37,7 +18,6 @@ class CSController final :public MulNX::Module<CSController>, public HookMixin<C
     uintptr_t retAddrForShowSpeaker = 0;
     std::atomic<int> needToLoadModules = 4;
     MulNX::CoTask InitTask();
-    void Main();
 
     RetEditor checkSource2EngineToClient001_IsPlayingDemo{};
     std::atomic<bool> Source2EngineToClient001ForceReturn = false;
@@ -49,21 +29,17 @@ class CSController final :public MulNX::Module<CSController>, public HookMixin<C
     void OnEngine2Load(MulNX::Message& msg);
     void OnTier0Load(MulNX::Message& msg);
     void OnPanoramaLoad(MulNX::Message& msg);
-public:
-    // CS2全局变量
-    C_GlobalVars* CSGlobalVars{};
-    std::vector<class ICSModule*>ParticipateItCSModules{};
 
+    bool Init()override;
+public:
     CS2::Module::Client client{};
     CS2::Module::engine2 engine2{};
     void* Source2EngineToClient001 = nullptr;
     MulNX::Memory::DllModule tier0{};
     MulNX::Memory::DllModule panorama{};
     
-    bool Init()override;
-    
     VExecutor<void* ()> GetDemo{};
-    
-    D_GameData CS2EBGameData{};
-    D_Player& GetPlayerMsg(int Index);
+
+    // CS2全局变量
+    C_GlobalVars* CSGlobalVars{};
 };

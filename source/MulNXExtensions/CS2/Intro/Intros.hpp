@@ -6,3 +6,4 @@
 #include "HookEntitySystem/HookEntitySystem.hpp"
 #include "HookView/HookView.hpp"
 #include "HookGameEvents/HookGameEvents.hpp"
+#include "BackgroundEntityScan/BackgroundEntityScan.hpp"

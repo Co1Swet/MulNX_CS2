@@ -11,7 +11,6 @@ bool SpeakingController::Init() {
         this->tv_listen_voice_indices = this->CS2Con->GetCvar("tv_listen_voice_indices")->GetPtr<int>();
         return;
         });
-    this->participateIt = true;
     this->UIRegisterCallback("UI.Sound", [this](auto&&...) {return this->Menu();});
     return true;
 }

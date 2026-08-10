@@ -28,6 +28,7 @@ def count_cpp_lines():
     print(f"主项目统计扩展名: {', '.join(main_extensions)}")
     print(f"第三方统计扩展名: {', '.join(third_party_extensions)}")
     print(f"排除关键字: {', '.join(excluded_keyword)}")
+    print(f"忽略目录: FFmpegBuild")
     print(f"{'='*60}")
     print("开始扫描目录...\n")
     
@@ -35,16 +36,16 @@ def count_cpp_lines():
     dir_count = 0
     
     for root, dirs, files in os.walk(parent_dir):
+        # 如果目录名包含 FFmpegBuild，则跳过该目录及其所有子目录
+        dirs[:] = [d for d in dirs if 'FFmpegBuild' not in d]
+        
         dir_count += 1
         relative_root = Path(root).relative_to(parent_dir) if Path(root) != parent_dir else Path('.')
-        
-        # 不再跳过目录，而是让 os.walk 继续递归，我们通过文件路径关键字区分主/第三方
         
         # 收集当前目录下需要处理的文件（主项目或第三方）
         all_files = [f for f in files if f.endswith(main_extensions + third_party_extensions)]
         if all_files:
             # 简单提示当前扫描的目录（可选）
-            # 为了减少输出噪音，可以只在有主项目文件时显示，或者统一显示
             pass
         
         for file in all_files:

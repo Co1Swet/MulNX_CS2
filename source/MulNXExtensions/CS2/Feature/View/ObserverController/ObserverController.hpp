@@ -1,7 +1,8 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
+#include <Intro/BackgroundEntityScan/EntityIterationMixin.hpp>
 
-class ObserverController final : public CSModuleBase {
+class ObserverController final : public CSModuleBase, public EntityIterationMixin<ObserverController> {
 private:
     bool CampathPlaying = false;
     uint8_t currentMode = 0;         // 当前检测到的模式
@@ -14,7 +15,7 @@ private:
     CS2::CCSPlayerController* FindControllerBySteam64UID(Steam64UID uid);
     void SetSpecMode(uint8_t mode);
     void SpecSteam64UID(Steam64UID uid);
-public:
+
     bool Init() override;
     void ProcessMsg(MulNX::Message& Msg) override;
     void Main();

@@ -35,8 +35,8 @@ MulNX::CoTask CSController::InitTask() {
     co_await this->WaitUntil([this]()->bool {return this->needToLoadModules.load() == 0;});
 
     this->SendTask("Main", "CSControl", [this]()->bool {
-        try {
-            this->Main();
+        try {// 获取CS2全局变量
+            this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
         }
         catch (const MulNX::Exception& e) {
             this->LogWarning(e);
@@ -103,67 +103,4 @@ void CSController::OnTier0Load(MulNX::Message& msg) {
 void CSController::OnPanoramaLoad(MulNX::Message& msg) {
     this->panorama = MulNX::Memory::DllModule(L"panorama.dll");
     --this->needToLoadModules;
-}
-
-void CSController::Main() {
-    // 获取CS2全局变量
-    this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
-
-    auto pGameRules = this->client.dwGameRules();
-    if (!pGameRules) return;
-
-    static int32_t OldRoundStartCount = 0;
-    auto currentStartCount = MulNX::MRead(pGameRules->m_nRoundStartCount());
-    if (OldRoundStartCount != currentStartCount) {
-        this->PublishAsync("Game/NewRound"_hash);
-        OldRoundStartCount = currentStartCount;
-    }
-    // 玩家控制器，地图上从1到10
-    int playerNum = 0;
-    for (const auto& mod : this->ParticipateItCSModules) {
-        mod->OnItBegin();
-    }
-    for (int i = 0; i < this->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-        auto* entity = this->client.GetBaseEntity(i);
-        if (!entity)continue;
-
-        auto* controller = entity->As<CS2::CCSPlayerController>();
-        auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
-        auto* pawn = this->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
-        if (!pawn)continue;
-
-        auto team = MulNX::MRead(pawn->iTeamNum());
-        if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT)continue;
-        ++playerNum;
-
-        for (const auto& mod : this->ParticipateItCSModules) {
-            mod->OnItPlayer(i, controller, pawn);
-            auto flashAlpha = pawn->m_flFlashOverlayAlpha();
-            if (MulNX::MRead(flashAlpha) > 0.9f) {
-                int p = 0;
-                ++p;
-            }
-        }
-        //MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), true);
-
-        if (playerNum <= 10) {
-            std::unique_lock lock(this->smutex);
-            auto& CS2EBEntity = this->CS2EBGameData.Players[playerNum];
-            CS2EBEntity.Position = MulNX::MRead(pawn->vOldOrigin());
-            CS2EBEntity.EyePosition = MulNX::MRead(pawn->vOldOrigin()) + MulNX::MRead(pawn->vecViewOffset());
-            CS2EBEntity.Rotation = MulNX::MRead(pawn->angEyeAngles());
-            CS2EBEntity.HP = MulNX::MRead(pawn->iHealth());
-            CS2EBEntity.Team = static_cast<int>(team);
-            CS2EBEntity.Alive = CS2EBEntity.HP;
-            CS2EBEntity.IndexInMap = playerNum;
-        }
-    }
-    for (const auto& mod : this->ParticipateItCSModules) {
-        mod->OnItEnd();
-    }
-    return;
-}
-
-D_Player& CSController::GetPlayerMsg(int Index) {
-    return this->CS2EBGameData.Players[Index];
 }

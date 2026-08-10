@@ -9,18 +9,8 @@ class TimeController;
 class HookConsole;
 class CS2Hash;
 
-class ICSModule {
-public:
-    ~ICSModule() = default;
-
-    virtual void OnItBegin() {};
-    virtual void OnItEntity(int index, CS2::C_BaseEntity*) {};
-    virtual void OnItPlayer(int index, CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*) {};
-    virtual void OnItEnd() {};
-};
-
 template <typename T>
-class CSModuleMixin : public ICSModule, public HookMixin<T>, public CSConMixin<T> {
+class CSModuleMixin :public HookMixin<T>, public CSConMixin<T> {
     class CS2Paths {
     public:
         // Counter-Strike Global Offensive
@@ -54,7 +44,6 @@ public:
     CS2Paths* CS2Paths = nullptr;
     CS2Hash* CS2Hashs = nullptr;
 protected:
-    bool participateIt = false;
     CSModuleMixin() {
         This()->preInits.push_back([this]() -> bool {
             this->CS2 = This()->FindModule<CSController>("CSController");
@@ -66,13 +55,6 @@ protected:
 
             this->CS2Paths = CS2Paths::Get();
 
-            return true;
-            });
-
-        This()->postInits.push_back([this]()->bool {
-            if (this->participateIt) {
-                this->CS2->ParticipateItCSModules.push_back(this);
-            }
             return true;
             });
     }

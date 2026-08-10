@@ -58,7 +58,7 @@ void MulNX::UI::ShowTime(int tick) {
 
 MulNX::UI::RAIIWindow::RAIIWindow(const char* name) {
     this->showed = true;
-    ImGui::Begin(name);
+    this->render = ImGui::Begin(name);
 }
 MulNX::UI::RAIIWindow::RAIIWindow(const char* name, std::atomic<bool>& showWindow) {
     this->showed = showWindow.load(std::memory_order_acquire);
@@ -75,7 +75,7 @@ MulNX::UI::RAIIWindow::~RAIIWindow() {
     }
 }
 MulNX::UI::RAIIWindow::operator bool()const {
-    return this->showed;
+    return this->showed && this->render;
 }
 
 MulNX::UI::RAIIChild::RAIIChild(const char* str_id, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) {

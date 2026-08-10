@@ -34,6 +34,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<CSController>("CSController")
 
         // CS2 关键底层支持
+        .CreateModule<BackgroundEntityScan>("BackgroundEntityScan")
         .CreateModule<HookConsole>("HookConsole")
         .CreateModule<HookView>("HookView")
         .CreateModule<CS2Hash>("CS2Hash")
@@ -157,9 +158,11 @@ DWORD WINAPI StartWrapper(LPVOID lpParam) {
         StartImpl(hModule);
     }
     catch (std::exception& e) {
+        SetEvent(hInitCompleteEvent);
         MulNX::ErrorTerminate("在启动时发生异常！异常描述：" + std::string(e.what()));
     }
     catch (...) {
+        SetEvent(hInitCompleteEvent);
         MulNX::ErrorTerminate("在启动时发生未知异常！");
     }
     FreeLibraryAndExitThread(hModule, 0);

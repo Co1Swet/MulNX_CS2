@@ -181,6 +181,6 @@ void ObserverController::SpecSteam64UID(Steam64UID uid) {
     }
 }
 bool ObserverController::SpecPlayer(int IndexInMap) {
-    this->AsyncCommand("spec_mode 2;spec_player " + std::to_string(this->CS2->CS2EBGameData.Players[IndexInMap].IndexInMap));
+    this->AsyncCommand("spec_mode 2;spec_player " + std::to_string(this->pBackgroundEntityScan->CS2EBGameData.Players[IndexInMap].IndexInMap));
     return true;
 }
