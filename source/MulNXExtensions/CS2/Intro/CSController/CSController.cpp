@@ -18,33 +18,14 @@ bool CSController::Init() {
         .SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {return this->OnPanoramaLoad(msg);})
         ;
 
-    this->InitTask().Fire();
-
     this->SendTask("Update", "CSControl", [this]()->bool {
         this->Update();
-        std::this_thread::sleep_for(std::chrono::milliseconds(2));
         return true;
         });
     
     //this->SendUIRoot("RTEST", [this](auto&&...) {return this->Window();});
     
     return true;
-}
-MulNX::CoTask CSController::InitTask() {
-    // 等待必要模块加载完成
-    co_await this->WaitUntil([this]()->bool {return this->needToLoadModules.load() == 0;});
-
-    this->SendTask("Main", "CSControl", [this]()->bool {
-        try {// 获取CS2全局变量
-            this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
-        }
-        catch (const MulNX::Exception& e) {
-            this->LogWarning(e);
-        }
-        return true;
-        });
-
-    co_return;
 }
 
 void CSController::OnClientLoad(MulNX::Message& msg) {
@@ -59,9 +40,15 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
     ).value();
     this->RegisterAttachHook(this->hkSource2Client002_Init, "Source2Client002::Init");
 
-    auto back = this->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::ifShowSpeaker).Rdata();
-    this->retAddrForShowSpeaker = reinterpret_cast<uintptr_t>(back) - 4;
-    --this->needToLoadModules;
+    this->SendTask("Main", "CSControl", [this]()->bool {
+        try {// 获取CS2全局变量
+            this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
+        }
+        catch (const MulNX::Exception& e) {
+            this->LogWarning(e);
+        }
+        return true;
+        });
 }
 void CSController::OnEngine2Load(MulNX::Message& msg) {
     this->engine2 = CS2::Module::engine2(L"engine2.dll");
@@ -80,12 +67,8 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
 
     // for show speaker
     this->hkSource2EngineToClient001_IsPlayingDemo = MulNX::Hook::Create((uint8_t*)IVClass::Assume(Source2EngineToClient001)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {
-        auto returnAddress = *(uintptr_t*)hk->GetRawStackAddr(ctx);
         using Source2EngineToClient001_IsPlayingDemo_t = bool(*)(void*);
         *(bool*)(&ctx->rax) = reinterpret_cast<Source2EngineToClient001_IsPlayingDemo_t>(hk->pMaybeRawFunc)(reinterpret_cast<void*>(ctx->rcx));
-        if (returnAddress == this->retAddrForShowSpeaker) {
-            *(bool*)(&ctx->rax) = false;
-        }
         // if (this->checkSource2EngineToClient001_IsPlayingDemo.Check(hk, ctx)) {
         //     if (this->Source2EngineToClient001ForceReturn) {
         //         *(bool*)(&ctx->rax) = this->Source2EngineToClient001ForceReturnValue;
@@ -94,13 +77,10 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
         return MulNX::Hook::Then::Return;
         }).value();
     this->RegisterAttachHook(this->hkSource2EngineToClient001_IsPlayingDemo, "Source2EngineToClient001::IsPlayingDemo");
-    --this->needToLoadModules;
 }
 void CSController::OnTier0Load(MulNX::Message& msg) {
     this->tier0 = MulNX::Memory::DllModule(L"tier0.dll");
-    --this->needToLoadModules;
 }
 void CSController::OnPanoramaLoad(MulNX::Message& msg) {
     this->panorama = MulNX::Memory::DllModule(L"panorama.dll");
-    --this->needToLoadModules;
 }

@@ -1,0 +1,1 @@
+run.bat 就是个快捷方式，要是不好使就打开CS2Injector/CS2Injector.exe手动执行

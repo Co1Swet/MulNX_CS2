@@ -15,10 +15,6 @@ class CSController final :public MulNX::Module<CSController>, public HookMixin<C
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
 
-    uintptr_t retAddrForShowSpeaker = 0;
-    std::atomic<int> needToLoadModules = 4;
-    MulNX::CoTask InitTask();
-
     RetEditor checkSource2EngineToClient001_IsPlayingDemo{};
     std::atomic<bool> Source2EngineToClient001ForceReturn = false;
     std::atomic<bool> Source2EngineToClient001ForceReturnValue = true;

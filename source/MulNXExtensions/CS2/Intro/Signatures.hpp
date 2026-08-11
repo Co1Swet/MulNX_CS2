@@ -24,7 +24,7 @@ namespace MulNX {
             namespace Hud {
                 inline const static MulNX::Memory::Pattern HandlePlayerDeath("4C 8B F2 41 B8 FA DA 03 3E BA 02 00 00 00 48 8B 58 50 E8 ?? ?? ?? ??");
                 inline const static MulNX::Memory::Pattern CLayoutFile_LoadFromFile("48 89 5C 24 08 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC 60 48 8D 05 ?? ?? ?? ?? 48 C7 45 D0 F4 03 00 00 48");
-                inline const static MulNX::Memory::Pattern ifShowSpeaker("48 63 ?? 48 8D 0D ?? ?? ?? ?? C6 84 08 ?? ?? ?? ?? 01 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 84 C0 0F 85");
+                
                 inline const static MulNX::Memory::Pattern PosTeamID_CmpForHide("0F 5B FF 0F 2F FE 0F 82 ?? ?? ?? 00 F3 0F 10 44 24");
                 inline const static MulNX::Memory::Pattern PosTeamID_xxIt("48 8B 75 ?? 33 FF 41 BC FF FF 00 00");
                 inline const static MulNX::Memory::Pattern Func_TeamCounterFillPlayerSlotCache("41 57 F3 0F 10 8C 24 C8 00 00 00");
@@ -58,6 +58,8 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern Pos_C_EnvSky_VF10_Call_ForceUpdateSkybox("33 DB 48 8D 05 ?? ?? ?? ?? 48 8B CF 48 89 44 24 ??");
             }
             namespace Sound {
+                inline const static MulNX::Memory::Pattern ifShowSpeaker("84 C0 0F 85 ?? ?? 00 00 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 85 C0");
+
                 inline const static MulNX::Memory::Pattern EmitHurtFeedbackSound("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 49 8B E8");
                 inline const static MulNX::Memory::Pattern Pos_CallGetPawnUpdateCirclePos("48 85 C0 0F 84 ?? ?? 00 00 48 89 6C 24 ?? 48 8D 54 24 ?? 48 89 74 24 ?? 48 8B C8");
                 inline const static MulNX::Memory::Pattern Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque("48 3B C3 75 1A 0F 28 DE");

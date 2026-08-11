@@ -91,6 +91,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookHealthAmmoCenter>("HookHealthAmmoCenter")
 
         // CS2 声音功能模块
+        .CreateModule<ReShowSpeaker>("ReShowSpeaker")
         .CreateModule<SpeakingController>("SpeakingController")
         .CreateModule<HitSoundFix>("HitSoundFix")
         .CreateModule<SoundCircleFix>("SoundCircleFix")

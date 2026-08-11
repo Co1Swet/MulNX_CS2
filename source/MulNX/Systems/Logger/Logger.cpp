@@ -121,7 +121,6 @@ void MulNX::Logger::Log() {
             this->PublishAsync(std::move(msg));
         }
     }
-
-    // 可选的定期刷盘（根据你的需求调整频率）
-    // this->target.flush();
+    // 直接刷盘应该问题不大
+    this->target.flush();
 }
