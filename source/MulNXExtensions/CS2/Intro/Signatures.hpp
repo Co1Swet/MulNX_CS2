@@ -29,7 +29,7 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern PosTeamID_xxIt("48 8B 75 ?? 33 FF 41 BC FF FF 00 00");
                 inline const static MulNX::Memory::Pattern Func_TeamCounterFillPlayerSlotCache("41 57 F3 0F 10 8C 24 C8 00 00 00");
 
-                inline const static MulNX::Memory::Pattern Pos_CheckFor_HudSpecplayerRoot__visible("65 48 8B 04 25 58 00 00 00 8B 0D E2 FB 7B 01");
+                inline const static MulNX::Memory::Pattern Pos_CheckFor_HudSpecplayerRoot__visible("65 48 8B 04 25 58 00 00 00 8B 0D ?? ?? ?? ?? 41 BD 68 00 00 00 4C 8B 24 C8");
                 inline const static MulNX::Memory::Pattern Pos_CheckFor_HUD__spectating_target("49 8B 86 ?? ?? 00 00 44 0F B6 C2");
             }
             namespace Flash {
