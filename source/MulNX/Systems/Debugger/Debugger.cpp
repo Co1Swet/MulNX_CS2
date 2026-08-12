@@ -8,8 +8,8 @@
 
 void MulNX::Debugger::DeMe() {
     MulNX::UI::Checkbox("调试器窗口", this->showWindow);
-    ImGui::Checkbox("当有错误信息时弹出调试器", &this->ShowWhenError);
-    ImGui::Checkbox("自动滚动到最新消息", &this->AutoScroll);
+    ImGui::Checkbox("当有错误信息时弹出调试器", &this->showWhenError);
+    ImGui::Checkbox("自动滚动到最新消息", &this->autoScroll);
     static int MaxDebugMsgs = 1000;
     ImGui::Text("设置最大消息数量（至少100）:");
     ImGui::SameLine();
@@ -23,9 +23,9 @@ void MulNX::Debugger::DeMe() {
     }
 }
 
-bool MulNX::Debugger::Window() {
+void MulNX::Debugger::Window() {
     auto w = MulNX::UI::RAIIWindow("调试器", this->showWindow);
-    if (!w)return true;
+    if (!w)return;
     std::shared_lock lock(this->smutex);
 
     // 在标签页内创建一个子窗口
@@ -37,10 +37,10 @@ bool MulNX::Debugger::Window() {
 
     // 使用虚拟列表优化性能
     ImGuiListClipper clipper;
-    clipper.Begin(static_cast<int>(this->DebugMsg.size()));
+    clipper.Begin(static_cast<int>(this->debugMsg.size()));
     while (clipper.Step()) {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
-            const auto& msg = this->DebugMsg[i];
+            const auto& msg = this->debugMsg[i];
 
             // 根据消息类型着色
             if (msg.find(this->kInfo) != std::string::npos) {
@@ -67,17 +67,15 @@ bool MulNX::Debugger::Window() {
     }
 
     // 自动滚动到最新消息
-    if (this->NeedAutoScroll) {
+    if (this->needAutoScroll) {
         ImGui::SetScrollHereY(1.0f);
-        this->NeedAutoScroll = false;
+        this->needAutoScroll = false;
     }
 
-    return true;
+    return;
 }
 
 bool MulNX::Debugger::Init() {
-    this->pLogger = this->Core->ModuleManager()->FindModule<MulNX::Logger>("Logger");
-
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
     this->UIRegisterCallback("UI.MulNXControl", [this](auto&&...) {return this->DeMe();});
 
@@ -108,13 +106,18 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
         this->ResetMaxMsgCount(count);
         break;
     }
-    case "Log/Error"_hash: if (this->ShowWhenError) this->showWindow = true;
+    case "Log/Error"_hash: {
+        if (this->showWhenError)
+            this->showWindow = true;
+    };
     case "Log/Info"_hash:
     case "Log/Succ"_hash:
     case "Log/Warning"_hash: {
+        if (this->autoScroll)
+            this->needAutoScroll = true;
         auto fmtted = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
-        this->DebugMsg.push_back(fmtted);
+        this->debugMsg.push_back(fmtted);
         break;
     }
 
@@ -124,18 +127,17 @@ void MulNX::Debugger::Main() {
     this->Update();
 }
 
-void MulNX::Debugger::ResetMaxMsgCount(const int Max) {
+void MulNX::Debugger::ResetMaxMsgCount(const int max) {
     std::unique_lock lock(this->smutex);
-    if (Max < 1) {
-        //this->AddError("最大信息条数不能小于一1!");
+    if (max < 1) {
+        this->LogError("最大信息条数不能小于一1!");
         return;
     }
-    if (DebugMsg.size() > Max) {
-        DebugMsg.erase(DebugMsg.begin(), DebugMsg.end() - Max);
+    if (this->debugMsg.size() > max) {
+        this->debugMsg.erase(this->debugMsg.begin(), this->debugMsg.end() - max);
     }
-    this->MaxMsgCount = Max;
+    this->maxMsgCount = max;
     lock.unlock();
-    //this->AddInfo("已重置最大信息条数为 " + std::to_string(Max) + " 条");
-
+    this->LogInfo(std::format("已重置最大信息条数为 {} 条", max));
     return;
 }

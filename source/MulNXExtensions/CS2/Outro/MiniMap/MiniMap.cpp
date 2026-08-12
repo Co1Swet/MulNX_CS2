@@ -1,9 +1,9 @@
 #include "MiniMap.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool MiniMap::Window() {
+void MiniMap::Window() {
     auto w = MulNX::UI::RAIIWindow("小地图窗口", this->showWindow);
-    if (!w)return true;
+    if (!w)return;
 
     // 保存当前样式
     ImGuiStyle& style = ImGui::GetStyle();
@@ -103,7 +103,7 @@ bool MiniMap::Window() {
     style.Colors[ImGuiCol_WindowBg] = oldWindowBg;
     style.Colors[ImGuiCol_ChildBg] = oldChildBg;
     style.Colors[ImGuiCol_Border] = oldBorder;
-    return true;
+    return;
 }
 
 bool MiniMap::Init() {

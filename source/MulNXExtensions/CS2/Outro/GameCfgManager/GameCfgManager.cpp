@@ -1,9 +1,9 @@
 #include"GameCfgManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool GameCfgManager::Window() {
+void GameCfgManager::Window() {
     auto w = MulNX::UI::RAIIWindow("配置管理器", this->showWindow);
-    if (!w)return true;
+    if (!w)return;
     //顶部工具栏
     if (ImGui::Button("刷新列表")) {
         this->UpdateCfgList();
@@ -99,7 +99,6 @@ bool GameCfgManager::Window() {
     //底部信息栏
     ImGui::Separator();
     ImGui::TextDisabled("提示: 点击按钮在工具目录和游戏目录间移动文件");
-    return true;
 }
 
 bool GameCfgManager::Init() {

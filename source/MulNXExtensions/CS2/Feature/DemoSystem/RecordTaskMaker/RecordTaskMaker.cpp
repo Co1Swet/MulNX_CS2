@@ -3,8 +3,9 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
-bool RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
+void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("录制任务创建");
+    if (!w)return;
     MulNX::UI::SmartButton btn{};
 
     std::shared_lock lock(this->smutex);
@@ -20,7 +21,7 @@ bool RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto it = this->demos.find(this->currentDemoName);
     if (it == this->demos.end()) {
         ImGui::Text("未选中任何demo");
-        return true;
+        return;
     }
     const auto& demoInfo = it->second;
 
@@ -79,7 +80,7 @@ bool RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto itPlayer = demoInfo.players.find(ctrlTarget);
     if (itPlayer == demoInfo.players.end()) {
         ImGui::SeparatorText("未选中玩家");
-        return true;
+        return;
     }
     const auto& player = itPlayer->second;
     ImGui::SeparatorText(player.name.c_str());
@@ -205,7 +206,7 @@ bool RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
             ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
         }
     }
-    return true;
+    return;
 }
 
 bool RecordTaskMaker::Init() {

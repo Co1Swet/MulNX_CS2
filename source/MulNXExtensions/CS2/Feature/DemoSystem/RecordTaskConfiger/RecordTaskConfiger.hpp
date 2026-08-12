@@ -3,11 +3,10 @@
 #include <Feature/DemoSystem/DemoStruct.hpp>
 
 class RecordTaskConfiger final :public CSModuleBase {
-    bool Window();
+    void Window();
     void ProcessMsg(MulNX::Message& msg)override;
-public:
     bool Init()override;
-
+public:
     int preRecordTicks = 200;
     int postRecordTicks = 200;
 

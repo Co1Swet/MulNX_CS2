@@ -5,6 +5,7 @@
 
 void CSController::Window() {
     auto w = MulNX::UI::RAIIWindow("实验性功能");
+    if (!w)return;
     MulNX::UI::Checkbox("Source2EngineToClient001 强制返回？", this->Source2EngineToClient001ForceReturn);
     MulNX::UI::Checkbox("Source2EngineToClient001 返回值", this->Source2EngineToClient001ForceReturnValue);
     this->checkSource2EngineToClient001_IsPlayingDemo.Render();

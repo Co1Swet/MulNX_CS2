@@ -4,8 +4,9 @@
 #include <Buildup/TimeController/TimeController.hpp>
 #include <Feature/DemoSystem/DemoJSONReader/DemoJSONReader.hpp>
 
-bool DemoRecorder::Window() {
+void DemoRecorder::Window() {
     auto w = MulNX::UI::RAIIWindow("Demo Recorder");
+    if (!w)return;
     std::shared_lock lock(this->smutex);
 
     if (ImGui::Button("启动")) {
@@ -40,8 +41,6 @@ bool DemoRecorder::Window() {
     for (const auto& recordTask : this->recordTaskBufferQueue) {
         ImGui::Text(recordTask.desc.c_str());
     }
-
-    return true;
 }
 
 bool DemoRecorder::Init() {

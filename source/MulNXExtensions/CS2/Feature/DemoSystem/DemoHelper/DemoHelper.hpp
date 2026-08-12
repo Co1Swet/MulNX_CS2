@@ -9,7 +9,7 @@ class DemoHelper final :public CSModuleBase {
     bool Init()override;
     void Main();
     void ProcessMsg(MulNX::Message& msg)override;
-    bool Window();
+    void Window();
 
     bool MarkTime();
     bool JumpMark(size_t Index);

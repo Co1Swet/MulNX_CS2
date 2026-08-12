@@ -35,7 +35,7 @@ public:
     std::unordered_map<std::string, std::shared_ptr<ElementBase>> elements;
 
     bool MenuElement();
-    bool UINodeFunc();
+    void UINodeFunc();
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;

@@ -4,7 +4,7 @@
 class DeathMsgController final :public CSModuleBase {
     using HandlePlayerDeath_t = void(*)(void* hudThis, void* event);
     std::unique_ptr<MulNX::Hook> hkHandlePlayerDeath{ nullptr };
-    bool Window();
+    void Window();
     MulNX::Hook::Then HandleOnPlayerDeath(CS2::CGameEvent* event);
     std::atomic<bool>enable{ false };
     bool Init();

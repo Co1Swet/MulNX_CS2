@@ -83,8 +83,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> eleme
     ImGui::SameLine();
     ImGui::Text(I18n("camsys.elem.type_duration", element->TypeGet_String(), std::to_string(element->DurationTime)).c_str());
 }
-
-bool ElementManager::UINodeFunc() {
+void ElementManager::UINodeFunc() {
     std::unique_lock lock(this->CamSys->smutex);
     for (auto& [name, elem] : this->elements) {
         elem->DrawBase(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
@@ -94,7 +93,7 @@ bool ElementManager::UINodeFunc() {
         this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.elem.preview_draw_label").c_str());
     }
     auto w = MulNX::UI::RAIIWindow("元素调试", this->showWindow);
-    if (!w)return true;
+    if (!w)return;
     // 检查当前是否有操作元素
     auto current = this->CurrentElement.load(std::memory_order_acquire);
     if (current) {
@@ -105,7 +104,6 @@ bool ElementManager::UINodeFunc() {
     else {
         ImGui::Text(I18n("text.no_selected").c_str());
     }
-    return true;
 }
 //元素管理器基本函数
 bool ElementManager::Init() {

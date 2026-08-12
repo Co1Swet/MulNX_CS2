@@ -1,8 +1,9 @@
 #include "RecordTaskConfiger.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-bool RecordTaskConfiger::Window() {
+void RecordTaskConfiger::Window() {
     auto w = MulNX::UI::RAIIWindow("录制参数调节");
+    if (!w)return;
     ImGui::SliderInt("击杀前预留tick", &this->preRecordTicks, 1, 640);
     ImGui::SliderInt("击杀后保留tick", &this->postRecordTicks, 1, 640);
 
@@ -15,7 +16,7 @@ bool RecordTaskConfiger::Window() {
     // ImGui::SliderFloat("子弹时间时间流速", &this->ShotingTimeRate, 0.01f, 1.0f);
     // ImGui::SliderInt("子弹时间前tick", &this->preTicksShotingTime, 1, 640);
     // ImGui::SliderInt("子弹时间后tick", &this->postTicksShotingTime, 1, 640);
-    return true;
+    return;
 }
 
 bool RecordTaskConfiger::Init() {
@@ -26,8 +27,6 @@ bool RecordTaskConfiger::Init() {
         this->Update();
         return true;
         });
-
-    this->showWindow.store(true, std::memory_order_release);
 
     return true;
 }

@@ -2,7 +2,6 @@
 #include <Intro/CSModuleBase.hpp>
 
 class GameCfgManager final :public CSModuleBase {
-private:
     MulNX::IPCer* IPCer = nullptr;
 
     std::filesystem::path ToolPath{};
@@ -11,7 +10,7 @@ private:
     std::vector<std::string>ToolCfgs{};
     std::vector<std::string>GameCfgs{};
 
-    bool Window();
+    void Window();
     bool Init()override;
 
     //Cfg文件操作接口

@@ -24,14 +24,19 @@ namespace MulNX {
         void ShowTime(int tick);
 
         class RAIIWindow {
-            bool showed;// 指示是否调用
-            bool render;// 指示是否应该渲染，ImGui::Begin返回值
+            bool bNeedCallEnd = false;// 指示是否调用
+            bool bCallBeginResult = false;// 指示是否应该渲染，ImGui::Begin返回值
         public:
             RAIIWindow() = delete;
             RAIIWindow(const char* name);
             RAIIWindow(const char* name, std::atomic<bool>& showWindow);
             ~RAIIWindow();
             explicit operator bool() const;
+
+            RAIIWindow(const RAIIWindow&) = delete;
+            RAIIWindow& operator=(const RAIIWindow&) = delete;
+            RAIIWindow(RAIIWindow&&) = delete;
+            RAIIWindow& operator=(RAIIWindow&&) = delete;
         };
 
         class RAIIChild {

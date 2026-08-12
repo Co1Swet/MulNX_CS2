@@ -57,25 +57,23 @@ void MulNX::UI::ShowTime(int tick) {
 }
 
 MulNX::UI::RAIIWindow::RAIIWindow(const char* name) {
-    this->showed = true;
-    this->render = ImGui::Begin(name);
+    this->bNeedCallEnd = true;
+    this->bCallBeginResult = ImGui::Begin(name);
 }
 MulNX::UI::RAIIWindow::RAIIWindow(const char* name, std::atomic<bool>& showWindow) {
-    this->showed = showWindow.load(std::memory_order_acquire);
-    if (this->showed) {
-        bool open = this->showed;
-        ImGui::Begin(name, &open);
-        showWindow.store(open, std::memory_order_release);
-    }
+    if (!showWindow.load(std::memory_order_acquire))return;
+    this->bNeedCallEnd = true;
+    bool open = true;
+    this->bCallBeginResult = ImGui::Begin(name, &open);
+    showWindow.store(open, std::memory_order_release);
 }
 MulNX::UI::RAIIWindow::~RAIIWindow() {
-    if (this->showed) {
-        ImGui::End();
-        this->showed = false;
-    }
+    if (!this->bNeedCallEnd)return;
+    ImGui::End();
+    this->bNeedCallEnd = false;
 }
 MulNX::UI::RAIIWindow::operator bool()const {
-    return this->showed && this->render;
+    return this->bCallBeginResult && this->bNeedCallEnd;
 }
 
 MulNX::UI::RAIIChild::RAIIChild(const char* str_id, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) {

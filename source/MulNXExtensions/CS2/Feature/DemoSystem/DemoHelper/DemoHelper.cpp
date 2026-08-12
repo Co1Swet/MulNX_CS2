@@ -3,8 +3,9 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
 
-bool DemoHelper::Window() {
+void DemoHelper::Window() {
     auto w = MulNX::UI::RAIIWindow("Demo辅助");
+    if (!w)return;
     std::shared_lock lock(this->smutex);
 
     auto tick = this->CS2Time->GetDemoTick();
@@ -54,7 +55,7 @@ bool DemoHelper::Window() {
         this->CS2Time->JumpRealRel(delta);
     }
 
-    return true;
+    return;
 }
 
 bool DemoHelper::Init() {

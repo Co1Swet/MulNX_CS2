@@ -5,20 +5,19 @@
 
 namespace MulNX {
     class Debugger final :public MulNX::Module<Debugger> {
-        MulNX::Logger* pLogger = nullptr;
         std::string kInfo{};
         std::string kSucc{};
         std::string kWarning{};
         std::string kError{};
-        std::deque<std::string> DebugMsg{};
+        std::deque<std::string> debugMsg{};
 
-        int MaxMsgCount = 1000;
-        bool ShowWhenError = true;
-        bool AutoScroll = true;
-		bool NeedAutoScroll = false;
+        int maxMsgCount = 1000;
+        bool showWhenError = true;
+        bool autoScroll = true;
+		bool needAutoScroll = false;
 
         void Main();
-        bool Window();
+        void Window();
         void DeMe();
         void ResetMaxMsgCount(const int Max);
 

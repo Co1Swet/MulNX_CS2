@@ -7,9 +7,9 @@
 #include <fstream>
 #include <TlHelp32.h>
 
-bool CS2BootLoader::Window(MulNX::UICoordinator* uico) {
+VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("CS2 Boot Loader");
-    if (!w)return true;
+    if (!w)return;
     uico->CallbackCall("CS2BootLoad"_hash, nullptr);
 
     std::unique_lock lock(this->smutex);
@@ -52,8 +52,6 @@ bool CS2BootLoader::Window(MulNX::UICoordinator* uico) {
     if (ImGui::Button(I18n("boot.save").c_str())) {
         this->PublishAsync("CS2BootLoader/Save"_hash);
     }
-
-    return true;
 }
 
 bool CS2BootLoader::Init() {

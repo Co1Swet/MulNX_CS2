@@ -35,7 +35,7 @@ class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraS
     ProjectManager* PManager = nullptr;
     WorkspaceManager* WManager = nullptr;
     void ProcessMsg(MulNX::Message& msg)override;
-    bool Window(MulNX::UICoordinator* uico);
+    void Window(MulNX::UICoordinator* uico);
     bool Init()override;
     bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;
 public:

@@ -3,8 +3,9 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookView/HookView.hpp>
 
-bool CameraSystem::Window(MulNX::UICoordinator* uico) {
+void CameraSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.camera_system").c_str());
+    if (!w)return;
     std::shared_lock lock(this->smutex);
     this->WManager->MenuWorkspace();
 
@@ -12,7 +13,7 @@ bool CameraSystem::Window(MulNX::UICoordinator* uico) {
         // 如果不在工作区，显示提示信息
         auto c = MulNX::UI::RAIIChild("提示", ImVec2(0, 0), true);
         ImGui::Text(I18n("camsys.please_enter_ws").c_str());
-        return true;
+        return;
     }
 
     // 进入工作区，显示工作区内容
@@ -61,8 +62,6 @@ bool CameraSystem::Window(MulNX::UICoordinator* uico) {
             break;
         }
     }
-
-    return true;
 }
 
 bool CameraSystem::Init() {

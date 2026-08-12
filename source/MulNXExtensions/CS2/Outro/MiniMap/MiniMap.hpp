@@ -14,5 +14,5 @@ class MiniMap final :public CSModuleBase, public EntityIterationMixin<MiniMap> {
     bool FollowWindow = true;
     bool Init()override;
     void Main();
-    bool Window();
+    void Window();
 };

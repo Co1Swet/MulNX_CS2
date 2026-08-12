@@ -3,11 +3,11 @@
 #include <Buildup/TimeController/TimeController.hpp>
 #include <Buildup/CS2Hash/CS2Hash.hpp>
 
-bool DeathMsgController::Window() {
+void DeathMsgController::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);
-    if (!w)return true;
+    if (!w)return;
     MulNX::UI::Checkbox(I18n("dthmsg.enable").c_str(), this->enable);
-    return true;
+    return;
 }
 
 bool DeathMsgController::Init() {
