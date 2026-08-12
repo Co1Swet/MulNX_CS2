@@ -134,7 +134,7 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool CameraSystem::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
+bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
     this->Update();
     CameraSystemIO IO;
     bool needOverride = false;
@@ -146,6 +146,7 @@ bool CameraSystem::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
     this->WManager->HandleUpdate();
 
     if (!needOverride)return false;
+    camLeavePlayer = true;
 
     const auto& pos = IO.Frame.view.position;
     const auto& fov = IO.Frame.view.FOV;

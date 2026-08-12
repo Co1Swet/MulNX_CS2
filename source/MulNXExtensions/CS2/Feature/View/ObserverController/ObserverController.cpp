@@ -22,12 +22,10 @@ void ObserverController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "CameraSystem/Play/Started"_hash: {
         this->LogInfo("收到运镜开始消息");
-        this->HandlePlayStarted();
         break;
     }
     case "CameraSystem/Play/Ended"_hash: {
         this->LogInfo("收到运镜结束消息");
-        this->HandlePlayEnded();
         break;
     }
     case "spec_mode_changed_to"_hash: {
@@ -74,41 +72,10 @@ void ObserverController::UpdateObserverState() {
     }
 }
 
-bool ObserverController::HandlePlayStarted() {
-    if (this->CampathPlaying) {
-        this->LogWarning("已在运镜播放中，重复的播放开始消息将被忽略。");
-        return false;
-    }
-    this->startedAsSpecMode = this->currentMode;
-    this->CampathPlaying = true;
-
-    if (this->currentMode != 4) {   // 不是自由视角，需要切换
-        this->LogInfo("运镜开始时当前模式非 spec_mode 4，切换");
-        this->SetSpecMode(4);
-    }
-    else {
-        this->LogInfo("运镜开始时已是 spec_mode 4，直接开始播放。");
-    }
-    return true;
-}
-
-bool ObserverController::HandlePlayEnded() {
-    if (startedAsSpecMode == 2) {
-        this->LogInfo("运镜结束后恢复 spec_mode 2。");
-        this->SetSpecMode(2);
-    }
-    this->CampathPlaying = false;
-    this->startedAsSpecMode = 0;
-    return true;
-}
-
 void ObserverController::OnSpecModeChanged(uint8_t newMode) {
-    this->currentMode = newMode;
-    // 运镜播放中，检测用户是否切回 spec_mode 2
-    if (this->CampathPlaying && newMode == 2) {
-        this->LogWarning("检测到 spec_mode 2，已中断当前运镜。");
+    if (newMode == 2) {
+        this->LogWarning("检测到 spec_mode 切换至 2");
         this->PublishAsync("CameraSystem/Play/Shutdown"_hash);
-        this->CampathPlaying = false;
     }
 }
 

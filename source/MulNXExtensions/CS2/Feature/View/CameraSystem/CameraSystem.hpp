@@ -37,7 +37,7 @@ class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraS
     void ProcessMsg(MulNX::Message& msg)override;
     bool Window(MulNX::UICoordinator* uico);
     bool Init()override;
-    bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num)override;
+    bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;
 public:
     CameraDrawer CamDrawer{};
 };

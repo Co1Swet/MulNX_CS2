@@ -17,5 +17,5 @@ class FreeCameraController final :public CSModuleBase, public CSViewControlMixin
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
 
-    bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num)override;
+    bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;
 };

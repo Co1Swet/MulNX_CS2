@@ -52,9 +52,14 @@ void HookView::HandleOverrideView(CS2::CViewSetup* viewSetup) {
     viewSetup->pViewAngles()->z = this->controlView.InputRoll.load(std::memory_order_acquire);
 
     int num = 0;
+    bool camLeavePlayer = false;
     for (auto& viewCtrlModule : this->viewControlModules) {
-        if (viewCtrlModule->HandleUpdate(viewSetup, num))++num;
+        if (viewCtrlModule->HandleUpdateCSView(viewSetup, num, camLeavePlayer))
+            ++num;
     }
+
+    if (this->cameraLeavePlayer.load(std::memory_order_acquire) != camLeavePlayer)
+        this->cameraLeavePlayer.store(camLeavePlayer, std::memory_order_release);
 
     this->PublishSync("Hook/OnSetupView"_hash);
 

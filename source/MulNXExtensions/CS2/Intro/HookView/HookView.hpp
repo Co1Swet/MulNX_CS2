@@ -40,5 +40,5 @@ public:
     void spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot);
     void SetDOF(const MulNX::Math::DOFParam& dof);
 
-    inline bool GetCameraLeavePlayerState() { return this->cameraLeavePlayer.load(std::memory_order_acquire); }
+    inline bool GetCameraLeavePlayerState()const { return this->cameraLeavePlayer.load(std::memory_order_acquire); }
 };

@@ -45,7 +45,7 @@ void FreeCameraController::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool FreeCameraController::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
+bool FreeCameraController::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
     this->Update();
     if (num)return false;
     if (!this->EnableControl.load(std::memory_order_acquire)) return false;

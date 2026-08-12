@@ -62,7 +62,7 @@ bool ViewSmoother::Init() {
     return true;
 }
 
-bool ViewSmoother::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
+bool ViewSmoother::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
     if (!this->enable.load(std::memory_order_acquire))return false;
 
     MulNX::Math::View view;

@@ -19,5 +19,5 @@ class ProjectileTracker final : public CSModuleBase, public CSViewControlMixin<P
     void OnEntityRemove(MulNX::Message& msg);
 
     bool Init()override;
-    bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num)override;
+    bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;
 };

@@ -14,6 +14,6 @@ class ViewSmoother final :public CSModuleBase, public CSViewControlMixin<ViewSmo
     std::atomic<bool> enable = false;
     ViewBuffer buffer;
     void Menu();
-    bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num)override;
+    bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;
     bool Init()override;
 };

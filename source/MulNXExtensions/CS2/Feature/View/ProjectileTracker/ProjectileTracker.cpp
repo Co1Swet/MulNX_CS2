@@ -2,14 +2,6 @@
 #include <MulNX/Base/Math/Translate/Translate.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-static std::string GetControllerPlayerName(CS2::CCSPlayerController* pController) {
-    if (!pController) return "未知玩家";
-    auto namePtr = pController->m_iszPlayerName();
-    if (!namePtr) return "未知玩家";
-    auto name = MulNX::Memory::ReadString(namePtr).value_or("读取失败");
-    return name.empty() ? "未知玩家" : name;
-}
-
 void ProjectileTracker::Menu() {
     MulNX::UI::Checkbox("启用投掷物追踪", this->enable);
 }
@@ -150,7 +142,7 @@ void ProjectileTracker::Main() {
     }
 }
 
-bool ProjectileTracker::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
+bool ProjectileTracker::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
     if (!this->enable.load(std::memory_order_acquire))return false;
     if (!this->pTargetWatchProjectile.load(std::memory_order_acquire)) return false;
     auto view = this->currentView.Read();

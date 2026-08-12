@@ -50,7 +50,7 @@ class AdvancedViewController final :public CSModuleBase, public CSViewControlMix
     bool Init()override;
     bool Menu();
 
-    bool HandleUpdate(CS2::CViewSetup* viewSetup,const int& num)override;
+    bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool&)override;
     CS2::C_CSPlayerPawn* GetSelfViewTargetPawn();
     std::expected<MulNX::Math::Point3, int> GetPoint3(CS2::CViewSetup* viewSetup);
     std::expected<MulNX::Math::View, int> HandleSelfViewUpdate(CS2::CViewSetup* viewSetup);

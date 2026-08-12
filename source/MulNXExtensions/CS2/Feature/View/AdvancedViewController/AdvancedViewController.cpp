@@ -81,7 +81,7 @@ bool AdvancedViewController::Init() {
     return true;
 }
 
-bool AdvancedViewController::HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) {
+bool AdvancedViewController::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool&) {
     if (!this->enable.load(std::memory_order_acquire)) return false;
 
     // 通过时间桥判断是否需要更新视角，防止抖动

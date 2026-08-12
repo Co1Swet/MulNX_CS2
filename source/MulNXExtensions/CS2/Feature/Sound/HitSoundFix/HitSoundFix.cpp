@@ -1,5 +1,6 @@
 #include "HitSoundFix.hpp"
 #include <Intro/HookGameEvents/HookGameEvents.hpp>
+#include <Intro/HookView/HookView.hpp>
 #include <Buildup/CS2Hash/CS2Hash.hpp>
 
 bool HitSoundFix::Init() {
@@ -33,6 +34,7 @@ bool HitSoundFix::Init() {
 }
 
 void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
+    if (this->CS2View->GetCameraLeavePlayerState())return;
     CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
     CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
     CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
@@ -81,6 +83,7 @@ void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
 }
 
 void HitSoundFix::HandleOnPlayerDeath(CS2::CGameEvent* event) {
+    if (this->CS2View->GetCameraLeavePlayerState())return;
     CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
     CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
     CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };

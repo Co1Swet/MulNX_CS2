@@ -5,7 +5,7 @@
 class ICSViewControlModule {
 public:
     MulNX::ModuleBase* pBaseFromViewControl = nullptr;
-    virtual bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) = 0;
+    virtual bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) = 0;
 };
 
 template<typename T>
