@@ -10,8 +10,9 @@ class HookD3D11 final : public MulNX::Module<HookD3D11>, public HookMixin<HookD3
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
     HWND hCS2Wnd = nullptr;
 
+    void UpdateRenderXY(IDXGISwapChain* pSwapChain);
+
     std::unique_ptr<MulNX::Hook> hkPosCallPresent{};
-    
     // ClearDepthStencilView 钩子（清空前偷深度）
     std::unique_ptr<MulNX::Hook> hkClearDepthStencilView{};
     // Present 钩子
@@ -20,10 +21,10 @@ class HookD3D11 final : public MulNX::Module<HookD3D11>, public HookMixin<HookD3
     MulNX::Hook::Then HandleOnPresent(MulNX::Hook* hk, RegContext* ctx);
     // ResizeBuffers 钩子
     std::unique_ptr<MulNX::Hook> hkResizeBuffers{};
+    MulNX::Hook::Then HandleOnResizeBuffers(MulNX::Hook* hk, RegContext* ctx);
 
     void HookD3D11DeviceAndContext();
     void HookD3D11SwapChain(IDXGISwapChain* pSwapChain);
 
     bool Init()override;
-    void Deinit()override;
 };

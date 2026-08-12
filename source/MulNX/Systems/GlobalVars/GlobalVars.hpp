@@ -3,7 +3,6 @@
 
 namespace MulNX {
     class GlobalVars final :public Module<GlobalVars> {
-	private:
 		void PublishTickAll();
 		void Tick();
 	public:
@@ -16,6 +15,11 @@ namespace MulNX {
 		std::atomic<uint32_t>CoreTick = 0;
         // 是否让部分高危错误直接引发崩溃
         std::atomic<bool>DangerousErrorShouldTerminate = false;
+
+        std::atomic<int>windowX = 1920;
+        std::atomic<int>windowY = 1080;
+        std::atomic<int>renderX = 1920;
+        std::atomic<int>renderY = 1080;
 
 		bool Init()override;
 		void Main();

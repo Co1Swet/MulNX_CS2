@@ -4,7 +4,6 @@
 
 bool HookWindow::Init() {
     this->pUISystem = this->FindModule<MulNX::UISystem>("UISystem");
-    this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
 
     this->SubscribeSync("Hook/hWnd", [this](MulNX::Message& msg) {
         auto&& [hWnd] = msg.Access<HWND>();
@@ -28,16 +27,12 @@ bool HookWindow::Init() {
 }
 void HookWindow::FixMouse(UINT& uMsg, LPARAM& lParam) {
     if (!MulNX::Win32::IsMouseMessage(uMsg)) return;
-    IDXGISwapChain* pSC = this->pGraphicsManager->pSwapChain;
-    if (!pSC)return;
-    DXGI_SWAP_CHAIN_DESC sd;
-    if (!SUCCEEDED(pSC->GetDesc(&sd))) return;
     RECT rc;
     if (!GetClientRect(this->hCS2Wnd, &rc)) return;
     int x = LOWORD(lParam);
     int y = HIWORD(lParam);
-    int newX = (int)(x * ((float)sd.BufferDesc.Width / (rc.right - rc.left)));
-    int newY = (int)(y * ((float)sd.BufferDesc.Height / (rc.bottom - rc.top)));
+    int newX = (int)(x * ((float)this->pGlobalVars->renderX.load(std::memory_order_acquire) / (rc.right - rc.left)));
+    int newY = (int)(y * ((float)this->pGlobalVars->renderY.load(std::memory_order_acquire) / (rc.bottom - rc.top)));
     lParam = MAKELPARAM(newX, newY);
 }
 MulNX::Hook::Then HookWindow::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {

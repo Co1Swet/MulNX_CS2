@@ -1,12 +1,10 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
-#include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
 #include <MulNXUtils/WinExt/HookMixin.hpp>
+#include <oleidl.h>
 
 class HookWindow final : public MulNX::Module<HookWindow>, public HookMixin<HookWindow> {
-private:
     MulNX::UISystem* pUISystem = nullptr;
-    MulNX::GraphicsManager* pGraphicsManager = nullptr;
     HWND hCS2Wnd = nullptr;
     // 窗口过程钩子
     std::unique_ptr<MulNX::Hook> hkWndProc = nullptr;
