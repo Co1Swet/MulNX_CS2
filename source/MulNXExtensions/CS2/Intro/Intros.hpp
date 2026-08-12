@@ -7,3 +7,4 @@
 #include "HookView/HookView.hpp"
 #include "HookGameEvents/HookGameEvents.hpp"
 #include "BackgroundEntityScan/BackgroundEntityScan.hpp"
+#include "HookGSI/HookGSI.hpp"

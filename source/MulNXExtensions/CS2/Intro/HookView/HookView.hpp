@@ -14,7 +14,6 @@ class ControlView {
 public:
     MulNX::NewestBuffer<MulNX::Math::View> currentView{};
     std::atomic<float> InputRoll = 0;
-    std::atomic<bool> CameraMode = false;
     std::atomic<int> WindowWidth = 1920;
     std::atomic<int> WindowHeight = 1080;
 
@@ -25,6 +24,7 @@ class ICSViewControlModule;
 class HookView final :public CSModuleBase {
     // 视角控制钩子
     std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo{};
+    std::atomic<bool> cameraLeavePlayer = false;
     ControlView controlView{};
     void HandleOverrideView(CS2::CViewSetup* viewSetup);
 
@@ -39,4 +39,6 @@ public:
 
     void spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot);
     void SetDOF(const MulNX::Math::DOFParam& dof);
+
+    inline bool GetCameraLeavePlayerState() { return this->cameraLeavePlayer.load(std::memory_order_acquire); }
 };

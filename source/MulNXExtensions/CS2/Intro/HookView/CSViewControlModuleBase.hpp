@@ -4,8 +4,8 @@
 
 class ICSViewControlModule {
 public:
-    virtual bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) = 0;
     MulNX::ModuleBase* pBaseFromViewControl = nullptr;
+    virtual bool HandleUpdate(CS2::CViewSetup* viewSetup, const int& num) = 0;
 };
 
 template<typename T>

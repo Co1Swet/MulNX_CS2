@@ -47,13 +47,7 @@ void BackgroundEntityScan::Main() {
 
         for (const auto& mod : this->ParticipateItCSModules) {
             mod->OnItPlayer(i, controller, pawn);
-            auto flashAlpha = pawn->m_flFlashOverlayAlpha();
-            if (MulNX::MRead(flashAlpha) > 0.9f) {
-                int p = 0;
-                ++p;
-            }
         }
-        //MulNX::MWrite(pawn->m_entitySpottedState()->m_bSpotted(), true);
 
         if (playerNum <= 10) {
             std::unique_lock lock(this->smutex);

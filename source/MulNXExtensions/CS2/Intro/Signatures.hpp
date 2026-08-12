@@ -67,6 +67,9 @@ namespace MulNX {
 
                 inline const static MulNX::Memory::Pattern Func_ProcessVoiceBan("48 63 F8 85 F6 75");
             }
+            namespace GSI {
+                inline const static MulNX::Memory::Pattern Pos_GSI_ID_ForSpecTarget_call_GetOBingPawn("48 8B F0 48 85 C0 0F 84 ?? ?? 00 00 8B 90 ?? ?? 00 00");
+            }
         }
     }
 }

@@ -37,6 +37,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<BackgroundEntityScan>("BackgroundEntityScan")
         .CreateModule<HookConsole>("HookConsole")
         .CreateModule<HookView>("HookView")
+        .CreateModule<HookGSI>("HookGSI")
         .CreateModule<CS2Hash>("CS2Hash")
         .CreateModule<TimeController>("TimeController")
         .CreateModule<PlayerHub>("PlayerHub")
