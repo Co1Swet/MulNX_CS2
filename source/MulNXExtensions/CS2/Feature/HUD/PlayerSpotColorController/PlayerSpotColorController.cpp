@@ -15,7 +15,7 @@ bool PlayerSpotColorController::Init() {
             if (this->TColorMulti.load(std::memory_order_acquire) || this->CTColorMulti.load(std::memory_order_acquire))
                 ctx->rbx = 0;
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }, true).value();
         this->RegisterAttachHook(this->hkPos_CmpToSetColor, "Pos_CmpToSetColor");
 
         // 让T显示五颜色
@@ -24,7 +24,7 @@ bool PlayerSpotColorController::Init() {
             if (this->TColorMulti.load(std::memory_order_acquire))
                 ctx->rax = 2;
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, false, true).value();
+            }, true, true).value();
         this->RegisterAttachHook(this->hkPos_CmpToSetTColor, "Pos_CmpToSetTColor");
 
         // 让CT显示五颜色
@@ -33,7 +33,7 @@ bool PlayerSpotColorController::Init() {
             if (this->CTColorMulti.load(std::memory_order_acquire))
                 ctx->rax = 3;
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, false, true).value();
+            }, true, true).value();
         this->RegisterAttachHook(this->hkPos_CmpToSetCTColor, "Pos_CmpToSetCTColor");
         });
 

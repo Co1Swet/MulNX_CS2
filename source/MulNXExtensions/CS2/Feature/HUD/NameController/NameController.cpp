@@ -79,7 +79,7 @@ bool NameController::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, false, true).value();
+            }, true, true).value();
         this->RegisterAttachHook(this->hkGetDecoratedPlayerName,
             "PosInFunc_GetDecoratedPlayerName where r12 is *provider and rdi is **currentComponentName(char**) and rax is **tempRetName(char**)");
 

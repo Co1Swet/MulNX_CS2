@@ -6,6 +6,13 @@
 
 uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     this->threadNumInAsm.fetch_add(1, std::memory_order_seq_cst);
+#ifdef _DEBUG
+    auto rsp = ctx->rsp;
+    auto test = rsp % 16;
+    if (test) {
+        MulNX::ErrorTerminate("DEBUG 栈对齐错误！");
+    }
+#endif
     auto then = this->callback(this, ctx);
     uint64_t target;
     switch (then) {

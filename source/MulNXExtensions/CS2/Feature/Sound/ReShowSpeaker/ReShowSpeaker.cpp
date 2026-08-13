@@ -6,7 +6,7 @@ bool ReShowSpeaker::Init() {
         this->hkPos_ifShowSpeaker = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->rax = 0;
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }, true).value();
         this->RegisterAttachHook(this->hkPos_ifShowSpeaker, "Pos_ifShowSpeaker");
         });
 

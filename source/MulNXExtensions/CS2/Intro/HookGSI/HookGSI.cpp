@@ -9,7 +9,7 @@ bool HookGSI::Init() {
                 ctx->rax = 0;
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }, true).value();
         this->RegisterAttachHook(this->hkPos_GSI_ForSpecTarget_call_GetOBingPawn, "Pos_GSI_ForSpecTarget_call_GetOBingPawn");
         });
 

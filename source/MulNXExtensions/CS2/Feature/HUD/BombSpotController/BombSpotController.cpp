@@ -18,11 +18,11 @@ bool BombSpotController::Init() {
                     *(int*)ctx->rdx = IM_COL32(255, 0, 0, 255);// -16776961 red
                 }
             }
-            catch (...) {
-
+            catch (MulNX::Exception& e) {
+                this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }, true).value();
         this->RegisterAttachHook(this->hkPos_Spot_WriteBombState, "Pos_Spot_WriteBombState where rdx is BombColor*");
 
         auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
