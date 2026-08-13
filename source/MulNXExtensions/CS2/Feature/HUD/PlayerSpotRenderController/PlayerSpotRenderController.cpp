@@ -27,11 +27,11 @@ bool PlayerSpotRenderController::Init() {
                 auto team = MulNX::MRead(pPawn->iTeamNum());
                 if (teamOBing == team)return MulNX::Hook::Then::JmpUserSettedTarget;
             }
-            catch (...) {
-
+            catch (MulNX::Exception& e) {
+                this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }, false, false, (uintptr_t)(Pos_Spot_CmpToSetShow + 10)).value();
+            }, true, false, (uintptr_t)(Pos_Spot_CmpToSetShow + 10)).value();
         this->RegisterAttachHook(this->hkPos_Spot_CmpToSetShow, "Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*");
 
         // 修改小地图上玩家图标的绘制样式
@@ -54,7 +54,7 @@ bool PlayerSpotRenderController::Init() {
                 
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }, true).value();
         this->RegisterAttachHook(this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw, "Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw");
 
         // 修改玩家图标的具体绘制组件可见性

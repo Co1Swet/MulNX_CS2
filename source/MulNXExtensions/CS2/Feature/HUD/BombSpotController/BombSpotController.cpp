@@ -31,7 +31,7 @@ bool BombSpotController::Init() {
             auto pRet = (CS2::C_BaseEntity*)ctx->rax;
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }, true).value();
         this->RegisterAttachHook(this->hkPos_CallGetPawnMaybeSetAllHUD, "Pos_CallGetPawnMaybeSetAllHUD");
         });
         

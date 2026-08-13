@@ -8,7 +8,7 @@ bool SoundCircleFix::Init() {
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }, true).value();
         this->RegisterAttachHook(this->hkPos_CallGetPawnUpdateCirclePos, "Pos_CallGetPawnUpdateCirclePos");
 
         auto Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque).Data();
@@ -18,7 +18,7 @@ bool SoundCircleFix::Init() {
             auto pOBing = this->CS2->client.TryGetObservingPawn();
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, false, true).value();
+            }, true, true).value();
         this->RegisterAttachHook(this->hkPos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque, "Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque");
 
         auto Pos_CallGetPawnMaybeOtherAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnMaybeOtherAsyncSoundEnque).Data();

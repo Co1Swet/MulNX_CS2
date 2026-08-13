@@ -73,7 +73,10 @@ MulNX::UI::RAIIWindow::~RAIIWindow() {
     this->bNeedCallEnd = false;
 }
 MulNX::UI::RAIIWindow::operator bool()const {
-    return this->bCallBeginResult && this->bNeedCallEnd;
+    return this->bNeedCallEnd;
+}
+bool MulNX::UI::RAIIWindow::ShouldDraw()const {
+    return this->bCallBeginResult;
 }
 
 MulNX::UI::RAIIChild::RAIIChild(const char* str_id, const ImVec2& size_arg, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags) {

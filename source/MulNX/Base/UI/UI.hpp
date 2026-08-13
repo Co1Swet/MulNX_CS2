@@ -32,6 +32,7 @@ namespace MulNX {
             RAIIWindow(const char* name, std::atomic<bool>& showWindow);
             ~RAIIWindow();
             explicit operator bool() const;
+            bool ShouldDraw()const;
 
             RAIIWindow(const RAIIWindow&) = delete;
             RAIIWindow& operator=(const RAIIWindow&) = delete;

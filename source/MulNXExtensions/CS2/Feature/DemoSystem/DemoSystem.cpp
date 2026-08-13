@@ -3,11 +3,11 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
 
-bool DemoSystem::Window(MulNX::UICoordinator* uico) {
+void DemoSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("Demo", this->showWindow);
-    if (!w) return true;
-
+    if (!w) return;
     uico->CallbackCall("UI.Demos"_hash, nullptr);
+    if (!w.ShouldDraw())return;
 
     std::unique_lock lock(this->smutex);
 
@@ -105,8 +105,6 @@ bool DemoSystem::Window(MulNX::UICoordinator* uico) {
     ImGui::Text(I18n("demo.status.is_pausing", this->CS2Time->IsDemoPaused()).c_str());
 
     ImGui::Separator();
-
-    return true;
 }
 
 bool DemoSystem::Init() {
