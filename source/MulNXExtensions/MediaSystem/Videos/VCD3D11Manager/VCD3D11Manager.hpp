@@ -10,9 +10,9 @@ public:
 
 // 环形队列的单个槽位：一对跨设备共享纹理 + 新帧标志 + 捕获时刻(PTS)
 struct RingSlot {
-    MidTex rawTex;      // 原设备（游戏）上的共享纹理
-    MidTex shareTex;    // 录制设备上的共享纹理
-    MulNX::VFrameExInfo frameInfo;
+    MidTex rawTex{};      // 原设备（游戏）上的共享纹理
+    MidTex shareTex{};    // 录制设备上的共享纹理
+    MulNX::VFrameExInfo frameInfo{};
 
     RingSlot() {
         this->rawTex.pFrameInfo = &this->frameInfo;
@@ -48,9 +48,10 @@ class VCD3D11Manager final : public MediaModuleBase {
     void RefreshTextures();
 
     bool Init() override;
+    void ReleaseTextures();
 public:
     // 环形队列
-    std::vector<RingSlot> ring;
+    std::array<RingSlot, 6> ring;
 
     ComPtr<ID3D11Device> pReadSideDevice;
     ComPtr<ID3D11DeviceContext> pReadSideContext;

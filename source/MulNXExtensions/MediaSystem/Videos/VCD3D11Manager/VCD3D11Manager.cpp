@@ -5,8 +5,10 @@ bool VCD3D11Manager::Init() {
 
     (*this)
         .SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {this->OnPresentFirst(msg);})
+        .SubscribeSync("Hook/IDXGISwapChain/ResizeBuffers/Pre", [this](MulNX::Message& msg) {this->ReleaseTextures();})
+        .SubscribeSync("Hook/IDXGISwapChain/ResizeBuffers/Post", [this](MulNX::Message& msg) {this->RefreshTextures();})
         ;
-        
+
     return true;
 }
 
@@ -21,46 +23,6 @@ av::PixelFormat VCD3D11Manager::DXGIFormatToAvPixelFormat(DXGI_FORMAT format) {
     default:
         return AV_PIX_FMT_NONE;
     }
-}
-
-bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot& slot) {
-    HRESULT hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &slot.rawTex.pTex);
-    if (FAILED(hr)) {
-        this->LogError("环形槽位共享纹理创建失败");
-        return false;
-    }
-
-    ComPtr<IDXGIResource> pDXGIRes;
-    hr = slot.rawTex.pTex.As(&pDXGIRes);
-    if (FAILED(hr)) {
-        this->LogError("槽位获取IDXGIResource失败");
-        return false;
-    }
-    HANDLE hSharedHandle = nullptr;
-    hr = pDXGIRes->GetSharedHandle(&hSharedHandle);
-    if (FAILED(hr)) {
-        this->LogError("槽位获取共享句柄失败");
-        return false;
-    }
-
-    hr = this->pReadSideDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&slot.shareTex.pTex));
-    if (FAILED(hr)) {
-        this->LogError("槽位在捕获设备上打开共享资源失败");
-        return false;
-    }
-
-    hr = slot.rawTex.pTex.As(&slot.rawTex.pMutex);
-    if (FAILED(hr)) {
-        this->LogError("槽位原设备获取KeyedMutex失败");
-        return false;
-    }
-    hr = slot.shareTex.pTex.As(&slot.shareTex.pMutex);
-    if (FAILED(hr)) {
-        this->LogError("槽位录制设备获取KeyedMutex失败");
-        return false;
-    }
-
-    return true;
 }
 
 void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
@@ -95,7 +57,7 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         this->LogError("捕获用D3D11设备创建失败");
         return;
     }
-    
+
     this->LogSucc("捕获用D3D11设备创建成功");
     return this->RefreshTextures();
 }
@@ -145,25 +107,13 @@ void VCD3D11Manager::RefreshTextures() {
         static_cast<unsigned>(bbDesc.Format),
         static_cast<unsigned>(rtvDesc.Format)));
 
-
-    int n = 6;
-    this->ring.clear();
-    this->ring.resize(n);
-    int created = 0;
-    for (int i = 0; i < n; ++i) {
-        if (this->CreateSlot(sharedDesc, this->ring[i])) {
-            ++created;
-        }
-        else {
-            this->LogWarning(std::format("环形槽位 {} 创建失败", i));
+    for (auto& slot : this->ring) {
+        if (!this->CreateSlot(sharedDesc, slot)) {
+            MulNX::ErrorTerminate("捕获用D3D11纹理槽位创建失败！");
         }
     }
-    if (created < 2) {
-        this->LogError("环形队列有效槽位不足(<2)，录制将不可用");
-        return;
-    }
 
-    this->LogSucc(std::format("共享纹理环形队列就绪，槽位数={}", created));
+    this->LogSucc(std::format("共享纹理环形队列就绪(共6槽)"));
 
     this->forWriter.enqueue(0);
     this->forWriter.enqueue(1);
@@ -171,6 +121,62 @@ void VCD3D11Manager::RefreshTextures() {
     this->forWriter.enqueue(3);
     this->forWriter.enqueue(4);
     this->forWriter.enqueue(5);
+}
+
+bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot& slot) {
+    HRESULT hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &slot.rawTex.pTex);
+    if (FAILED(hr)) {
+        this->LogError("环形槽位共享纹理创建失败");
+        return false;
+    }
+
+    ComPtr<IDXGIResource> pDXGIRes;
+    hr = slot.rawTex.pTex.As(&pDXGIRes);
+    if (FAILED(hr)) {
+        this->LogError("槽位获取IDXGIResource失败");
+        return false;
+    }
+    HANDLE hSharedHandle = nullptr;
+    hr = pDXGIRes->GetSharedHandle(&hSharedHandle);
+    if (FAILED(hr)) {
+        this->LogError("槽位获取共享句柄失败");
+        return false;
+    }
+
+    hr = this->pReadSideDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&slot.shareTex.pTex));
+    if (FAILED(hr)) {
+        this->LogError("槽位在捕获设备上打开共享资源失败");
+        return false;
+    }
+
+    hr = slot.rawTex.pTex.As(&slot.rawTex.pMutex);
+    if (FAILED(hr)) {
+        this->LogError("槽位原设备获取KeyedMutex失败");
+        return false;
+    }
+    hr = slot.shareTex.pTex.As(&slot.shareTex.pMutex);
+    if (FAILED(hr)) {
+        this->LogError("槽位录制设备获取KeyedMutex失败");
+        return false;
+    }
+
+    return true;
+}
+void VCD3D11Manager::ReleaseTextures() {
+    int out;
+    int count = 0;
+    while (count < 6) {
+        if (this->forReader.try_dequeue(out))count++;
+        if (this->forWriter.try_dequeue(out))count++;
+    }
+    this->LogInfo("索引队列已清空");
+    for (auto& slot : this->ring) {
+        slot.rawTex.pMutex.Reset();
+        slot.rawTex.pTex.Reset();
+        slot.shareTex.pMutex.Reset();
+        slot.shareTex.pTex.Reset();
+    }
+    this->LogInfo("旧资源已释放");
 }
 
 std::optional<int> VCD3D11Manager::TryGetReadSide() {

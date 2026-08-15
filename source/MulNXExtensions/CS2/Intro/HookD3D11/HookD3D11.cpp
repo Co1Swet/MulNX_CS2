@@ -30,6 +30,7 @@ void HookD3D11::UpdateRenderXY(IDXGISwapChain* pSwapChain) {
     pSwapChain->GetDesc(&sd);
     this->pGlobalVars->renderX.store(sd.BufferDesc.Width, std::memory_order_release);
     this->pGlobalVars->renderY.store(sd.BufferDesc.Height, std::memory_order_release);
+    this->LogInfo(std::format("当前渲染分辨率：{} x {}", sd.BufferDesc.Width, sd.BufferDesc.Height));
 }
 void HookD3D11::HookD3D11DeviceAndContext() {
     this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -121,11 +122,13 @@ MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
 }
 MulNX::Hook::Then HookD3D11::HandleOnResizeBuffers(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->ReleaseOld();
+    this->PublishSync("Hook/IDXGISwapChain/ResizeBuffers/Pre"_hash);
     ImGui_ImplDX11_InvalidateDeviceObjects();
     hk->CallMaybeOrigin(2, ctx);
     if (!ImGui_ImplDX11_CreateDeviceObjects()) {
         MulNX::ErrorTerminate("在重置后台缓冲区触发的ImGui资源重建中遇到错误！");
     }
     this->UpdateRenderXY(std::bit_cast<IDXGISwapChain*>(ctx->rcx));
+    this->PublishSync("Hook/IDXGISwapChain/ResizeBuffers/Post"_hash);
     return MulNX::Hook::Then::Return;
 }
