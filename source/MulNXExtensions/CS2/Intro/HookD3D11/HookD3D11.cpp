@@ -56,6 +56,7 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
     // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
     this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->pGraphicsManager->pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);
         this->PublishSync("Hook/Present/First"_hash);
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11AndImGuiInit(hk, ctx);});
         return MulNX::Hook::Then::Continue;
@@ -122,6 +123,7 @@ MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
 }
 MulNX::Hook::Then HookD3D11::HandleOnResizeBuffers(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->ReleaseOld();
+    this->pGraphicsManager->pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);
     this->PublishSync("Hook/IDXGISwapChain/ResizeBuffers/Pre"_hash);
     ImGui_ImplDX11_InvalidateDeviceObjects();
     hk->CallMaybeOrigin(2, ctx);

@@ -63,33 +63,26 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
 }
 
 void VCD3D11Manager::RefreshTextures() {
-    // 获取原设备后台缓冲区描述
-    ComPtr<ID3D11RenderTargetView> pRTV;
-    this->pGraphicsManager->pd3dContext->OMGetRenderTargets(1, pRTV.GetAddressOf(), nullptr);
-    if (!pRTV) {
-        this->LogError("无法获取原设备渲染目标");
+    IDXGISwapChain* pSwapChain = this->pGraphicsManager->pSwapChain;
+    if (!pSwapChain) {
+        this->LogError("无法获取交换链");
         return;
     }
 
-    D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-    pRTV->GetDesc(&rtvDesc);
-    ComPtr<ID3D11Resource> pBBRes;
-    pRTV->GetResource(&pBBRes);
-    if (!pBBRes) {
-        this->LogError("无法获取后台缓冲区资源");
+    DXGI_SWAP_CHAIN_DESC swapDesc;
+    HRESULT hr = pSwapChain->GetDesc(&swapDesc);
+    if (FAILED(hr)) {
+        this->LogError("获取交换链描述失败");
         return;
     }
 
-    D3D11_TEXTURE2D_DESC bbDesc;
-    static_cast<ID3D11Texture2D*>(pBBRes.Get())->GetDesc(&bbDesc);
-
-    // 共享纹理描述模板：强制非 MSAA、使用后备缓冲的实际格式
+    // 使用 swapDesc.BufferDesc.Width / Height / Format
     D3D11_TEXTURE2D_DESC sharedDesc = {};
-    sharedDesc.Width = bbDesc.Width;
-    sharedDesc.Height = bbDesc.Height;
+    sharedDesc.Width = swapDesc.BufferDesc.Width;
+    sharedDesc.Height = swapDesc.BufferDesc.Height;
     sharedDesc.MipLevels = 1;
     sharedDesc.ArraySize = 1;
-    sharedDesc.Format = rtvDesc.Format;
+    sharedDesc.Format = swapDesc.BufferDesc.Format;
     sharedDesc.SampleDesc.Count = 1;
     sharedDesc.SampleDesc.Quality = 0;
     sharedDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;
@@ -97,15 +90,13 @@ void VCD3D11Manager::RefreshTextures() {
     sharedDesc.CPUAccessFlags = 0;
     sharedDesc.Usage = D3D11_USAGE_DEFAULT;
 
-    // 记录源参数：像素格式用 RTV 格式（保证可被 DXGIFormatToAvPixelFormat 识别）
-
-    this->srcDxgiFormat = rtvDesc.Format;
+    this->srcDxgiFormat = swapDesc.BufferDesc.Format;
     this->srcAVFormat = this->DXGIFormatToAvPixelFormat(this->srcDxgiFormat);
 
-    this->LogInfo(std::format("源纹理: {}x{} bbFormat={:#x} rtvFormat={:#x}",
-        bbDesc.Width, bbDesc.Height,
-        static_cast<unsigned>(bbDesc.Format),
-        static_cast<unsigned>(rtvDesc.Format)));
+    this->LogInfo(std::format("纹理: {}x{} Format={:#x}",
+        sharedDesc.Width, sharedDesc.Height,
+        static_cast<unsigned>(sharedDesc.Format)
+    ));
 
     for (auto& slot : this->ring) {
         if (!this->CreateSlot(sharedDesc, slot)) {
