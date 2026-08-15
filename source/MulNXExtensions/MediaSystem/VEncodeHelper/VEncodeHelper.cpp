@@ -22,10 +22,10 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec)
     auto& rp = *this->pMediaParamManager;
 
     this->width = rp.width > 0 ? rp.width :
-        this->pVCD3D11Manager->srcWidth;
+        this->pGlobalVars->renderX.load(std::memory_order_acquire);
     
     this->height = rp.height > 0 ? rp.height :
-        this->pVCD3D11Manager->srcHeight;
+        this->pGlobalVars->renderY.load(std::memory_order_acquire);
 
     this->chosenEncoder = codec.name();
 

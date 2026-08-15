@@ -94,8 +94,8 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
     this->pMediaState->advancedMode = advance;
 
     std::string outFile = pathNoExt + ".mp4";
-    int srcW = this->pVCD3D11Manager->srcWidth;
-    int srcH = this->pVCD3D11Manager->srcHeight;
+    int srcW = this->pGlobalVars->renderX.load(std::memory_order_acquire);
+    int srcH = this->pGlobalVars->renderY.load(std::memory_order_acquire);
     av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
     if (srcW <= 0 || srcH <= 0 || srcFmt == AV_PIX_FMT_NONE) {
         this->LogError("源纹理参数无效"); return false;

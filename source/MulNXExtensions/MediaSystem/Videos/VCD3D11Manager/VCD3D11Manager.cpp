@@ -135,15 +135,13 @@ void VCD3D11Manager::RefreshTextures() {
     sharedDesc.CPUAccessFlags = 0;
     sharedDesc.Usage = D3D11_USAGE_DEFAULT;
 
-    // 记录源参数：宽高用后备缓冲，像素格式用 RTV 格式（保证可被 DXGIFormatToAvPixelFormat 识别）
-    this->srcWidth = (int)bbDesc.Width;
-    this->srcHeight = (int)bbDesc.Height;
+    // 记录源参数：像素格式用 RTV 格式（保证可被 DXGIFormatToAvPixelFormat 识别）
 
     this->srcDxgiFormat = rtvDesc.Format;
     this->srcAVFormat = this->DXGIFormatToAvPixelFormat(this->srcDxgiFormat);
 
     this->LogInfo(std::format("源纹理: {}x{} bbFormat={:#x} rtvFormat={:#x}",
-        this->srcWidth, this->srcHeight,
+        bbDesc.Width, bbDesc.Height,
         static_cast<unsigned>(bbDesc.Format),
         static_cast<unsigned>(rtvDesc.Format)));
 

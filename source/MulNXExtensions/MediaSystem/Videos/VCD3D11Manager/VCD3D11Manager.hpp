@@ -55,10 +55,6 @@ public:
     ComPtr<ID3D11Device> pReadSideDevice;
     ComPtr<ID3D11DeviceContext> pReadSideContext;
 
-    // 源纹理参数（创建环形队列时记录，供编码器配置使用）
-    int srcWidth = 0;
-    int srcHeight = 0;
-
     DXGI_FORMAT srcDxgiFormat = DXGI_FORMAT_UNKNOWN;
     av::PixelFormat srcAVFormat = AV_PIX_FMT_NONE;
 
