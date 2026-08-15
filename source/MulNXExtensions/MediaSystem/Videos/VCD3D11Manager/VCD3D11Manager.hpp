@@ -45,6 +45,7 @@ class VCD3D11Manager final : public MediaModuleBase {
 
     void OnPresentFirst(MulNX::Message& msg);
     bool CreateSlot(const D3D11_TEXTURE2D_DESC& desc, RingSlot& slot);
+    void RefreshTextures();
 
     bool Init() override;
 public:

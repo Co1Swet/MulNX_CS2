@@ -32,18 +32,33 @@ bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot
 
     ComPtr<IDXGIResource> pDXGIRes;
     hr = slot.rawTex.pTex.As(&pDXGIRes);
-    if (FAILED(hr)) { this->LogError("槽位获取IDXGIResource失败"); return false; }
+    if (FAILED(hr)) {
+        this->LogError("槽位获取IDXGIResource失败");
+        return false;
+    }
     HANDLE hSharedHandle = nullptr;
     hr = pDXGIRes->GetSharedHandle(&hSharedHandle);
-    if (FAILED(hr)) { this->LogError("槽位获取共享句柄失败"); return false; }
+    if (FAILED(hr)) {
+        this->LogError("槽位获取共享句柄失败");
+        return false;
+    }
 
     hr = this->pReadSideDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&slot.shareTex.pTex));
-    if (FAILED(hr)) { this->LogError("槽位在捕获设备上打开共享资源失败"); return false; }
+    if (FAILED(hr)) {
+        this->LogError("槽位在捕获设备上打开共享资源失败");
+        return false;
+    }
 
     hr = slot.rawTex.pTex.As(&slot.rawTex.pMutex);
-    if (FAILED(hr)) { this->LogError("槽位原设备获取KeyedMutex失败"); return false; }
+    if (FAILED(hr)) {
+        this->LogError("槽位原设备获取KeyedMutex失败");
+        return false;
+    }
     hr = slot.shareTex.pTex.As(&slot.shareTex.pMutex);
-    if (FAILED(hr)) { this->LogError("槽位录制设备获取KeyedMutex失败"); return false; }
+    if (FAILED(hr)) {
+        this->LogError("槽位录制设备获取KeyedMutex失败");
+        return false;
+    }
 
     return true;
 }
@@ -80,8 +95,12 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         this->LogError("捕获用D3D11设备创建失败");
         return;
     }
+    
     this->LogSucc("捕获用D3D11设备创建成功");
+    return this->RefreshTextures();
+}
 
+void VCD3D11Manager::RefreshTextures() {
     // 获取原设备后台缓冲区描述
     ComPtr<ID3D11RenderTargetView> pRTV;
     this->pGraphicsManager->pd3dContext->OMGetRenderTargets(1, pRTV.GetAddressOf(), nullptr);
@@ -136,7 +155,8 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
     for (int i = 0; i < n; ++i) {
         if (this->CreateSlot(sharedDesc, this->ring[i])) {
             ++created;
-        } else {
+        }
+        else {
             this->LogWarning(std::format("环形槽位 {} 创建失败", i));
         }
     }
