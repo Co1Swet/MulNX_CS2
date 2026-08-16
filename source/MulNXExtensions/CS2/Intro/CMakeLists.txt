@@ -8,6 +8,7 @@ add_library(CS2Intro STATIC
     HookGameEvents/HookGameEvents.cpp
     BackgroundEntityScan/BackgroundEntityScan.cpp
     HookGSI/HookGSI.cpp
+    GFuncBind/GFuncBind.cpp
 )
 target_link_libraries(CS2Intro PUBLIC
     CS2Game

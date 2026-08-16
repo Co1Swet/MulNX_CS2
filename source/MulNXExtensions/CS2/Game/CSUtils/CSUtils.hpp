@@ -1,4 +1,5 @@
 #pragma once
+#include "CBufferString.hpp"
 
 namespace CS2 {
     class CUtlSymbolLarge {
@@ -29,14 +30,5 @@ namespace CS2 {
         float* pFov() { return reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(this) + 0x498); }
         DirectX::XMFLOAT3* pViewOrigin() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + 0x4a0); }
         DirectX::XMFLOAT3* pViewAngles() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + 0x4b8); }
-    };
-
-    class CBufferString {
-        int length;
-        int allocSizeWithFlag;
-        union {
-            char* pHeapString;
-            char internalString[8];
-        };
     };
 }

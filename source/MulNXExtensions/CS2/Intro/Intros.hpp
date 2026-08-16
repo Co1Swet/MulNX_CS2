@@ -8,3 +8,4 @@
 #include "HookGameEvents/HookGameEvents.hpp"
 #include "BackgroundEntityScan/BackgroundEntityScan.hpp"
 #include "HookGSI/HookGSI.hpp"
+#include "GFuncBind/GFuncBind.hpp"
