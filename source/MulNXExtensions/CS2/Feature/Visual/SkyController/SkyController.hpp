@@ -27,6 +27,9 @@ class SkyController final : public CSModuleBase {
     std::atomic<uint32_t> skyColor{ IM_COL32(0, 0, 0, 255) };  // 普通染色（RGBA）
     std::atomic<float> brightness{ 2.0f };
 
+    std::string currentSkyName{};
+    std::unordered_map<std::string, bool> cachedMaterials{};
+
     void Menu();
     bool Init() override;
     void ProcessMsg(MulNX::Message& msg) override;

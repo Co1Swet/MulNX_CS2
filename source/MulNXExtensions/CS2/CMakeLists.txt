@@ -1,5 +1,6 @@
 add_library(MulNXCS2Ext INTERFACE)
 
+add_subdirectory("Game")
 add_subdirectory("Intro")
 add_subdirectory("Buildup")
 add_subdirectory("Feature")

@@ -1,2 +1,2 @@
-#include "GlobalVars.hpp"
+#include "CSGlobalVars.hpp"
 #include <MulNXUtils/WinExt/WinExt.hpp>

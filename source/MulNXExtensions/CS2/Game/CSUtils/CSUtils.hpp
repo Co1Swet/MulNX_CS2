@@ -32,9 +32,11 @@ namespace CS2 {
     };
 
     class CBufferString {
-    public:
         int length;
-        int allocatedSize;
-        char m_szString[32];
+        int allocSizeWithFlag;
+        union {
+            char* pHeapString;
+            char internalString[8];
+        };
     };
 }

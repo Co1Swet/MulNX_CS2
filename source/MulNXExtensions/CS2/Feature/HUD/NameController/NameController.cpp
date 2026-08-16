@@ -4,7 +4,6 @@
 #include <MulNXThirdParty/hlae/binutils.h>
 
 using GetDecoratedPlayerName_t = void(*)(void* This, CS2::CBufferString* pBufferString, unsigned int flags, bool bUnk3);
-
 using GetPlayerName_t = const char* (*)(CS2::CCSPlayerController*);
 
 void NameController::UIPlayer(MulNX::Message* msg) {

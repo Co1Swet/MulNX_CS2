@@ -5,7 +5,7 @@
 
 void TimeLiner::Menu() {
     MulNX::UI::RAIIWindow w("时间轴");
-    if (!w)return;
+    if (!w.ShouldDraw())return;
 
     if (!this->pActiveTimeAdapter) {
         ImGui::Text("无活跃时间适配器");

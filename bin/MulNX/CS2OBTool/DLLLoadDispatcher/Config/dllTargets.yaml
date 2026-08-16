@@ -8,3 +8,4 @@ targets:
   - scenesystem.dll
   - rendersystemdx11.dll
   - soundsystem.dll
+  - resourcesystem.dll

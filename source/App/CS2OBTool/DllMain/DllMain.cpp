@@ -51,6 +51,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<ParticleManager>("ParticleManager")
         .CreateModule<MaterialSystem>("MaterialSystem")
         .CreateModule<SceneSystem>("SceneSystem")
+        .CreateModule<ResourceSystem>("ResourceSystem")
 
         // CS2 摄像机系统
         .CreateModule<CameraSystem>("CameraSystem")

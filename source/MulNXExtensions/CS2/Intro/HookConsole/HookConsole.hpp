@@ -1,6 +1,6 @@
 #pragma once
+#include <Game/Consoles.hpp>
 #include <Intro/CSModuleBase.hpp>
-#include <Intro/CSClasses/Consoles.hpp>
 
 class HookConsole final :public CSModuleBase {
     friend class ConsoleManager;

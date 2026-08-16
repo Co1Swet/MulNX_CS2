@@ -3,10 +3,7 @@
 #include <MulNX/Base/Math/Math.hpp>
 #include <MulNXUtils/WinExt/WinExt.hpp>
 #include <Intro/Signatures.hpp>
-#include <Intro/CSClasses/tree/tree.hpp>
-#include <Intro/CSClasses/GlobalVars/GlobalVars.hpp>
-#include <Intro/CSClasses/CSDll/CSDll.hpp>
-#include <Intro/CSClasses/C_CSGameRules/C_CSGameRules.hpp>
+#include <Game/Games.hpp>
 #include <MulNXUtils/MemInsights/RetEditor/RetEditor.hpp>
 #include <MulNXUtils/WinExt/HookMixin.hpp>
 
@@ -37,5 +34,5 @@ public:
     VExecutor<void* ()> GetDemo{};
 
     // CS2全局变量
-    C_GlobalVars* CSGlobalVars{};
+    CCSGlobalVars* CSGlobalVars{};
 };

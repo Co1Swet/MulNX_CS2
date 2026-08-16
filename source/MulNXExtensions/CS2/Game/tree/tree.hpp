@@ -1,12 +1,9 @@
 #pragma once 
-#include <MulNX/MulNX.hpp>
+#include <Game/BaseType.hpp>
 #include <MulNXUtils/WinExt/vtable/vtable.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
-#include "../Utils/Utils.hpp"
+#include <Game/CSUtils/CSUtils.hpp>
 #include "PawnsServices.hpp"
-
-MULNX_USING(GameTime_t, float);
-MULNX_USING(Steam64UID, uint64_t);
 
 namespace CS2 {
     class CHandleBase {

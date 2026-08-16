@@ -43,7 +43,7 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
 
     this->SendTask("Main", "CSControl", [this]()->bool {
         try {// 获取CS2全局变量
-            this->CSGlobalVars = MulNX::MRead<C_GlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
+            this->CSGlobalVars = MulNX::MRead<CCSGlobalVars*>(this->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGlobalVars);
         }
         catch (const MulNX::Exception& e) {
             this->LogWarning(e);

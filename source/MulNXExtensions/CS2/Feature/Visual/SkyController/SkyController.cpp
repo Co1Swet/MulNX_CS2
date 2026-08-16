@@ -90,6 +90,14 @@ void SkyController::ProcessMsg(MulNX::Message& msg) {
 MulNX::Hook::Then SkyController::HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky) {
     if (!this->enable.load()) return MulNX::Hook::Then::Continue;
 
+    if (this->currentSkyName.size() != 0) {
+        if (this->cachedMaterials.find(this->currentSkyName) == this->cachedMaterials.end()) {
+            // if (0 != g_pCResourceSystem->PreCache(this->currentSkyName.c_str())) {
+            //     cachedMaterials.insert({ this->currentSkyName, true });
+            // }
+        }
+    }
+
     *pEnvSky->m_vTintColor() = this->skyColor.load();
     *pEnvSky->m_flBrightnessScale() = this->brightness.load();
 

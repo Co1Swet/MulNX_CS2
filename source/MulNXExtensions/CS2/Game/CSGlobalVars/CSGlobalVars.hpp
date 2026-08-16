@@ -1,9 +1,8 @@
 #pragma once
-
 #include <cstdint>
 #include <MulNX/MulNX.hpp>
 
-class C_GlobalVars {
+class CCSGlobalVars {
 public:
     // float RealTime{};
     // int FrameCount{};

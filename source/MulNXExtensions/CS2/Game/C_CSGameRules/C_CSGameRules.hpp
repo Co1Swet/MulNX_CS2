@@ -1,5 +1,5 @@
 #pragma once
-
+#include <Game/BaseType.hpp>
 #include <MulNX/Config/Config.hpp>
 #include <MulNXThirdParty/All_cs2_dumper.hpp>
 

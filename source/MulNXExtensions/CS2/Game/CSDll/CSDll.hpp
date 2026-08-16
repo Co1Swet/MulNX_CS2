@@ -1,8 +1,8 @@
 #pragma once
 #include <MulNX/Config/Config.hpp>
 #include <MulNXUtils/WinExt/WinExt.hpp>
-#include <Intro/CSClasses/tree/tree.hpp>
-#include <Intro/CSClasses/C_CSGameRules/C_CSGameRules.hpp>
+#include <Game/tree/tree.hpp>
+#include <Game/C_CSGameRules/C_CSGameRules.hpp>
 
 namespace CS2 {
     namespace Module {
