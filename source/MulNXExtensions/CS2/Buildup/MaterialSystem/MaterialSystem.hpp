@@ -6,5 +6,5 @@ class MaterialSystem final :public CSModuleBase {
     MulNX::Memory::DllModule materialsystem2{};
     bool Init()override;
 public:
-    void** FindMaterial(const std::string& name);
+    void* FindMaterial(CMaterial2*** out, const char* materialName);
 };

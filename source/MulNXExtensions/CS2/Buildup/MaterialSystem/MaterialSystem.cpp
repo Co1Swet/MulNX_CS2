@@ -1,7 +1,5 @@
 #include "MaterialSystem.hpp"
 
-using FindMaterial_t = void** (*)(void* pThis, const char* name);
-
 bool MaterialSystem::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/materialsystem2.dll", [this](MulNX::Message& msg) {
         this->materialsystem2 = MulNX::Memory::DllModule(L"materialsystem2.dll");
@@ -11,7 +9,8 @@ bool MaterialSystem::Init() {
     return true;
 }
 
-void** MaterialSystem::FindMaterial(const std::string& name) {
-    auto pFindMaterial = (FindMaterial_t)IVClass::Assume(*this->ppGameMaterialSystem)->GetVFuncPtr(13);
-    return pFindMaterial(*this->ppGameMaterialSystem, name.c_str());
+void* MaterialSystem::FindMaterial(CMaterial2*** out, const char* materialName) {
+    using FindMaterial_t = void* (*)(void* This, CMaterial2*** out, const char* materialName);
+    auto pFindMaterial = (FindMaterial_t)IVClass::Assume(this->ppGameMaterialSystem)->GetVFuncPtr(14);
+    return pFindMaterial(this->ppGameMaterialSystem, out, materialName);
 }

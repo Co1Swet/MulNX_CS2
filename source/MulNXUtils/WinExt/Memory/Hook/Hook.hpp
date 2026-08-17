@@ -60,7 +60,9 @@ namespace MulNX {
         std::optional<std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
     public:
         ~Hook();
-        
+
+        uintptr_t GetHookTarget()const { return std::bit_cast<uintptr_t>(this->hookTarget); }
+
         static std::expected<std::unique_ptr<Hook>, std::string> Create(
             uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
             bool extraStackAdjust = false, bool callRawFisrt = false,

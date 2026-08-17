@@ -60,5 +60,19 @@ namespace CS2 {
         void ExtractFileExtension(const char* pPath) {
             this->pFuncExtractFileExtension(this, pPath);
         }
+
+        int AllocatedNum() const { return this->allocSizeWithFlag & ((1 << 30) - 1); }
+        int Length() const { return this->length & ((1 << 30) - 1); }
+        bool IsStackAllocated() const { return (this->allocSizeWithFlag & (1 << 30)) != 0; }
+
+        char* c_str() {
+            if (this->IsStackAllocated()) {
+                return this->internalString;
+            }
+            if (this->AllocatedNum() != 0) {
+                return this->pHeapString;
+            }
+            return nullptr;
+        }
     };
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
+#include <Buildup/ResourceSystem/ResourceSystem.hpp>
+#include <Buildup/MaterialSystem/MaterialSystem.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
 namespace CS2 {
@@ -21,17 +23,24 @@ namespace CS2 {
 }
 
 class SkyController final : public CSModuleBase {
+    ResourceSystem* pResourceSystem = nullptr;
+    MaterialSystem* pMaterialSystem = nullptr;
+
     std::atomic<bool> enable = false;
     std::unique_ptr<MulNX::Hook> hkForceUpdateSkybox{};
 
     std::atomic<uint32_t> skyColor{ IM_COL32(0, 0, 0, 255) };  // 普通染色（RGBA）
     std::atomic<float> brightness{ 2.0f };
 
-    std::string currentSkyName{};
+    std::string currentSkyName = "materials/skybox/cs_italy_s2_skybox_2.vmat";
     std::unordered_map<std::string, bool> cachedMaterials{};
+
+    std::atomic<bool>nextUpdateSkyboxNeedOverride = false;
+
 
     void Menu();
     bool Init() override;
     void ProcessMsg(MulNX::Message& msg) override;
+    void HandleOnCmd();
     MulNX::Hook::Then HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky);
 };
