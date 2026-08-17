@@ -62,7 +62,7 @@ bool SkyController::Init() {
         .SubscribeAsync("Sky/Color/Set")
         .SubscribeAsync("Sky/Brightness/Set");
 
-    this->CS2Con->RegisterCmd("MulNX/Sky/Update", [this](auto&&...) {
+    this->CS2Con->RegisterCmd("MulNX/Sky/UpdateOnMainThread", [this](auto&&...) {
         this->HandleOnCmd();
         });
 
@@ -97,23 +97,30 @@ void SkyController::ProcessMsg(MulNX::Message& msg) {
 
 void SkyController::HandleOnCmd() {
     std::unique_lock lock(this->smutex);
-    if (this->currentSkyName.size() != 0) {
-        if (this->cachedMaterials.find(this->currentSkyName) == this->cachedMaterials.end()) {
-            if (0 != this->pResourceSystem->PreCache(this->currentSkyName.c_str())) {
-                this->cachedMaterials.insert({ this->currentSkyName, true });
-                this->nextUpdateSkyboxNeedOverride.store(true);
-            }
-        }
-    }
+
+    auto pWantedSkyName = this->wantedSkyName.load();
+    if (!pWantedSkyName)return;
+
+    auto skyName = *pWantedSkyName;
+    if (skyName.size() == 0) return;
+
+    auto EnsureSky = [&]()->bool {
+        if (this->cachedMaterials.find(skyName) != this->cachedMaterials.end())return true;
+        if (this->pResourceSystem->PreCache(skyName.c_str()) == 0)return false;
+        this->cachedMaterials.insert({ skyName, true });
+        return true;
+        };
+
+    if (!EnsureSky())return;
 
     for (int i = 0; i < 2048; i++) {
         auto pEntity = this->CS2->client.GetBaseEntity(i);
-        if(!pEntity)continue;
+        if (!pEntity)continue;
+        
         auto name = pEntity->GetName();
-
         if (_stricmp("env_sky", name.c_str())) continue;
 
-        *(void**)((unsigned char*)pEntity + 0x118) = nullptr;
+        *(void**)((char*)pEntity + 0x118) = nullptr;
 
         auto pEntry = this->hkForceUpdateSkybox->GetHookTarget();
         using ForceUpdateSkybox_t = void* (*)(void*);
@@ -124,31 +131,30 @@ void SkyController::HandleOnCmd() {
 MulNX::Hook::Then SkyController::HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky) {
     if (!this->enable.load()) return MulNX::Hook::Then::Continue;
 
-    this->LogWarning(pEnvSky->GetName());
+    //*pEnvSky->m_vTintColor() = this->skyColor.load();
+    //*pEnvSky->m_flBrightnessScale() = this->brightness.load();
+    auto pB = pEnvSky->m_flBrightnessScale();
+    *pB *= 0.1;
+
+    // 读取当前材质
+    auto nowMat = std::bit_cast<CMaterial2**>(*pEnvSky->m_hSkyMaterial());
+    auto nowName = (*nowMat)->GetName();
 
     // 查找新材质
     CMaterial2** newMat = nullptr;
-    this->pMaterialSystem->FindMaterial(&newMat, this->currentSkyName.c_str());
+    auto p = this->wantedSkyName.load();
+    if (!p)return MulNX::Hook::Then::Continue;
+    auto newName = *p;
+    this->pMaterialSystem->FindMaterial(&newMat, newName.c_str());
 
-    if (0 != newMat) {
-        auto now = std::bit_cast<CMaterial2**>(*pEnvSky->m_hSkyMaterial());
-        if (now != newMat) {
-            
-        }
-        // 手动增加引用计数
-        auto counter = *(uint32_t*)((unsigned char*)newMat + 0x20);
-        counter = counter + 1;
-        *(uint32_t*)((unsigned char*)newMat + 0x20) = counter;
-        // 替换实体中的材质指针
-        *pEnvSky->m_hSkyMaterial() = std::bit_cast<uint64_t>(newMat);
-    }
+    if (!newMat)return MulNX::Hook::Then::Continue;
+    if (nowMat == newMat) return MulNX::Hook::Then::Continue;
 
-    if (this->nextUpdateSkyboxNeedOverride.load()) {
-        
-    }
-
-    //*pEnvSky->m_vTintColor() = this->skyColor.load();
-    //*pEnvSky->m_flBrightnessScale() = this->brightness.load();
+    // 手动增加引用计数
+    auto pCount = (uint32_t*)((char*)newMat + 0x20);
+    (*pCount)++;
+    // 替换实体中的材质指针
+    *pEnvSky->m_hSkyMaterial() = std::bit_cast<uint64_t>(newMat);
 
     return MulNX::Hook::Then::Continue;
 }

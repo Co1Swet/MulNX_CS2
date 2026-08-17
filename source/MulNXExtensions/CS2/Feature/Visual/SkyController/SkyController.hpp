@@ -32,11 +32,11 @@ class SkyController final : public CSModuleBase {
     std::atomic<uint32_t> skyColor{ IM_COL32(0, 0, 0, 255) };  // 普通染色（RGBA）
     std::atomic<float> brightness{ 2.0f };
 
-    std::string currentSkyName = "materials/skybox/cs_italy_s2_skybox_2.vmat";
     std::unordered_map<std::string, bool> cachedMaterials{};
 
-    std::atomic<bool>nextUpdateSkyboxNeedOverride = false;
-
+    std::atomic<std::shared_ptr<const std::string>> wantedSkyName =
+        std::make_shared<const std::string>("materials/skybox/sky_rain_night_01.vmat");
+    std::atomic<std::shared_ptr<const std::string>> previousSkyName = nullptr;
 
     void Menu();
     bool Init() override;

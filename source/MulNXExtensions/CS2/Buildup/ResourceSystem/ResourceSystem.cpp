@@ -53,10 +53,10 @@ uint64_t MurmurHash64B(const void* key, int len, uint64_t seed) {
 bool ResourceSystem::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/resourcesystem.dll", [this](MulNX::Message& msg) {
         this->resourcesystem = MulNX::Memory::DllModule(L"resourcesystem.dll");
-        this->ppGameResourcesystem = (void**)(this->resourcesystem.GetBaseAddress() + cs2_dumper::interfaces::resourcesystem_dll::ResourceSystem013);
-        if (*this->ppGameResourcesystem) {
-            this->LogSucc("查找到 resourcesystem");
-        }
+        this->pGameResourcesystem = (void*)(this->resourcesystem.GetBaseAddress() +
+            cs2_dumper::interfaces::resourcesystem_dll::ResourceSystem013);
+        if (!this->pGameResourcesystem)MulNX::ErrorTerminate("找不到游戏资源系统");
+        this->LogSucc("查找到游戏资源系统");
         });
 
     return true;
@@ -64,15 +64,13 @@ bool ResourceSystem::Init() {
 
 void ResourceSystem::GetMaterials(uint64_t magic, GetMaterialsArrayResult* out, uint8_t unk) {
     using GetMaterials_t = void(*)(void* This, uint64_t magic, GetMaterialsArrayResult* out, uint8_t unk);
-    GetMaterials_t fGetMaterials = (GetMaterials_t)(*(void***)*this->ppGameResourcesystem)[32];
-    fGetMaterials(*this->ppGameResourcesystem, magic, out, unk);
+    auto pGetMaterials_t = (GetMaterials_t)IVClass::Assume(this->pGameResourcesystem)->GetVFuncPtr(32);
+    return pGetMaterials_t(this->pGameResourcesystem, magic, out, unk);
 }
 CMaterial2** ResourceSystem::PreCache(CBufferStringForSky* name, const char* unk) {
     using PreCacheFn_t = CMaterial2 * *(*)(void* pThis, CBufferStringForSky* name, const char* unk);
-    auto pGameResourcesystem = *this->ppGameResourcesystem;
-    auto pPreCache = (PreCacheFn_t)IVClass::Assume(this->ppGameResourcesystem)->GetVFuncPtr(40);
-    PreCacheFn_t fPreCache = (PreCacheFn_t)(*(void***)*this->ppGameResourcesystem)[40];
-    return pPreCache(this->ppGameResourcesystem, name, unk);
+    auto pPreCache = (PreCacheFn_t)IVClass::Assume(this->pGameResourcesystem)->GetVFuncPtr(40);
+    return pPreCache(this->pGameResourcesystem, name, unk);
 }
 CMaterial2** ResourceSystem::PreCache(const char* name) {
 

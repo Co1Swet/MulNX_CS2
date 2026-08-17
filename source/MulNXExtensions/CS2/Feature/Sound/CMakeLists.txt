@@ -2,7 +2,6 @@ add_library(CS2Sound STATIC
     SpeakingController/SpeakingController.cpp
     HitSoundFix/HitSoundFix.cpp
     SoundCircleFix/SoundCircleFix.cpp
-    PlayerVolumeController/PlayerVolumeController.cpp
     AntiVoiceBan/AntiVoiceBan.cpp
     ReShowSpeaker/ReShowSpeaker.cpp
 )

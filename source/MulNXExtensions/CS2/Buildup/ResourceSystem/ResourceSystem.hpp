@@ -14,7 +14,7 @@ struct CBufferStringForSky {
 
 class ResourceSystem final :public CSModuleBase {
     MulNX::Memory::DllModule resourcesystem{};
-    void** ppGameResourcesystem = nullptr;
+    void* pGameResourcesystem = nullptr;
     bool Init()override;
 public:
     void GetMaterials(uint64_t magic, GetMaterialsArrayResult* out, uint8_t unk);
