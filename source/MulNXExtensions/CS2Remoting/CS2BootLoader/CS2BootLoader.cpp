@@ -11,6 +11,7 @@ VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("CS2 Boot Loader");
     if (!w)return;
     uico->CallbackCall("CS2BootLoad"_hash, nullptr);
+    if (!w.ShouldDraw())return;
 
     std::unique_lock lock(this->smutex);
 

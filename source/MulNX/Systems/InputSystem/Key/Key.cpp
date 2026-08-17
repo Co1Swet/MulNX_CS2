@@ -96,7 +96,7 @@ void MulNX::KeyCheckPack::Refresh() {
 
 bool MulNX::KeyCheckPack::DebugWindow(std::atomic<bool>& openWindow) {
     auto w = MulNX::UI::RAIIWindow("按键绑定", openWindow);
-    if (!w) return false;
+    if (!w || !w.ShouldDraw())return false;
 
     ImGui::Text(("当前绑键：" + GetMsg()).c_str());
     ImGui::Separator();

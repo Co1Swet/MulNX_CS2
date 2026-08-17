@@ -5,7 +5,7 @@
 
 void CameraSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.camera_system").c_str());
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     std::shared_lock lock(this->smutex);
     this->WManager->MenuWorkspace();
 

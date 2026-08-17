@@ -4,7 +4,7 @@
 
 void MulNX::UICoordinator::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.settings").c_str());
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImVec2 fullSize = viewport->Size;

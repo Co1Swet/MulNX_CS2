@@ -2,7 +2,7 @@
 
 void GameSettingsManager::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.game_settings").c_str());
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     
     ConvarCheckbox<"sv_cheats">("作弊模式");
     ConvarSliderFloat<"fps_max">("FPS上限", 0, 1000);

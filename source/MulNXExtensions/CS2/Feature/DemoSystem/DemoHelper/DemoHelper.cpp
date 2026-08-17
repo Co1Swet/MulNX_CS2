@@ -5,7 +5,7 @@
 
 void DemoHelper::Window() {
     auto w = MulNX::UI::RAIIWindow("Demo辅助");
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     std::shared_lock lock(this->smutex);
 
     auto tick = this->CS2Time->GetDemoTick();

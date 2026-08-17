@@ -6,7 +6,7 @@
 
 void DemoRecorder::Window() {
     auto w = MulNX::UI::RAIIWindow("Demo Recorder");
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     std::shared_lock lock(this->smutex);
 
     if (ImGui::Button("启动")) {

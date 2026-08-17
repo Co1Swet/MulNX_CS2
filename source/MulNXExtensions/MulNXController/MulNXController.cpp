@@ -5,7 +5,7 @@
 
 void MulNXController::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.mulnx_control").c_str());
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     MulNX::UI::Checkbox("调试模式（Debug Mode），提供更多功能，但可能影响性能和稳定性", this->pGlobalVars->DebugMode);
     uico->CallbackCall("UI.MulNXControl"_hash, nullptr);
     if (ImGui::Button("尝试拉取所有模块信息")) {

@@ -3,7 +3,7 @@
 
 void GameCfgManager::Window() {
     auto w = MulNX::UI::RAIIWindow("配置管理器", this->showWindow);
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     //顶部工具栏
     if (ImGui::Button("刷新列表")) {
         this->UpdateCfgList();

@@ -54,7 +54,7 @@ bool ProjectManager::UINodeFunc() {
 }
 void ProjectManager::Project_DebugWindow() {
     auto w = MulNX::UI::RAIIWindow(I18n("camsys.proj.debug_window").c_str(), this->showWindow);
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     // 检查当前操作项目
     if (!this->ControllingProject) {
         ImGui::Text(I18n("camsys.proj.no_selected").c_str());

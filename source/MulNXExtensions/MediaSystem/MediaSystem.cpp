@@ -5,7 +5,7 @@
 
 void MediaSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("音视频");
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
 
     uico->CallbackCall("UI.MediaSys"_hash, nullptr);
     if (ImGui::CollapsingHeader("录制控制")) {

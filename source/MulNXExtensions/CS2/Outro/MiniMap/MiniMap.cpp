@@ -3,7 +3,7 @@
 
 void MiniMap::Window() {
     auto w = MulNX::UI::RAIIWindow("小地图窗口", this->showWindow);
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
 
     // 保存当前样式
     ImGuiStyle& style = ImGui::GetStyle();

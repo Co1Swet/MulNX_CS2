@@ -3,7 +3,7 @@
 
 void SpecTargetUI::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("观战信息");
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     auto pOBing = this->CS2->client.TryGetObservingPawn();
     if (!pOBing) {
         ImGui::Text("当前未观战任何玩家");

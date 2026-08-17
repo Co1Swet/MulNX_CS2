@@ -5,9 +5,8 @@
 
 void DeathMsgController::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     MulNX::UI::Checkbox(I18n("dthmsg.enable").c_str(), this->enable);
-    return;
 }
 
 bool DeathMsgController::Init() {

@@ -5,7 +5,7 @@
 
 void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("录制任务创建");
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     MulNX::UI::SmartButton btn{};
 
     std::shared_lock lock(this->smutex);

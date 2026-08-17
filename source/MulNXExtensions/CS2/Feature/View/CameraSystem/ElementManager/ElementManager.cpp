@@ -93,7 +93,7 @@ void ElementManager::UINodeFunc() {
         this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.elem.preview_draw_label").c_str());
     }
     auto w = MulNX::UI::RAIIWindow("元素调试", this->showWindow);
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     // 检查当前是否有操作元素
     auto current = this->CurrentElement.load(std::memory_order_acquire);
     if (current) {

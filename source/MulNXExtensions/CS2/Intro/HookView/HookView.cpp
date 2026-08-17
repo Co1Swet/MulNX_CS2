@@ -6,8 +6,8 @@
 void HookView::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow(I18n("镜头参数").c_str());
     if (!w)return;
-
     uico->CallbackCall("UI.CameraSetting"_hash, nullptr);
+    if (!w.ShouldDraw())return;
 
     MulNX::UI::SliderFloat("roll调整", this->controlView.InputRoll, -179.99f, 179.99f);
     static auto* pGlobalFOV = this->CS2Con->GetCvar("fov_cs_debug")->GetPtr<float>();

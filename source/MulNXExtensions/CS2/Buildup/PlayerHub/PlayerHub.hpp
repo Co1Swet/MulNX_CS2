@@ -4,5 +4,5 @@
 class PlayerHub final :public CSModuleBase {
     std::atomic<bool> ShowCompanionWindow = false;
     bool Init()override;
-    bool Window(MulNX::UICoordinator* uico);
+    void Window(MulNX::UICoordinator* uico);
 };

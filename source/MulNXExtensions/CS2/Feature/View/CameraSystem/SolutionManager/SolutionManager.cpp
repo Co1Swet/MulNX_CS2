@@ -113,7 +113,7 @@ bool SolutionManager::UINodeFunc() {
 }
 void SolutionManager::Solution_DebugWindow() {
     auto w = MulNX::UI::RAIIWindow(I18n("camsys.sol.debug_window").c_str(), this->showWindow);
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     // 检查当前是否操作解决方案
     if (!this->CurrentSolution) {
         ImGui::Text(I18n("ui.button.no_selected").c_str());

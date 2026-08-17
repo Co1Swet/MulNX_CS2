@@ -25,7 +25,7 @@ void MulNX::Debugger::DeMe() {
 
 void MulNX::Debugger::Window() {
     auto w = MulNX::UI::RAIIWindow("调试器", this->showWindow);
-    if (!w)return;
+    if (!w || !w.ShouldDraw())return;
     std::shared_lock lock(this->smutex);
 
     // 在标签页内创建一个子窗口
