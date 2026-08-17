@@ -26,17 +26,17 @@ class SkyController final : public CSModuleBase {
     ResourceSystem* pResourceSystem = nullptr;
     MaterialSystem* pMaterialSystem = nullptr;
 
-    std::atomic<bool> enable = false;
     std::unique_ptr<MulNX::Hook> hkForceUpdateSkybox{};
+    // RGB(A)
+    std::atomic<std::optional<uint32_t>> skyColor{};  
+    std::atomic<std::optional<float>> brightScale{};
 
-    std::atomic<uint32_t> skyColor{ IM_COL32(0, 0, 0, 255) };  // 普通染色（RGBA）
-    std::atomic<float> brightness{ 2.0f };
+    std::atomic<std::shared_ptr<const std::string>> wantedSkyName{};
 
-    std::unordered_map<std::string, bool> cachedMaterials{};
+    std::vector<std::string> skyNames{};
 
-    std::atomic<std::shared_ptr<const std::string>> wantedSkyName =
-        std::make_shared<const std::string>("materials/skybox/sky_rain_night_01.vmat");
-    std::atomic<std::shared_ptr<const std::string>> previousSkyName = nullptr;
+    void OnMsgSetMaterial(MulNX::Message& msg);
+    void OnMsgReportNew(MulNX::Message& msg);
 
     void Menu();
     bool Init() override;

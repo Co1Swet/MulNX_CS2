@@ -1,0 +1,9 @@
+skyNames:
+- materials/skybox/cs_italy_s2_skybox_2.vmat_c
+- materials/skybox/cs_italy_s2_skybox_2_fog.vmat_c
+- materials/skybox/cs_italy_s2_skybox_2_lighting.vmat_c
+- materials/skybox/sky_rain_night_01.vmat_c
+- materials/skybox/sky_overcast_01.vmat_c
+- materials/skybox/sky_hr_aztec_02_v1.vmat_c
+- materials/skybox/sky_hr_aztec_02_lighting.vmat_c
+- materials/skybox/sky_hr_aztec_02.vmat_c
