@@ -3,7 +3,6 @@
 #include <CameraSystem/ElementManager/ElementManager.hpp>
 #include <CameraSystem/SolutionManager/SolutionManager.hpp>
 #include <CameraSystem/ProjectManager/ProjectManager.hpp>
-#include <MulNXThirdParty/All_pugixml.hpp>
 
 bool WorkspaceManager::MenuWorkspace() {
     std::shared_lock lock(this->CamSys->smutex);

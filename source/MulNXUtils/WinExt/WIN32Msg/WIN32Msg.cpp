@@ -20,8 +20,9 @@ bool MulNX::Win32::IsMouseMessage(UINT uMsg) {
 }
 bool MulNX::Win32::IsKeyboardMessage(UINT uMsg) {
 	switch (uMsg) {
-	case WM_KEYDOWN: case WM_KEYUP: case WM_CHAR:
-	case WM_SYSKEYDOWN: case WM_SYSKEYUP: case WM_SYSCHAR:
+    case WM_KEYDOWN: case WM_KEYUP:
+    case WM_CHAR:
+    case WM_SYSKEYDOWN: case WM_SYSKEYUP: case WM_SYSCHAR:
 	case WM_DEADCHAR: case WM_SYSDEADCHAR:
 	case WM_HOTKEY:
 	case WM_APPCOMMAND:
@@ -31,4 +32,23 @@ bool MulNX::Win32::IsKeyboardMessage(UINT uMsg) {
 	default:
 		return false;
 	}
+}
+bool MulNX::Win32::IsImeMessage(UINT uMsg) {
+    switch (uMsg) {
+    case WM_IME_STARTCOMPOSITION:
+    case WM_IME_ENDCOMPOSITION:
+    case WM_IME_COMPOSITION:
+    case WM_IME_SETCONTEXT:
+    case WM_IME_NOTIFY:
+    case WM_IME_CONTROL:
+    case WM_IME_COMPOSITIONFULL:
+    case WM_IME_SELECT:
+    case WM_IME_CHAR:
+    case WM_IME_REQUEST:
+    case WM_IME_KEYDOWN:
+    case WM_IME_KEYUP:
+        return true;
+    default:
+        return false;
+    }
 }

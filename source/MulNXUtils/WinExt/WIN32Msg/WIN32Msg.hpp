@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Windows.h>
 
 namespace MulNX {
@@ -14,5 +13,7 @@ namespace MulNX {
             WPARAM wParam;
             LPARAM lParam;
         };
+
+        bool IsImeMessage(UINT uMsg);
     }
 }

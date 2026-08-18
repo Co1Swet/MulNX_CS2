@@ -18,7 +18,9 @@ bool HookWindow::Init() {
         this->RegisterAttachHook(this->hkDrop, "OleDropTargetInterface::Drop");
         // 窗口过程钩子
         this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->hCS2Wnd, GWLP_WNDPROC), [this](MulNX::Hook* hk, RegContext* ctx) {
-            return this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
+            auto then = this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
+            if (then == MulNX::Hook::Then::Return)ctx->rax = 0;
+            return then;
             }).value();
         this->RegisterAttachHook(this->hkWndProc, "WndProc");
         ImGui_ImplWin32_Init(this->hCS2Wnd);
@@ -35,17 +37,48 @@ void HookWindow::FixMouse(UINT& uMsg, LPARAM& lParam) {
     int newY = (int)(y * ((float)this->pGlobalVars->renderY.load(std::memory_order_acquire) / (rc.bottom - rc.top)));
     lParam = MAKELPARAM(newX, newY);
 }
-MulNX::Hook::Then HookWindow::HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+bool HookWindow::CheckIme(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    auto cur = this->pUISystem->WantTextInput.load();
+    if (!this->lastWantTextInput && cur) {
+        ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
+    }
+    if (this->lastWantTextInput && !cur) {
+        ImmAssociateContextEx(hWnd, NULL, 0);
+    }
+    this->lastWantTextInput = cur;
+    if (!MulNX::Win32::IsImeMessage(uMsg))return false;
+    if (cur) {
+        return true;
+    }
+    return false;
+}
+MulNX::Hook::Then HookWindow::HandleWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (uMsg == WM_IME_CHAR) {
+        uMsg = WM_CHAR;
+    }
+    auto bRet = this->CheckIme(hWnd, uMsg, wParam, lParam);
     this->FixMouse(uMsg, lParam);
-    this->pUISystem->winMsgs.enqueue({ hwnd, uMsg, wParam, lParam });
-    if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire) && MulNX::Win32::IsMouseMessage(uMsg))
-        return MulNX::Hook::Then::Return;
+    this->pUISystem->winMsgs.enqueue({ hWnd, uMsg, wParam, lParam });
+    if (bRet)return MulNX::Hook::Then::Return;
+
+    if (MulNX::Win32::IsMouseMessage(uMsg)) {
+        if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire)) {
+            return MulNX::Hook::Then::Return;
+        }
+    }
     if (MulNX::Win32::IsKeyboardMessage(uMsg)) {
-        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) || this->pInputSystem->IsKeyPressed(VK_MENU))
+        if (this->pUISystem->WantTextInput.load(std::memory_order_acquire) ||
+            this->pInputSystem->IsKeyPressed(VK_MENU)) {
             return MulNX::Hook::Then::Return; // 当alt按下时进行拦截，此时属于 MulNX 按键通道判定快捷键的时刻
+        }
+    }
+    if (wParam == VK_TAB) {
+        if (this->pUISystem->WantCaptureMouse.load(std::memory_order_acquire)) {
+            return MulNX::Hook::Then::Return;
+        }
     }
     if (uMsg == WM_CLOSE) {
-        int result = MessageBoxW(hwnd,
+        int result = MessageBoxW(hWnd,
             L"要关闭游戏前，必须先卸载 MulNX。\n点击“确定”卸载 MulNX，之后可再次尝试关闭游戏。",
             L"MulNX 警告",
             MB_OKCANCEL | MB_ICONWARNING | MB_TOPMOST

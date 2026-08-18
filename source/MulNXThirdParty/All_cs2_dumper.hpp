@@ -1,7 +1,5 @@
 #pragma once
-
 #include <cstdint>
-
 #include "cs2_dumper/animationsystem_dll.hpp"
 #include "cs2_dumper/buttons.hpp"
 #include "cs2_dumper/client_dll.hpp"

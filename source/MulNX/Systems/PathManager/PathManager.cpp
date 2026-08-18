@@ -3,7 +3,7 @@
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
 #include <MulNX/Systems/IPCer/IPCer.hpp>
-#include <MulNXThirdParty/All_pugixml.hpp>
+#include <MulNXThirdParty/pugixml/pugixml.hpp>
 
 bool MulNX::PathManager::Init() {
     WCHAR path[MAX_PATH] = { 0 };
