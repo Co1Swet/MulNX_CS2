@@ -1,5 +1,5 @@
 #include "AEncodeHelper.hpp"
-#include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
+#include <APipeline/AudioCapturer/AudioCapturer.hpp>
 
 bool AEncodeHelper::Init() {
     this->pAudioCapturer = this->FindModule<AudioCapturer>("AudioCapturer");

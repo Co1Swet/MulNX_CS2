@@ -1,6 +1,4 @@
 #include "MediaSystem.hpp"
-#include <MulNXExtensions/MediaSystem/MediaRecorder/MediaRecorder.hpp>
-#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
 void MediaSystem::Window(MulNX::UICoordinator* uico) {

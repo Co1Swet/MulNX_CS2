@@ -1,9 +1,4 @@
 #pragma once
 #include "MediaSystem.hpp"
-#include "MediaRecorder/MediaRecorder.hpp"
 #include "MediaProcesser/MediaProcesser.hpp"
-#include "VEncodeHelper/VEncodeHelper.hpp"
-#include "AudioCapturer/AudioCapturer.hpp"
-#include "AEncodeHelper/AEncodeHelper.hpp"
-#include "MediaParamManager/MediaParamManager.hpp"
-#include "Videos/Videos.hpp"
+#include "MediaRecorder/MediaRecords.hpp"

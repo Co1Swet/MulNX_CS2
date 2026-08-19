@@ -1,6 +1,6 @@
 #include "VEncodeHelper.hpp"
-#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
-#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <MediaParamManager/MediaParamManager.hpp>
+#include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool VEncodeHelper::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");

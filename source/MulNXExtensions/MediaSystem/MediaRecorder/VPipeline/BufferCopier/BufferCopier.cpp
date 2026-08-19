@@ -1,6 +1,6 @@
 #include "BufferCopier.hpp"
-#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
-#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
+#include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <MediaParamManager/MediaParamManager.hpp>
 
 bool BufferCopier::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");

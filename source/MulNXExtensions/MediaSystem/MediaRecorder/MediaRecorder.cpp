@@ -1,10 +1,10 @@
 #include "MediaRecorder.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
-#include <MulNXExtensions/MediaSystem/AudioCapturer/AudioCapturer.hpp>
-#include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
-#include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
-#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
+#include <APipeline/AudioCapturer/AudioCapturer.hpp>
+#include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
+#include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <VPipeline/VEncodeHelper/VEncodeHelper.hpp>
+#include <MediaParamManager/MediaParamManager.hpp>
 
 void MediaRecorder::CaptureCallback() {
     ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList*, const ImDrawCmd* cmd) {

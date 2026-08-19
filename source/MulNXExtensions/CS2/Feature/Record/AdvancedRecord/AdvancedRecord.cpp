@@ -1,5 +1,5 @@
 #include "AdvancedRecord.hpp"
-#include <MulNXExtensions/MediaSystem/MediaParamManager/MediaParamManager.hpp>
+#include <MulNXExtensions/MediaSystem/MediaRecorder/MediaRecords.hpp>
 
 void AdvancedRecord::PublishNormal() {
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);

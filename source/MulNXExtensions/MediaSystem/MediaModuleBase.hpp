@@ -1,5 +1,5 @@
 #pragma once
-#include "MediaRunningState/MediaRunningState.hpp"
+#include "MediaRecorder/MediaRunningState/MediaRunningState.hpp"
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
 #include <wrl/client.h>
 #include <d3d11.h>

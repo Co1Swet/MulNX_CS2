@@ -1,8 +1,8 @@
 #include "VideoCapturer.hpp"
-#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
-#include <MulNXExtensions/MediaSystem/Videos/BufferCopier/BufferCopier.hpp>
-#include <MulNXExtensions/MediaSystem/Videos/TextureMapper/TextureMapper.hpp>
-#include <MulNXExtensions/MediaSystem/VEncodeHelper/VEncodeHelper.hpp>
+#include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
+#include <VPipeline/BufferCopier/BufferCopier.hpp>
+#include <VPipeline/TextureMapper/TextureMapper.hpp>
+#include <VPipeline/VEncodeHelper/VEncodeHelper.hpp>
 
 bool VideoCapturer::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");

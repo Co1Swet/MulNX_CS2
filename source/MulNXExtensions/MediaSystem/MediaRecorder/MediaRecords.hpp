@@ -1,0 +1,10 @@
+#pragma once
+#include "APipeline/AudioCapturer/AudioCapturer.hpp"
+#include "APipeline/AEncodeHelper/AEncodeHelper.hpp"
+#include "VPipeline/VCD3D11Manager/VCD3D11Manager.hpp"
+#include "VPipeline/VideoCapturer/VideoCapturer.hpp"
+#include "VPipeline/BufferCopier/BufferCopier.hpp"
+#include "VPipeline/TextureMapper/TextureMapper.hpp"
+#include "VPipeline/VEncodeHelper/VEncodeHelper.hpp"
+#include "MediaParamManager/MediaParamManager.hpp"
+#include "MediaRecorder.hpp"

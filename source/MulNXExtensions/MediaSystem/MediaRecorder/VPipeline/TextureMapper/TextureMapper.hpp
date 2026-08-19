@@ -1,7 +1,8 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
-#include <MulNXExtensions/MediaSystem/Videos/VCD3D11Manager/VCD3D11Manager.hpp>
 
+class VCD3D11Manager;
+class MidTex;
 class TextureMapper final :public MediaModuleBase {
     VCD3D11Manager* pVCD3D11Manager = nullptr;
     // CPU 读回

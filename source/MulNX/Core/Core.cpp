@@ -12,11 +12,14 @@ MulNX::Core::Core::Core(std::string&& name) :
     // 创建模块管理器
     this->pModuleManager = std::make_unique<MulNX::Core::ModuleManager>();
     this->pModuleManager->SetName("ModuleManager");
-    this->postInits.clear();
+
     this->preInits.push_back([this]() {
         this->LogSucc("核心就绪");
+        this->LogInfo(MulNXVersion);
         return true;
         });
+
+    this->postInits.clear();
 }
 std::unique_ptr<MulNX::Core::Core> MulNX::Core::Core::Create(std::string&& coreName) {
     auto core = std::make_unique<MulNX::Core::Core>(std::move(coreName));

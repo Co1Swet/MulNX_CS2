@@ -1,5 +1,5 @@
 #include "AudioCapturer.hpp"
-#include <MulNXExtensions/MediaSystem/AEncodeHelper/AEncodeHelper.hpp>
+#include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
 #include <mmdeviceapi.h>
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;

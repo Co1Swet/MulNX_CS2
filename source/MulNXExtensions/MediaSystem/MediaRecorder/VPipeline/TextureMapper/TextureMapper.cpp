@@ -1,4 +1,5 @@
 #include "TextureMapper.hpp"
+#include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool TextureMapper::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
