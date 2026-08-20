@@ -41,7 +41,7 @@ public:
     void ProcessMsg(MulNX::Message& msg)override;
     bool HandleUpdate(CameraSystemIO* IO);
 
-    FreeCameraPath* Element_Create(const ElementType type, const std::string& name);
+    FreeCameraPath* Element_Create(const std::string& name);
     // 保存所有元素到磁盘文件
     bool Element_SaveAll();
     // 从磁盘文件加载元素的预处理函数，内部会创建对应类型的元素，并调用具体加载函数加载信息

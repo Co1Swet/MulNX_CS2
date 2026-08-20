@@ -81,7 +81,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<FreeCameraPath> el
     }
 
     ImGui::SameLine();
-    ImGui::Text(I18n("camsys.elem.type_duration", element->TypeGet_String(), std::to_string(element->DurationTime)).c_str());
+    ImGui::Text(I18n("camsys.elem.type_duration", "自由摄像机轨道", std::to_string(element->DurationTime)).c_str());
 }
 void ElementManager::UINodeFunc() {
     std::unique_lock lock(this->CamSys->smutex);
@@ -135,7 +135,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
     case "Element/Create"_hash: {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->CamSys->smutex);
-        if (!this->Element_Create(ElementType::FreeCameraPath, name)) {
+        if (!this->Element_Create(name)) {
             this->LogError(std::format("元素创建失败：{}", name));
         }
         break;
@@ -158,45 +158,31 @@ bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
     IO->FrameGameTime = this->pTimeline->GetTime();
     if (this->Preview_Call(IO)) {
         //自由摄像机轨道预览
-        if (this->Preview_CurrentElement->Type == ElementType::FreeCameraPath) {
-            if (this->Config.PreviewDraw) {
-                auto frame = this->drawCamera.Write();
-                *frame = IO->Frame;
-                this->needDrawCamera.store(true, std::memory_order_release);
-            }
-            else {
-                this->needDrawCamera.store(false, std::memory_order_release);
-            }
+        if (this->Config.PreviewDraw) {
+            auto frame = this->drawCamera.Write();
+            *frame = IO->Frame;
+            this->needDrawCamera.store(true, std::memory_order_release);
+        }
+        else {
+            this->needDrawCamera.store(false, std::memory_order_release);
         }
         return this->Config.PreviewOverride;
     }
     return false;
     //其它类型预览
 }
-//ElementBase，Create和Get已在头文件中实现
 
 //创建元素函数，支持传递任意参数给元素构造函数
-FreeCameraPath* ElementManager::Element_Create(const ElementType type, const std::string& name) {
+FreeCameraPath* ElementManager::Element_Create(const std::string& name) {
     // 检查是否已存在同名元素
     if (this->elements.find(name) != this->elements.end()) {
         this->LogError("元素名已占用！ 元素名：" + name);
         return nullptr;
     }
     std::shared_ptr<FreeCameraPath> pElement = nullptr;
-    // 分发到具体类型的加载函数
-    switch (type) {
-    case ElementType::FreeCameraPath:
-        pElement = std::make_shared<FreeCameraPath>(name);
-        break;
-    case ElementType::ElementBase:
-        break;
-    case ElementType::None:
-        break;
-    }
+    pElement = std::make_shared<FreeCameraPath>(name);
     // 输出成功信息
     this->LogSucc("成功创建元素！  元素名：" + name);
-    // 设置元素类型
-    pElement->Type = type;
     // 添加进Elements
     this->elements[name] = std::move(pElement);
     return this->elements[name].get();
@@ -240,11 +226,6 @@ bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
 
         // 获取元素类型
         std::string NewElementTypeString = root["type"].as<std::string>();
-        ElementType NewElementType = ElementType_StringToEnum(NewElementTypeString);
-        if (static_cast<int>(NewElementType) <= 0) {
-            this->LogError("尝试从磁盘文件加载元素失败，不可加载的元素类型！");
-            return false;
-        }
 
         // 获取元素名称
         std::string NewElementName = root["name"].as<std::string>();
@@ -261,7 +242,7 @@ bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
         // 创建基类指针
         this->LogInfo("尝试进行分发，元素类型为 " + NewElementTypeString + " ，文件路径：" + FullPath.string());
 
-        auto pElement = this->Element_Create(NewElementType, NewElementName);
+        auto pElement = this->Element_Create(NewElementName);
         // 判空
         if (!pElement) {
             this->LogError("尝试从磁盘文件加载元素失败，无法创建指定类型的元素实例！ 元素类型：" + NewElementTypeString);

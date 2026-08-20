@@ -5,32 +5,8 @@
 #include <CameraSystem/ElementManager/ElementManager.hpp>
 #include <fstream>
 
-std::string ElementType_EnumToString(const ElementType Type) {
-    switch (Type) {
-    case ElementType::ElementBase:return "ElementBase";
-    case ElementType::FreeCameraPath:return "FreeCameraPath";
-
-    default:return "None";
-    }
-}
-
-ElementType ElementType_StringToEnum(const std::string& typeStr) {
-    if (typeStr == "FreeCameraPath")  return ElementType::FreeCameraPath;
-
-    else if (typeStr == "ElementBase") return ElementType::ElementBase;
-    else return ElementType::None;
-}
-
-ElementType FreeCameraPath::TypeGet_Enum()const {
-    return this->Type;
-}
-
-std::string FreeCameraPath::TypeGet_String()const {
-    return ElementType_EnumToString(this->Type);
-}
-
 std::string FreeCameraPath::GetBaseInfo()const {
-    return I18n("camsys.elem.info_base_fmt", this->Name, this->TypeGet_String(), this->DurationTime);
+    return I18n("camsys.elem.info_base_fmt", this->Name, "自由摄像机轨道", this->DurationTime);
 }
 
 std::string FreeCameraPath::GetMsg()const {
@@ -46,14 +22,132 @@ void FreeCameraPath::ResetName(const std::string& NewName) {
 bool FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
     if (IO->ElementTime < this->StartTime)return false;
     if (IO->ElementTime > this->EndTime)return false;
-    return this->Call(IO);
+
+    // 如果不在理论影响范围内，应当直接返回而不做任何修改
+    // 是与被遍历的其它call一起工作
+
+    // 处理空关键帧的情况
+    if (this->CameraKeyframes.empty())return false;
+
+    float Time = IO->ElementTime;
+
+    // 查找当前时间所在的关键帧区间（使用绝对时间来搜索以匹配以绝对时间存储的关键帧）
+    auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), Time,
+        [](const MulNX::Math::CameraKeyframe& k, float t) {
+            return k.time < t;
+        });
+
+    // 确保迭代器有效并安全地计算索引
+    ptrdiff_t dist = std::distance(this->CameraKeyframes.begin(), it);
+    size_t index = (dist == 0) ? 0 : static_cast<size_t>(dist - 1);
+
+    // 保护：如果 index 位于最后一个元素，则没有下一个关键帧可用于插值
+    if (index + 1 >= this->CameraKeyframes.size()) return false;
+
+    // 获取相邻的四个关键帧用于插值
+    const auto& k1 = this->CameraKeyframes[index];
+    const auto& k2 = this->CameraKeyframes[index + 1];
+    const auto& k0 = (index > 0) ? this->CameraKeyframes[index - 1] : k1;
+    const auto& k3 = (index + 2 < this->CameraKeyframes.size()) ? this->CameraKeyframes[index + 2] : k2;
+
+    // 计算当前片段的时间比例 (0~1)
+    float segmentDuration = k2.time - k1.time;
+    if (segmentDuration <= 0.0f) return false; // 避免除以零或无效的段
+
+    float segmentTime = (Time - k1.time) / segmentDuration;
+
+    // 位置和FOV插值 (Catmull-Rom)
+    auto PositionAndFOV = DirectX::XMVectorCatmullRom(
+        k0.PositionAndFOV,
+        k1.PositionAndFOV,
+        k2.PositionAndFOV,
+        k3.PositionAndFOV,
+        segmentTime);
+
+    // 写入数据
+    IO->Frame.view.position = { PositionAndFOV.m128_f32[0],PositionAndFOV.m128_f32[1],PositionAndFOV.m128_f32[2] };
+    IO->Frame.view.FOV = PositionAndFOV.m128_f32[3];
+
+    // 景深插值
+    auto Dof = DirectX::XMVectorCatmullRom(
+        k0.dof,
+        k1.dof,
+        k2.dof,
+        k3.dof,
+        segmentTime
+    );
+
+    IO->Frame.view.dof.NearBlurry = Dof.m128_f32[0];
+    IO->Frame.view.dof.NearCrisp = Dof.m128_f32[1];
+    IO->Frame.view.dof.FarCrisp = Dof.m128_f32[2];
+    IO->Frame.view.dof.FarBlurry = Dof.m128_f32[3];
+
+    // 旋转插值 (使用Squad提供高阶连续性)
+
+    // 使用DirectXMath内置函数计算Squad控制点
+    DirectX::XMVECTOR s1, s2, s3;
+    DirectX::XMQuaternionSquadSetup(&s1, &s2, &s3,
+        k0.RotationQuat,
+        k1.RotationQuat,
+        k2.RotationQuat,
+        k3.RotationQuat);
+
+    // 使用Squad进行插值
+    DirectX::XMVECTOR rotation = DirectX::XMQuaternionSquad(k1.RotationQuat, s1, s2, s3, segmentTime);
+    auto RotationQuat = DirectX::XMQuaternionNormalize(rotation);
+    DirectX::XMFLOAT4 quat;
+    DirectX::XMStoreFloat4(&quat, RotationQuat);
+    MulNX::Math::CSQuatToEuler(quat, IO->Frame.view.rotation);
+
+    IO->Frame.TargetOBMode = 4;
+
+    return true;
 }
 
 bool FreeCameraPath::DrawBase(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const {
     if (!this->draw) {
         return false;
     }
-    return this->Draw(CamDrawer, Matrix, WinWidth, WinHeight);
+    const auto& keyframes = this->GetAllKeyFrames();
+
+    // 存储上一个关键帧的位置（用于连线）
+    DirectX::XMFLOAT3 prevPosition{};
+    bool firstFrame = true;
+
+    // 遍历当前路径的所有关键帧
+    for (int i = 0; i < keyframes.size(); ++i) {
+        if (!Matrix)return false;
+        const auto& keyframe = keyframes.at(i);
+        // 绘制关键帧的摄像机
+        std::string label = std::format("{} # {}", this->Name, i);
+        CamDrawer->DrawCamera(keyframe.GetPosition(), keyframe.GetRotationEuler(), label.c_str());
+
+        // 获取ImDrawList用于绘制连线
+        ImDrawList* drawList = ImGui::GetBackgroundDrawList();
+
+        // 如果不是第一个关键帧，绘制连线
+        if (!firstFrame) {
+            // 将3D位置转换为屏幕坐标
+            DirectX::XMFLOAT2 prevScreenPos, currentScreenPos;
+
+            // 使用CameraDrawer中的转换方法
+            MulNX::Math::WorldToScreen(prevPosition, prevScreenPos, Matrix, WinWidth, WinHeight);
+
+            MulNX::Math::WorldToScreen(keyframe.GetPosition(), currentScreenPos, Matrix, WinWidth, WinHeight);
+
+            // 绘制连线
+            drawList->AddLine(
+                ImVec2(prevScreenPos.x, prevScreenPos.y),
+                ImVec2(currentScreenPos.x, currentScreenPos.y),
+                IM_COL32(0, 255, 255, 255), // 青色连线
+                2.0f // 线宽
+            );
+        }
+        // 保存当前位置用于下一次连线
+        prevPosition = keyframe.GetPosition();
+        firstFrame = false;
+    }
+    return true;
 }
 
 float FreeCameraPath::GetStartTime()const {
@@ -73,7 +167,6 @@ std::pair<bool, std::string> FreeCameraPath::Save(const std::filesystem::path& f
         YAML::Node root;
 
         root["name"] = this->Name;
-        root["type"] = this->TypeGet_String();
         root["duration"] = this->DurationTime;
 
         auto [ok, msg] = this->SaveImpl(root);
@@ -259,130 +352,6 @@ void FreeCameraPath::TimeNormalize() {
     this->CameraKeyframes.front().time = 0;
     this->Refresh();
     return;
-}
-bool FreeCameraPath::Call(CameraSystemIO* IO)const {
-    // 如果不在理论影响范围内，应当直接返回而不做任何修改
-    // 是与被遍历的其它call一起工作
-
-    // 处理空关键帧的情况
-    if (this->CameraKeyframes.empty())return false;
-
-    float Time = IO->ElementTime;
-
-    // 查找当前时间所在的关键帧区间（使用绝对时间来搜索以匹配以绝对时间存储的关键帧）
-    auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), Time,
-        [](const MulNX::Math::CameraKeyframe& k, float t) {
-            return k.time < t;
-        });
-
-    // 确保迭代器有效并安全地计算索引
-    ptrdiff_t dist = std::distance(this->CameraKeyframes.begin(), it);
-    size_t index = (dist == 0) ? 0 : static_cast<size_t>(dist - 1);
-
-    // 保护：如果 index 位于最后一个元素，则没有下一个关键帧可用于插值
-    if (index + 1 >= this->CameraKeyframes.size()) return false;
-
-    // 获取相邻的四个关键帧用于插值
-    const auto& k1 = this->CameraKeyframes[index];
-    const auto& k2 = this->CameraKeyframes[index + 1];
-    const auto& k0 = (index > 0) ? this->CameraKeyframes[index - 1] : k1;
-    const auto& k3 = (index + 2 < this->CameraKeyframes.size()) ? this->CameraKeyframes[index + 2] : k2;
-
-    // 计算当前片段的时间比例 (0~1)
-    float segmentDuration = k2.time - k1.time;
-    if (segmentDuration <= 0.0f) return false; // 避免除以零或无效的段
-
-    float segmentTime = (Time - k1.time) / segmentDuration;
-
-    // 位置和FOV插值 (Catmull-Rom)
-    auto PositionAndFOV = DirectX::XMVectorCatmullRom(
-        k0.PositionAndFOV,
-        k1.PositionAndFOV,
-        k2.PositionAndFOV,
-        k3.PositionAndFOV,
-        segmentTime);
-
-    // 写入数据
-    IO->Frame.view.position = { PositionAndFOV.m128_f32[0],PositionAndFOV.m128_f32[1],PositionAndFOV.m128_f32[2] };
-    IO->Frame.view.FOV = PositionAndFOV.m128_f32[3];
-
-    // 景深插值
-    auto Dof = DirectX::XMVectorCatmullRom(
-        k0.dof,
-        k1.dof,
-        k2.dof,
-        k3.dof,
-        segmentTime
-    );
-
-    IO->Frame.view.dof.NearBlurry = Dof.m128_f32[0];
-    IO->Frame.view.dof.NearCrisp = Dof.m128_f32[1];
-    IO->Frame.view.dof.FarCrisp = Dof.m128_f32[2];
-    IO->Frame.view.dof.FarBlurry = Dof.m128_f32[3];
-
-    // 旋转插值 (使用Squad提供高阶连续性)
-
-    // 使用DirectXMath内置函数计算Squad控制点
-    DirectX::XMVECTOR s1, s2, s3;
-    DirectX::XMQuaternionSquadSetup(&s1, &s2, &s3,
-        k0.RotationQuat,
-        k1.RotationQuat,
-        k2.RotationQuat,
-        k3.RotationQuat);
-
-    // 使用Squad进行插值
-    DirectX::XMVECTOR rotation = DirectX::XMQuaternionSquad(k1.RotationQuat, s1, s2, s3, segmentTime);
-    auto RotationQuat = DirectX::XMQuaternionNormalize(rotation);
-    DirectX::XMFLOAT4 quat;
-    DirectX::XMStoreFloat4(&quat, RotationQuat);
-    MulNX::Math::CSQuatToEuler(quat, IO->Frame.view.rotation);
-    
-    IO->Frame.TargetOBMode = 4;
-
-    return true;
-}
-//绘制函数（虚），各个元素按需实现
-bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const {
-    const auto& keyframes = this->GetAllKeyFrames();
-
-    // 存储上一个关键帧的位置（用于连线）
-    DirectX::XMFLOAT3 prevPosition{};
-    bool firstFrame = true;
-
-    // 遍历当前路径的所有关键帧
-    for (int i = 0; i < keyframes.size(); ++i) {
-        if (!Matrix)return false;
-        const auto& keyframe = keyframes.at(i);
-        // 绘制关键帧的摄像机
-        std::string label = std::format("{} # {}", this->Name, i);
-        CamDrawer->DrawCamera(keyframe.GetPosition(), keyframe.GetRotationEuler(), label.c_str());
-
-        // 获取ImDrawList用于绘制连线
-        ImDrawList* drawList = ImGui::GetBackgroundDrawList();
-
-        // 如果不是第一个关键帧，绘制连线
-        if (!firstFrame) {
-            // 将3D位置转换为屏幕坐标
-            DirectX::XMFLOAT2 prevScreenPos, currentScreenPos;
-
-            // 使用CameraDrawer中的转换方法
-            MulNX::Math::WorldToScreen(prevPosition, prevScreenPos, Matrix, WinWidth, WinHeight);
-
-            MulNX::Math::WorldToScreen(keyframe.GetPosition(), currentScreenPos, Matrix, WinWidth, WinHeight);
-
-            // 绘制连线
-            drawList->AddLine(
-                ImVec2(prevScreenPos.x, prevScreenPos.y),
-                ImVec2(currentScreenPos.x, currentScreenPos.y),
-                IM_COL32(0, 255, 255, 255), // 青色连线
-                2.0f // 线宽
-            );
-        }
-        // 保存当前位置用于下一次连线
-        prevPosition = keyframe.GetPosition();
-        firstFrame = false;
-    }
-    return true;
 }
 
 size_t FreeCameraPath::GetKeyFrameCount() const {

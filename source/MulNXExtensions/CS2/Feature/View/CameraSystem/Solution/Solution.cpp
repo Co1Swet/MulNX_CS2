@@ -130,7 +130,7 @@ std::string Solution::GetMsg() {
             oss << i << ".  "
                 "  |元素编号：" << i <<
                 "  元素名称：" << element->Name <<
-                "  元素类型：" << element->TypeGet_String() <<
+                "  元素类型：" << "自由摄像机轨道" <<
                 "  元素持续时间：" << element->DurationTime <<
                 "  元素偏移时间：" << this->elements[i].Offset << "\n";
         }
