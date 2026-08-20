@@ -12,6 +12,9 @@ public:
     uint32_t assister = 0;
     uint32_t hitgroup = 0;
 
+    uint32_t dmg_health = 0;
+    uint32_t health = 0;
+
     uint32_t assistedflash = 0;
     uint32_t weapon = 0;
     uint32_t headshot = 0;

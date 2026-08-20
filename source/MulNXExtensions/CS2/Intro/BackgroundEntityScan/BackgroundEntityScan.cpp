@@ -37,6 +37,8 @@ void BackgroundEntityScan::Main() {
         if (!entity)continue;
 
         auto* controller = entity->As<CS2::CCSPlayerController>();
+        if (!controller->IsPlayerController())continue;
+
         auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
         auto* pawn = this->CS2->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
         if (!pawn)continue;

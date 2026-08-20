@@ -20,6 +20,9 @@ bool CS2Hash::Init() {
         // hitgroup 实际使用子串 "roup"，长度 4，种子 0x1717BDDE
         this->hitgroup = this->CSHashString("roup", 4, 0x1717BDDE);
 
+        this->dmg_health = this->WrapHash("dmg_health");
+        this->health = this->WrapHash("health");
+
         this->assistedflash = this->WrapHash("assistedflash");
         this->weapon = this->WrapHash("weapon");
         this->headshot = this->WrapHash("headshot");

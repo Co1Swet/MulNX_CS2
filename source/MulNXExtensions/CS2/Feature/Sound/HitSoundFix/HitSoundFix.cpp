@@ -35,9 +35,10 @@ bool HitSoundFix::Init() {
 
 void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
     if (this->CS2View->GetCameraLeavePlayerState())return;
-    CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
-    CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
-    CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
+    static CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
+    static CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
+    static CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
+    static CS2::CKV3MemberName health{ this->CS2Hashs->health, -1, nullptr };
 
     auto pOBingPawn = this->CS2->client.TryGetObservingPawn();
     if (!pOBingPawn)return;
@@ -52,7 +53,10 @@ void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
     bool hasHelmet = MulNX::MRead(pVictimPawn->m_bPrevHelmet());
     auto armorValue = MulNX::MRead(pVictimPawn->m_ArmorValue());
 
+    if (event->GetInt(health) == 0)return;
+    
     auto PraseSoundName = [&]()->const char* {
+        if (hitgroupValue == 0)return nullptr;
         if (hitgroupValue == 1) {  // 头部
             if (hasHelmet) {
                 return "Player.DamageHeadShotArmor.AttackerFeedback";
@@ -61,21 +65,17 @@ void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
                 return "Player.DamageHeadShot.AttackerFeedback";
             }
         }
-        else {  // 身体/其他部位
-            if (armorValue > 0) {
-                return "Player.DamageBodyArmor.AttackerFeedback";
-            }
-            else {
-                return "Player.DamageBody.AttackerFeedback";
-            }
-            // 将来可以细化 hitgroup 区分四肢、腹部，或根据伤害类型（刀、燃烧）选择
+        if (armorValue > 0) {
+            return "Player.DamageBodyArmor.AttackerFeedback";
+        }
+        else {
+            return "Player.DamageBody.AttackerFeedback";
         }
         };
 
     auto soundName = PraseSoundName();
 
     if (soundName) {
-        // 参数顺序：声源 = 受害者，过滤实体 = 观战者（即攻击者）
         this->EmitHurtFeedbackSound(pVictimPawn, nullptr, soundName);
     }
 
@@ -84,9 +84,9 @@ void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
 
 void HitSoundFix::HandleOnPlayerDeath(CS2::CGameEvent* event) {
     if (this->CS2View->GetCameraLeavePlayerState())return;
-    CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
-    CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
-    CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
+    static CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
+    static CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
+    static CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
 
     auto pOBingPawn = this->CS2->client.TryGetObservingPawn();
     if (!pOBingPawn)return;
@@ -102,6 +102,7 @@ void HitSoundFix::HandleOnPlayerDeath(CS2::CGameEvent* event) {
     auto armorValue = MulNX::MRead(pVictimPawn->m_ArmorValue());
 
     auto PraseSoundName = [&]()->const char* {
+        if (hitgroupValue == 0)return nullptr;
         if (hitgroupValue == 1) {  // 头部
             if (hasHelmet) {
                 return "Player.DeathHeadShotArmor.AttackerFeedback";
@@ -110,26 +111,18 @@ void HitSoundFix::HandleOnPlayerDeath(CS2::CGameEvent* event) {
                 return "Player.DeathHeadShot.AttackerFeedback";
             }
         }
-        else {  // 身体/其他部位
-            if (armorValue > 0) {
-                return "Player.DeathBodyArmor.AttackerFeedback";
-            }
-            else {
-                return "Player.DeathBody.AttackerFeedback";
-            }
-            // 将来可以细化 hitgroup 区分四肢、腹部，或根据伤害类型（刀、燃烧）选择
+        if (armorValue > 0) {
+            return "Player.DeathBodyArmor.AttackerFeedback";
+        }
+        else {
+            return "Player.DeathBody.AttackerFeedback";
         }
         };
 
     auto soundName = PraseSoundName();
 
     if (soundName) {
-        // 参数顺序：声源 = 受害者，过滤实体 = 观战者（即攻击者）
         this->EmitHurtFeedbackSound(pVictimPawn, nullptr, soundName);
-        //this->EmitHurtFeedbackSound(pVictimPawn, nullptr, "Player.Death");
-        
-        //this->EmitHurtFeedbackSound(pVictimPawn, nullptr, "Player.DeathHeadShot.Victim");
     }
-
-    return;
+    this->EmitHurtFeedbackSound(pVictimPawn, nullptr, "UI.KillCard.1");
 }
