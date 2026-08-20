@@ -70,9 +70,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<FreeCameraPath> el
         if (ImGui::MenuItem(I18n("text.copy_name").c_str())) {
             ImGui::SetClipboardText(element->Name.c_str());
         }
-        if (element->Drawable) {
-            MulNX::UI::Checkbox(I18n("camsys.elem.draw").c_str(), element->draw);
-        }
+        MulNX::UI::Checkbox(I18n("camsys.elem.draw").c_str(), element->draw);
         if (ImGui::MenuItem(I18n("text.delete").c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Element/Delete"_hash);
             rp->str1 = std::move(element->Name);

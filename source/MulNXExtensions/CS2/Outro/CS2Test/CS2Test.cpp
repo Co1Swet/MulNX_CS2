@@ -12,23 +12,15 @@ void CS2Test::UI() {
 
     ImGui::InputText("Address", buf, sizeof(buf),
         ImGuiInputTextFlags_ReadOnly);
-
-    MulNX::UI::Checkbox("强制返回？", this->forceReturn);
-    MulNX::UI::SliderInt("返回值", this->forceReturnValue, 1, 4);
-    this->OBRetEditor.Render();
-
-    ImGui::Separator();
-    MulNX::UI::Checkbox("强制返回nullptr？", this->forceReturnNullptr);
-    this->OBingPawnRetEditor.Render();
 }
 
 bool CS2Test::Init() {
     std::thread([]() {
         MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
         }).detach();
+    
     this->AsyncCommand("playdemo 111");
     this->AsyncCommand("tv_listen_voice_indices -1");
-
 
     this->SendUIRoot("MyCS2Test", [this](auto&&...) {
         try {
@@ -56,29 +48,23 @@ bool CS2Test::Init() {
     //     hook->Attach();
     //     });
 
-    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        this->hkGetOBMode = MulNX::Hook::Create((uint8_t*)this->CS2->client.GetBaseAddress() + 0x815180, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (this->OBRetEditor.Check(hk, ctx)) {
-                if (this->forceReturn) {
-                    *(int*)(&ctx->rax) = this->forceReturnValue.load();
-                    return MulNX::Hook::Then::Return;
-                }
-            }
-            return MulNX::Hook::Then::Continue;
-            }).value();
-        this->RegisterAttachHook(this->hkGetOBMode, "GetOBMode");
+    // this->SubscribeSync("Hook/LoadLibraryExW/server.dll", [this](MulNX::Message& msg) {
+    //     auto server = MulNX::Memory::DllModule::DllModule(L"server.dll");
+    //     auto target = server.GetBaseAddress() + 0xE3D810;
+    //     this->hkTest = MulNX::Hook::Create((uint8_t*)target, [this](MulNX::Hook* hk, RegContext* ctx) {
+    //         auto pName = **hk->GetStackParam<const char**>(ctx, 4);
+    //         auto name = std::string_view(pName);
+    //         if (name == "UI.KillCard.1") {
+    //             ctx->rax = ctx->rcx;
+    //             //return MulNX::Hook::Then::Return;
+    //         }
+    //         // ctx->rax = ctx->rcx;
+    //         // return MulNX::Hook::Then::Return;
 
-        this->hkGetOBingPawn = MulNX::Hook::Create((uint8_t*)this->CS2->client.GetBaseAddress() + 0xC11F70, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (this->OBingPawnRetEditor.Check(hk, ctx)) {
-                if (this->forceReturnNullptr) {
-                    ctx->rax = 0;
-                    return MulNX::Hook::Then::Return;
-                }
-            }
-            return MulNX::Hook::Then::Continue;
-            }).value();
-        this->RegisterAttachHook(this->hkGetOBingPawn, "hkGetOBingPawn");
-        });
+    //         return MulNX::Hook::Then::Continue;
+    //         }).value();
+    //     this->RegisterAttachHook(this->hkTest, "Test");
+    //     });
 
     return true;
 }

@@ -108,7 +108,7 @@ bool FreeCameraPath::DrawBase(CameraDrawer* CamDrawer, const float* Matrix, cons
     if (!this->draw) {
         return false;
     }
-    const auto& keyframes = this->GetAllKeyFrames();
+    const auto& keyframes = this->CameraKeyframes;
 
     // 存储上一个关键帧的位置（用于连线）
     DirectX::XMFLOAT3 prevPosition{};
@@ -354,14 +354,8 @@ void FreeCameraPath::TimeNormalize() {
     return;
 }
 
-size_t FreeCameraPath::GetKeyFrameCount() const {
-    return this->CameraKeyframes.size();
-}
 const MulNX::Math::CameraKeyframe& FreeCameraPath::GetKeyFrame(const size_t& index)const {
     return this->CameraKeyframes[index];
-}
-const std::vector<MulNX::Math::CameraKeyframe>& FreeCameraPath::GetAllKeyFrames()const {
-    return this->CameraKeyframes;
 }
 void FreeCameraPath::Clear() {
     this->CameraKeyframes.clear();
@@ -468,7 +462,6 @@ std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
                 // 如果没有景深信息，使用默认值
                 dof = { 0, 0, 10000, 10000 };
             }
-
 
             keyframe.dof = DirectX::XMVectorSet(
                 dof.NearBlurry,

@@ -11,31 +11,28 @@ class ElementManager;
 // 自由摄像机轨道，继承自Element
 class FreeCameraPath final {
 public:
-    // 额外数据存储
+    // 元素名称
+    std::string Name{};
+
+    // 开始时间（绝对）
+    float StartTime{};
+    // 结束时间（绝对）
+    float EndTime{};
+    // 持续时长
+    float DurationTime{};
+
+    // 需要被删除
+    bool NeedBeDelete = false;
+    // 脏标记，需要重新保存
+    bool Dirty = false;
+    // 是否绘制（默认不绘制）
+    std::atomic<bool> draw = false;
+
     std::vector<MulNX::Math::CameraKeyframe> CameraKeyframes{};
     // 构造函数
     explicit FreeCameraPath(const std::string& name) : 
-        Name(name) {
-        this->Drawable = true;
-    }
-    //元素名称
-    std::string Name{};
-
-    //开始时间（绝对）
-    float StartTime{};
-    //结束时间（绝对）
-    float EndTime{};
-    //持续时长
-    float DurationTime{};
-
-    //需要被删除
-    bool NeedBeDelete = false;
-    //脏标记，需要重新保存
-    bool Dirty = false;
-    //能否绘制（默认不能）
-    bool Drawable = false;
-    //是否绘制（默认不绘制）
-    std::atomic<bool> draw = false;
+        Name(name) {}
+    
     
     // 刷新状态
     void Refresh();
@@ -50,9 +47,7 @@ public:
     // 清空所有关键帧
     void Clear();
     
-    size_t GetKeyFrameCount()const;// 获取关键帧数量
     const MulNX::Math::CameraKeyframe& GetKeyFrame(const size_t& index)const;// 获取特定关键帧    
-    const std::vector<MulNX::Math::CameraKeyframe>& GetAllKeyFrames()const;// 获取所有关键帧
 
     // 磁盘IO
     std::pair<bool, std::string> Save(const std::filesystem::path& folderPath);

@@ -126,6 +126,9 @@ void HitSoundFix::HandleOnPlayerDeath(CS2::CGameEvent* event) {
     if (soundName) {
         // 参数顺序：声源 = 受害者，过滤实体 = 观战者（即攻击者）
         this->EmitHurtFeedbackSound(pVictimPawn, nullptr, soundName);
+        //this->EmitHurtFeedbackSound(pVictimPawn, nullptr, "Player.Death");
+        
+        //this->EmitHurtFeedbackSound(pVictimPawn, nullptr, "Player.DeathHeadShot.Victim");
     }
 
     return;
