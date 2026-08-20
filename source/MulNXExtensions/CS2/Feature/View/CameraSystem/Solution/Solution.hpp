@@ -1,11 +1,11 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <CameraSystem/Elements/Elements.hpp>
+#include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
 
 class ElementWithOffset {
 public:
     //元素
-    std::shared_ptr<ElementBase> Element;
+    std::shared_ptr<FreeCameraPath> Element;
 
     //这个Offset决定了元素的播放时间头
     float Offset = 0;
@@ -53,7 +53,7 @@ public:
 
     //添加元素
     //常量指针常量说明没有修改权，时间偏移默认是0.0f
-    bool AddElement(const std::shared_ptr<ElementBase> element, const float Offset = 0.0f);
+    bool AddElement(const std::shared_ptr<FreeCameraPath> element, const float Offset = 0.0f);
     //移除指定位置的元素
     bool RemoveElementAt(const size_t Index);
 

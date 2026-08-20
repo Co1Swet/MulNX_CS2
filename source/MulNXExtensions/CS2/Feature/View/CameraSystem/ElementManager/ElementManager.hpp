@@ -1,6 +1,6 @@
 #pragma once
 #include <CameraSystem/CameraSystem.hpp>
-#include <CameraSystem/Elements/Elements.hpp>
+#include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
 #include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
 #include "ElementConfig.hpp"
 
@@ -13,7 +13,7 @@ private:
     ProjectManager* PManager = nullptr;
 
     // 当前操作的元素指针
-    std::atomic<std::shared_ptr<ElementBase>> CurrentElement = nullptr;
+    std::atomic<std::shared_ptr<FreeCameraPath>> CurrentElement = nullptr;
     // 预览相关
 
     // 预览时间偏移
@@ -21,18 +21,18 @@ private:
     // 预览结束时间点
     float Preview_EndTime{};
     // 当前预览元素指针
-    std::shared_ptr<ElementBase> Preview_CurrentElement;
+    std::shared_ptr<FreeCameraPath> Preview_CurrentElement;
     // 是否处于预览状态
     bool OnPreview = false;
 
     // 展示单个元素信息在一行上
-    void Element_ShowInLine(const std::shared_ptr<ElementBase> element);
+    void Element_ShowInLine(const std::shared_ptr<FreeCameraPath> element);
     std::atomic<bool> needDrawCamera = false;
     MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
 public:
     ElementConfig Config{};
     // 使用智能指针存储多态对象，以存储不同类型的元素
-    std::unordered_map<std::string, std::shared_ptr<ElementBase>> elements;
+    std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> elements;
 
     bool MenuElement();
     void UINodeFunc();
@@ -41,7 +41,7 @@ public:
     void ProcessMsg(MulNX::Message& msg)override;
     bool HandleUpdate(CameraSystemIO* IO);
 
-    ElementBase* Element_Create(const ElementType type, const std::string& name);
+    FreeCameraPath* Element_Create(const ElementType type, const std::string& name);
     // 保存所有元素到磁盘文件
     bool Element_SaveAll();
     // 从磁盘文件加载元素的预处理函数，内部会创建对应类型的元素，并调用具体加载函数加载信息

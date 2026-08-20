@@ -53,7 +53,7 @@ bool ElementManager::MenuElement() {
     return true;
 }
 
-void ElementManager::Element_ShowInLine(const std::shared_ptr<ElementBase> element) {
+void ElementManager::Element_ShowInLine(const std::shared_ptr<FreeCameraPath> element) {
     ImGui::Text(I18n("camsys.elem.name_label").c_str());
     ImGui::SameLine();
 
@@ -176,13 +176,13 @@ bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
 //ElementBase，Create和Get已在头文件中实现
 
 //创建元素函数，支持传递任意参数给元素构造函数
-ElementBase* ElementManager::Element_Create(const ElementType type, const std::string& name) {
+FreeCameraPath* ElementManager::Element_Create(const ElementType type, const std::string& name) {
     // 检查是否已存在同名元素
     if (this->elements.find(name) != this->elements.end()) {
         this->LogError("元素名已占用！ 元素名：" + name);
         return nullptr;
     }
-    std::shared_ptr<ElementBase> pElement = nullptr;
+    std::shared_ptr<FreeCameraPath> pElement = nullptr;
     // 分发到具体类型的加载函数
     switch (type) {
     case ElementType::FreeCameraPath:

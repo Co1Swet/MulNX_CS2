@@ -177,7 +177,7 @@ void SolutionManager::Solution_DebugWindow() {
     static int PreIndex = -1;
     ImGui::SliderInt(I18n("camsys.sol.adjust_element_index").c_str(), &IndexForReset, 0, this->CurrentSolution->elements.size() - 1);
     if (this->CurrentSolution->elements.empty())return;
-    std::shared_ptr<ElementBase> element = this->CurrentSolution->elements.at(IndexForReset).Element;
+    std::shared_ptr<FreeCameraPath> element = this->CurrentSolution->elements.at(IndexForReset).Element;
     if (element) {
         const float& Offset = this->CurrentSolution->elements.at(IndexForReset).Offset;
         ImGui::Text(I18n("camsys.sol.element_info",

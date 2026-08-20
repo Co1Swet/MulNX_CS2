@@ -3,7 +3,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
-bool Solution::AddElement(const std::shared_ptr<ElementBase> element, const float Offset) {
+bool Solution::AddElement(const std::shared_ptr<FreeCameraPath> element, const float Offset) {
     //检查重复
     auto it = std::find_if(this->elements.begin(), this->elements.end(),
         [&element](const ElementWithOffset& ew) {
@@ -125,7 +125,7 @@ std::string Solution::GetMsg() {
         << "\n";
 
     for (size_t i = 0; i < this->elements.size(); ++i) {
-        std::shared_ptr<ElementBase> element = this->elements.at(i).Element;
+        std::shared_ptr<FreeCameraPath> element = this->elements.at(i).Element;
         if (element) {
             oss << i << ".  "
                 "  |元素编号：" << i <<
@@ -238,7 +238,7 @@ std::pair<bool, std::string> Solution::Save(const std::filesystem::path& folderP
 
         YAML::Node elementsNode = root["elements"];
         for (size_t i = 0; i < this->elements.size(); ++i) {
-            std::shared_ptr<ElementBase> element = this->elements[i].Element;
+            std::shared_ptr<FreeCameraPath> element = this->elements[i].Element;
             if (!element) return { false, "疑似有元素在保存过程中被删除，保存终止！" };
 
             YAML::Node elemNode;

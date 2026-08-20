@@ -3,9 +3,8 @@ add_library(CameraSystem
     "CameraDrawer/CameraDrawer.cpp"
     "CameraSystemIO/CameraSystemIO.cpp"
 
-    "Elements/ElementBase.cpp"
+    "FreeCameraPath/FreeCameraPath.cpp"
     "ElementManager/ElementManager.cpp"
-    "Elements/FreeCameraPath/FreeCameraPath.cpp"
 
     "Solution/Solution.cpp"
     "SolutionManager/SolutionManager.cpp"
