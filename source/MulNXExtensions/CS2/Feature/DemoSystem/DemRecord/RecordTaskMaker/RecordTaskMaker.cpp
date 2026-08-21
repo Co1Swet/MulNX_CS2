@@ -1,7 +1,7 @@
 #include "RecordTaskMaker.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
-#include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
+#include <Feature/DemoSystem/DemRecord/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
 void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("录制任务创建");
