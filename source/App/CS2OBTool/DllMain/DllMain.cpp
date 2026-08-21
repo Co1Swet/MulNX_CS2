@@ -130,13 +130,16 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<MediaRunningState>("MediaRunningState")
         .CreateModule<MediaSystem>("MediaSystem")
         .CreateModule<MediaParamManager>("MediaParamManager")
+
+        .CreateModule<AudioCapturer>("AudioCapturer")
+        .CreateModule<AEncodeHelper>("AEncodeHelper")
+
         .CreateModule<VCD3D11Manager>("VCD3D11Manager")
         .CreateModule<BufferCopier>("BufferCopier")
         .CreateModule<TextureMapper>("TextureMapper")
-        .CreateModule<AudioCapturer>("AudioCapturer")
         .CreateModule<VideoCapturer>("VideoCapturer")
-        .CreateModule<AEncodeHelper>("AEncodeHelper")
         .CreateModule<VEncodeHelper>("VEncodeHelper")
+        
         .CreateModule<MediaRecorder>("MediaRecorder")
         .CreateModule<MediaProcesser>("MediaProcesser")
 

@@ -7,7 +7,6 @@
 bool VideoCapturer::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
-    this->pBufferCopier = this->FindModule<BufferCopier>("BufferCopier");
     this->pTextureMapper = this->FindModule<TextureMapper>("TextureMapper");
 
     this->SendTask("VMap", "VMap", [this]() {

@@ -6,7 +6,12 @@ bool AEncodeHelper::Init() {
     this->SubscribeSync("MediaSync/Reset", [this](auto&&...) { this->Reset(); });
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
-        this->SetOn(info);
+        try {
+            this->SetOn(info);
+        }
+        catch (const std::exception& e) {
+            this->LogError(std::format("音频编码SetOn失败：{}", e.what()));
+        }
         });
     this->SubscribeSync("MediaSync/StateReport", [this](auto&&...) {
         this->LogInfo(std::format("音频编码器状态: {}", (this->aencoder.isOpened() ? "已打开" : "未打开")));
@@ -17,17 +22,27 @@ bool AEncodeHelper::Init() {
 }
 
 void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
-    if (this->pMediaState->advancedMode) { this->LogInfo("高级录制模式，不打开音频捕获"); return; }
-    auto* oCtx = info.pOutCtx;
+    if (this->pMediaState->advancedMode) {
+        this->LogInfo("高级录制模式，不打开音频捕获"); return;
+    }
     this->audioFifo.clear();
     this->flushPackets.clear();
     int sampleRate = this->pAudioCapturer->GetSampleRate();
-    if (sampleRate <= 0) { this->LogWarning("音频采样率无效"); return; }
+    if (sampleRate <= 0) {
+        this->LogWarning("音频采样率无效");
+        return;
+    }
 
     av::Codec acodec = av::findEncodingCodec(AV_CODEC_ID_AAC);
-    if (!acodec.canEncode()) { this->LogWarning("AAC 编码器不可用，仅录制视频"); return; }
+    if (!acodec.canEncode()) {
+        this->LogWarning("AAC 编码器不可用，仅录制视频");
+        return;
+    }
     auto supportedFmts = acodec.supportedSampleFormats();
-    if (supportedFmts.empty()) { this->LogWarning("AAC 编码器未报告支持的样本格式，跳过音频"); return; }
+    if (supportedFmts.empty()) {
+        this->LogWarning("AAC 编码器未报告支持的样本格式，跳过音频");
+        return;
+    }
     av::SampleFormat targetFmt = supportedFmts.front();
     this->LogWarning(std::format("音频编码器目标格式: {}", targetFmt.name()));
 
@@ -51,7 +66,7 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
         return;
     }
 
-    this->astream = oCtx->addStream(this->aencoder);
+    this->astream = info.pOutCtx->addStream(this->aencoder);
     this->astream.setTimeBase({ 1, sampleRate });
     av::CodecParameters cp;
     cp.copyFrom(this->aencoder);

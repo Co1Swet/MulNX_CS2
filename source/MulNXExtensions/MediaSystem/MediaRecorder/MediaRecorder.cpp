@@ -105,12 +105,14 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
 
     try {
         this->ofctx.openOutput(outFile);
+        this->LogSucc(std::format("已打开输出上下文: {}", outFile));
 
         MulNX::Message SetOnMsg("MediaSync/SetOn"_hash);
         auto&& [rInfo] = SetOnMsg.Access<MulNX::AVStartInfo>();
         rInfo.pOutCtx = &this->ofctx;
         rInfo.startTime = std::chrono::steady_clock::now();
         this->PublishSync(SetOnMsg);
+        this->LogSucc("音视频系统SetOn完毕");
 
         this->ofctx.writeHeader();
         this->LogInfo(std::format("输出头已写入, 流数={}", this->ofctx.streamsCount()));

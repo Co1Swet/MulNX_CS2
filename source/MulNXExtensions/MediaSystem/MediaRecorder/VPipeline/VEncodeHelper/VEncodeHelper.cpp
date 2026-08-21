@@ -12,7 +12,12 @@ bool VEncodeHelper::Init() {
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
-        this->SetOn(info.pOutCtx);
+        try {
+            this->SetOn(info.pOutCtx);
+        }
+        catch (const std::exception& e) {
+            this->LogError(std::format("视频编码器SetOn失败：{}", e.what()));
+        }
         });
 
     return true;
