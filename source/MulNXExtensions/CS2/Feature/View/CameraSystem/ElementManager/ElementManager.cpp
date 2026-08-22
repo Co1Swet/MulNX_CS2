@@ -222,9 +222,6 @@ bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
     try {
         YAML::Node root = YAML::LoadFile(FullPath.string());
 
-        // 获取元素类型
-        std::string NewElementTypeString = root["type"].as<std::string>();
-
         // 获取元素名称
         std::string NewElementName = root["name"].as<std::string>();
         // 检查元素名是否为空
@@ -238,12 +235,12 @@ bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
             return false;
         }
         // 创建基类指针
-        this->LogInfo("尝试进行分发，元素类型为 " + NewElementTypeString + " ，文件路径：" + FullPath.string());
+        this->LogInfo("加载元素文件路径：" + FullPath.string());
 
         auto pElement = this->Element_Create(NewElementName);
         // 判空
         if (!pElement) {
-            this->LogError("尝试从磁盘文件加载元素失败，无法创建指定类型的元素实例！ 元素类型：" + NewElementTypeString);
+            this->LogError("尝试从磁盘文件加载元素失败，无法创建指定类型的元素实例");
             return false;
         }
         // 统一加载信息

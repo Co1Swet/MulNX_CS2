@@ -15,6 +15,7 @@ class DemoRecorder final : public CSModuleBase {
     bool PeekQueue(RecordTask& task);
     void StartRecord();
 
+    MulNX::CoTask WaitTimed(bool& flag, const float milliseconds, const std::function<bool()>& f);
     MulNX::CoTask Main();
     std::atomic<uint64_t> num = 0;
     void Window();

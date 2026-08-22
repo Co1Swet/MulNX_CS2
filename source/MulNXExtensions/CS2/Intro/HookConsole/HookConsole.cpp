@@ -60,6 +60,7 @@ void HookConsole::OnEngine2Load(MulNX::Message& msg) {
     auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
     this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
         if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
+        this->PublishSync("Hook/CSMainLoop"_hash);
         std::string cmd;
         if (this->bufferGameCmds.try_dequeue(cmd))
             this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
