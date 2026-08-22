@@ -114,5 +114,5 @@ MulNX::UI::RAIITable::operator bool()const {
 
 bool MulNX::UI::SmartButton::Next(const std::string& label, const ImVec2& size) {
     ++this->counter;
-    return ImGui::Button(std::format("{}##{}", label, this->counter).c_str(), size);
+    return ImGui::Button(std::format("{}##{}{}", label, this->counter, this->id).c_str(), size);
 }

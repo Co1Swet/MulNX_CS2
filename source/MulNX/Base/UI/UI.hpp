@@ -59,8 +59,10 @@ namespace MulNX {
         };
 
         class SmartButton {
+            int id = 0;
             int counter = 0;
         public:
+            SmartButton(int id) :id(id) {};
             bool Next(const std::string& label, const ImVec2& size = ImVec2(0, 0));
         };
     }

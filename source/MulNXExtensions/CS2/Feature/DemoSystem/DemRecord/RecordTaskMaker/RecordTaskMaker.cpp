@@ -102,11 +102,177 @@ Steam64UID RecordTaskMaker::TeamPlayerMenu(const Demo::Info& demoInfo) {
     return ctrlTarget;
 }
 
+std::optional<RecordTask> RecordTaskMaker::CreatePlayFullRoundRTask(const int& round, const Demo::PlayerRoundInfo& info,
+    const Demo::Player& player, const Demo::Info& demoInfo) {
+    // 查找当前回合的元数据（startTick, endTick）
+    auto itRound = std::find_if(demoInfo.rounds.begin(), demoInfo.rounds.end(),
+        [round](const Demo::Round& r) { return r.number == round; });
+
+    if (itRound == demoInfo.rounds.end())return std::nullopt;
+
+    const auto& roundMeta = *itRound;
+
+    // 计算起点：提前3秒（3 * 64 = 192 ticks）
+    int startTickFull = std::max(0, roundMeta.freezeTimeEndTick - 192);
+
+    // 计算终点：若玩家死亡则截止到死亡后1秒，否则为回合实际结束tick
+    int endTickFull = roundMeta.endTick;
+    if (info.Bekilled.has_value()) {
+        endTickFull = std::min(info.Bekilled->tick + 64, roundMeta.endTick);
+    }
+
+    // 确保有效范围（防止死亡时间在回合开始前或极端情况）
+    if (startTickFull >= endTickFull)return std::nullopt;
+
+    RecordTask rTask{};
+    rTask.uid = player.steamId;
+    rTask.tickStart = startTickFull;
+    rTask.tickEnd = endTickFull;
+
+    return rTask;
+}
+
+void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::PlayerRoundInfo& info,
+    const Demo::Player& player, const Demo::Info& demoInfo) {
+    
+    ImGui::SeparatorText(std::format("第 {} 回合", round).c_str());
+
+    // ========== 录制整回合按钮 ==========
+    if (auto oRTask = this->CreatePlayFullRoundRTask(round, info, player, demoInfo)) {
+        auto rTask = oRTask.value();
+        if (ImGui::Button(std::format("录制整回合##round_{}", round).c_str())) {
+            rTask.desc = std::format("玩家 {} 第 {} 回合整段录制（{} ~ {} tick）",
+                player.name, round, rTask.tickStart, rTask.tickEnd);
+            this->PublishRecordTask(std::move(rTask));
+        }
+        ImGui::SameLine();
+        // 友好显示时间范围（方便调试）
+        ImGui::Text("范围: %d ~ %d ticks", rTask.tickStart, rTask.tickEnd);
+    }
+    else {
+        ImGui::Text("警告：该回合录制范围无效");
+    }
+    if (!this->showBekillEvent && info.killEvents.empty())return;
+    ImGui::Separator();
+
+    // ---------- 邻近合并预处理 ----------
+    struct MergeInfo {
+        int startTick;   // 合并后录制起始 tick（最早事件 tick - preRecordTicks）
+        int endTick;     // 合并后录制结束 tick（最晚事件 tick + postRecordTicks）
+        size_t eventCount;
+    };
+    const auto& killEvents = info.killEvents;
+    std::vector<std::optional<MergeInfo>> mergeAfter(killEvents.size());
+
+    if (!killEvents.empty()) {
+        size_t start = 0;
+        for (size_t i = 1; i <= killEvents.size(); ++i) {
+            // i == killEvents.size() 时强制结束上一组
+            bool endGroup = (i == killEvents.size()) ||
+                (killEvents[i].tick - killEvents[i - 1].tick > this->pConfiger->mergeThresholdTicks);
+
+            if (endGroup) {
+                size_t end = i - 1;
+                if (end > start) { // 至少两个事件才合并
+                    int startTick = killEvents[start].tick - this->pConfiger->preRecordTicks;
+                    int endTick = killEvents[end].tick + this->pConfiger->postRecordTicks;
+                    mergeAfter[end] = MergeInfo{ startTick, endTick, end - start + 1 };
+                }
+                start = i;
+            }
+        }
+    }
+
+    // ---------- 渲染击杀事件表 ----------
+    auto t = MulNX::UI::RAIITable("KillEventsTable", { "操作","Tick","被击杀者","助攻者","所用武器" });
+    if (!t)return;
+    MulNX::UI::SmartButton btn{round};
+    for (size_t idx = 0; idx < killEvents.size(); ++idx) {
+        const auto& ev = killEvents[idx];
+        ImGui::TableNextRow();
+
+        // 列0：单事件录制按钮
+        ImGui::TableSetColumnIndex(0);
+        if (btn.Next("录制")) {
+            RecordTask rTask;
+            rTask.uid = ev.killerSteamId;
+            rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
+            rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+            rTask.desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
+                demoInfo.GetPlayerName(ev.killerSteamId),
+                demoInfo.GetPlayerName(ev.victimSteamId),
+                rTask.tickStart, rTask.tickEnd);
+
+            this->PublishRecordTask(std::move(rTask));
+        }
+        ImGui::SameLine();
+        if (btn.Next("受害者视角")) {
+            auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
+            rp->uid = ev.victimSteamId;
+            rp->tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
+            rp->tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
+            rp->desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
+                demoInfo.GetPlayerName(ev.victimSteamId),
+                demoInfo.GetPlayerName(ev.killerSteamId),
+                rp->tickStart, rp->tickEnd);
+            this->PublishAsync(std::move(msg));
+        }
+
+        // 列1-4：事件信息
+        ImGui::TableSetColumnIndex(1); ImGui::Text("%d", ev.tick);
+        ImGui::TableSetColumnIndex(2); ImGui::Text("%s", demoInfo.GetPlayerName(ev.victimSteamId).c_str());
+        ImGui::TableSetColumnIndex(3); ImGui::Text("%s", demoInfo.GetPlayerName(ev.assisterSteamId).c_str());
+        ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
+
+        // ---------- 插入合并按钮（若当前事件是某合并组的最后一个）----------
+        if (mergeAfter[idx].has_value()) {
+            const auto& mi = mergeAfter[idx].value();
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            // 合并按钮：录制选中玩家的视角
+            if (btn.Next("合并记录")) {
+                auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
+                rp->uid = player.steamId;   // 当前查看的玩家
+                rp->tickStart = mi.startTick;
+                rp->tickEnd = mi.endTick;
+                rp->desc = std::format("玩家 {} 第 {} 回合合并录制 {} 个击杀事件，从 {} tick 到 {} tick",
+                    demoInfo.GetPlayerName(player.steamId), round,
+                    mi.eventCount, rp->tickStart, rp->tickEnd);
+                this->PublishAsync(std::move(msg));
+            }
+            // 其余列可空或显示信息
+            ImGui::TableSetColumnIndex(1); ImGui::Text("(%d 事件)", mi.eventCount);
+        }
+    }
+
+    // ---------- 被击杀事件（不参与合并）----------
+    if (this->showBekillEvent && info.Bekilled.has_value()) {
+        const auto& ev = info.Bekilled.value();
+        ImGui::TableNextRow();
+
+        ImGui::TableSetColumnIndex(0);
+        if (btn.Next("录制被击杀")) {
+            auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
+            rp->uid = ev.victimSteamId;
+            rp->tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
+            rp->tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
+            rp->desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
+                demoInfo.GetPlayerName(ev.victimSteamId),
+                demoInfo.GetPlayerName(ev.killerSteamId),
+                rp->tickStart, rp->tickEnd);
+            this->PublishAsync(std::move(msg));
+        }
+
+        ImGui::TableSetColumnIndex(1); ImGui::Text("%d", ev.tick);
+        ImGui::TableSetColumnIndex(2); ImGui::Text(std::format("{} (由 {} 击杀)", demoInfo.GetPlayerName(ev.victimSteamId), demoInfo.GetPlayerName(ev.killerSteamId)).c_str());
+        ImGui::TableSetColumnIndex(3); ImGui::Text("%s", demoInfo.GetPlayerName(ev.assisterSteamId).c_str());
+        ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
+    }
+}
+
 void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("录制任务创建");
     if (!w || !w.ShouldDraw())return;
-    MulNX::UI::SmartButton btn{};
-
     std::shared_lock lock(this->smutex);
 
     Demo::Info* pDemoInfo = nullptr;
@@ -116,7 +282,7 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
 
     this->DemoMetaMenu(demoInfo);
     ImGui::Separator();
-    
+
     auto ctrlTarget = this->TeamPlayerMenu(demoInfo);
     ImGui::Separator();
 
@@ -130,126 +296,20 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     ImGui::SeparatorText(player.name.c_str());
     ImGui::Checkbox("展示被击杀记录", &this->showBekillEvent);
 
-    for (const auto& [round, info] : player.roundInfo) {
-        if (!this->showBekillEvent && info.killEvents.empty())continue;
-
-        ImGui::SeparatorText(std::format("第 {} 回合", round).c_str());
-
-        // ---------- 邻近合并预处理 ----------
-        struct MergeInfo {
-            int startTick;   // 合并后录制起始 tick（最早事件 tick - preRecordTicks）
-            int endTick;     // 合并后录制结束 tick（最晚事件 tick + postRecordTicks）
-            size_t eventCount;
-        };
-        const auto& killEvents = info.killEvents;
-        std::vector<std::optional<MergeInfo>> mergeAfter(killEvents.size());
-
-        if (!killEvents.empty()) {
-            size_t start = 0;
-            for (size_t i = 1; i <= killEvents.size(); ++i) {
-                // i == killEvents.size() 时强制结束上一组
-                bool endGroup = (i == killEvents.size()) ||
-                    (killEvents[i].tick - killEvents[i - 1].tick > this->pConfiger->mergeThresholdTicks);
-
-                if (endGroup) {
-                    size_t end = i - 1;
-                    if (end > start) { // 至少两个事件才合并
-                        int startTick = killEvents[start].tick - this->pConfiger->preRecordTicks;
-                        int endTick = killEvents[end].tick + this->pConfiger->postRecordTicks;
-                        mergeAfter[end] = MergeInfo{ startTick, endTick, end - start + 1 };
-                    }
-                    start = i;
-                }
-            }
-        }
-
-        // ---------- 渲染击杀事件表 ----------
-        auto t = MulNX::UI::RAIITable("KillEventsTable", { "操作","Tick","被击杀者","助攻者","所用武器" });
-        if (!t)continue;
-
-        for (size_t idx = 0; idx < killEvents.size(); ++idx) {
-            const auto& ev = killEvents[idx];
-            ImGui::TableNextRow();
-
-            // 列0：单事件录制按钮
-            ImGui::TableSetColumnIndex(0);
-            if (btn.Next("录制")) {
-                RecordTask rTask;
-                rTask.uid = ev.killerSteamId;
-                rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
-                rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
-                rTask.desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
-                    demoInfo.GetPlayerName(ev.killerSteamId),
-                    demoInfo.GetPlayerName(ev.victimSteamId),
-                    rTask.tickStart, rTask.tickEnd);
-
+    if (ImGui::Button(std::format("为所有回合生成录制任务##{}", player.steamId).c_str())) {
+        for (const auto& [round, info] : player.roundInfo) {
+            if (auto oRTask = this->CreatePlayFullRoundRTask(round, info, player, demoInfo)) {
+                auto rTask = oRTask.value();
+                rTask.desc = std::format("玩家 {} 第 {} 回合整段录制（{} ~ {} tick）",
+                    player.name, round, rTask.tickStart, rTask.tickEnd);
                 this->PublishRecordTask(std::move(rTask));
             }
-            ImGui::SameLine();
-            if (btn.Next("受害者视角")) {
-                auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
-                rp->uid = ev.victimSteamId;
-                rp->tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
-                rp->tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
-                rp->desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
-                    demoInfo.GetPlayerName(ev.victimSteamId),
-                    demoInfo.GetPlayerName(ev.killerSteamId),
-                    rp->tickStart, rp->tickEnd);
-                this->PublishAsync(std::move(msg));
-            }
-
-            // 列1-4：事件信息
-            ImGui::TableSetColumnIndex(1); ImGui::Text("%d", ev.tick);
-            ImGui::TableSetColumnIndex(2); ImGui::Text("%s", demoInfo.GetPlayerName(ev.victimSteamId).c_str());
-            ImGui::TableSetColumnIndex(3); ImGui::Text("%s", demoInfo.GetPlayerName(ev.assisterSteamId).c_str());
-            ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
-
-            // ---------- 插入合并按钮（若当前事件是某合并组的最后一个）----------
-            if (mergeAfter[idx].has_value()) {
-                const auto& mi = mergeAfter[idx].value();
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                // 合并按钮：录制选中玩家的视角
-                if (btn.Next("合并记录")) {
-                    auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
-                    rp->uid = ctrlTarget;   // 当前查看的玩家
-                    rp->tickStart = mi.startTick;
-                    rp->tickEnd = mi.endTick;
-                    rp->desc = std::format("玩家 {} 第 {} 回合合并录制 {} 个击杀事件，从 {} tick 到 {} tick",
-                        demoInfo.GetPlayerName(ctrlTarget), round,
-                        mi.eventCount, rp->tickStart, rp->tickEnd);
-                    this->PublishAsync(std::move(msg));
-                }
-                // 其余列可空或显示信息
-                ImGui::TableSetColumnIndex(1); ImGui::Text("(%d 事件)", mi.eventCount);
-            }
-        }
-
-        // ---------- 被击杀事件（不参与合并）----------
-        if (this->showBekillEvent && info.Bekilled.has_value()) {
-            const auto& ev = info.Bekilled.value();
-            ImGui::TableNextRow();
-
-            ImGui::TableSetColumnIndex(0);
-            if (btn.Next("录制被击杀")) {
-                auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
-                rp->uid = ev.victimSteamId;
-                rp->tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
-                rp->tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
-                rp->desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
-                    demoInfo.GetPlayerName(ev.victimSteamId),
-                    demoInfo.GetPlayerName(ev.killerSteamId),
-                    rp->tickStart, rp->tickEnd);
-                this->PublishAsync(std::move(msg));
-            }
-
-            ImGui::TableSetColumnIndex(1); ImGui::Text("%d", ev.tick);
-            ImGui::TableSetColumnIndex(2); ImGui::Text(std::format("{} (由 {} 击杀)", demoInfo.GetPlayerName(ev.victimSteamId), demoInfo.GetPlayerName(ev.killerSteamId)).c_str());
-            ImGui::TableSetColumnIndex(3); ImGui::Text("%s", demoInfo.GetPlayerName(ev.assisterSteamId).c_str());
-            ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
         }
     }
-    return;
+
+    for (const auto& [round, info] : player.roundInfo) {
+        this->RoundPlayerMenu(round, info, player, demoInfo);
+    }
 }
 
 bool RecordTaskMaker::Init() {
