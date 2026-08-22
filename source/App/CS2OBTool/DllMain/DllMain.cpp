@@ -101,6 +101,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<SoundCircleFix>("SoundCircleFix")
 
         // CS2 Demo 相关模块
+        .CreateModule<DemState>("DemState")
         .CreateModule<HookDemo>("HookDemo")
         .CreateModule<DemoHelper>("DemoHelper")
         

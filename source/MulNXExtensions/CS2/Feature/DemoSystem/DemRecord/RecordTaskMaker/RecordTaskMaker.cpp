@@ -3,27 +3,55 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/DemoSystem/DemRecord/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
-void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
-    auto w = MulNX::UI::RAIIWindow("录制任务创建");
-    if (!w || !w.ShouldDraw())return;
-    MulNX::UI::SmartButton btn{};
-
-    std::shared_lock lock(this->smutex);
+bool RecordTaskMaker::DemoChooseMenu(Demo::Info& demoInfo) {
     ImGui::Text("选择demo：");
+
+    auto pPlaying = this->pDemState->currentPlayingDemoName.load();
+    if (pPlaying) {
+        ImGui::SameLine();
+        const auto& cp = *pPlaying;
+        if (ImGui::Button(std::format("切换到当前播放Demo:{}", cp).c_str())) {
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
+            rp->str1 = cp;
+            this->PublishAsync(std::move(msg));
+        }
+    }
+
     for (const auto& [name, demo] : this->demos) {
         if (ImGui::Button(name.c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
             rp->str1 = name;
             this->PublishAsync(std::move(msg));
         }
+        ImGui::SameLine();
+    }
+    ImGui::NewLine();
+
+    auto pOperating = this->pDemState->currentOperatingDemoName.load();
+    if (!pOperating) {
+        ImGui::Text("未选中任何demo");
+        return false;
     }
 
-    auto it = this->demos.find(this->currentDemoName);
+    const auto& curOpDemoName = *pOperating;
+    auto it = this->demos.find(curOpDemoName);
     if (it == this->demos.end()) {
         ImGui::Text("未选中任何demo");
-        return;
+        return false;
     }
-    const auto& demoInfo = it->second;
+    demoInfo = it->second;
+    return true;
+}
+
+void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
+    auto w = MulNX::UI::RAIIWindow("录制任务创建");
+    if (!w || !w.ShouldDraw())return;
+    MulNX::UI::SmartButton btn{};
+
+    std::shared_lock lock(this->smutex);
+
+    Demo::Info demoInfo;
+    if (!this->DemoChooseMenu(demoInfo))return;
 
     // 比赛基本信息表格
     if (ImGui::BeginTable("DemoInfo", 2, ImGuiTableFlags_Borders)) {
@@ -237,7 +265,8 @@ void RecordTaskMaker::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/SetOperating"_hash: {
         std::unique_lock lock(this->smutex);
-        this->currentDemoName = msg.asp.get<MulNX::NetExt>()->str1;
+        this->pDemState->currentOperatingDemoName =
+            std::make_shared<std::string>(msg.asp.get<MulNX::NetExt>()->str1);
         break;
     }
     }

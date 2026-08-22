@@ -90,9 +90,12 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
     rp->str1 = demoPath.string();
     this->PublishAsync(std::move(msg));
 
+    auto name = demoPath.stem().string();
+    this->pDemState->currentPlayingDemoName = std::make_shared<std::string>(name);
+
     // 发送设置当前操作的 Demo（使用不带扩展名的文件名）
     auto [msg2, rp2] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-    rp2->str1 = demoPath.stem().string();  // 例如 "111"
+    rp2->str1 = std::move(name);
     this->PublishAsync(std::move(msg2));
 
     this->PublishAsync("Demo/NewPlay"_hash);

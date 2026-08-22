@@ -23,8 +23,8 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
         std::filesystem::path demoPath(str);
         // 确保为绝对路径（正常情况下已经是）
         if (!demoPath.is_absolute()) {
-            this->LogWarning("收到非绝对路径: " + str);
-            demoPath = std::filesystem::absolute(demoPath);
+            this->LogError("收到非绝对路径: " + str);
+            break;
         }
         this->LogInfo("Received demo path: " + demoPath.string());
         this->HandleAnalyzeRequest(std::move(demoPath));
@@ -39,7 +39,7 @@ void DemoAnalyzer::HandleAnalyzeRequest(std::filesystem::path demoPath) {
     std::string stem = demoPath.stem().string();
     std::filesystem::path jsonPath = this->dirData / (stem + ".json");
 
-    // 1. JSON 已存在 → 直接发送加载消息
+    // JSON 已存在 → 直接发送加载消息
     if (std::filesystem::exists(jsonPath)) {
         this->LogInfo("分析结果已存在，直接加载: " + demoPath.string());
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
@@ -48,7 +48,7 @@ void DemoAnalyzer::HandleAnalyzeRequest(std::filesystem::path demoPath) {
         return;
     }
 
-    // 2. 检查是否正在分析
+    // 检查是否正在分析
     {
         std::unique_lock lock(this->smutex);
         if (this->analyzingSet.find(demoPath) != this->analyzingSet.end()) {

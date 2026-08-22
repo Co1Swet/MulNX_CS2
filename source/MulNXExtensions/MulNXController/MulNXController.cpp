@@ -19,6 +19,9 @@ void MulNXController::Window(MulNX::UICoordinator* uico) {
         this->PublishSync(MulNX::HashString(msg));
         msg.clear();
     }
+    if (ImGui::Button("注入错误")) {
+        this->LogError("Test");
+    }
 }
 
 bool MulNXController::Init() {
