@@ -55,6 +55,15 @@ namespace Demo {
         std::map<int, PlayerRoundInfo>roundInfo;
     };
 
+    struct Round {
+        int number;
+        int startTick;
+        int freezeTimeEndTick;
+        int endTick;
+        int endOfficiallyTick;
+        int duration;
+    };
+
     struct Info {
         std::string demoFileName;
         std::string mapName;
@@ -62,6 +71,7 @@ namespace Demo {
         Team teamA;
         Team teamB;
         std::map<Steam64UID, Player> players;
+        std::vector<Round> rounds;
 
         const std::string& GetPlayerName(Steam64UID steamId) const {
             auto it = players.find(steamId);

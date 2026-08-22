@@ -3,7 +3,13 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/DemoSystem/DemRecord/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
-bool RecordTaskMaker::DemoChooseMenu(Demo::Info& demoInfo) {
+void RecordTaskMaker::PublishRecordTask(RecordTask&& rTask) {
+    auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
+    *rp = std::move(rTask);
+    this->PublishAsync(std::move(msg));
+}
+
+bool RecordTaskMaker::DemoChooseMenu(Demo::Info*& pDemoInfo) {
     ImGui::Text("选择demo：");
 
     auto pPlaying = this->pDemState->currentPlayingDemoName.load();
@@ -39,22 +45,13 @@ bool RecordTaskMaker::DemoChooseMenu(Demo::Info& demoInfo) {
         ImGui::Text("未选中任何demo");
         return false;
     }
-    demoInfo = it->second;
+    pDemoInfo = &it->second;
     return true;
 }
 
-void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
-    auto w = MulNX::UI::RAIIWindow("录制任务创建");
-    if (!w || !w.ShouldDraw())return;
-    MulNX::UI::SmartButton btn{};
-
-    std::shared_lock lock(this->smutex);
-
-    Demo::Info demoInfo;
-    if (!this->DemoChooseMenu(demoInfo))return;
-
+void RecordTaskMaker::DemoMetaMenu(const Demo::Info& demoInfo) {
     // 比赛基本信息表格
-    if (ImGui::BeginTable("DemoInfo", 2, ImGuiTableFlags_Borders)) {
+    if (ImGui::BeginTable("DemoInfo", 2)) {
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0); ImGui::Text("Map");
         ImGui::TableSetColumnIndex(1); ImGui::Text("%s", demoInfo.mapName.c_str());
@@ -75,15 +72,14 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
 
         ImGui::EndTable();
     }
+}
 
-    ImGui::Separator();
-
+Steam64UID RecordTaskMaker::TeamPlayerMenu(const Demo::Info& demoInfo) {
     ImGui::Text("Players:");
 
     static Steam64UID ctrlTarget = 0;
     auto showPlayers = [&](bool wantA) {
-        auto t = MulNX::UI::RAIITable("PlayersTable", { "Player" ,"SteamID" ,"K/D/A" },
-            ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg);
+        auto t = MulNX::UI::RAIITable("PlayersTable", { "Player" ,"SteamID" ,"K/D/A" });
         if (!t)return;
 
         for (const auto& [steamID, player] : demoInfo.players) {
@@ -103,6 +99,25 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     ImGui::SeparatorText("B队");
     showPlayers(false);
 
+    return ctrlTarget;
+}
+
+void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
+    auto w = MulNX::UI::RAIIWindow("录制任务创建");
+    if (!w || !w.ShouldDraw())return;
+    MulNX::UI::SmartButton btn{};
+
+    std::shared_lock lock(this->smutex);
+
+    Demo::Info* pDemoInfo = nullptr;
+    if (!this->DemoChooseMenu(pDemoInfo))return;
+    ImGui::Separator();
+    Demo::Info& demoInfo = *pDemoInfo;
+
+    this->DemoMetaMenu(demoInfo);
+    ImGui::Separator();
+    
+    auto ctrlTarget = this->TeamPlayerMenu(demoInfo);
     ImGui::Separator();
 
     auto itPlayer = demoInfo.players.find(ctrlTarget);
@@ -110,6 +125,7 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
         ImGui::SeparatorText("未选中玩家");
         return;
     }
+
     const auto& player = itPlayer->second;
     ImGui::SeparatorText(player.name.c_str());
     ImGui::Checkbox("展示被击杀记录", &this->showBekillEvent);
@@ -148,8 +164,7 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
         }
 
         // ---------- 渲染击杀事件表 ----------
-        auto t = MulNX::UI::RAIITable("KillEventsTable", { "操作","Tick","被击杀者","助攻者","所用武器" },
-            ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg);
+        auto t = MulNX::UI::RAIITable("KillEventsTable", { "操作","Tick","被击杀者","助攻者","所用武器" });
         if (!t)continue;
 
         for (size_t idx = 0; idx < killEvents.size(); ++idx) {
@@ -159,16 +174,16 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
             // 列0：单事件录制按钮
             ImGui::TableSetColumnIndex(0);
             if (btn.Next("录制")) {
-                auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
-                rp->uid = ev.killerSteamId;
-                rp->tickStart = ev.tick - this->pConfiger->preRecordTicks;
-                rp->tickEnd = ev.tick + this->pConfiger->postRecordTicks;
-                auto desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
+                RecordTask rTask;
+                rTask.uid = ev.killerSteamId;
+                rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
+                rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+                rTask.desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
                     demoInfo.GetPlayerName(ev.killerSteamId),
                     demoInfo.GetPlayerName(ev.victimSteamId),
-                    rp->tickStart, rp->tickEnd);
-                rp->desc = std::move(desc);
-                this->PublishAsync(std::move(msg));
+                    rTask.tickStart, rTask.tickEnd);
+
+                this->PublishRecordTask(std::move(rTask));
             }
             ImGui::SameLine();
             if (btn.Next("受害者视角")) {
@@ -251,7 +266,6 @@ bool RecordTaskMaker::Init() {
         return true;
         });
 
-    this->showWindow.store(true, std::memory_order_release);
     return true;
 }
 

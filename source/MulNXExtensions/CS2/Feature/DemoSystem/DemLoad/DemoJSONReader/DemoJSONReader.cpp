@@ -109,6 +109,21 @@ void DemoJSONReader::ReadJSON(const std::filesystem::path& filePath) {
         info.players[killEvent.victimSteamId].roundInfo[killEvent.roundNumber].Bekilled = killEvent;
         info.players[killEvent.killerSteamId].roundInfo[killEvent.roundNumber].killEvents.push_back(std::move(killEvent));
     }
+
+    auto roundsJson = json["rounds"];
+    for (auto it = roundsJson.begin();it != roundsJson.end();++it) {
+        const auto& roundJson = it.value();
+        Demo::Round round{};
+        round.duration = roundJson["duration"].get<int>();
+        round.endOfficiallyTick = roundJson["endOfficiallyTick"].get<int>();
+        round.endTick = roundJson["endTick"].get<int>();
+        round.freezeTimeEndTick = roundJson["freezeTimeEndTick"].get<int>();
+        round.number = roundJson["number"].get<int>();
+        round.startTick = roundJson["startTick"].get<int>();
+
+        info.rounds.push_back(std::move(round));
+    }
+
     auto [msg, rp] = MulNX::Message::Create<Demo::Info>("Demo/InfoLoad"_hash, std::move(info));
     this->PublishAsync(std::move(msg));
     this->PublishAsync("Demo/Refresh"_hash);
