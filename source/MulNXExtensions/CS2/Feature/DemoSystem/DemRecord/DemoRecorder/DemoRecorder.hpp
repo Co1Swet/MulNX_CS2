@@ -1,8 +1,9 @@
 #pragma once
 #include <Feature/DemoSystem/DemBase/DemModuleBase.hpp>
+#include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <deque>
 
-class DemoRecorder final : public CSModuleBase {
+class DemoRecorder final : public CSModuleBase, public MediaModuleMixin<DemoRecorder> {
     std::filesystem::path dirOutput{};
     std::string subOutput = "default";
     std::deque<RecordTask> recordTaskBufferQueue;

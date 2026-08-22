@@ -208,7 +208,13 @@ MulNX::CoTask DemoRecorder::Main() {
             this->LogError("当前Demo不处于暂停状态，已丢弃一个片段");
             continue;
         }
-
+        // 验证音视频系统状态
+        if (this->pMediaState->MediaSystemGlobalWorkFlag || this->pMediaState->recordState == RecordState::Recording) {
+            this->LogError("音视频系统忙碌，正在等待结束。用户可能需要手动停止录制，如果在录制状态中。");
+            co_await this->WaitUntil([this]() {
+                return this->pMediaState->MediaSystemGlobalWorkFlag == false && this->pMediaState->recordState == RecordState::Free;
+                });
+        }
         // 跳转到稍微靠后的时间点，以设置观战目标
         auto backTick = this->currentRecordTaskStartTick + 1;
         this->AsyncCommand(std::format("demo_gototick {}", backTick));
@@ -259,7 +265,7 @@ MulNX::CoTask DemoRecorder::Main() {
         this->LogInfo(std::format("已经设置观战目标：{}", uid));
 
         // 跳转到稍微靠前的时间点，刷新雷达状态等等
-        int beforeRecord = this->currentRecordTaskStartTick - 10;
+        int beforeRecord = this->currentRecordTaskStartTick - 100;
         this->AsyncCommand(std::format("demo_gototick {}", beforeRecord));
         // 等待跳转完成
         MulNX::Message* gotoCplt2 = nullptr;

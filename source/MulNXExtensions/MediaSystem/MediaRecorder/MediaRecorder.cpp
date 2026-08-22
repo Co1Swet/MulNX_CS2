@@ -15,7 +15,7 @@ void MediaRecorder::CaptureCallback() {
 void MediaRecorder::Menu() {
     ImGui::Text("录制状态：");
     ImGui::SameLine();
-    switch (this->recordState.load()) {
+    switch (this->pMediaState->recordState.load()) {
     case RecordState::Free:
         ImGui::Text("空闲");
         break;
@@ -87,7 +87,7 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 }
 
 bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
-    if (this->recordState.load() != RecordState::Free) {
+    if (this->pMediaState->recordState.load() != RecordState::Free) {
         this->LogWarning("已在录制中");
         return false;
     }
@@ -126,7 +126,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
         ));
 
         this->pMediaState->MediaSystemGlobalWorkFlag = true;
-        this->recordState.store(RecordState::Recording);
+        this->pMediaState->recordState.store(RecordState::Recording);
         return true;
     }
     catch (const std::exception& e) {
@@ -137,7 +137,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
 }
 
 bool MediaRecorder::StopRecording() {
-    if(this->recordState.load() != RecordState::Recording) {
+    if (this->pMediaState->recordState.load() != RecordState::Recording) {
         this->LogWarning("未在录制中");
         return false;
     }
@@ -175,7 +175,7 @@ bool MediaRecorder::StopRecording() {
 
     this->ofctx.close();
     this->LogSucc("录制结束");
-    this->recordState.store(RecordState::Free);
+    this->pMediaState->recordState.store(RecordState::Free);
 
     return true;
 }
@@ -191,7 +191,7 @@ void MediaRecorder::Main() {
 }
 
 void MediaRecorder::Encode() {
-    if (this->recordState.load() != RecordState::Recording) return;
+    if (this->pMediaState->recordState.load() != RecordState::Recording) return;
     std::vector<av::Packet> packets;
 
     while (auto p = this->pVEncodeHelper->Encode()) {
