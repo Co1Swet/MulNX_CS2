@@ -16,17 +16,20 @@ bool HookD3D11::Init() {
         auto target = this->rendersystemdx11.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Render::Pos_Call_Present).Data();
 
         this->hkPosCallPresent = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto pSwapChain = (IDXGISwapChain*)ctx->rcx;
-            static int i = 0;
+            IDXGISwapChain* pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);
+            static std::atomic<int> i = 0;
             if (++i < 64)return MulNX::Hook::Then::Continue;
             this->hkPosCallPresent->Detach();
-            IDXGISwapChain* pRealSwapChain = pSwapChain;
+            IDXGISwapChain* pRealSwapChain = nullptr;
             // 如果加载了reshade，这里拿原始对象
             HRESULT hr = pSwapChain->QueryInterface(IID_UnwrappedObject, (void**)&pRealSwapChain);
-            this->HookD3D11SwapChain(pRealSwapChain);
             if (SUCCEEDED(hr)) {
                 this->LogWarning("检测到ReShade加载！已经反查原始交换链对象并部署钩子！");
+                this->HookD3D11SwapChain(pRealSwapChain);
                 pRealSwapChain->Release();
+            }
+            else {
+                this->HookD3D11SwapChain(pSwapChain);
             }
             return MulNX::Hook::Then::Continue;
             }, true).value();
