@@ -3,6 +3,7 @@
 #include "DemBase/DemoPlaying/DemoPlaying.hpp"
 #include "DemBase/DemoHelper/DemoHelper.hpp"
 
+#include "DemLoad/DemoFiles/DemoFiles.hpp"
 #include "DemLoad/DemoJSONReader/DemoJSONReader.hpp"
 #include "DemLoad/DemoAnalyzer/DemoAnalyzer.hpp"
 

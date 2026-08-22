@@ -4,6 +4,9 @@
 #include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
 #include <wrl/client.h>
 
+static const GUID IID_UnwrappedObject =
+{ 0x7f2c9a11, 0x3b4e, 0x4d6a, { 0x81, 0x2f, 0x5e, 0x9c, 0xd3, 0x7a, 0x1b, 0x42 } };
+
 bool HookD3D11::Init() {
     this->pUISystem = this->Core->ModuleManager()->FindModule<MulNX::UISystem>("UISystem");
     this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
@@ -17,7 +20,14 @@ bool HookD3D11::Init() {
             static int i = 0;
             if (++i < 64)return MulNX::Hook::Then::Continue;
             this->hkPosCallPresent->Detach();
-            this->HookD3D11SwapChain(pSwapChain);
+            IDXGISwapChain* pRealSwapChain = pSwapChain;
+            // 如果加载了reshade，这里拿原始对象
+            HRESULT hr = pSwapChain->QueryInterface(IID_UnwrappedObject, (void**)&pRealSwapChain);
+            this->HookD3D11SwapChain(pRealSwapChain);
+            if (SUCCEEDED(hr)) {
+                this->LogWarning("检测到ReShade加载！已经反查原始交换链对象并部署钩子！");
+                pRealSwapChain->Release();
+            }
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->RegisterAttachHook(this->hkPosCallPresent, "PosCallPresent");

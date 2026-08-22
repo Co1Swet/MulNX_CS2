@@ -9,7 +9,7 @@ namespace MulNX {
     public:
         // 便捷窗口显示标志
         std::atomic<bool> showWindow = false;
-        std::shared_mutex smutex;
+        mutable std::shared_mutex smutex;
 
         MulNXHandle HModule;        
         MulNX::MessageChannel* MainMsgChannel;

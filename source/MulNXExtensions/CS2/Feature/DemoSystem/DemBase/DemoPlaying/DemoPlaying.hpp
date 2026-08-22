@@ -1,6 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
-#include <Feature/DemoSystem/DemoStruct.hpp>
+#include <Feature/DemoSystem/DemBase/DemModuleBase.hpp>
 #include <MulNXExtensions/TimeLiner/ITimeAdapter.hpp>
 
 class DemoPlaying final : public CSModuleBase, public ITimeAdapter {

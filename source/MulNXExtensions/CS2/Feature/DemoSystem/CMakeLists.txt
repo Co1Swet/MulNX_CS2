@@ -14,6 +14,7 @@ add_library(DemoSystem STATIC
     DemRend/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
 
     DemoSystem.cpp
+    DemLoad/DemoFiles/DemoFiles.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

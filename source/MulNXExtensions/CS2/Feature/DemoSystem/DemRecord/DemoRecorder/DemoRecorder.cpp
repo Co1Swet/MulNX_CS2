@@ -1,6 +1,5 @@
 #include "DemoRecorder.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Intro/HookConsole/HookConsole.hpp>
 #include <Buildup/TimeController/TimeController.hpp>
 
 void DemoRecorder::Window() {

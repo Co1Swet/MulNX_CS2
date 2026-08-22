@@ -37,7 +37,7 @@ void HookDemo::HookDemoGotoTick(CCmd* pCmd) {
     this->RegisterAttachHook(this->hkDemoGotoTick, "DemoGotoTick");
 }
 void HookDemo::BeforePlay(std::string_view rawArg) {
-    // 1. 去除首尾空白
+    // 去除首尾空白
     std::string rawPath(rawArg);
     size_t start = rawPath.find_first_not_of(" \t");
     if (start == std::string::npos) {
@@ -47,7 +47,7 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
     size_t end = rawPath.find_last_not_of(" \t");
     rawPath = rawPath.substr(start, end - start + 1);
 
-    // 2. 去除可能存在的成对引号
+    // 去除可能存在的成对引号
     if (rawPath.size() >= 2) {
         if ((rawPath.front() == '"' && rawPath.back() == '"') ||
             (rawPath.front() == '\'' && rawPath.back() == '\'')) {
@@ -61,7 +61,7 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
         demoPath = dirDemos / demoPath;
     }
 
-    // 3. 检查文件是否存在，若不存在且缺少 .dem 后缀则自动补全
+    // 检查文件是否存在，若不存在且缺少 .dem 后缀则自动补全
     bool fileFound = false;
     if (std::filesystem::exists(demoPath) && std::filesystem::is_regular_file(demoPath)) {
         fileFound = true;   // 原路径直接有效
@@ -82,7 +82,7 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
         return;
     }
 
-    // 4. 最终确定，输出播放日志
+    // 最终确定，输出播放日志
     this->LogInfo(std::format("播放Demo: {}", demoPath.string()));
 
     // 发送分析请求（包含完整路径）

@@ -102,15 +102,20 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 Demo 相关模块
         .CreateModule<HookDemo>("HookDemo")
-        .CreateModule<DemoSystem>("DemoSystem")
-        .CreateModule<DemoAnalyzer>("DemoAnalyzer")
         .CreateModule<DemoHelper>("DemoHelper")
+        
+        .CreateModule<DemoFiles>("DemoFiles")
+        .CreateModule<DemoAnalyzer>("DemoAnalyzer")
         .CreateModule<DemoJSONReader>("DemoJSONReader")
+
         .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
         .CreateModule<RecordTaskMaker>("RecordTaskMaker")
         .CreateModule<DemoRecorder>("DemoRecorder")
+        
         .CreateModule<DemoEventsRender>("DemoEventsRender")
         .CreateModule<DemoPlayerInfoRender>("DemoPlayerInfoRender")
+
+        .CreateModule<DemoSystem>("DemoSystem")
 
         // CS2 外围功能
         .CreateModule<KeyboardOverlay>("KeyboardOverlay")
@@ -139,7 +144,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<TextureMapper>("TextureMapper")
         .CreateModule<VideoCapturer>("VideoCapturer")
         .CreateModule<VEncodeHelper>("VEncodeHelper")
-        
+
         .CreateModule<MediaRecorder>("MediaRecorder")
         .CreateModule<MediaProcesser>("MediaProcesser")
 

@@ -1,6 +1,6 @@
 #include "DemoJSONReader.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Feature/DemoSystem/DemoStruct.hpp>
+#include <Feature/DemoSystem/DemBase/DemModuleBase.hpp>
 #include <fstream>
 #include <nlohmann/json.hpp>
 
@@ -111,4 +111,5 @@ void DemoJSONReader::ReadJSON(const std::filesystem::path& filePath) {
     }
     auto [msg, rp] = MulNX::Message::Create<Demo::Info>("Demo/InfoLoad"_hash, std::move(info));
     this->PublishAsync(std::move(msg));
+    this->PublishAsync("Demo/Refresh"_hash);
 }

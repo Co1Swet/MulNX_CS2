@@ -1,6 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
-#include <Feature/DemoSystem/DemoStruct.hpp>
+#include <Feature/DemoSystem/DemBase/DemModuleBase.hpp>
 #include <deque>
 
 class DemoRecorder final : public CSModuleBase {

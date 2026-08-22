@@ -1,7 +1,6 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLineModuleBase.hpp>
-#include <Feature/DemoSystem/DemoStruct.hpp>
+#include <Feature/DemoSystem/DemBase/DemModuleBase.hpp>
 
 class DemoEventsRender final : public CSModuleBase, public ITimeLineModule {
     std::map<std::string, Demo::Info> m_demos;

@@ -1,17 +1,21 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <map>
-using Steam64UID = uint64_t;
+#include <Intro/CSModuleBase.hpp>
 
 class RecordTask {
 public:
-    std::string desc;
-    Steam64UID uid;
-    int tickStart;
-    int tickEnd;
-    int tickMain;
-    std::function<bool(int curTick, RecordTask* pRTask)>onPlaying;
+    // 任务描述
+    std::string desc{};
+    // 目标SteamUID
+    Steam64UID uid{};
+    // 开始录制tick
+    int tickStart{};
+    // 结束录制tick
+    int tickEnd{};
+    // 回合开始tick（用于跳转到起点）
+    int tickRoundStart{};
+
+    // 一个在录制时每帧调用的回调
+    std::function<bool(int curTick, RecordTask* pRTask)>onPlaying{};
 };
 
 namespace Demo {
@@ -68,5 +72,8 @@ namespace Demo {
             return unknown;
         }
     };
-
 }
+
+class DemModuleBase :public CSModuleBase {
+    
+};
