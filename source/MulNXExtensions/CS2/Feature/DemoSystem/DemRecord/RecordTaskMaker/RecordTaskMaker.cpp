@@ -116,7 +116,7 @@ std::optional<RecordTask> RecordTaskMaker::CreatePlayFullRoundRTask(const int& r
     int startTickFull = std::max(0, roundMeta.freezeTimeEndTick - 192);
 
     // 计算终点：若玩家死亡则截止到死亡后1秒，否则为回合实际结束tick
-    int endTickFull = roundMeta.endTick;
+    int endTickFull = roundMeta.endTick + this->pConfiger->postTickRoundEnd;
     if (info.Bekilled.has_value()) {
         endTickFull = std::min(info.Bekilled->tick + 64, roundMeta.endTick);
     }
@@ -135,8 +135,6 @@ std::optional<RecordTask> RecordTaskMaker::CreatePlayFullRoundRTask(const int& r
 void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::PlayerRoundInfo& info,
     const Demo::Player& player, const Demo::Info& demoInfo) {
     
-    ImGui::SeparatorText(std::format("第 {} 回合", round).c_str());
-
     // ========== 录制整回合按钮 ==========
     if (auto oRTask = this->CreatePlayFullRoundRTask(round, info, player, demoInfo)) {
         auto rTask = oRTask.value();
@@ -307,8 +305,12 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
         }
     }
 
-    for (const auto& [round, info] : player.roundInfo) {
-        this->RoundPlayerMenu(round, info, player, demoInfo);
+    for (int i = demoInfo.rounds.front().number;i <= demoInfo.rounds.back().number;++i) {
+        ImGui::SeparatorText(std::format("第 {} 回合", i).c_str());
+        if (player.roundInfo.contains(i)) {
+            const auto& info = player.roundInfo.at(i);
+            this->RoundPlayerMenu(i, info, player, demoInfo);
+        }
     }
 }
 

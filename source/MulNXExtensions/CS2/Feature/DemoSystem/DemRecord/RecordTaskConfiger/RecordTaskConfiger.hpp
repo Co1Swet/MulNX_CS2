@@ -19,4 +19,6 @@ public:
 
     // 邻近拼合阈值（tick）
     float mergeThresholdTicks = 480.0f;
+
+    int postTickRoundEnd = 100;
 };
