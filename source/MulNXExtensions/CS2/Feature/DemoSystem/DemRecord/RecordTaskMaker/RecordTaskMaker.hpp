@@ -7,7 +7,7 @@ class RecordTaskMaker final :public DemModuleBase {
     std::map<std::string, Demo::Info>demos;
 
     void PublishRecordTask(RecordTask&& rTask);
-    std::optional<RecordTask> CreatePlayFullRoundRTask(const int& round, const Demo::PlayerRoundInfo& info,
+    std::optional<RecordTask> CreatePlayFullRoundRTask(const int& round,
         const Demo::Player& player, const Demo::Info& demoInfo);
 
     bool showBekillEvent = true;
