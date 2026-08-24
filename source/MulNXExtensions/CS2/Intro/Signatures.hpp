@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNXUtils/WinExt/WinExt.hpp>
 
 namespace MulNX {
@@ -27,7 +26,13 @@ namespace MulNX {
                 
                 inline const static MulNX::Memory::Pattern PosTeamID_CmpForHide("0F 5B FF 0F 2F FE 0F 82 ?? ?? ?? 00 F3 0F 10 44 24");
                 inline const static MulNX::Memory::Pattern PosTeamID_xxIt("48 8B 75 ?? 33 FF 41 BC FF FF 00 00");
-                inline const static MulNX::Memory::Pattern Func_TeamCounterFillPlayerSlotCache("41 57 F3 0F 10 8C 24 C8 00 00 00");
+
+                namespace TeamCounter {
+                    inline const static MulNX::Memory::Pattern Func_FillPlayerSlotCache("41 57 F3 0F 10 8C 24 C8 00 00 00");
+                    inline const static MulNX::Memory::Pattern Pos_UpdatePanoramaSpecTargetVisible("48 8B 48 08 48 8B 01 FF 90 ?? ?? 00 00 B9 68 00 00 00 41 8B 04 0F 39");
+                    inline const static MulNX::Memory::Pattern Pos_UpdatePanoramaNameVisible("4C 8B 8A ?? ?? 00 00 0F B7 15 ?? ?? ?? ?? 41 FF D1 48 8B 13");
+                    inline const static MulNX::Memory::Pattern Pos_UpdatePanoramaFullInfoVisible("FF 90 ?? ?? 00 00 E8 ?? ?? ?? ?? 48 8B 5E ?? 48 8B C8");
+                }
 
                 inline const static MulNX::Memory::Pattern Pos_CheckFor_HudSpecplayerRoot__visible("65 48 8B 04 25 58 00 00 00 8B 0D ?? ?? ?? ?? 41 BD 68 00 00 00 4C 8B 24 C8");
                 inline const static MulNX::Memory::Pattern Pos_CheckFor_HUD__spectating_target("49 8B 86 ?? ?? 00 00 44 0F B6 C2");

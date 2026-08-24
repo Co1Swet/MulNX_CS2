@@ -4,10 +4,9 @@ add_library(CS2HUD STATIC
     KeyboardOverlay/KeyboardOverlay.cpp
     NameController/NameController.cpp
     PlayerSpotColorController/PlayerSpotColorController.cpp
-    TeamCounterController/TeamCounterController.cpp
+    HookTeamCounter/HookTeamCounter.cpp
     PlayerSpotRenderController/PlayerSpotRenderController.cpp
     FlashRenderController/FlashRenderController.cpp
-    VPKInjector/VPKInjector.cpp
     HookHealthAmmoCenter/HookHealthAmmoCenter.cpp
 )
 

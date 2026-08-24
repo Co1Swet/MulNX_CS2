@@ -5,7 +5,6 @@
 #include "NameController/NameController.hpp"
 #include "PlayerSpotColorController/PlayerSpotColorController.hpp"
 #include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
-#include "TeamCounterController/TeamCounterController.hpp"
+#include "HookTeamCounter/HookTeamCounter.hpp"
 #include "FlashRenderController/FlashRenderController.hpp"
-#include "VPKInjector/VPKInjector.hpp"
 #include "HookHealthAmmoCenter/HookHealthAmmoCenter.hpp"

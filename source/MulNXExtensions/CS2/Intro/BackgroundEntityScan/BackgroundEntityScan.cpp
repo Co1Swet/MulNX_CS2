@@ -22,7 +22,7 @@ void BackgroundEntityScan::Main() {
     if (!pGameRules) return;
 
     static int32_t OldRoundStartCount = 0;
-    auto currentStartCount = MulNX::MRead(pGameRules->m_nRoundStartCount());
+    auto currentStartCount = MulNX::MRead(&pGameRules->m_nRoundStartCount);
     if (OldRoundStartCount != currentStartCount) {
         this->PublishAsync("Game/NewRound"_hash);
         OldRoundStartCount = currentStartCount;

@@ -83,13 +83,12 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<SmokeController>("SmokeController")
 
         // CS2 视觉（HUD）功能模块
-        .CreateModule<VPKInjector>("VPKInjector")
         .CreateModule<TeamIDColorController>("TeamIDColorController")
         .CreateModule<TeamIDRenderController>("TeamIDRenderController")
         .CreateModule<PlayerSpotRenderController>("PlayerSpotRenderController")
         .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
         .CreateModule<BombSpotController>("BombSpotController")
-        .CreateModule<TeamCounterController>("TeamCounterController")
+        .CreateModule<HookTeamCounter>("HookTeamCounter")
         .CreateModule<FlashRenderController>("FlashRenderController")
         .CreateModule<HookHealthAmmoCenter>("HookHealthAmmoCenter")
 
