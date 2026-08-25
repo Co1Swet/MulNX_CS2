@@ -1,15 +1,17 @@
+# 工作流名称
 name: CI and Release
 
 # 触发条件：任何推送（包括分支和标签）
 on: [push]
 
-# 并发控制：同一分支或标签的旧运行会被取消
+# 并发控制：同一分支或标签的旧运行会被自动取消，只保留最新的
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build-and-maybe-release:
+    # 运行环境：最新 Windows
     runs-on: windows-latest
 
     # 设置必要的权限，用于创建 Release
@@ -17,24 +19,30 @@ jobs:
       contents: write
 
     steps:
+      # 1. 检出代码（包含完整历史，以便处理标签对象）
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0      # 获取完整历史，确保标签对象被下载
 
-      # 配置 CMake（强制 UTF-8 编码）
+      # 2. 配置 CMake（强制 UTF-8 编码，避免 MSVC 中文警告）
       - name: Configure CMake
         run: cmake -B build -A x64 -DCMAKE_CXX_FLAGS="/utf-8"
 
-      # 构建 Release 版本
+      # 3. 构建 Release 版本（并行编译）
       - name: Build
         run: cmake --build build --config Release --parallel
 
-      # 运行 Python 打包脚本（失败则终止，避免发布无附件）
+      # 4. 安装 Python 依赖：py7zr（用于创建 7z 压缩包）
+      - name: Install Python dependencies
+        run: pip install py7zr
+
+      # 5. 运行 Python 打包脚本（失败则终止流程，避免发布无附件的 Release）
       - name: Run Python helper scripts
         run: python bin/Pack.py
 
-      # 上传构建产物（仅标签或 main 分支）
+      # 6. 上传构建产物（仅当推送的是标签或 main 分支）
+      #    包含 Output 目录、MulNX.7z 和 MulNX 原始目录
       - name: Upload artifacts
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
@@ -42,11 +50,11 @@ jobs:
           name: build-outputs-${{ github.sha }}
           path: |
             bin/Output/
-            bin/MulNX.zip
+            bin/MulNX.7z
             bin/MulNX/
           if-no-files-found: warn
 
-      # 如果是标签推送，准备 Release 信息（包含时间戳）
+      # 7. 如果是标签推送，准备 Release 信息（包含时间戳和标签消息）
       - name: Prepare release info
         if: github.ref_type == 'tag'
         id: release_info
@@ -60,31 +68,33 @@ jobs:
 
           # 判断标签类型：注解标签 vs 轻量标签
           if [ "$(git cat-file -t "$TAG_NAME")" = "tag" ]; then
+            # 注解标签：获取完整消息
             MSG=$(git tag -l --format='%(contents)' "$TAG_NAME")
           else
+            # 轻量标签：使用默认消息
             MSG="自动构建的 Release，版本：$TAG_NAME"
           fi
 
-          # 将消息与构建时间写入文件
+          # 将标签消息和构建时间写入临时文件，供下一步使用
           printf '%s\n' "$MSG" > tag_body.txt
           printf '\n构建时间：%s\n' "$TS" >> tag_body.txt
 
-      # 如果是标签推送，则创建 GitHub Release 并上传文件
+      # 8. 如果是标签推送，创建 GitHub Release 并上传 MulNX.7z
       - name: Create GitHub Release (only for tags)
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          # Release 标题中包含时间戳
+          # Release 标题：包含版本号和构建时间
           name: Release ${{ github.ref_name }} (${{ steps.release_info.outputs.now }})
-          # 从文件读取 Release 说明（包含原始标签消息和构建时间）
+          # Release 说明：从 tag_body.txt 文件读取
           body_path: tag_body.txt
-          # 要上传的文件列表
-          files: bin/MulNX.zip
-          # 确保附件存在，否则失败
+          # 要上传的文件（这里上传 7z 压缩包）
+          files: bin/MulNX.7z
+          # 如果文件不存在，则失败（防止发布空 Release）
           fail_on_unmatched_files: true
-          # 是否为预发布版本（根据需要调整）
+          # 是否为预发布版本（默认 false）
           prerelease: false
-          # 是否为草稿
+          # 是否为草稿（默认 false）
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

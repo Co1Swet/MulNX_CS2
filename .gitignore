@@ -9,6 +9,8 @@ bin/**/*.mp4
 bin/**/*.wav
 bin/**/*.png
 
+bin/**/Log/*.txt
+
 # bin/MulNX/Tools
 bin/MulNX/Tools/*[Rr]e[Ss]hade*
 bin/MulNX/Tools/dxgi.dll

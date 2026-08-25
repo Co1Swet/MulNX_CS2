@@ -116,13 +116,14 @@ std::optional<RecordTask> RecordTaskMaker::CreatePlayFullRoundRTask(const int& r
     int startTickFull = std::max(0, roundMeta.freezeTimeEndTick - 192);
 
     // 计算终点
-    int endTickFull = roundMeta.endTick + this->pConfiger->postTickRoundEnd;
+    int endTickFull = roundMeta.endTick;
     if (player.roundInfo.contains(round)) {
         auto info = player.roundInfo.at(round);
         if (info.Bekilled.has_value()) {
-            endTickFull = std::min(info.Bekilled->tick + 64, roundMeta.endTick);
+            endTickFull = std::min(info.Bekilled->tick + 64, endTickFull);
         }
     }
+    endTickFull += this->pConfiger->postTickRoundEnd;
 
     // 确保有效范围（防止死亡时间在回合开始前或极端情况）
     if (startTickFull >= endTickFull)return std::nullopt;
