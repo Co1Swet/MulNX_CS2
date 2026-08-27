@@ -6,8 +6,7 @@ bool CS2HelperController::Init() {
     this->pInjectHelper = this->Core->ModuleManager()->FindModule<DLLInjectHelper>("DLLInjectHelper");
 
     auto rootPath = this->Path()->GetRoot();
-    this->helperPath = rootPath / "CS2InternalHelper" / "CS2InternalHelper.dll";
-    LoadLibraryW(this->helperPath.wstring().c_str());
+    this->CS2OBToolPath = rootPath / "CS2OBTool" / "CS2OBTool.dll";
 
     this->UIRegisterCallback("CS2BootLoad", [this](auto&&...) {
         MulNX::UI::Checkbox("当reshade被安装时，加载reshade", this->injectReshade);
@@ -28,9 +27,6 @@ void CS2HelperController::DoInject(PROCESS_INFORMATION& pi,
 }
 
 bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi) {
-    // 注入 DLL
-    this->DoInject(pi, this->helperPath);
-
     auto root = this->Path()->GetRoot();
     auto Tools = root / "Tools";
     auto dirFfmpeg = Tools / "ffmpeg";
@@ -52,13 +48,14 @@ bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi) {
 
     for (const auto& ffmpegDll : ffmpegDllsName) {
         auto fullPath = dirFfmpeg / ffmpegDll;
+        LoadLibraryW(fullPath.c_str());
         this->DoInject(pi, fullPath);
     }
 
-    auto pthCS2OBTool = root / "CS2OBTool" / "CS2OBTool.dll";
-    this->DoInject(pi, pthCS2OBTool);
+    LoadLibraryW(this->CS2OBToolPath.wstring().c_str());
+    this->DoInject(pi, this->CS2OBToolPath);
 
-    if (!this->pInjectHelper->InitDLL(pi.hProcess, L"CS2InternalHelper.dll", "MulNX_HelperStart")) {
+    if (!this->pInjectHelper->InitDLL(pi.hProcess, L"CS2OBTool.dll", "MulNX_CS2_Start")) {
         TerminateProcess(pi.hProcess, 0);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);

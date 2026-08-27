@@ -4,17 +4,10 @@ cmake_minimum_required(VERSION 3.31)
 project("MulNX_CS2")
 
 # 版本定义
-add_compile_definitions(MulNXVersion="Beta2.0")
+add_compile_definitions(MulNXVersion="Beta1.7")
 
 # 启用 LTO（仅 Release 配置）
-include(CheckIPOSupported)
-check_ipo_supported(RESULT IPO?)
-if(IPO?)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_CONFIG Release)
-    message(STATUS "IPO/LTO 在 Release 模式可用")
-else()
-    message(WARNING "IPO/LTO 不支持！")
-endif()
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 
 # C++ 标准设置
 set(CMAKE_CXX_STANDARD 23)
@@ -27,6 +20,10 @@ add_compile_options(/MP)
 add_compile_options(/utf-8)
 add_compile_options(/EHsc)
 add_compile_options(/Zc:__cplusplus) # 让MSVC标注正确的cpp版本
+
+add_compile_options(/Gy) # 函数级链接，配合 /OPT:REF 移除未用函数
+add_compile_options(/Gw) # 全局数据优化，允许移除未引用的全局变量
+add_compile_options(/GF) # 合并重复字符串常量
 
 # 控制 PDB 文件
 string(APPEND CMAKE_SHARED_LINKER_FLAGS_RELEASE " /DEBUG /OPT:REF /OPT:ICF /INCREMENTAL:NO")
@@ -48,14 +45,6 @@ set(CS2OBToolPath ${MulNXPath}/CS2OBTool)
 set(CS2InjectorPath ${MulNXPath}/CS2Injector)
 set(CS2InternalHelper ${MulNXPath}/CS2InternalHelper)
 
-# 处理 CS2InternalHelper 目标
-set_target_properties(CS2InternalHelper PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CS2InternalHelper}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CS2InternalHelper}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CS2InternalHelper}"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CS2InternalHelper}"
-    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CS2InternalHelper}"
-)
 # 处理 CS2Injector 目标
 set_target_properties(CS2Injector PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CS2InjectorPath}"

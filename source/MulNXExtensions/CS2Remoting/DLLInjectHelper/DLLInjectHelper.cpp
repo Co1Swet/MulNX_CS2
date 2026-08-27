@@ -67,7 +67,7 @@ bool DLLInjectHelper::InitDLL(HANDLE hProcess, const std::wstring& dllName, cons
     GetExitCodeThread(hThread, &exitCode);
     CloseHandle(hThread);
 
-    // 检查返回码：你的 MulNX_CS2_Start 成功时返回 0
+    // MulNX_CS2_Start 成功时返回 0
     if (exitCode != 0) {
         this->LogError(std::format("Remote initialization failed with code: {}", exitCode));
         return false;
