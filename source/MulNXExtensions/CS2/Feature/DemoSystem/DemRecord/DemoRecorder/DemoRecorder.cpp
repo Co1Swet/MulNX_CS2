@@ -160,20 +160,14 @@ MulNX::CoTask DemoRecorder::Main() {
         co_await this->WaitUntil([this]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
 
         // 等待队列中有任务
-        RecordTask task;
-        co_await this->WaitUntil([&]()->bool { return this->PeekQueue(task); });
+        RecordTask rTask;
+        co_await this->WaitUntil([&]()->bool { return this->PeekQueue(rTask); });
         this->LogInfo("进行新片段录制");
 
-        // 绑定片段信息
-        this->currentRecordTaskStartTick = task.tickStart;
-        this->currentRecordTaskEndTick = task.tickEnd;
-        auto uid = task.uid;
-        this->currentRecordTask = std::move(task);
-
         // 检验窗口安全
-        if (this->currentRecordTaskStartTick < 1) {
-            this->LogWarning(std::format("录制窗口起点从 {} 修正至1", this->currentRecordTaskStartTick));
-            this->currentRecordTaskStartTick = 1;
+        if (rTask.tickStart < 1) {
+            this->LogWarning(std::format("录制窗口起点从 {} 修正至1", rTask.tickStart));
+            rTask.tickStart = 1;
         }
 
         // 首先暂停Demo
@@ -216,7 +210,7 @@ MulNX::CoTask DemoRecorder::Main() {
                 });
         }
         // 跳转到稍微靠后的时间点，以设置观战目标
-        auto backTick = this->currentRecordTaskStartTick + 1;
+        auto backTick = rTask.tickStart + 1;
         this->AsyncCommand(std::format("demo_gototick {}", backTick));
         // 等待跳转完成
         MulNX::Message* gotoCplt = nullptr;
@@ -230,17 +224,17 @@ MulNX::CoTask DemoRecorder::Main() {
         // 设置观战目标
         for (int i = 0;;++i) {
             auto obUID = this->CS2->client.TryGetObservingSteam64UID();
-            if (!obUID || (obUID.value() != uid)) {
+            if (!obUID || (obUID.value() != rTask.uid)) {
                 // 发送设置观察目标消息
                 MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
                 auto&& [uidRef] = specMsg.Access<Steam64UID>();
-                uidRef = uid;
+                uidRef = rTask.uid;
                 this->PublishAsync(std::move(specMsg));
             }
             bool ok = false;
             co_await this->WaitTimed(ok, 500.0f, [&]() {
                 auto obUID = this->CS2->client.TryGetObservingSteam64UID();
-                if (!obUID || (obUID.value() != uid))return false;
+                if (!obUID || (obUID.value() != rTask.uid))return false;
                 return true;
                 });
             if (ok) {
@@ -258,14 +252,14 @@ MulNX::CoTask DemoRecorder::Main() {
         }
         // 验证观战目标
         auto obUID = this->CS2->client.TryGetObservingSteam64UID();
-        if (!obUID || (obUID.value() != uid)) {
+        if (!obUID || (obUID.value() != rTask.uid)) {
             this->LogError("由于观战设置尝试失败，丢弃一个片段");
             continue;
         }
-        this->LogInfo(std::format("已经设置观战目标：{}", uid));
+        this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
 
         // 跳转到稍微靠前的时间点，刷新雷达状态等等
-        int beforeRecord = this->currentRecordTaskStartTick - 100;
+        int beforeRecord = rTask.tickStart - 100;
         this->AsyncCommand(std::format("demo_gototick {}", beforeRecord));
         // 等待跳转完成
         MulNX::Message* gotoCplt2 = nullptr;
@@ -306,22 +300,21 @@ MulNX::CoTask DemoRecorder::Main() {
         this->StartRecord();
         // 输出提示信息
         this->LogInfo(std::format("当前tick：{} ，正在观战目标UID:{}",
-            this->currentRecordTaskStartTick, uid));
+            rTask.tickStart, rTask.uid));
         this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
-            uid, this->currentRecordTaskStartTick, this->currentRecordTaskEndTick));
+            rTask.uid, rTask.tickStart, rTask.tickEnd));
         // 等待录制结束 tick
-        co_await this->WaitUntil([this, &task] {
+        co_await this->WaitUntil([&] {
             auto curTick = this->CS2Time->GetDemoTick();
-            if (task.onPlaying) {
-                task.onPlaying(curTick, &task);
+            if (rTask.onPlaying) {
+                rTask.onPlaying(curTick, &rTask);
             }
-            return curTick >= this->currentRecordTaskEndTick;
+            return curTick >= rTask.tickEnd;
             });
         // 停止录制
         this->PublishAsync("Media/Record/Stop"_hash);
         // 输出成功信息并重置状态
-        this->LogSucc(std::format("录制结束，UID={}", uid));
-        this->currentRecordTask.reset();
+        this->LogSucc(std::format("录制结束，UID={}", rTask.uid));
         continue;
     }
     co_return;

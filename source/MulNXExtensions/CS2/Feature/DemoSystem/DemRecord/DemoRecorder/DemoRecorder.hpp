@@ -7,9 +7,6 @@ class DemoRecorder final : public CSModuleBase, public MediaModuleMixin<DemoReco
     std::filesystem::path dirOutput{};
     std::string subOutput = "default";
     std::deque<RecordTask> recordTaskBufferQueue;
-    std::optional<RecordTask> currentRecordTask;
-    int currentRecordTaskStartTick = 0;
-    int currentRecordTaskEndTick = 0;
 
     std::atomic<bool> moduleActive = false;
 
