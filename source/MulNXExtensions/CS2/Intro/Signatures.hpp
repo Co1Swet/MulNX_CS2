@@ -37,6 +37,10 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern Pos_CheckFor_HudSpecplayerRoot__visible("65 48 8B 04 25 58 00 00 00 8B 0D ?? ?? ?? ?? 41 BD 68 00 00 00 4C 8B 24 C8");
                 inline const static MulNX::Memory::Pattern Pos_CheckFor_HUD__spectating_target("49 8B 86 ?? ?? 00 00 44 0F B6 C2");
             }
+            namespace ViewModel {
+                inline const static MulNX::Memory::Pattern Func_GetViewModelInfo("40 55 53 56 41 56 41 57 48 8B EC 48 83 EC 20 4D 8B F8 4C 8B F2 48 8B F1");
+                inline const static MulNX::Memory::Pattern Func_GetIfHandLeftSide("40 53 48 83 EC ?? 80 B9 ?? ?? ?? ?? ?? 48 8B D9 0F 84 ?? ?? ?? ?? 48 8B 89 ?? ?? ?? ?? 48 85 C9 75");
+            }
             namespace Flash {
                 inline const static MulNX::Memory::Pattern PosCallCmpDrawFlashUpHUD("48 8B F2 48 8B E9 E8 ?? ?? ?? ?? 84 C0 0F 85");
                 inline const static MulNX::Memory::Pattern PosCallCmpDrawFlashDownHUD("84 C0 74 4C 8B 85 B0 02 00 00 49 8D 8D 48 03 00 00");

@@ -271,6 +271,11 @@ namespace CS2 {
         EntitySpottedState_t* m_entitySpottedState() { return Schema<EntitySpottedState_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_entitySpottedState); }
         int32_t* m_ArmorValue() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_ArmorValue); }
         bool* m_bPrevHelmet() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_bPrevHelmet); }
+
+        float* m_flViewmodelOffsetX() { return Schema<float>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_flViewmodelOffsetX); }
+        float* m_flViewmodelOffsetY() { return Schema<float>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_flViewmodelOffsetY); }
+        float* m_flViewmodelOffsetZ() { return Schema<float>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_flViewmodelOffsetZ); }
+        float* m_flViewmodelFOV() { return Schema<float>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_flViewmodelFOV); }
     };
 
     class CBasePlayerController :public C_BaseEntity {
