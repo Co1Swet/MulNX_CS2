@@ -43,7 +43,6 @@ add_subdirectory("source")
 set(MulNXPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
 set(CS2OBToolPath ${MulNXPath}/CS2OBTool)
 set(CS2InjectorPath ${MulNXPath}/CS2Injector)
-set(CS2InternalHelper ${MulNXPath}/CS2InternalHelper)
 
 # 处理 CS2Injector 目标
 set_target_properties(CS2Injector PROPERTIES
