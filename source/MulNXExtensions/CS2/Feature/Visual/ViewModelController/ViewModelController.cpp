@@ -29,19 +29,27 @@ void ViewModelController::Menu() {
 }
 
 void ViewModelController::MenuPlayer(MulNX::Message* umsg) {
-    // auto&& [uid] = umsg->Access<Steam64UID>();
-    // auto pPawn = this->CS2->client
-    // auto pPawn = this->CS2->client.TryGetObservingPawn();
-    // if (!pPawn)return;
-    // auto pCtrler = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pPawn->m_hController()))
-    //     ->As<CS2::CCSPlayerController>();
-    // if (!pCtrler)return;
+    auto&& [uid] = umsg->Access<Steam64UID>();
+    auto pCon = this->CS2Entitys->FindControllerBySteam64UID(uid);
+    if (!pCon)return;
+    auto pPawn = this->CS2Entitys->GetBaseEntityFromHandle(MulNX::MRead(pCon->m_hPlayerPawn()))->As<CS2::C_CSPlayerPawn>();
+    if (!pPawn)return;
 
+    auto offsetX = MulNX::MRead(pPawn->m_flViewmodelOffsetX());
+    auto offsetY = MulNX::MRead(pPawn->m_flViewmodelOffsetY());
+    auto offsetZ = MulNX::MRead(pPawn->m_flViewmodelOffsetZ());
 
-    
-    // if (ImGui::Button("复制内存准星到剪贴板")) {
-    //     ImGui::SetClipboardText(str.c_str());
-    // }
+    auto ViewmodelFOV = MulNX::MRead(pPawn->m_flViewmodelFOV());
+
+    std::string info = std::format("viewmodel_offset_x {};viewmodel_offset_y {};viewmodel_offset_z {};viewmodel_fov {}",
+        offsetX, offsetY, offsetZ, ViewmodelFOV);
+
+    ImGui::InputText("原始持枪视角", info.data(), info.size() + 1,
+        ImGuiInputTextFlags_ReadOnly);
+    ImGui::SameLine();
+    if (ImGui::Button("复制持枪视角到剪贴板")) {
+        ImGui::SetClipboardText(info.c_str());
+    }
 }
 
 bool ViewModelController::Init() {

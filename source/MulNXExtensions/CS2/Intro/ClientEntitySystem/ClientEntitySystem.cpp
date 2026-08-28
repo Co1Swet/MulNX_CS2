@@ -65,3 +65,20 @@ std::optional<Steam64UID> ClientEntitySystem::TryGetObservingSteam64UID() {
         return std::nullopt;
     }
 }
+
+CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64UID uid) {
+    try {
+        for (int i = 0; i < 32; ++i) {
+            auto* controller = this->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+            if (!controller)continue;
+            if (!controller->IsPlayerController())continue;
+            auto steam64UID = MulNX::MRead(controller->m_steamID());
+            if (steam64UID != uid)continue;
+            return controller;
+        }
+    }
+    catch (...) {
+        this->LogError("FindControllerBySteam64UID 失败");
+    }
+    return nullptr;
+}

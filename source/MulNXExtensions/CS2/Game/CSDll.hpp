@@ -2,7 +2,7 @@
 #include <MulNX/Config/Config.hpp>
 #include <MulNXUtils/WinExt/WinExt.hpp>
 #include <Game/tree/tree.hpp>
-#include <Game/C_CSGameRules/C_CSGameRules.hpp>
+#include "C_CSGameRules.hpp"
 
 namespace CS2 {
     namespace Module {

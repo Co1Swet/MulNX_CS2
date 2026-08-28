@@ -79,25 +79,6 @@ void ObserverController::OnSpecModeChanged(uint8_t newMode) {
     }
 }
 
-CS2::CCSPlayerController* ObserverController::FindControllerBySteam64UID(Steam64UID uid) {
-    CS2::CCSPlayerController* pController = nullptr;
-    try {
-        for (int i = 0; i < 32; ++i) {
-            auto* controller = this->CS2Entitys->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
-            if (!controller)continue;
-            if (!controller->IsPlayerController())continue;
-            auto steam64UID = MulNX::MRead(controller->m_steamID());
-            if (steam64UID != uid)continue;
-            pController = controller;
-            break;
-        }
-    }
-    catch (...) {
-        this->LogError("FindControllerBySteam64UID 失败");
-    }
-    return pController;
-}
-
 void ObserverController::SetSpecMode(uint8_t mode) {
     this->AsyncCommand(std::format("spec_mode {}", mode));
 }
@@ -129,7 +110,11 @@ void ObserverController::SpecSteam64UID(Steam64UID uid) {
     int counter = 0;
     while (true) {
         try {
-            auto* pController = this->FindControllerBySteam64UID(uid);
+            auto* pController = this->CS2Entitys->FindControllerBySteam64UID(uid);
+            if (!pController) {
+                this->LogError("因未查找到Controller导致观战设置失败！");
+                break;
+            }
             auto handle = MulNX::MRead(pController->m_hPlayerPawn());
             MulNX::Message msg("Observe/SpecHandle"_hash);
             auto&& [handleRef] = msg.Access<CS2::CHandleBase>();
