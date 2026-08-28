@@ -1,7 +1,6 @@
 # MulNX — CS2 多功能 OB 与制作平台
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue)](LICENSE.txt)
-[![License: MulNX 2.0](https://img.shields.io/badge/License-MulNX%202.0-blue)](LICENSE_MulNX.txt)
 
 > 为 CS2 赛事直播、内容创作与游戏体验增强提供一站式解决方案。
 

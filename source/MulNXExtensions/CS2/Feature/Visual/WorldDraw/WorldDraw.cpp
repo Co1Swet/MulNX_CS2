@@ -52,7 +52,7 @@ void WorldDraw::OnFirst() {
     this->myTrail.trailHandle = handle;
 
     // 记录基准时间
-    this->m_flTrailBaseTime = *this->CS2->CSGlobalVars->fCurrentTime();
+    this->m_flTrailBaseTime = *this->CS2->CSGlobalVars->fCurrentTime()-3;
     this->m_flLastSampleTime = this->m_flTrailBaseTime;
 
     this->LogSucc("绑定成功");
@@ -67,7 +67,7 @@ void WorldDraw::UpdateMyDraw() {
     if (this->myTrail.particleIndex == -1 || this->myTrail.trailHandle == 0)
         return;
 
-    float curTime = *this->CS2->CSGlobalVars->fCurrentTime();
+    float curTime = *this->CS2->CSGlobalVars->fCurrentTime()-3;
 
     // 时间片控制：每隔 m_flSampleInterval 采样一次
     if (curTime - this->m_flLastSampleTime < this->m_flSampleInterval)
