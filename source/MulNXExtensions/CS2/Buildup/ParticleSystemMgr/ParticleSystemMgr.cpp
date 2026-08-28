@@ -9,3 +9,13 @@ bool ParticleSystemMgr::Init() {
 
     return true;
 }
+
+int64_t ParticleSystemMgr::CreateTrailHandle(int64_t* outHandle, void* nameString) { // CUtlString*
+    auto pF = (CreateTrailHandle_t)IVClass::Assume(this->pGameParticleSystemMgr)->GetVFuncPtr(328 / 8);
+    return pF(this->pGameParticleSystemMgr, outHandle, nameString);
+}
+
+void ParticleSystemMgr::UpdateTrail(int64_t handle, int pointCount, void** controlPointData) {
+    auto pF = (UpdateTrail_t)IVClass::Assume(this->pGameParticleSystemMgr)->GetVFuncPtr(336 / 8);
+    return pF(this->pGameParticleSystemMgr, handle, pointCount, controlPointData);
+}

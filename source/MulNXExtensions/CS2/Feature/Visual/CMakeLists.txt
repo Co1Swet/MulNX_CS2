@@ -11,6 +11,7 @@ add_library(CS2Visual STATIC
     ESPSkeleton/ESPSkeleton.cpp
     SpecTargetUI/SpecTargetUI.cpp
     ViewModelController/ViewModelController.cpp
+    WorldDraw/WorldDraw.cpp
 )
 
 target_link_libraries(CS2Visual PUBLIC
