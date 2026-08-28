@@ -21,7 +21,7 @@
 
 ## ◇ 许可证
 
-本项目采用双重许可（AGPL v3 或 MulNX 2.0），详见 [COPYRIGHT.md](COPYRIGHT.md)。
+本项目采用 AGPL v3，详见 [COPYRIGHT.md](COPYRIGHT.md)。
 
 ---
 
