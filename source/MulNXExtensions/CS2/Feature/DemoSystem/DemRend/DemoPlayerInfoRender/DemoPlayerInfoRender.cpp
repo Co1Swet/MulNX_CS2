@@ -20,9 +20,9 @@ void DemoPlayerInfoRender::Menu(MulNX::Message* umsg) {
     }
     
 
-    auto pPawn = this->CS2->client.TryGetObservingPawn();
+    auto pPawn = this->CS2Entitys->TryGetObservingPawn();
     if (!pPawn)return;
-    auto pCtrler = this->CS2->client.GetBaseEntityFromHandle(MulNX::MRead(pPawn->m_hController()))
+    auto pCtrler = this->CS2Entitys->GetBaseEntityFromHandle(MulNX::MRead(pPawn->m_hController()))
         ->As<CS2::CCSPlayerController>();
     if (!pCtrler)return;
     auto Symbol = MulNX::MRead(pCtrler->m_szCrosshairCodes());

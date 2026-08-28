@@ -59,17 +59,17 @@ void ProjectileTracker::OnEntityRemove(MulNX::Message& msg) {
 bool ProjectileTracker::HandleProjectileAdd(CS2::C_BaseCSGrenadeProjectile* pProjectile) {
     try {
         auto hThrower = MulNX::MRead(pProjectile->m_hThrower());
-        auto* pPawn = this->CS2->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
+        auto* pPawn = this->CS2Entitys->GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
         auto hController = MulNX::MRead(pPawn->m_hController());
-        auto* pController = this->CS2->client.GetBaseEntityFromHandle(hController)->As<CS2::CCSPlayerController>();
+        auto* pController = this->CS2Entitys->GetBaseEntityFromHandle(hController)->As<CS2::CCSPlayerController>();
         if (!pController)return false;
 
         this->LogInfo(std::format("记录 projectile({}) -> 控制器 SteamID={} ", pProjectile->GetName(), MulNX::MRead(pController->m_steamID())));
 
-        auto* pObPawn = this->CS2->client.TryGetObservingPawn();
+        auto* pObPawn = this->CS2Entitys->TryGetObservingPawn();
         if(!pObPawn) return true;
         auto hTargetController = MulNX::MRead(pObPawn->m_hController());
-        auto* pTargetController = this->CS2->client.GetBaseEntityFromHandle(hTargetController);
+        auto* pTargetController = this->CS2Entitys->GetBaseEntityFromHandle(hTargetController);
 
         if (pController == pTargetController) {
             this->pTargetWatchProjectile.store(pProjectile, std::memory_order_release);

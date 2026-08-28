@@ -235,7 +235,7 @@ void GlowController::HandleSetGlowColor(CS2::CGlowProperty* pGlowProperty, uint3
     }
     else {
         auto hOwnerEntity = MulNX::MRead(pBaseModelEntity->m_hOwnerEntity());
-        pPlayerPawn = this->CS2->client.GetBaseEntityFromHandle(hOwnerEntity)->As<CS2::C_CSPlayerPawn>();
+        pPlayerPawn = this->CS2Entitys->GetBaseEntityFromHandle(hOwnerEntity)->As<CS2::C_CSPlayerPawn>();
     }
 
     // 检查队伍颜色
@@ -258,7 +258,7 @@ void GlowController::HandleSetGlowColor(CS2::CGlowProperty* pGlowProperty, uint3
 
     if (!pPlayerPawn) return;
     auto hController = MulNX::MRead(pPlayerPawn->m_hController());
-    auto pController = this->CS2->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
+    auto pController = this->CS2Entitys->GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
     if (!pController) return;
 
     Steam64UID uid = MulNX::MRead(pController->m_steamID());

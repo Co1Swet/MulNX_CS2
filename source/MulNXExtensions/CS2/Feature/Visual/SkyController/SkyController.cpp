@@ -214,7 +214,7 @@ void SkyController::HandleOnCmd() {
     }
 
     for (int i = 0; i < 2048; i++) {
-        auto pEntity = this->CS2->client.GetBaseEntity(i);
+        auto pEntity = this->CS2Entitys->GetBaseEntity(i);
         if (!pEntity)continue;
 
         auto name = pEntity->GetName();

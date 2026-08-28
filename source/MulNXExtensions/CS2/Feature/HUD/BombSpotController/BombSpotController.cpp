@@ -11,7 +11,7 @@ bool BombSpotController::Init() {
         auto Pos_Spot_WriteBombState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_WriteBombState);
         this->hkPos_Spot_WriteBombState = MulNX::Hook::Create(Pos_Spot_WriteBombState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->forceBombRedWhenSpecCT.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
-            auto pOBing = this->CS2->client.TryGetObservingPawn();
+            auto pOBing = this->CS2Entitys->TryGetObservingPawn();
             if (!pOBing)return MulNX::Hook::Then::Continue;
             try {
                 if (MulNX::MRead(pOBing->iTeamNum()) == CS2::ui8TeamNum::CT) {
@@ -27,7 +27,7 @@ bool BombSpotController::Init() {
 
         auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
         this->hkPos_CallGetPawnMaybeSetAllHUD = MulNX::Hook::Create(Pos_CallGetPawnMaybeSetAllHUD + 14, [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto pOBing = this->CS2->client.TryGetObservingPawn();
+            auto pOBing = this->CS2Entitys->TryGetObservingPawn();
             auto pRet = (CS2::C_BaseEntity*)ctx->rax;
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::Continue;

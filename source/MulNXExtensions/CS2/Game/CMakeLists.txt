@@ -1,5 +1,4 @@
 add_library(CS2Game STATIC
-    CSDll/CSDll.cpp
     CSGlobalVars/CSGlobalVars.cpp
     tree/tree.cpp
 )

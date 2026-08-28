@@ -40,7 +40,7 @@ void HitSoundFix::HandleOnPlayerHurt(CS2::CGameEvent* event) {
     static CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
     static CS2::CKV3MemberName health{ this->CS2Hashs->health, -1, nullptr };
 
-    auto pOBingPawn = this->CS2->client.TryGetObservingPawn();
+    auto pOBingPawn = this->CS2Entitys->TryGetObservingPawn();
     if (!pOBingPawn)return;
 
     auto pAttackerPawn = event->GetPlayerPawn(attacker);
@@ -88,7 +88,7 @@ void HitSoundFix::HandleOnPlayerDeath(CS2::CGameEvent* event) {
     static CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
     static CS2::CKV3MemberName hitgroup{ this->CS2Hashs->hitgroup, -1, nullptr };
 
-    auto pOBingPawn = this->CS2->client.TryGetObservingPawn();
+    auto pOBingPawn = this->CS2Entitys->TryGetObservingPawn();
     if (!pOBingPawn)return;
 
     auto pAttackerPawn = event->GetPlayerPawn(attacker);

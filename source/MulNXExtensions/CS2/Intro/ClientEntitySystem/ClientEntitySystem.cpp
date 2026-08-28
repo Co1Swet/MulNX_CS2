@@ -1,7 +1,15 @@
-#include "CSDll.hpp"
+#include "ClientEntitySystem.hpp"
+#include <MulNXUtils/WinExt/WinExt.hpp>
+#include <Intro/CSController/CSController.hpp>
 
-CS2::C_BaseEntity* CS2::Module::Client::GetBaseEntity(int index) {
-    uintptr_t entListBase = MulNX::MRead<uintptr_t>(this->GetBaseAddress() + cs2_dumper::offsets::client_dll::dwEntityList);
+bool ClientEntitySystem::Init() {
+    this->CS2 = this->FindModule<CSController>("CSController");
+
+    return true;
+}
+
+CS2::C_BaseEntity* ClientEntitySystem::GetBaseEntity(int index) {
+    uintptr_t entListBase = MulNX::MRead<uintptr_t>(this->CS2->client.GetBaseAddress() + cs2_dumper::offsets::client_dll::dwEntityList);
     if (entListBase == 0) {
         return 0;
     }
@@ -12,14 +20,14 @@ CS2::C_BaseEntity* CS2::Module::Client::GetBaseEntity(int index) {
     return MulNX::MRead<CS2::C_BaseEntity*>(entityListBase + (0x70 * (index & 0x1FF)));
 }
 
-CS2::C_BaseEntity* CS2::Module::Client::GetBaseEntityFromHandle(CS2::CHandleBase handle) {
+CS2::C_BaseEntity* ClientEntitySystem::GetBaseEntityFromHandle(CS2::CHandleBase handle) {
     if (!handle.Valid())return nullptr;
     return this->GetBaseEntity(handle.GetIndexInEntityList());
 }
 
-CS2::C_CSPlayerPawn* CS2::Module::Client::GetLocalPlayerPawn() {
+CS2::C_CSPlayerPawn* ClientEntitySystem::GetLocalPlayerPawnEx() {
     try {
-        auto* localController = this->dwLocalPlayerController();
+        auto* localController = this->CS2->client.dwLocalPlayerController();
         if (!localController) return nullptr;
         auto hLocalPawn = MulNX::MRead(localController->m_hPawn());
         auto* localPawn = this->GetBaseEntityFromHandle(hLocalPawn)->As<CS2::C_CSPlayerPawn>();
@@ -30,9 +38,9 @@ CS2::C_CSPlayerPawn* CS2::Module::Client::GetLocalPlayerPawn() {
     }
 }
 
-CS2::C_CSPlayerPawn* CS2::Module::Client::TryGetObservingPawn() {
+CS2::C_CSPlayerPawn* ClientEntitySystem::TryGetObservingPawn() {
     try {
-        auto* localPawn = this->GetLocalPlayerPawn();
+        auto* localPawn = this->GetLocalPlayerPawnEx();
         if (!localPawn) return nullptr;
         auto hObserverTarget = localPawn->GetHandleObserverTarget();
         auto* target = this->GetBaseEntityFromHandle(hObserverTarget)->As<CS2::C_CSPlayerPawn>();
@@ -43,7 +51,7 @@ CS2::C_CSPlayerPawn* CS2::Module::Client::TryGetObservingPawn() {
     }
 }
 
-std::optional<Steam64UID> CS2::Module::Client::TryGetObservingSteam64UID() {
+std::optional<Steam64UID> ClientEntitySystem::TryGetObservingSteam64UID() {
     try {
         auto pPawn = this->TryGetObservingPawn();
         if (!pPawn)return std::nullopt;

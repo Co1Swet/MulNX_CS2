@@ -53,7 +53,7 @@ void ObserverController::Main() {
 
 void ObserverController::UpdateObserverState() {
     try {
-        auto localPlayerPawn = this->CS2->client.GetLocalPlayerPawn();
+        auto localPlayerPawn = this->CS2Entitys->GetLocalPlayerPawnEx();
         if (!localPlayerPawn)return;
         auto pObserverServices = MulNX::MRead(localPlayerPawn->pObserverServices());
         if (!pObserverServices)return;
@@ -83,7 +83,7 @@ CS2::CCSPlayerController* ObserverController::FindControllerBySteam64UID(Steam64
     CS2::CCSPlayerController* pController = nullptr;
     try {
         for (int i = 0; i < 32; ++i) {
-            auto* controller = this->CS2->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+            auto* controller = this->CS2Entitys->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
             if (!controller)continue;
             if (!controller->IsPlayerController())continue;
             auto steam64UID = MulNX::MRead(controller->m_steamID());
@@ -104,7 +104,7 @@ void ObserverController::SetSpecMode(uint8_t mode) {
 
 bool ObserverController::SpecHandle(CS2::CHandleBase handle) {
     try {
-        auto* localPawn = this->CS2->client.GetLocalPlayerPawn();
+        auto* localPawn = this->CS2Entitys->GetLocalPlayerPawnEx();
         if (!localPawn) {
             this->LogWarning("尝试在无本地实体情况下设置观战？");
             return false;

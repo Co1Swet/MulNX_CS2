@@ -33,14 +33,14 @@ void BackgroundEntityScan::Main() {
         mod->OnItBegin();
     }
     for (int i = 0; i < this->CS2->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-        auto* entity = this->CS2->client.GetBaseEntity(i);
+        auto* entity = this->CS2Entitys->GetBaseEntity(i);
         if (!entity)continue;
 
         auto* controller = entity->As<CS2::CCSPlayerController>();
         if (!controller->IsPlayerController())continue;
 
         auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
-        auto* pawn = this->CS2->client.GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
+        auto* pawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
         if (!pawn)continue;
 
         auto team = MulNX::MRead(pawn->iTeamNum());

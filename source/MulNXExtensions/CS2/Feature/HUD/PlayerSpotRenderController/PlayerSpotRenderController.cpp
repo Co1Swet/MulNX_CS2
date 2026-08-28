@@ -21,7 +21,7 @@ bool PlayerSpotRenderController::Init() {
             if (!this->forceTeammateDraw.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             auto pPawn = (CS2::C_CSPlayerPawn*)ctx->r15;
             try {
-                auto pOBing = this->CS2->client.TryGetObservingPawn();
+                auto pOBing = this->CS2Entitys->TryGetObservingPawn();
                 if (!pOBing)return MulNX::Hook::Then::Continue;
                 auto teamOBing = MulNX::MRead(pOBing->iTeamNum());
                 auto team = MulNX::MRead(pPawn->iTeamNum());
@@ -39,7 +39,7 @@ bool PlayerSpotRenderController::Init() {
         this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = MulNX::Hook::Create(Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->forceEnemyRed.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             uint64_t Enum = ctx->rbx;
-            auto pOBing = this->CS2->client.TryGetObservingPawn();
+            auto pOBing = this->CS2Entitys->TryGetObservingPawn();
             if (!pOBing)return MulNX::Hook::Then::Continue;
             try {
                 auto OBingTeam = MulNX::MRead(pOBing->iTeamNum());

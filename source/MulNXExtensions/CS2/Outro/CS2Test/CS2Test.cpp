@@ -1,7 +1,7 @@
 #include "CS2Test.hpp"
 
 void CS2Test::UI() {
-    auto pLocalPawn = this->CS2->client.GetLocalPlayerPawn();
+    auto pLocalPawn = this->CS2Entitys->GetLocalPlayerPawnEx();
     if (!pLocalPawn)return;
     auto observerService = MulNX::MRead(pLocalPawn->pObserverServices());
     auto pMode = observerService->iObserverMode();

@@ -1,5 +1,6 @@
 #pragma once
 #include <Intro/CSController/CSController.hpp>
+#include <Intro/ClientEntitySystem/ClientEntitySystem.hpp>
 #include <MulNXUtils/WinExt/HookMixin.hpp>
 #include <Intro/HookConsole/CSConMixin.hpp>
 
@@ -43,6 +44,7 @@ public:
     HookConsole* CS2Con = nullptr;
     CS2Paths* CS2Paths = nullptr;
     CS2Hash* CS2Hashs = nullptr;
+    ClientEntitySystem* CS2Entitys = nullptr;
 protected:
     CSModuleMixin() {
         This()->preInits.push_back([this]() -> bool {
@@ -52,6 +54,7 @@ protected:
             this->Hub = This()->FindModule<PlayerHub>("PlayerHub");
             this->CS2Con = This()->FindModule<HookConsole>("HookConsole");
             this->CS2Hashs = This()->FindModule<CS2Hash>("CS2Hash");
+            this->CS2Entitys = This()->FindModule<ClientEntitySystem>("ClientEntitySystem");
 
             this->CS2Paths = CS2Paths::Get();
 

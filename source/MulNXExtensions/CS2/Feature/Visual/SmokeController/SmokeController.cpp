@@ -149,7 +149,7 @@ void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
         
         // 获取投掷者实体
         auto hThrower = MulNX::MRead(pSmoke->m_hThrower());
-        auto* pThrower = this->CS2->client.GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
+        auto* pThrower = this->CS2Entitys->GetBaseEntityFromHandle(hThrower)->As<CS2::C_CSPlayerPawn>();
 
         if (!pThrower) {
             return;
@@ -157,7 +157,7 @@ void SmokeController::MySetSmokeProps(CS2::C_SmokeGrenadeProjectile* pSmoke) {
 
         // 获取控制器
         auto hController = MulNX::MRead(pThrower->m_hController());
-        auto pController = this->CS2->client.GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
+        auto pController = this->CS2Entitys->GetBaseEntityFromHandle(hController)->As<CS2::CBasePlayerController>();
 
         if (!pController) {
             return;

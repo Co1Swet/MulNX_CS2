@@ -4,14 +4,14 @@
 void SpecTargetUI::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("观战信息");
     if (!w || !w.ShouldDraw())return;
-    auto pOBing = this->CS2->client.TryGetObservingPawn();
+    auto pOBing = this->CS2Entitys->TryGetObservingPawn();
     if (!pOBing) {
         ImGui::Text("当前未观战任何玩家");
         return;
     }
 
-    auto pCon = this->CS2->client
-        .GetBaseEntityFromHandle(MulNX::MRead(pOBing->m_hController()))
+    auto pCon = this->CS2Entitys
+        ->GetBaseEntityFromHandle(MulNX::MRead(pOBing->m_hController()))
         ->As<CS2::CCSPlayerController>();
     if (!pCon)return;
 

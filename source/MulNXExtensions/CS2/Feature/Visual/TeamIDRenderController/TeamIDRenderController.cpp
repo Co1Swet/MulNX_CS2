@@ -42,7 +42,7 @@ void TeamIDRenderController::ProcessMsg(MulNX::Message& msg) {
 MulNX::Hook::Then TeamIDRenderController::HandleForShowTeamID(CS2::C_CSPlayerPawn* pCSPlayerPawn) {
     if (!this->hideEnemyTeamID.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
     try {
-        auto pOBPawn = this->CS2->client.TryGetObservingPawn();
+        auto pOBPawn = this->CS2Entitys->TryGetObservingPawn();
         if (!pOBPawn)return MulNX::Hook::Then::Continue;
         auto OBTeam = MulNX::MRead(pOBPawn->iTeamNum());
 

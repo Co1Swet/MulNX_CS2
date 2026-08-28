@@ -22,10 +22,10 @@ void ESPSkeleton::Draw() {
     if (!this->enable.load())return;
     try {
         for (int i = 0;i < this->CS2->client.dwGameEntitySystem_highestEntityIndex() && i < 30;++i) {
-            auto pController = this->CS2->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+            auto pController = this->CS2Entitys->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
             if (!pController)continue;
             auto hPawn = MulNX::MRead(pController->m_hPlayerPawn());
-            auto pPawn = this->CS2->client.GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
+            auto pPawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
             if (!pPawn)continue;
             this->DrawSkelgton(pPawn);
         }

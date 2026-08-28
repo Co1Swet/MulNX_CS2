@@ -54,10 +54,10 @@ MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(CS2::CGameEvent* event
 
         if (!this->enable.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
 
-        auto currentObservingPawn = this->CS2->client.TryGetObservingPawn();
+        auto currentObservingPawn = this->CS2Entitys->TryGetObservingPawn();
         if (!currentObservingPawn)return MulNX::Hook::Then::Return;
         auto hObservingCtrl = MulNX::MRead(currentObservingPawn->m_hController());
-        auto pObservingCtrl = this->CS2->client.GetBaseEntityFromHandle(hObservingCtrl)->As<CS2::CCSPlayerController>();
+        auto pObservingCtrl = this->CS2Entitys->GetBaseEntityFromHandle(hObservingCtrl)->As<CS2::CCSPlayerController>();
         if (!pObservingCtrl)return MulNX::Hook::Then::Return;
         auto currentObSteamID = MulNX::MRead(pObservingCtrl->m_steamID());
         if (killerSteamID != currentObSteamID)return MulNX::Hook::Then::Return;

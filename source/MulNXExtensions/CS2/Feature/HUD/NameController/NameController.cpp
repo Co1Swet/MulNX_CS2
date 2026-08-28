@@ -129,7 +129,7 @@ MulNX::Hook::Then NameController::HandleGetDecoratedPlayerName(MulNX::Hook* hk, 
     GetUserId(&userId);
     if (userId == -1)return MulNX::Hook::Then::SkipAllAndContinue;
 
-    auto pCtrler = this->CS2->client.GetBaseEntity(userId + 1)->As<CS2::CBasePlayerController>();
+    auto pCtrler = this->CS2Entitys->GetBaseEntity(userId + 1)->As<CS2::CBasePlayerController>();
     auto steamId = MulNX::MRead(pCtrler->m_steamID());
 
     const char* currentComponentName = *(const char**)ctx->rdi;

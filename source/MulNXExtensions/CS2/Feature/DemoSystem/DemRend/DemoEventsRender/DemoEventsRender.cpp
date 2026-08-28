@@ -42,7 +42,7 @@ void DemoEventsRender::TimeLineCallback(TimeLiner* timeline, ImDrawList* dl) {
 
     const auto& info = itDemo->second;
 
-    auto oSteam64uid = this->CS2->client.TryGetObservingSteam64UID();
+    auto oSteam64uid = this->CS2Entitys->TryGetObservingSteam64UID();
     if (!oSteam64uid)return;
     auto Steam64uid = *oSteam64uid;
 

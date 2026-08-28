@@ -23,7 +23,7 @@ VOID PlayerHub::Window(MulNX::UICoordinator* uico) {
     std::vector<PlayerInfo> tPlayers;
 
     for (int i = 0; i <= std::min(this->CS2->client.dwGameEntitySystem_highestEntityIndex(), showMax); ++i) {
-        auto* baseEntity = this->CS2->client.GetBaseEntity(i);
+        auto* baseEntity = this->CS2Entitys->GetBaseEntity(i);
         if (!baseEntity) continue;
 
         auto* playerController = baseEntity->As<CS2::CCSPlayerController>();

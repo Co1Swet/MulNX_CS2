@@ -64,7 +64,7 @@ bool HookTeamCounter::Init() {
                     ctx->r8 = false;
                     return MulNX::Hook::Then::Continue;
                 }
-                auto pOBingPawn = this->CS2->client.TryGetObservingPawn();
+                auto pOBingPawn = this->CS2Entitys->TryGetObservingPawn();
                 if (!pOBingPawn)return MulNX::Hook::Then::Continue;
                 auto pCtrl = (CS2::CCSPlayerController*)ctx->rdi;
                 auto OBTeam = MulNX::MRead(pOBingPawn->iTeamNum());
@@ -114,7 +114,7 @@ bool HookTeamCounter::Init() {
     return true;
 }
 void HookTeamCounter::HandleTeamCounterFillPlayerSlotCacheHook(MulNX::Hook* hk, RegContext* ctx) {
-    auto pOBPawn = this->CS2->client.TryGetObservingPawn();
+    auto pOBPawn = this->CS2Entitys->TryGetObservingPawn();
     if (!pOBPawn)return;
     auto OBingTeam = MulNX::MRead(pOBPawn->iTeamNum());
 

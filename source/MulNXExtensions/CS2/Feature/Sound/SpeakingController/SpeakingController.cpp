@@ -17,7 +17,7 @@ bool SpeakingController::Init() {
 void SpeakingController::OnItBegin() {
     if (!this->autoActiveTeamVoice)return;
     this->bufferMask = 0;
-    auto curOBing = this->CS2->client.TryGetObservingPawn();
+    auto curOBing = this->CS2Entitys->TryGetObservingPawn();
     if (!curOBing)return;
     try {
         this->targetTeam = MulNX::MRead(curOBing->iTeamNum());

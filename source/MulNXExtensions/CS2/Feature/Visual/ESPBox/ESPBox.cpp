@@ -6,10 +6,10 @@ void ESPBox::Draw() {
     if (!this->enable.load(std::memory_order_acquire))return;
 
     for (int i = 0;i < 32;++i) {
-        auto* pCtrl = this->CS2->client.GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+        auto* pCtrl = this->CS2Entitys->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
         if (!pCtrl)continue;
         auto hPawn = MulNX::MRead(pCtrl->m_hPlayerPawn());
-        auto pPawn = this->CS2->client.GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
+        auto pPawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
         if (!pPawn)continue;
         if (!MulNX::MRead(pPawn->iHealth()))continue;
 

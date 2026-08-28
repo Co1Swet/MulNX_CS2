@@ -223,7 +223,7 @@ MulNX::CoTask DemoRecorder::Main() {
         }
         // 设置观战目标
         for (int i = 0;;++i) {
-            auto obUID = this->CS2->client.TryGetObservingSteam64UID();
+            auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
             if (!obUID || (obUID.value() != rTask.uid)) {
                 // 发送设置观察目标消息
                 MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
@@ -233,7 +233,7 @@ MulNX::CoTask DemoRecorder::Main() {
             }
             bool ok = false;
             co_await this->WaitTimed(ok, 500.0f, [&]() {
-                auto obUID = this->CS2->client.TryGetObservingSteam64UID();
+                auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
                 if (!obUID || (obUID.value() != rTask.uid))return false;
                 return true;
                 });
@@ -251,7 +251,7 @@ MulNX::CoTask DemoRecorder::Main() {
             }
         }
         // 验证观战目标
-        auto obUID = this->CS2->client.TryGetObservingSteam64UID();
+        auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
         if (!obUID || (obUID.value() != rTask.uid)) {
             this->LogError("由于观战设置尝试失败，丢弃一个片段");
             continue;
