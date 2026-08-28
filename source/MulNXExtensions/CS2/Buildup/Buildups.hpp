@@ -8,3 +8,4 @@
 #include "MaterialSystem/MaterialSystem.hpp"
 #include "SceneSystem/SceneSystem.hpp"
 #include "ResourceSystem/ResourceSystem.hpp"
+#include "ParticleSystemMgr/ParticleSystemMgr.hpp"

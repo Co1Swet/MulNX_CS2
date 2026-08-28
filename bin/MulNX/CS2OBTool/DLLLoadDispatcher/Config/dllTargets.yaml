@@ -9,3 +9,4 @@ targets:
   - rendersystemdx11.dll
   - soundsystem.dll
   - resourcesystem.dll
+  - particles.dll
