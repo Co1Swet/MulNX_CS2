@@ -136,24 +136,6 @@ void DemoRecorder::StartRecord() {
     this->PublishAsync(std::move(msg));
 }
 
-MulNX::CoTask DemoRecorder::WaitTimed(bool& flag, const float milliseconds, const std::function<bool()>& f) {
-    auto start = std::chrono::steady_clock::now();
-    auto timeout = std::chrono::duration<float, std::milli>(milliseconds);
-    co_await this->WaitUntil([&]() {
-        auto now = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - start);
-        if (f()) {
-            flag = true;
-            return true;
-        }
-        if (elapsed >= timeout) {
-            flag = false;
-            return true;
-        }
-        return false;
-        });
-}
-
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
         // 等待模块激活
@@ -170,13 +152,16 @@ MulNX::CoTask DemoRecorder::Main() {
             rTask.tickStart = 1;
         }
 
+        this->LogInfo(std::format("汇报当前片段信息---UID:{},开始tick:{},结束tick:{}",
+            rTask.uid, rTask.tickStart, rTask.tickEnd));
+
         // 首先暂停Demo
         if (!this->CS2Time->IsDemoPaused()) {
             this->LogInfo("当前Demo未暂停，尝试暂停");
             for (int i = 0;;++i) {
                 this->AsyncCommand("demo_pause");
                 bool ok;
-                co_await this->WaitTimed(ok, 500.0f, [&]() {
+                co_await this->WaitTimed(ok, 500, [&]() {
                     return this->CS2Time->IsDemoPaused();
                     });
                 if (ok) {
@@ -209,18 +194,20 @@ MulNX::CoTask DemoRecorder::Main() {
                 return this->pMediaState->MediaSystemGlobalWorkFlag == false && this->pMediaState->recordState == RecordState::Free;
                 });
         }
-        // 跳转到稍微靠后的时间点，以设置观战目标
-        auto backTick = rTask.tickStart + 1;
-        this->AsyncCommand(std::format("demo_gototick {}", backTick));
+        // 跳转时间点，以设置观战目标
+        this->AsyncCommand(std::format("demo_gototick {}", rTask.tickStart));
         // 等待跳转完成
         MulNX::Message* gotoCplt = nullptr;
         co_await this->WaitMsgForever("Demo/GotoTick/Complete"_hash, gotoCplt);
         auto&& [jmped] = gotoCplt->Access<int>();
-        if (jmped != backTick) {
+        if (jmped != rTask.tickStart) {
             this->LogError(std::format("期望跳到tick:{}而接收到了跳转到tick:{}，已丢弃此片段",
-                backTick, jmped));
+                rTask.tickStart, jmped));
             continue;
         }
+
+        co_await this->WaitMilliseconds(750);
+
         // 设置观战目标
         for (int i = 0;;++i) {
             auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
@@ -232,7 +219,7 @@ MulNX::CoTask DemoRecorder::Main() {
                 this->PublishAsync(std::move(specMsg));
             }
             bool ok = false;
-            co_await this->WaitTimed(ok, 500.0f, [&]() {
+            co_await this->WaitTimed(ok, 500, [&]() {
                 auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
                 if (!obUID || (obUID.value() != rTask.uid))return false;
                 return true;
@@ -258,8 +245,10 @@ MulNX::CoTask DemoRecorder::Main() {
         }
         this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
 
+        co_await this->WaitMilliseconds(750);
+
         // 跳转到稍微靠前的时间点，刷新雷达状态等等
-        int beforeRecord = rTask.tickStart - 100;
+        int beforeRecord = rTask.tickStart - 150;
         this->AsyncCommand(std::format("demo_gototick {}", beforeRecord));
         // 等待跳转完成
         MulNX::Message* gotoCplt2 = nullptr;
@@ -270,13 +259,16 @@ MulNX::CoTask DemoRecorder::Main() {
                 beforeRecord, jmped2));
             continue;
         }
+
+        co_await this->WaitMilliseconds(750);
+
         // 恢复Demo播放
         for (int i = 0;;++i) {
             bool ok = false;
             this->AsyncCommand("demo_resume");
-            co_await this->WaitTimed(ok, 500.0f, [&]() {
+            co_await this->WaitTimed(ok, 500, [&]() {
                 // 这里直接验证有没有向下走，如果走了自然播放了
-                return this->CS2Time->GetDemoTick() >= beforeRecord - 5;
+                return this->CS2Time->GetDemoTick() > beforeRecord;
                 });
             if (ok) {
                 break;
@@ -292,15 +284,38 @@ MulNX::CoTask DemoRecorder::Main() {
             }
         }
         // 验证一下是不是确实走了
-        if (this->CS2Time->GetDemoTick() < beforeRecord - 5) {
+        if (this->CS2Time->GetDemoTick() <= beforeRecord) {
             this->LogError("播放未成功，已丢弃一个片段");
             continue;
         }
+
+        // 等待播放到片段起点
+        for (int i = 0;;++i) {
+            bool ok = false;
+            co_await this->WaitTimed(ok, 2500, [&]() {
+                return this->CS2Time->GetDemoTick() > rTask.tickStart - 5;
+                });
+            if (ok) {
+                break;
+            }
+            else if (i < 2) {
+                ++i;
+                this->LogWarning("正在等待播放到指定位置");
+                continue;
+            }
+            else {
+                this->LogError("多次等待播放到指定位置尝试均未成功");
+                break;
+            }
+        }
+        if (std::abs(rTask.tickStart - this->CS2Time->GetDemoTick()) > 32) {
+            this->LogError("恢复播放后，Tick流动不符合起点预期，丢弃一个片段");
+            continue;
+        }
+
         // 开始录制
         this->StartRecord();
         // 输出提示信息
-        this->LogInfo(std::format("当前tick：{} ，正在观战目标UID:{}",
-            rTask.tickStart, rTask.uid));
         this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
             rTask.uid, rTask.tickStart, rTask.tickEnd));
         // 等待录制结束 tick
@@ -315,7 +330,5 @@ MulNX::CoTask DemoRecorder::Main() {
         this->PublishAsync("Media/Record/Stop"_hash);
         // 输出成功信息并重置状态
         this->LogSucc(std::format("录制结束，UID={}", rTask.uid));
-        continue;
     }
-    co_return;
 }

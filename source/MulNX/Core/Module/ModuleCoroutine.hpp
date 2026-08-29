@@ -98,5 +98,34 @@ namespace MulNX {
             co_await this->WaitMsg(type, std::move(onUpdate));
             co_return;
         }
+        CoTask WaitTimed(bool& flag, const int milliseconds, const std::function<bool()>& f) {
+            auto start = std::chrono::steady_clock::now();
+            auto timeout = std::chrono::milliseconds(milliseconds);
+            co_await this->WaitUntil([&]() {
+                auto now = std::chrono::steady_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
+                if (f()) {
+                    flag = true;
+                    return true;
+                }
+                if (elapsed >= timeout) {
+                    flag = false;
+                    return true;
+                }
+                return false;
+                });
+        }
+        CoTask WaitMilliseconds(const int milliseconds) {
+            auto start = std::chrono::steady_clock::now();
+            auto timeout = std::chrono::milliseconds(milliseconds);
+            co_await this->WaitUntil([&]() {
+                auto now = std::chrono::steady_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
+                if (elapsed >= timeout) {
+                    return true;
+                }
+                return false;
+                });
+        }
     };
 }

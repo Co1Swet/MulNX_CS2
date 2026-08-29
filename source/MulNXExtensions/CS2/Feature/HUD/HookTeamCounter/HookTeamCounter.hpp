@@ -9,7 +9,7 @@ class HookTeamCounter final :public CSModuleBase {
     std::atomic<bool> hideEnemyHP = true;
     std::atomic<bool> hideEnemyDefuseOrKit = true;
     std::atomic<bool> forceHideEquipmentInfo = false;
-    std::atomic<bool> forceShowName = false;
+    std::atomic<bool> noHideShowName = false;
 
     void Menu();
     bool Init()override;

@@ -28,7 +28,7 @@ void HookTeamCounter::Menu() {
     ImGui::SeparatorText("TeamCounter(HUD上方玩家信息)");
     MulNX::UI::Checkbox("隐藏敌方血条", this->hideEnemyHP);
     MulNX::UI::Checkbox("隐藏敌方拆弹器/炸弹", this->hideEnemyDefuseOrKit);
-    MulNX::UI::Checkbox("强制显示名字", this->forceShowName);
+    MulNX::UI::Checkbox("不隐藏名字", this->noHideShowName);
     MulNX::UI::Checkbox("强制隐藏装备信息", this->forceHideEquipmentInfo);
     ImGui::Separator();
 }
@@ -83,14 +83,7 @@ bool HookTeamCounter::Init() {
             MulNX::CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible).Data();
         this->hkPos_UpdatePanoramaNameVisible = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
-                if (this->forceShowName) {
-                    ctx->r8 = true;
-                    return MulNX::Hook::Then::Continue;
-                }
-                auto pGameRules = this->CS2->client.dwGameRules();
-                if (!pGameRules)return MulNX::Hook::Then::Continue;
-                auto bIsFreeze = MulNX::MRead(&pGameRules->m_bFreezePeriod);
-                if (bIsFreeze)return MulNX::Hook::Then::Continue;
+                if (this->noHideShowName) return MulNX::Hook::Then::Continue;
                 ctx->r8 = false;
             }
             catch (const MulNX::Exception& e) {
