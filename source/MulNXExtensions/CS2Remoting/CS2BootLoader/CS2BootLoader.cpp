@@ -165,7 +165,6 @@ bool CS2BootLoader::LaunchAndInject() {
     cmdLine += L" -insecure ";// 强制insecure
     cmdLine += std::wstring(this->launchOptions.begin(), this->launchOptions.end());
 
-
     // 以 CREATE_SUSPENDED 方式创建游戏进程
     STARTUPINFOW si{ sizeof(si) };
     PROCESS_INFORMATION pi{};
@@ -173,7 +172,7 @@ bool CS2BootLoader::LaunchAndInject() {
         nullptr,                // 命令行中已包含可执行文件路径
         cmdLine.data(),
         nullptr, nullptr, FALSE,
-        CREATE_SUSPENDED,       // 关键：挂起主线程
+        CREATE_SUSPENDED,       // 挂起主线程
         nullptr, nullptr,
         &si, &pi
     );

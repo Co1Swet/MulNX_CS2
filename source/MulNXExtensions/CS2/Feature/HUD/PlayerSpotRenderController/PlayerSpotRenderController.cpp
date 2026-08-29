@@ -9,6 +9,7 @@ enum TeamSytle :uint64_t {
 
 void PlayerSpotRenderController::Menu() {
     MulNX::UI::Checkbox("隐藏雷达玩家头像数字显示", this->hideNumLabel);
+    MulNX::UI::Checkbox("当观战具体玩家时转换观战外框", this->hideNumLabel);
     MulNX::UI::Checkbox("强制雷达敌人渲染为红色", this->forceEnemyRed);
     MulNX::UI::Checkbox("强制雷达队友显示", this->forceTeammateDraw);
 }
@@ -60,11 +61,14 @@ bool PlayerSpotRenderController::Init() {
         // 修改玩家图标的具体绘制组件可见性
         auto pFunc_FinallyUpdatePlayerState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Func_FinallyUpdatePlayerState).FindFuncStart();
         this->hkFunc_FinallyUpdatePlayerState = MulNX::Hook::Create(pFunc_FinallyUpdatePlayerState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->hideNumLabel.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
-            ctx->rdx &= ~1ULL;
-            if (ctx->rdx & (1ULL << 27)) {          // 如果 bit 27 是 1
-                ctx->rdx &= ~(1ULL << 27);          // 清零 bit 27
-                ctx->rdx |= (1ULL << 28);          // 置位 bit 28
+            if (this->hideNumLabel.load(std::memory_order_acquire)) {
+                ctx->rdx &= ~1ULL;
+            }
+            if (this->transSpecLabel.load(std::memory_order_acquire) && this->CS2Entitys->TryGetObservingPawn()) {
+                if (ctx->rdx & (1ULL << 27)) {          // 如果 bit 27 是 1
+                    ctx->rdx &= ~(1ULL << 27);          // 清零 bit 27
+                    ctx->rdx |= (1ULL << 28);          // 置位 bit 28
+                }
             }
             return MulNX::Hook::Then::Continue;
             }).value();

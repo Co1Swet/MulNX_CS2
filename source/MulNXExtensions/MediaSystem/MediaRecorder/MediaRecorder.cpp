@@ -98,12 +98,26 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
     int srcH = this->pGlobalVars->renderY.load(std::memory_order_acquire);
     av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
     if (srcW <= 0 || srcH <= 0 || srcFmt == AV_PIX_FMT_NONE) {
-        this->LogError("源纹理参数无效"); return false;
+        this->LogError("源纹理参数无效");
+        return false;
     }
 
+    try {
+        if (this->ofctx.isOpened()) {
+            this->LogWarning("输出上下文正处于打开状态！将尝试关闭");
+            this->ofctx.close();
+        }
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("在验证上下文状态时发生错误： {}", e.what()));
+    }
+
+    this->LogInfo("准备第一次Reset");
     this->PublishSync("MediaSync/Reset"_hash);
+    this->LogSucc("第一次Reset完成");
 
     try {
+        this->LogInfo(std::format("准备打开输出上下文: {}", outFile));
         this->ofctx.openOutput(outFile);
         this->LogSucc(std::format("已打开输出上下文: {}", outFile));
 
