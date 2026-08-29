@@ -189,20 +189,21 @@ MulNX::CoTask DemoRecorder::Main() {
         }
         // 验证音视频系统状态
         if (this->pMediaState->MediaSystemGlobalWorkFlag || this->pMediaState->recordState == RecordState::Recording) {
-            this->LogError("音视频系统忙碌，正在等待结束。用户可能需要手动停止录制，如果在录制状态中。");
+            this->LogWarning("音视频系统忙碌，正在等待结束。如果在录制状态中，用户可能需要手动停止录制。");
             co_await this->WaitUntil([this]() {
                 return this->pMediaState->MediaSystemGlobalWorkFlag == false && this->pMediaState->recordState == RecordState::Free;
                 });
         }
         // 跳转时间点，以设置观战目标
-        this->AsyncCommand(std::format("demo_gototick {}", rTask.tickStart));
+        auto tick10before = rTask.tickStart - 10;
+        this->AsyncCommand(std::format("demo_gototick {}", tick10before));
         // 等待跳转完成
         MulNX::Message* gotoCplt = nullptr;
         co_await this->WaitMsgForever("Demo/GotoTick/Complete"_hash, gotoCplt);
         auto&& [jmped] = gotoCplt->Access<int>();
-        if (jmped != rTask.tickStart) {
-            this->LogError(std::format("期望跳到tick:{}而接收到了跳转到tick:{}，已丢弃此片段",
-                rTask.tickStart, jmped));
+        if (jmped != tick10before) {
+            this->LogError(std::format("期望跳到tick:{} 而接收到了跳转到tick:{}，已丢弃此片段",
+                tick10before, jmped));
             continue;
         }
 
