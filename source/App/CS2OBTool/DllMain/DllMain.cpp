@@ -84,7 +84,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<TrailsController>("TrailsController")
         .CreateModule<SmokeController>("SmokeController")
         .CreateModule<ViewModelController>("ViewModelController")
-        .CreateModule<WorldDraw>("WorldDraw")
+        //.CreateModule<WorldDraw>("WorldDraw")
 
         // CS2 视觉（HUD）功能模块
         .CreateModule<TeamIDColorController>("TeamIDColorController")
