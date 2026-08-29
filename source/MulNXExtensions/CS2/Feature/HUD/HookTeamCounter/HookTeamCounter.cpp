@@ -84,6 +84,11 @@ bool HookTeamCounter::Init() {
         this->hkPos_UpdatePanoramaNameVisible = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 if (this->noHideShowName) return MulNX::Hook::Then::Continue;
+                auto pGameRules = this->CS2->client.dwGameRules();
+                if (!pGameRules)return MulNX::Hook::Then::Continue;
+                auto bIsFreeze = MulNX::MRead(&pGameRules->m_bFreezePeriod);
+                auto flRestartRoundTime = MulNX::MRead(&pGameRules->m_flRestartRoundTime);
+                if (bIsFreeze || flRestartRoundTime)return MulNX::Hook::Then::Continue;
                 ctx->r8 = false;
             }
             catch (const MulNX::Exception& e) {
@@ -92,6 +97,13 @@ bool HookTeamCounter::Init() {
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible, "Pos_UpdatePanoramaNameVisible");
+
+        auto tPos_UpdatePanoramaNameVisible2 = this->CS2->client.GetTextRegion().FindRegion(
+            MulNX::CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible2).Data();
+        this->hkPos_UpdatePanoramaNameVisible2 = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible2, [this](MulNX::Hook* hk, RegContext* ctx) {
+            return MulNX::Hook::Then::SkipAllAndContinue;
+            }, true).value();
+        this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible2, "Pos_UpdatePanoramaNameVisible2");
 
         auto tPos_UpdatePanoramaSpecTargetVisible = this->CS2->client.GetTextRegion().FindRegion(
             MulNX::CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaSpecTargetVisible).Data() + 7;
