@@ -5,3 +5,5 @@
 #include "ObserverController/ObserverController.hpp"
 #include "ProjectileTracker/ProjectileTracker.hpp"
 #include "ViewSmoother/ViewSmoother.hpp"
+#include "AutoAim/AutoAim.hpp"
+#include "AutoDepth/AutoDepth.hpp"

@@ -26,8 +26,4 @@ void UIDocker::MainDraw(MulNX::UICoordinator* uico) {
     ImGui::Begin(I18n("3D视觉").c_str());
     uico->CallbackCall("UI.3DVision"_hash, nullptr);
     ImGui::End();
-
-    ImGui::Begin(I18n("视角视图").c_str());
-    uico->CallbackCall("UI.View"_hash, nullptr);
-    ImGui::End();
 }

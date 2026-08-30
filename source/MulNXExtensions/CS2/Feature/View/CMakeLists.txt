@@ -4,6 +4,8 @@ add_library(CS2View STATIC
     ObserverController/ObserverController.cpp
     ProjectileTracker/ProjectileTracker.cpp
     ViewSmoother/ViewSmoother.cpp
+    AutoAim/AutoAim.cpp
+    AutoDepth/AutoDepth.cpp
 )
 add_subdirectory("CameraSystem")
 target_link_libraries(CS2View PUBLIC

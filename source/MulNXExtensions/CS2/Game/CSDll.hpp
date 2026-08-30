@@ -14,6 +14,7 @@ namespace CS2 {
             int dwGameEntitySystem_highestEntityIndex() { return MulNX::MRead<int>(this->dwGameEntitySystem() + cs2_dumper::offsets::client_dll::dwGameEntitySystem_highestEntityIndex); }
             CS2::C_CSGameRules* dwGameRules() { return MulNX::MRead<CS2::C_CSGameRules*>(this->GetBaseAddress() + cs2_dumper::offsets::client_dll::dwGameRules); }
             float* dwViewMatrix() { return reinterpret_cast<float*>(this->GetBaseAddress() + cs2_dumper::offsets::client_dll::dwViewMatrix); }
+            float* dwViewAngles() { return reinterpret_cast<float*>(this->GetBaseAddress() + cs2_dumper::offsets::client_dll::dwViewAngles); }
             CS2::CCSPlayerController* dwLocalPlayerController() { return MulNX::MRead(reinterpret_cast<CS2::CCSPlayerController**>(this->GetBaseAddress() + cs2_dumper::offsets::client_dll::dwLocalPlayerController)); }
 
             // 这个东西只在作为玩家的局内有用

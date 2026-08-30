@@ -36,6 +36,7 @@ public:
     float GetWinHeight()const;
     MulNX::Math::View GetView();
     float* GetViewMatrix();
+    Dofs GetDofs();
 
     void spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot);
     void SetDOF(const MulNX::Math::DOFParam& dof);

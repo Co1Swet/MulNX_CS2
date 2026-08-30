@@ -68,6 +68,8 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<AdvancedViewController>("AdvancedViewController")
         .CreateModule<ObserverController>("ObserverController")
         .CreateModule<ProjectileTracker>("ProjectileTracker")
+        .CreateModule<AutoAim>("AutoAim")
+        .CreateModule<AutoDepth>("AutoDepth")
         .CreateModule<ViewSmoother>("ViewSmoother")
 
         // CS2 视觉叠加功能模块

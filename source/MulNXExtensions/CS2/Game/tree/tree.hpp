@@ -236,13 +236,13 @@ namespace CS2 {
         CPlayer_ItemServices** pItemServices() { return Schema<CPlayer_ItemServices*>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_pItemServices); }
         CPlayer_ObserverServices** pObserverServices() { return Schema<CPlayer_ObserverServices*>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_pObserverServices); }
         DirectX::XMFLOAT3* vOldOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_vOldOrigin); }
-        //DirectX::XMFLOAT3 GetEyePos(){}
         uint32_t* m_iHideHUD() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_iHideHUD); }
         CPlayer_WeaponServices** pWeaponServices() { return Schema<CPlayer_WeaponServices*>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_pWeaponServices); }
         CHandle<CBasePlayerController>* m_hController() { return Schema<CHandle<CBasePlayerController>>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_hController); }
 
         CHandle<C_BasePlayerWeapon> GetHandleActiveWeapon();
         CHandle<C_BaseEntity> GetHandleObserverTarget();
+        DirectX::XMFLOAT3 GetEyePos();
     };
 
     class C_CSPlayerPawnBase :public C_BasePlayerPawn {

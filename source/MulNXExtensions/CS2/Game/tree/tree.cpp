@@ -1,5 +1,5 @@
 #include "tree.hpp"
-
+#include <MulNX/Base/Math/Math.hpp>
 #include <MulNXUtils/WinExt/Memory/Memory.hpp>
 
 DirectX::XMFLOAT3 CS2::C_BaseEntity::GetBonePos(int index) {
@@ -40,4 +40,9 @@ CS2::CHandle<CS2::C_BaseEntity> CS2::C_BasePlayerPawn::GetHandleObserverTarget()
     if (!pObserverServices) return{};
     auto hObserverTarget = MulNX::MRead(pObserverServices->hObserverTarget());
     return hObserverTarget;
+}
+DirectX::XMFLOAT3 CS2::C_BasePlayerPawn::GetEyePos() {
+    auto offset = MulNX::MRead(this->vecViewOffset());
+    auto pos = MulNX::MRead(this->vOldOrigin());
+    return pos + offset;
 }

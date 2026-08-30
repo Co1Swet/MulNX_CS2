@@ -57,7 +57,7 @@ void ViewSmoother::Menu() {
 }
 
 bool ViewSmoother::Init() {
-    this->UIRegisterCallback("UI.View", [this](auto&&...) {this->Menu();});
+    this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {this->Menu();});
 
     return true;
 }

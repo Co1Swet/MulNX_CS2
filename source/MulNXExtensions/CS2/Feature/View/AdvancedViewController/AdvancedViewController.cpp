@@ -76,7 +76,7 @@ bool AdvancedViewController::Menu() {
 }
 
 bool AdvancedViewController::Init() {
-    this->UIRegisterCallback("UI.View", [this](auto&&...) {return this->Menu(); });
+    this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {return this->Menu(); });
 
     return true;
 }

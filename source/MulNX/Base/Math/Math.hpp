@@ -1,10 +1,9 @@
 #pragma once
-
 #include "dxmext.hpp"
 #include "DOF/DOF.hpp"
 #include "Translate/Translate.hpp"
-
 #include <atomic>
+
 namespace MulNX {
     namespace Math {
         // 包含游戏提取视角信息

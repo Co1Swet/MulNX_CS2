@@ -4,7 +4,7 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 
 void HookView::Window(MulNX::UICoordinator* uico) {
-    auto w = MulNX::UI::RAIIWindow(I18n("镜头参数").c_str());
+    auto w = MulNX::UI::RAIIWindow(I18n("镜头控制").c_str());
     if (!w)return;
     uico->CallbackCall("UI.CameraSetting"_hash, nullptr);
     if (!w.ShouldDraw())return;
@@ -98,6 +98,9 @@ MulNX::Math::View HookView::GetView() {
     view.dof.FarBlurry = *this->controlView.dofs.pFarBlurry;
 
     return view;
+}
+Dofs HookView::GetDofs() {
+    return this->controlView.dofs;
 }
 
 void HookView::spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot) {

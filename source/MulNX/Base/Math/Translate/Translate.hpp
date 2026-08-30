@@ -1,5 +1,4 @@
 #pragma once
-
 #include <MulNX/Base/Math/dxmext.hpp>
 
 namespace MulNX {
@@ -11,7 +10,6 @@ namespace MulNX {
         void CSDirToEuler(const DirectX::XMFLOAT3& Dir, DirectX::XMFLOAT3& Euler);
         // 从欧拉角（俯仰、偏航）计算方向向量（单位向量）
         DirectX::XMFLOAT3 CSEulerToDir(float pitchDegrees, float yawDegrees);
-
 
         bool WorldToScreen(const DirectX::XMFLOAT3& pWorldPos, DirectX::XMFLOAT2& pScreenPos, const float* pMatrixPtr, const float pWinWidth, const float pWinHeight);
 
