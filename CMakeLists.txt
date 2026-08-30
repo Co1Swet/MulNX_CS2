@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.31)
 project("MulNX_CS2")
 
 # 版本定义
-add_compile_definitions(MulNXVersion="Beta3")
+add_compile_definitions(MulNXVersion="Beta4")
 
 # 启用 LTO（仅 Release 配置）
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)

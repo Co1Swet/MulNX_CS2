@@ -1,79 +1,87 @@
 #include "AutoAim.hpp"
+#include <Buildup/TargetPicker/TargetPicker.hpp>
+
+void AutoAim::Menu() {
+    if (ImGui::Button("启动自瞄")) {
+        this->AsyncCommand("MulNX/AutoAim/Enable");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("关闭自瞄")) {
+        this->AsyncCommand("MulNX/AutoAim/Disable");
+    }
+}
 
 bool AutoAim::Init() {
+    this->pTargetPicker = this->FindModule<TargetPicker>("TargetPicker");
+
+    this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {this->Menu();});
+
+    (*this)
+        .SubscribeAsync<void>("AutoAim/Enable")
+        .SubscribeAsync<void>("AutoAim/Disable")
+        ;
 
     return true;
 }
 
+void AutoAim::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "AutoAim/Enable"_hash: {
+        if (this->pTargetPicker->UpdateTarget()) {
+            this->enable = true;
+        }
+        break;
+    }
+    case "AutoAim/Disable"_hash: {
+        this->enable = false;
+        break;
+    }
+    }
+}
+
 bool AutoAim::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
+    this->Update();
     if (!this->enable.load(std::memory_order_acquire)) return false;
     try {
+        auto steam64 = this->pTargetPicker->GetTarget();
+        if (!steam64) return false;
+
+        auto pTarCtrl = this->CS2Entitys->FindControllerBySteam64UID(steam64);
+        if (!pTarCtrl) return false;
+
+        auto hPawn = MulNX::MRead(pTarCtrl->m_hPlayerPawn());
+        if (!hPawn.Valid()) return false;
+        auto pPawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
+        if (!pPawn) return false;
+        if (MulNX::MRead(pPawn->iHealth()) == 0) return false;
+
         DirectX::XMFLOAT3 currentCamPos = *viewSetup->pViewOrigin();
-        auto pAngle = viewSetup->pViewAngles();                 // 渲染视角指针
-        auto localAngle = this->CS2->client.dwViewAngles();     // 引擎视角指针（用户确认是指针）
-        if (!pAngle) return false;
+        auto pAngle = viewSetup->pViewAngles();
+        auto localAngle = this->CS2->client.dwViewAngles();
+        if (!pAngle || !localAngle) return false;
 
-        // 定义一个 lambda，用于同时修改两个视角角度
-        auto setAngles = [&](const DirectX::XMFLOAT3& angles) {
-            if (pAngle) {
-                pAngle->x = angles.x;
-                pAngle->y = angles.y;
-                pAngle->z = angles.z;
-            }
-            if (localAngle) {
-                localAngle[0] = angles.x;
-                localAngle[1] = angles.y;
-                localAngle[2] = angles.z;
-            }
-            };
+        auto eyePos = pPawn->GetEyePos();
 
-        float bestDistSq = FLT_MAX;
-        DirectX::XMFLOAT3 bestTargetPos;
+        // 计算指向目标的方向
+        DirectX::XMFLOAT3 dirToTarget = {
+            eyePos.x - currentCamPos.x,
+            eyePos.y - currentCamPos.y,
+            eyePos.z - currentCamPos.z
+        };
 
-        // 遍历实体，选择距离摄像机最近的敌人
-        for (int i = 0; i < 32; ++i) {
-            auto pCtrl = this->CS2Entitys->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
-            if (!pCtrl || this->CS2->client.dwLocalPlayerController() == pCtrl) continue;
+        DirectX::XMFLOAT3 newAngles;
+        MulNX::Math::CSDirToEuler(dirToTarget, newAngles);
 
-            auto hPawn = MulNX::MRead(pCtrl->m_hPlayerPawn());
-            if (!hPawn.Valid()) continue;
-            auto pPawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
-            if (!pPawn) continue;
-            if (MulNX::MRead(pPawn->iHealth()) == 0)continue;
+        // 同时修改两个视角角度
+        pAngle->x = newAngles.x;
+        pAngle->y = newAngles.y;
+        localAngle[0] = newAngles.x;
+        localAngle[1] = newAngles.y;
 
-            auto eyePos = pPawn->GetEyePos();
-
-            float dx = eyePos.x - currentCamPos.x;
-            float dy = eyePos.y - currentCamPos.y;
-            float dz = eyePos.z - currentCamPos.z;
-            float distSq = dx * dx + dy * dy + dz * dz;
-
-            if (distSq < bestDistSq) {
-                bestDistSq = distSq;
-                bestTargetPos = eyePos;
-            }
-        }
-
-        if (bestDistSq < FLT_MAX) {
-            // 计算指向最近目标的方向
-            DirectX::XMFLOAT3 dirToBest = {
-                bestTargetPos.x - currentCamPos.x,
-                bestTargetPos.y - currentCamPos.y,
-                bestTargetPos.z - currentCamPos.z
-            };
-            DirectX::XMFLOAT3 newAngles;
-            MulNX::Math::CSDirToEuler(dirToBest, newAngles);
-            newAngles.z = 0.0f;   // 保持 roll = 0
-
-            // 使用 lambda 同时修改两个视角
-            setAngles(newAngles);
-
-            return true;
-        }
+        return true;
     }
     catch (const MulNX::Exception& e) {
         this->LogError(e);
     }
-
     return false;
 }

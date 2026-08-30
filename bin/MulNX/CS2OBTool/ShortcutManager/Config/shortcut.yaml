@@ -70,3 +70,23 @@ binds:
       alt: false
       vkCode: 45
       comboClick: 1
+
+  - desc: "开启自瞄"
+    msg: "AutoAim/Enable"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: true
+      vkCode: 86
+      comboClick: 1
+
+  - desc: "关闭自瞄"
+    msg: "AutoAim/Disable"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: true
+      vkCode: 86
+      comboClick: 2

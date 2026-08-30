@@ -41,6 +41,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookView>("HookView")
         .CreateModule<HookGSI>("HookGSI")
         .CreateModule<CS2Hash>("CS2Hash")
+        .CreateModule<TargetPicker>("TargetPicker")
         .CreateModule<TimeController>("TimeController")
         .CreateModule<PlayerHub>("PlayerHub")
         .CreateModule<DemoPlaying>("DemoPlaying") // 承担了时间适配器责任
