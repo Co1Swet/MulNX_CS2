@@ -70,6 +70,8 @@ namespace MulNX {
             }
             namespace Sound {
                 inline const static MulNX::Memory::Pattern ifShowSpeaker("84 C0 0F 85 ?? ?? 00 00 48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 85 C0");
+                inline const static MulNX::Memory::Pattern GetVoiceStatus("48 8B 05 ?? ?? ?? ?? C3 CC CC CC CC CC CC CC CC 48 8D 05");
+                inline const static MulNX::Memory::Pattern UpdateSpeakerStatus("44 88 4C 24 ?? 44 89 44 24 ?? 89 54 24");
 
                 inline const static MulNX::Memory::Pattern EmitHurtFeedbackSound("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 49 8B E8");
                 inline const static MulNX::Memory::Pattern Pos_CallGetPawnUpdateCirclePos("48 85 C0 0F 84 ?? ?? 00 00 48 89 6C 24 ?? 48 8D 54 24 ?? 48 89 74 24 ?? 48 8B C8");
