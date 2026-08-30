@@ -2,59 +2,59 @@ FontSizeBase: 16
 FontScaleMain: 1
 FontScaleDpi: 1
 Alpha: 1
-DisabledAlpha: 0.6
+DisabledAlpha: 0.55
 WindowPadding:
+  - 12
   - 10
-  - 8
-WindowRounding: 8
-WindowBorderSize: 1
-WindowBorderHoverPadding: 4
+WindowRounding: 10
+WindowBorderSize: 0
+WindowBorderHoverPadding: 6
 WindowMinSize:
-  - 32
-  - 32
+  - 36
+  - 36
 WindowTitleAlign:
   - 0.5
   - 0.5
 WindowMenuButtonPosition: Left
-ChildRounding: 4
-ChildBorderSize: 1
-PopupRounding: 6
-PopupBorderSize: 1
+ChildRounding: 8
+ChildBorderSize: 0
+PopupRounding: 12
+PopupBorderSize: 0
 FramePadding:
-  - 6
-  - 4
-FrameRounding: 6
-FrameBorderSize: 1
-ItemSpacing:
   - 8
-  - 6
+  - 5
+FrameRounding: 8
+FrameBorderSize: 0
+ItemSpacing:
+  - 10
+  - 7
 ItemInnerSpacing:
-  - 6
-  - 4
+  - 7
+  - 5
 CellPadding:
-  - 4
-  - 2
+  - 6
+  - 3
 TouchExtraPadding:
   - 0
   - 0
-IndentSpacing: 21
-ColumnsMinSpacing: 6
-ScrollbarSize: 14
-ScrollbarRounding: 6
-ScrollbarPadding: 2
-GrabMinSize: 12
-GrabRounding: 6
+IndentSpacing: 24
+ColumnsMinSpacing: 8
+ScrollbarSize: 16
+ScrollbarRounding: 10
+ScrollbarPadding: 3
+GrabMinSize: 14
+GrabRounding: 8
 LogSliderDeadzone: 4
-ImageRounding: 0
+ImageRounding: 6
 ImageBorderSize: 0
-TabRounding: 8
+TabRounding: 10
 TabBorderSize: 0
 TabMinWidthBase: 1
-TabMinWidthShrink: 80
+TabMinWidthShrink: 90
 TabCloseButtonMinWidthSelected: -1
 TabCloseButtonMinWidthUnselected: 0
-TabBarBorderSize: 1
-TabBarOverlineSize: 1
+TabBarBorderSize: 0
+TabBarOverlineSize: 2
 TableAngledHeadersAngle: 0.61086524
 TableAngledHeadersTextAlign:
   - 0.5
@@ -62,10 +62,10 @@ TableAngledHeadersTextAlign:
 TreeLinesFlags: 262144
 TreeLinesSize: 1
 TreeLinesRounding: 0
-DragDropTargetRounding: 0
+DragDropTargetRounding: 8
 DragDropTargetBorderSize: 2
-DragDropTargetPadding: 3
-ColorMarkerSize: 3
+DragDropTargetPadding: 4
+ColorMarkerSize: 4
 ColorButtonPosition: Right
 ButtonTextAlign:
   - 0.5
@@ -79,14 +79,14 @@ SeparatorTextAlign:
   - 0
   - 0.5
 SeparatorTextPadding:
-  - 20
-  - 3
+  - 24
+  - 4
 DisplayWindowPadding:
-  - 19
-  - 19
+  - 22
+  - 22
 DisplaySafeAreaPadding:
-  - 3
-  - 3
+  - 4
+  - 4
 MouseCursorScale: 1
 AntiAliasedLines: true
 AntiAliasedLinesUseTex: true
@@ -102,312 +102,312 @@ _MainScale: 1
 _NextFrameFontSizeBase: 0
 Colors:
   Text:
-    - 0.96
-    - 0.94
-    - 0.9
+    - 0.93
+    - 0.95
+    - 0.98
     - 1
   TextDisabled:
-    - 0.65
+    - 0.52
+    - 0.56
     - 0.62
-    - 0.58
     - 1
   WindowBg:
-    - 0.2
-    - 0.18
-    - 0.16
+    - 0.09
+    - 0.10
+    - 0.13
     - 1
   ChildBg:
-    - 0.22
-    - 0.2
-    - 0.18
+    - 0.12
+    - 0.13
+    - 0.16
     - 1
   PopupBg:
-    - 0.24
-    - 0.22
-    - 0.2
+    - 0.14
+    - 0.15
+    - 0.19
     - 1
   Border:
-    - 0.58
-    - 0.54
-    - 0.5
+    - 0.28
+    - 0.32
+    - 0.38
     - 1
   BorderShadow:
-    - 0.08
-    - 0.06
-    - 0.04
-    - 0.5
+    - 0.02
+    - 0.03
+    - 0.05
+    - 0.6
   FrameBg:
-    - 0.42
-    - 0.39
-    - 0.36
+    - 0.22
+    - 0.24
+    - 0.28
     - 1
   FrameBgHovered:
-    - 0.5
-    - 0.46
-    - 0.42
+    - 0.28
+    - 0.31
+    - 0.37
     - 1
   FrameBgActive:
-    - 0.58
-    - 0.54
-    - 0.5
+    - 0.33
+    - 0.37
+    - 0.45
     - 1
   TitleBg:
-    - 0.16
-    - 0.14
+    - 0.11
     - 0.12
+    - 0.15
     - 1
   TitleBgActive:
-    - 0.24
-    - 0.22
-    - 0.2
+    - 0.16
+    - 0.18
+    - 0.23
     - 1
   TitleBgCollapsed:
-    - 0.16
-    - 0.14
+    - 0.11
     - 0.12
-    - 0.7
+    - 0.15
+    - 0.75
   MenuBarBg:
-    - 0.18
-    - 0.16
+    - 0.13
     - 0.14
+    - 0.18
     - 1
   ScrollbarBg:
-    - 0.3
-    - 0.28
-    - 0.26
+    - 0.14
+    - 0.15
+    - 0.19
     - 1
   ScrollbarGrab:
-    - 0.55
-    - 0.52
-    - 0.49
+    - 0.31
+    - 0.35
+    - 0.43
     - 1
   ScrollbarGrabHovered:
-    - 0.65
-    - 0.62
-    - 0.58
+    - 0.41
+    - 0.46
+    - 0.56
     - 1
   ScrollbarGrabActive:
-    - 0.75
-    - 0.72
-    - 0.68
+    - 0.52
+    - 0.58
+    - 0.70
     - 1
   CheckMark:
-    - 0.85
-    - 0.6
-    - 0.7
+    - 0.35
+    - 0.80
+    - 0.95
     - 1
   SliderGrab:
-    - 0.8
-    - 0.55
-    - 0.65
+    - 0.33
+    - 0.75
+    - 0.90
     - 1
   SliderGrabActive:
-    - 0.9
-    - 0.65
-    - 0.75
+    - 0.45
+    - 0.88
+    - 1.00
     - 1
   Button:
-    - 0.7
-    - 0.45
-    - 0.55
+    - 0.22
+    - 0.52
+    - 0.68
     - 1
   ButtonHovered:
-    - 0.8
-    - 0.55
-    - 0.65
+    - 0.28
+    - 0.64
+    - 0.82
     - 1
   ButtonActive:
-    - 0.6
-    - 0.35
-    - 0.45
+    - 0.18
+    - 0.42
+    - 0.56
     - 1
   Header:
-    - 0.65
-    - 0.5
-    - 0.7
-    - 0.65
-  HeaderHovered:
-    - 0.75
-    - 0.6
-    - 0.8
-    - 0.85
-  HeaderActive:
-    - 0.7
+    - 0.28
     - 0.55
+    - 0.72
+    - 0.55
+  HeaderHovered:
+    - 0.35
+    - 0.66
+    - 0.84
     - 0.75
+  HeaderActive:
+    - 0.32
+    - 0.58
+    - 0.76
     - 0.95
   Separator:
-    - 0.55
-    - 0.5
-    - 0.46
+    - 0.30
+    - 0.34
+    - 0.40
     - 1
   SeparatorHovered:
-    - 0.75
-    - 0.65
-    - 0.6
+    - 0.45
+    - 0.55
+    - 0.66
     - 1
   SeparatorActive:
-    - 0.85
-    - 0.75
-    - 0.7
+    - 0.35
+    - 0.80
+    - 0.95
     - 1
   ResizeGrip:
-    - 0.26
-    - 0.59
-    - 0.98
-    - 0.2
+    - 0.35
+    - 0.80
+    - 0.95
+    - 0.25
   ResizeGripHovered:
-    - 0.26
-    - 0.59
-    - 0.98
-    - 0.67
+    - 0.35
+    - 0.80
+    - 0.95
+    - 0.65
   ResizeGripActive:
-    - 0.26
-    - 0.59
-    - 0.98
+    - 0.35
+    - 0.80
+    - 0.95
     - 0.95
   InputTextCursor:
-    - 1
-    - 1
-    - 1
+    - 0.75
+    - 0.90
+    - 1.00
     - 1
   TabHovered:
+    - 0.28
     - 0.55
-    - 0.4
-    - 0.7
+    - 0.72
     - 1
   Tab:
-    - 0.45
-    - 0.3
-    - 0.6
-    - 1
-  TabSelected:
-    - 0.6
-    - 0.45
-    - 0.75
-    - 1
-  TabSelectedOverline:
-    - 0.26
-    - 0.59
-    - 0.98
-    - 1
-  TabDimmed:
-    - 0.4
-    - 0.26
-    - 0.55
-    - 1
-  TabDimmedSelected:
-    - 0.5
-    - 0.35
-    - 0.65
-    - 1
-  TabDimmedSelectedOverline:
-    - 0.5
-    - 0.5
-    - 0.5
-    - 0
-  DockingPreview:
-    - 0.26
-    - 0.59
-    - 0.98
-    - 0.7
-  DockingEmptyBg:
-    - 0.2
-    - 0.2
-    - 0.2
-    - 1
-  PlotLines:
-    - 0.8
-    - 0.9
-    - 0.65
-    - 1
-  PlotLinesHovered:
-    - 0.9
-    - 1
-    - 0.75
-    - 1
-  PlotHistogram:
-    - 0.85
-    - 0.6
-    - 0.8
-    - 1
-  PlotHistogramHovered:
-    - 0.95
-    - 0.7
-    - 0.9
-    - 1
-  TableHeaderBg:
-    - 0.48
-    - 0.44
-    - 0.4
-    - 1
-  TableBorderStrong:
-    - 0.62
-    - 0.58
-    - 0.54
-    - 1
-  TableBorderLight:
-    - 0.52
-    - 0.48
-    - 0.44
-    - 1
-  TableRowBg:
-    - 0.28
-    - 0.26
+    - 0.17
+    - 0.19
     - 0.24
     - 1
-  TableRowBgAlt:
-    - 0.32
-    - 0.3
+  TabSelected:
+    - 0.24
+    - 0.28
+    - 0.35
+    - 1
+  TabSelectedOverline:
+    - 0.35
+    - 0.80
+    - 0.95
+    - 1
+  TabDimmed:
+    - 0.15
+    - 0.16
+    - 0.20
+    - 1
+  TabDimmedSelected:
+    - 0.22
+    - 0.25
+    - 0.31
+    - 1
+  TabDimmedSelectedOverline:
+    - 0.50
+    - 0.55
+    - 0.60
+    - 0
+  DockingPreview:
+    - 0.35
+    - 0.80
+    - 0.95
+    - 0.75
+  DockingEmptyBg:
+    - 0.08
+    - 0.09
+    - 0.12
+    - 1
+  PlotLines:
+    - 0.55
+    - 0.80
+    - 0.95
+    - 1
+  PlotLinesHovered:
+    - 0.70
+    - 0.90
+    - 1.00
+    - 1
+  PlotHistogram:
+    - 0.35
+    - 0.72
+    - 0.90
+    - 1
+  PlotHistogramHovered:
+    - 0.45
+    - 0.85
+    - 1.00
+    - 1
+  TableHeaderBg:
+    - 0.20
+    - 0.22
     - 0.27
     - 1
+  TableBorderStrong:
+    - 0.34
+    - 0.39
+    - 0.46
+    - 1
+  TableBorderLight:
+    - 0.27
+    - 0.31
+    - 0.37
+    - 1
+  TableRowBg:
+    - 0.13
+    - 0.14
+    - 0.18
+    - 1
+  TableRowBgAlt:
+    - 0.16
+    - 0.18
+    - 0.22
+    - 1
   TextLink:
-    - 0.26
-    - 0.59
-    - 0.98
+    - 0.35
+    - 0.80
+    - 0.95
     - 1
   TextSelectedBg:
-    - 0.85
-    - 0.6
+    - 0.35
     - 0.75
+    - 0.90
     - 0.45
   TreeLines:
-    - 0.43
-    - 0.43
-    - 0.5
-    - 0.5
+    - 0.40
+    - 0.50
+    - 0.60
+    - 0.55
   DragDropTarget:
+    - 0.35
+    - 0.80
+    - 0.95
     - 0.85
-    - 0.6
-    - 0.75
-    - 0.8
   DragDropTargetBg:
     - 0
     - 0
     - 0
     - 0
   UnsavedMarker:
-    - 1
-    - 1
-    - 1
+    - 1.00
+    - 0.88
+    - 0.35
     - 1
   NavCursor:
+    - 0.40
     - 0.75
-    - 0.55
-    - 0.85
-    - 0.8
+    - 0.95
+    - 0.80
   NavWindowingHighlight:
-    - 0.9
-    - 0.7
-    - 0.9
-    - 0.7
+    - 0.70
+    - 0.90
+    - 1.00
+    - 0.75
   NavWindowingDimBg:
-    - 0.08
-    - 0.06
-    - 0.04
-    - 0.5
+    - 0.02
+    - 0.03
+    - 0.05
+    - 0.60
   ModalWindowDimBg:
-    - 0.08
-    - 0.06
-    - 0.04
-    - 0.6
+    - 0.02
+    - 0.03
+    - 0.05
+    - 0.65

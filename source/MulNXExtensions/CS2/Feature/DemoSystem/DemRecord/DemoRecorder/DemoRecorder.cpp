@@ -125,6 +125,7 @@ bool DemoRecorder::PeekQueue(RecordTask& task) {
     task = std::move(this->recordTaskBufferQueue.front());
     this->recordTaskBufferQueue.pop_front();
     if (this->recordTaskBufferQueue.empty()) {
+        this->AsyncCommand("demo_pause");
         this->moduleActive.store(false, std::memory_order_release);
     }
     return true;
