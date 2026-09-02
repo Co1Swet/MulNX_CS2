@@ -125,7 +125,6 @@ bool DemoRecorder::PeekQueue(RecordTask& task) {
     task = std::move(this->recordTaskBufferQueue.front());
     this->recordTaskBufferQueue.pop_front();
     if (this->recordTaskBufferQueue.empty()) {
-        this->AsyncCommand("demo_pause");
         this->moduleActive.store(false, std::memory_order_release);
     }
     return true;
@@ -133,7 +132,8 @@ bool DemoRecorder::PeekQueue(RecordTask& task) {
 void DemoRecorder::StartRecord() {
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
     ++this->num;
-    rp->str1 = (this->dirOutput / this->subOutput / std::to_string(this->num)).string();
+    rp->str1 = (this->dirOutput / this->subOutput).string();
+    rp->str2 = std::to_string(this->num);
     this->PublishAsync(std::move(msg));
 }
 

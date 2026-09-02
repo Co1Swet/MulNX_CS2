@@ -14,7 +14,10 @@ public:
     // 该标记位使得在录制核心仍忙碌时，位于其它线程上的模块可以安全暂停
     // 该暂停的目的一部分是为了防止队列雪崩导致持续阻塞
     std::atomic<bool> MediaSystemGlobalWorkFlag = false;
+    std::atomic<bool> nextStartUseAdvancedMode = false;
     std::atomic<bool> advancedMode = false;
 
     std::atomic<RecordState> recordState = RecordState::Free;
+
+    std::atomic<std::shared_ptr<std::filesystem::path>> pCurrentOutputDir{};
 };

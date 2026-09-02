@@ -4,6 +4,18 @@
 bool RecordFileRedirect::Init() {
     this->dirVideos = this->Path()->PathGetForShared("Videos");
 
+    this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message&) {
+        auto current = this->pMediaState->pCurrentOutputDir.load(std::memory_order_acquire);
+        std::filesystem::path snapshotDir = current ? *current : this->dirVideos;
+
+        this->redirectBaseSnapshot.store(
+            std::make_shared<std::filesystem::path>(snapshotDir),
+            std::memory_order_release
+        );
+
+        this->LogInfo(std::string("重定向文件夹快照已更新: ") + snapshotDir.string());
+    });
+
     return true;
 }
 
@@ -37,7 +49,9 @@ std::optional<MulNX::Hook::Then> RecordFileRedirect::OnCreateFileW(CreateFileWCo
     if (filename.empty())
         return std::nullopt;
 
-    std::filesystem::path targetPath = this->dirVideos / filename;
+    auto current = this->redirectBaseSnapshot.load(std::memory_order_acquire);
+    std::filesystem::path targetRoot = current ? *current : this->dirVideos;
+    std::filesystem::path targetPath = targetRoot / filename;
 
     std::error_code ec;
     std::filesystem::create_directories(targetPath.parent_path(), ec);
@@ -87,7 +101,9 @@ std::optional<MulNX::Hook::Then> RecordFileRedirect::OnGetFileAttributesExW(GetF
     if (filename.empty())
         return std::nullopt;
 
-    std::filesystem::path targetPath = this->dirVideos / filename;
+    auto current = this->redirectBaseSnapshot.load(std::memory_order_acquire);
+    std::filesystem::path targetRoot = current ? *current : this->dirVideos;
+    std::filesystem::path targetPath = targetRoot / filename;
     std::wstring newPath = L"\\\\?\\" + targetPath.wstring();
 
     BOOL result = pac->WrapGetFileAttributesExW(newPath.c_str());

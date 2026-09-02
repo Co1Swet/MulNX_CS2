@@ -1,49 +1,21 @@
 #include "AdvancedRecord.hpp"
+#include <Intro/HookConsole/HookConsole.hpp>
 #include <MulNXExtensions/MediaSystem/MediaRecorder/MediaRecords.hpp>
-
-void AdvancedRecord::PublishNormal() {
-    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
-    rp->str1 = (this->dirVideos / this->outputFile).string();
-    this->PublishAsync(std::move(msg));
-}
-void AdvancedRecord::PublishAdvanced() {
-    this->frameCount = 0;
-    int fps = this->pMediaParamManager->targetFPS.load();
-    this->AsyncCommand(std::format("host_framerate {}; startmovie {} wav framerate {}",
-        fps, this->outputFile, fps));
-
-    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/StartAdvanced"_hash);
-    rp->str1 = (this->dirVideos / this->outputFile).string();
-    this->PublishAsync(std::move(msg));
-}
-void AdvancedRecord::PublishStop(bool isAdvanced) {
-    if (isAdvanced) {
-        this->AsyncCommand("host_framerate 0; endmovie");
-    }
-    this->PublishAsync("Media/Record/Stop"_hash);
-}
 
 void AdvancedRecord::Menu() {
     ImGui::InputText("文件名", &this->outputFile);
 
-    static bool shouldStartAsAdvanced = false;
-    static bool startAsAdvanced = false;
-
-    ImGui::Checkbox("高级录制模式", &shouldStartAsAdvanced);
+    MulNX::UI::Checkbox("高级录制模式", this->pMediaState->nextStartUseAdvancedMode);
 
     if (ImGui::Button("开始录制")) {
-        if (shouldStartAsAdvanced) {
-            this->PublishAdvanced();
-            startAsAdvanced = true;
-        }
-        else {
-            this->PublishNormal();
-            startAsAdvanced = false;
-        }
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
+        rp->str1 = this->dirVideos.string();
+        rp->str2 = this->outputFile;
+        this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();
     if (ImGui::Button("结束录制")) {
-        this->PublishStop(startAsAdvanced);
+        this->PublishAsync("Media/Record/Stop"_hash);
     }
 }
 
@@ -61,15 +33,30 @@ bool AdvancedRecord::Init() {
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
-        this->SetRecordStart(info.startTime);
+        this->SetRecordStart(info);
+        });
+
+    this->SubscribeSync("Media/Record/Stop/FastNotify", [this](MulNX::Message&) {
+        if (this->startAsAdvanced.load(std::memory_order_acquire)) {
+            this->AsyncCommandHighPriority("host_framerate 0; endmovie");
+            this->startAsAdvanced.store(false, std::memory_order_release);
+        }
         });
 
     return true;
 }
-
-void AdvancedRecord::SetRecordStart(std::chrono::steady_clock::time_point t) {
+void AdvancedRecord::SetRecordStart(const MulNX::AVStartInfo& sInfo) {
+    auto t = sInfo.startTime;
     this->recordStartTime = t;
     this->lastSlot = -1;
+
+    this->frameCount = 0;
+    this->startAsAdvanced = this->pMediaState->advancedMode.load(std::memory_order_acquire);
+    if (!this->startAsAdvanced)return;
+
+    int fps = this->pMediaParamManager->targetFPS.load();
+    this->AsyncCommandHighPriority(std::format("host_framerate {}; startmovie {} wav framerate {}",
+        fps, *sInfo.pFilenameWithoutStem, fps));
 }
 
 void AdvancedRecord::HandleBeforeCopyBackbuffer(MulNX::Message& msg) {

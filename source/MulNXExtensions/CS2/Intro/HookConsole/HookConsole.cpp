@@ -62,6 +62,13 @@ void HookConsole::OnEngine2Load(MulNX::Message& msg) {
         if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
         this->PublishSync("Hook/CSMainLoop"_hash);
         std::string cmd;
+        if (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
+            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+            while (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
+                this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+            }
+            return MulNX::Hook::Then::Continue;
+        }
         if (this->bufferGameCmds.try_dequeue(cmd))
             this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
         return MulNX::Hook::Then::Continue;

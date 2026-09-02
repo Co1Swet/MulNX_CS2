@@ -53,7 +53,6 @@ bool MediaRecorder::Init() {
     
     (*this)
         .SubscribeAsync("Media/Record/Start")
-        .SubscribeAsync("Media/Record/StartAdvanced")
         .SubscribeAsync("Media/Record/Stop");
 
     this->SendTask("Main", "AVEncoding", [this]() {
@@ -74,26 +73,40 @@ bool MediaRecorder::Init() {
 
 void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Media/Record/Start"_hash:
-        this->StartRecording(msg.asp.get<MulNX::NetExt>()->str1, false);
+    case "Media/Record/Start"_hash: {
+        auto* ext = msg.asp.get<MulNX::NetExt>();
+        this->StartRecording(ext->str1, ext->str2, this->pMediaState->nextStartUseAdvancedMode.load());
         break;
-    case "Media/Record/StartAdvanced"_hash:
-        this->StartRecording(msg.asp.get<MulNX::NetExt>()->str1, true);
-        break;
+    }
     case "Media/Record/Stop"_hash:
         this->StopRecording();
         break;
     }
 }
 
-bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
+bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string& fileName, bool advance) {
     if (this->pMediaState->recordState.load() != RecordState::Free) {
         this->LogWarning("已在录制中");
         return false;
     }
     this->pMediaState->advancedMode = advance;
 
-    std::string outFile = pathNoExt + ".mp4";
+    std::filesystem::path outputDir = std::filesystem::path(dirPath);
+    std::filesystem::path outputFile = outputDir / (fileName + ".mp4");
+    std::string outFile = outputFile.string();
+
+    std::error_code ec;
+    std::filesystem::create_directories(outputDir, ec);
+    if (ec) {
+        this->LogError(std::format("创建输出目录失败: {} ({})", outputDir.string(), ec.message()));
+        return false;
+    }
+
+    this->pMediaState->pCurrentOutputDir.store(
+        std::make_shared<std::filesystem::path>(outputDir),
+        std::memory_order_release
+    );
+
     int srcW = this->pGlobalVars->renderX.load(std::memory_order_acquire);
     int srcH = this->pGlobalVars->renderY.load(std::memory_order_acquire);
     av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
@@ -125,6 +138,7 @@ bool MediaRecorder::StartRecording(const std::string& pathNoExt, bool advance) {
         auto&& [rInfo] = SetOnMsg.Access<MulNX::AVStartInfo>();
         rInfo.pOutCtx = &this->ofctx;
         rInfo.startTime = std::chrono::steady_clock::now();
+        rInfo.pFilenameWithoutStem = &fileName;
         this->PublishSync(SetOnMsg);
         this->LogSucc("音视频系统SetOn完毕");
 
@@ -188,6 +202,7 @@ bool MediaRecorder::StopRecording() {
     this->PublishSync("MediaSync/Reset"_hash);
 
     this->ofctx.close();
+    this->pMediaState->pCurrentOutputDir.store(nullptr, std::memory_order_release);
     this->LogSucc("录制结束");
     this->pMediaState->recordState.store(RecordState::Free);
 

@@ -15,6 +15,7 @@ void MediaRunningState::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Media/Record/Stop"_hash:
         this->MediaSystemGlobalWorkFlag = false;
+        this->PublishSync("Media/Record/Stop/FastNotify"_hash);
         break;
     }
 }

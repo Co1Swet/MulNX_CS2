@@ -16,7 +16,7 @@ class MediaRecorder final :public MediaModuleBase {
 
     void ReportCtxState();
 
-    bool StartRecording(const std::string& filename, bool advance);
+    bool StartRecording(const std::string& dirPath, const std::string& fileName, bool advance);
     bool StopRecording();
     void CaptureCallback();
     void Encode();
