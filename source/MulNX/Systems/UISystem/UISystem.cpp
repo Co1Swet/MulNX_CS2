@@ -23,7 +23,8 @@ bool MulNX::UISystem::Init() {
 
     (*this)
         .SubscribeAsync("UISystem/Start")
-        .SubscribeAsync("UISystem/Toggle")
+        .SubscribeAsync<void>("UISystem/Toggle")
+        .SubscribeAsync<void>("UISystem/Hide")
         .SubscribeAsync("UISystem/SaveStyle");
 
     return true;
@@ -35,11 +36,14 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
         this->rendEnable.store(true);
         this->ifDrawMid.store(true);
         this->LogWarning("接收到启动消息，UI系统开始启动");
-
         break;
     }
     case "UISystem/Toggle"_hash: {
         this->ifDrawMid.store(!this->ifDrawMid.load());
+        break;
+    }
+    case "UISystem/Hide"_hash: {
+        this->ifDrawMid.store(false);
         break;
     }
     case "UISystem/SaveStyle"_hash: {
