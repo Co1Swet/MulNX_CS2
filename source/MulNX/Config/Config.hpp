@@ -1,9 +1,6 @@
 #pragma once
-#include <MulNX/Base/Hash/Hash.hpp>
-#include <cstdint>
 #include <string>
 #include <source_location>
-
 
 class MulNXInfo {
 public:
@@ -18,23 +15,7 @@ public:
 #endif
 };
 
-// 核心类前置声明
-
 namespace MulNX {
     [[noreturn]] void ErrorTerminate(const std::string& Msg,
         const std::source_location& loc = std::source_location::current());
-}
-
-// 辅助模板：将函数签名 R(Args...) 转换为对应的函数指针类型 R(*)(Args...)
-template<typename T>
-struct MulNXFunc;
-
-template<typename R, typename... Args>
-struct MulNXFunc<R(Args...)> {
-    using type = R(*)(Args...);
-};
-
-template<typename T>
-T* Schema(auto* pThis, std::ptrdiff_t dif) {
-    return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(pThis) + dif);
 }

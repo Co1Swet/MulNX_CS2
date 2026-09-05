@@ -1,10 +1,10 @@
 #pragma once
-#include <MulNX/Common/Common.hpp>
-#include <MulNX/Base/any_smart_ptr/any_smart_ptr.hpp>
+#include <MulNX/Common/any_smart_ptr.hpp>
+#include <MulNX/Common/Type.hpp>
+#include <string>
 #include <functional>
 
 namespace MulNX {
-
     using MsgType = size_t;
 
     class NetExt {

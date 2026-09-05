@@ -1,6 +1,6 @@
 #pragma once
 #include "ModuleCoroutine.hpp"
-#include <MulNX/Base/MulNXHandle/MulNXHandle.hpp>
+#include <MulNX/Common/MulNXHandle.hpp>
 #include <shared_mutex>
 
 namespace MulNX {

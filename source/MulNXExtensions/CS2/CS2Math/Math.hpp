@@ -2,6 +2,7 @@
 #include "dxmext.hpp"
 #include "DOF/DOF.hpp"
 #include "Translate/Translate.hpp"
+#include "Draw/Draw.hpp"
 #include <atomic>
 
 namespace MulNX {

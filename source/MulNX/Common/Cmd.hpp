@@ -1,14 +1,13 @@
 #pragma once
 #include <MulNX/Common/Message.hpp>
-#include <MulNX/Base/Hash/Hash.hpp>
+#include <MulNX/Common/Hash.hpp>
 #include <functional>
 #include <string_view>
 #include <stdexcept>
 #include <utility>
 
 namespace MulNX {
-
-    // 字符串分割（可复用 Common 中的实现）
+    // 字符串分割
     inline std::vector<std::string_view> split(std::string_view str, char delim = ' ') {
         std::vector<std::string_view> tokens;
         size_t start = 0, end;

@@ -1,6 +1,5 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <MulNX/Base/Math/Math.hpp>
 #include <MulNXUtils/WinExt/WinExt.hpp>
 #include <Intro/Signatures.hpp>
 #include <Game/Games.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 #include "SolutionConfig.hpp"
-#include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
+#include <MulNXUtils/NewestBuffer.hpp>
 #include <CameraSystem/Solution/Solution.hpp>
 #include <CameraSystem/CameraSystem.hpp>
 

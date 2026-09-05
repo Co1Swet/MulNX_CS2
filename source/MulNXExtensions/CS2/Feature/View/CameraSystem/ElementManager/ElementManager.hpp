@@ -1,7 +1,7 @@
 #pragma once
 #include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
-#include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
+#include <MulNXUtils/NewestBuffer.hpp>
 #include "ElementConfig.hpp"
 
 //元素管理器，用于管理元素

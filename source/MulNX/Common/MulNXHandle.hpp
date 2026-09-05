@@ -10,11 +10,21 @@ private:
     inline static std::atomic<uint64_t> CurrentHandleValue = 16;
     uint64_t Value;
 public:
-    // 默认构造函数，创建无效句柄
-    MulNXHandle();
-    static MulNXHandle CreateHandle();
-    bool IsValid()const;
-    uint64_t GetValue()const;
+    // 默认构造函数创建无效句柄
+    MulNXHandle() {
+        this->Value = MulNXHandle::Invalid;
+    }
+    static MulNXHandle CreateHandle() {
+        MulNXHandle handle{};
+        handle.Value = MulNXHandle::CurrentHandleValue.fetch_add(1);
+        return handle;
+    }
+    bool IsValid()const {
+        return this->Value != MulNXHandle::Invalid;
+    }
+    uint64_t GetValue()const {
+        return this->Value;
+    }
     bool operator == (const MulNXHandle& Other)const = default;
     auto operator<=>(const MulNXHandle&)const = default;
 };

@@ -1,18 +1,9 @@
 #pragma once
-#include <cstddef>
+#include <array>
+#include <cstdint>
+#include <string>
 #include <type_traits>
-#include <chrono>
 #include <concepts>
-
-template <typename F>
-class scope_exit {
-    F f;
-public:
-    explicit scope_exit(F&& func) : f(std::forward<F>(func)) {}
-    ~scope_exit() { f(); }
-    scope_exit(const scope_exit&) = delete;
-    scope_exit& operator=(const scope_exit&) = delete;
-};
 
 namespace MulNX {
     template<typename T>
@@ -37,17 +28,6 @@ namespace MulNX {
             current += sizes[i];
         }
         return offsets;
-    }
-
-    inline int64_t ToUnixUs(std::chrono::system_clock::time_point tp) {
-        return std::chrono::duration_cast<std::chrono::microseconds>(
-            tp.time_since_epoch()).count();
-    }
-
-    inline std::chrono::system_clock::time_point FromUnixUs(int64_t us) {
-        return std::chrono::system_clock::time_point(
-            std::chrono::microseconds(us)
-        );
     }
 
     // 类型名萃取（可定制）
@@ -77,6 +57,15 @@ namespace MulNX {
         }
     }
 }
+
+// 辅助模板：将函数签名 R(Args...) 转换为对应的函数指针类型 R(*)(Args...)
+template<typename T>
+struct MulNXFunc;
+
+template<typename R, typename... Args>
+struct MulNXFunc<R(Args...)> {
+    using type = R(*)(Args...);
+};
 
 // 便捷宏 —— 定义别名的同时注册类型名
 #define MULNX_USING(alias, underlying) \

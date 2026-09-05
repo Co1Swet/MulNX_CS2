@@ -1,10 +1,8 @@
 #pragma once
-#include <Base/UI/UI.hpp>
-#include <MulNX.hpp>
+#include <CS2Math/Math.hpp>
 
 class CameraModel {
 public:
-
     DirectX::XMFLOAT3 Origin{};
     DirectX::XMFLOAT3 Lens[4]{};
     DirectX::XMFLOAT3 X{};

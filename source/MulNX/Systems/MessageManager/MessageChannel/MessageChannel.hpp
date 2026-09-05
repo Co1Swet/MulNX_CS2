@@ -1,6 +1,5 @@
 #pragma once
-
-#include <MulNX/Base/MulNXHandle/MulNXHandle.hpp>
+#include <MulNX/Common/MulNXHandle.hpp>
 #include <MulNX/Common/Message.hpp>
 #include <MulNX/Config/Config.hpp>
 #include <MulNXThirdParty/queue/concurrentqueue.h>

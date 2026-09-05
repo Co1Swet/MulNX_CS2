@@ -1,5 +1,4 @@
 #include "tree.hpp"
-#include <MulNX/Base/Math/Math.hpp>
 #include <MulNXUtils/WinExt/Memory/Memory.hpp>
 
 DirectX::XMFLOAT3 CS2::C_BaseEntity::GetBonePos(int index) {

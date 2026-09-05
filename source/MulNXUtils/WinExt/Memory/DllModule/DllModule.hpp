@@ -1,6 +1,6 @@
 #pragma once
-#include "../Region/Region.hpp"
-#include "../../../MulNX/Config/Config.hpp"
+#include <MulNX/Common/Type.hpp>
+#include <MulNXUtils/WinExt/Memory/Region/Region.hpp>
 #include <cstdint>
 #include <cstddef>
 #include <string>

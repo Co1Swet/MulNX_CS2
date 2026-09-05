@@ -1,5 +1,6 @@
 #pragma once
 #include "IModule.hpp"
+#include <MulNX/Common/Time.hpp>
 #include <MulNX/Common/coroutine.hpp>
 #include <map>
 

@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <MulNX/Base/Math/Math.hpp>
+#include <CS2Math/Math.hpp>
 
 // 播放模式：激活模式与编排模式
 enum class PlaybackMode {
@@ -14,8 +14,6 @@ inline std::string PlaybackModeToString(PlaybackMode mode) {
     }
     return "错误";
 }
-
-// 待添加的附加元素类型，如景深滤镜
 
 class CameraSystemIO {
 public:

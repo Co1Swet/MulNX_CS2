@@ -1,6 +1,5 @@
 #include "ProjectileTracker.hpp"
-#include <MulNX/Base/Math/Translate/Translate.hpp>
-#include <MulNX/Base/UI/UI.hpp>
+#include <CS2Math/Math.hpp>
 
 void ProjectileTracker::Menu() {
     MulNX::UI::Checkbox("启用投掷物追踪", this->enable);

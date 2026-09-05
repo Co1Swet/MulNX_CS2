@@ -1,6 +1,5 @@
 #pragma once
-#include <MulNX/Core/Module/IModule.hpp>
-#include <MulNX/Base/Cmd/Cmd.hpp>
+#include <MulNX/Common/Cmd.hpp>
 
 namespace MulNX {
     class MessageManager;
@@ -10,17 +9,14 @@ namespace MulNX {
         T* This() { return static_cast<T*>(this); }
         MessageManager* pMsgManager = nullptr;
     public:
-        
         MsgMixin() {
             This()->preInits.push_back([this]() {
-                this->pMsgManager = static_cast<MessageManager*>(This()->FindModule("MessageManager"));
+                this->pMsgManager = This()->FindModule<MessageManager>("MessageManager");
                 This()->MainMsgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());
                 return true;
                 });
         }
-
         // 异步消息
-
         auto& SubscribeAsync(const std::string& msgType) {
             This()->MainMsgChannel->SubscribeAsync(msgType);
             auto full = std::format("{}  Args: <void>", msgType);
@@ -52,7 +48,6 @@ namespace MulNX {
             this->pMsgManager->PublishAsync(MulNX::Message(msg));
         }
 
-
         // 同步消息
         auto& SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle) {
             this->pMsgManager->SubscribeSync(msgType, std::move(handle));
@@ -66,6 +61,5 @@ namespace MulNX {
             auto m = MulNX::Message(msg);
             this->pMsgManager->PublishSync(m);
         }
-
     };
 }

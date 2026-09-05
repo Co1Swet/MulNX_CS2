@@ -1,5 +1,5 @@
 #pragma once
-#include <MulNX/Base/Math/dxmext.hpp>
+#include <CS2Math/dxmext.hpp>
 
 namespace MulNX {
     namespace Math {

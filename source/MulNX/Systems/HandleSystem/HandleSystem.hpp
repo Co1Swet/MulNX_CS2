@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/Core/Module/Module.hpp>
-#include <MulNX/Base/any_smart_ptr/any_smart_ptr.hpp>
+#include <MulNX/Common/any_smart_ptr.hpp>
 #include <unordered_map>
 
 namespace MulNX {

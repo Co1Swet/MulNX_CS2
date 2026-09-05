@@ -1,4 +1,5 @@
 #include "BufferCopier.hpp"
+#include <MulNX/Common/Misc.hpp>
 #include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <MediaParamManager/MediaParamManager.hpp>
 

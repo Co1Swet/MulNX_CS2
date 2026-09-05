@@ -1,5 +1,5 @@
 #pragma once
-#include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
+#include <MulNXUtils/NewestBuffer.hpp>
 #include <Intro/CSModuleBase.hpp>
 
 class Dofs {

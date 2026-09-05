@@ -1,4 +1,5 @@
 #include "AudioCapturer.hpp"
+#include <MulNX/Common/Misc.hpp>
 #include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
 #include <mmdeviceapi.h>
 #include <wrl/client.h>

@@ -1,4 +1,5 @@
 #include "VideoCapturer.hpp"
+#include <MulNX/Common/Misc.hpp>
 #include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <VPipeline/BufferCopier/BufferCopier.hpp>
 #include <VPipeline/TextureMapper/TextureMapper.hpp>

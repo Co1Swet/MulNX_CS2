@@ -1,7 +1,5 @@
 #pragma once
-
-#include <MulNX/Common/Common.hpp>
-
+#include <MulNX/Common/Type.hpp>
 #include <array>
 #include <atomic>
 

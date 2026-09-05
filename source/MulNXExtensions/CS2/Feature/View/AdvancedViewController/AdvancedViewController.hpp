@@ -1,7 +1,8 @@
 #pragma once
+#include <CS2Math/Math.hpp>
 #include <Intro/CSModuleBase.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
-#include <MulNX/Base/NewestBuffer/NewestBuffer.hpp>
+#include <MulNXUtils/NewestBuffer.hpp>
 #include <MulNXUtils/WinExt/WinExt.hpp>
 #include <expected>
 

@@ -1,9 +1,13 @@
 #pragma once
+#include <MulNX/Common/Type.hpp>
 #include <MulNXUtils/WinExt/Memory/AddrTool/AddrTool.hpp>
-#include <MulNX/Common/Common.hpp>
 #include <MulNXUtils/WinExt/Memory/Assembler/Assembler.hpp>
-#include <functional>
+#include <atomic>
+#include <bit>
+#include <optional>
 #include <expected>
+#include <functional>
+#include <memory>
 
 namespace MulNX {
     class Hook final {

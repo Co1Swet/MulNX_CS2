@@ -1,4 +1,5 @@
 #pragma once
+#include <CS2Math/Math.hpp>
 #include "CBufferString.hpp"
 
 class CMaterial2 {

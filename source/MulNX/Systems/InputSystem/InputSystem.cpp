@@ -1,12 +1,7 @@
+#include "InputSystem.hpp"
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
-#include "InputSystem.hpp"
-
-#include <unordered_map>
 #include <Windows.h>
-#include <DirectXMath.h>
-#include <MulNX/Base/Math/Translate/Translate.hpp>
-
 
 bool MulNX::InputSystem::Init() {
     this->SendTask("UpdateKeysState", "InputSystem", [this]()->bool {

@@ -3,7 +3,6 @@
 #include "Key/Key.hpp"
 #include <thread>
 #include <chrono>
-#include <DirectXMath.h>
 
 namespace MulNX {
 	class KeyState {
