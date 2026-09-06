@@ -11,10 +11,8 @@ class CS2BootLoader final : public MulNX::Module<CS2BootLoader> {
     bool environmentChecked = false;
     bool CheckEnvironment();
     bool LaunchAndInject();
-    bool IsGameRunning();
 
     void Window(MulNX::UICoordinator* uico);
     void ProcessMsg(MulNX::Message& msg);
     bool Init()override;
-    void Deinit()override;
 };

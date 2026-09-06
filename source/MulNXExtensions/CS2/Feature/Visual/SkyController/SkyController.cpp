@@ -196,7 +196,7 @@ void SkyController::HandleOnCmd() {
         CMaterial2** ensureSky = nullptr;
         this->pMaterialSystem->FindMaterial(&ensureSky, skyName.c_str());
         if (!ensureSky)return false;
-        auto name = (*ensureSky)->GetName();
+        const char* name = (*ensureSky)->GetName();
         if (!name)return false;
         if (std::string(name) == "materials/error.vmat")return false;
         return true;
@@ -226,6 +226,8 @@ void SkyController::HandleOnCmd() {
         using ForceUpdateSkybox_t = void* (*)(void*);
         reinterpret_cast<ForceUpdateSkybox_t>(pEntry)(pEntity);// 先到虚函数入口，然后会跳到我们的钩子，再继续原有流程
     }
+
+    this->needReUpdateSky.store(false, std::memory_order_release);
 }
 
 MulNX::Hook::Then SkyController::HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky) {
@@ -264,6 +266,14 @@ MulNX::Hook::Then SkyController::HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky)
     if (!newMat)return MulNX::Hook::Then::Continue;
     if (*nowMat == *newMat)
         return MulNX::Hook::Then::Continue;
+    const char* name = (*newMat)->GetName();
+    if (!name)return MulNX::Hook::Then::Continue;
+    if (std::string(name) == "materials/error.vmat") {
+        if(this->needReUpdateSky.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
+        this->needReUpdateSky.store(true, std::memory_order_release);
+        this->AsyncCommand("MulNX/Sky/UpdateOnMainThread");
+        return MulNX::Hook::Then::Continue;
+    }
 
     // 手动增加引用计数
     auto pCount = (uint32_t*)((char*)newMat + 0x20);

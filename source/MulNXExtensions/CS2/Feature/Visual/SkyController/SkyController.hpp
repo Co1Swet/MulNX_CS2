@@ -32,6 +32,7 @@ class SkyController final : public CSModuleBase {
     std::atomic<std::optional<float>> brightScale{};
 
     std::atomic<std::shared_ptr<const std::string>> wantedSkyName{};
+    std::atomic<bool> needReUpdateSky = false;
 
     std::vector<std::string> skyNames{};
 

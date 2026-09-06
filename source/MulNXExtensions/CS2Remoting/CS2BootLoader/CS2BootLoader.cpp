@@ -115,12 +115,11 @@ bool CS2BootLoader::CheckEnvironment() {
         this->LogError(std::format("无法创建进程快照. Error: {}", GetLastError()));
         return false;
     }
-
     PROCESSENTRY32W pe32;
     pe32.dwSize = sizeof(pe32);
 
     if (!Process32FirstW(hSnapshot, &pe32)) {
-        this->LogError(std::format("Process32First failed. Error: {}", GetLastError()));
+        this->LogError(std::format("Process32First失败，Error: {}", GetLastError()));
         CloseHandle(hSnapshot);
         return false;
     }
@@ -131,7 +130,7 @@ bool CS2BootLoader::CheckEnvironment() {
 
         for (const auto& pattern : patternsCheckDangerous) {
             if (exeNameUtf8.find(pattern) != std::string::npos) {
-                this->LogError("为防止反作弊冲突，请先自行检验环境");
+                this->LogError("为防止反作弊冲突，请先自行检验环境，关闭可能冲突的软件后再使用");
                 CloseHandle(hSnapshot);
                 return false;
             }
@@ -145,18 +144,19 @@ bool CS2BootLoader::CheckEnvironment() {
 bool CS2BootLoader::LaunchAndInject() {
     // 验证游戏路径
     if (gamePath.empty() || !std::filesystem::exists(gamePath)) {
-        this->LogError(std::format("Invalid CS2 path: {}", gamePath.string()));
+        this->LogError(std::format("无效CS2路径: {}", gamePath.string()));
         return false;
     }
 
     if (gamePath.filename() != "cs2.exe") {
-        this->LogError(std::format("The specified game path does not point to cs2.exe: {}", gamePath.string()));
+        this->LogError(std::format("指定的游戏路径不指向cs2.exe: {}", gamePath.string()));
         return false;
     }
 
     // 检查游戏是否已在运行
-    if (IsGameRunning()) {
-        this->LogError(std::format("CS2 is already running. Please close it first."));
+    HWND hwnd = FindWindowW(nullptr, L"Counter-Strike 2");
+    if (hwnd != nullptr) {
+        this->LogError(std::format("CS2 已在运行，请先关闭游戏: {}", gamePath.string()));
         return false;
     }
 
@@ -177,7 +177,7 @@ bool CS2BootLoader::LaunchAndInject() {
         &si, &pi
     );
     if (!ok) {
-        this->LogError(std::format("Failed to create CS2 process. Error: {}", GetLastError()));
+        this->LogError(std::format("创建CS2进程失败. Error: {}", GetLastError()));
         return false;
     }
 
@@ -190,16 +190,6 @@ bool CS2BootLoader::LaunchAndInject() {
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
 
-    this->LogInfo(std::format("CS2 launched and injected successfully."));
+    this->LogInfo(std::format("CS2启动并注入成功: {}", gamePath.string()));
     return true;
-}
-
-bool CS2BootLoader::IsGameRunning() {
-    HWND hwnd = FindWindowW(nullptr, L"Counter-Strike 2");
-    return hwnd != nullptr;
-}
-
-void CS2BootLoader::Deinit() {
-
-    return;
 }
