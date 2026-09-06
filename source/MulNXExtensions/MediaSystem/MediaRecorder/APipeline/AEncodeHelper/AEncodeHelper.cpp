@@ -73,8 +73,8 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     this->astream.setCodecParameters(cp);
 
     // 重置槽位计数器
-    m_slotCounter = 0;
-    m_slotInitialized = false;
+    this->slotCounter = 0;
+    this->slotInitialized = false;
 
     this->LogInfo(std::format("音频开启=m{}", (this->aencoder.isOpened() ? "是" : "否")));
 }
@@ -107,17 +107,17 @@ bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples
     return true;
 }
 
-std::optional<av::Packet> AEncodeHelper::encodeOneFrame() {
+std::optional<av::Packet> AEncodeHelper::EncodeOneFrame() {
     int totalSamples = 0;
     for (const auto& buf : this->audioFifo) totalSamples += buf.samplesCount();
     if (totalSamples < this->frameSize) return std::nullopt;
 
     // 初始化槽位（仅第一次）
-    if (!m_slotInitialized) {
+    if (!this->slotInitialized) {
         int64_t firstUs = this->audioFifo.front().pts().timestamp({ 1, 1000000 });
         // 计算起始槽位：四舍五入到最近的帧边界
-        m_slotCounter = (firstUs * (int64_t)this->aencoder.sampleRate() + 500000) / 1000000 / this->frameSize;
-        m_slotInitialized = true;
+        this->slotCounter = (firstUs * (int64_t)this->aencoder.sampleRate() + 500000) / 1000000 / this->frameSize;
+        this->slotInitialized = true;
     }
 
     // 从 audioFifo 凑满一帧（不关心样本自带 PTS，因为我们将使用槽位 PTS）
@@ -175,8 +175,8 @@ std::optional<av::Packet> AEncodeHelper::encodeOneFrame() {
         }
     }
 
-    int64_t ptsSamples = m_slotCounter * this->frameSize;
-    m_slotCounter++;
+    int64_t ptsSamples = this->slotCounter * this->frameSize;
+    this->slotCounter++;
 
     frame.setTimeBase({ 1, this->aencoder.sampleRate() });
     frame.setPts(av::Timestamp(ptsSamples, { 1, this->aencoder.sampleRate() }));
@@ -210,18 +210,18 @@ std::optional<av::Packet> AEncodeHelper::Encode() {
         this->audioFifo.push_back(std::move(converted));
         totalSamples += this->audioFifo.back().samplesCount();
     }
-    return this->encodeOneFrame();
+    return this->EncodeOneFrame();
 }
 
-void AEncodeHelper::flushAll() {
+void AEncodeHelper::FlushAll() {
     if (!this->aencoder.isOpened()) return;
     this->LogInfo("[冲刷] 开始最终冲刷流程");
 
     // 确保槽位已初始化（如果此前从未编码过）
-    if (!m_slotInitialized && !this->audioFifo.empty()) {
+    if (!this->slotInitialized && !this->audioFifo.empty()) {
         int64_t firstUs = this->audioFifo.front().pts().timestamp({ 1, 1000000 });
-        m_slotCounter = (firstUs * (int64_t)this->aencoder.sampleRate() + 500000) / 1000000 / this->frameSize;
-        m_slotInitialized = true;
+        this->slotCounter = (firstUs * (int64_t)this->aencoder.sampleRate() + 500000) / 1000000 / this->frameSize;
+        this->slotInitialized = true;
     }
 
     int flushFrameCount = 0;
@@ -263,8 +263,8 @@ void AEncodeHelper::flushAll() {
                 if (take == front.samplesCount()) this->audioFifo.pop_front();
                 else break;
             }
-            int64_t ptsSamples = m_slotCounter * this->frameSize;
-            m_slotCounter++;
+            int64_t ptsSamples = this->slotCounter * this->frameSize;
+            this->slotCounter++;
             paddedFrame.setTimeBase({ 1, this->aencoder.sampleRate() });
             paddedFrame.setPts(av::Timestamp(ptsSamples, { 1, this->aencoder.sampleRate() }));
 
@@ -293,8 +293,8 @@ void AEncodeHelper::flushAll() {
             av::Packet pkt = this->aencoder.encode();
             if (!pkt || pkt.size() <= 0) break;
 
-            int64_t ptsSamples = m_slotCounter * this->frameSize;
-            m_slotCounter++;
+            int64_t ptsSamples = this->slotCounter * this->frameSize;
+            this->slotCounter++;
             pkt.setStreamIndex(this->astream.index());
             pkt.setTimeBase(this->astream.timeBase());
             pkt.setPts(ptsSamples, this->astream.timeBase());
@@ -305,7 +305,7 @@ void AEncodeHelper::flushAll() {
         }
     }
     catch (...) { this->LogError("冲刷编码器失败"); }
-    this->LogInfo(std::format("[冲刷] 编码器内部冲刷出 {} 个包，PTS 已完美对齐", internalPkts));
+    this->LogInfo(std::format("[冲刷] 编码器内部冲刷出 {} 个包", internalPkts));
 
     // 最终遍历，确保 duration 万无一失
     int corrected = 0;
@@ -320,15 +320,23 @@ void AEncodeHelper::flushAll() {
         this->LogInfo(std::format("[冲刷] 最终再修正 {} 个包的 duration", corrected));
     }
 
-    if (this->aencoder.isValid()) { this->aencoder.close(); this->aencoder = {}; }
+    if (this->aencoder.isValid()) {
+        this->aencoder.close();
+        this->aencoder = {};
+    }
     this->astream = av::Stream();
     this->audioFifo.clear();
     this->LogInfo("[冲刷] 音频编码器已关闭");
 }
 
 std::optional<av::Packet> AEncodeHelper::TrySetOff() {
-    if (!this->aencoder.isOpened() && this->flushPackets.empty()) return std::nullopt;
-    if (this->aencoder.isOpened()) this->flushAll();
+    if (!this->flushPackets.empty()) {
+        av::Packet pkt = std::move(this->flushPackets.front());
+        this->flushPackets.pop_front();
+        return pkt;
+    }
+    if (!this->aencoder.isOpened())return std::nullopt;
+    this->FlushAll();
     if (!this->flushPackets.empty()) {
         av::Packet pkt = std::move(this->flushPackets.front());
         this->flushPackets.pop_front();
@@ -348,6 +356,6 @@ void AEncodeHelper::Reset() {
     this->aresampler = {};
     this->frameSize = 0;
     this->lastStreamDuration = 0.0;
-    m_slotInitialized = false;
-    m_slotCounter = 0;
+    this->slotInitialized = false;
+    this->slotCounter = 0;
 }

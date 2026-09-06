@@ -7,9 +7,9 @@ class VEncodeHelper final :public MediaModuleBase {
     av::VideoEncoderContext encoder;
     av::VideoRescaler rescaler;
 
-    std::string chosenEncoder;
-    std::atomic<int> width = 0, height = 0;
-    av::PixelFormat dstPixFmt = AV_PIX_FMT_NV12;   // 软编用 NV12
+    std::atomic<int> width = 0;
+    std::atomic<int> height = 0;
+    av::PixelFormat dstPixFmt{};
     AVRational timeBase{ 1, 1000000 };
 
     bool Init() override;

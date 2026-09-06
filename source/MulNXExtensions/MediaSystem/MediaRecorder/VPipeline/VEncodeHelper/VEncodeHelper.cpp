@@ -23,7 +23,6 @@ bool VEncodeHelper::Init() {
 
 bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
     this->encoder = av::VideoEncoderContext(codec);
-    this->chosenEncoder = codec.name();
 
     auto& rp = *this->pMediaParamManager;
     this->width = rp.width > 0 ? rp.width :
@@ -63,12 +62,12 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec)
         std::error_code ec;
         this->encoder.open(opts, ec);
         if (ec) {
-            this->LogError(std::format("{} 打开失败: {}", this->chosenEncoder, ec.message()));
+            this->LogError(std::format("{} 打开失败: {}", this->encoder.codec().name(), ec.message()));
             return false;
         }
     }
     catch (const std::exception& e) {
-        this->LogError(std::format("{} 打开异常: {}", this->chosenEncoder, e.what()));
+        this->LogError(std::format("{} 打开异常: {}", this->encoder.codec().name(), e.what()));
         return false;
     }
 
@@ -83,7 +82,7 @@ void VEncodeHelper::SetOn(av::FormatContext* oCtx) {
 
     // 纯软件
     av::Codec codec = av::findEncodingCodec("libopenh264");
-    if (codec.isNull()){
+    if (codec.isNull()) {
         this->LogError("libopenh264 缺失");
         return;
     }
@@ -95,13 +94,10 @@ void VEncodeHelper::SetOn(av::FormatContext* oCtx) {
         this->LogError("编码器打开失败");
     }
 
-    this->LogInfo(std::format("目标分辨率: {}x{}",
-        this->width.load(), this->height.load()));
+    this->LogInfo(std::format("目标分辨率: {}x{}", this->width.load(), this->height.load()));
     auto fps = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
-    this->LogInfo(std::format("目标帧率: {} fps",
-        fps > 0 ? fps : 60));
-    this->LogSucc(std::format("软件编码已开启: {} ({}x{})",
-        this->chosenEncoder, this->width.load(), this->height.load()));
+    this->LogInfo(std::format("目标帧率: {} fps", fps > 0 ? fps : 60));
+    this->LogSucc(std::format("编码器已开启: {}", this->encoder.codec().name()));
 }
 
 void VEncodeHelper::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
@@ -175,6 +171,6 @@ std::optional<av::Packet> VEncodeHelper::TrySetOff() {
 void VEncodeHelper::Reset() {
     av::VideoFrame clear;
     while (this->bufferVFrames.try_dequeue(clear)) {
-        
+
     }
 }

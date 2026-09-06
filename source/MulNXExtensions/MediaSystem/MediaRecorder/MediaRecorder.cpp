@@ -115,7 +115,13 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
     }
 
     this->LogInfo("准备Reset");
-    this->PublishSync("MediaSync/Reset"_hash);
+    try {
+        this->PublishSync("MediaSync/Reset"_hash);
+    }
+    catch(const std::exception& e) {
+        this->LogError(std::format("Reset异常: {}", e.what()));
+        return false;
+    }
     this->LogSucc("Reset完成");
 
     try {
