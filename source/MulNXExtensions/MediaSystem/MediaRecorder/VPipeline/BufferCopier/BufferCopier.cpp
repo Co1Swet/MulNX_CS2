@@ -1,12 +1,10 @@
 #include "BufferCopier.hpp"
 #include <MulNX/Common/Misc.hpp>
 #include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
-#include <MediaParamManager/MediaParamManager.hpp>
 
 bool BufferCopier::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
     this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
-    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
 
     this->SubscribeSync("MediaSync/PresentCallback", [this](MulNX::Message& msg) {
         this->CopyTexture();

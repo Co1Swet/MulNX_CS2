@@ -1,10 +1,8 @@
 #include "VEncodeHelper.hpp"
 #include <MediaParamManager/MediaParamManager.hpp>
-#include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool VEncodeHelper::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
-    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
 
     this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
         this->Reset();
@@ -24,36 +22,40 @@ bool VEncodeHelper::Init() {
 }
 
 bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
-    auto& rp = *this->pMediaParamManager;
-
-    this->width = rp.width > 0 ? rp.width :
-        this->pGlobalVars->renderX.load(std::memory_order_acquire);
-    
-    this->height = rp.height > 0 ? rp.height :
-        this->pGlobalVars->renderY.load(std::memory_order_acquire);
-
+    this->encoder = av::VideoEncoderContext(codec);
     this->chosenEncoder = codec.name();
 
-    this->encoder = av::VideoEncoderContext(codec);
+    auto& rp = *this->pMediaParamManager;
+    this->width = rp.width > 0 ? rp.width :
+        this->pGlobalVars->renderX.load(std::memory_order_acquire);
+    this->height = rp.height > 0 ? rp.height :
+        this->pGlobalVars->renderY.load(std::memory_order_acquire);
     this->encoder.setWidth(this->width);
     this->encoder.setHeight(this->height);
     this->encoder.setPixelFormat(this->dstPixFmt);
-    this->encoder.setTimeBase(this->timeBase);
 
-    int gop = rp.gopSize > 0 ? rp.gopSize :
-        (rp.targetFPS > 0 ? rp.targetFPS * 2 : 120);
-    this->encoder.setGopSize(gop);
+    auto* raw = this->encoder.raw();
+    raw->color_range = AVCOL_RANGE_MPEG;
+    raw->colorspace = AVCOL_SPC_BT709;
+    raw->color_primaries = AVCOL_PRI_BT709;
+    raw->color_trc = AVCOL_TRC_BT709;
+
+    this->encoder.setTimeBase(this->timeBase);
 
     this->encoder.setMaxBFrames(rp.maxBFrames);
     this->encoder.setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate);
-    if (rp.rc == RateControl::CQ && rp.cq > 0)
-        this->encoder.setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
 
-    if (auto* raw = this->encoder.raw()) {
-        raw->color_range = AVCOL_RANGE_MPEG;
-        raw->colorspace = AVCOL_SPC_BT709;
-        raw->color_primaries = AVCOL_PRI_BT709;
-        raw->color_trc = AVCOL_TRC_BT709;
+    if (rp.gopSize > 0) {
+        this->encoder.setGopSize(rp.gopSize);
+    }
+    else if (rp.targetFPS > 0) {
+        this->encoder.setGopSize(rp.targetFPS * 2);
+    }
+    else {
+        this->encoder.setGopSize(120);
+    }
+    if (rp.rc == RateControl::CQ && rp.cq > 0) {
+        this->encoder.setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
     }
 
     av::Dictionary opts;
@@ -93,7 +95,12 @@ void VEncodeHelper::SetOn(av::FormatContext* oCtx) {
         this->LogError("编码器打开失败");
     }
 
-    this->LogSucc(std::format("软件编码: {} ({}x{})",
+    this->LogInfo(std::format("目标分辨率: {}x{}",
+        this->width.load(), this->height.load()));
+    auto fps = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
+    this->LogInfo(std::format("目标帧率: {} fps",
+        fps > 0 ? fps : 60));
+    this->LogSucc(std::format("软件编码已开启: {} ({}x{})",
         this->chosenEncoder, this->width.load(), this->height.load()));
 }
 
@@ -117,13 +124,15 @@ std::optional<av::Packet> VEncodeHelper::Encode() {
     try {
         auto srcFmtRaw = srcFrame.pixelFormat();
         int64_t inPts = srcFrame.pts().timestamp(this->timeBase);
-        int srcW = srcFrame.width(), srcH = srcFrame.height();
+        int srcW = srcFrame.width();
+        int srcH = srcFrame.height();
 
         av::VideoFrame dst;
 
         // ── 软件帧（BGRA，来自 CPU 读回）──
-        bool same = (srcW == this->width && srcH == this->height && srcFmtRaw == this->dstPixFmt);
-        if (same) { dst = std::move(srcFrame); }
+        if (srcW == this->width && srcH == this->height && srcFmtRaw == this->dstPixFmt) {
+            dst = std::move(srcFrame);
+        }
         else {
             this->CheckRescaler(srcW, srcH, srcFmtRaw);
             dst = av::VideoFrame(this->dstPixFmt, this->width, this->height);

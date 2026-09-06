@@ -3,7 +3,6 @@
 
 class VEncodeHelper final :public MediaModuleBase {
     class MediaParamManager* pMediaParamManager = nullptr;
-    class VCD3D11Manager* pVCD3D11Manager = nullptr;
     av::Stream vstream;
     av::VideoEncoderContext encoder;
     av::VideoRescaler rescaler;

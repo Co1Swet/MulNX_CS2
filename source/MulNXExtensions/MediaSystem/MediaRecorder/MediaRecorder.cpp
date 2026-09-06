@@ -1,14 +1,13 @@
 #include "MediaRecorder.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <APipeline/AudioCapturer/AudioCapturer.hpp>
 #include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
-#include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <VPipeline/VEncodeHelper/VEncodeHelper.hpp>
-#include <MediaParamManager/MediaParamManager.hpp>
 
 void MediaRecorder::CaptureCallback() {
-    ImGui::GetBackgroundDrawList()->AddCallback([](const ImDrawList*, const ImDrawCmd* cmd) {
-        static_cast<MediaRecorder*>(cmd->UserCallbackData)->PublishSync("MediaSync/PresentCallback"_hash);
+    ImGui::GetBackgroundDrawList()->AddCallback(
+        [](const ImDrawList*, const ImDrawCmd* cmd) {
+            auto pThis = static_cast<MediaRecorder*>(cmd->UserCallbackData);
+            pThis->PublishSync("MediaSync/PresentCallback"_hash);
         }, this, 0);
 }
 
@@ -37,7 +36,7 @@ void MediaRecorder::ReportCtxState() {
     this->LogInfo(std::format("输出上下文状态: 流数={} , 码流数={}",
         this->ofctx.streamsCount(),
         this->ofctx.streams().size()));
-    for(auto&& st : this->ofctx.streams()) {
+    for (auto&& st : this->ofctx.streams()) {
         this->LogInfo(std::format("流索引={}",
             st.index()));
     }
@@ -48,9 +47,7 @@ void MediaRecorder::ReportCtxState() {
 bool MediaRecorder::Init() {
     this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
-    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
-    
+
     (*this)
         .SubscribeAsync("Media/Record/Start")
         .SubscribeAsync("Media/Record/Stop");
@@ -107,14 +104,6 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
         std::memory_order_release
     );
 
-    int srcW = this->pGlobalVars->renderX.load(std::memory_order_acquire);
-    int srcH = this->pGlobalVars->renderY.load(std::memory_order_acquire);
-    av::PixelFormat srcFmt = this->pVCD3D11Manager->srcAVFormat;
-    if (srcW <= 0 || srcH <= 0 || srcFmt == AV_PIX_FMT_NONE) {
-        this->LogError("源纹理参数无效");
-        return false;
-    }
-
     try {
         if (this->ofctx.isOpened()) {
             this->LogWarning("输出上下文正处于打开状态！将尝试关闭");
@@ -125,15 +114,16 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
         this->LogError(std::format("在验证上下文状态时发生错误： {}", e.what()));
     }
 
-    this->LogInfo("准备第一次Reset");
+    this->LogInfo("准备Reset");
     this->PublishSync("MediaSync/Reset"_hash);
-    this->LogSucc("第一次Reset完成");
+    this->LogSucc("Reset完成");
 
     try {
         this->LogInfo(std::format("准备打开输出上下文: {}", outFile));
         this->ofctx.openOutput(outFile);
         this->LogSucc(std::format("已打开输出上下文: {}", outFile));
 
+        this->LogInfo("准备SetOn");
         MulNX::Message SetOnMsg("MediaSync/SetOn"_hash);
         auto&& [rInfo] = SetOnMsg.Access<MulNX::AVStartInfo>();
         rInfo.pOutCtx = &this->ofctx;
@@ -144,14 +134,7 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
 
         this->ofctx.writeHeader();
         this->LogInfo(std::format("输出头已写入, 流数={}", this->ofctx.streamsCount()));
-
-        auto& rp = *this->pMediaParamManager;
-        this->LogSucc(std::format("开始录制: {} ({}x{})",
-            outFile,
-            rp.width > 0 ? rp.width : srcW,
-            rp.height > 0 ? rp.height : srcH,
-            rp.targetFPS > 0 ? std::to_string(rp.targetFPS) + "fps " : ""
-        ));
+        this->LogSucc(std::format("开始录制: {}", outFile));
 
         this->pMediaState->MediaSystemGlobalWorkFlag = true;
         this->pMediaState->recordState.store(RecordState::Recording);
@@ -181,7 +164,7 @@ bool MediaRecorder::StopRecording() {
         while (auto p = this->pVEncodeHelper->TrySetOff()) {
             this->ofctx.writePacket(*p);
         }
-            
+
         while (auto p = this->pAEncodeHelper->Encode()) {
             this->ofctx.writePacket(*p);
         }
@@ -198,8 +181,6 @@ bool MediaRecorder::StopRecording() {
 
     this->ofctx.writeTrailer();
     this->LogInfo("尾部写入完毕");
-
-    this->PublishSync("MediaSync/Reset"_hash);
 
     this->ofctx.close();
     this->pMediaState->pCurrentOutputDir.store(nullptr, std::memory_order_release);
@@ -226,7 +207,7 @@ void MediaRecorder::Encode() {
     while (auto p = this->pVEncodeHelper->Encode()) {
         packets.push_back(std::move(*p));
     }
-        
+
     while (auto p = this->pAEncodeHelper->Encode()) {
         packets.push_back(std::move(*p));
     }
@@ -244,5 +225,5 @@ void MediaRecorder::Encode() {
 }
 
 void MediaRecorder::WritePacket() {
-    
+
 }
