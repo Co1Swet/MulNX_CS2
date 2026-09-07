@@ -4,5 +4,5 @@ add_library(CS2Record STATIC
     RecordFileRedirect/RecordFileRedirect.cpp
 )
 target_link_libraries(CS2Record PUBLIC
-    CS2Buildup
+    CS2Support
 )

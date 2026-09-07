@@ -1,5 +1,5 @@
 #include "ReShowSpeaker.hpp"
-#include <Buildup/TimeController/TimeController.hpp>
+#include <Support/TimeController/TimeController.hpp>
 
 bool ReShowSpeaker::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {

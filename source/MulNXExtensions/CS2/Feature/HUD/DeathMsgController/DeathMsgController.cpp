@@ -1,7 +1,7 @@
 #include "DeathMsgController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Buildup/TimeController/TimeController.hpp>
-#include <Buildup/CS2Hash/CS2Hash.hpp>
+#include <Mirror/CS2Hash/CS2Hash.hpp>
+#include <Support/TimeController/TimeController.hpp>
 
 void DeathMsgController::Window() {
     auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);

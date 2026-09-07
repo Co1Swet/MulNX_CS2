@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
-#include <Buildup/ParticleManager/ParticleManager.hpp>
-#include <Buildup/ParticleSystemMgr/ParticleSystemMgr.hpp>
+#include <Mirror/ParticleManager/ParticleManager.hpp>
+#include <Mirror/ParticleSystemMgr/ParticleSystemMgr.hpp>
 
 class WorldDraw final :public CSModuleBase {
     ParticleManager* pParticleManager = nullptr;

@@ -1,7 +1,7 @@
 #include "HitSoundFix.hpp"
 #include <Intro/HookGameEvents/HookGameEvents.hpp>
 #include <Intro/HookView/HookView.hpp>
-#include <Buildup/CS2Hash/CS2Hash.hpp>
+#include <Mirror/CS2Hash/CS2Hash.hpp>
 
 bool HitSoundFix::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {

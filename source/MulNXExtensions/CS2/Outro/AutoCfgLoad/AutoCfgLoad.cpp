@@ -1,5 +1,5 @@
 #include "AutoCfgLoad.hpp"
-#include <Buildup/TimeController/TimeController.hpp>
+#include <Support/TimeController/TimeController.hpp>
 
 bool AutoCfgLoad::Init() {
     this->SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {

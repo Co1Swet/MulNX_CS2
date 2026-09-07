@@ -1,7 +1,7 @@
 #include "AdvancedViewController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Buildup/TimeController/TimeController.hpp>
 #include <Intro/HookView/HookView.hpp>
+#include <Support/TimeController/TimeController.hpp>
 
 bool AdvancedViewController::Menu() {
     if (ImGui::CollapsingHeader("高级视角控制")) {

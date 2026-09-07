@@ -1,7 +1,7 @@
 #include "DemoHelper.hpp"
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
-#include <Buildup/TimeController/TimeController.hpp>
+#include <Support/TimeController/TimeController.hpp>
 
 void DemoHelper::Window() {
     auto w = MulNX::UI::RAIIWindow("Demo辅助");

@@ -9,5 +9,5 @@ add_library(CS2View STATIC
 )
 add_subdirectory("CameraSystem")
 target_link_libraries(CS2View PUBLIC
-    CS2Buildup
+    CS2Support
 )

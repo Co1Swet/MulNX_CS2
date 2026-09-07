@@ -6,5 +6,5 @@ add_library(CS2Sound STATIC
     ReShowSpeaker/ReShowSpeaker.cpp
 )
 target_link_libraries(CS2Sound PUBLIC
-    CS2Buildup
+    CS2Support
 )

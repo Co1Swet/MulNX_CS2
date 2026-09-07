@@ -1,6 +1,6 @@
 #include "SmokeController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Buildup/PlayerHub/PlayerHub.hpp>
+#include <Support/PlayerHub/PlayerHub.hpp>
 
 void SmokeController::HubPlayer(MulNX::Message* umsg) {
     std::shared_lock lock(this->smutex);

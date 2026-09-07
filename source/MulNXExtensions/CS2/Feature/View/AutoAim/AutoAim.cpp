@@ -1,5 +1,5 @@
 #include "AutoAim.hpp"
-#include <Buildup/TargetPicker/TargetPicker.hpp>
+#include <Support/TargetPicker/TargetPicker.hpp>
 
 void AutoAim::Menu() {
     if (ImGui::Button("启动自瞄")) {

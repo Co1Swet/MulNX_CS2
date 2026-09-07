@@ -2,8 +2,8 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/CSController/CSController.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
-#include <Buildup/ParticleManager/ParticleManager.hpp>
-#include <Buildup/PlayerHub/PlayerHub.hpp>
+#include <Mirror/ParticleManager/ParticleManager.hpp>
+#include <Support/PlayerHub/PlayerHub.hpp>
 #include <MulNXUtils/ColorTran/ColorTran.hpp>
 
 using DrawStuff_t = void(*)(CS2::C_BaseCSGrenadeProjectile*, char);

@@ -15,5 +15,5 @@ add_library(CS2Visual STATIC
 )
 
 target_link_libraries(CS2Visual PUBLIC
-    CS2Buildup
+    CS2Support
 )

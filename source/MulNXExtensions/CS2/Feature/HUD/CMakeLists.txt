@@ -11,5 +11,5 @@ add_library(CS2HUD STATIC
 )
 
 target_link_libraries(CS2HUD PUBLIC
-    CS2Buildup
+    CS2Support
 )

@@ -1,7 +1,7 @@
 #include "TeamIDColorController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXThirdParty/hlae/binutils.h>
-#include <Buildup/PlayerHub/PlayerHub.hpp>
+#include <Support/PlayerHub/PlayerHub.hpp>
 
 using CLayoutFile_LoadFromFile_t = int(__fastcall*)(void*, const char*, unsigned char);
 

@@ -1,6 +1,6 @@
 #include "NameController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Buildup/PlayerHub/PlayerHub.hpp>
+#include <Support/PlayerHub/PlayerHub.hpp>
 #include <MulNXThirdParty/hlae/binutils.h>
 
 using GetDecoratedPlayerName_t = void(*)(void* This, CS2::CBufferString* pBufferString, unsigned int flags, bool bUnk3);

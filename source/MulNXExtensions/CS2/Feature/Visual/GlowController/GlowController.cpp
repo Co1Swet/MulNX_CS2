@@ -1,7 +1,7 @@
 #include "GlowController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
-#include <Buildup/PlayerHub/PlayerHub.hpp>
+#include <Support/PlayerHub/PlayerHub.hpp>
 #include <MulNXUtils/ColorTran/ColorTran.hpp>
 
 // ---------- UI 回调 ----------

@@ -39,23 +39,25 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<BackgroundEntityScan>("BackgroundEntityScan")
         .CreateModule<HookConsole>("HookConsole")
         .CreateModule<HookView>("HookView")
-        .CreateModule<HookGSI>("HookGSI")
-        .CreateModule<CS2Hash>("CS2Hash")
-        .CreateModule<TargetPicker>("TargetPicker")
-        .CreateModule<TimeController>("TimeController")
-        .CreateModule<PlayerHub>("PlayerHub")
-        .CreateModule<DemoPlaying>("DemoPlaying") // 承担了时间适配器责任
-        .CreateModule<NameController>("NameController")
-
-        // CS2 基础支持
-        .CreateModule<ConsoleOutput>("ConsoleOutput")
         .CreateModule<HookEntitySystem>("HookEntitySystem")
         .CreateModule<HookGameEvents>("HookGameEvents")
+        .CreateModule<HookGSI>("HookGSI")
+        
+        // CS2 子系统镜像
+        .CreateModule<CS2Hash>("CS2Hash")
         .CreateModule<ParticleManager>("ParticleManager")
         .CreateModule<MaterialSystem>("MaterialSystem")
         .CreateModule<SceneSystem>("SceneSystem")
         .CreateModule<ResourceSystem>("ResourceSystem")
         .CreateModule<ParticleSystemMgr>("ParticleSystemMgr")
+
+        // CS2 自定义支持
+        .CreateModule<ConsoleOutput>("ConsoleOutput")
+        .CreateModule<TargetPicker>("TargetPicker")
+        .CreateModule<TimeController>("TimeController")
+        .CreateModule<NameController>("NameController")
+        .CreateModule<PlayerHub>("PlayerHub")
+        .CreateModule<DemoPlaying>("DemoPlaying") // 承担了时间适配器责任
 
         // CS2 摄像机系统
         .CreateModule<CameraSystem>("CameraSystem")

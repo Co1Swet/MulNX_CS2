@@ -1,6 +1,6 @@
 #include "HSI.hpp"
 #include <Intro/HookGameEvents/HookGameEvents.hpp>
-#include <Buildup/CS2Hash/CS2Hash.hpp>
+#include <Mirror/CS2Hash/CS2Hash.hpp>
 #include <nlohmann/json.hpp>
 
 bool HSI::Init() {

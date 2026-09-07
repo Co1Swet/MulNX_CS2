@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
-#include <Buildup/ResourceSystem/ResourceSystem.hpp>
-#include <Buildup/MaterialSystem/MaterialSystem.hpp>
+#include <Mirror/ResourceSystem/ResourceSystem.hpp>
+#include <Mirror/MaterialSystem/MaterialSystem.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
 namespace CS2 {

@@ -19,5 +19,5 @@ add_library(DemoSystem STATIC
 )
 
 target_link_libraries(DemoSystem PUBLIC
-    CS2Buildup
+    CS2Support
 )
