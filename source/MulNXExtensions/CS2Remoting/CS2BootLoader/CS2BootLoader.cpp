@@ -64,14 +64,18 @@ bool CS2BootLoader::Init() {
     this->launchOptions = config["launchOptions"].as<std::string>();
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
 
-    this->showWindow = true;
-
     (*this)
         .SubscribeAsync("CS2BootLoader/Launch")
         .SubscribeAsync("CS2BootLoader/PathUpdate")
         .SubscribeAsync("CS2BootLoader/Save")
         ;
 
+    auto autoCfg = YAML::LoadFile((configPath / "auto.yaml").string());
+    auto autoLaunch = autoCfg["autoLaunch"].as<bool>();
+    if (autoLaunch) {
+        this->PublishAsync("CS2BootLoader/Launch"_hash);
+    }
+    
     this->SendTask("Update", "MulNXMain", [this]()->bool {
         this->Update();
         return true;
