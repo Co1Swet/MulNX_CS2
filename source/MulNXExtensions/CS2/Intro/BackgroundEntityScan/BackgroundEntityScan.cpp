@@ -29,9 +29,6 @@ void BackgroundEntityScan::Main() {
     }
     // 玩家控制器，地图上从1到10
     int playerNum = 0;
-    for (const auto& mod : this->ParticipateItCSModules) {
-        mod->OnItBegin();
-    }
     for (int i = 0; i < this->CS2->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
         auto* entity = this->CS2Entitys->GetBaseEntity(i);
         if (!entity)continue;
@@ -40,7 +37,7 @@ void BackgroundEntityScan::Main() {
         if (!controller->IsPlayerController())continue;
 
         auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
-        auto* pawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn.GetIndexInEntityList())->As<CS2::C_CSPlayerPawn>();
+        auto* pawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
         if (!pawn)continue;
 
         auto team = MulNX::MRead(pawn->iTeamNum());
@@ -62,9 +59,6 @@ void BackgroundEntityScan::Main() {
             CS2EBEntity.Alive = CS2EBEntity.HP;
             CS2EBEntity.IndexInMap = playerNum;
         }
-    }
-    for (const auto& mod : this->ParticipateItCSModules) {
-        mod->OnItEnd();
     }
     return;
 }

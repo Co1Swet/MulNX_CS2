@@ -10,6 +10,7 @@ class ClientEntitySystem final :public MulNX::Module<ClientEntitySystem> {
 public:
     CS2::C_BaseEntity* GetBaseEntity(int index);
     CS2::C_BaseEntity* GetBaseEntityFromHandle(CS2::CHandleBase handle);
+    std::optional<std::pair<CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*>> TryGetPlayer(int index);
 
     CS2::C_CSPlayerPawn* GetLocalPlayerPawnEx();
 

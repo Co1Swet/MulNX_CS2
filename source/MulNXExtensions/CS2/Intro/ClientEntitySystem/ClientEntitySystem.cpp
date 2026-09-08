@@ -25,6 +25,28 @@ CS2::C_BaseEntity* ClientEntitySystem::GetBaseEntityFromHandle(CS2::CHandleBase 
     return this->GetBaseEntity(handle.GetIndexInEntityList());
 }
 
+std::optional<std::pair<CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*>> ClientEntitySystem::TryGetPlayer(int index) {
+    try {
+        auto* entity = this->GetBaseEntity(index);
+        if (!entity)return std::nullopt;
+
+        auto* controller = entity->As<CS2::CCSPlayerController>();
+        if (!controller->IsPlayerController())return std::nullopt;
+
+        auto hPawn = MulNX::MRead(controller->m_hPlayerPawn());
+        auto* pawn = this->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
+        if (!pawn)return std::nullopt;
+
+        auto team = MulNX::MRead(pawn->iTeamNum());
+        if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT)return std::nullopt;
+
+        return std::make_optional(std::make_pair(controller, pawn));
+    }
+    catch (...) {
+        return std::nullopt;
+    }
+}
+
 CS2::C_CSPlayerPawn* ClientEntitySystem::GetLocalPlayerPawnEx() {
     try {
         auto* localController = this->CS2->client.dwLocalPlayerController();
