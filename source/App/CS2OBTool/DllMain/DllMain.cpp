@@ -152,7 +152,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<BufferCopier>("BufferCopier")
         .CreateModule<TextureMapper>("TextureMapper")
         .CreateModule<VideoCapturer>("VideoCapturer")
-        .CreateModule<VEncodeHelper>("VEncodeHelper")
+        .CreateModule<VEncodeController>("VEncodeController")
 
         .CreateModule<MediaRecorder>("MediaRecorder")
         .CreateModule<MediaProcesser>("MediaProcesser")

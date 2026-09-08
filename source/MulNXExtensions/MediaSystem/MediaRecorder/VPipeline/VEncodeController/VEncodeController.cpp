@@ -1,8 +1,28 @@
-#include "VEncodeHelper.hpp"
+#include "VEncodeController.hpp"
+#include <MulNX/Base/UI/UI.hpp>
 #include <MediaParamManager/MediaParamManager.hpp>
 
-bool VEncodeHelper::Init() {
+#include "OpenH264/OpenH264.hpp"
+
+void VEncodeController::Menu() {
+    if (ImGui::CollapsingHeader("高级设置")) {
+        this->encoders[0]->DrawSettingsUI();
+    }
+}
+
+bool VEncodeController::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
+
+    this->encoders.push_back(std::make_unique<OpenH264Encoder>());
+
+    for (auto& encoder : this->encoders) {
+        if (!encoder->Init()) {
+            this->LogError(std::format("编码器 {} 初始化失败", encoder->GetAVCodec()->name()));
+        }
+        else {
+            this->LogInfo(std::format("编码器 {} 初始化成功", encoder->GetAVCodec()->name()));
+        }
+    }
 
     this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
         this->Reset();
@@ -18,46 +38,63 @@ bool VEncodeHelper::Init() {
         }
         });
 
+    this->UIRegisterCallback("UI.MediaSys", [this](auto&&...) {this->Menu();});
+
+    this->SendTask("Check", "MediaState", [this]() {
+        auto curSize = this->bufferVFrames.size_approx();
+        this->bufferSize.store(curSize, std::memory_order_release);
+        return true;
+        });
+
+    this->UIRegisterCallback("UI.MediaSys/Control", [this](auto&&...) {
+        ImGui::Text(std::format("视频帧大致缓存(压力系数): {} 帧",
+            this->bufferSize.load(std::memory_order_relaxed)).c_str());
+            });
+
     return true;
 }
-
-bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
-    this->encoder = av::VideoEncoderContext(codec);
-
+void VEncodeController::SetEncoderParams(av::VideoEncoderContext* encoder) {
     auto& rp = *this->pMediaParamManager;
     this->width = rp.width > 0 ? rp.width :
         this->pGlobalVars->renderX.load(std::memory_order_acquire);
     this->height = rp.height > 0 ? rp.height :
         this->pGlobalVars->renderY.load(std::memory_order_acquire);
-    this->encoder.setWidth(this->width);
-    this->encoder.setHeight(this->height);
-    this->encoder.setPixelFormat(this->dstPixFmt);
 
-    auto* raw = this->encoder.raw();
+    encoder->setWidth(this->width);
+    encoder->setHeight(this->height);
+    encoder->setPixelFormat(this->dstPixFmt);
+
+    auto* raw = encoder->raw();
     raw->color_range = AVCOL_RANGE_MPEG;
     raw->colorspace = AVCOL_SPC_BT709;
     raw->color_primaries = AVCOL_PRI_BT709;
     raw->color_trc = AVCOL_TRC_BT709;
 
-    this->encoder.setTimeBase(this->timeBase);
+    encoder->setTimeBase(this->timeBase);
 
-    this->encoder.setMaxBFrames(rp.maxBFrames);
-    this->encoder.setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate);
+    encoder->setMaxBFrames(rp.maxBFrames);
+    encoder->setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate);
 
     if (rp.gopSize > 0) {
-        this->encoder.setGopSize(rp.gopSize);
+        encoder->setGopSize(rp.gopSize);
     }
     else if (rp.targetFPS > 0) {
-        this->encoder.setGopSize(rp.targetFPS * 2);
+        encoder->setGopSize(rp.targetFPS * 2);
     }
     else {
-        this->encoder.setGopSize(120);
+        encoder->setGopSize(120);
     }
     if (rp.rc == RateControl::CQ && rp.cq > 0) {
-        this->encoder.setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
+        encoder->setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
     }
 
-    av::Dictionary opts;
+}
+
+bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
+    this->encoder = av::VideoEncoderContext(codec);
+    this->SetEncoderParams(&this->encoder);
+
+    av::Dictionary opts = *this->encoders[0]->GetPrivateOpts();
     try {
         std::error_code ec;
         this->encoder.open(opts, ec);
@@ -77,21 +114,15 @@ bool VEncodeHelper::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec)
     return true;
 }
 
-void VEncodeHelper::SetOn(av::FormatContext* oCtx) {
+void VEncodeController::SetOn(av::FormatContext* oCtx) {
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
 
-    // 纯软件
-    av::Codec codec = av::findEncodingCodec("libopenh264");
-    if (codec.isNull()) {
-        this->LogError("libopenh264 缺失");
-        return;
-    }
-    if (!codec.canEncode()) {
-        this->LogError("编码器无法编码");
-        return;
-    }
-    if (!this->OpenEncoder(oCtx, codec)) {
+    auto codec = this->encoders[0]->GetAVCodec();
+    if (!this->OpenEncoder(oCtx, *codec)) {
         this->LogError("编码器打开失败");
+    }
+    else {
+        this->LogSucc(std::format("创建编码器上下文成功: {}", codec->name()));
     }
 
     this->LogInfo(std::format("目标分辨率: {}x{}", this->width.load(), this->height.load()));
@@ -100,18 +131,19 @@ void VEncodeHelper::SetOn(av::FormatContext* oCtx) {
     this->LogSucc(std::format("编码器已开启: {}", this->encoder.codec().name()));
 }
 
-void VEncodeHelper::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
+void VEncodeController::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
     if (this->rescaler.isValid() &&
         this->rescaler.srcWidth() == srcW && this->rescaler.srcHeight() == srcH &&
         this->rescaler.srcPixelFormat() == srcFmt &&
         this->rescaler.dstWidth() == this->width && this->rescaler.dstHeight() == this->height &&
-        this->rescaler.dstPixelFormat() == this->dstPixFmt)
+        this->rescaler.dstPixelFormat() == this->dstPixFmt) {
         return;
+    }
     this->rescaler = av::VideoRescaler(this->width, this->height, this->dstPixFmt,
         srcW, srcH, srcFmt, av::SwsFlagBicubic);
 }
 
-std::optional<av::Packet> VEncodeHelper::Encode() {
+std::optional<av::Packet> VEncodeController::Encode() {
     if (!this->encoder.isOpened()) return std::nullopt;
 
     av::VideoFrame srcFrame;
@@ -151,7 +183,7 @@ std::optional<av::Packet> VEncodeHelper::Encode() {
     }
 }
 
-std::optional<av::Packet> VEncodeHelper::TrySetOff() {
+std::optional<av::Packet> VEncodeController::TrySetOff() {
     return std::nullopt;
     if (!this->encoder.isOpened()) return std::nullopt;
     try {
@@ -168,7 +200,7 @@ std::optional<av::Packet> VEncodeHelper::TrySetOff() {
     return std::nullopt;
 }
 
-void VEncodeHelper::Reset() {
+void VEncodeController::Reset() {
     av::VideoFrame clear;
     while (this->bufferVFrames.try_dequeue(clear)) {
 

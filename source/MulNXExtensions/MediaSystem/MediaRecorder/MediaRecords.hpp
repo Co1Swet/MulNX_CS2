@@ -5,6 +5,6 @@
 #include "VPipeline/VideoCapturer/VideoCapturer.hpp"
 #include "VPipeline/BufferCopier/BufferCopier.hpp"
 #include "VPipeline/TextureMapper/TextureMapper.hpp"
-#include "VPipeline/VEncodeHelper/VEncodeHelper.hpp"
+#include "VPipeline/VEncodeController/VEncodeController.hpp"
 #include "MediaParamManager/MediaParamManager.hpp"
 #include "MediaRecorder.hpp"

@@ -3,7 +3,7 @@
 
 class MediaRecorder final :public MediaModuleBase {
     class AEncodeHelper* pAEncodeHelper = nullptr;
-    class VEncodeHelper* pVEncodeHelper = nullptr;
+    class VEncodeController* pVEncodeController = nullptr;
 
     av::FormatContext ofctx;
     std::chrono::steady_clock::time_point recordStartTime;

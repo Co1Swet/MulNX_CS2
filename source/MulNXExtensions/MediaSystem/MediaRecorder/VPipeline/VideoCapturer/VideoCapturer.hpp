@@ -3,7 +3,7 @@
 
 class VideoCapturer final :public MediaModuleBase {
     class VCD3D11Manager* pVCD3D11Manager = nullptr;
-    class VEncodeHelper* pVEncodeHelper = nullptr;
+    class VEncodeController* pVEncodeController = nullptr;
     class TextureMapper* pTextureMapper = nullptr;
 
     std::atomic<std::chrono::steady_clock::time_point> recordStartTime;

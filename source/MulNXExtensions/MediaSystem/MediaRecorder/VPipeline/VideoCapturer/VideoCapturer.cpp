@@ -3,11 +3,11 @@
 #include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 #include <VPipeline/BufferCopier/BufferCopier.hpp>
 #include <VPipeline/TextureMapper/TextureMapper.hpp>
-#include <VPipeline/VEncodeHelper/VEncodeHelper.hpp>
+#include <VPipeline/VEncodeController/VEncodeController.hpp>
 
 bool VideoCapturer::Init() {
     this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->pVEncodeController = this->FindModule<VEncodeController>("VEncodeController");
     this->pTextureMapper = this->FindModule<TextureMapper>("TextureMapper");
 
     this->SendTask("VMap", "VMap", [this]() {
@@ -69,5 +69,5 @@ void VideoCapturer::Captuer() {
 
     frame.setTimeBase({ 1, 1000000 });
     frame.setPts(av::Timestamp(ptsUs, frame.timeBase()));
-    this->pVEncodeHelper->bufferVFrames.enqueue(std::move(frame));
+    this->pVEncodeController->bufferVFrames.enqueue(std::move(frame));
 }

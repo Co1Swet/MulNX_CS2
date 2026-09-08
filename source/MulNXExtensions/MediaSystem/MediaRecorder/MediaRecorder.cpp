@@ -1,7 +1,7 @@
 #include "MediaRecorder.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
-#include <VPipeline/VEncodeHelper/VEncodeHelper.hpp>
+#include <VPipeline/VEncodeController/VEncodeController.hpp>
 
 void MediaRecorder::CaptureCallback() {
     ImGui::GetBackgroundDrawList()->AddCallback(
@@ -45,7 +45,7 @@ void MediaRecorder::ReportCtxState() {
 }
 
 bool MediaRecorder::Init() {
-    this->pVEncodeHelper = this->FindModule<VEncodeHelper>("VEncodeHelper");
+    this->pVEncodeController = this->FindModule<VEncodeController>("VEncodeController");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
 
     (*this)
@@ -164,10 +164,10 @@ bool MediaRecorder::StopRecording() {
     this->PublishSync("MediaSync/SetOff"_hash);
 
     try {
-        while (auto p = this->pVEncodeHelper->Encode()) {
+        while (auto p = this->pVEncodeController->Encode()) {
             this->ofctx.writePacket(*p);
         }
-        while (auto p = this->pVEncodeHelper->TrySetOff()) {
+        while (auto p = this->pVEncodeController->TrySetOff()) {
             this->ofctx.writePacket(*p);
         }
 
@@ -210,7 +210,7 @@ void MediaRecorder::Encode() {
     if (this->pMediaState->recordState.load() != RecordState::Recording) return;
     std::vector<av::Packet> packets;
 
-    while (auto p = this->pVEncodeHelper->Encode()) {
+    while (auto p = this->pVEncodeController->Encode()) {
         packets.push_back(std::move(*p));
     }
 
