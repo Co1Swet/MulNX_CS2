@@ -5,6 +5,9 @@
 class CS2HelperController final :public MulNX::Module<CS2HelperController> {
     class DLLInjectHelper* pInjectHelper = nullptr;
     std::filesystem::path CS2OBToolPath;
+    std::filesystem::path dirTools;
+    std::filesystem::path dirFFmpeg;
+    std::vector<std::string> ffmpegsDll{};
     std::atomic<bool> injectReshade = true;
     bool Init()override;
     void DoInject(PROCESS_INFORMATION& pi, const std::filesystem::path& dllPath);
