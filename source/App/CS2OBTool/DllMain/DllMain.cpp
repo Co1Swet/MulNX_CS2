@@ -54,10 +54,9 @@ void StartImpl(HMODULE& hModule) {
         // CS2 自定义支持
         .CreateModule<ConsoleOutput>("ConsoleOutput")
         .CreateModule<TargetPicker>("TargetPicker")
-        .CreateModule<TimeController>("TimeController")
+        .CreateModule<TimeController>("TimeController")// 承担了时间适配器责任
         .CreateModule<NameController>("NameController")
         .CreateModule<PlayerHub>("PlayerHub")
-        .CreateModule<DemoPlaying>("DemoPlaying") // 承担了时间适配器责任
 
         // CS2 摄像机系统
         .CreateModule<CameraSystem>("CameraSystem")
