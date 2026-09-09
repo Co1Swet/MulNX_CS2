@@ -6,13 +6,24 @@ bool WebSocketManager::Init() {
     this->server.clear_access_channels(websocketpp::log::alevel::all);
     this->server.clear_error_channels(websocketpp::log::elevel::all);
 
+    auto path = this->PathGet("Config") / "config.yaml";
+    try {
+        auto yaml = YAML::LoadFile(path.string());
+        this->port = yaml["port"].as<uint16_t>();
+        this->LogSucc(std::format("从配置文件中读取到指定端口号：{}", this->port));
+    }
+    catch (const std::exception& e) {
+        this->LogError(e.what());
+        this->LogError("解析 yaml 配置出错，端口保持默认55202");
+    }
+    
+
     // 初始化服务器
     this->server.init_asio();
 
     this->server.set_open_handler([this](ConnectionHandle handle) {
         this->connectionHandles.insert(handle);
         });
-
     this->server.set_close_handler([this](ConnectionHandle handle) {
         this->connectionHandles.erase(handle);
         });
@@ -43,7 +54,7 @@ bool WebSocketManager::Init() {
                 }
                 this->server.listen(this->port);
                 this->server.start_accept();
-                this->LogSucc("正在监听端口：" + std::to_string(port));
+                this->LogSucc(std::format("正在监听端口：{}", this->port));
                 // 阻塞调用
                 this->server.run();
             }
