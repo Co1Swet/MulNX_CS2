@@ -9,9 +9,9 @@ void CS2Test::UI() {
     auto observerService = MulNX::MRead(pLocalPawn->pObserverServices());
     auto pMode = observerService->iObserverMode();
 
-    uint64_t address = (uint64_t)pMode;  // 示例 64 位地址
+    uint64_t address = (uint64_t)pMode;
     char buf[32];
-    snprintf(buf, sizeof(buf), "0x%016llX", address); // 格式化为 16 位十六进制
+    snprintf(buf, sizeof(buf), "0x%016llX", address);
 
     ImGui::InputText("Address", buf, sizeof(buf),
         ImGuiInputTextFlags_ReadOnly);
@@ -36,202 +36,192 @@ bool CS2Test::Init() {
         }
         });
 
-    // this->SubscribeSync("Hook/FireEventClientSide/player_death", [this](MulNX::Message& msg) {
-    //     this->runFlag1.store(true);
-    //     this->LogWarning("开始记录声音事件");
-    //     });
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
+        auto base = this->CS2->engine2.GetBaseAddress();
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-    //     static auto hook = MulNX::Hook::Create((uint8_t*)this->CS2->client.GetBaseAddress() + 0xBA34F0, [this](MulNX::Hook* hk, RegContext* ctx) {
-    //         auto pppName = hk->GetStackParam<char**>(ctx, 4);
-    //         if (this->runFlag1.load()) {
-    //             this->LogWarning(std::format("声音：{}",**pppName));
-    //         }
+        static auto hookFormat = MulNX::Hook::Create(
+            (uint8_t*)base + 0x85522,
+            [this](MulNX::Hook* hk, RegContext* ctx) {
+                auto mapName = (char*)ctx->r8;
+                auto thisPtr = (void*)ctx->rcx;
+                if (mapName) {
+                    this->LogInfo(std::format(
+                        "[Format] this={:#x} map={}",
+                        (uintptr_t)thisPtr, mapName));
+                }
+                return MulNX::Hook::Then::Continue;
+            }, true).value();
+        hookFormat->Attach();
 
-    //         return MulNX::Hook::Then::Continue;
-    //         }).value();
-    //     hook->Attach();
-    //     });
+        static auto hookSet = MulNX::Hook::Create(
+            (uint8_t*)base + 0x85541,
+            [this](MulNX::Hook* hk, RegContext* ctx) {
+                auto mapName = (char*)ctx->rdx;
+                auto thisPtr = (void*)ctx->rcx;
+                if (mapName) {
+                    this->LogInfo(std::format(
+                        "[Set]    this={:#x} map={}",
+                        (uintptr_t)thisPtr, mapName));
+                }
+                return MulNX::Hook::Then::Continue;
+            }, true).value();
+        hookSet->Attach();
+        });
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/server.dll", [this](MulNX::Message& msg) {
-    //     auto server = MulNX::Memory::DllModule::DllModule(L"server.dll");
-    //     auto target = server.GetBaseAddress() + 0xE3D810;
-    //     this->hkTest = MulNX::Hook::Create((uint8_t*)target, [this](MulNX::Hook* hk, RegContext* ctx) {
-    //         auto pName = **hk->GetStackParam<const char**>(ctx, 4);
-    //         auto name = std::string_view(pName);
-    //         if (name == "UI.KillCard.1") {
-    //             ctx->rax = ctx->rcx;
-    //             //return MulNX::Hook::Then::Return;
-    //         }
-    //         // ctx->rax = ctx->rcx;
-    //         // return MulNX::Hook::Then::Return;
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
+        auto base = this->CS2->engine2.GetBaseAddress();
 
-    //         return MulNX::Hook::Then::Continue;
-    //         }).value();
-    //     this->RegisterAttachHook(this->hkTest, "Test");
-    //     });
+        static auto hookManifestPath = MulNX::Hook::Create(
+            (uint8_t*)(base + 0x3F425D),
+            [this](MulNX::Hook* hk, RegContext* ctx) {
+                auto path = (const char*)ctx->r8;
+                this->LogInfo(std::format("[Manifest/Path] {}", path));
+                return MulNX::Hook::Then::Continue;
+            }, true).value();
+        hookManifestPath->Attach();
+        });
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-    //     static auto hook = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x82F86,
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             uintptr_t v51 = ctx->r8;                       // v51 数组首地址
-    //             uintptr_t* mapNameSlot = (uintptr_t*)(v51 + 0); // v51[0] 指向 SpawnGroup 名称
-    //             const char* currentName = (const char*)*mapNameSlot;
-    //             this->LogWarning(std::format("游戏尝试加载：{}", currentName));
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
+        static auto hook = MulNX::Hook::Create(
+            (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x83346,
+            [this](MulNX::Hook* hk, RegContext* ctx) {
+                uintptr_t v51 = ctx->r8;                      
+                const char* rawName = *(const char**)v51;      
+                const char* xformName = *(const char**)(v51 + 8);
 
-    //             if (currentName && strcmp(currentName, "<empty>") != 0) {
-    //                 // 情况1：纯地图名（不含路径和 prefabs）
-    //                 if (!strchr(currentName, '/') && !strchr(currentName, '\\') && !strstr(currentName, "prefabs")) {
-    //                     // 替换主地图名为 de_mirage
-    //                     //*mapNameSlot = (uintptr_t)"de_mirage";
-    //                     return MulNX::Hook::Then::Continue;
-    //                 }
+                this->LogWarning(std::format("游戏尝试加载：raw={} xform={}",
+                    rawName ? rawName : "<null>",
+                    xformName ? xformName : "<null>"));
 
-    //                 // 情况2：天空盒（路径中包含 "skybox"）
-    //                 if (std::string(currentName).find("skybox") != std::string::npos) {
-    //                     // 替换天空盒路径为 de_mirage 的天空盒
-    //                     *mapNameSlot = (uintptr_t)"maps/prefabs/de_mirage/3dskybox_mirage_legacy";
-    //                     return MulNX::Hook::Then::Continue;
-    //                 }
-    //             }
+                auto isPureMap = [](const char* s) {
+                    if (!s || !*s) return false;
+                    if (strchr(s, '/') || strchr(s, '\\')) return false;
+                    if (strstr(s, "prefabs")) return false;
+                    return true;
+                    };
+                auto isSkybox = [](const char* s) {
+                    if (!s) return false;
+                    return std::string_view(s).find("skybox") != std::string_view::npos;
+                    };
 
-    //             // 其它所有情况：跳过（包括 <empty> 和其它 prefabs）
-    //             return MulNX::Hook::Then::SkipAllAndContinue;
-    //         }, true).value();
-    //     hook->Attach();
+                bool rawMap = isPureMap(rawName);
+                bool xformMap = isPureMap(xformName);
+                bool rawSky = isSkybox(rawName);
+                bool xformSky = isSkybox(xformName);
 
-    //     static auto hook2 = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x842F8,
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             // 此时 r8 指向原始的地图路径字符串（如 "maps/<empty>.vpk" 或 "maps/de_inferno.vpk"）
-    //             const char* original = (const char*)ctx->r8;
-    //             this->LogWarning(std::format("Hook2 原始地图通知：{}", original ? original : "null"));
+                if (rawMap || xformMap) {
+                    this->LogInfo(std::format("地图：raw={} xform={}",
+                        rawName ? rawName : "<null>",
+                        xformName ? xformName : "<null>"));
+                    return MulNX::Hook::Then::Continue;
+                }
 
-    //             // 替换为 de_mirage 的路径
-    //             const char* newMapPath = "maps/de_mirage.vpk";
-    //             ctx->r8 = (uintptr_t)newMapPath;
+                if (rawSky || xformSky) {
+                    this->LogInfo(std::format("天空：raw={} xform={}",
+                        rawName ? rawName : "<null>",
+                        xformName ? xformName : "<null>"));
+                    return MulNX::Hook::Then::Continue;
+                }
 
-    //             return MulNX::Hook::Then::Continue;
-    //         }, true).value();
-    //     hook2->Attach();
-    //     });
+                this->LogInfo(std::format("拦截：raw={} xform={}",
+                    rawName ? rawName : "<null>",
+                    xformName ? xformName : "<null>"));
+                return MulNX::Hook::Then::SkipAllAndContinue;
+            }, true).value();
+        hook->Attach();
+        });
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-    //     static auto hook3 = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x1AE6E0, // CGameResourceService::BuildResourceManifest
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             // 参数：RCX = this, RDX = a2 (组名，应为地图名如 "de_inferno")
-    //             const char* groupName = (const char*)ctx->r9;
-    //             this->LogWarning(std::format("Hook3 BuildResourceManifest 组名：{}", groupName ? groupName : "null"));
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
+        auto base = this->CS2->engine2.GetBaseAddress();
 
-    //             // 可选：如果你之后想修改，可以在这里替换 ctx->rdx 指向的字符串
-    //             // 例如：ctx->rdx = (uintptr_t)"de_mirage";
+        static auto hookMapReq = MulNX::Hook::Create(
+            (uint8_t*)(base + 0x21B500),
+            [this](MulNX::Hook* hk, RegContext* ctx) {
+                auto mapName = (const char*)ctx->rdx;
+                auto addonName = (const char*)ctx->r8;
+                auto isChangelevel = (uint8_t)ctx->r9;
+                auto optionsPtr = hk->GetStackParam<void*>(ctx, 4);
+                this->LogInfo(std::format(
+                    "[HostState/Map] map={} addon={} isChangelevel={} options={:#x}",
+                    mapName ? mapName : "<null>",
+                    addonName ? addonName : "<null>",
+                    isChangelevel,
+                    optionsPtr ? (uintptr_t)*optionsPtr : 0));
+                return MulNX::Hook::Then::Continue;
+            }).value();
+        hookMapReq->Attach();
 
-    //             return MulNX::Hook::Then::Continue;
-    //         }).value();
-    //     hook3->Attach();
-    //     });
+        static auto hookPlayDemo = MulNX::Hook::Create(
+            (uint8_t*)(base + 0x21AB20),
+            [this](MulNX::Hook* hk, RegContext* ctx) {
+                auto demoName = (const char*)ctx->rdx;
+                auto addonName = (const char*)ctx->r8;
+                auto flag = (uint8_t)ctx->r9;
+                auto optionsPtr = hk->GetStackParam<void*>(ctx, 4);
+                this->LogInfo(std::format(
+                    "[HostState/Demo] demo={} addon={} flag={} options={:#x}",
+                    demoName ? demoName : "<null>",
+                    addonName ? addonName : "<null>",
+                    flag,
+                    optionsPtr ? (uintptr_t)*optionsPtr : 0));
+                return MulNX::Hook::Then::Continue;
+            }).value();
+        hookPlayDemo->Attach();
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-    //     static auto hookManifest = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x3F2689, // call AddString 的地址
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             // 字符串参数在 r8 中
-    //             const char* original = (const char*)ctx->r8;
-    //             if (original) {
-    //                 this->LogWarning(std::format("清单添加字符串：{}", original));
+        static auto hookAddonDL = MulNX::Hook::Create(
+            (uint8_t*)(base + 0x21AE60),
+            [this](MulNX::Hook* hk, RegContext* ctx) {
+                auto optionsPtr = (void*)ctx->rdx;
+                this->LogInfo(std::format(
+                    "[HostState/AddonDL] options={:#x}",
+                    (uintptr_t)optionsPtr));
+                return MulNX::Hook::Then::Continue;
+            }).value();
+        hookAddonDL->Attach();
+        });
 
-    //                 // 替换地图名（可自定义）
-    //                 if (strcmp(original, "de_inferno") == 0) {
-    //                     ctx->r8 = (uintptr_t)"de_mirage";
-    //                     this->LogWarning("已将地图名替换为 de_mirage");
-    //                 }
-    //             }
-    //             return MulNX::Hook::Then::Continue; // 继续执行原 call
-    //         }, true).value();
-    //     hookManifest->Attach();
-    //     });
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
+        auto base = this->CS2->engine2.GetBaseAddress();
 
-    // // 全局缓冲区，用于存放替换后的字符串
-    // static char g_ReplacedPath[512];
+        static auto hook = MulNX::Hook::Create(
+            (uint8_t*)(base + 0x17916C),
+            [this, base](MulNX::Hook* hk, RegContext* ctx) {
+                auto a1 = (uint8_t*)ctx->rsi;
+                if (!a1) return MulNX::Hook::Then::Continue;
+                if (!ctx->rax) return MulNX::Hook::Then::Continue;
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-    //     static auto hookManifest2 = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x3F2B4D,
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             const char* original = (const char*)ctx->r8;
-    //             if (!original) return MulNX::Hook::Then::Continue;
+                uint32_t hasBits = *(uint32_t*)(a1 + 0x10);
+                if ((hasBits & 0x01) == 0) return MulNX::Hook::Then::Continue;
 
-    //             // 只处理包含 de_inferno 的路径
-    //             if (strstr(original, "de_inferno")) {
-    //                 // 判断是否是需要替换的关键资源
-    //                 bool replace = false;
-    //                 if (strstr(original, "world") ||
-    //                     strstr(original, "skybox") ||
-    //                     strstr(original, "postprocessing") ||
-    //                     strstr(original, "prefabs") ||
-    //                     strstr(original, "pulse")) {
-    //                     replace = true;
-    //                 }
+                uint64_t tagged = *(uint64_t*)(a1 + 0x18);
+                uint64_t pStd = tagged & ~3ull;
+                if (!pStd || pStd == (base + 0x62ED10)) return MulNX::Hook::Then::Continue;
 
-    //                 // if (replace) {
-    //                 //     // 将 de_inferno 替换为 de_mirage
-    //                 //     std::string newPath = original;
-    //                 //     size_t pos = newPath.find("de_inferno");
-    //                 //     while (pos != std::string::npos) {
-    //                 //         newPath.replace(pos, strlen("de_inferno"), "de_mirage");
-    //                 //         pos = newPath.find("de_inferno", pos + strlen("de_mirage"));
-    //                 //     }
-    //                 //     // 复制到全局缓冲区
-    //                 //     strncpy_s(g_ReplacedPath, newPath.c_str(), sizeof(g_ReplacedPath) - 1);
-    //                 //     ctx->r8 = (uintptr_t)g_ReplacedPath;
-    //                 //     this->LogWarning(std::format("替换资源路径: {} -> {}", original, g_ReplacedPath));
-    //                 // }
-    //             }
-    //             return MulNX::Hook::Then::Continue;
-    //         }, true).value();
-    //     hookManifest2->Attach();
-    //     });
+                uint64_t size = *(uint64_t*)(pStd + 0x10);
+                uint64_t capacity = *(uint64_t*)(pStd + 0x18);
+                if (size == 0) return MulNX::Hook::Then::Continue;
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-    //     static auto hookManifest3 = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x3F26F9, // 第三个 AddString 调用
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             const char* str = (const char*)ctx->r8; // 字符串参数
-    //             if (str) {
-    //                 this->LogWarning(std::format("清单添加字符串3：{}", str));
-    //             }
-    //             return MulNX::Hook::Then::Continue;
-    //         }, true).value();
-    //     hookManifest3->Attach();
-    //     });
+                char* data = (capacity > 0xF) ? *(char**)pStd : (char*)pStd;
+                std::string_view name(data, (size_t)size);
+                this->LogInfo(std::format("[SpawnGroup/Name] {}", name));
 
-    // this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-    //     // Hook 1: CUtlString::Format("maps/%s.vpk", mapName) 调用处
-    //     static auto hookFormatMapPath = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x85162,
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             // r8 是原始地图名字符串（纯地图名，如 "de_inferno"）
-    //             // 替换为 de_mirage
-    //             ctx->r8 = (uintptr_t)"de_mirage";
-    //             this->LogWarning("Hook Format: 已将地图名替换为 de_mirage");
-    //             return MulNX::Hook::Then::Continue;
-    //         }, true).value();
-    //     hookFormatMapPath->Attach();
+                if (name == "de_inferno") {
+                    constexpr std::string_view newName = "de_overpass";
 
-    //     // Hook 2: CUtlString::Set(mapName) 调用处
-    //     static auto hookSetMapName = MulNX::Hook::Create(
-    //         (uint8_t*)this->CS2->engine2.GetBaseAddress() + 0x85181,
-    //         [this](MulNX::Hook* hk, RegContext* ctx) {
-    //             // rdx 是原始地图名字符串（纯地图名，如 "de_inferno"）
-    //             // 替换为 de_mirage
-    //             ctx->rdx = (uintptr_t)"de_mirage";
-    //             this->LogWarning("Hook Set: 已将地图名替换为 de_mirage");
-    //             return MulNX::Hook::Then::Continue;
-    //         }, true).value();
-    //     hookSetMapName->Attach();
-    //     });
+                    char* dst = (capacity > 0xF) ? *(char**)pStd : (char*)pStd;
+                    memcpy(dst, newName.data(), newName.size());
+                    dst[newName.size()] = 0;
+                    *(uint64_t*)(pStd + 0x10) = newName.size();
+
+                    this->LogInfo("[SpawnGroup/Name] → de_overpass");
+                }
+
+                return MulNX::Hook::Then::Continue;
+            },true).value();
+        hook->Attach();
+        });
+
+    
 
     return true;
 }
