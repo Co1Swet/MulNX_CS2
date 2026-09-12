@@ -56,6 +56,13 @@ namespace CS2 {
 
         bool IsInitialized() const { return (*this->slot & 2) != 0; }
 
+        bool IsValid(uint64_t emptySentinelAddr) const {
+            if ((*this->slot & 3) == 0) return false;
+            CUtlString* p = this->Get();
+            if (!p) return false;
+            return true;
+        }
+
         CUtlString* Get() const {
             return reinterpret_cast<CUtlString*>(*this->slot & ~3ull);
         }

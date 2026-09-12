@@ -84,6 +84,11 @@ namespace MulNX {
             namespace GSI {
                 inline const static MulNX::Memory::Pattern Pos_GSI_ID_ForSpecTarget_call_GetOBingPawn("48 8B F0 48 85 C0 0F 84 ?? ?? 00 00 8B 90 ?? ?? 00 00");
             }
+            namespace MapRemap {
+                namespace Protobuf {
+                    inline const static MulNX::Memory::Pattern Pos_DemoFileHeader_PraseString("48 8B D8 48 85 C0 0F 85 1F FF FF FF E9 4A 03 00 00");
+                }
+            }
         }
     }
 }

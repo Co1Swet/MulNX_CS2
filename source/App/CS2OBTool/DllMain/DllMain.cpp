@@ -125,6 +125,9 @@ void StartImpl(HMODULE& hModule) {
 
         .CreateModule<DemoSystem>("DemoSystem")
 
+        // CS2 地图更换功能模块
+        .CreateModule<MapProto>("MapProto")
+
         // CS2 外围功能
         .CreateModule<KeyboardOverlay>("KeyboardOverlay")
         .CreateModule<MiniMap>("MiniMap")

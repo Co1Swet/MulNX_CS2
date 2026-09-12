@@ -1,6 +1,7 @@
 #pragma once
 #include "DemoSystem/Demos.hpp"
 #include "HUD/HUDs.hpp"
+#include "MapRemap/MapRemaps.hpp"
 #include "Record/Records.hpp"
 #include "Sound/Sounds.hpp"
 #include "View/Views.hpp"
