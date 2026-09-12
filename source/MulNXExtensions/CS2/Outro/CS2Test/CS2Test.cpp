@@ -1,7 +1,6 @@
 #include "CS2Test.hpp"
 #include <Mirror/ResourceSystem/ResourceSystem.hpp>
-
-
+#include <MulNXUtils/AddressCheck.hpp>
 
 ResourceSystem* pResourceSystem = nullptr;
 

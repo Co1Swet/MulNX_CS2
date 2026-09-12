@@ -6,6 +6,12 @@ bool GFuncBind::Init() {
         this->HandleOnTier0Load();
         });
 
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
+        auto t = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::CUtlStringRef__Assign);
+        // 初始化 assign 函数指针
+        CS2::CUtlStringRef::pAssign = std::bit_cast<CS2::CUtlStringRef::Assign_t>(t.Data());
+        });
+
     return true;
 }
 
