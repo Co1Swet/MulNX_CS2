@@ -72,6 +72,9 @@ bool CS2BootLoader::Init() {
 
     auto autoCfg = YAML::LoadFile((configPath / "auto.yaml").string());
     auto autoLaunch = autoCfg["autoLaunch"].as<bool>();
+#ifdef _DEBUG
+    autoLaunch = true;
+#endif
     if (autoLaunch) {
         this->PublishAsync("CS2BootLoader/Launch"_hash);
     }

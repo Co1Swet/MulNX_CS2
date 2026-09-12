@@ -10,3 +10,5 @@ targets:
   - soundsystem.dll
   - resourcesystem.dll
   - particles.dll
+  - networksystem.dll
+  - matchmaking.dll
