@@ -87,6 +87,7 @@ namespace MulNX {
             namespace MapRemap {
                 namespace Protobuf {
                     inline const static MulNX::Memory::Pattern Pos_DemoFileHeader_PraseString("48 8B D8 48 85 C0 0F 85 1F FF FF FF E9 4A 03 00 00");
+                    inline const static MulNX::Memory::Pattern Pos_CNETMsg_SpawnGroup_Load_PraseString("48 8B D8 48 85 C0 0F 85 1C FF FF FF E9 58 05 00 00");
                 }
             }
         }

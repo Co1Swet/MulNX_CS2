@@ -33,4 +33,33 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             return MulNX::Hook::Then::Continue;
         }, true).value();
     this->RegisterAttachHook(this->hkCDemoFileHeader_PraseString, "CDemoFileHeader_PraseString");
+
+    // SpawnGroup 字符串公共出口：改 name（数据源 1/2）
+    this->hkCNETMsg_SpawnGroup_Load_PraseString = MulNX::Hook::Create(
+        textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Protobuf::Pos_CNETMsg_SpawnGroup_Load_PraseString).Data(),
+        [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto a1 = (uint8_t*)ctx->rsi;
+            if (!a1) return MulNX::Hook::Then::Continue;
+            if (!ctx->rax) return MulNX::Hook::Then::Continue;
+
+            uint32_t hasBits = *(uint32_t*)(a1 + 0x10);
+            if ((hasBits & 0b1) == 0) return MulNX::Hook::Then::Continue;
+
+            CS2::CUtlStringRef name((uint64_t*)(a1 + 0x18));
+            std::string_view sv = name.View();
+            if (sv.empty()) return MulNX::Hook::Then::Continue;
+
+            this->LogInfo(std::format("[SpawnGroup/Name] {}", sv));
+
+            if (sv == "de_inferno") {
+                name.Assign("de_mirage");
+                this->LogInfo("[SpawnGroup/Name] → de_mirage");
+            }
+            if (sv == "maps/prefabs/de_inferno/inferno_skybox") {
+                name.Assign("maps/prefabs/de_mirage/3dskybox_mirage_legacy");
+            }
+
+            return MulNX::Hook::Then::Continue;
+        }, true).value();
+    this->RegisterAttachHook(this->hkCNETMsg_SpawnGroup_Load_PraseString, "CNETMsg_SpawnGroup_Load_PraseString");
 }
