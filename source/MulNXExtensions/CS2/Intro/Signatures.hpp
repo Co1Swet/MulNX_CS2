@@ -88,6 +88,9 @@ namespace MulNX {
                 namespace Protobuf {
                     inline const static MulNX::Memory::Pattern Pos_DemoFileHeader_PraseString("48 8B D8 48 85 C0 0F 85 1F FF FF FF E9 4A 03 00 00");
                     inline const static MulNX::Memory::Pattern Pos_CNETMsg_SpawnGroup_Load_PraseString("48 8B D8 48 85 C0 0F 85 1C FF FF FF E9 58 05 00 00");
+                    inline const static MulNX::Memory::Pattern Pos_CSVCMsg_ServerInfo_PraseString("48 8B D8 48 85 C0 0F 85 14 FC FF FF E9 16 01 00 00");
+                    inline const static MulNX::Memory::Pattern Pos_CSVCMsg_ClearAllStringTables_PraseString("48 8B D8 48 85 C0 0F 85 C0 FE FF FF EB 60");
+                    inline const static MulNX::Memory::Pattern Pos_CSVCMsg_GameSessionConfiguration_PraseString("48 8B D8 48 85 C0 0F 85 55 FC FF FF E9 26 02 00 00");
                 }
             }
         }
