@@ -3,6 +3,7 @@
 
 bool GFuncBind::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {
+        this->pTier0 = &this->CS2->tier0;
         this->HandleOnTier0Load();
         });
 
@@ -24,8 +25,6 @@ F GFuncBind::FindTier0Func(std::string procName) {
 }
 
 void GFuncBind::HandleOnTier0Load() {
-    this->pTier0 = &this->CS2->tier0;
-
     CS2::CBufferString::pFuncInsert = this->FindTier0Func
         <CS2::CBufferString::Insert_t>("?Insert@CBufferString@@QEAAPEBDHPEBDH_N@Z");
     CS2::CBufferString::pFuncPurge = this->FindTier0Func
@@ -38,4 +37,9 @@ void GFuncBind::HandleOnTier0Load() {
         <CS2::CBufferString::FixSlashes_t>("?FixSlashes@CBufferString@@QEAAPEBDD@Z");
     CS2::CBufferString::pFuncExtractFileExtension = this->FindTier0Func
         <CS2::CBufferString::ExtractFileExtension_t>("?ExtractFileExtension@CBufferString@@QEAAPEBDPEBD@Z");
+
+    CS2::KeyValues::pFuncFindKey = this->FindTier0Func
+        <CS2::KeyValues::FindKey_t>("?FindKey@KeyValues@@QEAAPEAV1@PEBD_N@Z");
+    CS2::KeyValues::pFuncSetString = this->FindTier0Func
+        <CS2::KeyValues::SetString_t>("?SetString@KeyValues@@QEAAXPEBD0@Z");
 }

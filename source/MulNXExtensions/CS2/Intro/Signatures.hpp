@@ -92,6 +92,7 @@ namespace MulNX {
                     inline const static MulNX::Memory::Pattern Pos_CSVCMsg_ClearAllStringTables_PraseString("48 8B D8 48 85 C0 0F 85 C0 FE FF FF EB 60");
                     inline const static MulNX::Memory::Pattern Pos_CSVCMsg_GameSessionConfiguration_PraseString("48 8B D8 48 85 C0 0F 85 55 FC FF FF E9 26 02 00 00");
                 }
+                inline const static MulNX::Memory::Pattern Pos_MapKVReaded("89 5C ?? ?? A9 FF FF FF 7F 76 1C C1 E8 1F 84 C0 75 15 48 8B 05 ?? ?? ?? ?? 48 8B 54 ?? ?? 48 8B 08 48 8B 01 FF 50 ?? 48 85 ED 48 8B 6C");
             }
         }
     }

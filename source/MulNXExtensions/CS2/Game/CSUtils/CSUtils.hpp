@@ -2,6 +2,7 @@
 #include <CS2Math/Math.hpp>
 #include "CBufferString.hpp"
 #include "CUtlString.hpp"
+#include "KeyValues.hpp"
 
 class CMaterial2 {
 public:
