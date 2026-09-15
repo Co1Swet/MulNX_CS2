@@ -3,14 +3,12 @@
 #include <string>
 #include <format>
 
-// ─────────────────────────────────────────────────────────────
 // 诊断辅助：描述一个地址的所属段 / 模块
 // 返回示例：
-//   "IMAGE:networksystem.dll+0x466b90 (COMMIT,XR)"
+//   "IMAGE:Xxx.dll+0x466b90 (COMMIT,XR)"
 //   "MAPPED:base=0x16c500000000 sz=0x100000 (COMMIT,XR)"
 //   "PRIVATE:base=0x16c508300000 sz=0x1000 (COMMIT,RW)"
 //   "VQ-fail(gle=487)"
-// ─────────────────────────────────────────────────────────────
 std::string DescribeAddress(uint64_t addr) {
     if (!addr) return "null";
 

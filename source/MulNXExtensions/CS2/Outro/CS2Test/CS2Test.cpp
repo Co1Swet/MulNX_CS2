@@ -1,6 +1,7 @@
 #include "CS2Test.hpp"
 #include <Mirror/ResourceSystem/ResourceSystem.hpp>
 #include <MulNXUtils/AddressCheck.hpp>
+#include <unordered_set>
 
 ResourceSystem* pResourceSystem = nullptr;
 
@@ -36,8 +37,6 @@ bool CS2Test::Init() {
 
         }
         });
-
-    
 
     return true;
 }

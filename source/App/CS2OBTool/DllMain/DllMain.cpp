@@ -128,6 +128,8 @@ void StartImpl(HMODULE& hModule) {
         // CS2 地图更换功能模块
         .CreateModule<MapProto>("MapProto")
         .CreateModule<MapKeyValues>("MapKeyValues")
+        .CreateModule<MapManifest>("MapManifest")
+        .CreateModule<MapResource>("MapResource")
 
         // CS2 外围功能
         .CreateModule<KeyboardOverlay>("KeyboardOverlay")

@@ -93,6 +93,10 @@ namespace MulNX {
                     inline const static MulNX::Memory::Pattern Pos_CSVCMsg_GameSessionConfiguration_PraseString("48 8B D8 48 85 C0 0F 85 55 FC FF FF E9 26 02 00 00");
                 }
                 inline const static MulNX::Memory::Pattern Pos_MapKVReaded("89 5C ?? ?? A9 FF FF FF 7F 76 1C C1 E8 1F 84 C0 75 15 48 8B 05 ?? ?? ?? ?? 48 8B 54 ?? ?? 48 8B 08 48 8B 01 FF 50 ?? 48 85 ED 48 8B 6C");
+                inline const static MulNX::Memory::Pattern Pos_Manifest_AddFullPath("FF 15 ?? ?? ?? ?? 0F B7 85 ?? ?? ?? ?? B9 FF FF 00 00 66 3B C1 74 32 4C 8B B5");
+
+                inline const static MulNX::Memory::Pattern Func_RequestResourceByHash("48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 20 49 8B F8 48 8B DA");
+                inline const static MulNX::Memory::Pattern Func_FindResourceByHash("48 89 5C 24 18 48 89 6C 24 20 56 57 41 56 48 83 EC 20");
             }
         }
     }
