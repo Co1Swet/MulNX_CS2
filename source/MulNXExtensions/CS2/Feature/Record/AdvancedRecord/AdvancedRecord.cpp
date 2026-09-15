@@ -90,6 +90,9 @@ void AdvancedRecord::HandleBeforeCopyBackbuffer(MulNX::Message& msg) {
 
 bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
     if (!info.isAdvancedMode) return false;
+    while (this->pMediaState->encodingOverload) {
+        std::this_thread::sleep_for(std::chrono::microseconds(10));
+    }
 
     info.needDrop = false;
 

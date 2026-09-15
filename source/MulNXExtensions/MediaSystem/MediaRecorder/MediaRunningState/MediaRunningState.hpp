@@ -16,6 +16,7 @@ public:
     std::atomic<bool> MediaSystemGlobalWorkFlag = false;
     std::atomic<bool> nextStartUseAdvancedMode = false;
     std::atomic<bool> advancedMode = false;
+    std::atomic<bool> encodingOverload = false;
 
     std::atomic<RecordState> recordState = RecordState::Free;
 

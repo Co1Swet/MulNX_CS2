@@ -20,5 +20,5 @@ public:
     
     int  width = 0;           // 0=原生
     int  height = 0;           // 0=原生
-    std::atomic<int> targetFPS = 60;          // 0=不限制
+    std::atomic<int> targetFPS = 30;          // 0=不限制
 };

@@ -4,7 +4,7 @@
 
 class VEncodeController final :public MediaModuleBase {
     class MediaParamManager* pMediaParamManager = nullptr;
-    std::vector<std::unique_ptr<MulNX::IVEncoder>> encoders;
+   
     av::VideoEncoderContext encoder{};
 
     av::Stream vstream{};
@@ -17,7 +17,7 @@ class VEncodeController final :public MediaModuleBase {
 
     std::atomic<size_t> bufferSize = 0;
 
-    void Menu();
+    void Menu(MulNX::UICoordinator* uico);
     bool Init() override;
     void SetEncoderParams(av::VideoEncoderContext* encoder);
     bool OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec);
@@ -25,6 +25,7 @@ class VEncodeController final :public MediaModuleBase {
     void Reset();
     void SetOn(av::FormatContext* oCtx);
 public:
+    MulNX::IVEncoder* pEncoder;
     std::optional<av::Packet> Encode();
     std::optional<av::Packet> TrySetOff();
     moodycamel::ConcurrentQueue<av::VideoFrame> bufferVFrames{};

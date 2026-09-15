@@ -158,6 +158,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<BufferCopier>("BufferCopier")
         .CreateModule<TextureMapper>("TextureMapper")
         .CreateModule<VideoCapturer>("VideoCapturer")
+        .CreateModule<OpenH264Encoder>("OpenH264Encoder")
         .CreateModule<VEncodeController>("VEncodeController")
 
         .CreateModule<MediaRecorder>("MediaRecorder")

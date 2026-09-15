@@ -2,27 +2,14 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MediaParamManager/MediaParamManager.hpp>
 
-#include "OpenH264/OpenH264.hpp"
-
-void VEncodeController::Menu() {
+void VEncodeController::Menu(MulNX::UICoordinator* uico) {
     if (ImGui::CollapsingHeader("高级设置")) {
-        this->encoders[0]->DrawSettingsUI();
+        uico->CallbackCall("AV.VCodec"_hash, nullptr);
     }
 }
 
 bool VEncodeController::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
-
-    this->encoders.push_back(std::make_unique<OpenH264Encoder>());
-
-    for (auto& encoder : this->encoders) {
-        if (!encoder->Init()) {
-            this->LogError(std::format("编码器 {} 初始化失败", encoder->GetAVCodec()->name()));
-        }
-        else {
-            this->LogInfo(std::format("编码器 {} 初始化成功", encoder->GetAVCodec()->name()));
-        }
-    }
 
     this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
         this->Reset();
@@ -38,7 +25,7 @@ bool VEncodeController::Init() {
         }
         });
 
-    this->UIRegisterCallback("UI.MediaSys", [this](auto&&...) {this->Menu();});
+    this->UIRegisterCallback("UI.MediaSys", [this](auto uico, auto&&...) {this->Menu(uico);});
 
     this->SendTask("Check", "MediaState", [this]() {
         auto curSize = this->bufferVFrames.size_approx();
@@ -94,7 +81,7 @@ bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& co
     this->encoder = av::VideoEncoderContext(codec);
     this->SetEncoderParams(&this->encoder);
 
-    av::Dictionary opts = *this->encoders[0]->GetPrivateOpts();
+    av::Dictionary opts = this->pEncoder->GetPrivateOpts();
     try {
         std::error_code ec;
         this->encoder.open(opts, ec);
@@ -116,8 +103,9 @@ bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& co
 
 void VEncodeController::SetOn(av::FormatContext* oCtx) {
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
+    this->pMediaState->encodingOverload = false;
 
-    auto codec = this->encoders[0]->GetAVCodec();
+    auto codec = this->pEncoder->GetAVCodec();
     if (!this->OpenEncoder(oCtx, *codec)) {
         this->LogError("编码器打开失败");
     }
@@ -144,10 +132,22 @@ void VEncodeController::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt
 }
 
 std::optional<av::Packet> VEncodeController::Encode() {
-    if (!this->encoder.isOpened()) return std::nullopt;
+    if (!this->encoder.isOpened()) {
+        this->pMediaState->encodingOverload = false;
+        return std::nullopt;
+    }
 
     av::VideoFrame srcFrame;
-    if (!this->bufferVFrames.try_dequeue(srcFrame))return std::nullopt;
+    if (!this->bufferVFrames.try_dequeue(srcFrame)) {
+        this->pMediaState->encodingOverload = false;
+        return std::nullopt;
+    }
+    if (this->bufferVFrames.size_approx() >= 200) {
+        this->pMediaState->encodingOverload = true;
+    }
+    else {
+        this->pMediaState->encodingOverload = false;
+    }
 
     try {
         auto srcFmtRaw = srcFrame.pixelFormat();
@@ -205,4 +205,5 @@ void VEncodeController::Reset() {
     while (this->bufferVFrames.try_dequeue(clear)) {
 
     }
+    this->pMediaState->encodingOverload = false;
 }

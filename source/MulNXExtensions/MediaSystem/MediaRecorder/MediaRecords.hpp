@@ -8,3 +8,5 @@
 #include "VPipeline/VEncodeController/VEncodeController.hpp"
 #include "MediaParamManager/MediaParamManager.hpp"
 #include "MediaRecorder.hpp"
+
+#include "VPipeline/VEncodeController/OpenH264/OpenH264.hpp"
