@@ -70,9 +70,9 @@ namespace CS2 {
             return this->Get()->View();
         }
         // 统一入口：任何长度都用引擎 assign
-        void Assign(std::string_view newStr) {
+        void Assign(const char* in,uint64_t size) {
             CUtlString* p = this->Get();
-            pAssign(p, newStr.data(), newStr.size());
+            pAssign(p, in, size);
         }
     };
 } // namespace CS2

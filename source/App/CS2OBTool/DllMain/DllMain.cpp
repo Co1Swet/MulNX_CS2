@@ -126,6 +126,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<DemoSystem>("DemoSystem")
 
         // CS2 地图更换功能模块
+        .CreateModule<MapState>("MapState")
         .CreateModule<MapProto>("MapProto")
         .CreateModule<MapKeyValues>("MapKeyValues")
         .CreateModule<MapManifest>("MapManifest")
