@@ -3,6 +3,10 @@
 constexpr std::string_view safeBuf = "models/tools/bullet_hit_marker.vmdl";
 
 bool MapManifest::Init() {
+    (*this)
+        .SubscribeAsync("MapRemap/Set")
+        ;
+
     // manifest 资源路径
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
         auto target = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::MapRemap::Pos_Manifest_AddFullPath).Data();
@@ -34,5 +38,21 @@ bool MapManifest::Init() {
         this->RegisterAttachHook(this->hkPos_Log_Failedloading, "Pos_Log_Failedloading");
         });
 
+    this->SendTask("Update", "CSControl", [this]() {
+        this->Update();
+        return true;
+        });
+
     return true;
+}
+
+void MapManifest::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "MapRemap/Set"_hash: {
+        std::unique_lock lock(this->smutex);
+        this->errorLoadings.clear();
+        this->LogInfo("错误拦截列表已清空");
+        break;
+    }
+    }
 }

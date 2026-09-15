@@ -7,4 +7,5 @@ class MapManifest final :public CSModuleBase {
     std::unique_ptr<MulNX::Hook> hkPos_Manifest_AddFullPath = nullptr;
     std::unique_ptr<MulNX::Hook> hkPos_Log_Failedloading = nullptr;
     bool Init()override;
+    void ProcessMsg(MulNX::Message& msg);
 };
