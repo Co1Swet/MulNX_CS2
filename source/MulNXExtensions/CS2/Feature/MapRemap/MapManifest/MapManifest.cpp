@@ -1,5 +1,7 @@
 #include "MapManifest.hpp"
 
+constexpr std::string_view safeBuf = "models/tools/bullet_hit_marker.vmdl";
+
 bool MapManifest::Init() {
     // manifest 资源路径
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
@@ -9,18 +11,27 @@ bool MapManifest::Init() {
             auto path = (const char*)ctx->r8;
             if (!path) return MulNX::Hook::Then::Continue;
             std::string_view sv(path);
-            if (kMissingEntities.contains(sv)) {
-                // 替换
-                static thread_local char safeBuf[] = "models/tools/bullet_hit_marker.vmdl";
-                ctx->r8 = (uint64_t)safeBuf;
-                this->LogInfo(std::format("替换失败实体: {} -> models/tools/bullet_hit_marker.vmdl", path));
-            }
-            else {
-                //this->LogInfo(std::format("[Manifest/Path] {}", path));
-            }
+            std::shared_lock lock(this->smutex);
+            if (!this->errorLoadings.contains(std::string(sv)))return MulNX::Hook::Then::Continue;
+            ctx->r8 = std::bit_cast<uint64_t>(safeBuf.data());
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->RegisterAttachHook(this->hkPos_Manifest_AddFullPath, "Pos_Manifest_AddFullPath");
+        });
+
+    this->SubscribeSync("Hook/LoadLibraryExW/resourcesystem.dll", [this](auto&&...) {
+        auto textRegion = MulNX::Memory::DllModule(L"resourcesystem.dll").GetTextRegion();
+        auto t = textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Pos_Log_Failedloading).Data();
+        this->hkPos_Log_Failedloading = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto pPath = std::bit_cast<const char*>(ctx->rax);
+            auto path = std::string_view(pPath);
+            if (!path.ends_with(".vmdl_c"))return MulNX::Hook::Then::Continue;
+            path = path.substr(0, path.size() - 2);
+            std::unique_lock lock(this->smutex);
+            this->errorLoadings.insert(std::string(path));
+            return MulNX::Hook::Then::Continue;
+            }, true).value();
+        this->RegisterAttachHook(this->hkPos_Log_Failedloading, "Pos_Log_Failedloading");
         });
 
     return true;

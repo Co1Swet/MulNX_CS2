@@ -4,7 +4,7 @@ bool MapResource::Init() {
     constexpr uint64_t kVmdlTypeId = 0x6C646D76ULL;
 
     this->SubscribeSync("Hook/LoadLibraryExW/resourcesystem.dll", [this](auto&&...) {
-        auto textRegion = MulNX::Memory::DllModule(L"resourcesystem.dll").GetTextRegion();;
+        auto textRegion = MulNX::Memory::DllModule(L"resourcesystem.dll").GetTextRegion();
         auto tFunc_RequestResourceByHash = textRegion.
             FindRegion(MulNX::CS2::Signatures::MapRemap::Func_RequestResourceByHash).Data();
         this->pFindByHash = std::bit_cast<FindResourceByHash_t>(textRegion.
