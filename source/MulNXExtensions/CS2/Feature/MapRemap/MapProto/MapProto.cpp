@@ -35,22 +35,20 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
                 auto sv = ref.View();
                 if (!CheckName(sv))return;
                 auto pName = this->pMapState->pTargetMapName.load();
-                if (pName && sv == "de_inferno") {
-                    ref.Assign(pName->c_str(), pName->size());
-                    this->LogInfo(std::format("[DemoHeader/map_name] {} → {}", sv, pName->c_str()));
-                }
+                if (!pName)return;
+                this->LogInfo(std::format("[DemoHeader/map_name] {} → {}", sv, pName->c_str()));
+                ref.Assign(pName->c_str(), pName->size());
                 }();
             // field 10: addons
             [&]()->void {
                 if (!(hasBits & 0b100000))return;
                 CS2::CUtlStringRef ref((uint64_t*)(pHeader + 0x40));
                 auto sv = ref.View();
-                this->LogInfo(std::format("[DemoHeader/addons] '{}' (len={})", sv, sv.size()));
-
                 auto pAddon = this->pMapState->pTargetAddonID.load();
-                if (pAddon && sv != *pAddon) {
-                    ref.Assign(pAddon->c_str(), pAddon->size());
-                }
+                if (!pAddon)return;
+                if (sv == *pAddon)return;
+                this->LogInfo(std::format("[DemoHeader/addons] {} -> {}", sv, pAddon->c_str()));
+                ref.Assign(pAddon->c_str(), pAddon->size());
                 }();
             return MulNX::Hook::Then::Continue;
         }, true).value();
@@ -70,20 +68,15 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             CS2::CUtlStringRef name((uint64_t*)(a1 + 0x18));
             std::string_view sv = name.View();
             if (sv.empty()) return MulNX::Hook::Then::Continue;
-
-            this->LogInfo(std::format("[SpawnGroup/Name] {}", sv));
             if (!CheckName(sv))return MulNX::Hook::Then::Continue;
 
-            if (sv.starts_with("de_")) {
-                auto pName = this->pMapState->pTargetMapName.load();
-                if (!pName)return MulNX::Hook::Then::Continue;
-                name.Assign(pName->c_str(), pName->size());
-                this->LogInfo(std::format("[SpawnGroup/Name] {} → {}", sv, pName->c_str()));
-            }
-            if (sv == "maps/prefabs/de_inferno/inferno_skybox") {
-                //name.Assign("maps/prefabs/de_inferno_rain/3dskybox_mirage_legacy");
-            }
-
+            auto pName = this->pMapState->pTargetMapName.load();
+            if (!pName)return MulNX::Hook::Then::Continue;
+            this->LogInfo(std::format("[SpawnGroup/Name] {} → {}", sv, pName->c_str()));
+            name.Assign(pName->c_str(), pName->size());
+            // if (sv == "maps/prefabs/de_inferno/inferno_skybox") {
+            //     name.Assign("maps/prefabs/de_inferno_rain/3dskybox_mirage_legacy");
+            // }
             return MulNX::Hook::Then::Continue;
         }, true).value();
     this->RegisterAttachHook(this->hkCNETMsg_SpawnGroup_Load_PraseString, "CNETMsg_SpawnGroup_Load_PraseString");
@@ -97,7 +90,6 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             CS2::CUtlStringRef name((uint64_t*)(a1 + 0x18));
             auto sv = name.View();
             if (!CheckName(sv))return MulNX::Hook::Then::Continue;
-            this->LogInfo(std::format("[CAT/mapname] {}", sv));
             auto pName = this->pMapState->pTargetMapName.load();
             if (!pName)return MulNX::Hook::Then::Continue;
             if (sv == *pName)return MulNX::Hook::Then::Continue;
@@ -149,8 +141,6 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             std::string_view sv = ref.View();
             if (sv.empty()) return MulNX::Hook::Then::Continue;
             if (!CheckName(sv))return MulNX::Hook::Then::Continue;
-
-            this->LogInfo(std::format("[GSC/s1_mapname] {}", sv));
             auto pName = this->pMapState->pTargetMapName.load();
             if (!pName)return MulNX::Hook::Then::Continue;
             if (sv == *pName)return MulNX::Hook::Then::Continue;

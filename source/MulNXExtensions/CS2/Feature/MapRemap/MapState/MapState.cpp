@@ -27,10 +27,6 @@ void MapState::Menu() {
 }
 
 bool MapState::Init() {
-    this->pRawMapName = std::make_shared<std::string>("de_inferno");
-    this->pTargetAddonID = std::make_shared<std::string>("3488478228");
-    this->pTargetMapName = std::make_shared<std::string>("de_inferno_rain");
-
     (*this)
         .SubscribeAsync("MapRemap/RawMap")
         .SubscribeAsync("MapRemap/Set")
