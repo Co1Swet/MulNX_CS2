@@ -210,14 +210,13 @@ bool SolutionManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
     auto* PathManager = this->Path();
-    if (PathManager->CreateKey("Solutions", "Solutions",
-        [this](MulNX::PathManager* PathManager)->bool {
-            auto Path = PathManager->PathGetFromKey("Solutions");
-            this->LogSucc("成功设置解决方案路径为：" + Path.string());
-            return true;
-        })) {
-        PathManager->KeyBindDynamic("Solutions", "CurrentProject");
-    }
+    PathManager->CreateKey("Solutions", "Solutions", [this](MulNX::PathManager* PathManager)->bool {
+        auto Path = PathManager->PathGetFromKey("Solutions");
+        this->LogSucc("成功设置解决方案路径为：" + Path.string());
+        return true;
+        });
+    PathManager->KeyBindDynamic("Solutions", "CurrentProject");
+    
     (*this)
         .SubscribeAsync("CameraSystem/Element/Deleted")
         .SubscribeAsync("CameraSystem/Solution/Create")

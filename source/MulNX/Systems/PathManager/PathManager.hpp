@@ -37,9 +37,9 @@ namespace MulNX {
         bool KeyBindParentKey(const std::string& Key, const std::string& Parent);
         bool KeyUnbindParentKey(const std::string& Key);
         bool CallNodeChange(FilePathNode* Node);
-    public:
-        bool Init()override;
 
+        bool Init()override;
+    public:
         bool LoadPathLists(const std::filesystem::path& xmlPath);
         bool CheckShared();
 
@@ -49,7 +49,7 @@ namespace MulNX {
         // 将目标映射到共享的目录
         std::filesystem::path PathGetForShared(const std::string& Target);
 
-        bool CreateKey(const std::string& Key, std::string&& Value, std::function<bool(PathManager*)>&& OnChange);
+        void CreateKey(const std::string& Key, std::string&& Value, std::function<bool(PathManager*)>&& OnChange);
         bool KeyBindStatic(const std::string& Key, const std::filesystem::path& Position);
         bool KeyBindDynamic(const std::string& Key, const std::string& Parent);
         bool KeySetCurrent(const std::string& Key, const std::string& Current);

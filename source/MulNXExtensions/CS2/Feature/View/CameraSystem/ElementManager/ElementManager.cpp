@@ -219,14 +219,12 @@ bool ElementManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
     auto* PathManager = this->Path();
-    if (PathManager->CreateKey("Elements", "Elements",
-        [this](MulNX::PathManager* PathManager)->bool {
-            auto Path = PathManager->PathGetFromKey("Elements");
-            this->LogSucc("成功设置元素路径为：" + Path.string());
-            return true;
-        })) {
-        PathManager->KeyBindDynamic("Elements", "CurrentProject");
-    }
+    PathManager->CreateKey("Elements", "Elements", [this](MulNX::PathManager* PathManager)->bool {
+        auto Path = PathManager->PathGetFromKey("Elements");
+        this->LogSucc("成功设置元素路径为：" + Path.string());
+        return true;
+        });
+    PathManager->KeyBindDynamic("Elements", "CurrentProject");
 
     (*this)
         .SubscribeAsync("Element/Create")

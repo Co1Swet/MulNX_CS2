@@ -69,17 +69,16 @@ bool MulNX::PathManager::CallNodeChange(FilePathNode* Node) {
     return AllRight;
 }
 
-bool MulNX::PathManager::CreateKey(const std::string& Key, std::string&& Value, std::function<bool(PathManager*)>&& OnChange) {
+void MulNX::PathManager::CreateKey(const std::string& Key, std::string&& Value, std::function<bool(PathManager*)>&& OnChange) {
     std::unique_lock lock(this->MutexEx);
     auto it = this->Nodes.find(Key);
     if (it != this->Nodes.end()) {
-        this->LogWarning("key尝试被二次创建:" + Key);
-        return false;
+        this->LogError("key尝试被二次创建:" + Key);
+        throw MulNX::Exception("key尝试被二次创建");
     }
     this->Nodes[Key] = MulNX::FilePathNode{};
     this->Nodes[Key].OnCurrentValueChange = std::move(OnChange);
     this->Nodes[Key].CurrentValue = std::move(Value);
-    return true;
 }
 bool MulNX::PathManager::KeyBindStatic(const std::string& Key, const std::filesystem::path& Position) {
     std::unique_lock lock(this->MutexEx);
