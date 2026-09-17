@@ -11,9 +11,6 @@ add_library(CameraSystem
 
     "Project/Project.cpp"
     "ProjectManager/ProjectManager.cpp"
-
-    "Workspace/Workspace.cpp"
-    "WorkspaceManager/WorkspaceManager.cpp"
 )
 
 target_link_libraries(CameraSystem PUBLIC

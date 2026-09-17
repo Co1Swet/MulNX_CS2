@@ -63,7 +63,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<ProjectManager>("ProjectManager")
         .CreateModule<ElementManager>("ElementManager")
         .CreateModule<SolutionManager>("SolutionManager")
-        .CreateModule<WorkspaceManager>("WorkspaceManager")
 
         // CS2 视角控制功能模块
         .CreateModule<FreeCameraController>("FreeCameraController")

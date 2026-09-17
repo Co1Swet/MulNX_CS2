@@ -22,10 +22,23 @@
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 #include "CameraDrawer/CameraDrawer.hpp"
 
+#include <CameraSystem/ElementManager/ElementConfig.hpp>
+#include <CameraSystem/SolutionManager/SolutionConfig.hpp>
+#include <CameraSystem/ProjectManager/ProjectConfig.hpp>
+
 class ElementManager;
 class SolutionManager;
 class ProjectManager;
-class WorkspaceManager;
+
+class Config {
+public:
+    ElementConfig ElementCfg{};
+    SolutionConfig SolutionCfg{};
+    ProjectConfig ProjectCfg{};
+
+    //保存配置文件
+    std::pair<bool, std::string> Save(const std::filesystem::path& FolderPath);
+};
 
 // 摄像机系统
 class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem> {
@@ -33,11 +46,19 @@ class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraS
     ElementManager* EManager = nullptr;
     SolutionManager* SManager = nullptr;
     ProjectManager* PManager = nullptr;
-    WorkspaceManager* WManager = nullptr;
+    MulNX::IPCer* pIPCer = nullptr;
+
+    Config config{};
+
     void ProcessMsg(MulNX::Message& msg)override;
     void Window(MulNX::UICoordinator* uico);
     bool Init()override;
     bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;
+
+    bool ConfigGenerate();
+    bool ConfigSave();
+    bool ConfigLoad();
+    bool ConfigApply();
 public:
     CameraDrawer CamDrawer{};
 };
