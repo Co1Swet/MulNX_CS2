@@ -6,11 +6,12 @@
 
 //解决方案管理器，用于管理解决方案
 class SolutionManager final :public CamSysModule {
-private:
     CameraDrawer* CamDrawer = nullptr;
     ElementManager* EManager = nullptr;
     ProjectManager* PManager = nullptr;
-
+    MulNX::IPCer* pIPCer = nullptr;
+    //数据存储
+    std::unordered_map<std::string, std::unique_ptr<Solution>> solutions{};
     //当前操作的解决方案指针
     Solution* CurrentSolution = nullptr;
     //按键调试缓存
@@ -24,19 +25,13 @@ private:
     bool Playing = false;
     std::atomic<bool> needDrawCamera = false;
     MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
-public:
-    SolutionConfig Config{};
-    
-    //数据存储
-    std::unordered_map<std::string, std::unique_ptr<Solution>> solutions{};
-    bool MenuSolution();
+
     bool UINodeFunc();
     void Solution_ShowInLine(Solution* solution);
     void Solution_DebugWindow();
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    bool HandleUpdate(CameraSystemIO* IO);
 
     bool Solution_Create(const std::string& Name);
     //保存所有解决方案到文件
@@ -56,4 +51,8 @@ public:
     void Playing_Solution(const std::string& SolutionName);
     //调用播放
     bool Playing_Call(CameraSystemIO* IO);
+public:
+    SolutionConfig Config{};
+    bool MenuSolution();
+    bool HandleUpdate(CameraSystemIO* IO);
 };

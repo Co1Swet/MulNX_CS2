@@ -202,9 +202,10 @@ void SolutionManager::Solution_DebugWindow() {
 //解决方案管理器
 
 bool SolutionManager::Init() {
-    this->CamDrawer = &this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
-    this->EManager = this->Core->ModuleManager()->FindModule<ElementManager>("ElementManager");
-    this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
+    this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
+    this->EManager = this->FindModule<ElementManager>("ElementManager");
+    this->PManager = this->FindModule<ProjectManager>("ProjectManager");
+    this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
@@ -222,6 +223,30 @@ bool SolutionManager::Init() {
         .SubscribeAsync("CameraSystem/Solution/Create")
         .SubscribeAsync("CameraSystem/Solution/Delete")
         .SubscribeAsync("CameraSystem/Solution/Play");
+
+    this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
+        this->Solution_ClearAll();
+        });
+
+    this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {
+        this->Solution_SaveAll();
+        });
+
+    this->SubscribeSync("CamSync/Load", [this](auto&&...) {
+        //获取解决方案文件夹路径
+        std::filesystem::path SolutionsPath = this->Path()->PathGetFromKey("Solutions");
+        std::vector<std::string>Solutions = this->pIPCer->GetFileNamesByPath(SolutionsPath);
+        //遍历加载解决方案
+        for (const std::string& Solution : Solutions) {
+            this->Solution_Load(SolutionsPath / Solution);
+        }
+        this->LogSucc("尝试加载解决方案总数：" + std::to_string(Solutions.size()));
+        this->LogSucc("成功加载解决方案总数：" + std::to_string(this->solutions.size()));
+        });
+
+    this->SubscribeSync("CamSync/Play/Shutdown", [this](auto&&...) {
+        this->Playing_Disable();
+        });
 
     return true;
 }

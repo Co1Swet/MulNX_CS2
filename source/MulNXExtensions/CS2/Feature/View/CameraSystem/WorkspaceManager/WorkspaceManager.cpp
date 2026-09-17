@@ -107,7 +107,6 @@ bool WorkspaceManager::Workspace_Set(const std::string& Name) {
     this->InWorkspace = false;
     // 清空旧存储
     this->PublishSync("CamSync/Clear"_hash);
-    this->SManager->Solution_ClearAll();
     this->PManager->Project_ClearAll();
     // 制作指针
     this->CurrentWorkspace = std::make_unique<Workspace>(Name);

@@ -60,10 +60,10 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 摄像机系统
         .CreateModule<CameraSystem>("CameraSystem")
-        .CreateModule<WorkspaceManager>("WorkspaceManager")
         .CreateModule<ProjectManager>("ProjectManager")
-        .CreateModule<SolutionManager>("SolutionManager")
         .CreateModule<ElementManager>("ElementManager")
+        .CreateModule<SolutionManager>("SolutionManager")
+        .CreateModule<WorkspaceManager>("WorkspaceManager")
 
         // CS2 视角控制功能模块
         .CreateModule<FreeCameraController>("FreeCameraController")
