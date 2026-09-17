@@ -1,0 +1,13 @@
+name: ALONG
+duration: 5.703125
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 51
+  comboClick: 2
+size: 1
+elements:
+  - name: ALONG
+    offset: 0

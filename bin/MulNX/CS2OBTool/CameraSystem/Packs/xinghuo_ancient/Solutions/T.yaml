@@ -1,0 +1,13 @@
+name: T
+duration: 18.328125
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 78
+  comboClick: 2
+size: 1
+elements:
+  - name: T
+    offset: 0

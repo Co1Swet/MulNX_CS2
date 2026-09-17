@@ -1,0 +1,13 @@
+name: BEAR
+duration: 9.375
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 57
+  comboClick: 2
+size: 1
+elements:
+  - name: BEAR
+    offset: 0

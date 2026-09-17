@@ -1,0 +1,13 @@
+name: GARDEN
+duration: 6.859375
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 56
+  comboClick: 2
+size: 1
+elements:
+  - name: GD
+    offset: 0

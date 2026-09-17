@@ -1,0 +1,13 @@
+name: CT
+duration: 21.8125
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 78
+  comboClick: 2
+size: 1
+elements:
+  - name: CT
+    offset: 0

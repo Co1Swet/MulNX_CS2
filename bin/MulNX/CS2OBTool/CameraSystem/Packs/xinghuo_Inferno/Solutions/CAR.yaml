@@ -1,0 +1,13 @@
+name: CAR
+duration: 5.296875
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 55
+  comboClick: 2
+size: 1
+elements:
+  - name: CAR
+    offset: 0

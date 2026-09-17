@@ -1,0 +1,13 @@
+name: APTS
+duration: 9.734375
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 51
+  comboClick: 2
+size: 1
+elements:
+  - name: APTS
+    offset: 0

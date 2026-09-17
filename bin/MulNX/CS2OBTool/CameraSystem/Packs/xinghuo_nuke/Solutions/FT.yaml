@@ -1,0 +1,13 @@
+name: FT
+duration: 4.953125
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 50
+  comboClick: 2
+size: 1
+elements:
+  - name: FT
+    offset: 0

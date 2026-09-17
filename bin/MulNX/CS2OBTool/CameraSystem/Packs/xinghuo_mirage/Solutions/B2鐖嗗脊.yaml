@@ -1,0 +1,13 @@
+name: B2爆弹
+duration: 7.8125
+KCP:
+  usable: true
+  ctrl: true
+  shift: false
+  alt: false
+  vkCode: 53
+  comboClick: 2
+size: 1
+elements:
+  - name: B2爆弹
+    offset: 0

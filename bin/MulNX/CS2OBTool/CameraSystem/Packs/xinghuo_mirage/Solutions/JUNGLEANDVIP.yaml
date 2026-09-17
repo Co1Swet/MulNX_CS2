@@ -1,0 +1,13 @@
+name: JUNGLEANDVIP
+duration: 8.71875
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 51
+  comboClick: 2
+size: 1
+elements:
+  - name: JUNGLEANDVIP
+    offset: 0

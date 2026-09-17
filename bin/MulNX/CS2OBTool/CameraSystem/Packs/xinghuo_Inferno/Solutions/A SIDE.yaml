@@ -1,0 +1,13 @@
+name: A SIDE
+duration: 8.796875
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 49
+  comboClick: 2
+size: 1
+elements:
+  - name: A SIDE
+    offset: 0

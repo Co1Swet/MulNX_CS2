@@ -1,0 +1,13 @@
+name: CTMID
+duration: 8.5625
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 51
+  comboClick: 2
+size: 1
+elements:
+  - name: CTMID
+    offset: 0

@@ -1,0 +1,13 @@
+name: WAI1
+duration: 6.265625
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 52
+  comboClick: 2
+size: 1
+elements:
+  - name: WAI1
+    offset: 0

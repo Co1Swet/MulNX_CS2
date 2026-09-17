@@ -1,0 +1,13 @@
+name: OSBD
+duration: 6.5625
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 56
+  comboClick: 2
+size: 1
+elements:
+  - name: OSBD
+    offset: 0

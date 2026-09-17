@@ -1,0 +1,13 @@
+name: SUNSHINE
+duration: 6.375
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 56
+  comboClick: 2
+size: 1
+elements:
+  - name: SUNSHINE
+    offset: 0

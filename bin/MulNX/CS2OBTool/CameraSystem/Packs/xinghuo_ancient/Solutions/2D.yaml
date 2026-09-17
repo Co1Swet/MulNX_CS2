@@ -1,0 +1,13 @@
+name: 2D
+duration: 8.25
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 54
+  comboClick: 2
+size: 1
+elements:
+  - name: 2D
+    offset: 0

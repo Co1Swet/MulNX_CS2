@@ -1,0 +1,10 @@
+name: 开局警匪展示
+duration: 0
+KCP:
+  usable: true
+  ctrl: true
+  shift: false
+  alt: false
+  vkCode: 81
+  comboClick: 2
+size: 0

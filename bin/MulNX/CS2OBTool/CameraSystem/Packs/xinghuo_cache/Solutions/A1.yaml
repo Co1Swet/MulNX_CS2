@@ -1,0 +1,13 @@
+name: A1
+duration: 5.625
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 53
+  comboClick: 2
+size: 1
+elements:
+  - name: A1
+    offset: 0

@@ -1,7 +1,5 @@
 #pragma once
-
 #include <MulNX/MulNX.hpp>
-
 #include <filesystem>
 
 class Project {
@@ -23,8 +21,6 @@ public:
     //构造函数
     explicit Project(const std::string& name) :
         Name(name) {}
-    //析构函数
-    ~Project() = default;
 
     //修改名称
     void ResetName(const std::string& NewName);
@@ -38,6 +34,4 @@ public:
     std::string GetDescription()const {
         return this->Description;
     }
-    //获取项目信息
-    std::string GetMsg()const;
 };

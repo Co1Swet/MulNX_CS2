@@ -195,7 +195,7 @@ bool ProjectManager::Project_Save() {
     //保存所有元素和解决方案到磁盘
     this->PublishSync("CamSync/SaveAll"_hash);
     //保存项目到磁盘
-    std::filesystem::path Path = this->Path()->PathGetFromKey("CameraSystem") / this->ActiveProject->Name;
+    std::filesystem::path Path = this->Path()->PathGetFromKey("Packs") / this->ActiveProject->Name;
     auto [ok, msg] = this->ActiveProject->Save(Path);
     if (ok) {
         this->LogSucc(std::move(msg));

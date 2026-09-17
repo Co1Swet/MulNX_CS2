@@ -1,0 +1,13 @@
+name: EMM
+duration: 7.046875
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 56
+  comboClick: 2
+size: 1
+elements:
+  - name: EMM
+    offset: 0

@@ -1,5 +1,4 @@
 #include "Project.hpp"
-
 #include <strstream>
 #include <filesystem>
 #include <fstream>
@@ -35,11 +34,4 @@ std::pair<bool, std::string> Project::Save(const std::filesystem::path& FolderPa
     catch (const YAML::Exception& e) {
         return { false,std::string(e.what()) };
     }
-}
-
-std::string Project::GetMsg()const {
-    std::ostringstream oss;
-    oss << "项目名称：" << this->Name << "   项目描述：" << this->GetDescription();
-
-    return oss.str();
 }

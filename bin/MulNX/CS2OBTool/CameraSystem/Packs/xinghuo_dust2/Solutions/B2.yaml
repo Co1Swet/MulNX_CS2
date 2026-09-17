@@ -1,0 +1,13 @@
+name: B2
+duration: 9.0625
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 55
+  comboClick: 2
+size: 1
+elements:
+  - name: B2
+    offset: 0

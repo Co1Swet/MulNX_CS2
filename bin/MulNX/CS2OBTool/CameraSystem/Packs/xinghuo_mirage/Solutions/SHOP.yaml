@@ -1,0 +1,13 @@
+name: SHOP
+duration: 6.53125
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 56
+  comboClick: 2
+size: 1
+elements:
+  - name: SHOP1
+    offset: 0

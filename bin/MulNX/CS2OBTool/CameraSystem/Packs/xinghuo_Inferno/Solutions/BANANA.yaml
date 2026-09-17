@@ -1,0 +1,13 @@
+name: BANANA
+duration: 7.265625
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 56
+  comboClick: 2
+size: 1
+elements:
+  - name: BANANA
+    offset: 0

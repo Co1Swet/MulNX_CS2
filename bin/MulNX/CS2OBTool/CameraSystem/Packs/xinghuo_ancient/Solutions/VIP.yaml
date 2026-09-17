@@ -1,0 +1,13 @@
+name: VIP
+duration: 7.109375
+KCP:
+  usable: true
+  ctrl: false
+  shift: false
+  alt: true
+  vkCode: 57
+  comboClick: 2
+size: 1
+elements:
+  - name: VIP
+    offset: 0
