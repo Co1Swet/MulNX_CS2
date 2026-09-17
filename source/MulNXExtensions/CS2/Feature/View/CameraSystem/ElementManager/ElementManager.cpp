@@ -224,7 +224,7 @@ bool ElementManager::Init() {
         this->LogSucc("成功设置元素路径为：" + Path.string());
         return true;
         });
-    PathManager->KeyBindDynamic("Elements", "CurrentProject");
+    PathManager->KeyBindDynamic("Elements", "CurrentPack");
 
     (*this)
         .SubscribeAsync("Element/Create")

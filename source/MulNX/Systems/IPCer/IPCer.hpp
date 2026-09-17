@@ -4,12 +4,11 @@
 
 namespace MulNX {
     class IPCer final :public MulNX::Module<IPCer> {
-    public:
         bool Init()override;
-
+    public:
         bool GetWindowPathByName(const LPCWSTR& WindowName, std::filesystem::path& Output);
 
-        std::vector<std::string> GetProjectsNames(std::filesystem::path Path);
+        std::vector<std::string> GetDirNamesByPath(std::filesystem::path Path);
         std::vector<std::string> GetFileNamesByPath(std::filesystem::path& FolderPath);
 
         bool GetFileNames(std::vector<std::string>& FileNames, const std::filesystem::path& FolderPath, const std::vector<std::string>& Filter, const bool Extension = false);

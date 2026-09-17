@@ -215,7 +215,7 @@ bool SolutionManager::Init() {
         this->LogSucc("成功设置解决方案路径为：" + Path.string());
         return true;
         });
-    PathManager->KeyBindDynamic("Solutions", "CurrentProject");
+    PathManager->KeyBindDynamic("Solutions", "CurrentPack");
     
     (*this)
         .SubscribeAsync("CameraSystem/Element/Deleted")

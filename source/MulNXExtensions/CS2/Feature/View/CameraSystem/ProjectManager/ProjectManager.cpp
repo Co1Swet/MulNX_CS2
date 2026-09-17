@@ -45,7 +45,7 @@ bool ProjectManager::UINodeFunc() {
         this->Project_DebugWindow();
         if (this->OpenProjectKCPackDebugWindow) {
             //项目按键绑定调试窗口
-            if(this->Buffer_KCPack.DebugWindow(this->OpenProjectKCPackDebugWindow)) {
+            if (this->Buffer_KCPack.DebugWindow(this->OpenProjectKCPackDebugWindow)) {
                 this->ControllingProject->KCPack = this->Buffer_KCPack;//修改按键绑定
             }
         }
@@ -116,8 +116,8 @@ bool ProjectManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
     auto* PathManager = this->Path();
-    PathManager->CreateKey("CurrentProject", {}, [this](MulNX::PathManager* PathManager)->bool {
-        auto NewProjectPath = PathManager->PathGetFromKey("CurrentProject");
+    PathManager->CreateKey("CurrentPack", {}, [this](MulNX::PathManager* PathManager)->bool {
+        auto NewProjectPath = PathManager->PathGetFromKey("CurrentPack");
         // 检验文件夹是否已存在
         if (!std::filesystem::exists(NewProjectPath)) {
             this->LogInfo("指定的项目文件夹不存在，需创建新的项目文件夹！  路径：" + NewProjectPath.string());
@@ -138,7 +138,7 @@ bool ProjectManager::Init() {
         this->LogSucc("成功设置项目路径为：" + NewProjectPath.string());
         return true;
         });
-    PathManager->KeyBindDynamic("CurrentProject", "CurrentWorkspace");
+    PathManager->KeyBindDynamic("CurrentPack", "Packs");
 
     return true;
 }
@@ -165,11 +165,9 @@ bool ProjectManager::Project_ClearAll() {
     return true;
 }
 
-
-
 bool ProjectManager::Project_Create(const std::string& name) {
     //检查是否已存在同名项目
-    if (this->projects.find(name)!=this->projects.end()) {
+    if (this->projects.find(name) != this->projects.end()) {
         this->LogError("项目名已占用！ 项目名：" + name);
         return false;
     }
@@ -197,7 +195,7 @@ bool ProjectManager::Project_Save() {
     //保存所有元素和解决方案到磁盘
     this->PublishSync("CamSync/SaveAll"_hash);
     //保存项目到磁盘
-    std::filesystem::path Path = this->Path()->PathGetFromKey("CurrentWorkspace") / this->ActiveProject->Name;
+    std::filesystem::path Path = this->Path()->PathGetFromKey("CameraSystem") / this->ActiveProject->Name;
     auto [ok, msg] = this->ActiveProject->Save(Path);
     if (ok) {
         this->LogSucc(std::move(msg));
@@ -216,7 +214,7 @@ bool ProjectManager::Project_Apply(const std::shared_ptr<Project> Project) {
     this->ActiveProject = Project;
     //清空旧元素，防止冲突
     this->PublishSync("CamSync/Clear"_hash);
-    if (!this->Path()->KeySetCurrent("CurrentProject", Project->Name)) {
+    if (!this->Path()->KeySetCurrent("CurrentPack", Project->Name)) {
         this->LogError("尝试切换到项目时出现问题，设置项目文件夹路径失败！");
         return false;
     }
@@ -248,7 +246,7 @@ bool ProjectManager::Project_Load(const std::filesystem::path& ProjectPath, cons
         YAML::Node root = YAML::LoadFile(FullPath.string());
         std::string loadProjectName = root["name"].as<std::string>();
         //检查是否存在同名项目
-        if (this->projects.find(loadProjectName)!=this->projects.end()) {
+        if (this->projects.find(loadProjectName) != this->projects.end()) {
             this->LogError("项目名已占用，无法从文件加载项目！ 项目名：" + std::move(loadProjectName));
             return false;
         }
@@ -282,7 +280,7 @@ bool ProjectManager::Playing_AutoCall(const MulNX::Message& Msg) {
             return false;
         }
         int temp = rand() % OnNewRound.size();
-        auto [msg,rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
         rp->str1 = OnNewRound[temp];
         this->PublishAsync(std::move(msg));
         return true;

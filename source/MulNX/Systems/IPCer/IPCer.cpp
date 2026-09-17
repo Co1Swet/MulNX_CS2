@@ -45,21 +45,21 @@ bool MulNX::IPCer::Init() {
     return true;
 }
 
-std::vector<std::string> MulNX::IPCer::GetProjectsNames(std::filesystem::path Path) {
-    std::vector<std::string> FileNames;
+std::vector<std::string> MulNX::IPCer::GetDirNamesByPath(std::filesystem::path path) {
+    std::vector<std::string> fileNames;
     //检查路径存在且为文件夹
-    if (!std::filesystem::exists(Path) || !std::filesystem::is_directory(Path)) {
-        this->LogError("尝试获取当前工作区的所有项目名时出现错误：当前工作区文件夹不存在！");
-        return FileNames;
+    if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
+        this->LogError(std::format("尝试获取 {} 的所有子文件夹名时出错：文件夹 {} 不存在！", path.string(), path.string()));
+        return fileNames;
     }
     //遍历目录
-    for (const auto& entry : std::filesystem::directory_iterator(Path)) {
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
         if (entry.is_directory()) {
             std::string FileName = entry.path().filename().string();
-            FileNames.push_back(std::move(FileName));
+            fileNames.push_back(std::move(FileName));
         }
     }
-    return FileNames;
+    return fileNames;
 }
 std::vector<std::string> MulNX::IPCer::GetFileNamesByPath(std::filesystem::path& FolderPath) {
     std::vector<std::string> FileNames;
