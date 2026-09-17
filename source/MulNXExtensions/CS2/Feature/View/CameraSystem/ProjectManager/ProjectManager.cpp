@@ -140,14 +140,61 @@ bool ProjectManager::Init() {
         });
     PathManager->KeyBindDynamic("CurrentPack", "Packs");
 
+    (*this)
+        .SubscribeAsync("Game/NewRound");
+
+    this->SubscribeSync("System/Init/End", [this](auto&&...) {
+        // 自动加载所有项目到内存中
+        auto ProPath = this->Path()->PathGetFromKey("Packs");
+        std::vector<std::string> ProjectsNames = this->pIPCer->GetDirNamesByPath(ProPath);
+        if (!ProjectsNames.empty()) {
+            for (const auto& ProjectName : ProjectsNames) {
+                std::filesystem::path ProjectPath = ProPath / ProjectName;
+                this->Project_Load(ProjectPath, ProjectName);
+            }
+        }
+        });
+
+    this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {
+        this->Project_Save();
+        });
+
     return true;
 }
 void ProjectManager::HandleUpdate() {
+    this->Update();
     if (!this->Config.ProjectShortcutEnable)return;
     for (const auto& [name, project] : this->projects) {
         if (this->pInputSystem->CheckWithPack(project->KCPack)) {
             this->Project_Apply(project);
         }
+    }
+}
+
+void ProjectManager::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "Game/NewRound"_hash: {
+        if (!this->ActiveProject)break;
+        const std::vector<std::string>& OnNewRound = this->ActiveProject->OnNewRound;
+        if (OnNewRound.empty()) {
+            this->LogWarning("无新回合解决方案可尝试调用");
+            break;
+        }
+        int temp = rand() % OnNewRound.size();
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
+        rp->str1 = OnNewRound[temp];
+        this->PublishAsync(std::move(msg));
+        break;
+    }
+    case "Game/RoundEnd"_hash: {
+        // const std::vector<std::string>& OnEnd = this->ActiveProject->OnRoundEnd;
+        // if (OnEnd.empty()) {
+        //     this->LogWarning("无回合结束解决方案可尝试调用");
+        //     return false;
+        // }
+        // int temp = rand() % OnEnd.size();
+        // return this->SManager->Playing_SetSolution(OnEnd[temp]);
+    }
     }
 }
 
@@ -191,10 +238,8 @@ bool ProjectManager::Project_Refresh() {
 bool ProjectManager::Project_Save() {
     if (!this->Project_Refresh()) {
         return false;
-    }
-    //保存所有元素和解决方案到磁盘
-    this->PublishSync("CamSync/SaveAll"_hash);
-    //保存项目到磁盘
+    }    
+    // 保存项目到磁盘
     std::filesystem::path Path = this->Path()->PathGetFromKey("Packs") / this->ActiveProject->Name;
     auto [ok, msg] = this->ActiveProject->Save(Path);
     if (ok) {
@@ -265,35 +310,4 @@ bool ProjectManager::Project_Load(const std::filesystem::path& ProjectPath, cons
         this->LogError("在加载项目时出现问题：" + std::string(e.what()));
         return false;
     }
-}
-bool ProjectManager::Playing_AutoCall(const MulNX::Message& Msg) {
-    this->LogInfo("项目管理器正在处理消息！");
-    if (!this->ActiveProject) {
-        this->LogWarning("无活跃项目，无法执行自动操作");
-        return false;
-    }
-    switch (Msg.type) {
-    case "Game/NewRound"_hash: {
-        const std::vector<std::string>& OnNewRound = this->ActiveProject->OnNewRound;
-        if (OnNewRound.empty()) {
-            this->LogWarning("无新回合解决方案可尝试调用");
-            return false;
-        }
-        int temp = rand() % OnNewRound.size();
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
-        rp->str1 = OnNewRound[temp];
-        this->PublishAsync(std::move(msg));
-        return true;
-    }
-    case "Game/RoundEnd"_hash: {
-        // const std::vector<std::string>& OnEnd = this->ActiveProject->OnRoundEnd;
-        // if (OnEnd.empty()) {
-        //     this->LogWarning("无回合结束解决方案可尝试调用");
-        //     return false;
-        // }
-        // int temp = rand() % OnEnd.size();
-        // return this->SManager->Playing_SetSolution(OnEnd[temp]);
-    }
-    }
-    return false;
 }

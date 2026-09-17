@@ -76,29 +76,15 @@ bool CameraSystem::Init() {
         .SubscribeAsync("Global/Save")
         .SubscribeAsync("Global/Save/Strong")
         .SubscribeAsync("Command/SpecPlayer")
-        .SubscribeAsync("Game/NewRound")
         .SubscribeAsync("CameraSystem/Play/Shutdown");
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
-        // 清空旧存储
-        this->PManager->Project_ClearAll();
-        // 制作指针
         this->config = {};
         auto* PathManager = this->Path();
-
         PathManager->KeySetCurrent("CurrentPack", {});
         PathManager->KeySetCurrent("Packs", "Packs");
         if (this->ConfigLoad()) {
             this->ConfigApply();
-        }
-        // 自动加载所有项目到内存中
-        auto ProPath = PathManager->PathGetFromKey("Packs");
-        std::vector<std::string> ProjectsNames = this->pIPCer->GetDirNamesByPath(ProPath);
-        if (!ProjectsNames.empty()) {
-            for (const auto& ProjectName : ProjectsNames) {
-                std::filesystem::path ProjectPath = ProPath / ProjectName;
-                this->PManager->Project_Load(ProjectPath, ProjectName);
-            }
         }
         });
 
@@ -116,20 +102,13 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
         if (!this->ConfigSave()) {
             return;
         }
-        //保存当前活跃项目
-        if (!this->PManager->Project_Save()) {
-            return;
-        }
-        this->LogSucc("摄像机系统配置保存成功");
+        this->PublishSync("CamSync/SaveAll"_hash);
+        this->LogSucc("摄像机系统保存成功");
         break;
     }
     case "CameraSystem/Play/Shutdown"_hash: {
         this->LogWarning("接收到播放停止消息");
         this->PublishSync("CamSync/Play/Shutdown"_hash);
-        break;
-    }
-    case "Game/NewRound"_hash: {
-        this->PManager->Playing_AutoCall(msg);
         break;
     }
     case "Command/SpecPlayer"_hash: {
