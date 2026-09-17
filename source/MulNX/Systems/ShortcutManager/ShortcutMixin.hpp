@@ -14,7 +14,7 @@ namespace MulNX {
                 return true;
                 });
         }
-        ShortcutManager* Shortcut() {
+        const ShortcutManager* Shortcut()const {
             return this->pShortcutManager;
         }
     };

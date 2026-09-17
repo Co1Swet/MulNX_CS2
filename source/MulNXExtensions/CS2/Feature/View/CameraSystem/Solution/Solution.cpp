@@ -129,7 +129,7 @@ std::string Solution::GetMsg() {
         if (element) {
             oss << i << ".  "
                 "  |元素编号：" << i <<
-                "  元素名称：" << element->Name <<
+                "  元素名称：" << element->GetName() <<
                 "  元素类型：" << "自由摄像机轨道" <<
                 "  元素持续时间：" << element->DurationTime <<
                 "  元素偏移时间：" << this->elements[i].Offset << "\n";
@@ -242,7 +242,7 @@ std::pair<bool, std::string> Solution::Save(const std::filesystem::path& folderP
             if (!element) return { false, "疑似有元素在保存过程中被删除，保存终止！" };
 
             YAML::Node elemNode;
-            elemNode["name"] = element->Name;
+            elemNode["name"] = element->GetName();
             elemNode["offset"] = this->elements[i].Offset;
             elementsNode.push_back(elemNode);
         }

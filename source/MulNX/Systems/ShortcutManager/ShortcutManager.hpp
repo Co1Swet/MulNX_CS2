@@ -15,8 +15,8 @@ namespace MulNX {
         std::unordered_map<std::string, MulNX::KeyCheckPack>buttons;
 
         void Check();
-    public:
         bool Init();
-        std::optional<MulNX::KeyCheckPack> GetButton(const std::string& name);
+    public:
+        std::optional<MulNX::KeyCheckPack> GetButton(const std::string& name)const;
     };
 }

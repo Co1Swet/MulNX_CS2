@@ -6,17 +6,17 @@
 #include <fstream>
 
 std::string FreeCameraPath::GetBaseInfo()const {
-    return I18n("camsys.elem.info_base_fmt", this->Name, "自由摄像机轨道", this->DurationTime);
+    return std::format("轨道名称：{} ，持续时长：{}", this->name, this->DurationTime);
 }
 
 std::string FreeCameraPath::GetMsg()const {
     return I18n("camsys.elem.info_fmt", this->GetBaseInfo(), this->GetPrivateMsg());
 }
-std::string FreeCameraPath::GetName()const {
-    return this->Name;
+const std::string& FreeCameraPath::GetName()const {
+    return this->name;
 }
 void FreeCameraPath::ResetName(const std::string& NewName) {
-    this->Name = NewName;
+    this->name = NewName;
 }
 
 bool FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
@@ -99,8 +99,6 @@ bool FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
     DirectX::XMStoreFloat4(&quat, RotationQuat);
     MulNX::Math::CSQuatToEuler(quat, IO->Frame.view.rotation);
 
-    IO->Frame.TargetOBMode = 4;
-
     return true;
 }
 
@@ -119,7 +117,7 @@ bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const fl
         if (!Matrix)return false;
         const auto& keyframe = keyframes.at(i);
         // 绘制关键帧的摄像机
-        std::string label = std::format("{} # {}", this->Name, i);
+        std::string label = std::format("{} # {}", this->name, i);
         CamDrawer->DrawCamera(keyframe.GetPosition(), keyframe.GetRotationEuler(), label.c_str());
 
         // 获取ImDrawList用于绘制连线
@@ -161,12 +159,12 @@ float FreeCameraPath::GetDurationTime()const {
 }
 
 std::pair<bool, std::string> FreeCameraPath::Save(const std::filesystem::path& folderPath) {
-    if (this->Name.empty())return { false,"元素名为空，无法保存元素到磁盘文件！" };
-    std::filesystem::path filePath = folderPath / (this->Name + ".yaml");
+    if (this->name.empty())return { false,"元素名为空，无法保存元素到磁盘文件！" };
+    std::filesystem::path filePath = folderPath / (this->name + ".yaml");
     try {
         YAML::Node root;
 
-        root["name"] = this->Name;
+        root["name"] = this->name;
         root["duration"] = this->DurationTime;
 
         auto [ok, msg] = this->SaveImpl(root);
@@ -366,7 +364,7 @@ std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
             this->AddKeyframe(std::move(keyframe));
         }
 
-        return { true, "成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：" + this->Name };
+        return { true, "成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：" + this->name };
     }
     catch (const YAML::Exception& e) {
         return { false, "YAML解析错误：" + std::string(e.what()) };

@@ -1,214 +1,10 @@
 #include "ElementManager.hpp"
 #include <Intro/HookView/HookView.hpp>
-#include <Support/TimeController/TimeController.hpp>
 #include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <CameraSystem/SolutionManager/SolutionManager.hpp>
 #include <CameraSystem/ProjectManager/ProjectManager.hpp>
 
-bool ElementManager::MenuElement() {
-    // 展示预览功能相关状态
-    ImGui::TextUnformatted(I18n(
-        "camsys.elem.preview_status",
-        this->OnPreview ? I18n("text.opened") : I18n("text.closed"),
-        this->Preview_CurrentElement ? this->Preview_CurrentElement->GetName() : I18n("text.none"),
-        this->Preview_TimeSchema
-    ).c_str());
-
-    ImGui::Separator();
-
-    // 元素总设置
-    if (ImGui::CollapsingHeader(I18n("camsys.elem.settings").c_str())) {
-        ImGui::Checkbox(I18n("camsys.elem.preview_draw").c_str(), &this->Config.PreviewDraw);
-        ImGui::Checkbox(I18n("camsys.elem.preview_override").c_str(), &this->Config.PreviewOverride);
-    }
-
-    // 创建元素
-    if (ImGui::CollapsingHeader(I18n("camsys.elem.create").c_str())) {
-        ImGui::Text(I18n("camsys.elem.new_name").c_str());
-        ImGui::SameLine();
-        static std::string newElementName = "";
-        ImGui::InputText("##新元素名", &newElementName);
-        // 创建自由摄像机轨道
-        if (ImGui::Button(I18n("camsys.elem.new_free_camera_path").c_str())) {
-            if (newElementName.empty()) {
-                this->LogError(I18n("result.error_empty_name").c_str());
-            }
-            else {
-                auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Element/Create"_hash);
-                rp->str1 = std::move(newElementName);
-                this->PublishAsync(std::move(msg));
-            }
-            newElementName.clear();
-        }
-    }
-    // 展示修改元素
-    if (ImGui::CollapsingHeader(I18n("camsys.elem.list").c_str())) {
-        for (const auto& [name, element] : this->elements) {
-            this->Element_ShowInLine(element);
-        }
-    }
-
-    return true;
-}
-
-void ElementManager::DebugUI(FreeCameraPath* campath) {
-    ImGui::TextUnformatted(campath->GetBaseInfo().c_str());
-
-    static int IndexForReset = -1;
-    static int PreIndex = -2;
-
-    for (size_t i = 0; i < campath->CameraKeyframes.size(); ++i) {
-        const MulNX::Math::CameraKeyframe& keyframe = campath->CameraKeyframes.at(i);
-        if (ImGui::Selectable(std::to_string(i).c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
-            IndexForReset = i;
-            if (ImGui::IsMouseDoubleClicked(0)) {
-                auto pos = keyframe.GetPosition();
-                auto rot = keyframe.GetRotationEuler();
-                auto dof = keyframe.GetDOF();
-                this->CS2View->spec_goto_ex(pos, rot);
-                this->CS2View->SetDOF(dof);
-                if (this->pInputSystem->IsKeyPressed(VK_MENU)) {
-                    this->CS2Time->JumpReal(keyframe.time);
-                }
-            }
-        }
-        ImGui::SameLine();
-        ImGui::Text(I18n("free_campath.fmt", i, keyframe.GetMsg()).c_str());
-    }
-
-    static auto kAdd = this->Shortcut()->GetButton("place camera").value();
-    if (ImGui::Button(I18n("free_campath.add").c_str()) || this->pInputSystem->CheckWithPack(kAdd)) {
-        MulNX::Math::CameraKeyframe keyframe;
-        keyframe.time = this->pTimeline->GetTime();
-        auto view = this->CS2View->GetView();
-        keyframe.PositionAndFOV = view.ToPositionAndFOV();
-        keyframe.RotationQuat = view.ToRotationQuat();
-        keyframe.dof = view.ToDOFPack();
-        campath->AddKeyframe(keyframe);
-    }
-
-    if (ImGui::Button(I18n("text.clear").c_str()) || this->pInputSystem->CheckComboClick(VK_DELETE, 2)) {
-        campath->Clear();
-    }
-
-    if (ImGui::Button(I18n("text.normalize").c_str())) {
-        campath->TimeNormalize();
-    }
-
-    if (ImGui::Button(I18n("text.preview").c_str())) {
-        this->Preview_SetElement(campath->Name);
-        this->Preview_SetPreviewSchema(this->pTimeline->GetTime());
-        this->Preview_Enable();
-    }
-
-    ImGui::Separator();
-
-    if (0 <= IndexForReset && IndexForReset < campath->CameraKeyframes.size()) {
-        const MulNX::Math::CameraKeyframe& keyframe = campath->GetKeyFrame(IndexForReset);
-        ImGui::Text(I18n("free_campath.fmt_edit", IndexForReset, keyframe.GetMsg()).c_str());
-        ImGui::Separator();
-
-        static float temptime{};
-        static DirectX::XMFLOAT4 tempPositionAndFOV{};
-        static DirectX::XMFLOAT3 tempRotationEuler{};
-        if (IndexForReset != PreIndex) {
-            temptime = keyframe.time;
-            tempPositionAndFOV = keyframe.GetPositionAndFOV();
-            tempRotationEuler = keyframe.GetRotationEuler();
-        }
-
-        ImGui::SliderFloat(I18n("math.time").c_str(), &temptime, 0, 20000);
-
-        ImGui::SliderFloat3(I18n("math.pos").c_str(), &tempPositionAndFOV.x, -2000.0, 2000, 0);
-        ImGui::SliderFloat(I18n("math.yaw").c_str(), &tempRotationEuler.x, -89.0, 89.0);
-        ImGui::SliderFloat(I18n("math.pitch").c_str(), &tempRotationEuler.y, -179.0, 179.0);
-        ImGui::SliderFloat(I18n("math.roll").c_str(), &tempRotationEuler.z, -179.0, 179.0);
-        ImGui::SliderFloat(I18n("math.fov").c_str(), &tempPositionAndFOV.w, 10, 170);
-
-        this->CamSys->CamDrawer.DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
-        if (ImGui::Button(I18n("text.confirm_modify").c_str())) {
-            // 构造临时摄像机关键帧
-            MulNX::Math::CameraKeyframe tempKey;
-            // 注入时间
-            tempKey.time = temptime;
-            // 注入位置和FOV
-            tempKey.PositionAndFOV = DirectX::XMLoadFloat4(&tempPositionAndFOV);
-            // 转换角度并注入
-            DirectX::XMFLOAT4 tempRotationQuat;
-            MulNX::Math::CSEulerToQuat(tempRotationEuler, tempRotationQuat);
-            tempKey.RotationQuat = DirectX::XMLoadFloat4(&tempRotationQuat);
-            // 擦除旧关键帧
-            campath->CameraKeyframes.erase(campath->CameraKeyframes.begin() + IndexForReset);
-            // 添加新关键帧
-            campath->AddKeyframe(std::move(tempKey));
-            PreIndex = -1;
-        }
-        if (ImGui::Button(I18n("text.delete").c_str())) {
-            //删除并刷新
-            campath->CameraKeyframes.erase(campath->CameraKeyframes.begin() + IndexForReset);
-            campath->Refresh();
-            PreIndex = -1;
-        }
-        if (ImGui::Button(I18n("text.copy").c_str())) {
-            //拷贝复制
-            campath->AddKeyframe(campath->GetKeyFrame(IndexForReset));
-            PreIndex = -1;
-        }
-    }
-    PreIndex = IndexForReset;
-}
-
-void ElementManager::Element_ShowInLine(const std::shared_ptr<FreeCameraPath> element) {
-    ImGui::Text(I18n("camsys.elem.name_label").c_str());
-    ImGui::SameLine();
-
-    if (element->Name.empty())return;
-
-    if (ImGui::Selectable(element->Name.data(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
-        if (ImGui::IsMouseDoubleClicked(0)) {
-            this->CurrentElement.store(element, std::memory_order_release);
-            this->showWindow.store(true, std::memory_order_release);
-        }
-    }
-
-    if (ImGui::BeginPopupContextItem((I18n("camsys.elem.context_menu") + element->Name).c_str())) {
-        if (ImGui::MenuItem(I18n("text.copy_name").c_str())) {
-            ImGui::SetClipboardText(element->Name.c_str());
-        }
-        MulNX::UI::Checkbox(I18n("camsys.elem.draw").c_str(), element->draw);
-        if (ImGui::MenuItem(I18n("text.delete").c_str())) {
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Element/Delete"_hash);
-            rp->str1 = std::move(element->Name);
-        }
-        ImGui::EndPopup();
-    }
-
-    ImGui::SameLine();
-    ImGui::Text(I18n("camsys.elem.type_duration", "自由摄像机轨道", std::to_string(element->DurationTime)).c_str());
-}
-void ElementManager::UINodeFunc() {
-    std::unique_lock lock(this->CamSys->smutex);
-    for (auto& [name, elem] : this->elements) {
-        elem->Draw(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
-    }
-    if (this->needDrawCamera.load(std::memory_order_acquire) && this->Config.PreviewDraw) {
-        auto frame = this->drawCamera.Read();
-        this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.elem.preview_draw_label").c_str());
-    }
-    auto w = MulNX::UI::RAIIWindow("元素调试", this->showWindow);
-    if (!w || !w.ShouldDraw())return;
-    // 检查当前是否有操作元素
-    auto current = this->CurrentElement.load(std::memory_order_acquire);
-    if (current) {
-        // 根据元素类型调用不同的调试菜单
-        this->DebugUI(current.get());
-    }
-    // 如果没有操作元素
-    else {
-        ImGui::Text(I18n("text.no_selected").c_str());
-    }
-}
 //元素管理器基本函数
 bool ElementManager::Init() {
     this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
@@ -228,7 +24,22 @@ bool ElementManager::Init() {
 
     (*this)
         .SubscribeAsync("Element/Create")
-        .SubscribeAsync("Element/Delete");
+        .SubscribeAsync("Element/Delete")
+        .SubscribeAsync<void>("Campath/Preview/Draw/Enable")
+        .SubscribeAsync<void>("Campath/Preview/Draw/Disable")
+        .SubscribeAsync<void>("Campath/Preview/Override/Enable")
+        .SubscribeAsync<void>("Campath/Preview/Override/Disable")
+        .SubscribeAsync("Campath/OpenDebug")
+        .SubscribeAsync("Campath/Draw/EnableOne")
+        .SubscribeAsync("Campath/Draw/DisableOne")
+        .SubscribeAsync("Campath/AddKeyframe")
+        .SubscribeAsync("Campath/DeleteKeyframe")
+        .SubscribeAsync("Campath/CopyKeyframe")
+        .SubscribeAsync("Campath/ClearOne")
+        .SubscribeAsync("Campath/Preview")
+        .SubscribeAsync("Campath/DrawOne")
+        .SubscribeAsync("Campath/UnDrawOne")
+        ;
 
     this->SubscribeSync("CamSync/Play/Shutdown", [this](auto&&...) {
         this->Preview_Disable();
@@ -261,7 +72,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Element/Create"_hash: {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys->smutex);
+        std::unique_lock lock(this->smutex);
         if (!this->Element_Create(name)) {
             this->LogError(std::format("元素创建失败：{}", name));
         }
@@ -269,10 +80,109 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "Element/Delete"_hash: {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys->smutex);
+        std::unique_lock lock(this->smutex);
         if (!this->Element_Delete(name)) {
             this->LogError(std::format("元素删除失败：{}", name));
         }
+        break;
+    }
+    case "Campath/Preview/Draw/Enable"_hash: {
+        this->Config.PreviewDraw = true;
+        break;
+    }
+    case "Campath/Preview/Draw/Disable"_hash: {
+        this->Config.PreviewDraw = false;
+        break;
+    }
+    case "Campath/Preview/Override/Enable"_hash: {
+        this->Config.PreviewOverride = true;
+        break;
+    }
+    case "Campath/Preview/Override/Disable"_hash: {
+        this->Config.PreviewOverride = false;
+        break;
+    }
+    case "Campath/OpenDebug"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        this->CurrentElement.store(pCampath, std::memory_order_release);
+        this->showWindow.store(true, std::memory_order_release);
+        break;
+    }
+    case "Campath/AddKeyframe"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        auto&& [t, x, y, z, fov, rx, ry, rz, d1, d2, d3, d4] =
+            msg.Access<float, float, float, float, float, float, float, float, float, float, float, float>();
+        MulNX::Math::View view{};
+        view.position = { x,y,z };
+        view.rotation = { rx,ry,rz };
+        view.FOV = fov;
+        view.dof.NearBlurry = d1;
+        view.dof.NearCrisp = d2;
+        view.dof.FarCrisp = d3;
+        view.dof.FarBlurry = d4;
+        MulNX::Math::CameraKeyframe keyframe{};
+        keyframe.PositionAndFOV = view.ToPositionAndFOV();
+        keyframe.RotationQuat = view.ToRotationQuat();
+        keyframe.dof = view.ToDOFPack();
+        keyframe.time = t;
+        pCampath->AddKeyframe(std::move(keyframe));
+        break;
+    }
+    case "Campath/DeleteKeyframe"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        auto&& [index] = msg.Access<size_t>();
+        pCampath->CameraKeyframes.erase(pCampath->CameraKeyframes.begin() + index);
+        pCampath->Refresh();
+        break;
+    }
+    case "Campath/CopyKeyframe"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        auto&& [index] = msg.Access<size_t>();
+        pCampath->AddKeyframe(pCampath->GetKeyFrame(index));
+        break;
+    }
+    case "Campath/ClearOne"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        pCampath->Clear();
+        break;
+    }
+    case "Campath/Preview"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        this->Preview_SetElement(name);
+        this->Preview_SetPreviewSchema(this->pTimeline->GetTime());
+        this->Preview_Enable();
+        break;
+    }
+    case "Campath/DrawOne"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        pCampath->draw = true;
+        break;
+    }
+    case "Campath/UnDrawOne"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        pCampath->draw = false;
         break;
     }
     }
@@ -280,6 +190,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
 
 bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
+    std::shared_lock lock(this->smutex);
     if (!this->OnPreview) return false;
     IO->ElementTime = this->pTimeline->GetTime();
     IO->FrameGameTime = this->pTimeline->GetTime();
@@ -297,6 +208,12 @@ bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
     }
     return false;
     //其它类型预览
+}
+
+std::shared_ptr<FreeCameraPath> ElementManager::FindCampath(const std::string& name) {
+    auto it = this->elements.find(name);
+    if (it == this->elements.end())return nullptr;
+    return it->second;
 }
 
 //创建元素函数，支持传递任意参数给元素构造函数
@@ -403,13 +320,13 @@ bool ElementManager::Element_Delete(const std::string Name) {
     }
 
     // 检查是否正在预览此元素
-    if (this->Preview_CurrentElement && this->Preview_CurrentElement->Name == Name) {
+    if (this->Preview_CurrentElement && this->Preview_CurrentElement->GetName() == Name) {
         this->Preview_Disable(); // 禁用预览
     }
 
     // 检查是否当前正在操作此元素
     auto current = this->CurrentElement.load(std::memory_order_acquire);
-    if (current && current->Name == Name) {
+    if (current && current->GetName() == Name) {
         this->CurrentElement = nullptr;
     }
 

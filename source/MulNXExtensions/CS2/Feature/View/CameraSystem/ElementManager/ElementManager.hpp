@@ -25,12 +25,12 @@ class ElementManager final : public CamSysModule {
     bool OnPreview = false;
 
     // 展示单个元素信息在一行上
-    void Element_ShowInLine(const std::shared_ptr<FreeCameraPath> element);
+    void Element_ShowInLine(const std::shared_ptr<const FreeCameraPath> element)const;
     std::atomic<bool> needDrawCamera = false;
-    MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
+    mutable MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
 
-    void DebugUI(FreeCameraPath* campath);
-    void UINodeFunc();
+    void DebugUI(const FreeCameraPath* campath)const;
+    void UINodeFunc()const;
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
 
@@ -43,7 +43,6 @@ class ElementManager final : public CamSysModule {
     bool Element_Delete(const std::string Name);
     // 清空所有元素
     bool Element_ClearAll();
-
 
     //预览功能相关：
     //启用预览
@@ -60,7 +59,8 @@ public:
     ElementConfig Config{};
     // 使用智能指针存储多态对象，以存储不同类型的元素
     std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> elements;
+    std::shared_ptr<FreeCameraPath> FindCampath(const std::string& name);
     bool HandleUpdate(CameraSystemIO* IO);
 
-    bool MenuElement();
+    bool MenuElement()const;
 };

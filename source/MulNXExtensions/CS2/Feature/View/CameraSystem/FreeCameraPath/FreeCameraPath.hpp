@@ -10,10 +10,9 @@ class ElementManager;
 
 // 自由摄像机轨道，继承自Element
 class FreeCameraPath final {
-public:
     // 元素名称
-    std::string Name{};
-
+    std::string name{};
+public:
     // 开始时间（绝对）
     float StartTime{};
     // 结束时间（绝对）
@@ -31,7 +30,7 @@ public:
     std::vector<MulNX::Math::CameraKeyframe> CameraKeyframes{};
     // 构造函数
     explicit FreeCameraPath(const std::string& name) : 
-        Name(name) {}
+        name(name) {}
     
     
     // 刷新状态
@@ -61,7 +60,7 @@ public:
     std::string GetBaseInfo()const;
     std::string GetMsg()const;
     // 获取名字
-    std::string GetName()const;
+    const std::string& GetName()const;
     // 重设名字
     void ResetName(const std::string& NewName);
 

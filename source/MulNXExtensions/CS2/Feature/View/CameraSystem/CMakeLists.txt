@@ -11,6 +11,7 @@ add_library(CameraSystem
 
     "Project/Project.cpp"
     "ProjectManager/ProjectManager.cpp"
+    ElementManager/ElementUI.cpp
 )
 
 target_link_libraries(CameraSystem PUBLIC

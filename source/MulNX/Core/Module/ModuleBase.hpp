@@ -8,7 +8,7 @@ namespace MulNX {
     class ModuleComponents{
     public:
         // 便捷窗口显示标志
-        std::atomic<bool> showWindow = false;
+        mutable std::atomic<bool> showWindow = false;
         mutable std::shared_mutex smutex;
 
         MulNXHandle HModule;        

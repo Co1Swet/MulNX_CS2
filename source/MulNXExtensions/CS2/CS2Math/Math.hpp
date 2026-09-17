@@ -33,9 +33,6 @@ namespace MulNX {
         public:
             // 目标空间状态，自由摄像机轨道完全使用，锁定摄像机轨道使用视角，不使用其它
             View view{};
-
-            // 目标OB模式，4是自由摄像机轨道和锁定摄像机轨道，2是第一人称摄像机轨道
-            uint8_t TargetOBMode = 4;
             // 第一人称摄像机轨道和锁定摄像机轨道使用，均指代目标人物
             uint8_t TargetPlayerIndexInMap = 0;
 

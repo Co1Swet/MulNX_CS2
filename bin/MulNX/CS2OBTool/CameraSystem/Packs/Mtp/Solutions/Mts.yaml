@@ -1,5 +1,5 @@
 name: Mts
-duration: 23.247711
+duration: 14.247711
 KCP:
   usable: true
   ctrl: false
@@ -7,10 +7,8 @@ KCP:
   alt: true
   vkCode: 88
   comboClick: 3
-size: 3
+size: 2
 elements:
-  - name: ttt
-    offset: 0
   - name: Mte
     offset: 9
   - name: nnn

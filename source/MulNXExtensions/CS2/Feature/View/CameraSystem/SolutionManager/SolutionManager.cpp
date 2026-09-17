@@ -181,7 +181,7 @@ void SolutionManager::Solution_DebugWindow() {
     if (element) {
         const float& Offset = this->CurrentSolution->elements.at(IndexForReset).Offset;
         ImGui::Text(I18n("camsys.sol.element_info",
-            IndexForReset, element->Name, element->DurationTime, Offset).c_str());
+            IndexForReset, element->GetName(), element->DurationTime, Offset).c_str());
         ImGui::Separator();
         static float tempOffset{};
         if (IndexForReset != PreIndex) {

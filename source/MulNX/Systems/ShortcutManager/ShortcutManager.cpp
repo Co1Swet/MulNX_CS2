@@ -45,7 +45,7 @@ void MulNX::ShortcutManager::Check() {
     }
 }
 
-std::optional<MulNX::KeyCheckPack> MulNX::ShortcutManager::GetButton(const std::string& name) {
+std::optional<MulNX::KeyCheckPack> MulNX::ShortcutManager::GetButton(const std::string& name)const {
     auto it = this->buttons.find(name);
     if (it == this->buttons.end())return std::nullopt;
     return it->second;
