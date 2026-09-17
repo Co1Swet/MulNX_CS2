@@ -4,13 +4,12 @@
 #include <MulNXUtils/NewestBuffer.hpp>
 #include "ElementConfig.hpp"
 
-//元素管理器，用于管理元素
+// 元素管理器，用于管理元素
 class ElementManager final : public CamSysModule {
-    //对于元素，我们只给出三个通用接口：创建、获取、删除，具体的各个元素的功能由各个元素类自己实现
-private:
     CameraDrawer* CamDrawer = nullptr;
     SolutionManager* SManager = nullptr;
     ProjectManager* PManager = nullptr;
+    MulNX::IPCer* pIPCer = nullptr;
 
     // 当前操作的元素指针
     std::atomic<std::shared_ptr<FreeCameraPath>> CurrentElement = nullptr;
@@ -29,17 +28,11 @@ private:
     void Element_ShowInLine(const std::shared_ptr<FreeCameraPath> element);
     std::atomic<bool> needDrawCamera = false;
     MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
-public:
-    ElementConfig Config{};
-    // 使用智能指针存储多态对象，以存储不同类型的元素
-    std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> elements;
 
-    bool MenuElement();
+    void DebugUI(FreeCameraPath* campath);
     void UINodeFunc();
-
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    bool HandleUpdate(CameraSystemIO* IO);
 
     FreeCameraPath* Element_Create(const std::string& name);
     // 保存所有元素到磁盘文件
@@ -50,7 +43,7 @@ public:
     bool Element_Delete(const std::string Name);
     // 清空所有元素
     bool Element_ClearAll();
-    
+
 
     //预览功能相关：
     //启用预览
@@ -63,4 +56,11 @@ public:
     void Preview_SetPreviewSchema(const float Time);
     //预览Call
     bool Preview_Call(CameraSystemIO* IO);
+public:
+    ElementConfig Config{};
+    // 使用智能指针存储多态对象，以存储不同类型的元素
+    std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> elements;
+    bool HandleUpdate(CameraSystemIO* IO);
+
+    bool MenuElement();
 };

@@ -115,7 +115,7 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
     }
     case "CameraSystem/Play/Shutdown"_hash: {
         this->LogWarning("接收到播放停止消息");
-        this->EManager->Preview_Disable();
+        this->PublishSync("CamSync/Play/Shutdown"_hash);
         this->SManager->Playing_Disable();
         break;
     }
@@ -125,7 +125,7 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
     }
     case "Command/SpecPlayer"_hash: {
         this->LogInfo("因为操作停止播放");
-        this->EManager->Preview_Disable();
+        this->PublishSync("CamSync/Play/Shutdown"_hash);
         this->SManager->Playing_Disable();
         break;
     }

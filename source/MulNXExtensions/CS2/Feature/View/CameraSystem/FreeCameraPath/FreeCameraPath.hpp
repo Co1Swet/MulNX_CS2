@@ -55,8 +55,7 @@ public:
     std::pair<bool, std::string> Load(YAML::Node& root);
 
     // 绘制
-    bool DrawBase(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
-    void DebugUI(ElementManager* EManager);
+    bool Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
 
     // 获取基本信息
     std::string GetBaseInfo()const;

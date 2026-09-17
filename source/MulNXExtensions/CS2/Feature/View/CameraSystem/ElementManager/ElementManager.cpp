@@ -52,6 +52,113 @@ bool ElementManager::MenuElement() {
     return true;
 }
 
+void ElementManager::DebugUI(FreeCameraPath* campath) {
+    ImGui::TextUnformatted(campath->GetBaseInfo().c_str());
+
+    static int IndexForReset = -1;
+    static int PreIndex = -2;
+
+    for (size_t i = 0; i < campath->CameraKeyframes.size(); ++i) {
+        const MulNX::Math::CameraKeyframe& keyframe = campath->CameraKeyframes.at(i);
+        if (ImGui::Selectable(std::to_string(i).c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+            IndexForReset = i;
+            if (ImGui::IsMouseDoubleClicked(0)) {
+                auto pos = keyframe.GetPosition();
+                auto rot = keyframe.GetRotationEuler();
+                auto dof = keyframe.GetDOF();
+                this->CS2View->spec_goto_ex(pos, rot);
+                this->CS2View->SetDOF(dof);
+                if (this->pInputSystem->IsKeyPressed(VK_MENU)) {
+                    this->CS2Time->JumpReal(keyframe.time);
+                }
+            }
+        }
+        ImGui::SameLine();
+        ImGui::Text(I18n("free_campath.fmt", i, keyframe.GetMsg()).c_str());
+    }
+
+    static auto kAdd = this->Shortcut()->GetButton("place camera").value();
+    if (ImGui::Button(I18n("free_campath.add").c_str()) || this->pInputSystem->CheckWithPack(kAdd)) {
+        MulNX::Math::CameraKeyframe keyframe;
+        keyframe.time = this->pTimeline->GetTime();
+        auto view = this->CS2View->GetView();
+        keyframe.PositionAndFOV = view.ToPositionAndFOV();
+        keyframe.RotationQuat = view.ToRotationQuat();
+        keyframe.dof = view.ToDOFPack();
+        campath->AddKeyframe(keyframe);
+    }
+
+    if (ImGui::Button(I18n("text.clear").c_str()) || this->pInputSystem->CheckComboClick(VK_DELETE, 2)) {
+        campath->Clear();
+    }
+
+    if (ImGui::Button(I18n("text.normalize").c_str())) {
+        campath->TimeNormalize();
+    }
+
+    if (ImGui::Button(I18n("text.preview").c_str())) {
+        this->Preview_SetElement(campath->Name);
+        this->Preview_SetPreviewSchema(this->pTimeline->GetTime());
+        this->Preview_Enable();
+    }
+
+    ImGui::Separator();
+
+    if (0 <= IndexForReset && IndexForReset < campath->CameraKeyframes.size()) {
+        const MulNX::Math::CameraKeyframe& keyframe = campath->GetKeyFrame(IndexForReset);
+        ImGui::Text(I18n("free_campath.fmt_edit", IndexForReset, keyframe.GetMsg()).c_str());
+        ImGui::Separator();
+
+        static float temptime{};
+        static DirectX::XMFLOAT4 tempPositionAndFOV{};
+        static DirectX::XMFLOAT3 tempRotationEuler{};
+        if (IndexForReset != PreIndex) {
+            temptime = keyframe.time;
+            tempPositionAndFOV = keyframe.GetPositionAndFOV();
+            tempRotationEuler = keyframe.GetRotationEuler();
+        }
+
+        ImGui::SliderFloat(I18n("math.time").c_str(), &temptime, 0, 20000);
+
+        ImGui::SliderFloat3(I18n("math.pos").c_str(), &tempPositionAndFOV.x, -2000.0, 2000, 0);
+        ImGui::SliderFloat(I18n("math.yaw").c_str(), &tempRotationEuler.x, -89.0, 89.0);
+        ImGui::SliderFloat(I18n("math.pitch").c_str(), &tempRotationEuler.y, -179.0, 179.0);
+        ImGui::SliderFloat(I18n("math.roll").c_str(), &tempRotationEuler.z, -179.0, 179.0);
+        ImGui::SliderFloat(I18n("math.fov").c_str(), &tempPositionAndFOV.w, 10, 170);
+
+        this->CamSys->CamDrawer.DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
+        if (ImGui::Button(I18n("text.confirm_modify").c_str())) {
+            // 构造临时摄像机关键帧
+            MulNX::Math::CameraKeyframe tempKey;
+            // 注入时间
+            tempKey.time = temptime;
+            // 注入位置和FOV
+            tempKey.PositionAndFOV = DirectX::XMLoadFloat4(&tempPositionAndFOV);
+            // 转换角度并注入
+            DirectX::XMFLOAT4 tempRotationQuat;
+            MulNX::Math::CSEulerToQuat(tempRotationEuler, tempRotationQuat);
+            tempKey.RotationQuat = DirectX::XMLoadFloat4(&tempRotationQuat);
+            // 擦除旧关键帧
+            campath->CameraKeyframes.erase(campath->CameraKeyframes.begin() + IndexForReset);
+            // 添加新关键帧
+            campath->AddKeyframe(std::move(tempKey));
+            PreIndex = -1;
+        }
+        if (ImGui::Button(I18n("text.delete").c_str())) {
+            //删除并刷新
+            campath->CameraKeyframes.erase(campath->CameraKeyframes.begin() + IndexForReset);
+            campath->Refresh();
+            PreIndex = -1;
+        }
+        if (ImGui::Button(I18n("text.copy").c_str())) {
+            //拷贝复制
+            campath->AddKeyframe(campath->GetKeyFrame(IndexForReset));
+            PreIndex = -1;
+        }
+    }
+    PreIndex = IndexForReset;
+}
+
 void ElementManager::Element_ShowInLine(const std::shared_ptr<FreeCameraPath> element) {
     ImGui::Text(I18n("camsys.elem.name_label").c_str());
     ImGui::SameLine();
@@ -83,7 +190,7 @@ void ElementManager::Element_ShowInLine(const std::shared_ptr<FreeCameraPath> el
 void ElementManager::UINodeFunc() {
     std::unique_lock lock(this->CamSys->smutex);
     for (auto& [name, elem] : this->elements) {
-        elem->DrawBase(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
+        elem->Draw(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     }
     if (this->needDrawCamera.load(std::memory_order_acquire) && this->Config.PreviewDraw) {
         auto frame = this->drawCamera.Read();
@@ -95,7 +202,7 @@ void ElementManager::UINodeFunc() {
     auto current = this->CurrentElement.load(std::memory_order_acquire);
     if (current) {
         // 根据元素类型调用不同的调试菜单
-        current->DebugUI(this);
+        this->DebugUI(current.get());
     }
     // 如果没有操作元素
     else {
@@ -104,9 +211,10 @@ void ElementManager::UINodeFunc() {
 }
 //元素管理器基本函数
 bool ElementManager::Init() {
-    this->CamDrawer = &this->Core->ModuleManager()->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
-    this->SManager = this->Core->ModuleManager()->FindModule<SolutionManager>("SolutionManager");
-    this->PManager = this->Core->ModuleManager()->FindModule<ProjectManager>("ProjectManager");
+    this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
+    this->SManager = this->FindModule<SolutionManager>("SolutionManager");
+    this->PManager = this->FindModule<ProjectManager>("ProjectManager");
+    this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
@@ -123,6 +231,30 @@ bool ElementManager::Init() {
     (*this)
         .SubscribeAsync("Element/Create")
         .SubscribeAsync("Element/Delete");
+
+    this->SubscribeSync("CamSync/Play/Shutdown", [this](auto&&...) {
+        this->Preview_Disable();
+        });
+
+    this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
+        this->Element_ClearAll();
+        });
+
+    this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {
+        this->Element_SaveAll();
+        });
+
+    this->SubscribeSync("CamSync/Load", [this](auto&&...) {
+        //获取元素文件夹路径
+        std::filesystem::path ElementsPath = this->Path()->PathGetFromKey("Elements");
+        std::vector<std::string>Elements = this->pIPCer->GetFileNamesByPath(ElementsPath);
+        //遍历加载元素
+        for (const std::string& Element : Elements) {
+            this->Element_Load(ElementsPath / Element);
+        }
+        this->LogSucc("尝试加载元素总数：" + std::to_string(Elements.size()));
+        this->LogSucc("成功加载元素总数：" + std::to_string(this->elements.size()));
+        });
 
     return true;
 }

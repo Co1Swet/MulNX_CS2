@@ -201,7 +201,7 @@ bool ProjectManager::Project_Save() {
         return false;
     }
     //保存所有元素和解决方案到磁盘
-    this->EManager->Element_SaveAll();
+    this->PublishSync("CamSync/SaveAll"_hash);
     this->SManager->Solution_SaveAll();
     //保存项目到磁盘
     std::filesystem::path Path = this->Path()->PathGetFromKey("CurrentWorkspace") / this->ActiveProject->Name;
@@ -224,18 +224,12 @@ bool ProjectManager::Project_Apply(const std::shared_ptr<Project> Project) {
     //清空旧解决方案，防止冲突
     this->SManager->Solution_ClearAll();
     //清空旧元素，防止冲突
-    this->EManager->Element_ClearAll();
+    this->PublishSync("CamSync/Clear"_hash);
     if (!this->Path()->KeySetCurrent("CurrentProject", Project->Name)) {
         this->LogError("尝试切换到项目时出现问题，设置项目文件夹路径失败！");
         return false;
     }
-    //获取元素文件夹路径
-    std::filesystem::path ElementsPath = this->Path()->PathGetFromKey("Elements");
-    std::vector<std::string>Elements = this->pIPCer->GetFileNamesByPath(ElementsPath);
-    //遍历加载元素
-    for (const std::string& Element : Elements) {
-        this->EManager->Element_Load(ElementsPath / Element);
-    }
+    this->PublishSync("CamSync/Load"_hash);
     //获取解决方案文件夹路径
     std::filesystem::path SolutionsPath = this->Path()->PathGetFromKey("Solutions");
     std::vector<std::string>Solutions = this->pIPCer->GetFileNamesByPath(SolutionsPath);
@@ -245,9 +239,7 @@ bool ProjectManager::Project_Apply(const std::shared_ptr<Project> Project) {
     }
     this->ActiveProject = Project;
     this->LogSucc("已切换至项目" + Project->Name);
-    this->LogSucc("尝试加载元素总数：" + std::to_string(Elements.size()));
     this->LogSucc("尝试加载解决方案总数：" + std::to_string(Solutions.size()));
-    this->LogSucc("成功加载元素总数：" + std::to_string(this->EManager->elements.size()));
     this->LogSucc("成功加载解决方案总数：" + std::to_string(this->SManager->solutions.size()));
     return true;
 }
