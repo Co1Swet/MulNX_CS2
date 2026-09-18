@@ -3,13 +3,6 @@
 
 bool ElementManager::MenuElement()const {
     std::shared_lock lock(this->smutex);
-    // 展示预览功能相关状态
-    ImGui::TextUnformatted(std::format(
-        "是否在预览中：{} \n当前预览运镜：{} \n 预览时间偏移：{}",
-        this->OnPreview ? "是" : "否",
-        this->Preview_CurrentElement ? this->Preview_CurrentElement->GetName() : "无运镜",
-        this->Preview_TimeSchema
-    ).c_str());
 
     ImGui::SeparatorText("预览总控");
     ImGui::Text(std::format("是否允许预览摄像机绘制：{}", this->Config.PreviewDraw ? "允许" : "不允许").c_str());

@@ -13,16 +13,6 @@ class ElementManager final : public CamSysModule {
 
     // 当前操作的元素指针
     std::atomic<std::shared_ptr<FreeCameraPath>> CurrentElement = nullptr;
-    // 预览相关
-
-    // 预览时间偏移
-    float Preview_TimeSchema{};
-    // 预览结束时间点
-    float Preview_EndTime{};
-    // 当前预览元素指针
-    std::shared_ptr<FreeCameraPath> Preview_CurrentElement;
-    // 是否处于预览状态
-    bool OnPreview = false;
 
     // 展示单个元素信息在一行上
     void Element_ShowInLine(const std::shared_ptr<const FreeCameraPath> element)const;
@@ -43,18 +33,6 @@ class ElementManager final : public CamSysModule {
     bool Element_Delete(const std::string Name);
     // 清空所有元素
     bool Element_ClearAll();
-
-    //预览功能相关：
-    //启用预览
-    void Preview_Enable();
-    //禁用预览
-    void Preview_Disable();
-    //切换预览元素
-    void Preview_SetElement(const std::string& Name);
-    //设置预览偏移
-    void Preview_SetPreviewSchema(const float Time);
-    //预览Call
-    bool Preview_Call(CameraSystemIO* IO);
 public:
     ElementConfig Config{};
     // 使用智能指针存储多态对象，以存储不同类型的元素

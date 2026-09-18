@@ -63,6 +63,7 @@ bool CameraSystem::Init() {
     this->EManager = this->FindModule<ElementManager>("ElementManager");
     this->SManager = this->FindModule<SolutionManager>("SolutionManager");
     this->PManager = this->FindModule<ProjectManager>("ProjectManager");
+    this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>("CamPlayScheduler");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     auto* PathManager = this->Path();
@@ -188,6 +189,7 @@ bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num
     this->CamDrawer.Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     if (this->EManager->HandleUpdate(&IO))needOverride = true;
     if (this->SManager->HandleUpdate(&IO))needOverride = true;
+    if (this->pCamPlayScheduler->HandleUpdate(&IO))needOverride = true;
     this->PManager->HandleUpdate();
 
     if (!needOverride)return false;

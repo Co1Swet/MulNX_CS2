@@ -1,7 +1,6 @@
 add_library(CameraSystem
     "CameraSystem.cpp"
     "CameraDrawer/CameraDrawer.cpp"
-    "CameraSystemIO/CameraSystemIO.cpp"
 
     "FreeCameraPath/FreeCameraPath.cpp"
     "ElementManager/ElementManager.cpp"
@@ -12,6 +11,7 @@ add_library(CameraSystem
     "Project/Project.cpp"
     "ProjectManager/ProjectManager.cpp"
     ElementManager/ElementUI.cpp
+    CamPlayScheduler/CamPlayScheduler.cpp
 )
 
 target_link_libraries(CameraSystem PUBLIC

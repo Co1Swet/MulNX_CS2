@@ -3,13 +3,12 @@
 #include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <CameraSystem/SolutionManager/SolutionManager.hpp>
-#include <CameraSystem/ProjectManager/ProjectManager.hpp>
+#include <CameraSystem/CamPlayScheduler/CamPlayRequest.hpp>
 
 //元素管理器基本函数
 bool ElementManager::Init() {
     this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
     this->SManager = this->FindModule<SolutionManager>("SolutionManager");
-    this->PManager = this->FindModule<ProjectManager>("ProjectManager");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
@@ -42,7 +41,6 @@ bool ElementManager::Init() {
         ;
 
     this->SubscribeSync("CamSync/Play/Shutdown", [this](auto&&...) {
-        this->Preview_Disable();
         });
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
@@ -162,11 +160,10 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Campath/Preview"_hash: {
-        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->smutex);
-        this->Preview_SetElement(name);
-        this->Preview_SetPreviewSchema(this->pTimeline->GetTime());
-        this->Preview_Enable();
+        auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
+        rp->campathName = msg.asp.get<MulNX::NetExt>()->str1;
+        rp->offsetTime = this->pTimeline->GetTime();
+        this->PublishAsync(std::move(play));
         break;
     }
     case "Campath/DrawOne"_hash: {
@@ -190,24 +187,23 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
 
 bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
-    std::shared_lock lock(this->smutex);
-    if (!this->OnPreview) return false;
-    IO->ElementTime = this->pTimeline->GetTime();
-    IO->FrameGameTime = this->pTimeline->GetTime();
-    if (this->Preview_Call(IO)) {
-        //自由摄像机轨道预览
-        if (this->Config.PreviewDraw) {
-            auto frame = this->drawCamera.Write();
-            *frame = IO->Frame;
-            this->needDrawCamera.store(true, std::memory_order_release);
-        }
-        else {
-            this->needDrawCamera.store(false, std::memory_order_release);
-        }
-        return this->Config.PreviewOverride;
-    }
     return false;
-    //其它类型预览
+    // std::shared_lock lock(this->smutex);
+    // if (!this->OnPreview) return false;
+    // IO->ElementTime = this->pTimeline->GetTime();
+    // IO->FrameGameTime = this->pTimeline->GetTime();
+    // if (this->Preview_Call(IO)) {
+    //     //自由摄像机轨道预览
+    //     if (this->Config.PreviewDraw) {
+    //         auto frame = this->drawCamera.Write();
+    //         *frame = IO->Frame;
+    //         this->needDrawCamera.store(true, std::memory_order_release);
+    //     }
+    //     else {
+    //         this->needDrawCamera.store(false, std::memory_order_release);
+    //     }
+    //     return this->Config.PreviewOverride;
+    // }
 }
 
 std::shared_ptr<FreeCameraPath> ElementManager::FindCampath(const std::string& name) {
@@ -319,11 +315,6 @@ bool ElementManager::Element_Delete(const std::string Name) {
         return false;
     }
 
-    // 检查是否正在预览此元素
-    if (this->Preview_CurrentElement && this->Preview_CurrentElement->GetName() == Name) {
-        this->Preview_Disable(); // 禁用预览
-    }
-
     // 检查是否当前正在操作此元素
     auto current = this->CurrentElement.load(std::memory_order_acquire);
     if (current && current->GetName() == Name) {
@@ -346,9 +337,6 @@ bool ElementManager::Element_ClearAll() {
         this->LogWarning("当前没有任何元素，跳过清空操作！");
         return true;
     }
-    // 禁用预览
-    this->Preview_Disable();
-    this->Preview_CurrentElement = nullptr;
     // 清空当前操作元素
     this->CurrentElement = nullptr;
     // 把所有元素标记为需要清理并从Elements中释放
@@ -359,48 +347,5 @@ bool ElementManager::Element_ClearAll() {
     // 添加刷新信息
     this->PublishAsync("CameraSystem/Element/Deleted"_hash);
     this->LogSucc("成功清空所有元素！");
-    return true;
-}
-
-//预览相关
-void ElementManager::Preview_Enable() {
-    if (!this->Preview_CurrentElement) {
-        this->LogError("无法开启预览：未设置预览元素！");
-        return;
-    }
-    this->OnPreview = true;
-    this->PublishAsync("CameraSystem/Preview/Started"_hash);
-    this->LogInfo("已开启预览");
-}
-void ElementManager::Preview_Disable() {
-    this->OnPreview = false;
-    this->PublishAsync("CameraSystem/Preview/Ended"_hash);
-    this->LogInfo("已关闭预览");
-}
-void ElementManager::Preview_SetElement(const std::string& name) {
-    auto it = this->elements.find(name);
-    if (it == this->elements.end()) {
-        this->LogError("找不到目标元素   元素名：" + name);
-        return;
-    }
-    this->Preview_CurrentElement = it->second;
-    this->LogInfo("准备预览该元素   元素名：" + name);
-}
-void ElementManager::Preview_SetPreviewSchema(const float Time) {
-    this->Preview_TimeSchema = Time;
-    this->LogInfo("元素预览时间偏移设置为：" + std::to_string(this->Preview_TimeSchema));
-    this->Preview_EndTime = this->Preview_CurrentElement->StartTime + this->Preview_CurrentElement->DurationTime;
-}
-bool ElementManager::Preview_Call(CameraSystemIO* IO) {
-    if (!this->OnPreview)return false;
-    if (!this->Preview_CurrentElement) {
-        this->Preview_Disable();
-        return false;
-    }
-    IO->ElementTime += this->Preview_CurrentElement->GetStartTime() - this->Preview_TimeSchema;
-    if (!this->Preview_CurrentElement->CalculateFrame(IO)) {
-        this->Preview_Disable();
-        return false;
-    }
     return true;
 }

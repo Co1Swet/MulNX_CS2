@@ -68,6 +68,5 @@ public:
     float GetEndTime()const;
     float GetDurationTime()const;
 
-    //（Mode:0为默认，1自动减去头时间）
     bool CalculateFrame(CameraSystemIO* IO)const;
 };

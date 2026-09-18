@@ -3,3 +3,4 @@
 #include "ElementManager/ElementManager.hpp"
 #include "SolutionManager/SolutionManager.hpp"
 #include "ProjectManager/ProjectManager.hpp"
+#include "CamPlayScheduler/CamPlayScheduler.hpp"
