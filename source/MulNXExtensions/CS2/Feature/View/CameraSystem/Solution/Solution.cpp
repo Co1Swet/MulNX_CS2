@@ -42,8 +42,6 @@ void Solution::SetSolutionOffset(const float Offset) {
     this->solutionOffset = Offset;
 }
 std::string Solution::GetMsg() {
-    if (!this->safeUse)return "不安全的解决方案";
-
     std::ostringstream oss;
     oss << "解决方案名称：" << this->name
         << "   元素数量：" << this->elements.size()
@@ -71,70 +69,11 @@ void Solution::Clear() {
 void Solution::ResetName(std::string_view NewName) {
     this->name = NewName;
     this->dirty = true;
-
     return;
 }
 std::string Solution::GetName()const {
     return this->name;
 }
-// bool Solution::Call(CameraSystemIO* IO) {
-//     if (!this->safeUse) {
-//         IO->isPlaying = false;
-//         return false;
-//     }
-//     //对时间依次进行两次偏移：解决方案偏移，具体元素具体偏移
-
-//     //判断是否有插值结果。
-//     //有结果，Manager才可能覆盖
-//     bool bResult = false;
-
-//     //尝试依次调用所有的元素插值
-//     //编号靠后的元素有更高的决定权
-//     this->Refresh();//调用前立刻更新，智能共享指针锁定状态
-
-//     //先分开播放模式逻辑
-//     switch (this->playmode) {
-//     case PlaybackMode::Orchestration: {
-//         //偏移时间轴播放
-
-//         //判断偏移后的时间是否位于解决方案持续范围之中（先统一计算偏移后时间，无论究竟有没有偏移）
-//         float SolutionOffsetedTime = IO->SolutionTime - this->solutionOffset;
-
-//         if (this->endTime < SolutionOffsetedTime) {
-//             //播放结束
-//             this->solutionOffset = 0;//归位时间
-//             IO->isPlaying = false;//播放结束
-//             return false;//无插值结果
-//         }
-//         for (size_t i = 0; i < this->elements.size(); ++i) {
-//             //这里用减法得到相对于元素的时间
-//             //尝试该元素插值，如果有结果则代表可以应用
-//             //这里传入的时间已经是相对时间
-//             //模式1自动减去头时间
-//             auto& element = this->elements[i].Element;
-//             IO->ElementTime = SolutionOffsetedTime - this->elements[i].Offset + element->GetStartTime();
-//             //bResult = bResult || element->CalculateFrame(IO);
-//         }
-//         break;
-//     }
-//     case PlaybackMode::Activation: {
-//         //默认游戏时间轴播放
-//         //if (Time < this->StartTime || this->EndTime < Time) {
-//         //    return false;//无插值结果
-//         //    //不修改isPlaying状态，使用者任意跳转时间，如果在范围内，仍能给出插值结果
-//         //}
-        
-//         IO->ElementTime = IO->SolutionTime;
-//         for (size_t i = 0; i < this->elements.size(); ++i) {
-//             auto& element = this->elements[i].Element;
-//             //bResult = bResult || element->CalculateFrame(IO);
-//         }
-//         break;
-//     }
-//     }
-
-//     return bResult;
-// }
 void Solution::SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack) {
     this->KCPack = KCPack;
     this->KCPack.Refresh();

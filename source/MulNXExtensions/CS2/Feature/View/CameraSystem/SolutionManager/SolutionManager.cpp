@@ -2,14 +2,10 @@
 #include <Intro/HookView/HookView.hpp>
 #include <Support/TimeController/TimeController.hpp>
 #include <CameraSystem/CameraSystem.hpp>
-#include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <CameraSystem/ElementManager/ElementManager.hpp>
-#include <CameraSystem/ProjectManager/ProjectManager.hpp>
 
 bool SolutionManager::Init() {
-    this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
     this->EManager = this->FindModule<ElementManager>("ElementManager");
-    this->PManager = this->FindModule<ProjectManager>("ProjectManager");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
@@ -90,20 +86,18 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
 
 bool SolutionManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
-
     return false;
-    // if (!this->Config.SolutionShortcutEnable)return this->Playing_Call(IO);
-    // //遍历
-    // for (const auto& [name, pSolution] : this->solutions) {
-    //     //快捷键播放处理
-    //     if (this->pInputSystem->CheckWithPack(pSolution->KCPack)) {
-    //         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
-    //         rp->str1 = pSolution->name;
-    //         this->PublishAsync(std::move(msg));
-    //     }
-    //     //后续其它任务待补充
-    // }
-    // return this->Playing_Call(IO);
+    if (!this->Config.SolutionShortcutEnable)return false;
+    //遍历
+    for (const auto& [name, pSolution] : this->solutions) {
+        //快捷键播放处理
+        if (this->pInputSystem->CheckWithPack(pSolution->KCPack)) {
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
+            rp->str1 = pSolution->name;
+            this->PublishAsync(std::move(msg));
+        }
+    }
+    return false;
 }
 //创建，得到，删除
 

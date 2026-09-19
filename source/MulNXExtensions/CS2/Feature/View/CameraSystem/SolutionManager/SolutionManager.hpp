@@ -6,9 +6,7 @@
 
 //解决方案管理器，用于管理解决方案
 class SolutionManager final :public CamSysModule {
-    CameraDrawer* CamDrawer = nullptr;
     ElementManager* EManager = nullptr;
-    ProjectManager* PManager = nullptr;
     MulNX::IPCer* pIPCer = nullptr;
     //数据存储
     std::unordered_map<std::string, std::unique_ptr<Solution>> solutions{};
@@ -18,9 +16,6 @@ class SolutionManager final :public CamSysModule {
     MulNX::KeyCheckPack Buffer_KCPack{};
     //是否打开解决方案按键绑定调试窗口
     std::atomic<bool> OpenSolutionKCPackDebugWindow = false;
-
-    std::atomic<bool> needDrawCamera = false;
-    MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
 
     bool UINodeFunc();
     void Solution_ShowInLine(Solution* solution);

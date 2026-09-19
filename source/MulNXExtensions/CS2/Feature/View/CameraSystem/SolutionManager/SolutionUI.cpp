@@ -78,11 +78,6 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
     ).c_str());
 }
 bool SolutionManager::UINodeFunc() {
-    if (this->needDrawCamera.load(std::memory_order_acquire) && this->Config.PlayingDraw) {
-        auto frame = this->drawCamera.Read();
-        this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.sol.playing_draw_label").c_str());
-    }
-
     if (!this->showWindow.load(std::memory_order_acquire))return true;
     this->Solution_DebugWindow();
     if (!this->CurrentSolution) {

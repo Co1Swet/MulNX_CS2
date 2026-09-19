@@ -16,8 +16,6 @@ class Solution final {
     //友元声明
     friend class SolutionManager;
 private:
-    //数据存储
-
     //解决方案名称
     std::string name{};
 
@@ -37,18 +35,13 @@ private:
 
     //按键检测包
     MulNX::KeyCheckPack KCPack{};
-
     //脏标记，需要重新保存
     bool dirty = false;
 public:
     Solution(const std::string& name) :
         name(name) {
+        
     }
-    ~Solution() = default;
-
-    //解决方案能否安全使用
-    bool safeUse = false;
-    
 
     //添加元素
     //常量指针常量说明没有修改权，时间偏移默认是0.0f
@@ -65,14 +58,10 @@ public:
     void ResetName(std::string_view NewName);
     //获取名字
     std::string GetName()const;
-
-    //解决方案插值调用
-    //bool Call(CameraSystemIO* IO);
     //设置解决方案偏移
     void SetSolutionOffset(const float Offset);
     //展示信息
     std::string GetMsg();
-
     //设置按键检测包
     void SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack);
 
