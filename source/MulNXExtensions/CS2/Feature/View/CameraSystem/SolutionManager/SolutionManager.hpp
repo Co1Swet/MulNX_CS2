@@ -18,11 +18,7 @@ class SolutionManager final :public CamSysModule {
     MulNX::KeyCheckPack Buffer_KCPack{};
     //是否打开解决方案按键绑定调试窗口
     std::atomic<bool> OpenSolutionKCPackDebugWindow = false;
-    // 当前播放的解决方案
-    Solution* Playing_pSolution = nullptr;
-    // 是否处于播放状态
-    // 播放完成之后需要变为false，切换解决方案要变成true
-    bool Playing = false;
+
     std::atomic<bool> needDrawCamera = false;
     MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
 
@@ -45,12 +41,8 @@ class SolutionManager final :public CamSysModule {
 
     //预览功能相关
 
-    //关闭播放
-    void Playing_Disable();
     //通过名称设置当前播放的解决方案
     void Playing_Solution(const std::string& SolutionName);
-    //调用播放
-    bool Playing_Call(CameraSystemIO* IO);
 public:
     SolutionConfig Config{};
     bool MenuSolution();

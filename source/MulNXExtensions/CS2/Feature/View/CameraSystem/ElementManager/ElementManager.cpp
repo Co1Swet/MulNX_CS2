@@ -164,10 +164,12 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
         std::shared_lock lock(this->smutex);
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
+        auto&& [previewOffset] = msg.Access<float>();
 
         auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
         rp->campathName = msg.asp.get<MulNX::NetExt>()->str1;
         rp->offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
+        rp->offsetTime += previewOffset;
         this->PublishAsync(std::move(play));
         break;
     }

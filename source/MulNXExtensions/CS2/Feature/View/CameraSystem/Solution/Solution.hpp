@@ -1,12 +1,12 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 #include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
+#include <CameraSystem/CamPlayScheduler/CamPlayRequest.hpp>
 
 class ElementWithOffset {
 public:
     //元素
-    std::shared_ptr<FreeCameraPath> Element;
-
+    std::string campathName;
     //这个Offset决定了元素的播放时间头
     float Offset = 0;
 };
@@ -43,7 +43,6 @@ private:
 public:
     Solution(const std::string& name) :
         name(name) {
-        this->Refresh();
     }
     ~Solution() = default;
 
@@ -53,12 +52,12 @@ public:
 
     //添加元素
     //常量指针常量说明没有修改权，时间偏移默认是0.0f
-    bool AddElement(const std::shared_ptr<FreeCameraPath> element, const float Offset = 0.0f);
+    bool AddElement(std::string&& name, const float Offset);
     //移除指定位置的元素
     bool RemoveElementAt(const size_t Index);
 
     std::pair<bool, std::string> Save(const std::filesystem::path& folderPath);
-    std::pair<bool, std::string> Load(YAML::Node& root, ElementManager* elementManager);
+    std::pair<bool, std::string> Load(YAML::Node& root);
 
     //清空数据
     void Clear();
@@ -68,16 +67,14 @@ public:
     std::string GetName()const;
 
     //解决方案插值调用
-    bool Call(CameraSystemIO* IO);
+    //bool Call(CameraSystemIO* IO);
     //设置解决方案偏移
     void SetSolutionOffset(const float Offset);
-    //按组合模式各个元素绝对启动时间生成复用模式的偏移
-    bool TimeLineGenerate();
-    //刷新（所有涉及调用、时间的修改操作应该调用本函数，会移除已经删除的元素）
-    void Refresh();
     //展示信息
     std::string GetMsg();
 
     //设置按键检测包
     void SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack);
+
+    std::vector<CamPlayRequest> GetRequests();
 };

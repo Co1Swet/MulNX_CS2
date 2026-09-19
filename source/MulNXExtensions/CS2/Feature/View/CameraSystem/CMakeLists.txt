@@ -12,6 +12,7 @@ add_library(CameraSystem
     "ProjectManager/ProjectManager.cpp"
     ElementManager/ElementUI.cpp
     CamPlayScheduler/CamPlayScheduler.cpp
+    SolutionManager/SolutionUI.cpp
 )
 
 target_link_libraries(CameraSystem PUBLIC
