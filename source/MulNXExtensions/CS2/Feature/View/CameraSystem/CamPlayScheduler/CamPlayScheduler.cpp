@@ -6,6 +6,7 @@ bool CamPlayScheduler::Init() {
 
     (*this)
         .SubscribeAsync("CamPlay/Request")
+        .SubscribeAsync("CamPlay/Clear")
         ;
 
     return true;
@@ -23,12 +24,20 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         }
         PlaySlot slot{};
         slot.pCampath = std::move(pCampath);
-        slot.offestTime = request->offsetTime;
+        slot.offsetTime = request->offsetTime;
         this->playslots.push_back(std::move(slot));
+        this->LogSucc(std::format("已添加运镜到播放阵列：{} ，时间偏移为：{}",
+            name, request->offsetTime));
+        break;
+    }
+    case "CamPlay/Clear"_hash: {
+        for (auto& slot : this->playslots) {
+            this->LogInfo(std::format("因清理请求移除运镜：{}", slot.pCampath->GetName()));
+        }
+        this->playslots.clear();
         break;
     }
     }
-    
 }
 
 bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
@@ -39,13 +48,16 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
         IO->ElementTime = this->pTimeline->GetTime();
         IO->FrameGameTime = this->pTimeline->GetTime();
 
-        IO->ElementTime += slot->pCampath->GetStartTime() - slot->offestTime;
-        if (!slot->pCampath->CalculateFrame(IO)) {
+        IO->ElementTime += slot->offsetTime;
+        auto calResult = slot->pCampath->CalculateFrame(IO);
+        if (calResult == FreeCameraPath::CalResult::Back && slot->forceKeep == false) {
             this->LogInfo(std::format("移除播放结束的运镜：{}", slot->pCampath->GetName()));
             slot = this->playslots.erase(slot);
             continue;
         }
-        ret = true;
+        if (calResult == FreeCameraPath::CalResult::In) {
+            ret = true;
+        }
         ++slot;
     }
     return ret;

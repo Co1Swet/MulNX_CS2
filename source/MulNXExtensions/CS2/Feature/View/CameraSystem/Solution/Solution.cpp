@@ -190,7 +190,7 @@ bool Solution::Call(CameraSystemIO* IO) {
             //模式1自动减去头时间
             auto& element = this->elements[i].Element;
             IO->ElementTime = SolutionOffsetedTime - this->elements[i].Offset + element->GetStartTime();
-            bResult = bResult || element->CalculateFrame(IO);
+            //bResult = bResult || element->CalculateFrame(IO);
         }
         break;
     }
@@ -204,7 +204,7 @@ bool Solution::Call(CameraSystemIO* IO) {
         IO->ElementTime = IO->SolutionTime;
         for (size_t i = 0; i < this->elements.size(); ++i) {
             auto& element = this->elements[i].Element;
-            bResult = bResult || element->CalculateFrame(IO);
+            //bResult = bResult || element->CalculateFrame(IO);
         }
         break;
     }

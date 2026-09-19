@@ -295,7 +295,7 @@ bool SolutionManager::HandleUpdate(CameraSystemIO* IO) {
         //快捷键播放处理
         if (this->pInputSystem->CheckWithPack(pSolution->KCPack)) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
-            rp->str1 = pSolution.get()->name;
+            rp->str1 = pSolution->name;
             this->PublishAsync(std::move(msg));
         }
         //后续其它任务待补充
@@ -396,13 +396,11 @@ bool SolutionManager::Solution_Delete(const std::string& name) {
         this->LogError("尝试删除空名称的解决方案！");
         return false;
     }
-
     auto it = this->solutions.find(name);
     if (it == this->solutions.end()) {
         this->LogError("未找到指定名称的解决方案：" + name);
         return false;
     }
-
     //检查是否正在播放此解决方案
     if (this->Playing) {
         if (this->Playing_pSolution == it->second.get()) {
@@ -410,15 +408,12 @@ bool SolutionManager::Solution_Delete(const std::string& name) {
             this->Playing_pSolution = nullptr;
         }
     }
-
     //检查是否当前正在操作此解决方案
     if (this->CurrentSolution) {
         if (this->CurrentSolution == it->second.get())
             this->CurrentSolution = nullptr;
     }
-
     this->solutions.erase(it);
-
     this->LogSucc("成功删除解决方案：" + name);
     return true;
 }
@@ -438,7 +433,6 @@ bool SolutionManager::Solution_ClearAll() {
     this->LogSucc("成功删除所有解决方案！");
     return true;
 }
-
 void SolutionManager::Playing_Solution(const std::string& name) {
     auto it = this->solutions.find(name);
     if (it == this->solutions.end()) {
@@ -476,11 +470,9 @@ bool SolutionManager::Playing_Call(CameraSystemIO* IO) {
         this->Playing_Disable();
         return false;
     }
-
     IO->SolutionTime = this->pTimeline->GetTime();
     IO->FrameGameTime = this->pTimeline->GetTime();
     IO->isPlaying = this->Playing;
-
     if (!this->Playing_pSolution->Call(IO)) {
         // 这里不关闭播放，因为解决方案可能还有内容
         // 不应该由管理器因为仅仅没有结果就关闭

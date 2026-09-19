@@ -19,15 +19,15 @@ void FreeCameraPath::ResetName(const std::string& NewName) {
     this->name = NewName;
 }
 
-bool FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
-    if (IO->ElementTime < this->StartTime)return false;
-    if (IO->ElementTime > this->EndTime)return false;
+FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
+    if (IO->ElementTime < this->StartTime)return FreeCameraPath::CalResult::Before;
+    if (IO->ElementTime > this->EndTime)return FreeCameraPath::CalResult::Back;
 
     // 如果不在理论影响范围内，应当直接返回而不做任何修改
     // 是与被遍历的其它call一起工作
 
     // 处理空关键帧的情况
-    if (this->CameraKeyframes.empty())return false;
+    if (this->CameraKeyframes.empty())return FreeCameraPath::CalResult::NoFrame;
 
     float Time = IO->ElementTime;
 
@@ -42,7 +42,7 @@ bool FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
     size_t index = (dist == 0) ? 0 : static_cast<size_t>(dist - 1);
 
     // 保护：如果 index 位于最后一个元素，则没有下一个关键帧可用于插值
-    if (index + 1 >= this->CameraKeyframes.size()) return false;
+    if (index + 1 >= this->CameraKeyframes.size()) return FreeCameraPath::CalResult::NoFrame;
 
     // 获取相邻的四个关键帧用于插值
     const auto& k1 = this->CameraKeyframes[index];
@@ -52,7 +52,7 @@ bool FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
 
     // 计算当前片段的时间比例 (0~1)
     float segmentDuration = k2.time - k1.time;
-    if (segmentDuration <= 0.0f) return false; // 避免除以零或无效的段
+    if (segmentDuration <= 0.0f) return FreeCameraPath::CalResult::NoFrame; // 避免除以零或无效的段
 
     float segmentTime = (Time - k1.time) / segmentDuration;
 
@@ -99,7 +99,7 @@ bool FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
     DirectX::XMStoreFloat4(&quat, RotationQuat);
     MulNX::Math::CSQuatToEuler(quat, IO->Frame.view.rotation);
 
-    return true;
+    return FreeCameraPath::CalResult::In;
 }
 
 bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const {

@@ -68,5 +68,12 @@ public:
     float GetEndTime()const;
     float GetDurationTime()const;
 
-    bool CalculateFrame(CameraSystemIO* IO)const;
+    enum class CalResult :int8_t {
+        Before,
+        In,
+        Back,
+        NoFrame
+    };
+
+    CalResult CalculateFrame(CameraSystemIO* IO)const;
 };
