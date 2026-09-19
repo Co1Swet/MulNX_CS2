@@ -1,11 +1,7 @@
 #include "SolutionManager.hpp"
-#include <Intro/HookView/HookView.hpp>
-#include <Support/TimeController/TimeController.hpp>
 #include <CameraSystem/CameraSystem.hpp>
-#include <CameraSystem/ElementManager/ElementManager.hpp>
 
 bool SolutionManager::Init() {
-    this->EManager = this->FindModule<ElementManager>("ElementManager");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
@@ -17,12 +13,17 @@ bool SolutionManager::Init() {
         return true;
         });
     PathManager->KeyBindDynamic("Solutions", "CurrentPack");
-    
+
     (*this)
         .SubscribeAsync("CameraSystem/Element/Deleted")
         .SubscribeAsync("CameraSystem/Solution/Create")
         .SubscribeAsync("CameraSystem/Solution/Delete")
-        .SubscribeAsync("CameraSystem/Solution/Play");
+        .SubscribeAsync("CameraSystem/Solution/Play")
+        .SubscribeAsync("CamMacro/OpenDebug")
+        .SubscribeAsync("CamMacro/DebugKCP")
+        .SubscribeAsync("CamMacro/SaveOne")
+        .SubscribeAsync("CamMacro/AddCampath")
+        ;
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
         this->Solution_ClearAll();
@@ -81,6 +82,54 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         }
         break;
     }
+    case "CamMacro/OpenDebug"_hash: {
+        std::unique_lock lock(this->smutex);
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        auto pCamMacro = this->FindCamMacro(name);
+        if (!pCamMacro)break;
+        this->CurrentSolution = pCamMacro;
+        this->showWindow.store(true, std::memory_order_release);
+        break;
+    }
+    case "CamMacro/DebugKCP"_hash: {
+        std::unique_lock lock(this->smutex);
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        const Solution* pCamMacro = this->FindCamMacro(name);
+        if (!pCamMacro)break;
+        this->Buffer_KCPack = pCamMacro->KCPack;//缓存
+        this->OpenSolutionKCPackDebugWindow = true;//打开窗口
+        break;
+    }
+    case "CamMacro/SaveOne"_hash: {
+        std::shared_lock lock(this->smutex);
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        const Solution* pCamMacro = this->FindCamMacro(name);
+        if (!pCamMacro)break;
+        auto path = this->Path()->PathGetFromKey("Solutions");
+        auto [ok, msg] = pCamMacro->Save(path);
+        if (ok) {
+            this->LogSucc(std::move(msg));
+        }
+        else {
+            this->LogError(std::move(msg));
+        }
+        break;
+    }
+    case "CamMacro/AddCampath"_hash: {
+        std::unique_lock lock(this->smutex);
+        auto pNetExt = msg.asp.get<MulNX::NetExt>();
+        Solution* pCamMacro = this->FindCamMacro(pNetExt->str1);
+        if (!pCamMacro)break;
+        if (pCamMacro->AddElement(pNetExt->str2, 0)) {
+            this->LogError(std::format("无法添加运镜到宏，可能是运镜已存在于解决方案中。宏：{}，运镜：{}",
+                pNetExt->str1, pNetExt->str2));
+        }
+        else {
+            this->LogSucc(std::format("成功添加运镜到宏 。宏：{}，运镜：{}",
+                pNetExt->str1, pNetExt->str2));
+        }
+        break;
+    }
     }
 }
 
@@ -100,6 +149,12 @@ bool SolutionManager::HandleUpdate(CameraSystemIO* IO) {
     return false;
 }
 //创建，得到，删除
+
+Solution* SolutionManager::FindCamMacro(const std::string& name) {
+    auto it = this->solutions.find(name);
+    if (it == this->solutions.end())return nullptr;
+    return it->second.get();
+}
 
 bool SolutionManager::Solution_Create(const std::string& name) {
     // 检查是否已存在同名解决方案

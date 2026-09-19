@@ -45,11 +45,11 @@ public:
 
     //添加元素
     //常量指针常量说明没有修改权，时间偏移默认是0.0f
-    bool AddElement(std::string&& name, const float Offset);
+    bool AddElement(const std::string& name, const float offset);
     //移除指定位置的元素
     bool RemoveElementAt(const size_t Index);
 
-    std::pair<bool, std::string> Save(const std::filesystem::path& folderPath);
+    std::pair<bool, std::string> Save(const std::filesystem::path& folderPath)const;
     std::pair<bool, std::string> Load(YAML::Node& root);
 
     //清空数据

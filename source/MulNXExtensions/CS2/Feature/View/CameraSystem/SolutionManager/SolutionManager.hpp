@@ -1,12 +1,10 @@
 #pragma once
 #include "SolutionConfig.hpp"
-#include <MulNXUtils/NewestBuffer.hpp>
 #include <CameraSystem/Solution/Solution.hpp>
 #include <CameraSystem/CameraSystem.hpp>
 
 //解决方案管理器，用于管理解决方案
 class SolutionManager final :public CamSysModule {
-    ElementManager* EManager = nullptr;
     MulNX::IPCer* pIPCer = nullptr;
     //数据存储
     std::unordered_map<std::string, std::unique_ptr<Solution>> solutions{};
@@ -18,11 +16,13 @@ class SolutionManager final :public CamSysModule {
     std::atomic<bool> OpenSolutionKCPackDebugWindow = false;
 
     bool UINodeFunc();
-    void Solution_ShowInLine(Solution* solution);
-    void Solution_DebugWindow();
+    void Solution_ShowInLine(const Solution* solution)const;
+    void Solution_DebugWindow(const Solution* pMacro)const;
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
+
+    Solution* FindCamMacro(const std::string& name);
 
     bool Solution_Create(const std::string& Name);
     //保存所有解决方案到文件

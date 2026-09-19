@@ -1,6 +1,7 @@
 #include "SolutionManager.hpp"
 
 bool SolutionManager::MenuSolution() {
+    std::shared_lock lock(this->smutex);
     ImGui::Separator();
     // 解决方案总设置
     if (ImGui::CollapsingHeader(I18n("camsys.sol.settings").c_str())) {
@@ -36,13 +37,14 @@ bool SolutionManager::MenuSolution() {
 
     return true;
 }
-void SolutionManager::Solution_ShowInLine(Solution* solution) {
+void SolutionManager::Solution_ShowInLine(const Solution* solution)const {
     ImGui::Text(I18n("camsys.sol.name_label").c_str());
     ImGui::SameLine();
     if (ImGui::Selectable(solution->name.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
         if (ImGui::IsMouseDoubleClicked(0)) {
-            this->CurrentSolution = solution;
-            this->showWindow.store(true, std::memory_order_release);
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/OpenDebug"_hash);
+            rp->str1 = solution->GetName();
+            this->PublishAsync(std::move(msg));
         }
     }
     if (ImGui::BeginPopupContextItem(("右键菜单" + solution->name).c_str())) {
@@ -50,19 +52,9 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
             ImGui::SetClipboardText(solution->name.c_str());
         }
         if (ImGui::MenuItem(I18n("text.save").c_str())) {
-            auto path = this->Path()->PathGetFromKey("Solutions");
-            auto [ok, msg] = solution->Save(path);
-            if (ok) {
-                this->LogSucc(std::move(msg));
-            }
-            else {
-                this->LogError(std::move(msg));
-            }
-        }
-        if (ImGui::MenuItem(I18n("text.print_debug").c_str())) {
-            this->LogLine();
-            this->LogInfo(solution->GetMsg());
-            this->LogLine();
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/SaveOne"_hash);
+            rp->str1 = solution->GetName();
+            this->PublishAsync(std::move(msg));
         }
         if (ImGui::MenuItem(I18n("text.delete").c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Delete"_hash);
@@ -78,9 +70,13 @@ void SolutionManager::Solution_ShowInLine(Solution* solution) {
     ).c_str());
 }
 bool SolutionManager::UINodeFunc() {
+    std::shared_lock lock(this->smutex);
     if (!this->showWindow.load(std::memory_order_acquire))return true;
-    this->Solution_DebugWindow();
-    if (!this->CurrentSolution) {
+    
+    if (this->CurrentSolution) {
+        this->Solution_DebugWindow(this->CurrentSolution);
+    }
+    else {
         this->OpenSolutionKCPackDebugWindow = false;
     }
     if (!this->OpenSolutionKCPackDebugWindow)return true;
@@ -96,12 +92,12 @@ bool SolutionManager::UINodeFunc() {
     return true;
 }
 
-void SolutionManager::Solution_DebugWindow() {
-    auto w = MulNX::UI::RAIIWindow(I18n("camsys.sol.debug_window").c_str(), this->showWindow);
+void SolutionManager::Solution_DebugWindow(const Solution* pMacro)const {
+    auto w = MulNX::UI::RAIIWindow("运镜宏调试", this->showWindow);
     if (!w || !w.ShouldDraw())return;
     // 检查当前是否操作解决方案
     if (!this->CurrentSolution) {
-        ImGui::Text(I18n("ui.button.no_selected").c_str());
+        ImGui::Text("当前未选择任何宏");
         return;
     }
 
@@ -124,31 +120,21 @@ void SolutionManager::Solution_DebugWindow() {
         this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();
-    // if (ImGui::Button("按激活模式生成编排模式偏移")) {
-    //     this->CurrentSolution->TimeLineGenerate();
-    // }
-    if (ImGui::Button(I18n("text.modify_keybind").c_str())) {
-        this->Buffer_KCPack = this->CurrentSolution->KCPack;//缓存
-        this->OpenSolutionKCPackDebugWindow = true;//打开窗口
+    if (ImGui::Button("编辑宏绑定")) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/DebugKCP"_hash);
+        rp->str1 = pMacro->GetName();
+        this->PublishAsync(std::move(msg));
     }
     ImGui::Separator();
 
-    static std::string NewElementName = "";
-    ImGui::InputText(I18n("camsys.sol.new_element_name").c_str(), &NewElementName);
-    if (ImGui::Button(I18n("text.add").c_str())) {
-        // auto it = this->EManager->elements.find(NewElementName);
-        // if (it == this->EManager->elements.end()) {
-        //     this->LogError("找不到目标元素   元素名：" + NewElementName);
-        // }
-        // else {
-        //     if (!this->CurrentSolution->AddElement(it->second, 0)) {
-        //         this->LogError("无法添加元素到解决方案，可能是元素已存在于解决方案中   元素名：" + NewElementName);
-        //     }
-        //     else {
-        //         this->LogSucc("成功添加元素到解决方案   元素名：" + NewElementName);
-        //         NewElementName.clear();
-        //     }
-        // }
+    static std::string newCampathName{};
+    ImGui::InputText("目标运镜轨道名", &newCampathName);
+    if (ImGui::Button("为当前宏添加运镜轨道")) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/AddCampath"_hash);
+        rp->str1 = pMacro->GetName();
+        rp->str2 = std::move(newCampathName);
+        newCampathName.clear();
+        this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();
     if (ImGui::Button(I18n("text.clear").c_str())) {

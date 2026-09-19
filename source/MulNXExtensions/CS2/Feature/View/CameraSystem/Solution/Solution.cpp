@@ -3,7 +3,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
-bool Solution::AddElement(std::string&& name, const float Offset) {
+bool Solution::AddElement(const std::string& name, const float offset) {
     //检查重复
     auto it = std::find_if(this->elements.begin(), this->elements.end(),
         [&](const ElementWithOffset& ew) {
@@ -17,7 +17,7 @@ bool Solution::AddElement(std::string&& name, const float Offset) {
     }
 
     //创建新元素
-    ElementWithOffset newElement{ name, Offset };
+    ElementWithOffset newElement{ name, offset };
 
     //找到正确的插入位置以保持排序
     auto insertPos = std::lower_bound(this->elements.begin(), this->elements.end(), newElement,
@@ -81,13 +81,9 @@ void Solution::SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack) {
     return;
 }
 
-std::pair<bool, std::string> Solution::Save(const std::filesystem::path& folderPath) {
-    // 检查文件路径和名称存在性
+std::pair<bool, std::string> Solution::Save(const std::filesystem::path& folderPath)const {
     if (folderPath.empty()) return { false, "文件夹路径为空，无法保存解决方案！" };
-
-    // 拼接完整路径
     std::filesystem::path filePath = folderPath / (this->name + ".yaml");
-
     try {
         YAML::Node root;
 
