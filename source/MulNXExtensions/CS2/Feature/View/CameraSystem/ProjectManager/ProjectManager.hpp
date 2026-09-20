@@ -5,8 +5,6 @@
 
 //项目管理器，用于管理项目
 class ProjectManager final :public CamSysModule {
-    ElementManager* EManager = nullptr;
-    SolutionManager* SManager = nullptr;
     MulNX::IPCer* pIPCer = nullptr;
 
     std::atomic<bool> OpenProjectKCPackDebugWindow = false;
@@ -18,7 +16,7 @@ class ProjectManager final :public CamSysModule {
     std::shared_ptr<Project> ControllingProject = nullptr;
 
     void Project_DebugWindow();
-    bool UINodeFunc();
+    void UINodeFunc();
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
