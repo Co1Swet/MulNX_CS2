@@ -13,29 +13,18 @@ public:
 
 //解决方案，包含ElementWithOffset，用于调用call方法
 class Solution final {
-    //友元声明
-    friend class SolutionManager;
-private:
-    //解决方案名称
     std::string name{};
-
-    //存储元素的指针，允许调用不同元素的同一个Call函数（多态，内部实现不同）
     std::vector<ElementWithOffset> elements;
 
-    //开始时间
     float startTime{};
-    //结束时间
     float endTime{};
-    //总持续时间
     float totalDurationTime{};
-    //解决方案时间偏移
-    float solutionOffset = 0;
-    //播放模式
+    // 播放模式
     PlaybackMode playmode = PlaybackMode::Orchestration;
 
-    //按键检测包
+    // 按键检测包
     std::atomic<MulNX::KeyCheckPack> KCPack{};
-    //脏标记，需要重新保存
+    // 脏标记，需要重新保存
     bool dirty = false;
 public:
     Solution(const std::string& name) :
@@ -43,11 +32,11 @@ public:
         
     }
 
-    //添加元素
-    //常量指针常量说明没有修改权，时间偏移默认是0.0f
+    // 添加元素
     bool AddElement(const std::string& name, const float offset);
-    //移除指定位置的元素
+    // 移除指定位置的元素
     bool RemoveElementAt(const size_t Index);
+    inline const std::vector<ElementWithOffset>& GetVec()const { return this->elements; }
 
     std::pair<bool, std::string> Save(const std::filesystem::path& folderPath)const;
     std::pair<bool, std::string> Load(YAML::Node& root);
@@ -57,12 +46,11 @@ public:
     //重设名字
     void ResetName(std::string_view NewName);
     //获取名字
-    std::string GetName()const;
-    //设置解决方案偏移
-    void SetSolutionOffset(const float Offset);
+    const std::string& GetName()const;
     //展示信息
     std::string GetMsg();
-    //设置按键检测包
+
+    inline const std::atomic<MulNX::KeyCheckPack>& GetKeyCheckPack()const { return this->KCPack; }
     void SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack);
 
     std::vector<CamPlayRequest> GetRequests();

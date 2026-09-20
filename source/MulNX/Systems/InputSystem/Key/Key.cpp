@@ -157,7 +157,6 @@ std::pair<std::optional<MulNX::KeyCheckPack>, bool> MulNX::KeyCheckPack::DebugWi
     }
     else {
         if (!change)return { std::nullopt,false };
-        if (!temp.Usable)return { std::nullopt,false };
         return { temp,false };
     }    
 }

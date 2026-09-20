@@ -40,16 +40,16 @@ bool SolutionManager::MenuSolution() {
 void SolutionManager::Solution_ShowInLine(const Solution* solution)const {
     ImGui::Text(I18n("camsys.sol.name_label").c_str());
     ImGui::SameLine();
-    if (ImGui::Selectable(solution->name.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+    if (ImGui::Selectable(solution->GetName().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
         if (ImGui::IsMouseDoubleClicked(0)) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/OpenDebug"_hash);
             rp->str1 = solution->GetName();
             this->PublishAsync(std::move(msg));
         }
     }
-    if (ImGui::BeginPopupContextItem(("右键菜单" + solution->name).c_str())) {
+    if (ImGui::BeginPopupContextItem(("右键菜单" + solution->GetName()).c_str())) {
         if (ImGui::MenuItem(I18n("text.copy_name").c_str())) {
-            ImGui::SetClipboardText(solution->name.c_str());
+            ImGui::SetClipboardText(solution->GetName().c_str());
         }
         if (ImGui::MenuItem(I18n("text.save").c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/SaveOne"_hash);
@@ -58,16 +58,11 @@ void SolutionManager::Solution_ShowInLine(const Solution* solution)const {
         }
         if (ImGui::MenuItem(I18n("text.delete").c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Delete"_hash);
-            rp->str1 = solution->name;
+            rp->str1 = solution->GetName();
             this->PublishAsync(std::move(msg));
         }
         ImGui::EndPopup();
     }
-    ImGui::SameLine();
-    ImGui::Text(I18n("camsys.sol.element_count_duration",
-        solution->elements.size(),
-        solution->totalDurationTime
-    ).c_str());
 }
 void SolutionManager::UINodeFunc()const {
     std::shared_lock lock(this->smutex);
@@ -84,7 +79,7 @@ void SolutionManager::UINodeFunc()const {
     this->bufKCPack = *p.first;
     if (!p.second)return;
     this->OpenSolutionKCPackDebugWindow.store(false, std::memory_order_release);
-    this->CurrentSolution->KCPack = p.first.value();//更新绑键
+    this->CurrentSolution->SetKeyCheckPack(*p.first);//更新绑键
 }
 
 void SolutionManager::Solution_DebugWindow(const Solution* pMacro)const {
@@ -96,22 +91,10 @@ void SolutionManager::Solution_DebugWindow(const Solution* pMacro)const {
         return;
     }
 
-    ImGui::Text(I18n("camsys.sol.current_info",
-        this->CurrentSolution->name,
-        this->CurrentSolution->elements.size(),
-        this->CurrentSolution->totalDurationTime,
-        PlaybackModeToString(this->CurrentSolution->playmode)
-    ).c_str());
-    if (ImGui::Button(I18n("camsys.sol.switch_to_activation").c_str())) {
-        this->CurrentSolution->playmode = PlaybackMode::Activation;
-    }
-    ImGui::SameLine();
-    if (ImGui::Button(I18n("camsys.sol.switch_to_orchestration").c_str())) {
-        this->CurrentSolution->playmode = PlaybackMode::Orchestration;
-    }
+    ImGui::Text(std::format("宏名称：{}", pMacro->GetName()).c_str());
     if (ImGui::Button(I18n("camsys.sol.enable_current").c_str())) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
-        rp->str1 = this->CurrentSolution->name;
+        rp->str1 = this->CurrentSolution->GetName();
         this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();
@@ -141,8 +124,8 @@ void SolutionManager::Solution_DebugWindow(const Solution* pMacro)const {
 
     static int IndexForReset = 0;
     static int PreIndex = -1;
-    ImGui::SliderInt(I18n("camsys.sol.adjust_element_index").c_str(), &IndexForReset, 0, this->CurrentSolution->elements.size() - 1);
-    if (this->CurrentSolution->elements.empty())return;
+    //ImGui::SliderInt(I18n("camsys.sol.adjust_element_index").c_str(), &IndexForReset, 0, this->CurrentSolution->elements.size() - 1);
+    //if (this->CurrentSolution->elements.empty())return;
     // std::shared_ptr<FreeCameraPath> element = this->CurrentSolution->elements.at(IndexForReset).Element;
     // if (element) {
     //     const float& Offset = this->CurrentSolution->elements.at(IndexForReset).Offset;

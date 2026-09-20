@@ -96,7 +96,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         const Solution* pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
-        this->bufKCPack = pCamMacro->KCPack.load();//缓存
+        this->bufKCPack = pCamMacro->GetKeyCheckPack().load();//缓存
         this->OpenSolutionKCPackDebugWindow = true;//打开窗口
         break;
     }
@@ -139,9 +139,9 @@ bool SolutionManager::HandleUpdate(CameraSystemIO* IO) {
     //遍历
     for (const auto& [name, pSolution] : this->solutions) {
         //快捷键播放处理
-        if (this->pInputSystem->CheckWithPack(pSolution->KCPack)) {
+        if (this->pInputSystem->CheckWithPack(pSolution->GetKeyCheckPack())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
-            rp->str1 = pSolution->name;
+            rp->str1 = pSolution->GetName();
             this->PublishAsync(std::move(msg));
         }
     }
@@ -177,9 +177,6 @@ bool SolutionManager::Solution_SaveAll() {
     std::filesystem::path SolutionFolderPath = this->Path()->PathGetFromKey("Solutions");
     //遍历所有解决方案保存
     for (const auto& [name, solution] : this->solutions) {
-        if (!solution->dirty) {
-            continue;//不脏不需保存
-        }
         auto [ok, msg] = solution->Save(SolutionFolderPath);
         if (!ok) {
             this->LogError(std::move(msg));
@@ -222,11 +219,6 @@ bool SolutionManager::Solution_Load(const std::filesystem::path& FullPath) {
         if (!ok) {
             this->LogError(std::move(msg));
             return false;
-        }
-
-        // 检验时间关系
-        if (newSolution->totalDurationTime != TargetDurationTime) {
-            this->LogWarning("该解决方案实际持续时长与预估持续时长不同，可能出现问题");
         }
 
         // 添加进解决方案组
@@ -281,18 +273,9 @@ void SolutionManager::Playing_Solution(const std::string& name) {
         return;
     }
 
-    switch (it->second->playmode) {
-    case PlaybackMode::Orchestration:
-        it->second->SetSolutionOffset(this->pTimeline->GetTime());//偏移时间轴播放
-        this->LogInfo(std::format("偏移时间轴播放，偏移时间设置为：{}", this->pTimeline->GetTime()));
-        break;
-    case PlaybackMode::Activation:
-        it->second->SetSolutionOffset(0);
-        break;
-    }
     this->PublishAsync("CameraSystem/Play/Started"_hash);
 
-    for (const auto& item : it->second->elements) {
+    for (const auto& item : it->second->GetVec()) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Preview"_hash);
         auto&& [previewOffset] = msg.Access<float>();
         previewOffset = 0.0f - item.Offset;

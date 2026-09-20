@@ -37,10 +37,6 @@ bool Solution::RemoveElementAt(const size_t Index) {
     this->elements.erase(this->elements.begin() + Index);
     return true;
 }
-
-void Solution::SetSolutionOffset(const float Offset) {
-    this->solutionOffset = Offset;
-}
 std::string Solution::GetMsg() {
     std::ostringstream oss;
     oss << "解决方案名称：" << this->name
@@ -63,7 +59,7 @@ std::string Solution::GetMsg() {
 }
 void Solution::Clear() {
     this->elements.clear();
-    this->solutionOffset = 0;
+    this->dirty = true;
     return;
 }
 void Solution::ResetName(std::string_view NewName) {
@@ -71,7 +67,7 @@ void Solution::ResetName(std::string_view NewName) {
     this->dirty = true;
     return;
 }
-std::string Solution::GetName()const {
+const std::string& Solution::GetName()const {
     return this->name;
 }
 void Solution::SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack) {
@@ -82,6 +78,7 @@ void Solution::SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack) {
 }
 
 std::pair<bool, std::string> Solution::Save(const std::filesystem::path& folderPath)const {
+    if (!this->dirty)return { true,"宏未修改，无需保存" };
     if (folderPath.empty()) return { false, "文件夹路径为空，无法保存解决方案！" };
     std::filesystem::path filePath = folderPath / (this->name + ".yaml");
     try {
