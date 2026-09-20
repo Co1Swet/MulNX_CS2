@@ -34,7 +34,7 @@ private:
     PlaybackMode playmode = PlaybackMode::Orchestration;
 
     //按键检测包
-    MulNX::KeyCheckPack KCPack{};
+    std::atomic<MulNX::KeyCheckPack> KCPack{};
     //脏标记，需要重新保存
     bool dirty = false;
 public:

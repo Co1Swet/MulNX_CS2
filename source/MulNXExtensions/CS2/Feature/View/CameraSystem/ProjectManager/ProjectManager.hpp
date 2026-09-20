@@ -6,12 +6,11 @@
 //项目管理器，用于管理项目
 class ProjectManager final :public CamSysModule {
     MulNX::IPCer* pIPCer = nullptr;
-
-    std::atomic<bool> OpenProjectKCPackDebugWindow = false;
     std::unordered_map<std::string, std::shared_ptr<Project>> projects{};
 
-    // 快捷键修改缓存
-    MulNX::KeyCheckPack Buffer_KCPack{};
+    std::atomic<bool> OpenProjectKCPackDebugWindow = false;
+    mutable std::atomic<MulNX::KeyCheckPack> bufKCPack{};
+
     // 当前操作项目指针（操作对象）
     std::shared_ptr<Project> ControllingProject = nullptr;
 

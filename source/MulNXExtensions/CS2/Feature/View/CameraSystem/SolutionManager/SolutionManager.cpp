@@ -96,7 +96,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         const Solution* pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
-        this->Buffer_KCPack = pCamMacro->KCPack;//缓存
+        this->bufKCPack = pCamMacro->KCPack.load();//缓存
         this->OpenSolutionKCPackDebugWindow = true;//打开窗口
         break;
     }
@@ -135,7 +135,6 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
 
 bool SolutionManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
-    return false;
     if (!this->Config.SolutionShortcutEnable)return false;
     //遍历
     for (const auto& [name, pSolution] : this->solutions) {

@@ -42,12 +42,14 @@ void ProjectManager::UINodeFunc() {
     if (!this->showWindow.load(std::memory_order_acquire))return;
     //项目调试窗口
     this->Project_DebugWindow();
-    if (this->OpenProjectKCPackDebugWindow) {
-        //项目按键绑定调试窗口
-        if (this->Buffer_KCPack.DebugWindow(this->OpenProjectKCPackDebugWindow)) {
-            this->ControllingProject->KCPack = this->Buffer_KCPack;//修改按键绑定
-        }
-    }
+    if (!this->OpenProjectKCPackDebugWindow)return;
+    auto buffer = this->bufKCPack.load();
+    auto p = buffer.DebugWindow("运镜包快捷切换按键绑定", this->OpenProjectKCPackDebugWindow);
+    if (!p.first.has_value())return;
+    this->bufKCPack = *p.first;
+    if (!p.second)return;
+    this->OpenProjectKCPackDebugWindow.store(false, std::memory_order_release);
+    this->ControllingProject->KCPack = p.first.value();//更新绑键
 }
 void ProjectManager::Project_DebugWindow() {
     auto w = MulNX::UI::RAIIWindow(I18n("camsys.proj.debug_window").c_str(), this->showWindow);
@@ -69,7 +71,7 @@ void ProjectManager::Project_DebugWindow() {
         return;
     }
     if (ImGui::Button(I18n("camsys.proj.modify_keybind").c_str())) {
-        this->Buffer_KCPack = this->ControllingProject->KCPack;
+        this->bufKCPack = this->ControllingProject->KCPack;
         this->OpenProjectKCPackDebugWindow = true;
     }
     ImGui::Separator();

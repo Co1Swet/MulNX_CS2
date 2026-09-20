@@ -76,7 +76,7 @@ std::string Solution::GetName()const {
 }
 void Solution::SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack) {
     this->KCPack = KCPack;
-    this->KCPack.Refresh();
+    this->KCPack.load().Refresh();
     this->dirty = true;
     return;
 }
@@ -89,7 +89,7 @@ std::pair<bool, std::string> Solution::Save(const std::filesystem::path& folderP
 
         root["name"] = this->name;
         root["duration"] = this->totalDurationTime;
-        root["KCP"] = this->KCPack;
+        root["KCP"] = this->KCPack.load();
         root["size"] = this->elements.size();
 
         YAML::Node elementsNode = root["elements"];

@@ -11,11 +11,11 @@ class SolutionManager final :public CamSysModule {
     //当前操作的解决方案指针
     Solution* CurrentSolution = nullptr;
     //按键调试缓存
-    MulNX::KeyCheckPack Buffer_KCPack{};
+    mutable std::atomic<MulNX::KeyCheckPack> bufKCPack{};
     //是否打开解决方案按键绑定调试窗口
-    std::atomic<bool> OpenSolutionKCPackDebugWindow = false;
+    mutable std::atomic<bool> OpenSolutionKCPackDebugWindow = false;
 
-    bool UINodeFunc();
+    void UINodeFunc()const;
     void Solution_ShowInLine(const Solution* solution)const;
     void Solution_DebugWindow(const Solution* pMacro)const;
 

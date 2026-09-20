@@ -69,27 +69,22 @@ void SolutionManager::Solution_ShowInLine(const Solution* solution)const {
         solution->totalDurationTime
     ).c_str());
 }
-bool SolutionManager::UINodeFunc() {
+void SolutionManager::UINodeFunc()const {
     std::shared_lock lock(this->smutex);
-    if (!this->showWindow.load(std::memory_order_acquire))return true;
-    
-    if (this->CurrentSolution) {
-        this->Solution_DebugWindow(this->CurrentSolution);
-    }
-    else {
+    if (!this->showWindow.load(std::memory_order_acquire))return;
+    if (!this->CurrentSolution) {
         this->OpenSolutionKCPackDebugWindow = false;
+        return;
     }
-    if (!this->OpenSolutionKCPackDebugWindow)return true;
-    if (this->Buffer_KCPack.DebugWindow(this->OpenSolutionKCPackDebugWindow)) {
-        this->OpenSolutionKCPackDebugWindow.store(false, std::memory_order_release);
-        if (!this->Buffer_KCPack.Usable) {
-            this->LogError("当前按键绑定不可用，无法使用这个绑键播放解决方案！");
-        }
-        else {
-            this->CurrentSolution->KCPack = this->Buffer_KCPack;//更新绑键
-        }
-    }
-    return true;
+    this->Solution_DebugWindow(this->CurrentSolution);
+    if (!this->OpenSolutionKCPackDebugWindow)return;
+    auto buffer = this->bufKCPack.load();
+    auto p = buffer.DebugWindow("宏按键绑定", this->OpenSolutionKCPackDebugWindow);
+    if (!p.first.has_value())return;
+    this->bufKCPack = *p.first;
+    if (!p.second)return;
+    this->OpenSolutionKCPackDebugWindow.store(false, std::memory_order_release);
+    this->CurrentSolution->KCPack = p.first.value();//更新绑键
 }
 
 void SolutionManager::Solution_DebugWindow(const Solution* pMacro)const {
