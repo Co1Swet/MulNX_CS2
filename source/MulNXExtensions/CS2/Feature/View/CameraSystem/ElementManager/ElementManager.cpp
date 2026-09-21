@@ -29,13 +29,12 @@ bool ElementManager::Init() {
         .SubscribeAsync<void>("Campath/Preview/Override/Enable")
         .SubscribeAsync<void>("Campath/Preview/Override/Disable")
         .SubscribeAsync("Campath/OpenDebug")
-        .SubscribeAsync("Campath/Draw/EnableOne")
-        .SubscribeAsync("Campath/Draw/DisableOne")
         .SubscribeAsync("Campath/AddKeyframe")
         .SubscribeAsync("Campath/DeleteKeyframe")
         .SubscribeAsync("Campath/CopyKeyframe")
         .SubscribeAsync("Campath/ClearOne")
         .SubscribeAsync("Campath/Preview")
+        .SubscribeAsync("Campath/Active")
         .SubscribeAsync("Campath/DrawOne")
         .SubscribeAsync("Campath/UnDrawOne")
         ;
@@ -56,8 +55,8 @@ bool ElementManager::Init() {
         for (const std::string& Element : Elements) {
             this->Element_Load(ElementsPath / Element);
         }
-        this->LogSucc("尝试加载元素总数：" + std::to_string(Elements.size()));
-        this->LogSucc("成功加载元素总数：" + std::to_string(this->elements.size()));
+        this->LogSucc(std::format("尝试加载元素总数：{}", Elements.size()));
+        this->LogSucc(std::format("成功加载元素总数：", this->elements.size()));
         });
 
     return true;
@@ -164,9 +163,22 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
         auto&& [previewOffset] = msg.Access<float>();
 
         auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
-        rp->campathName = msg.asp.get<MulNX::NetExt>()->str1;
+        rp->campathName = name;
         rp->offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
         rp->offsetTime += previewOffset;
+        rp->isActiveMode = false;
+        this->PublishAsync(std::move(play));
+        break;
+    }
+    case "Campath/Active"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::shared_lock lock(this->smutex);
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
+        rp->campathName = name;
+        rp->offsetTime = 0;
+        rp->isActiveMode = true;
         this->PublishAsync(std::move(play));
         break;
     }

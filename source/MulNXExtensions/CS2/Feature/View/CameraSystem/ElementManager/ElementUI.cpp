@@ -144,6 +144,12 @@ void ElementManager::DebugUI(const FreeCameraPath* campath)const {
         rp->str1 = campath->GetName();
         this->PublishAsync(std::move(msg));
     }
+    ImGui::SameLine();
+    if (ImGui::Button("激活运镜")) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Active"_hash);
+        rp->str1 = campath->GetName();
+        this->PublishAsync(std::move(msg));
+    }
     if (ImGui::Button("复制运镜名称")) {
         ImGui::SetClipboardText(campath->GetName().c_str());
     }

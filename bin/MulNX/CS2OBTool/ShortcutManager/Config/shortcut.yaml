@@ -51,6 +51,16 @@ binds:
       vkCode: 80
       comboClick: 1
 
+  - desc: "强制停止运镜（alt+P*2）"
+    msg: "CamPlay/ClearForce"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: true
+      vkCode: 80
+      comboClick: 2
+
   - desc: "切换自由摄像机模式（Alt+T）"
     msg: "FreeCamCtrl/Toggle"
     KCP:
