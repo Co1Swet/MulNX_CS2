@@ -75,7 +75,7 @@ void ObserverController::UpdateObserverState() {
 void ObserverController::OnSpecModeChanged(uint8_t newMode) {
     if (newMode == 2) {
         this->LogWarning("检测到 spec_mode 切换至 2");
-        this->PublishAsync("CameraSystem/Play/Shutdown"_hash);
+        this->PublishAsync("CamPlay/Clear"_hash);
     }
 }
 

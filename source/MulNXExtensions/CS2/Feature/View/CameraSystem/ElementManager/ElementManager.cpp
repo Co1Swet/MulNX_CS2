@@ -40,9 +40,6 @@ bool ElementManager::Init() {
         .SubscribeAsync("Campath/UnDrawOne")
         ;
 
-    this->SubscribeSync("CamSync/Play/Shutdown", [this](auto&&...) {
-        });
-
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
         this->Element_ClearAll();
         });

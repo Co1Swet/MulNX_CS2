@@ -77,7 +77,7 @@ bool CameraSystem::Init() {
         .SubscribeAsync("Global/Save")
         .SubscribeAsync("Global/Save/Strong")
         .SubscribeAsync("Command/SpecPlayer")
-        .SubscribeAsync("CameraSystem/Play/Shutdown");
+        ;
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->config = {};
@@ -107,14 +107,9 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
         this->LogSucc("摄像机系统保存成功");
         break;
     }
-    case "CameraSystem/Play/Shutdown"_hash: {
-        this->LogWarning("接收到播放停止消息");
-        this->PublishSync("CamSync/Play/Shutdown"_hash);
-        break;
-    }
     case "Command/SpecPlayer"_hash: {
         this->LogInfo("因为操作停止播放");
-        this->PublishSync("CamSync/Play/Shutdown"_hash);
+        this->PublishAsync("CamPlay/Clear"_hash);
         break;
     }
     default:break;

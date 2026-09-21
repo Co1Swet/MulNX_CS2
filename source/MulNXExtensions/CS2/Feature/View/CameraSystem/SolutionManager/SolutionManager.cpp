@@ -45,9 +45,6 @@ bool SolutionManager::Init() {
         this->LogSucc("成功加载解决方案总数：" + std::to_string(this->solutions.size()));
         });
 
-    this->SubscribeSync("CamSync/Play/Shutdown", [this](auto&&...) {
-        });
-
     return true;
 }
 
