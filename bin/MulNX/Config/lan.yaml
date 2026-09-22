@@ -177,26 +177,6 @@ camsys:
     请先进入工作区
     在上方的工作区面板中加载（或创建并加载）一个工作区
     工作区是管理项目、解决方案和元素的基础
-  
-  elem:
-    info_base_fmt: 元素名称：{0}  元素类型：{1}  持续时长：{2}
-    info_fmt: "基本信息：{0}\n详细信息：{1}"
-    preview_status: "预览状态：{0}   预览元素名：{1}   预览时间偏移：{2}"
-    settings: 元素设置
-    preview_draw: 预览插值摄像机绘制
-    preview_draw_label: 元素预览插值摄像机
-    preview_override: 预览插值摄像机覆盖
-    create: 元素创建
-    new_name: 新元素名：
-    new_free_camera_path: 新的自由摄像机轨道
-    list: 元素列表
-    name_label: "|元素名称："
-    context_menu: 元素右键菜单
-    copy_name: 复制名称
-    draw: 绘制
-    type_duration: "   元素类型：{0}   持续时长：{1}"
-    debug_window: 元素调试
-    no_selected: 当前未选择任何元素
 
   sol:
     play_status: 播放状态：{0}  活跃解决方案名：{1}
