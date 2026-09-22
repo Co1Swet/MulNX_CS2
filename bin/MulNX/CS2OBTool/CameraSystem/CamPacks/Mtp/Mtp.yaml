@@ -8,3 +8,7 @@ KCP:
   comboClick: 2
 OnNewRound:
   - begin
+OnRoundStart:
+  []
+OnRoundEnd:
+  []

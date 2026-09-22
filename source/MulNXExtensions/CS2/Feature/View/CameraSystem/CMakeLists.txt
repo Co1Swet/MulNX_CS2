@@ -10,9 +10,9 @@ add_library(CameraSystem
     CamMacroManager/CamMacroManager.cpp
     CamMacroManager/CamMacroUI.cpp
 
-    Project/Project.cpp
-    ProjectManager/ProjectManager.cpp
-    ProjectManager/ProjectUI.cpp
+    CamPack/CamPack.cpp
+    CamPackManager/CamPackManager.cpp
+    CamPackManager/CamPackUI.cpp
 
     CamPlayScheduler/CamPlayScheduler.cpp
     CamPlayScheduler/CamPlayUI.cpp

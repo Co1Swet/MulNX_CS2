@@ -1,10 +1,14 @@
 name: xinghuo_Inferno
 KCP:
-  usable: false
+  usable: true
   ctrl: false
-  shift: false
+  shift: true
   alt: false
-  vkCode: 0
-  comboClick: 0
+  vkCode: 88
+  comboClick: 2
 OnNewRound:
+  []
+OnRoundStart:
+  []
+OnRoundEnd:
   []

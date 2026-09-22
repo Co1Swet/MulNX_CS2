@@ -24,21 +24,22 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
     {
         auto right = MulNX::UI::RAIIChild("右侧");
         {
+            std::shared_lock lock(this->pCamPackManager->smutex);
             float topH = (ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.y) * 2.0f / 3.0f;
             auto c = MulNX::UI::RAIIChild("内容", ImVec2(0, topH), ImGuiChildFlags_Borders);
             bool InProject = false;
-            if (this->PManager->ActiveProject) {
+            if (this->pCamPackManager->pActiveCamPack) {
                 InProject = true;
-                ImGui::Text(I18n("camsys.proj.current", this->PManager->ActiveProject->Name).c_str());
+                ImGui::Text(std::format("当前运镜包名：{}", this->pCamPackManager->pActiveCamPack->GetName()).c_str());
             }
             else {
-                ImGui::Text("还未打开任何运镜包，请打开");
+                ImGui::Text("还未打开任何运镜包，请打开一个运镜包");
             }
 
             ImGui::Separator();
             switch (selectedTab) {
             case 0:
-                this->PManager->MenuProject();
+                this->pCamPackManager->Menu();
                 break;
             case 1:
                 if (!InProject)break;
@@ -64,7 +65,7 @@ bool CameraSystem::Init() {
     this->CamDrawer.Init(20.0, 30.0, 15.0, 10.0, IM_COL32(255, 0, 255, 255));
     this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
     this->pCamMacroManager = this->FindModule<CamMacroManager>("CamMacroManager");
-    this->PManager = this->FindModule<ProjectManager>("ProjectManager");
+    this->pCamPackManager = this->FindModule<CamPackManager>("CamPackManager");
     this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>("CamPlayScheduler");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
@@ -82,13 +83,9 @@ bool CameraSystem::Init() {
         ;
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
-        this->config = {};
         auto* PathManager = this->Path();
         PathManager->KeySetCurrent("kCurrentPack", {});
         PathManager->KeySetCurrent("kCamPacks", "CamPacks");
-        if (this->ConfigLoad()) {
-            this->ConfigApply();
-        }
         });
 
     return true;
@@ -97,14 +94,6 @@ bool CameraSystem::Init() {
 void CameraSystem::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Global/Save"_hash: {
-        //生成配置文件
-        if (!this->ConfigGenerate()) {
-            return;
-        }
-        //保存配置文件
-        if (!this->ConfigSave()) {
-            return;
-        }
         this->PublishSync("CamSync/SaveAll"_hash);
         this->LogSucc("摄像机系统保存成功");
         break;
@@ -118,53 +107,6 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool CameraSystem::ConfigGenerate() {
-    this->config.ProjectCfg = this->PManager->Config;
-    return true;
-}
-bool CameraSystem::ConfigSave() {
-    auto [ok, msg] = this->config.Save(this->PathGet("Config"));
-    if (!ok) {
-        this->LogError(std::move(msg));
-        return false;
-    }
-    this->LogSucc(std::move(msg));
-    return true;
-}
-
-bool CameraSystem::ConfigLoad() {
-    auto path = this->PathGet("Config");
-    // 拼接完整路径
-    std::filesystem::path FullPath = path / ("Config.yaml");
-    // 检查文件本身存在性
-    if (!std::filesystem::exists(FullPath)) {
-        this->LogWarning(I18n("result.error_no_file", FullPath.string()));
-        return false;
-    }
-    // 输出调试信息
-    this->LogInfo(I18n("action.try_load_config", FullPath.string()));
-
-    try {
-        YAML::Node root = YAML::LoadFile(FullPath.string());
-
-        auto config = root["config"];
-
-        auto projects = config["projects"];
-        this->config.ProjectCfg.ProjectShortcutEnable = projects["ProjectShortcutEnable"].as<bool>();
-
-        this->LogSucc(I18n("result.cfg_load_succ", FullPath.string()));
-        return true;
-    }
-    catch (const YAML::Exception& e) {
-        this->LogError(I18n("result.cfg_load_error", e.what()));
-        return false;
-    }
-}
-bool CameraSystem::ConfigApply() {
-    this->PManager->Config = this->config.ProjectCfg;
-    return true;
-}
-
 bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
     this->Update();
     CameraSystemIO IO;
@@ -172,7 +114,7 @@ bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num
     this->CamDrawer.Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     this->pCampathManager->HandleUpdate();
     this->pCamMacroManager->HandleUpdate();
-    this->PManager->HandleUpdate();
+    this->pCamPackManager->HandleUpdate();
 
     if (!this->pCamPlayScheduler->HandleUpdate(&IO))return false;
     camLeavePlayer = true;
@@ -192,29 +134,4 @@ bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num
     this->CS2View->SetDOF(dof);
 
     return true;
-}
-
-std::pair<bool, std::string> Config::Save(const std::filesystem::path& FolderPath) {
-    // 检查文件路径和名称存在性
-    if (FolderPath.empty())return { false,"文件夹路径为空，无法保存工作区配置文件！" };
-
-    // 拼接完整路径
-    std::filesystem::path FullPath = FolderPath / ("Config.yaml");
-    try {
-        YAML::Node root;
-
-        auto config = root["config"];
-
-        auto projects = config["projects"];
-        projects["ProjectShortcutEnable"] = this->ProjectCfg.ProjectShortcutEnable;
-
-        std::ofstream fout(FullPath);
-        fout << root;
-        fout.close();
-
-        return { true,"成功保存工作区配置文件到文件！ 文件路径：" + FullPath.string() };
-    }
-    catch (const YAML::Exception& e) {
-        return { false,"在尝试保存工作区时发生异常：" + std::string(e.what()) };
-    }
 }

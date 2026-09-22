@@ -2,5 +2,5 @@
 #include "CameraSystem.hpp"
 #include "CampathManager/CampathManager.hpp"
 #include "CamMacroManager/CamMacroManager.hpp"
-#include "ProjectManager/ProjectManager.hpp"
+#include "CamPackManager/CamPackManager.hpp"
 #include "CamPlayScheduler/CamPlayScheduler.hpp"
