@@ -8,7 +8,7 @@ public:
     //元素
     std::string campathName;
     //这个Offset决定了元素的播放时间头
-    float Offset = 0;
+    float offset = 0;
 };
 
 //解决方案，包含ElementWithOffset，用于调用call方法
@@ -35,7 +35,7 @@ public:
     // 添加元素
     bool AddElement(const std::string& name, const float offset);
     // 移除指定位置的元素
-    bool RemoveElementAt(const size_t Index);
+    bool RemoveCampath(const std::string& campathName);
     inline const std::vector<ElementWithOffset>& GetVec()const { return this->elements; }
 
     std::pair<bool, std::string> Save(const std::filesystem::path& folderPath)const;

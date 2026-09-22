@@ -21,8 +21,10 @@ bool SolutionManager::Init() {
         .SubscribeAsync("CameraSystem/Solution/Play")
         .SubscribeAsync("CamMacro/OpenDebug")
         .SubscribeAsync("CamMacro/DebugKCP")
+        .SubscribeAsync("CamMacro/ClearOne")
         .SubscribeAsync("CamMacro/SaveOne")
         .SubscribeAsync("CamMacro/AddCampath")
+        .SubscribeAsync("CamMacro/RemoveCampath")
         ;
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
@@ -89,12 +91,21 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "CamMacro/DebugKCP"_hash: {
-        std::unique_lock lock(this->smutex);
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
         const Solution* pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
         this->bufKCPack = pCamMacro->GetKeyCheckPack().load();//缓存
         this->OpenSolutionKCPackDebugWindow = true;//打开窗口
+        break;
+    }
+    case "CamMacro/ClearOne"_hash: {
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        std::unique_lock lock(this->smutex);
+        auto* pCamMacro = this->FindCamMacro(name);
+        if (!pCamMacro)break;
+        pCamMacro->Clear();
+        this->LogSucc(std::format("成功清空宏 {} 的所有运镜", name));
         break;
     }
     case "CamMacro/SaveOne"_hash: {
@@ -113,18 +124,27 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "CamMacro/AddCampath"_hash: {
-        std::unique_lock lock(this->smutex);
         auto pNetExt = msg.asp.get<MulNX::NetExt>();
+        auto&& [offset] = msg.Access<float>();
+        std::unique_lock lock(this->smutex);
         Solution* pCamMacro = this->FindCamMacro(pNetExt->str1);
         if (!pCamMacro)break;
-        if (pCamMacro->AddElement(pNetExt->str2, 0)) {
-            this->LogError(std::format("无法添加运镜到宏，可能是运镜已存在于解决方案中。宏：{}，运镜：{}",
+        if (pCamMacro->AddElement(pNetExt->str2, offset)) {
+            this->LogError(std::format("无法添加运镜到宏，可能是运镜已存在于宏中。宏：{}，运镜：{}",
                 pNetExt->str1, pNetExt->str2));
         }
         else {
             this->LogSucc(std::format("成功添加运镜到宏 。宏：{}，运镜：{}",
                 pNetExt->str1, pNetExt->str2));
         }
+        break;
+    }
+    case "CamMacro/RemoveCampath"_hash: {
+        std::unique_lock lock(this->smutex);
+        auto pNetExt = msg.asp.get<MulNX::NetExt>();
+        auto* pCamMacro = this->FindCamMacro(pNetExt->str1);
+        if (!pCamMacro)break;
+        pCamMacro->RemoveCampath(pNetExt->str2);
         break;
     }
     }
@@ -275,7 +295,7 @@ void SolutionManager::Playing_Solution(const std::string& name) {
     for (const auto& item : it->second->GetVec()) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Preview"_hash);
         auto&& [previewOffset] = msg.Access<float>();
-        previewOffset = 0.0f - item.Offset;
+        previewOffset = 0.0f - item.offset;
         rp->str1 = item.campathName;
         this->PublishAsync(std::move(msg));
     }

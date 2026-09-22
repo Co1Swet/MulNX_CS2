@@ -22,7 +22,7 @@ bool Solution::AddElement(const std::string& name, const float offset) {
     //找到正确的插入位置以保持排序
     auto insertPos = std::lower_bound(this->elements.begin(), this->elements.end(), newElement,
         [](const ElementWithOffset& a, const ElementWithOffset& b) {
-            return a.Offset < b.Offset;
+            return a.offset < b.offset;
         });
 
     //插入元素
@@ -30,12 +30,14 @@ bool Solution::AddElement(const std::string& name, const float offset) {
 
     return true;
 }
-bool Solution::RemoveElementAt(const size_t Index) {
-    if (Index < 0 || Index >= this->elements.size()) {
-        return false;
+bool Solution::RemoveCampath(const std::string& campathName) {
+    for (auto it = this->elements.begin();it != this->elements.end();++it) {
+        if (it->campathName == campathName) {
+            this->elements.erase(it);
+            return true;
+        }
     }
-    this->elements.erase(this->elements.begin() + Index);
-    return true;
+    return false;
 }
 std::string Solution::GetMsg() {
     std::ostringstream oss;
@@ -47,12 +49,11 @@ std::string Solution::GetMsg() {
 
     for (size_t i = 0; i < this->elements.size(); ++i) {
         auto& name = this->elements[i].campathName;
-        auto& offset = this->elements[i].Offset;
         oss << i << ".  "
             "  |元素编号：" << i <<
             "  元素名称：" << name <<
             "  元素类型：" << "自由摄像机轨道" <<
-            "  元素偏移时间：" << this->elements[i].Offset << "\n";
+            "  元素偏移时间：" << this->elements[i].offset << "\n";
     }
 
     return oss.str();
@@ -95,7 +96,7 @@ std::pair<bool, std::string> Solution::Save(const std::filesystem::path& folderP
 
             YAML::Node elemNode;
             elemNode["name"] = name;
-            elemNode["offset"] = this->elements[i].Offset;
+            elemNode["offset"] = this->elements[i].offset;
             elementsNode.push_back(elemNode);
         }
 
