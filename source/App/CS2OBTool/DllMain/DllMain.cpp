@@ -62,7 +62,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<CameraSystem>("CameraSystem")
         .CreateModule<ProjectManager>("ProjectManager")
         .CreateModule<CampathManager>("CampathManager")
-        .CreateModule<SolutionManager>("SolutionManager")
+        .CreateModule<CamMacroManager>("CamMacroManager")
         .CreateModule<CamPlayScheduler>("CamPlayScheduler")
 
         // CS2 视角控制功能模块

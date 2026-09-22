@@ -6,9 +6,9 @@ add_library(CameraSystem
     CampathManager/CampathManager.cpp
     CampathManager/CampathUI.cpp
 
-    Solution/Solution.cpp
-    SolutionManager/SolutionManager.cpp
-    SolutionManager/SolutionUI.cpp
+    CamMacro/CamMacro.cpp
+    CamMacroManager/CamMacroManager.cpp
+    CamMacroManager/CamMacroUI.cpp
 
     Project/Project.cpp
     ProjectManager/ProjectManager.cpp

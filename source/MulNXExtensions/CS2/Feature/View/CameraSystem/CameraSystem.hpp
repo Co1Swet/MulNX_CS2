@@ -4,16 +4,14 @@
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 #include "CameraDrawer/CameraDrawer.hpp"
 
-#include <CameraSystem/SolutionManager/SolutionConfig.hpp>
 #include <CameraSystem/ProjectManager/ProjectConfig.hpp>
 
 class CampathManager;
-class SolutionManager;
+class CamMacroManager;
 class ProjectManager;
 
 class Config {
 public:
-    SolutionConfig SolutionCfg{};
     ProjectConfig ProjectCfg{};
 
     std::pair<bool, std::string> Save(const std::filesystem::path& FolderPath);
@@ -21,7 +19,7 @@ public:
 
 class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem> {
     CampathManager* pCampathManager = nullptr;
-    SolutionManager* SManager = nullptr;
+    CamMacroManager* pCamMacroManager = nullptr;
     ProjectManager* PManager = nullptr;
     class CamPlayScheduler* pCamPlayScheduler = nullptr;
     MulNX::IPCer* pIPCer = nullptr;

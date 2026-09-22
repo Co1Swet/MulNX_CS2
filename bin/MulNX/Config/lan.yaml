@@ -167,45 +167,7 @@ log:
     +----------新的日志片段----------+
     日志系统已上线，欢迎使用MulNX
 # 摄像机系统
-camsys:
-  tab_proj: 项目
-  tab_sol: 解决方案
-  tab_elem: 元素
-
-  please_enter_proj: 当前未加载项目，请先加载项目
-  please_enter_ws: |
-    请先进入工作区
-    在上方的工作区面板中加载（或创建并加载）一个工作区
-    工作区是管理项目、解决方案和元素的基础
-
-  sol:
-    play_status: 播放状态：{0}  活跃解决方案名：{1}
-    settings: 解决方案设置
-    shortcut_enable: 解决方案快捷键检测系统
-    playing_draw: 解决方案插值摄像机绘制
-    playing_override: 解决方案插值覆盖
-    create: 解决方案创建
-    new_name: 新解决方案名：
-    create_btn: 创建解决方案
-    list: 解决方案列表
-    name_label: "|解决方案名称："
-    element_count_duration: " 元素数量：{0},   总时长：{1}"
-    playing_draw_label: 解决方案插值摄像机
-    debug_window: 解决方案调试
-    current_info: "当前操作解决方案名称：{0}   元素数量：{1}   总时长：{2}   播放模式：{3}"
-    switch_to_activation: 切换到激活模式
-    switch_to_orchestration: 切换到编排模式
-    enable_current: 使能当前解决方案
-    gen_timeline_offset: 按激活模式生成编排模式偏移
-    new_element_name: 新元素名称
-    add_element: 添加元素
-    clear_all_elements: 清空所有元素
-    clear_all_elements_success: 成功清空解决方案所有元素
-    adjust_element_index: 要调整的本解决方案的元素
-    element_info: "元素信息： 编号：{0}  元素名称：{1}  元素持续时间：{2}  元素偏移时间：{3}"
-    offset_time: 偏移时间
-    invalid_index: "索引无效！请输入 0 到 {} 之间的值"
-  
+camsys:  
   proj:
     settings: 项目设置
     shortcut_enable: 项目快捷键检测系统

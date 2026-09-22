@@ -1,5 +1,4 @@
 #include"ProjectManager.hpp"
-#include <CameraSystem/SolutionManager/SolutionManager.hpp>
 
 bool ProjectManager::Init() {
     this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
@@ -71,7 +70,7 @@ void ProjectManager::ProcessMsg(MulNX::Message& msg) {
             break;
         }
         int temp = rand() % OnNewRound.size();
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CameraSystem/Solution/Play"_hash);
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/Play"_hash);
         rp->str1 = OnNewRound[temp];
         this->PublishAsync(std::move(msg));
         break;

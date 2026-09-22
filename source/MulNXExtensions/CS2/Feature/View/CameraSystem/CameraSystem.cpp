@@ -42,7 +42,7 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
                 break;
             case 1:
                 if (!InProject)break;
-                this->SManager->MenuSolution();
+                this->pCamMacroManager->Menu();
                 break;
             case 2:
                 if (!InProject)break;
@@ -63,7 +63,7 @@ bool CameraSystem::Init() {
     // 注意，本模块所有级别的管理器相互显示注入，其它服务借助Core隐式注入
     this->CamDrawer.Init(20.0, 30.0, 15.0, 10.0, IM_COL32(255, 0, 255, 255));
     this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
-    this->SManager = this->FindModule<SolutionManager>("SolutionManager");
+    this->pCamMacroManager = this->FindModule<CamMacroManager>("CamMacroManager");
     this->PManager = this->FindModule<ProjectManager>("ProjectManager");
     this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>("CamPlayScheduler");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
@@ -120,7 +120,6 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
 
 bool CameraSystem::ConfigGenerate() {
     this->config.ProjectCfg = this->PManager->Config;
-    this->config.SolutionCfg = this->SManager->Config;
     return true;
 }
 bool CameraSystem::ConfigSave() {
@@ -150,11 +149,6 @@ bool CameraSystem::ConfigLoad() {
 
         auto config = root["config"];
 
-        auto solutions = config["solutions"];
-        this->config.SolutionCfg.SolutionShortcutEnable = solutions["shortcutEnable"].as<bool>();
-        this->config.SolutionCfg.PlayingDraw = solutions["PlayingDraw"].as<bool>();
-        this->config.SolutionCfg.PlayingOverride = solutions["PlayingOverride"].as<bool>();
-
         auto projects = config["projects"];
         this->config.ProjectCfg.ProjectShortcutEnable = projects["ProjectShortcutEnable"].as<bool>();
 
@@ -168,22 +162,19 @@ bool CameraSystem::ConfigLoad() {
 }
 bool CameraSystem::ConfigApply() {
     this->PManager->Config = this->config.ProjectCfg;
-    this->SManager->Config = this->config.SolutionCfg;
     return true;
 }
 
 bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
     this->Update();
     CameraSystemIO IO;
-    bool needOverride = false;
 
     this->CamDrawer.Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     this->pCampathManager->HandleUpdate();
-    if (this->SManager->HandleUpdate(&IO))needOverride = true;
-    if (this->pCamPlayScheduler->HandleUpdate(&IO))needOverride = true;
+    this->pCamMacroManager->HandleUpdate();
     this->PManager->HandleUpdate();
 
-    if (!needOverride)return false;
+    if (!this->pCamPlayScheduler->HandleUpdate(&IO))return false;
     camLeavePlayer = true;
 
     const auto& pos = IO.Frame.view.position;
@@ -213,12 +204,6 @@ std::pair<bool, std::string> Config::Save(const std::filesystem::path& FolderPat
         YAML::Node root;
 
         auto config = root["config"];
-        auto elements = config["elements"];
-
-        auto solutions = config["solutions"];
-        solutions["shortcutEnable"] = this->SolutionCfg.SolutionShortcutEnable;
-        solutions["PlayingDraw"] = this->SolutionCfg.PlayingDraw;
-        solutions["PlayingOverride"] = this->SolutionCfg.PlayingOverride;
 
         auto projects = config["projects"];
         projects["ProjectShortcutEnable"] = this->ProjectCfg.ProjectShortcutEnable;
