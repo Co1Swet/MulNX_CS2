@@ -1,5 +1,4 @@
 #include "Solution.hpp"
-#include <CameraSystem/ElementManager/ElementManager.hpp>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 

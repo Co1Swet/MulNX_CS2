@@ -6,46 +6,44 @@
 #include <filesystem>
 
 class CameraDrawer;
-class ElementManager;
 
-// 自由摄像机轨道，继承自Element
 class FreeCameraPath final {
-    // 元素名称
     std::string name{};
-public:
+    bool dirty = false;
     // 开始时间（绝对）
-    float StartTime{};
+    float startTime{};
     // 结束时间（绝对）
-    float EndTime{};
-    // 持续时长
-    float DurationTime{};
+    float endTime{};
+    float durationTime{};
+public:
+    inline bool IsDirty()const { return this->dirty; }
 
-    // 需要被删除
-    bool NeedBeDelete = false;
-    // 脏标记，需要重新保存
-    bool Dirty = false;
+    inline float GetStartTime()const { return this->startTime; }
+    inline float GetEndTime()const { return this->endTime; }
+    inline float GetDurationTime()const { return this->durationTime; }
+
     // 是否绘制（默认不绘制）
     std::atomic<bool> draw = false;
 
     std::vector<MulNX::Math::CameraKeyframe> CameraKeyframes{};
     // 构造函数
-    explicit FreeCameraPath(const std::string& name) : 
+    explicit FreeCameraPath(const std::string& name) :
         name(name) {}
-    
-    
+
     // 刷新状态
     void Refresh();
-    
-    // 获取详细信息
-    std::string GetPrivateMsg()const;
-    
+
+    // 获取基本信息
+    std::string GetBaseInfo()const;
+    std::string GetMsg()const;
+
     // 增加关键帧
-	void AddKeyframe(const MulNX::Math::CameraKeyframe& KeyFrame);
+    void AddKeyframe(const MulNX::Math::CameraKeyframe& KeyFrame);
     // 归一化关键帧时间
     void TimeNormalize();
     // 清空所有关键帧
     void Clear();
-    
+
     const MulNX::Math::CameraKeyframe& GetKeyFrame(const size_t& index)const;// 获取特定关键帧    
 
     // 磁盘IO
@@ -56,17 +54,11 @@ public:
     // 绘制
     bool Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
 
-    // 获取基本信息
-    std::string GetBaseInfo()const;
-    std::string GetMsg()const;
+    
     // 获取名字
     const std::string& GetName()const;
     // 重设名字
     void ResetName(const std::string& NewName);
-
-    float GetStartTime()const;
-    float GetEndTime()const;
-    float GetDurationTime()const;
 
     enum class CalResult :int8_t {
         Before,

@@ -1,16 +1,17 @@
 #include "FreeCameraPath.hpp"
-#include <Intro/HookView/HookView.hpp>
-#include <Support/TimeController/TimeController.hpp>
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
-#include <CameraSystem/ElementManager/ElementManager.hpp>
 #include <fstream>
 
 std::string FreeCameraPath::GetBaseInfo()const {
-    return std::format("轨道名称：{} ，持续时长：{}", this->name, this->DurationTime);
+    return std::format("轨道名称：{} ，持续时长：{}", this->name, this->durationTime);
 }
-
 std::string FreeCameraPath::GetMsg()const {
-    return I18n("camsys.elem.info_fmt", this->GetBaseInfo(), this->GetPrivateMsg());
+    std::ostringstream oss;
+    for (size_t i = 0; i < this->CameraKeyframes.size(); ++i) {
+        const auto& keyframe = this->CameraKeyframes.at(i);
+        oss << I18n("free_campath.fmt", i, keyframe.GetMsg());
+    }
+    return std::format("基本信息：{0}\n详细信息：{1}", this->GetBaseInfo(), oss.str());
 }
 const std::string& FreeCameraPath::GetName()const {
     return this->name;
@@ -20,8 +21,8 @@ void FreeCameraPath::ResetName(const std::string& NewName) {
 }
 
 FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
-    if (IO->ElementTime < this->StartTime)return FreeCameraPath::CalResult::Before;
-    if (IO->ElementTime > this->EndTime)return FreeCameraPath::CalResult::Back;
+    if (IO->ElementTime < this->startTime)return FreeCameraPath::CalResult::Before;
+    if (IO->ElementTime > this->endTime)return FreeCameraPath::CalResult::Back;
 
     // 如果不在理论影响范围内，应当直接返回而不做任何修改
     // 是与被遍历的其它call一起工作
@@ -41,7 +42,7 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     ptrdiff_t dist = std::distance(this->CameraKeyframes.begin(), it);
     size_t index = (dist == 0) ? 0 : static_cast<size_t>(dist - 1);
 
-    // 保护：如果 index 位于最后一个元素，则没有下一个关键帧可用于插值
+    // 保护：如果 index 位于最后一个，则没有下一个关键帧可用于插值
     if (index + 1 >= this->CameraKeyframes.size()) return FreeCameraPath::CalResult::NoFrame;
 
     // 获取相邻的四个关键帧用于插值
@@ -128,9 +129,7 @@ bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const fl
             // 将3D位置转换为屏幕坐标
             DirectX::XMFLOAT2 prevScreenPos, currentScreenPos;
 
-            // 使用CameraDrawer中的转换方法
             MulNX::Math::WorldToScreen(prevPosition, prevScreenPos, Matrix, WinWidth, WinHeight);
-
             MulNX::Math::WorldToScreen(keyframe.GetPosition(), currentScreenPos, Matrix, WinWidth, WinHeight);
 
             // 绘制连线
@@ -148,24 +147,14 @@ bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const fl
     return true;
 }
 
-float FreeCameraPath::GetStartTime()const {
-    return this->StartTime;
-}
-float FreeCameraPath::GetEndTime()const {
-    return this->EndTime;
-}
-float FreeCameraPath::GetDurationTime()const {
-    return this->DurationTime;
-}
-
 std::pair<bool, std::string> FreeCameraPath::Save(const std::filesystem::path& folderPath) {
-    if (this->name.empty())return { false,"元素名为空，无法保存元素到磁盘文件！" };
+    if (this->name.empty())return { false,"无法保存运镜轨道到磁盘，运镜名为空！" };
     std::filesystem::path filePath = folderPath / (this->name + ".yaml");
     try {
         YAML::Node root;
 
         root["name"] = this->name;
-        root["duration"] = this->DurationTime;
+        root["duration"] = this->durationTime;
 
         auto [ok, msg] = this->SaveImpl(root);
         if (!ok)return { false,std::move(msg) + " 文件路径：" + filePath.string() };
@@ -188,45 +177,30 @@ std::pair<bool, std::string> FreeCameraPath::Save(const std::filesystem::path& f
     }
 }
 
-std::string FreeCameraPath::GetPrivateMsg()const {
-    std::ostringstream oss;
-    for (size_t i = 0; i < this->CameraKeyframes.size(); ++i) {
-        const MulNX::Math::CameraKeyframe& keyframe = this->CameraKeyframes.at(i);
-        oss << I18n("free_campath.fmt", i, keyframe.GetMsg());
-    }
-    return oss.str();
-}
-
 void FreeCameraPath::AddKeyframe(const MulNX::Math::CameraKeyframe& keyframe) {
-	//按照时间排序插入
+    //按照时间排序插入
     auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), keyframe,
         [&](const MulNX::Math::CameraKeyframe& a, const MulNX::Math::CameraKeyframe& b) {//引用捕获加速
             return a.time < b.time;
         });
     this->CameraKeyframes.insert(it, keyframe); // 拷贝插入
     this->Refresh();
-
-    return;
 }
 
 void FreeCameraPath::Refresh() {
-    //标记为脏
-    this->Dirty = true;
+    this->dirty = true;
     if (this->CameraKeyframes.size() == 0) {
-        this->StartTime = 0;
-        this->EndTime = 0;
-        this->DurationTime = 0;
-        return;
+        this->startTime = 0;
+        this->endTime = 0;
+        this->durationTime = 0;
     }
     else {
-        this->StartTime = this->CameraKeyframes.front().time;
-        this->EndTime = this->CameraKeyframes.back().time;
-        this->DurationTime = this->EndTime - this->StartTime;
-        return;
+        this->startTime = this->CameraKeyframes.front().time;
+        this->endTime = this->CameraKeyframes.back().time;
+        this->durationTime = this->endTime - this->startTime;
     }
-    
-    return;
 }
+
 void FreeCameraPath::TimeNormalize() {
     if (this->CameraKeyframes.empty())return;
     if (this->CameraKeyframes.front().time == 0)return;
@@ -299,7 +273,7 @@ std::pair<bool, std::string> FreeCameraPath::SaveImpl(YAML::Node& root) {
             // 将关键帧节点挂载上去
             root["keyframes"].push_back(keyframeNode);
         }
-        return { true, {} };
+        return { true,{} };
     }
     catch (const std::exception& e) {
         return { false, "保存YAML文件时发生错误：" + std::string(e.what()) };
@@ -308,7 +282,7 @@ std::pair<bool, std::string> FreeCameraPath::SaveImpl(YAML::Node& root) {
 
 std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
     try {
-        if (!root.IsMap()) return { false, "YAML文件根节点不是映射类型"};
+        if (!root.IsMap()) return { false, "YAML文件根节点不是映射类型" };
 
         // 清空现有数据
         this->Clear();
@@ -363,6 +337,8 @@ std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
 
             this->AddKeyframe(std::move(keyframe));
         }
+        this->Refresh();
+        this->dirty = false;
 
         return { true, "成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：" + this->name };
     }

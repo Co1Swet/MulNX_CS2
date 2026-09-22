@@ -1,8 +1,8 @@
 #include "CamPlayScheduler.hpp"
-#include <CameraSystem/ElementManager/ElementManager.hpp>
+#include <CameraSystem/CampathManager/CampathManager.hpp>
 
 bool CamPlayScheduler::Init() {
-    this->pEManager = this->FindModule<ElementManager>("ElementManager");
+    this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
     this->pCamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
 
     (*this)
@@ -30,7 +30,7 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     case "CamPlay/Request"_hash: {
         auto request = msg.asp.get<CamPlayRequest>();
         auto& name = request->campathName;
-        std::shared_ptr<const FreeCameraPath> pCampath = this->pEManager->FindCampath(name);
+        std::shared_ptr<const FreeCameraPath> pCampath = this->pCampathManager->FindCampath(name);
         if (!pCampath) {
             this->LogError(std::format("请求播放运镜 \"{}\" 而未查找到！", name));
             break;

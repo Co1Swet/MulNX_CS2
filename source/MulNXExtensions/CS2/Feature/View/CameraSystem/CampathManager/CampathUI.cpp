@@ -1,64 +1,58 @@
-#include "ElementManager.hpp"
+#include "CampathManager.hpp"
 #include <Support/TimeController/TimeController.hpp>
 
-bool ElementManager::MenuElement()const {
+void CampathManager::Menu()const {
     std::shared_lock lock(this->smutex);
 
     ImGui::SeparatorText("运镜创建");
-    static std::string newElementName = "";
-    ImGui::InputText("新轨道名", &newElementName);
-    // 创建自由摄像机轨道
+    static std::string newCampathName = "";
+    ImGui::InputText("新轨道名", &newCampathName);
     if (ImGui::Button("创建")) {
-        if (newElementName.empty()) {
+        if (newCampathName.empty()) {
             this->LogError("运镜名不能为空！");
         }
         else {
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Element/Create"_hash);
-            rp->str1 = std::move(newElementName);
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Create"_hash);
+            rp->str1 = newCampathName;
             this->PublishAsync(std::move(msg));
         }
-        newElementName.clear();
+        newCampathName.clear();
     }
 
     ImGui::SeparatorText("运镜列表");
-    for (const auto& [name, element] : this->elements) {
-        this->Element_ShowInLine(element);
+    for (const auto& [name, pCampath] : this->campaths) {
+        this->CampathShowOneLine(pCampath.get());
     }
-
-    return true;
 }
 
-void ElementManager::Element_ShowInLine(const std::shared_ptr<const FreeCameraPath> element)const {
-    ImGui::Text(I18n("camsys.elem.name_label").c_str());
-    ImGui::SameLine();
+void CampathManager::CampathShowOneLine(const FreeCameraPath* pCampath)const {
+    if (pCampath->GetName().empty())return;
 
-    if (element->GetName().empty())return;
-
-    if (ImGui::Selectable(element->GetName().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
+    if (ImGui::Selectable(pCampath->GetName().c_str(), false, ImGuiSelectableFlags_AllowDoubleClick)) {
         if (ImGui::IsMouseDoubleClicked(0)) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/OpenDebug"_hash);
-            rp->str1 = element->GetName();
+            rp->str1 = pCampath->GetName();
             this->PublishAsync(std::move(msg));
         }
     }
 
-    if (ImGui::BeginPopupContextItem((I18n("camsys.elem.context_menu") + element->GetName().c_str()).c_str())) {
+    if (ImGui::BeginPopupContextItem(pCampath->GetName().c_str())) {
         if (ImGui::MenuItem("复制运镜名称")) {
-            ImGui::SetClipboardText(element->GetName().c_str());
+            ImGui::SetClipboardText(pCampath->GetName().c_str());
         }
         if (ImGui::MenuItem("删除运镜")) {
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Element/Delete"_hash);
-            rp->str1 = element->GetName();
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Delete"_hash);
+            rp->str1 = pCampath->GetName();
             this->PublishAsync(std::move(msg));
         }
         ImGui::EndPopup();
     }
 
     ImGui::SameLine();
-    ImGui::Text(I18n("camsys.elem.type_duration", "自由摄像机轨道", std::to_string(element->DurationTime)).c_str());
+    ImGui::Text(std::format("运镜轨道持续时长：{}", pCampath->GetDurationTime()).c_str());
 }
 
-void ElementManager::DebugUI(const FreeCameraPath* campath)const {
+void CampathManager::DebugUI(const FreeCameraPath* campath)const {
     ImGui::TextUnformatted(campath->GetBaseInfo().c_str());
     ImGui::SeparatorText("关键帧列表");
 
@@ -140,8 +134,8 @@ void ElementManager::DebugUI(const FreeCameraPath* campath)const {
         this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("删除运镜")) {
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Element/Delete"_hash);
-        rp->str1 = std::move(campath->GetName());
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Delete"_hash);
+        rp->str1 = campath->GetName();
         this->PublishAsync(std::move(msg));
     }
 
@@ -215,14 +209,15 @@ void ElementManager::DebugUI(const FreeCameraPath* campath)const {
     }
     PreIndex = indexForReset;
 }
-void ElementManager::UINodeFunc()const {
+void CampathManager::UI()const {
     std::shared_lock lock(this->smutex);
-    for (auto& [name, elem] : this->elements) {
-        elem->Draw(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
+    for (auto& [name, pCampath] : this->campaths) {
+        pCampath->Draw(this->CamDrawer, this->CS2View->GetViewMatrix(),
+            this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     }
-    auto w = MulNX::UI::RAIIWindow("元素调试", this->showWindow);
+    auto w = MulNX::UI::RAIIWindow("运镜轨道调试", this->showWindow);
     if (!w || !w.ShouldDraw())return;
-    auto current = this->CurrentElement.load(std::memory_order_acquire);
+    auto current = this->pOperatingCampath.load(std::memory_order_acquire);
     if (current) {
         this->DebugUI(current.get());
     }

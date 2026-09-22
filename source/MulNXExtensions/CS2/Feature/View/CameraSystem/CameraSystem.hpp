@@ -4,17 +4,15 @@
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 #include "CameraDrawer/CameraDrawer.hpp"
 
-#include <CameraSystem/ElementManager/ElementConfig.hpp>
 #include <CameraSystem/SolutionManager/SolutionConfig.hpp>
 #include <CameraSystem/ProjectManager/ProjectConfig.hpp>
 
-class ElementManager;
+class CampathManager;
 class SolutionManager;
 class ProjectManager;
 
 class Config {
 public:
-    ElementConfig ElementCfg{};
     SolutionConfig SolutionCfg{};
     ProjectConfig ProjectCfg{};
 
@@ -22,7 +20,7 @@ public:
 };
 
 class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem> {
-    ElementManager* EManager = nullptr;
+    CampathManager* pCampathManager = nullptr;
     SolutionManager* SManager = nullptr;
     ProjectManager* PManager = nullptr;
     class CamPlayScheduler* pCamPlayScheduler = nullptr;

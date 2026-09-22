@@ -1,29 +1,25 @@
-#include "ElementManager.hpp"
+#include "CampathManager.hpp"
 #include <Intro/HookView/HookView.hpp>
-#include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
-#include <CameraSystem/SolutionManager/SolutionManager.hpp>
 #include <CameraSystem/CamPlayScheduler/CamPlayRequest.hpp>
 
-//元素管理器基本函数
-bool ElementManager::Init() {
+bool CampathManager::Init() {
     this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
-    this->SManager = this->FindModule<SolutionManager>("SolutionManager");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
-    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
     auto* PathManager = this->Path();
     PathManager->CreateKey("kCampaths", "Campaths", [this](MulNX::PathManager* PathManager)->bool {
         auto Path = PathManager->PathGetFromKey("kCampaths");
-        this->LogSucc("成功设置元素路径为：" + Path.string());
+        this->LogSucc("成功设置运镜轨道资源路径为：" + Path.string());
         return true;
         });
     PathManager->KeyBindDynamic("kCampaths", "kCurrentPack");
 
     (*this)
-        .SubscribeAsync("Element/Create")
-        .SubscribeAsync("Element/Delete")
+        .SubscribeAsync("Campath/Create")
+        .SubscribeAsync("Campath/Delete")
         .SubscribeAsync("Campath/OpenDebug")
         .SubscribeAsync("Campath/AddKeyframe")
         .SubscribeAsync("Campath/DeleteKeyframe")
@@ -36,43 +32,46 @@ bool ElementManager::Init() {
         ;
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
-        this->Element_ClearAll();
+        this->CampathClearAll();
         });
 
     this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {
-        this->Element_SaveAll();
+        this->CampathSaveAll();
         });
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
-        //获取元素文件夹路径
-        std::filesystem::path ElementsPath = this->Path()->PathGetFromKey("kCampaths");
-        std::vector<std::string>Elements = this->pIPCer->GetFileNamesByPath(ElementsPath);
-        //遍历加载元素
-        for (const std::string& Element : Elements) {
-            this->Element_Load(ElementsPath / Element);
+        std::filesystem::path dirCampaths = this->Path()->PathGetFromKey("kCampaths");
+        std::vector<std::string> campathNames = this->pIPCer->GetFileNamesByPath(dirCampaths);
+        for (const std::string& campathName : campathNames) {
+            if (!this->CampathLoad(dirCampaths / campathName)) {
+                this->LogError(std::format("运镜轨道加载失败：{}", campathName));
+            }
         }
-        this->LogSucc(std::format("尝试加载元素总数：{}", Elements.size()));
-        this->LogSucc(std::format("成功加载元素总数：", this->elements.size()));
+        this->LogInfo(std::format("尝试加载运镜轨道总数： {}", campathNames.size()));
+        this->LogSucc(std::format("成功加载运镜轨道总数： {}", this->campaths.size()));
+        if (campathNames.size() != this->campaths.size()) {
+            this->LogError("存在加载失败！");
+        }
         });
 
     return true;
 }
 
-void ElementManager::ProcessMsg(MulNX::Message& msg) {
+void CampathManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Element/Create"_hash: {
+    case "Campath/Create"_hash: {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
-        if (!this->Element_Create(name)) {
-            this->LogError(std::format("元素创建失败：{}", name));
+        if (!this->CampathCreate(name)) {
+            this->LogError(std::format("运镜轨道创建失败：{}", name));
         }
         break;
     }
-    case "Element/Delete"_hash: {
+    case "Campath/Delete"_hash: {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
-        if (!this->Element_Delete(name)) {
-            this->LogError(std::format("元素删除失败：{}", name));
+        if (!this->CampathDelete(name)) {
+            this->LogError(std::format("运镜轨道删除失败：{}", name));
         }
         break;
     }
@@ -81,7 +80,7 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
         std::unique_lock lock(this->smutex);
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
-        this->CurrentElement.store(pCampath, std::memory_order_release);
+        this->pOperatingCampath.store(pCampath, std::memory_order_release);
         this->showWindow.store(true, std::memory_order_release);
         break;
     }
@@ -181,47 +180,43 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
+void CampathManager::HandleUpdate() {
     this->Update();
-    return false;
 }
 
-std::shared_ptr<FreeCameraPath> ElementManager::FindCampath(const std::string& name) {
-    auto it = this->elements.find(name);
-    if (it == this->elements.end())return nullptr;
+std::shared_ptr<FreeCameraPath> CampathManager::FindCampath(const std::string& name,
+    std::source_location where) {
+    auto it = this->campaths.find(name);
+    if (it == this->campaths.end()) {
+        this->LogError(std::format("搜索运镜轨道失败：{}", name), where);
+        return nullptr;
+    }
     return it->second;
 }
 
-//创建元素函数，支持传递任意参数给元素构造函数
-FreeCameraPath* ElementManager::Element_Create(const std::string& name) {
-    // 检查是否已存在同名元素
-    if (this->elements.find(name) != this->elements.end()) {
-        this->LogError("元素名已占用！ 元素名：" + name);
+FreeCameraPath* CampathManager::CampathCreate(const std::string& name) {
+    if (this->campaths.find(name) != this->campaths.end()) {
+        this->LogError(std::format("该运镜轨道名已经存在，无法创建：{}", name));
         return nullptr;
     }
-    std::shared_ptr<FreeCameraPath> pElement = nullptr;
-    pElement = std::make_shared<FreeCameraPath>(name);
-    // 输出成功信息
-    this->LogSucc("成功创建元素！  元素名：" + name);
-    // 添加进Elements
-    this->elements[name] = std::move(pElement);
-    return this->elements[name].get();
+    auto pCampath = std::make_shared<FreeCameraPath>(name);
+    this->LogSucc(std::format("成功创建运镜轨道：{}", name));
+    this->campaths[name] = std::move(pCampath);
+    return this->campaths[name].get();
 }
 
-bool ElementManager::Element_SaveAll() {
-    //检查是否有元素
-    if (this->elements.empty()) {
-        this->LogWarning("当前没有任何元素，跳过保存操作！");
+bool CampathManager::CampathSaveAll() {
+    if (this->campaths.empty()) {
+        this->LogInfo("当前没有任何运镜轨道，跳过保存操作");
         return true;
     }
-    std::filesystem::path ElementFolderPath = this->Path()->PathGetFromKey("kCampaths");
-    //遍历所有元素并保存
-    for (const auto& [name, elem] : this->elements) {
-        if (!elem->Dirty) {
-            //如果不脏则跳过保存
+    auto dirCampaths = this->Path()->PathGetFromKey("kCampaths");
+
+    for (const auto& [name, pCampath] : this->campaths) {
+        if (!pCampath->IsDirty()) {
             continue;
         }
-        auto [ok, msg] = elem->Save(ElementFolderPath);
+        auto [ok, msg] = pCampath->Save(dirCampaths);
         if (ok) {
             this->LogSucc(std::move(msg));
         }
@@ -230,102 +225,73 @@ bool ElementManager::Element_SaveAll() {
             return false;
         }
     }
-    this->LogSucc("成功保存所有元素到磁盘！");
+    this->LogSucc("成功保存所有运镜轨道到磁盘！");
     return true;
 }
-bool ElementManager::Element_Load(const std::filesystem::path& FullPath) {
-    this->LogInfo("尝试从磁盘文件加载元素，文件路径：" + FullPath.string());
+bool CampathManager::CampathLoad(const std::filesystem::path& pathCampath) {
+    this->LogInfo(std::format("尝试从磁盘文件加载运镜轨道，文件路径：{}", pathCampath.string()));
     // 检查文件本身存在性
-    if (!std::filesystem::exists(FullPath)) {
-        this->LogError("磁盘文件不存在！文件路径：" + FullPath.string());
+    if (!std::filesystem::exists(pathCampath)) {
+        this->LogError("磁盘文件不存在！文件路径：" + pathCampath.string());
         return false;
     }
 
     try {
-        YAML::Node root = YAML::LoadFile(FullPath.string());
+        YAML::Node root = YAML::LoadFile(pathCampath.string());
 
-        // 获取元素名称
-        std::string NewElementName = root["name"].as<std::string>();
-        // 检查元素名是否为空
-        if (NewElementName.empty()) {
-            this->LogError("尝试从磁盘文件加载元素失败，元素名称为空！");
+        std::string newCampathName = root["name"].as<std::string>();
+        if (newCampathName.empty()) {
+            this->LogError("尝试从磁盘文件加载运镜轨道失败，名称为空！");
             return false;
         }
-        // 检查是否存在同名元素
-        if (this->elements.find(NewElementName) != this->elements.end()) {
-            this->LogError("元素名已占用，无法从磁盘文件加载元素！ 元素名：" + NewElementName);
+        if (this->campaths.find(newCampathName) != this->campaths.end()) {
+            this->LogError(std::format("运镜轨道名已占用，无法从磁盘文件加载：{}", newCampathName));
             return false;
         }
-        // 创建基类指针
-        this->LogInfo("加载元素文件路径：" + FullPath.string());
 
-        auto pElement = this->Element_Create(NewElementName);
-        // 判空
-        if (!pElement) {
-            this->LogError("尝试从磁盘文件加载元素失败，无法创建指定类型的元素实例");
+        auto pCampath = this->CampathCreate(newCampathName);
+        if (!pCampath) {
+            this->LogError(std::format("尝试从磁盘文件加载运镜轨道失败，无法实例化：{}", newCampathName));
             return false;
         }
-        // 统一加载信息
-        auto [ok, msg] = pElement->Load(root);
+        auto [ok, msg] = pCampath->Load(root);
         if (!ok) {
             this->LogError(std::move(msg));
             return false;
         }
-        pElement->Refresh();
-        pElement->Dirty = false;// 刚刚进入内存，非脏
         this->LogSucc(std::move(msg));
         return true;
     }
-    catch (...) {
-        MulNX::ErrorTerminate("元素加载异常");
+    catch (const std::exception& e) {
+        MulNX::ErrorTerminate(std::format("运镜轨道加载异常：{}", e.what()));
     }
 }
-bool ElementManager::Element_Delete(const std::string Name) {
-    // 安全检查
-    if (Name.empty()) {
-        this->LogError("尝试删除空名称的元素！");
+bool CampathManager::CampathDelete(const std::string& name) {
+    if (name.empty()) {
+        this->LogError("尝试删除空名称的运镜轨道！");
+        return false;
+    }
+    auto it = this->campaths.find(name);
+    if (it == this->campaths.end()) {
+        this->LogError(std::format("未找到要删除的运镜轨道：{}", name));
         return false;
     }
 
-    // 获取迭代器
-    auto it = this->elements.find(Name);
-    // 判空
-    if (it == this->elements.end()) {
-        this->LogError("未找到指定名称的元素：" + Name);
-        return false;
+    auto current = this->pOperatingCampath.load(std::memory_order_acquire);
+    if (current && current->GetName() == name) {
+        this->pOperatingCampath = nullptr;
     }
-
-    // 检查是否当前正在操作此元素
-    auto current = this->CurrentElement.load(std::memory_order_acquire);
-    if (current && current->GetName() == Name) {
-        this->CurrentElement = nullptr;
-    }
-
-    // 先标记为需要清理
-    it->second->NeedBeDelete = true;
-    // 通过迭代器删除元素
-    this->elements.erase(it);
-    // 添加刷新信息
-    this->PublishAsync("CameraSystem/Element/Deleted"_hash);
-
-    this->LogSucc("成功删除元素：" + Name);
+    this->campaths.erase(it);
+    this->LogSucc(std::format("成功删除运镜轨道： {}", name));
     return true;
 }
-bool ElementManager::Element_ClearAll() {
-    // 检查是否有元素
-    if (this->elements.empty()) {
-        this->LogWarning("当前没有任何元素，跳过清空操作！");
+bool CampathManager::CampathClearAll() {
+    if (this->campaths.empty()) {
+        this->LogInfo("当前没有任何运镜轨道，跳过清空");
         return true;
     }
-    // 清空当前操作元素
-    this->CurrentElement = nullptr;
-    // 把所有元素标记为需要清理并从Elements中释放
-    for (auto& [name, elem] : this->elements) {
-        elem->NeedBeDelete = true;
-    }
-    this->elements.clear();
-    // 添加刷新信息
-    this->PublishAsync("CameraSystem/Element/Deleted"_hash);
-    this->LogSucc("成功清空所有元素！");
+    this->pOperatingCampath = nullptr;
+    this->campaths.clear();
+    this->LogSucc("成功清空所有运镜轨道！");
     return true;
 }

@@ -61,7 +61,7 @@ void StartImpl(HMODULE& hModule) {
         // CS2 摄像机系统
         .CreateModule<CameraSystem>("CameraSystem")
         .CreateModule<ProjectManager>("ProjectManager")
-        .CreateModule<ElementManager>("ElementManager")
+        .CreateModule<CampathManager>("CampathManager")
         .CreateModule<SolutionManager>("SolutionManager")
         .CreateModule<CamPlayScheduler>("CamPlayScheduler")
 

@@ -15,7 +15,6 @@ bool SolutionManager::Init() {
     PathManager->KeyBindDynamic("kCamMacros", "kCurrentPack");
 
     (*this)
-        .SubscribeAsync("CameraSystem/Element/Deleted")
         .SubscribeAsync("CameraSystem/Solution/Create")
         .SubscribeAsync("CameraSystem/Solution/Delete")
         .SubscribeAsync("CameraSystem/Solution/Play")
@@ -72,13 +71,6 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->CamSys->smutex);
         this->Playing_Solution(name);
-        break;
-    }
-    case "CameraSystem/Element/Deleted"_hash: {
-        //全部刷新用于清理失效元素
-        for (auto& [name, pSolution] : this->solutions) {
-            //pSolution->Refresh();
-        }
         break;
     }
     case "CamMacro/OpenDebug"_hash: {

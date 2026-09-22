@@ -46,7 +46,7 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
                 break;
             case 2:
                 if (!InProject)break;
-                this->EManager->MenuElement();
+                this->pCampathManager->Menu();
                 break;
             }
         }
@@ -62,7 +62,7 @@ bool CameraSystem::Init() {
     // 传递指针，注入依赖，提升性能，直接调用
     // 注意，本模块所有级别的管理器相互显示注入，其它服务借助Core隐式注入
     this->CamDrawer.Init(20.0, 30.0, 15.0, 10.0, IM_COL32(255, 0, 255, 255));
-    this->EManager = this->FindModule<ElementManager>("ElementManager");
+    this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
     this->SManager = this->FindModule<SolutionManager>("SolutionManager");
     this->PManager = this->FindModule<ProjectManager>("ProjectManager");
     this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>("CamPlayScheduler");
@@ -150,10 +150,6 @@ bool CameraSystem::ConfigLoad() {
 
         auto config = root["config"];
 
-        auto elements = config["elements"];
-        this->config.ElementCfg.PreviewDraw = elements["PreviewDraw"].as<bool>();
-        this->config.ElementCfg.PreviewOverride = elements["PreviewOverride"].as<bool>();
-
         auto solutions = config["solutions"];
         this->config.SolutionCfg.SolutionShortcutEnable = solutions["shortcutEnable"].as<bool>();
         this->config.SolutionCfg.PlayingDraw = solutions["PlayingDraw"].as<bool>();
@@ -182,7 +178,7 @@ bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num
     bool needOverride = false;
 
     this->CamDrawer.Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
-    if (this->EManager->HandleUpdate(&IO))needOverride = true;
+    this->pCampathManager->HandleUpdate();
     if (this->SManager->HandleUpdate(&IO))needOverride = true;
     if (this->pCamPlayScheduler->HandleUpdate(&IO))needOverride = true;
     this->PManager->HandleUpdate();
@@ -218,8 +214,6 @@ std::pair<bool, std::string> Config::Save(const std::filesystem::path& FolderPat
 
         auto config = root["config"];
         auto elements = config["elements"];
-        elements["PreviewDraw"] = this->ElementCfg.PreviewDraw;
-        elements["PreviewOverride"] = this->ElementCfg.PreviewOverride;
 
         auto solutions = config["solutions"];
         solutions["shortcutEnable"] = this->SolutionCfg.SolutionShortcutEnable;

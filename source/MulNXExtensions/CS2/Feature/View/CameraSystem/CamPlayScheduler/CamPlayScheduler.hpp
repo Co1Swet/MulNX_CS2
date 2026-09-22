@@ -13,7 +13,7 @@ class CamPlayScheduler final :public CamSysModule {
         bool isActiveMode = false;
     };
     std::vector<PlaySlot>playslots{};
-    ElementManager* pEManager = nullptr;
+    CampathManager* pCampathManager = nullptr;
     CameraDrawer* pCamDrawer = nullptr;
 
     std::atomic<bool> drawCam = false;
