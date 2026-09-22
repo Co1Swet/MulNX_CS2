@@ -14,12 +14,12 @@ bool ElementManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
     auto* PathManager = this->Path();
-    PathManager->CreateKey("Elements", "Elements", [this](MulNX::PathManager* PathManager)->bool {
-        auto Path = PathManager->PathGetFromKey("Elements");
+    PathManager->CreateKey("kCampaths", "Campaths", [this](MulNX::PathManager* PathManager)->bool {
+        auto Path = PathManager->PathGetFromKey("kCampaths");
         this->LogSucc("成功设置元素路径为：" + Path.string());
         return true;
         });
-    PathManager->KeyBindDynamic("Elements", "CurrentPack");
+    PathManager->KeyBindDynamic("kCampaths", "kCurrentPack");
 
     (*this)
         .SubscribeAsync("Element/Create")
@@ -49,7 +49,7 @@ bool ElementManager::Init() {
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
         //获取元素文件夹路径
-        std::filesystem::path ElementsPath = this->Path()->PathGetFromKey("Elements");
+        std::filesystem::path ElementsPath = this->Path()->PathGetFromKey("kCampaths");
         std::vector<std::string>Elements = this->pIPCer->GetFileNamesByPath(ElementsPath);
         //遍历加载元素
         for (const std::string& Element : Elements) {
@@ -250,7 +250,7 @@ bool ElementManager::Element_SaveAll() {
         this->LogWarning("当前没有任何元素，跳过保存操作！");
         return true;
     }
-    std::filesystem::path ElementFolderPath = this->Path()->PathGetFromKey("Elements");
+    std::filesystem::path ElementFolderPath = this->Path()->PathGetFromKey("kCampaths");
     //遍历所有元素并保存
     for (const auto& [name, elem] : this->elements) {
         if (!elem->Dirty) {

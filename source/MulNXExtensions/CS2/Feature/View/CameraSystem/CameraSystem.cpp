@@ -66,13 +66,13 @@ bool CameraSystem::Init() {
     this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>("CamPlayScheduler");
     this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
-    auto* PathManager = this->Path();
-    PathManager->CreateKey("Packs", {}, [this](MulNX::PathManager* PathManager)->bool {
+    this->Path()->CreateKey("kCamPacks", {}, [this](MulNX::PathManager* PathManager)->bool {
         return true;
         });
-    auto dirCameraSystem = this->PathGet("Packs").parent_path();
-    PathManager->KeyBindStatic("Packs", dirCameraSystem);
+    auto dirCameraSystem = this->PathGet("CamPacks").parent_path();
+    this->Path()->KeyBindStatic("kCamPacks", dirCameraSystem);
     this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
+
     (*this)
         .SubscribeAsync("Global/Save")
         .SubscribeAsync("Global/Save/Strong")
@@ -82,8 +82,8 @@ bool CameraSystem::Init() {
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->config = {};
         auto* PathManager = this->Path();
-        PathManager->KeySetCurrent("CurrentPack", {});
-        PathManager->KeySetCurrent("Packs", "Packs");
+        PathManager->KeySetCurrent("kCurrentPack", {});
+        PathManager->KeySetCurrent("kCamPacks", "CamPacks");
         if (this->ConfigLoad()) {
             this->ConfigApply();
         }

@@ -7,12 +7,12 @@ bool SolutionManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
     auto* PathManager = this->Path();
-    PathManager->CreateKey("Solutions", "Solutions", [this](MulNX::PathManager* PathManager)->bool {
-        auto Path = PathManager->PathGetFromKey("Solutions");
+    PathManager->CreateKey("kCamMacros", "CamMacros", [this](MulNX::PathManager* PathManager)->bool {
+        auto Path = PathManager->PathGetFromKey("kCamMacros");
         this->LogSucc("成功设置解决方案路径为：" + Path.string());
         return true;
         });
-    PathManager->KeyBindDynamic("Solutions", "CurrentPack");
+    PathManager->KeyBindDynamic("kCamMacros", "kCurrentPack");
 
     (*this)
         .SubscribeAsync("CameraSystem/Element/Deleted")
@@ -37,7 +37,7 @@ bool SolutionManager::Init() {
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
         //获取解决方案文件夹路径
-        std::filesystem::path SolutionsPath = this->Path()->PathGetFromKey("Solutions");
+        std::filesystem::path SolutionsPath = this->Path()->PathGetFromKey("kCamMacros");
         std::vector<std::string>Solutions = this->pIPCer->GetFileNamesByPath(SolutionsPath);
         //遍历加载解决方案
         for (const std::string& Solution : Solutions) {
@@ -113,7 +113,7 @@ void SolutionManager::ProcessMsg(MulNX::Message& msg) {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         const Solution* pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
-        auto path = this->Path()->PathGetFromKey("Solutions");
+        auto path = this->Path()->PathGetFromKey("kCamMacros");
         auto [ok, msg] = pCamMacro->Save(path);
         if (ok) {
             this->LogSucc(std::move(msg));
@@ -191,7 +191,7 @@ bool SolutionManager::Solution_SaveAll() {
         this->LogWarning("尝试在没有任何解决方案的情况下保存");
         return true;
     }
-    std::filesystem::path SolutionFolderPath = this->Path()->PathGetFromKey("Solutions");
+    std::filesystem::path SolutionFolderPath = this->Path()->PathGetFromKey("kCamMacros");
     //遍历所有解决方案保存
     for (const auto& [name, solution] : this->solutions) {
         auto [ok, msg] = solution->Save(SolutionFolderPath);

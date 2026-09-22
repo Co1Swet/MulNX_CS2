@@ -6,9 +6,8 @@ bool ProjectManager::Init() {
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UINodeFunc();});
 
-    auto* PathManager = this->Path();
-    PathManager->CreateKey("CurrentPack", {}, [this](MulNX::PathManager* PathManager)->bool {
-        auto NewProjectPath = PathManager->PathGetFromKey("CurrentPack");
+    this->Path()->CreateKey("kCurrentPack", {}, [this](MulNX::PathManager* PathManager)->bool {
+        auto NewProjectPath = PathManager->PathGetFromKey("kCurrentPack");
         // 检验文件夹是否已存在
         if (!std::filesystem::exists(NewProjectPath)) {
             this->LogInfo("指定的项目文件夹不存在，需创建新的项目文件夹！  路径：" + NewProjectPath.string());
@@ -16,8 +15,8 @@ bool ProjectManager::Init() {
             try {
                 std::filesystem::create_directory(NewProjectPath);
                 //创建子文件夹
-                std::filesystem::create_directory(NewProjectPath / "Elements");
-                std::filesystem::create_directory(NewProjectPath / "Solutions");
+                std::filesystem::create_directory(NewProjectPath / "Campaths");
+                std::filesystem::create_directory(NewProjectPath / "CamMacros");
             }
             catch (const std::filesystem::filesystem_error& e) {
                 this->LogError("创建项目文件夹失败，错误信息：" + std::string(e.what()));
@@ -29,14 +28,14 @@ bool ProjectManager::Init() {
         this->LogSucc("成功设置项目路径为：" + NewProjectPath.string());
         return true;
         });
-    PathManager->KeyBindDynamic("CurrentPack", "Packs");
+    this->Path()->KeyBindDynamic("kCurrentPack", "kCamPacks");
 
     (*this)
         .SubscribeAsync("Game/NewRound");
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         // 自动加载所有项目到内存中
-        auto ProPath = this->Path()->PathGetFromKey("Packs");
+        auto ProPath = this->Path()->PathGetFromKey("kCamPacks");
         std::vector<std::string> ProjectsNames = this->pIPCer->GetDirNamesByPath(ProPath);
         if (!ProjectsNames.empty()) {
             for (const auto& ProjectName : ProjectsNames) {
@@ -150,7 +149,7 @@ bool ProjectManager::Project_Apply(const std::shared_ptr<Project> Project) {
     this->ActiveProject = Project;
     //清空旧元素，防止冲突
     this->PublishSync("CamSync/Clear"_hash);
-    if (!this->Path()->KeySetCurrent("CurrentPack", Project->Name)) {
+    if (!this->Path()->KeySetCurrent("kCurrentPack", Project->Name)) {
         this->LogError("尝试切换到项目时出现问题，设置项目文件夹路径失败！");
         return false;
     }
