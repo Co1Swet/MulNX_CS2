@@ -32,7 +32,6 @@ class ElementManager final : public CamSysModule {
     // 清空所有元素
     bool Element_ClearAll();
 public:
-    ElementConfig Config{};
     // 使用智能指针存储多态对象，以存储不同类型的元素
     std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> elements;
     std::shared_ptr<FreeCameraPath> FindCampath(const std::string& name);

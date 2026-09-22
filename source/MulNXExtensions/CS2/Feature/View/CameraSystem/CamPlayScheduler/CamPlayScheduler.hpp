@@ -23,5 +23,6 @@ class CamPlayScheduler final :public CamSysModule {
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
 public:
+    void Menu();
     bool HandleUpdate(CameraSystemIO* IO);
 };

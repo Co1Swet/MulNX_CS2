@@ -9,49 +9,51 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
     std::shared_lock lock(this->smutex);
 
     // 进入工作区，显示工作区内容
-    static int SelectedTab = 0;
+    static int selectedTab = 0;
     // 左侧导航栏
     {
-        auto c = MulNX::UI::RAIIChild("导航", ImVec2(150, 0), true);
-        if (ImGui::Selectable(I18n("camsys.tab_proj").c_str(), SelectedTab == 0))
-            SelectedTab = 0;
-        if (ImGui::Selectable(I18n("camsys.tab_sol").c_str(), SelectedTab == 1))
-            SelectedTab = 1;
-        if (ImGui::Selectable(I18n("camsys.tab_elem").c_str(), SelectedTab == 2))
-            SelectedTab = 2;
+        auto c = MulNX::UI::RAIIChild("导航", ImVec2(150, 0), ImGuiChildFlags_Borders);
+        if (ImGui::Selectable("运镜包管理", selectedTab == 0))
+            selectedTab = 0;
+        if (ImGui::Selectable("运镜宏管理", selectedTab == 1))
+            selectedTab = 1;
+        if (ImGui::Selectable("运镜轨道管理", selectedTab == 2))
+            selectedTab = 2;
     }
     ImGui::SameLine();
     {
-        // 右侧三类控制区
-        auto c = MulNX::UI::RAIIChild("内容", ImVec2(0, 0), true);
-        bool InProject = false;
-        if (this->PManager->ActiveProject) {
-            InProject = true;
-            ImGui::Text(I18n("camsys.proj.current", this->PManager->ActiveProject->Name).c_str());
-        }
-        else {
-            ImGui::Text(I18n("camsys.please_enter_proj").c_str());
-        }
+        auto right = MulNX::UI::RAIIChild("右侧");
+        {
+            float topH = (ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.y) * 2.0f / 3.0f;
+            auto c = MulNX::UI::RAIIChild("内容", ImVec2(0, topH), ImGuiChildFlags_Borders);
+            bool InProject = false;
+            if (this->PManager->ActiveProject) {
+                InProject = true;
+                ImGui::Text(I18n("camsys.proj.current", this->PManager->ActiveProject->Name).c_str());
+            }
+            else {
+                ImGui::Text("还未打开任何运镜包，请打开");
+            }
 
+            ImGui::Separator();
+            switch (selectedTab) {
+            case 0:
+                this->PManager->MenuProject();
+                break;
+            case 1:
+                if (!InProject)break;
+                this->SManager->MenuSolution();
+                break;
+            case 2:
+                if (!InProject)break;
+                this->EManager->MenuElement();
+                break;
+            }
+        }
         ImGui::Separator();
-        switch (SelectedTab) {
-        case 0:// 项目菜单
-            this->PManager->MenuProject();
-            break;
-        case 1:// 解决方案菜单
-            if (!InProject) {
-                ImGui::Text(I18n("camsys.please_enter_proj").c_str());
-                break;
-            }
-            this->SManager->MenuSolution();
-            break;
-        case 2:// 元素菜单
-            if (!InProject) {
-                ImGui::Text(I18n("camsys.please_enter_proj").c_str());
-                break;
-            }
-            this->EManager->MenuElement();
-            break;
+        {
+            auto c = MulNX::UI::RAIIChild("控制", ImVec2(0, 0), ImGuiChildFlags_Borders);
+            this->pCamPlayScheduler->Menu();
         }
     }
 }
@@ -117,7 +119,6 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
 }
 
 bool CameraSystem::ConfigGenerate() {
-    this->config.ElementCfg = this->EManager->Config;
     this->config.ProjectCfg = this->PManager->Config;
     this->config.SolutionCfg = this->SManager->Config;
     return true;
@@ -170,7 +171,6 @@ bool CameraSystem::ConfigLoad() {
     }
 }
 bool CameraSystem::ConfigApply() {
-    this->EManager->Config = this->config.ElementCfg;
     this->PManager->Config = this->config.ProjectCfg;
     this->SManager->Config = this->config.SolutionCfg;
     return true;

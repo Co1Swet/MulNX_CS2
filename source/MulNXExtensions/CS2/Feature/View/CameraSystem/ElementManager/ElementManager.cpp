@@ -24,10 +24,6 @@ bool ElementManager::Init() {
     (*this)
         .SubscribeAsync("Element/Create")
         .SubscribeAsync("Element/Delete")
-        .SubscribeAsync<void>("Campath/Preview/Draw/Enable")
-        .SubscribeAsync<void>("Campath/Preview/Draw/Disable")
-        .SubscribeAsync<void>("Campath/Preview/Override/Enable")
-        .SubscribeAsync<void>("Campath/Preview/Override/Disable")
         .SubscribeAsync("Campath/OpenDebug")
         .SubscribeAsync("Campath/AddKeyframe")
         .SubscribeAsync("Campath/DeleteKeyframe")
@@ -78,22 +74,6 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
         if (!this->Element_Delete(name)) {
             this->LogError(std::format("元素删除失败：{}", name));
         }
-        break;
-    }
-    case "Campath/Preview/Draw/Enable"_hash: {
-        this->Config.PreviewDraw = true;
-        break;
-    }
-    case "Campath/Preview/Draw/Disable"_hash: {
-        this->Config.PreviewDraw = false;
-        break;
-    }
-    case "Campath/Preview/Override/Enable"_hash: {
-        this->Config.PreviewOverride = true;
-        break;
-    }
-    case "Campath/Preview/Override/Disable"_hash: {
-        this->Config.PreviewOverride = false;
         break;
     }
     case "Campath/OpenDebug"_hash: {
