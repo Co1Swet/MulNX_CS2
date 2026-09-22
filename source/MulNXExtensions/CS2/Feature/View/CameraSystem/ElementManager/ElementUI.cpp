@@ -239,10 +239,6 @@ void ElementManager::UINodeFunc()const {
     for (auto& [name, elem] : this->elements) {
         elem->Draw(this->CamDrawer, this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     }
-    if (this->needDrawCamera.load(std::memory_order_acquire) && this->Config.PreviewDraw) {
-        auto frame = this->drawCamera.Read();
-        this->CamDrawer->DrawFrameCamera(*frame, I18n("camsys.elem.preview_draw_label").c_str());
-    }
     auto w = MulNX::UI::RAIIWindow("元素调试", this->showWindow);
     if (!w || !w.ShouldDraw())return;
     auto current = this->CurrentElement.load(std::memory_order_acquire);

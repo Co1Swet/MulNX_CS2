@@ -2,6 +2,7 @@
 #include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 #include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
+#include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include "CamPlayRequest.hpp"
 
 class CamPlayScheduler final :public CamSysModule {
@@ -13,7 +14,12 @@ class CamPlayScheduler final :public CamSysModule {
     };
     std::vector<PlaySlot>playslots{};
     ElementManager* pEManager = nullptr;
+    CameraDrawer* pCamDrawer = nullptr;
 
+    std::atomic<bool> needDrawCamera = false;
+    MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
+
+    void DrawPlayCamera();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
 public:

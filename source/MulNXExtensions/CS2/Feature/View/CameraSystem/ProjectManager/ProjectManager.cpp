@@ -130,7 +130,7 @@ bool ProjectManager::Project_Save() {
         return false;
     }    
     // 保存项目到磁盘
-    std::filesystem::path Path = this->Path()->PathGetFromKey("Packs") / this->ActiveProject->Name;
+    std::filesystem::path Path = this->Path()->PathGetFromKey("kCamPacks") / this->ActiveProject->Name;
     auto [ok, msg] = this->ActiveProject->Save(Path);
     if (ok) {
         this->LogSucc(std::move(msg));

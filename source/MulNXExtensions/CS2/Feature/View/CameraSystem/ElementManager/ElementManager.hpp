@@ -16,8 +16,6 @@ class ElementManager final : public CamSysModule {
 
     // 展示单个元素信息在一行上
     void Element_ShowInLine(const std::shared_ptr<const FreeCameraPath> element)const;
-    std::atomic<bool> needDrawCamera = false;
-    mutable MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
 
     void DebugUI(const FreeCameraPath* campath)const;
     void UINodeFunc()const;

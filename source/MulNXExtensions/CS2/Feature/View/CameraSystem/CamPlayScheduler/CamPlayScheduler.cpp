@@ -1,14 +1,28 @@
 #include "CamPlayScheduler.hpp"
 #include <CameraSystem/ElementManager/ElementManager.hpp>
 
+void CamPlayScheduler::DrawPlayCamera() {
+    if (!this->needDrawCamera.load(std::memory_order_acquire))return;
+
+    auto frame = this->drawCamera.Read();
+    this->pCamDrawer->DrawFrameCamera(*frame, "当前播放摄像机");
+}
+
 bool CamPlayScheduler::Init() {
     this->pEManager = this->FindModule<ElementManager>("ElementManager");
+    this->pCamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
 
     (*this)
         .SubscribeAsync("CamPlay/Request")
         .SubscribeAsync("CamPlay/Clear")
         .SubscribeAsync("CamPlay/ClearForce")
         ;
+
+    this->SubscribeSync("System/Init/End", [this](auto&&...) {
+        this->UIRegisterBackground("DrawPlayCamera", [this](auto&&...) {
+            this->DrawPlayCamera();
+            });
+        });
 
     return true;
 }
@@ -55,7 +69,12 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
 
 bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
-    if (this->playslots.empty())return false;
+
+    if (this->playslots.empty()) {
+        this->needDrawCamera = false;
+        return false;
+    }
+
     bool ret = false;
     for (auto slot = this->playslots.begin();slot != this->playslots.end();) {
         IO->ElementTime = this->pTimeline->GetTime();
@@ -72,6 +91,15 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
             ret = true;
         }
         ++slot;
+    }
+
+    if (ret) {
+        auto frame = this->drawCamera.Write();
+        *frame = IO->Frame;
+        this->needDrawCamera.store(true, std::memory_order_release);
+    }
+    else {
+        this->needDrawCamera.store(false, std::memory_order_release);
     }
     return ret;
 }

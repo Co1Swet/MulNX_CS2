@@ -204,22 +204,6 @@ void ElementManager::ProcessMsg(MulNX::Message& msg) {
 bool ElementManager::HandleUpdate(CameraSystemIO* IO) {
     this->Update();
     return false;
-    // std::shared_lock lock(this->smutex);
-    // if (!this->OnPreview) return false;
-    // IO->ElementTime = this->pTimeline->GetTime();
-    // IO->FrameGameTime = this->pTimeline->GetTime();
-    // if (this->Preview_Call(IO)) {
-    //     //自由摄像机轨道预览
-    //     if (this->Config.PreviewDraw) {
-    //         auto frame = this->drawCamera.Write();
-    //         *frame = IO->Frame;
-    //         this->needDrawCamera.store(true, std::memory_order_release);
-    //     }
-    //     else {
-    //         this->needDrawCamera.store(false, std::memory_order_release);
-    //     }
-    //     return this->Config.PreviewOverride;
-    // }
 }
 
 std::shared_ptr<FreeCameraPath> ElementManager::FindCampath(const std::string& name) {
