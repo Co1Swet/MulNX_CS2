@@ -112,7 +112,9 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
         rp->str1 = campath->GetName();
         this->PublishAsync(std::move(msg));
     }
-    if (ImGui::Button("预览运镜")) {
+
+    static auto kPreview = this->Shortcut()->GetButton("preview").value();
+    if (ImGui::Button("预览运镜（或双击R）") || this->pInputSystem->CheckWithPack(kPreview)) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Preview"_hash);
         auto&& [previewOffset] = msg.Access<float>();
         previewOffset = 0.0f;

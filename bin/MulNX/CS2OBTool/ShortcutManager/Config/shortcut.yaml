@@ -12,6 +12,15 @@ buttons:
       vkCode: 20 # 大写锁定键
       comboClick: 1
 
+  - name: "preview" # 预览轨道
+    KCP:
+      usable: true
+      ctrl: false
+      shift: false
+      alt: false
+      vkCode: 82 # R
+      comboClick: 2
+
   - name: "CamMovUp" # 摄像机上升，默认R
     KCP:
       usable: true

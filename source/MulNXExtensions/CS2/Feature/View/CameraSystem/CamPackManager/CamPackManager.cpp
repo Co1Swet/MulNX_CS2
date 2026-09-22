@@ -46,6 +46,10 @@ bool CamPackManager::Init() {
         for (const auto& camPackName : camPackNames) {
             this->CamPackLoad(dirCamPacks / camPackName, camPackName);
         }
+
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPack/Apply"_hash);
+        rp->str1 = "default";
+        this->PublishAsync(std::move(msg));
         });
 
     this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {

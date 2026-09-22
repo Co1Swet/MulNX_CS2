@@ -30,4 +30,5 @@ void CamPlayScheduler::Menu() {
             this->PublishAsync("CamPlay/Override/Disable"_hash);
         }
     }
+    ImGui::Text("alt+P以 停止所有预览（包括宏触发），alt+P*2清理所有运镜");
 }
