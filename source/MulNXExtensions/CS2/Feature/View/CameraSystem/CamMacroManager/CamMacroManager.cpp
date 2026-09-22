@@ -50,7 +50,7 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "CamMacro/Create"_hash: {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys->smutex);
+        std::unique_lock lock(this->smutex);
         if (!this->CamMacroCreate(name)) {
             this->LogError(std::format("创建运镜宏失败：{}", name));
         }
@@ -58,7 +58,7 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "CamMacro/Delete"_hash: {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys->smutex);
+        std::unique_lock lock(this->smutex);
         if (!this->CamMacroDelete(name)) {
             this->LogError(std::format("删除运镜宏失败：{}", name));
         }
@@ -66,7 +66,7 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "CamMacro/Play"_hash: {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->CamSys->smutex);
+        std::unique_lock lock(this->smutex);
         this->PlayCamMacro(name);
         break;
     }
