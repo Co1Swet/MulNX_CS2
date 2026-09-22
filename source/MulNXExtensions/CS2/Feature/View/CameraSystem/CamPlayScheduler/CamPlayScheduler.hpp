@@ -16,6 +16,9 @@ class CamPlayScheduler final :public CamSysModule {
     ElementManager* pEManager = nullptr;
     CameraDrawer* pCamDrawer = nullptr;
 
+    std::atomic<bool> drawCam = false;
+    std::atomic<bool> camOverride = true;
+
     std::atomic<bool> needDrawCamera = false;
     MulNX::NewestBuffer<MulNX::Math::Frame> drawCamera;
 

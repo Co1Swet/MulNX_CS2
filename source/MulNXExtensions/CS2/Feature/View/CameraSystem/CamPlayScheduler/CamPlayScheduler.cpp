@@ -1,13 +1,6 @@
 #include "CamPlayScheduler.hpp"
 #include <CameraSystem/ElementManager/ElementManager.hpp>
 
-void CamPlayScheduler::DrawPlayCamera() {
-    if (!this->needDrawCamera.load(std::memory_order_acquire))return;
-
-    auto frame = this->drawCamera.Read();
-    this->pCamDrawer->DrawFrameCamera(*frame, "当前播放摄像机");
-}
-
 bool CamPlayScheduler::Init() {
     this->pEManager = this->FindModule<ElementManager>("ElementManager");
     this->pCamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
@@ -16,6 +9,11 @@ bool CamPlayScheduler::Init() {
         .SubscribeAsync("CamPlay/Request")
         .SubscribeAsync("CamPlay/Clear")
         .SubscribeAsync("CamPlay/ClearForce")
+
+        .SubscribeAsync<void>("CamPlay/Draw/Enable")
+        .SubscribeAsync<void>("CamPlay/Draw/Disable")
+        .SubscribeAsync<void>("CamPlay/Override/Enable")
+        .SubscribeAsync<void>("CamPlay/Override/Disable")
         ;
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
@@ -64,6 +62,22 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         this->playslots.clear();
         break;
     }
+    case "CamPlay/Draw/Enable"_hash: {
+        this->drawCam.store(true, std::memory_order_release);
+        break;
+    }
+    case "CamPlay/Draw/Disable"_hash: {
+        this->drawCam.store(false, std::memory_order_release);
+        break;
+    }
+    case "CamPlay/Override/Enable"_hash: {
+        this->camOverride.store(true, std::memory_order_release);
+        break;
+    }
+    case "CamPlay/Override/Disable"_hash: {
+        this->camOverride.store(false, std::memory_order_release);
+        break;
+    }
     }
 }
 
@@ -101,5 +115,6 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
     else {
         this->needDrawCamera.store(false, std::memory_order_release);
     }
+    ret = ret && this->camOverride.load(std::memory_order_acquire);
     return ret;
 }

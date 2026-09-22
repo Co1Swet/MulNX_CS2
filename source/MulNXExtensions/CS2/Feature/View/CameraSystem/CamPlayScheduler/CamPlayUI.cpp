@@ -1,23 +1,33 @@
 #include "CamPlayScheduler.hpp"
 
+void CamPlayScheduler::DrawPlayCamera() {
+    if (!this->drawCam.load(std::memory_order_acquire))return;
+    if (!this->needDrawCamera.load(std::memory_order_acquire))return;
+    
+    auto frame = this->drawCamera.Read();
+    this->pCamDrawer->DrawFrameCamera(*frame, "当前播放摄像机");
+}
+
 void CamPlayScheduler::Menu() {
 
-    ImGui::SeparatorText("预览总控");
-    //ImGui::Text(std::format("是否允许预览摄像机绘制：{}", this->Config.PreviewDraw ? "允许" : "不允许").c_str());
-    if (ImGui::Button("启用预览摄像机绘制")) {
-        this->PublishAsync("Campath/Preview/Draw/Enable"_hash);
+    ImGui::Text("播放控制");
+    auto bDraw = this->drawCam.load(std::memory_order_acquire);
+    if (ImGui::Checkbox("绘制播放摄像机",&bDraw)) {
+        if (bDraw) {
+            this->PublishAsync("CamPlay/Draw/Enable"_hash);
+        }
+        else {
+            this->PublishAsync("CamPlay/Draw/Disable"_hash);
+        }
     }
-    ImGui::SameLine();
-    if (ImGui::Button("禁用预览摄像机绘制")) {
-        this->PublishAsync("Campath/Preview/Draw/Disable"_hash);
-    }
-    // ImGui::Text(std::format("是否允许预览摄像机覆盖游戏摄像机：{}",
-    //     this->Config.PreviewOverride ? "允许" : "不允许").c_str());
-    if (ImGui::Button("启用预览摄像机覆盖")) {
-        this->PublishAsync("Campath/Preview/Override/Enable"_hash);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("禁用预览摄像机覆盖")) {
-        this->PublishAsync("Campath/Preview/Override/Disable"_hash);
+
+    auto bOverride = this->camOverride.load(std::memory_order_acquire);
+    if (ImGui::Checkbox("播放覆盖游戏视角", &bOverride)) {
+        if (bOverride) {
+            this->PublishAsync("CamPlay/Override/Enable"_hash);
+        }
+        else {
+            this->PublishAsync("CamPlay/Override/Disable"_hash);
+        }
     }
 }
