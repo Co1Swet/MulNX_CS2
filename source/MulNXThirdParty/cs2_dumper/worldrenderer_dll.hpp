@@ -1,5 +1,5 @@
 // Generated using https://github.com/a2x/cs2-dumper
-// 2026-09-10 00:37:40.395762200 UTC
+// 2026-09-23 04:33:43.342540800 UTC
 
 #pragma once
 
@@ -19,7 +19,7 @@ namespace cs2_dumper {
                 RTPROXY_INSTANCE_UNIQUE_MESH = 0x1
             };
             // Alignment: 4
-            // Member count: 16
+            // Member count: 17
             enum class ObjectTypeFlags_t : uint32_t {
                 OBJECT_TYPE_NONE = 0x0,
                 OBJECT_TYPE_MODEL = 0x8,
@@ -36,7 +36,8 @@ namespace cs2_dumper {
                 OBJECT_TYPE_DISABLE_VIS_CULLING = 0x10000,
                 OBJECT_TYPE_BAKED_GEOMETRY = 0x20000,
                 OBJECT_TYPE_NEEDS_DYNAMIC_SHADOWS = 0x40000,
-                OBJECT_TYPE_HAS_AGGREGATE_RTPROXY = 0x80000
+                OBJECT_TYPE_HAS_AGGREGATE_RTPROXY = 0x80000,
+                OBJECT_TYPE_HAS_EMISSIVE_GI = 0x100000
             };
             // Alignment: 1
             // Member count: 4
@@ -57,7 +58,7 @@ namespace cs2_dumper {
             // Field count: 0
             namespace CEntityComponent {
             }
-            // Parent: CEntityComponent
+            // Parent: None
             // Field count: 1
             //
             // Metadata:
@@ -85,7 +86,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_pNextByClass = 0x68; // CEntityIdentity*
             }
             // Parent: None
-            // Field count: 9
+            // Field count: 10
             //
             // Metadata:
             // MGetKV3ClassDefaults
@@ -99,6 +100,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_nVertexEmissiveByteOffset = 0x10; // uint32
                 constexpr std::ptrdiff_t m_fEmissiveFactor = 0x14; // float32
                 constexpr std::ptrdiff_t m_mWorldFromLocal = 0x18; // matrix3x4_t
+                constexpr std::ptrdiff_t m_vTintColorSRGB = 0x48; // Color
             }
             // Parent: None
             // Field count: 1
@@ -109,7 +111,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_BufferData = 0x0; // CUtlBinaryBlock
             }
             // Parent: None
-            // Field count: 14
+            // Field count: 15
             //
             // Metadata:
             // MGetKV3ClassDefaults
@@ -126,8 +128,9 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_nLODOverride = 0x6A; // int16
                 constexpr std::ptrdiff_t m_nCubeMapPrecomputedHandshake = 0x6C; // int32
                 constexpr std::ptrdiff_t m_nLightProbeVolumePrecomputedHandshake = 0x70; // int32
-                constexpr std::ptrdiff_t m_renderableModel = 0x78; // CStrongHandle<InfoForResourceTypeCModel>
-                constexpr std::ptrdiff_t m_renderable = 0x80; // CStrongHandle<InfoForResourceTypeCRenderMesh>
+                constexpr std::ptrdiff_t m_flEmissiveLightingBoost = 0x74; // float32
+                constexpr std::ptrdiff_t m_renderableModel = 0x80; // CStrongHandle<InfoForResourceTypeCModel>
+                constexpr std::ptrdiff_t m_renderable = 0x88; // CStrongHandle<InfoForResourceTypeCRenderMesh>
             }
             // Parent: None
             // Field count: 3
@@ -179,18 +182,15 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_renderableModel = 0x70; // CStrongHandle<InfoForResourceTypeCModel>
             }
             // Parent: None
-            // Field count: 7
+            // Field count: 4
             //
             // Metadata:
             // MGetKV3ClassDefaults
             namespace NodeData_t {
-                constexpr std::ptrdiff_t m_nParent = 0x0; // int32
-                constexpr std::ptrdiff_t m_vOrigin = 0x4; // Vector
-                constexpr std::ptrdiff_t m_vMinBounds = 0x10; // Vector
-                constexpr std::ptrdiff_t m_vMaxBounds = 0x1C; // Vector
-                constexpr std::ptrdiff_t m_flMinimumDistance = 0x28; // float32
-                constexpr std::ptrdiff_t m_ChildNodeIndices = 0x30; // CUtlVector<int32>
-                constexpr std::ptrdiff_t m_worldNodePrefix = 0x48; // CUtlString
+                constexpr std::ptrdiff_t m_vOrigin = 0x0; // Vector
+                constexpr std::ptrdiff_t m_vMinBounds = 0xC; // Vector
+                constexpr std::ptrdiff_t m_vMaxBounds = 0x18; // Vector
+                constexpr std::ptrdiff_t m_worldNodePrefix = 0x28; // CUtlString
             }
             // Parent: None
             // Field count: 0
@@ -317,7 +317,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_paramMap = 0x30; // KeyValues3
             }
             // Parent: None
-            // Field count: 11
+            // Field count: 12
             //
             // Metadata:
             // MGetKV3ClassDefaults
@@ -328,9 +328,10 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_bHasLightmaps = 0x10; // bool
                 constexpr std::ptrdiff_t m_bBakedShadowsGamma20 = 0x11; // bool
                 constexpr std::ptrdiff_t m_bCompressionEnabled = 0x12; // bool
-                constexpr std::ptrdiff_t m_bSHLightmaps = 0x13; // bool
-                constexpr std::ptrdiff_t m_nChartPackIterations = 0x14; // uint8
-                constexpr std::ptrdiff_t m_nVradQuality = 0x15; // uint8
+                constexpr std::ptrdiff_t m_nLPVEncoding = 0x13; // int8
+                constexpr std::ptrdiff_t m_nLightmapEncoding = 0x14; // int8
+                constexpr std::ptrdiff_t m_nChartPackIterations = 0x15; // uint8
+                constexpr std::ptrdiff_t m_nVradQuality = 0x16; // uint8
                 constexpr std::ptrdiff_t m_lightMaps = 0x18; // CUtlVector<CStrongHandle<InfoForResourceTypeCTextureBase>>
                 constexpr std::ptrdiff_t m_bakedShadows = 0x30; // CUtlVector<BakedLightingInfo_t::BakedShadowAssignment_t>
             }

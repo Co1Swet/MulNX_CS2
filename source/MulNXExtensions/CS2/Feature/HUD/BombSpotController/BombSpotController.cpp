@@ -26,7 +26,7 @@ bool BombSpotController::Init() {
         this->RegisterAttachHook(this->hkPos_Spot_WriteBombState, "Pos_Spot_WriteBombState where rdx is BombColor*");
 
         auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
-        this->hkPos_CallGetPawnMaybeSetAllHUD = MulNX::Hook::Create(Pos_CallGetPawnMaybeSetAllHUD + 14, [this](MulNX::Hook* hk, RegContext* ctx) {
+        this->hkPos_CallGetPawnMaybeSetAllHUD = MulNX::Hook::Create(Pos_CallGetPawnMaybeSetAllHUD, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pOBing = this->CS2Entitys->TryGetObservingPawn();
             auto pRet = (CS2::C_BaseEntity*)ctx->rax;
             if (pOBing)ctx->rax = (uint64_t)pOBing;

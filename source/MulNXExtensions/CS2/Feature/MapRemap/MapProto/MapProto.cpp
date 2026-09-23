@@ -126,7 +126,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
     // RVA: 0x17B7A3 (mov rbx, rax)
     // rsi = a1 = pGSC
     // _has_bits_ 低位在 +0x10，field 11 是 bit 2
-    // field 11 slot 在 a1 + 0x28
+    // field 11 slot 在 a1 + 0x40
     this->hkCSVCMsg_GameSessionConfiguration_PraseString = MulNX::Hook::Create(
         textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Protobuf::Pos_CSVCMsg_GameSessionConfiguration_PraseString).Data(),
         [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -137,7 +137,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             uint32_t hasBits = *(uint32_t*)(a1 + 0x10);
             if ((hasBits & 0b100) == 0) return MulNX::Hook::Then::Continue;
 
-            CS2::CUtlStringRef ref((uint64_t*)(a1 + 0x28));
+            CS2::CUtlStringRef ref((uint64_t*)(a1 + 0x40));
             std::string_view sv = ref.View();
             if (sv.empty()) return MulNX::Hook::Then::Continue;
             if (!CheckName(sv))return MulNX::Hook::Then::Continue;

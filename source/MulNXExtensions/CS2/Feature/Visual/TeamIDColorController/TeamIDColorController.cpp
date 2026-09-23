@@ -45,12 +45,9 @@ bool TeamIDColorController::Init() {
         auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄
 
         // Hook CLayoutFile::LoadFromFile
-        auto lflAddr = textRegion.FindRegion(
-            MulNX::CS2::Signatures::Hud::CLayoutFile_LoadFromFile
-        );
-        if (!lflAddr.IsValid()) return;
+        auto target = textRegion.FindRegion(MulNX::CS2::Signatures::Hud::CLayoutFile_LoadFromFile).Data();
 
-        this->hkLoadFromFile = MulNX::Hook::Create(lflAddr.Data(), [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
+        this->hkLoadFromFile = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
             // RCX=this, RDX=filePath, R8=unk
             const char* filePath = reinterpret_cast<const char*>(ctx->rdx);
             if (filePath && strstr(filePath, "hudreticle.xml")) {

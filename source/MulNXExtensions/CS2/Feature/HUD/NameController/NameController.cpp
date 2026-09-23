@@ -29,41 +29,6 @@ void NameController::UIPlayer(MulNX::Message* msg) {
     }
 }
 
-// .text:00000001808C24A0 4C 89 A5 98 00 00 00                                            mov[rbp + 210h + var_178], r12
-// .text:00000001808C24A7 4C 89 74 24 58                                                  mov[rsp + 310h + var_2B8], r14
-// .text:00000001808C24AC F3 0F 7F 44 24 60                                               movdqu[rsp + 310h + var_2B0], xmm0
-// .text:00000001808C24B2
-// .text:00000001808C24B2                                                 loc_1808C24B2 : ; CODE XREF : sub_1808C2260 + 34F↓j
-// .text : 00000001808C24B2 44 85 7F F8                                                     test[rdi - 8], r15d
-// .text:00000001808C24B6 0F 84 C9 00 00 00                                               jz      loc_1808C2585
-// .text:00000001808C24BC 48 8B 4F 40                                                     mov     rcx, [rdi + 40h]
-// .text:00000001808C24C0 48 85 C9                                                        test    rcx, rcx
-// .text:00000001808C24C3 0F 84 35 04 00 00                                               jz      loc_1808C28FE
-// .text:00000001808C24C9 48 8B 01                                                        mov     rax, [rcx] <--- 我们在这里进行劫持
-// .text:00000001808C24CC FF 50 10                                                        call    qword ptr[rax + 10h]
-// .text:00000001808C24CF 4C 8B F0                                                        mov     r14, rax <--- 自由篡改字符串！
-// .text:00000001808C24D2 48 85 C0                                                        test    rax, rax
-// .text:00000001808C24D5 0F 84 A7 00 00 00                                               jz      loc_1808C2582
-// .text:00000001808C24DB 80 38 00                                                        cmp     byte ptr[rax], 0
-// .text:00000001808C24DE 0F 84 9E 00 00 00                                               jz      loc_1808C2582
-// .text:00000001808C24E4 48 8B 1F                                                        mov     rbx, [rdi] <--- 这个地方不稳定，我们不要通过rbx拿取现在正在读取什么（拿了也是垃圾值）
-// .text:00000001808C24E7 48 8D 8D 38 02 00 00                                            lea     rcx, [rbp + 210h + arg_18]
-// .text:00000001808C24EE 48 8B D3                                                        mov     rdx, rbx
-// .text:00000001808C24F1 FF 15 91 61 09 01                                               call    cs : ? Make@CUtlStringToken@@SA ? AV1@PEBD@Z; CUtlStringToken::Make(char const*)
-// .text:00000001808C24F7 48 85 DB                                                        test    rbx, rbx
-// .text:00000001808C24FA C6 44 24 34 00                                                  mov[rsp + 310h + var_2DC], 0
-// .text:00000001808C24FF C7 44 24 30 01 00 00 00                                         mov[rsp + 310h + var_2E0], 1
-// .text:00000001808C2507 8B 08                                                           mov     ecx, [rax]
-// .text:00000001808C2509 48 8D 05 78 7B 0A 01                                            lea     rax, byte_18196A088
-// .text:00000001808C2510 48 0F 45 C3                                                     cmovnz  rax, rbx
-// .text:00000001808C2514 89 4C 24 40                                                     mov[rsp + 310h + var_2D0], ecx
-// .text:00000001808C2518 49 8B CE                                                        mov     rcx, r14
-// .text:00000001808C251B 48 89 44 24 48                                                  mov[rsp + 310h + var_2C8], rax
-// .text:00000001808C2520 FF 15 FA 62 09 01                                               call    cs : MemAlloc_StrDupFunc
-// .text : 00000001808C2526 45 33 C9 xor r9d, r9d
-// .text:00000001808C2529 4C 8D 44 24 30                                                  lea     r8, [rsp + 310h + var_2E0]
-// .text:00000001808C252E 48 8D 54 24 40                                                  lea     rdx, [rsp + 310h + var_2D0]
-
 bool NameController::Init() {
     this->SubscribeAsync("Name/Player/Set");
 
@@ -86,7 +51,7 @@ bool NameController::Init() {
         uint8_t** vtable = (uint8_t**)Afx::BinUtils::FindClassVtable(this->CS2->client.hModule, ".?AVCCSPlayerController@@", 0, 0);
         if (!vtable)MulNX::ErrorTerminate("找不到pCCSPlayerController::vtable");
         
-        auto pCCSPlayerController_GetPlayerName = vtable[226];
+        auto pCCSPlayerController_GetPlayerName = vtable[230];
         this->hkGetPlayerName = MulNX::Hook::Create(pCCSPlayerController_GetPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto playerController = (CS2::CCSPlayerController*)ctx->rcx;
             // 调用原始函数获取原始名字
@@ -132,7 +97,7 @@ MulNX::Hook::Then NameController::HandleGetDecoratedPlayerName(MulNX::Hook* hk, 
     auto pCtrler = this->CS2Entitys->GetBaseEntity(userId + 1)->As<CS2::CBasePlayerController>();
     auto steamId = MulNX::MRead(pCtrler->m_steamID());
 
-    const char* currentComponentName = *(const char**)ctx->rdi;
+    const char* currentComponentName = *(const char**)ctx->rsi;
 
     if (*currentComponentName == 'o') {
         // original_controller
