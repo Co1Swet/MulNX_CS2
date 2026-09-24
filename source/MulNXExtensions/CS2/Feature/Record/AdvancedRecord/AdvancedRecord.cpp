@@ -55,6 +55,13 @@ void AdvancedRecord::SetRecordStart(const MulNX::AVStartInfo& sInfo) {
     if (!this->startAsAdvanced)return;
 
     int fps = this->pMediaParamManager->targetFPS.load();
+    if (fps > 0) {
+        this->minIntervalUs.store(1000000LL / fps, std::memory_order_release);
+    }
+    else {
+        this->minIntervalUs.store(1, std::memory_order_release);
+    }
+
     this->AsyncCommandHighPriority(std::format("host_framerate {}; startmovie {} wav framerate {}",
         fps, *sInfo.pFilenameWithoutStem, fps));
 }
