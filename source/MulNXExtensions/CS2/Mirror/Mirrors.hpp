@@ -5,3 +5,4 @@
 #include "SceneSystem/SceneSystem.hpp"
 #include "ResourceSystem/ResourceSystem.hpp"
 #include "ParticleSystemMgr/ParticleSystemMgr.hpp"
+#include "VFileSystem/VFileSystem.hpp"

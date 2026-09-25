@@ -50,6 +50,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<SceneSystem>("SceneSystem")
         .CreateModule<ResourceSystem>("ResourceSystem")
         .CreateModule<ParticleSystemMgr>("ParticleSystemMgr")
+        .CreateModule<VFileSystem>("VFileSystem")
 
         // CS2 自定义支持
         .CreateModule<ConsoleOutput>("ConsoleOutput")
@@ -57,6 +58,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<TimeController>("TimeController")// 承担了时间适配器责任
         .CreateModule<NameController>("NameController")
         .CreateModule<PlayerHub>("PlayerHub")
+        .CreateModule<FileInjector>("FileInjector")
 
         // CS2 摄像机系统
         .CreateModule<CameraSystem>("CameraSystem")

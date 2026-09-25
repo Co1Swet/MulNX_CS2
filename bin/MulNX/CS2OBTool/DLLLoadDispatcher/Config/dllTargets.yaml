@@ -10,3 +10,4 @@ targets:
   - soundsystem.dll
   - resourcesystem.dll
   - particles.dll
+  - filesystem_stdio.dll
