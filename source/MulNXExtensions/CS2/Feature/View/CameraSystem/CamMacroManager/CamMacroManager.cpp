@@ -119,11 +119,11 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         auto* pCamMacro = this->FindCamMacro(pNetExt->str1);
         if (!pCamMacro)break;
         if (pCamMacro->AddCampath(pNetExt->str2, offset)) {
-            this->LogError(std::format("无法添加运镜到宏，可能是运镜已存在于宏中。宏：{}，运镜：{}",
+            this->LogSucc(std::format("成功添加运镜到宏 。宏：{}，运镜：{}",
                 pNetExt->str1, pNetExt->str2));
         }
         else {
-            this->LogSucc(std::format("成功添加运镜到宏 。宏：{}，运镜：{}",
+            this->LogError(std::format("无法添加运镜到宏，可能是运镜已存在于宏中。宏：{}，运镜：{}",
                 pNetExt->str1, pNetExt->str2));
         }
         break;
