@@ -48,8 +48,12 @@ void HSI::OnDeathEvent(CS2::CGameEvent* event) {
         auto pVictim = event->GetPlayerController(userid);
         auto pAssister = event->GetPlayerController(assister);
 
-        kEvent.attacker = MulNX::MRead(pAttacker->m_steamID());
-        kEvent.victim = MulNX::MRead(pVictim->m_steamID());
+        if (pAttacker) {
+            kEvent.attacker = MulNX::MRead(pAttacker->m_steamID());
+        }
+        if (pVictim) {
+            kEvent.victim = MulNX::MRead(pVictim->m_steamID());
+        }
         if (pAssister)kEvent.assister = MulNX::MRead(pAssister->m_steamID());
         else kEvent.assister = 0;
     }
