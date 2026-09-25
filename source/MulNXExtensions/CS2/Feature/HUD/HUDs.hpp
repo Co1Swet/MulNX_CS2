@@ -2,7 +2,6 @@
 #include "BombSpotController/BombSpotController.hpp"
 #include "DeathMsgController/DeathMsgController.hpp"
 #include "KeyboardOverlay/KeyboardOverlay.hpp"
-#include "NameController/NameController.hpp"
 #include "PlayerSpotColorController/PlayerSpotColorController.hpp"
 #include "PlayerSpotRenderController/PlayerSpotRenderController.hpp"
 #include "HookTeamCounter/HookTeamCounter.hpp"

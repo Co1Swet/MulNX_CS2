@@ -4,3 +4,4 @@
 #include "PlayerHub/PlayerHub.hpp"
 #include "TimeController/TimeController.hpp"
 #include "TargetPicker/TargetPicker.hpp"
+#include "NameController/NameController.hpp"
