@@ -1,7 +1,7 @@
 #include "CSController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/CSModuleBase.hpp>
-#include <MulNXThirdParty/All_cs2_dumper.hpp>
+#include <MulNXThirdParty/cs2_dumpers.hpp>
 
 void CSController::Window() {
     auto w = MulNX::UI::RAIIWindow("实验性功能");

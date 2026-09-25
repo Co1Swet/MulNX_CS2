@@ -1,5 +1,5 @@
 // Generated using https://github.com/a2x/cs2-dumper
-// 2026-09-24 04:25:03.761688700 UTC
+// 2026-09-25 02:01:52.073323700 UTC
 
 #pragma once
 
@@ -9279,7 +9279,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_bPvsModifyEntity = 0x1B8; // bool
             }
             // Parent: CBasePlayerWeapon
-            // Field count: 56
+            // Field count: 57
             namespace CCSWeaponBase {
                 constexpr std::ptrdiff_t m_bRemoveable = 0xEF8; // bool
                 constexpr std::ptrdiff_t m_bPlayerAmmoStockOnPickup = 0xEF9; // bool
@@ -9314,11 +9314,12 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_bInSilentReloadSection = 0xFC1; // bool
                 constexpr std::ptrdiff_t m_bSilentReloadStatCounted = 0xFC2; // bool
                 constexpr std::ptrdiff_t m_flStealthHoldStartTime = 0xFC4; // GameTime_t
-                constexpr std::ptrdiff_t m_flWeaponActionPlaybackRate = 0xFC8; // float32
-                constexpr std::ptrdiff_t m_iOriginalTeamNumber = 0xFCC; // int32
-                constexpr std::ptrdiff_t m_iMostRecentTeamNumber = 0xFD0; // int32
-                constexpr std::ptrdiff_t m_bDroppedNearBuyZone = 0xFD4; // bool
-                constexpr std::ptrdiff_t m_flNextAttackRenderTimeOffset = 0xFD8; // float32
+                constexpr std::ptrdiff_t m_bReloadHeldSinceStart = 0xFC8; // bool
+                constexpr std::ptrdiff_t m_flWeaponActionPlaybackRate = 0xFCC; // float32
+                constexpr std::ptrdiff_t m_iOriginalTeamNumber = 0xFD0; // int32
+                constexpr std::ptrdiff_t m_iMostRecentTeamNumber = 0xFD4; // int32
+                constexpr std::ptrdiff_t m_bDroppedNearBuyZone = 0xFD8; // bool
+                constexpr std::ptrdiff_t m_flNextAttackRenderTimeOffset = 0xFDC; // float32
                 constexpr std::ptrdiff_t m_bCanBePickedUp = 0xFF0; // bool
                 constexpr std::ptrdiff_t m_bUseCanOverrideNextOwnerTouchTime = 0xFF1; // bool
                 constexpr std::ptrdiff_t m_nextOwnerTouchTime = 0xFF4; // GameTime_t

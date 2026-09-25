@@ -1,7 +1,7 @@
 #pragma once
 #include <Game/BaseType.hpp>
 #include <MulNX/Config/Config.hpp>
-#include <MulNXThirdParty/All_cs2_dumper.hpp>
+#include <MulNXThirdParty/cs2_dumpers.hpp>
 
 namespace CS2 {
 #pragma pack(push, 1)

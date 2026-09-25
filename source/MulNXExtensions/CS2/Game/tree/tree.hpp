@@ -1,7 +1,7 @@
 #pragma once 
 #include <Game/BaseType.hpp>
 #include <MulNXUtils/WinExt/vtable/vtable.hpp>
-#include <MulNXThirdParty/All_cs2_dumper.hpp>
+#include <MulNXThirdParty/cs2_dumpers.hpp>
 #include <Game/CSUtils/CSUtils.hpp>
 #include "PawnsServices.hpp"
 
