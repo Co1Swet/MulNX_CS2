@@ -1,0 +1,12 @@
+name: test
+KCP:
+  usable: false
+  ctrl: false
+  shift: false
+  alt: false
+  vkCode: 0
+  comboClick: 0
+size: 1
+elements:
+  - name: test
+    offset: 0

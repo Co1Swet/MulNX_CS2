@@ -20,9 +20,11 @@ bool CamMacro::AddCampath(const std::string& name, const float offset) {
             return a.offset < b.offset;
         });
     this->wrapCampaths.insert(insertPos, std::move(newWrap));
+    this->dirty = true;
     return true;
 }
 bool CamMacro::RemoveCampath(const std::string& campathName) {
+    this->dirty = true;
     for (auto it = this->wrapCampaths.begin();it != this->wrapCampaths.end();++it) {
         if (it->campathName == campathName) {
             this->wrapCampaths.erase(it);
@@ -92,6 +94,7 @@ std::pair<bool, std::string> CamMacro::Save(const std::filesystem::path& folderP
         fout << root;
         fout.close();
 
+        this->dirty = false;
         return { true, std::format("保存成功：运镜宏名：{}  运镜数：{}",this->name ,this->wrapCampaths.size()) };
     }
     catch (const std::exception& e) {

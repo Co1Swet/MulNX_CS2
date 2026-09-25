@@ -170,6 +170,7 @@ std::pair<bool, std::string> FreeCameraPath::Save(const std::filesystem::path& f
         fout << out.c_str();
         fout.close();
 
+        this->dirty = false;
         return { true,"成功保存" + filePath.string() };
     }
     catch (const std::exception& e) {

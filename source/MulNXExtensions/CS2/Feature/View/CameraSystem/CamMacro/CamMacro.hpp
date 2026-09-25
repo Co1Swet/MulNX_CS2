@@ -15,10 +15,12 @@ class CamMacro final {
 
     PlaybackMode playmode = PlaybackMode::Orchestration;
     std::atomic<MulNX::KeyCheckPack> KCPack{};
-    bool dirty = false;
+    mutable bool dirty = false;
 public:
     CamMacro(const std::string& name) :
-        name(name) {}
+        name(name) {
+        this->dirty = true;
+    }
 
     bool AddCampath(const std::string& name, const float offset);
     bool RemoveCampath(const std::string& campathName);
