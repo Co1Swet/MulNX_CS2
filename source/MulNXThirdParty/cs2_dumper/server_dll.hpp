@@ -1,5 +1,5 @@
 // Generated using https://github.com/a2x/cs2-dumper
-// 2026-09-25 02:01:52.073323700 UTC
+// 2026-09-26 01:14:33.488110500 UTC
 
 #pragma once
 
@@ -9279,7 +9279,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_bPvsModifyEntity = 0x1B8; // bool
             }
             // Parent: CBasePlayerWeapon
-            // Field count: 57
+            // Field count: 58
             namespace CCSWeaponBase {
                 constexpr std::ptrdiff_t m_bRemoveable = 0xEF8; // bool
                 constexpr std::ptrdiff_t m_bPlayerAmmoStockOnPickup = 0xEF9; // bool
@@ -9313,6 +9313,7 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_bStealthy = 0xFC0; // bool
                 constexpr std::ptrdiff_t m_bInSilentReloadSection = 0xFC1; // bool
                 constexpr std::ptrdiff_t m_bSilentReloadStatCounted = 0xFC2; // bool
+                constexpr std::ptrdiff_t m_bSilentReloadStatPending = 0xFC3; // bool
                 constexpr std::ptrdiff_t m_flStealthHoldStartTime = 0xFC4; // GameTime_t
                 constexpr std::ptrdiff_t m_bReloadHeldSinceStart = 0xFC8; // bool
                 constexpr std::ptrdiff_t m_flWeaponActionPlaybackRate = 0xFCC; // float32
@@ -10730,7 +10731,7 @@ namespace cs2_dumper {
             namespace CPulseCell_ApplyDynamicAttributeString {
             }
             // Parent: None
-            // Field count: 12
+            // Field count: 13
             namespace CSmokeGrenadeProjectile {
                 constexpr std::ptrdiff_t m_nSmokeEffectTickBegin = 0xB68; // int32
                 constexpr std::ptrdiff_t m_bDidSmokeEffect = 0xB6C; // bool
@@ -10740,10 +10741,11 @@ namespace cs2_dumper {
                 constexpr std::ptrdiff_t m_VoxelFrameData = 0xB90; // CNetworkUtlVectorBase<uint8>
                 constexpr std::ptrdiff_t m_nVoxelFrameDataSize = 0xBA8; // int32
                 constexpr std::ptrdiff_t m_nVoxelUpdate = 0xBAC; // int32
-                constexpr std::ptrdiff_t m_flLastBounce = 0xBB0; // GameTime_t
-                constexpr std::ptrdiff_t m_fllastSimulationTime = 0xBB4; // GameTime_t
-                constexpr std::ptrdiff_t m_bExplodeFromInferno = 0x2E38; // bool
-                constexpr std::ptrdiff_t m_bDidGroundScorch = 0x2E39; // bool
+                constexpr std::ptrdiff_t m_nSmokeLightProbeRegen = 0xBB0; // uint8
+                constexpr std::ptrdiff_t m_flLastBounce = 0xBB4; // GameTime_t
+                constexpr std::ptrdiff_t m_fllastSimulationTime = 0xBB8; // GameTime_t
+                constexpr std::ptrdiff_t m_bExplodeFromInferno = 0x2E40; // bool
+                constexpr std::ptrdiff_t m_bDidGroundScorch = 0x2E41; // bool
             }
             // Parent: CPointEntity
             // Field count: 4

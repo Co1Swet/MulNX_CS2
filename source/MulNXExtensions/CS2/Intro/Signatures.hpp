@@ -15,7 +15,7 @@ namespace MulNX {
                 inline const static MulNX::Memory::Pattern Pos_CGameEventManager_FireEvents_AcquiredLock("C7 44 24 ?? 00 00 00 00 33 D2 48 8B CE");
                 inline const static MulNX::Memory::Pattern RegenerateWeaponSkins("48 83 EC ?? E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10");
                 inline const static MulNX::Memory::Pattern SetGlowColor("40 53 48 83 EC 20 48 8B D9 48 83 C1 40 39 11 74 02 89 11 E8 ?? ?? ?? ?? 48 8B 4B 18 48 85 C9");
-                inline const static MulNX::Memory::Pattern GetDecoratedPlayerName("48 8B 01 FF 50 10 48 8B F8 48 85 C0 0F 84 ?? ?? ?? ?? 80 38 00");
+                inline const static MulNX::Memory::Pattern GetDecoratedPlayerName("48 8B 01 FF 50 10 48 8B ?? 48 85 C0 0F 84 ?? ?? ?? ?? 80 38 00");
             }
             namespace Projectile {
                 inline const static MulNX::Memory::Pattern SetSmokeProps("40 53 48 83 EC ?? 8B 91 ?? ?? ?? ?? 48 8B D9 85 D2 75");

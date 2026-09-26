@@ -45,7 +45,7 @@ bool NameController::Init() {
             return MulNX::Hook::Then::SkipAllAndContinue;
             }, true, true).value();
         this->RegisterAttachHook(this->hkGetDecoratedPlayerName,
-            "PosInFunc_GetDecoratedPlayerName where r12 is *provider and rdi is **currentComponentName(char**) and rax is **tempRetName(char**)");
+            "PosInFunc_GetDecoratedPlayerName");
 
         // fn has 3rd reference to string "WWWWWWWWWWWWWWWW"
         uint8_t** vtable = (uint8_t**)Afx::BinUtils::FindClassVtable(this->CS2->client.hModule, ".?AVCCSPlayerController@@", 0, 0);
@@ -97,7 +97,7 @@ MulNX::Hook::Then NameController::HandleGetDecoratedPlayerName(MulNX::Hook* hk, 
     auto pCtrler = this->CS2Entitys->GetBaseEntity(userId + 1)->As<CS2::CBasePlayerController>();
     auto steamId = MulNX::MRead(pCtrler->m_steamID());
 
-    const char* currentComponentName = *(const char**)ctx->rsi;
+    const char* currentComponentName = *(const char**)ctx->rdi;
 
     if (*currentComponentName == 'o') {
         // original_controller
