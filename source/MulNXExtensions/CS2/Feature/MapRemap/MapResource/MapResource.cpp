@@ -6,9 +6,9 @@ bool MapResource::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/resourcesystem.dll", [this](auto&&...) {
         auto textRegion = MulNX::Memory::DllModule(L"resourcesystem.dll").GetTextRegion();
         auto tFunc_RequestResourceByHash = textRegion.
-            FindRegion(MulNX::CS2::Signatures::MapRemap::Func_RequestResourceByHash).Data();
+            FindRegion(CS2::Signatures::MapRemap::Func_RequestResourceByHash).Data();
         this->pFindByHash = std::bit_cast<FindResourceByHash_t>(textRegion.
-            FindRegion(MulNX::CS2::Signatures::MapRemap::Func_FindResourceByHash).Data());
+            FindRegion(CS2::Signatures::MapRemap::Func_FindResourceByHash).Data());
 
         this->hkFunc_RequestResourceByHash = MulNX::Hook::Create(tFunc_RequestResourceByHash,
             [this](MulNX::Hook* hk, RegContext* ctx) {

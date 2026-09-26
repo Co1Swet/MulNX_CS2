@@ -13,7 +13,7 @@ bool HookD3D11::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/rendersystemdx11.dll", [this](MulNX::Message& msg) {
         this->rendersystemdx11 = MulNX::Memory::DllModule(L"rendersystemdx11.dll");
-        auto target = this->rendersystemdx11.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Render::Pos_Call_Present).Data();
+        auto target = this->rendersystemdx11.GetTextRegion().FindRegion(CS2::Signatures::Render::Pos_Call_Present).Data();
 
         this->hkPosCallPresent = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             IDXGISwapChain* pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);

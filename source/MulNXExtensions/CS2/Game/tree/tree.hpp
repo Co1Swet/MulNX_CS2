@@ -286,8 +286,10 @@ namespace CS2 {
         uint64_t* m_steamID() { return Schema<uint64_t>(this, cs2_dumper::schemas::client_dll::CBasePlayerController::m_steamID); } // uint64
     };
 
+    class CCSPlayerController_DamageServices;
     class CCSPlayerController :public CBasePlayerController {
     public:
+        CCSPlayerController_DamageServices** m_pDamageServices() { return Schema<CCSPlayerController_DamageServices*>(this, cs2_dumper::schemas::client_dll::CCSPlayerController::m_pDamageServices); }
         CHandle<C_CSPlayerPawn>* m_hPlayerPawn() { return Schema<CHandle<C_CSPlayerPawn>>(this, cs2_dumper::schemas::client_dll::CCSPlayerController::m_hPlayerPawn); }
         CUtlSymbolLarge* m_szCrosshairCodes() { return Schema<CUtlSymbolLarge>(this, cs2_dumper::schemas::client_dll::CCSPlayerController::m_szCrosshairCodes); }
     };

@@ -7,3 +7,4 @@
 #include "HookTeamCounter/HookTeamCounter.hpp"
 #include "FlashRenderController/FlashRenderController.hpp"
 #include "HookHealthAmmoCenter/HookHealthAmmoCenter.hpp"
+#include "HookDamageReport/HookDamageReport.hpp"

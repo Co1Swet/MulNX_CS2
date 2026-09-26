@@ -9,7 +9,7 @@ bool MapManifest::Init() {
 
     // manifest 资源路径
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
-        auto target = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::MapRemap::Pos_Manifest_AddFullPath).Data();
+        auto target = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::MapRemap::Pos_Manifest_AddFullPath).Data();
         // 表 3：完整资源路径
         this->hkPos_Manifest_AddFullPath = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto path = (const char*)ctx->r8;
@@ -25,7 +25,7 @@ bool MapManifest::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/resourcesystem.dll", [this](auto&&...) {
         auto textRegion = MulNX::Memory::DllModule(L"resourcesystem.dll").GetTextRegion();
-        auto t = textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Pos_Log_Failedloading).Data();
+        auto t = textRegion.FindRegion(CS2::Signatures::MapRemap::Pos_Log_Failedloading).Data();
         this->hkPos_Log_Failedloading = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pPath = std::bit_cast<const char*>(ctx->rax);
             auto path = std::string_view(pPath);

@@ -23,7 +23,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
     // rsi = pHeader = pMessage = pDemoFileHeader + 8
     // _has_bits_ rsi +0x10
     this->hkCDemoFileHeader_PraseString = MulNX::Hook::Create(
-        textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Protobuf::Pos_DemoFileHeader_PraseString).Data(),
+        textRegion.FindRegion(CS2::Signatures::MapRemap::Protobuf::Pos_DemoFileHeader_PraseString).Data(),
         [this](MulNX::Hook* hk, RegContext* ctx) {
             uint64_t pHeader = ctx->rsi;
             if (!pHeader) return MulNX::Hook::Then::Continue;
@@ -56,7 +56,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
 
     // SpawnGroup 字符串公共出口：改 name（数据源 1/2）
     this->hkCNETMsg_SpawnGroup_Load_PraseString = MulNX::Hook::Create(
-        textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Protobuf::Pos_CNETMsg_SpawnGroup_Load_PraseString).Data(),
+        textRegion.FindRegion(CS2::Signatures::MapRemap::Protobuf::Pos_CNETMsg_SpawnGroup_Load_PraseString).Data(),
         [this](MulNX::Hook* hk, RegContext* ctx) {
             auto a1 = (uint8_t*)ctx->rsi;
             if (!a1) return MulNX::Hook::Then::Continue;
@@ -83,7 +83,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
 
     // CSVCMsg_ClearAllStringTables 字符串写入点
     this->hkCSVCMsg_ClearAllStringTables_PraseString = MulNX::Hook::Create(
-        textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Protobuf::Pos_CSVCMsg_ClearAllStringTables_PraseString).Data(),
+        textRegion.FindRegion(CS2::Signatures::MapRemap::Protobuf::Pos_CSVCMsg_ClearAllStringTables_PraseString).Data(),
         [this](MulNX::Hook* hk, RegContext* ctx) {
             uint64_t a1 = (uint64_t)ctx->rsi;
             if (!a1) return MulNX::Hook::Then::Continue;
@@ -103,7 +103,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
 
     // CSVCMsg_ServerInfo 字符串公共出口：改 map_name（rsi + 0x20）
     this->hkCSVCMsg_ServerInfo_PraseString = MulNX::Hook::Create(
-        textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Protobuf::Pos_CSVCMsg_ServerInfo_PraseString).Data(),
+        textRegion.FindRegion(CS2::Signatures::MapRemap::Protobuf::Pos_CSVCMsg_ServerInfo_PraseString).Data(),
         [this](MulNX::Hook* hk, RegContext* ctx) {
             auto rsi = (uint64_t)ctx->rsi;
             if (!rsi) return MulNX::Hook::Then::Continue;
@@ -128,7 +128,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
     // _has_bits_ 低位在 +0x10，field 11 是 bit 2
     // field 11 slot 在 a1 + 0x40
     this->hkCSVCMsg_GameSessionConfiguration_PraseString = MulNX::Hook::Create(
-        textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Protobuf::Pos_CSVCMsg_GameSessionConfiguration_PraseString).Data(),
+        textRegion.FindRegion(CS2::Signatures::MapRemap::Protobuf::Pos_CSVCMsg_GameSessionConfiguration_PraseString).Data(),
         [this](MulNX::Hook* hk, RegContext* ctx) {
             auto a1 = (uint8_t*)ctx->rsi;
             if (!a1) return MulNX::Hook::Then::Continue;

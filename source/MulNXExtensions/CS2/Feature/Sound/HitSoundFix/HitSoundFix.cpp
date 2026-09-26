@@ -5,7 +5,7 @@
 
 bool HitSoundFix::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto pFunc = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::EmitHurtFeedbackSound);
+        auto pFunc = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Sound::EmitHurtFeedbackSound);
         if (!pFunc.IsValid())MulNX::ErrorTerminate("无法找到 EmitHurtFeedbackSound 函数的签名！");
         this->EmitHurtFeedbackSound = std::bit_cast<EmitHurtFeedbackSound_t>(pFunc.Data());
         });

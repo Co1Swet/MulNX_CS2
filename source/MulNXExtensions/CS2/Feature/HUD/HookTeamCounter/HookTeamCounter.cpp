@@ -36,7 +36,7 @@ void HookTeamCounter::Menu() {
 bool HookTeamCounter::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(
-            MulNX::CS2::Signatures::Hud::TeamCounter::Func_FillPlayerSlotCache).FindFuncStart().Data();
+            CS2::Signatures::Hud::TeamCounter::Func_FillPlayerSlotCache).FindFuncStart().Data();
         this->hkTeamCounterFillPlayerSlotCache = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 this->HandleTeamCounterFillPlayerSlotCacheHook(hk, ctx);
@@ -49,7 +49,7 @@ bool HookTeamCounter::Init() {
         this->RegisterAttachHook(this->hkTeamCounterFillPlayerSlotCache, "Func_TeamCounterFillPlayerSlotCache where r15 is *CCSPlayerController");
 
         auto tPos_UpdatePanoramaFullInfoVisible = this->CS2->client.GetTextRegion().FindRegion(
-            MulNX::CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaFullInfoVisible).Data();
+            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaFullInfoVisible).Data();
         this->hkPos_UpdatePanoramaFullInfoVisible = MulNX::Hook::Create(tPos_UpdatePanoramaFullInfoVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 if (this->forceHideEquipmentInfo) {
@@ -80,7 +80,7 @@ bool HookTeamCounter::Init() {
         this->RegisterAttachHook(this->hkPos_UpdatePanoramaFullInfoVisible, "Pos_UpdatePanoramaFullInfoVisible where rdi is CCSPlayerController*");
 
         auto tPos_UpdatePanoramaNameVisible = this->CS2->client.GetTextRegion().FindRegion(
-            MulNX::CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible).Data();
+            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible).Data();
         this->hkPos_UpdatePanoramaNameVisible = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 if (this->noHideShowName) return MulNX::Hook::Then::Continue;
@@ -99,14 +99,14 @@ bool HookTeamCounter::Init() {
         this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible, "Pos_UpdatePanoramaNameVisible");
 
         auto tPos_UpdatePanoramaNameVisible2 = this->CS2->client.GetTextRegion().FindRegion(
-            MulNX::CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible2).Data();
+            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible2).Data();
         this->hkPos_UpdatePanoramaNameVisible2 = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible2, [this](MulNX::Hook* hk, RegContext* ctx) {
             return MulNX::Hook::Then::SkipAllAndContinue;
             }, true).value();
         this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible2, "Pos_UpdatePanoramaNameVisible2");
 
         auto tPos_UpdatePanoramaSpecTargetVisible = this->CS2->client.GetTextRegion().FindRegion(
-            MulNX::CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaSpecTargetVisible).Data() + 7;
+            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaSpecTargetVisible).Data() + 7;
         this->hkPos_UpdatePanoramaSpecTargetVisible = MulNX::Hook::Create(tPos_UpdatePanoramaSpecTargetVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->r8 = false;
             return MulNX::Hook::Then::Continue;

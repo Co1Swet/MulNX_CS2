@@ -6,7 +6,7 @@ uint32_t CS2Hash::WrapHash(const std::string& str) {
 
 bool CS2Hash::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto pattern = MulNX::CS2::Signatures::Utils::CSHashString;
+        auto pattern = CS2::Signatures::Utils::CSHashString;
         
         auto region = this->CS2->client.GetTextRegion().FindRegion(pattern);
         if (!region.IsValid())MulNX::ErrorTerminate("找不到hash函数");

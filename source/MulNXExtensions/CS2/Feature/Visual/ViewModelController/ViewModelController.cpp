@@ -55,7 +55,7 @@ void ViewModelController::MenuPlayer(MulNX::Message* umsg) {
 bool ViewModelController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
 
-        auto tGetViewModelInfo = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::ViewModel::Func_GetViewModelInfo).Data();
+        auto tGetViewModelInfo = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::ViewModel::Func_GetViewModelInfo).Data();
         this->hkGetViewModelInfo = MulNX::Hook::Create(tGetViewModelInfo, [this](MulNX::Hook* hk, RegContext* ctx) {
             float* pOffsets = std::bit_cast<float*>(ctx->rdx);
             float* pFov = std::bit_cast<float*>(ctx->r8);
@@ -74,7 +74,7 @@ bool ViewModelController::Init() {
             }).value();
         this->RegisterAttachHook(this->hkGetViewModelInfo, "GetViewModelInfo");
 
-        auto tGetIfHandLeftSide = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::ViewModel::Func_GetIfHandLeftSide).Data();
+        auto tGetIfHandLeftSide = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::ViewModel::Func_GetIfHandLeftSide).Data();
         this->hkGetIfHandLeftSide = MulNX::Hook::Create(tGetIfHandLeftSide, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->rax = hk->CallMaybeAs<GetHandSide_t>((void*)ctx->rcx);
             if (this->enableHandSide.load(std::memory_order_acquire))

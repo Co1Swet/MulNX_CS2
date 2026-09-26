@@ -57,7 +57,7 @@ HookConsole& HookConsole::RegisterCmd(std::string&& name, std::function<void(CCo
 }
 void HookConsole::OnEngine2Load(MulNX::Message& msg) {
     this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int, double, int64_t)>(51);
-    auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
+    auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
     this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
         if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
         this->PublishSync("Hook/CSMainLoop"_hash);

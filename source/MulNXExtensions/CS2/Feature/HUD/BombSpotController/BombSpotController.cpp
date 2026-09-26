@@ -8,7 +8,7 @@ void BombSpotController::Menu() {
 bool BombSpotController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改雷包颜色
-        auto Pos_Spot_WriteBombState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_WriteBombState);
+        auto Pos_Spot_WriteBombState = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_WriteBombState);
         this->hkPos_Spot_WriteBombState = MulNX::Hook::Create(Pos_Spot_WriteBombState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->forceBombRedWhenSpecCT.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             auto pOBing = this->CS2Entitys->TryGetObservingPawn();
@@ -25,7 +25,7 @@ bool BombSpotController::Init() {
             }, true).value();
         this->RegisterAttachHook(this->hkPos_Spot_WriteBombState, "Pos_Spot_WriteBombState where rdx is BombColor*");
 
-        auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
+        auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
         this->hkPos_CallGetPawnMaybeSetAllHUD = MulNX::Hook::Create(Pos_CallGetPawnMaybeSetAllHUD, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pOBing = this->CS2Entitys->TryGetObservingPawn();
             auto pRet = (CS2::C_BaseEntity*)ctx->rax;

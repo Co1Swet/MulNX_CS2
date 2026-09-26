@@ -100,7 +100,7 @@ bool TrailsController::Init() {
     this->pParticleMgr = this->FindModule<ParticleManager>("ParticleManager");
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message&) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Projectile::Func_BaseCSGrenadeProjectile_DrawStuff).Data();
+        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Projectile::Func_BaseCSGrenadeProjectile_DrawStuff).Data();
         this->hkFunc_BaseCSGrenadeProjectile_DrawStuff = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pProjectile = (CS2::C_BaseCSGrenadeProjectile*)ctx->rcx;
             char flag = *(char*)&ctx->rdx;

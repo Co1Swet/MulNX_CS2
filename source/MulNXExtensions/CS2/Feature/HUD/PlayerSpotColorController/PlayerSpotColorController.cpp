@@ -10,7 +10,7 @@ bool PlayerSpotColorController::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改汇编分支进入着色
-        auto Pos_CmpToSetColor = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetColor);
+        auto Pos_CmpToSetColor = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_CmpToSetColor);
         this->hkPos_CmpToSetColor = MulNX::Hook::Create(Pos_CmpToSetColor.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->TColorMulti.load(std::memory_order_acquire) || this->CTColorMulti.load(std::memory_order_acquire))
                 ctx->rbx = 0;
@@ -19,7 +19,7 @@ bool PlayerSpotColorController::Init() {
         this->RegisterAttachHook(this->hkPos_CmpToSetColor, "Pos_CmpToSetColor");
 
         // 让T显示五颜色
-        auto Pos_CmpToSetTColor = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetTColor);
+        auto Pos_CmpToSetTColor = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_CmpToSetTColor);
         this->hkPos_CmpToSetTColor = MulNX::Hook::Create(Pos_CmpToSetTColor.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->TColorMulti.load(std::memory_order_acquire))
                 ctx->rax = 2;
@@ -28,7 +28,7 @@ bool PlayerSpotColorController::Init() {
         this->RegisterAttachHook(this->hkPos_CmpToSetTColor, "Pos_CmpToSetTColor");
 
         // 让CT显示五颜色
-        auto Pos_CmpToSetCTColor = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetCTColor);
+        auto Pos_CmpToSetCTColor = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_CmpToSetCTColor);
         this->hkPos_CmpToSetCTColor = MulNX::Hook::Create(Pos_CmpToSetCTColor.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->CTColorMulti.load(std::memory_order_acquire))
                 ctx->rax = 3;

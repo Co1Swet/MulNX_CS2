@@ -7,8 +7,8 @@ void TeamIDRenderController::Menu() {
 
 bool TeamIDRenderController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_CmpForHide);
-        auto jmp = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Hud::PosTeamID_xxIt);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::PosTeamID_CmpForHide);
+        auto jmp = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::PosTeamID_xxIt);
         this->hkPosTeamID_CmpForHide = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleForShowTeamID((CS2::C_CSPlayerPawn*)ctx->rbx);
             }, true, false, (uintptr_t)jmp.Begin()).value();

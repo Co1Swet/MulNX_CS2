@@ -67,7 +67,7 @@ bool SkyController::Init() {
     this->pMaterialSystem = this->FindModule<MaterialSystem>("MaterialSystem");
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto posCallForce = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sky::Pos_C_EnvSky_VF10_Call_ForceUpdateSkybox).Data();
+        auto posCallForce = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Sky::Pos_C_EnvSky_VF10_Call_ForceUpdateSkybox).Data();
         auto leaAddr = posCallForce + 2;
         int32_t disp = *reinterpret_cast<int32_t*>(leaAddr + 3);
         auto targetAddr = leaAddr + 7 + disp;

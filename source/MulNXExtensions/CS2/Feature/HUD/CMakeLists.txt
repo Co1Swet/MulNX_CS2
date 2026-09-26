@@ -7,6 +7,7 @@ add_library(CS2HUD STATIC
     PlayerSpotRenderController/PlayerSpotRenderController.cpp
     FlashRenderController/FlashRenderController.cpp
     HookHealthAmmoCenter/HookHealthAmmoCenter.cpp
+    HookDamageReport/HookDamageReport.cpp
 )
 
 target_link_libraries(CS2HUD PUBLIC

@@ -16,6 +16,6 @@ public:
 
     CS2::C_CSPlayerPawn* TryGetObservingPawn();
     std::optional<Steam64UID> TryGetObservingSteam64UID();
-
+    std::optional<CS2::CHandleBase> TryGetControllerHandle(CS2::CCSPlayerController* pController);
     CS2::CCSPlayerController* FindControllerBySteam64UID(Steam64UID uid);
 };

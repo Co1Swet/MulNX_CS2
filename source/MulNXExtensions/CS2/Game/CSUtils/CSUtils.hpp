@@ -18,8 +18,8 @@ namespace CS2 {
 
     template<typename T>
     struct C_UtlVectorEmbeddedNetworkVar {
-        size_t m_nSize;
-        T* m_pData;
+        size_t m_nSize{};
+        T* m_pData{};
         // 后面未知
     };
 

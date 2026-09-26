@@ -45,7 +45,7 @@ bool TeamIDColorController::Init() {
         auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄
 
         // Hook CLayoutFile::LoadFromFile
-        auto target = textRegion.FindRegion(MulNX::CS2::Signatures::Hud::CLayoutFile_LoadFromFile).Data();
+        auto target = textRegion.FindRegion(CS2::Signatures::Hud::CLayoutFile_LoadFromFile).Data();
 
         this->hkLoadFromFile = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
             // RCX=this, RDX=filePath, R8=unk

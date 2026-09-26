@@ -10,7 +10,7 @@ void FlashRenderController::Menu() {
 
 bool FlashRenderController::Init() {
     this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
-        auto up = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Flash::PosCallCmpDrawFlashUpHUD).Data();
+        auto up = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Flash::PosCallCmpDrawFlashUpHUD).Data();
         this->hkDrawUp = MulNX::Hook::Create(up + 11, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->rendFlashUpHUD.load(std::memory_order_relaxed)) {
                 ctx->rax = 0ULL;
@@ -22,7 +22,7 @@ bool FlashRenderController::Init() {
             }, true).value();
         this->RegisterAttachHook(this->hkDrawUp, "PosCallCmpDrawFlashUpHUD");
 
-        auto down = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Flash::PosCallCmpDrawFlashDownHUD).Data();
+        auto down = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Flash::PosCallCmpDrawFlashDownHUD).Data();
         down -= 5;
         this->hkDrawDown = MulNX::Hook::Create(down, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->rendFlashDownHUD.load(std::memory_order_relaxed)) {

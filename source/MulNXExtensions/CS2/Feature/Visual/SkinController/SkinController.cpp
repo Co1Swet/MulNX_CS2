@@ -16,7 +16,7 @@ bool SkinController::Init() {
         ;
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::RegenerateWeaponSkins);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Utils::RegenerateWeaponSkins);
         this->regenerateWeaponSkins = (RegenerateWeaponSkins)target.Data();
         // static auto hkSkin = MulNX::Hook::Create(target.Data(), 0, false, [this](RegContext* ctx, MulNX::Hook* Hook) {
         //     return MulNX::Hook::Then::Continue;

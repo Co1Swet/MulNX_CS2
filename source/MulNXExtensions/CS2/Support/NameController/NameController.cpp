@@ -34,7 +34,7 @@ bool NameController::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
-        auto pFnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::GetDecoratedPlayerName).Data();
+        auto pFnGetDecoratedPlayerName = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Utils::GetDecoratedPlayerName).Data();
         this->hkGetDecoratedPlayerName = MulNX::Hook::Create(pFnGetDecoratedPlayerName, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 return this->HandleGetDecoratedPlayerName(hk, ctx);

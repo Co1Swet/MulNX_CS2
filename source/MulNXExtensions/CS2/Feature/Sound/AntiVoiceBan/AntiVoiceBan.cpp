@@ -3,7 +3,7 @@
 bool AntiVoiceBan::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto) {
         auto target = this->CS2->client.GetTextRegion()
-            .FindRegion(MulNX::CS2::Signatures::Sound::Func_ProcessVoiceBan).FindFuncStart().Data();
+            .FindRegion(CS2::Signatures::Sound::Func_ProcessVoiceBan).FindFuncStart().Data();
 
         this->hkProcessVoiceBan = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->r8 = 0;

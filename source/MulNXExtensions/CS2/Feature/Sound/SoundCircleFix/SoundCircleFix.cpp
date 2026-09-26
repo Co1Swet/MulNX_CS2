@@ -2,7 +2,7 @@
 
 bool SoundCircleFix::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto Pos_CallGetPawnUpdateCirclePos = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnUpdateCirclePos).Data();
+        auto Pos_CallGetPawnUpdateCirclePos = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Sound::Pos_CallGetPawnUpdateCirclePos).Data();
         this->hkPos_CallGetPawnUpdateCirclePos = MulNX::Hook::Create(Pos_CallGetPawnUpdateCirclePos, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->enable.load())return MulNX::Hook::Then::Continue;
             auto pOBing = this->CS2Entitys->TryGetObservingPawn();
@@ -11,7 +11,7 @@ bool SoundCircleFix::Init() {
             }, true).value();
         this->RegisterAttachHook(this->hkPos_CallGetPawnUpdateCirclePos, "Pos_CallGetPawnUpdateCirclePos");
 
-        auto Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque).Data();
+        auto Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Sound::Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque).Data();
         Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque -= 5;
         this->hkPos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque = MulNX::Hook::Create(Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->enable.load())return MulNX::Hook::Then::SkipAllAndContinue;
@@ -21,7 +21,7 @@ bool SoundCircleFix::Init() {
             }, true, true).value();
         this->RegisterAttachHook(this->hkPos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque, "Pos_CallGetPawnMaybeLocalPawnsAsyncSoundEnque");
 
-        auto Pos_CallGetPawnMaybeOtherAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::Pos_CallGetPawnMaybeOtherAsyncSoundEnque).Data();
+        auto Pos_CallGetPawnMaybeOtherAsyncSoundEnque = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Sound::Pos_CallGetPawnMaybeOtherAsyncSoundEnque).Data();
         this->hkPos_CallGetPawnMaybeOtherAsyncSoundEnque = MulNX::Hook::Create(Pos_CallGetPawnMaybeOtherAsyncSoundEnque, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->enable.load())return MulNX::Hook::Then::Continue;
             try {

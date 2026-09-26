@@ -88,6 +88,19 @@ std::optional<Steam64UID> ClientEntitySystem::TryGetObservingSteam64UID() {
     }
 }
 
+std::optional<CS2::CHandleBase> ClientEntitySystem::TryGetControllerHandle(CS2::CCSPlayerController* pController) {
+    try {
+        if (!pController)return std::nullopt;
+        auto hPawn = MulNX::MRead(pController->m_hPawn());
+        auto* pPawn = this->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
+        if (!pPawn)return std::nullopt;
+        return MulNX::MRead(pPawn->m_hController());
+    }
+    catch (...) {
+        return std::nullopt;
+    }
+}
+
 CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64UID uid) {
     try {
         for (int i = 0; i < 32; ++i) {

@@ -10,7 +10,7 @@ bool MapKeyValues::Init() {
 }
 
 void MapKeyValues::OnClientLoad(MulNX::Memory::Region& textRegion) {
-    auto target = textRegion.FindRegion(MulNX::CS2::Signatures::MapRemap::Pos_MapKVReaded).Data();
+    auto target = textRegion.FindRegion(CS2::Signatures::MapRemap::Pos_MapKVReaded).Data();
     this->hkPos_MapKVReaded = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
         auto pTargetName = this->pMapState->pTargetMapName.load(std::memory_order_acquire);
         if (!pTargetName)return MulNX::Hook::Then::Continue;

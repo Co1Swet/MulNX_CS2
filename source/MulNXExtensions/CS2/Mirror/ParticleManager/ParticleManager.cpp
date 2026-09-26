@@ -2,10 +2,10 @@
 
 bool ParticleManager::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        this->pFuncGet = (GetParticleManager_t)this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Particle::Func_ParticleManager_Get).Data();
-        this->pFuncCreateParticle = (CreateParticle_t)this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Particle::Func_ParticleManager_CreateParticle).Data();
-        this->pFuncUpdateParticle = (UpdateParticle_t)this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Particle::Func_ParticleManager_UpdateParticle).Data();
-        this->pFuncBindTrail = (BindTrail_t)this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Particle::Func_BindTrail).Data();
+        this->pFuncGet = (GetParticleManager_t)this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Particle::Func_ParticleManager_Get).Data();
+        this->pFuncCreateParticle = (CreateParticle_t)this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Particle::Func_ParticleManager_CreateParticle).Data();
+        this->pFuncUpdateParticle = (UpdateParticle_t)this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Particle::Func_ParticleManager_UpdateParticle).Data();
+        this->pFuncBindTrail = (BindTrail_t)this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Particle::Func_BindTrail).Data();
         });
 
     return true;

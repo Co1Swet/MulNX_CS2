@@ -32,7 +32,7 @@ bool HookGameEvents::Init() {
         //     }).value();
         // this->hkCGameEventManager_FireEvent.Attach();
 
-        auto Pos_CGameEventManager_FireEvents_AcquiredLock = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Utils::Pos_CGameEventManager_FireEvents_AcquiredLock).Data();
+        auto Pos_CGameEventManager_FireEvents_AcquiredLock = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Utils::Pos_CGameEventManager_FireEvents_AcquiredLock).Data();
         this->hkPos_CGameEventManager_FireEvents_AcquiredLock = MulNX::Hook::Create(Pos_CGameEventManager_FireEvents_AcquiredLock, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto event = reinterpret_cast<CS2::CGameEvent*>(ctx->rsi);            
             

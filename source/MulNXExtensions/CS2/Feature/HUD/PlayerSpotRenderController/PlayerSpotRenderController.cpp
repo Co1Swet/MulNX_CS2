@@ -17,7 +17,7 @@ void PlayerSpotRenderController::Menu() {
 bool PlayerSpotRenderController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         // 修改绘制状态
-        auto Pos_Spot_CmpToSetShow = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_CmpToSetShow).Data();
+        auto Pos_Spot_CmpToSetShow = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_CmpToSetShow).Data();
         this->hkPos_Spot_CmpToSetShow = MulNX::Hook::Create(Pos_Spot_CmpToSetShow, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->forceTeammateDraw.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             auto pPawn = (CS2::C_CSPlayerPawn*)ctx->r15;
@@ -36,7 +36,7 @@ bool PlayerSpotRenderController::Init() {
         this->RegisterAttachHook(this->hkPos_Spot_CmpToSetShow, "Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*");
 
         // 修改小地图上玩家图标的绘制样式
-        auto Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Pos_WriteMaybeEnumToChangeRadarPlayerDraw);
+        auto Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_WriteMaybeEnumToChangeRadarPlayerDraw);
         this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = MulNX::Hook::Create(Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->forceEnemyRed.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             uint64_t Enum = ctx->rbx;
@@ -59,7 +59,7 @@ bool PlayerSpotRenderController::Init() {
         this->RegisterAttachHook(this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw, "Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw");
 
         // 修改玩家图标的具体绘制组件可见性
-        auto pFunc_FinallyUpdatePlayerState = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Spot::Func_FinallyUpdatePlayerState).FindFuncStart();
+        auto pFunc_FinallyUpdatePlayerState = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Func_FinallyUpdatePlayerState).FindFuncStart();
         this->hkFunc_FinallyUpdatePlayerState = MulNX::Hook::Create(pFunc_FinallyUpdatePlayerState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->hideNumLabel.load(std::memory_order_acquire)) {
                 ctx->rdx &= ~1ULL;

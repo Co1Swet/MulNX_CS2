@@ -3,7 +3,7 @@
 
 bool ReShowSpeaker::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(MulNX::CS2::Signatures::Sound::ifShowSpeaker).Data();
+        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Sound::ifShowSpeaker).Data();
         this->hkPos_ifShowSpeaker = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->rax = 0;
             return MulNX::Hook::Then::Continue;
@@ -11,9 +11,9 @@ bool ReShowSpeaker::Init() {
         this->RegisterAttachHook(this->hkPos_ifShowSpeaker, "Pos_ifShowSpeaker");
 
         this->pFuncGetVoiceStatus = (GetVoiceStatus_t)this->CS2->client.GetTextRegion()
-            .FindRegion(MulNX::CS2::Signatures::Sound::GetVoiceStatus).Data();
+            .FindRegion(CS2::Signatures::Sound::GetVoiceStatus).Data();
         this->pFuncUpdateSpeakerStatus = (UpdateSpeakerStatus_t)this->CS2->client.GetTextRegion()
-            .FindRegion(MulNX::CS2::Signatures::Sound::UpdateSpeakerStatus).Data();
+            .FindRegion(CS2::Signatures::Sound::UpdateSpeakerStatus).Data();
         // if (*v8) {
         //     n2 = Msg("CVoiceStatus::UpdateSpeakerStatus: ent %d ss[%d] talking = %d\n", n0x3F, v7, v5);
         //     goto LABEL_72;
