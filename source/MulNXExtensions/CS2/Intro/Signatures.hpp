@@ -105,5 +105,8 @@ namespace CS2 {
             inline const static MulNX::Memory::Pattern Func_RequestResourceByHash("48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 20 49 8B F8 48 8B DA");
             inline const static MulNX::Memory::Pattern Func_FindResourceByHash("48 89 5C 24 18 48 89 6C 24 20 56 57 41 56 48 83 EC 20");
         }
+        namespace SceneSystem {
+            inline const static MulNX::Memory::Pattern Func_DrawSceneData("48 89 5c 24 20 55 48 83 ec 30 f6 81 ?? ?? 00 00 40");
+        }
     }
 }
