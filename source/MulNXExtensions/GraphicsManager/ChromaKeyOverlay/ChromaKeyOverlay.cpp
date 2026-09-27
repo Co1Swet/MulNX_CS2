@@ -16,7 +16,7 @@ bool ChromaKeyOverlay::Init() {
         this->ReleaseOld();
         });
 
-    this->SubscribeSync("GraphicsSync/D3D11AndImGuiInit/Done", [this](auto&&...) {
+    this->SubscribeSync("GraphicsSync/D3D11/Init/Post", [this](auto&&...) {
         // 创建绿幕着色器资源
         this->ReleaseOld();
         this->CreateGreenScreenAssets();

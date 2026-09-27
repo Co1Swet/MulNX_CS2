@@ -21,7 +21,6 @@ void StartImpl(HMODULE& hModule) {
     (*core->ModuleManager())
         .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
         .CreateModule<HookWindow>("HookWindow")
-        .CreateModule<HookD3D11>("HookD3D11")
         .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
         .CreateModule<FileRedirector>("FileRedirector")
         .CreateModule<WebSocketManager>("WebSocketManager")
@@ -29,6 +28,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<FlowClock>("FlowClock")
 
         // 图形组件
+        .CreateModule<HookD3D11>("HookD3D11")
         .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
         .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
         .CreateModule<ChromaKeyOverlay>("ChromaKeyOverlay")
@@ -47,7 +47,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookEntitySystem>("HookEntitySystem")
         .CreateModule<HookGameEvents>("HookGameEvents")
         .CreateModule<HookGSI>("HookGSI")
-        
+
         // CS2 子系统镜像
         .CreateModule<CS2Hash>("CS2Hash")
         .CreateModule<ParticleManager>("ParticleManager")
@@ -58,6 +58,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<VFileSystem>("VFileSystem")
 
         // CS2 自定义支持
+        .CreateModule<ImGuiBinder>("ImGuiBinder")
         .CreateModule<ConsoleOutput>("ConsoleOutput")
         .CreateModule<TargetPicker>("TargetPicker")
         .CreateModule<TimeController>("TimeController")// 承担了时间适配器责任

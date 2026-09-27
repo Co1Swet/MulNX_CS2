@@ -6,5 +6,6 @@ add_library(CS2Support STATIC
     TargetPicker/TargetPicker.cpp
     NameController/NameController.cpp
     FileInjector/FileInjector.cpp
+    ImGuiBinder/ImGuiBinder.cpp
 )
 target_link_libraries(CS2Support PUBLIC CS2Mirror)

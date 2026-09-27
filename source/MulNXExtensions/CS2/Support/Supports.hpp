@@ -6,3 +6,4 @@
 #include "TargetPicker/TargetPicker.hpp"
 #include "NameController/NameController.hpp"
 #include "FileInjector/FileInjector.hpp"
+#include "ImGuiBinder/ImGuiBinder.hpp"
