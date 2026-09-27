@@ -1,5 +1,6 @@
 #include "DllMain.hpp"
 #include <App/CS2OBTool/UIDocker/UIDocker.hpp>
+#include <MulNXExtensions/GraphicsManager/Graphicses.hpp>
 #include <MulNXExtensions/WinBaseHooks/WinBaseHooks.hpp>
 #include <MulNXExtensions/CS2/CS2s.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
@@ -23,11 +24,15 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookD3D11>("HookD3D11")
         .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
         .CreateModule<FileRedirector>("FileRedirector")
-        .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
-        .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
         .CreateModule<WebSocketManager>("WebSocketManager")
         .CreateModule<TimeLiner>("TimeLiner")
         .CreateModule<FlowClock>("FlowClock")
+
+        // 图形组件
+        .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
+        .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
+        .CreateModule<ChromaKeyOverlay>("ChromaKeyOverlay")
+
         // 以上为通用逻辑
 
         // 底层CS2支持

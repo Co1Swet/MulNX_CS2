@@ -8,7 +8,6 @@ class HookD3D11 final : public MulNX::Module<HookD3D11>, public HookMixin<HookD3
 
     MulNX::UISystem* pUISystem = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
-    HWND hCS2Wnd = nullptr;
 
     void UpdateRenderXY(IDXGISwapChain* pSwapChain);
 

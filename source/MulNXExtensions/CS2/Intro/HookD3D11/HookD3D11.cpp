@@ -47,10 +47,13 @@ void HookD3D11::UpdateRenderXY(IDXGISwapChain* pSwapChain) {
 }
 void HookD3D11::HookD3D11DeviceAndContext() {
     this->hkClearDepthStencilView = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->pGraphicsManager->pd3dContext)->GetVFuncPtr(53), [this](MulNX::Hook* hk, RegContext* ctx) {
-        ID3D11DeviceContext* pCtx = (ID3D11DeviceContext*)ctx->rcx;
-        ID3D11DepthStencilView* pDSV = (ID3D11DepthStencilView*)ctx->rdx;
-        UINT ClearFlags = *(UINT*)(&ctx->r8);
-        this->pGraphicsManager->OnClearDepthStencilView(pCtx, pDSV, ClearFlags);
+        MulNX::Message msg("Hook/ClearDepthStencilView"_hash);
+        auto&& [pCtx, pDSV, clearFlags] = msg
+            .Access<ID3D11DeviceContext*, ID3D11DepthStencilView*, UINT>();
+        pCtx = (ID3D11DeviceContext*)ctx->rcx;
+        pDSV = (ID3D11DepthStencilView*)ctx->rdx;
+        clearFlags = *(UINT*)(&ctx->r8);
+        this->PublishSync(msg);
         return MulNX::Hook::Then::Continue;
         }).value();
     this->RegisterAttachHook(this->hkClearDepthStencilView, "ClearDepthStencilView");
@@ -81,16 +84,14 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     MulNX::Message msg("Hook/hWnd"_hash);
     auto&& [hWnd] = msg.Access<HWND>();
     hWnd = sd.OutputWindow;
-    this->hCS2Wnd = sd.OutputWindow;
     this->PublishSync(msg);
 }
 MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx) {
     hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnPresent(hk, ctx);});
     // ImGui 初始化
     ImGui_ImplDX11_Init(this->pGraphicsManager->pd3dDevice, this->pGraphicsManager->pd3dContext);
-    // 创建绿幕着色器资源
-    this->pGraphicsManager->ReleaseOld();
-    this->pGraphicsManager->CreateGreenScreenAssets();
+
+    this->PublishSync("GraphicsSync/D3D11AndImGuiInit/Done"_hash);
 
     this->pUISystem->FrameBefore = [this]() {
         ImGui_ImplDX11_NewFrame();
@@ -110,7 +111,8 @@ MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx)
     this->pUISystem->FrameBehind = [this]() {
         ImGui::EndFrame();
         ImGui::Render();
-        this->pGraphicsManager->pd3dContext->OMSetRenderTargets(1, &this->pGraphicsManager->view, nullptr);
+        this->pGraphicsManager->pd3dContext->OMSetRenderTargets(
+            1, this->pGraphicsManager->view.GetAddressOf(), nullptr);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         };
     this->Core->Driver()->CreateMainDraw();
@@ -126,16 +128,13 @@ MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx)
 }
 MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->pSwapChain = (IDXGISwapChain*)ctx->rcx;
-    // 绿幕渲染
-    this->pGraphicsManager->BuildNew();
-    this->pGraphicsManager->OnPresent();
+    this->PublishSync("Hook/Present"_hash);
     // UI 系统渲染
     this->pUISystem->HandleUpdate();    // 处理消息（坐标已在 HookWindow 中预缩放）
     this->pUISystem->Render();
     return MulNX::Hook::Then::Continue;
 }
 MulNX::Hook::Then HookD3D11::HandleOnResizeBuffers(MulNX::Hook* hk, RegContext* ctx) {
-    this->pGraphicsManager->ReleaseOld();
     this->pGraphicsManager->pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);
     this->PublishSync("Hook/IDXGISwapChain/ResizeBuffers/Pre"_hash);
     ImGui_ImplDX11_InvalidateDeviceObjects();
