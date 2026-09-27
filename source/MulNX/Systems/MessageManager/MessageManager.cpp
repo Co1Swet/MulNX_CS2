@@ -38,14 +38,14 @@ MulNXHandle MulNX::MessageManager::CreateMessageChannel() {
     this->asyncChannels[hChannel] = std::move(Channel);
     return hChannel;
 }
-MulNX::MessageChannel* MulNX::MessageManager::GetMessageChannel(const MulNXHandle& hChannel) {
+MulNX::MessageChannel* MulNX::MessageManager::GetMessageChannel(const MulNXHandle& hChannel)const {
     auto it = this->asyncChannels.find(hChannel);
     if (it == this->asyncChannels.end())return nullptr;
     return it->second.get();
 }
 
-bool MulNX::MessageManager::PublishAsync(Message&& Msg) {
-    return this->asyncMsgBuffer.enqueue(std::move(Msg));
+bool MulNX::MessageManager::PublishAsync(Message&& msg)const {
+    return this->asyncMsgBuffer.enqueue(std::move(msg));
 }
 bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const std::string& type,
     std::function<void(MulNX::Message&, std::string_view)>&& makingHandler) {
@@ -55,7 +55,7 @@ bool MulNX::MessageManager::SubscribeAsync(MessageChannel* const pChannel, const
     return true;
 }
 
-bool MulNX::MessageManager::DispatchAsyncMsg() {
+bool MulNX::MessageManager::DispatchAsyncMsg()const {
     MulNX::Message msg;
     if(!this->asyncMsgBuffer.wait_dequeue_timed(msg, 100000))return false;
     // 检查是否存在管道订阅者
@@ -75,7 +75,7 @@ bool MulNX::MessageManager::DispatchAsyncMsg() {
     return true;
 }
 
-bool MulNX::MessageManager::HandleDispatch() {
+bool MulNX::MessageManager::HandleDispatch()const {
     if (!this->pGlobalVars->SystemReady.load()) {
         return true;
     }
@@ -94,7 +94,7 @@ bool MulNX::MessageManager::SubscribeSync(const std::string& type, SyncMsgCallba
     return true;
 }
 
-bool MulNX::MessageManager::PublishSync(MulNX::Message& msg) {
+bool MulNX::MessageManager::PublishSync(MulNX::Message& msg)const {
     auto it = this->syncMap.find(msg.type);
     if (it == this->syncMap.end())return false;
     auto& subscribers = it->second;

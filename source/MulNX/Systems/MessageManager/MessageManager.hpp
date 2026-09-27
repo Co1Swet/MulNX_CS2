@@ -18,13 +18,12 @@ namespace MulNX {
     };
     class MessageManager final :public MulNX::Module<MessageManager> {
         friend MessageChannel;
-    private:
         // 元数据
         std::unordered_map<MulNX::MsgType, MsgMeta>msgInfo{};
 
         std::unordered_map<MulNX::MsgType, std::vector<MessageChannel*>>asyncMap{};
         std::unordered_map<MulNXHandle, std::unique_ptr<MessageChannel>>asyncChannels;
-        moodycamel::BlockingConcurrentQueue<MulNX::Message> asyncMsgBuffer;
+        mutable moodycamel::BlockingConcurrentQueue<MulNX::Message> asyncMsgBuffer;
         std::unordered_map<MulNX::MsgType, std::vector<SyncMsgCallback>>syncMap{};
 
         bool Init()override;
@@ -35,15 +34,15 @@ namespace MulNX {
 
         // 创建私有消息队列（但是生命周期仍然委托给消息管理器）
         MulNXHandle CreateMessageChannel();
-        MessageChannel* GetMessageChannel(const MulNXHandle& hChannel);
+        MessageChannel* GetMessageChannel(const MulNXHandle& hChannel)const;
         bool SubscribeAsync(MessageChannel* const pChannel, const std::string& type,
             std::function<void(MulNX::Message&, std::string_view)>&& makingHandler = nullptr);
-        bool PublishAsync(Message&& msg);
-        bool DispatchAsyncMsg();// 单次派发，返回true意味着还有消息
-        bool HandleDispatch();// 派发所有剩余消息
+        bool PublishAsync(Message&& msg)const;
+        bool DispatchAsyncMsg()const;// 单次派发，返回true意味着还有消息
+        bool HandleDispatch()const;
 
         bool SubscribeSync(const std::string& type, SyncMsgCallback&& handle);
-        bool PublishSync(MulNX::Message& msg);
+        bool PublishSync(MulNX::Message& msg)const;
 
         const std::unordered_map<MulNX::MsgType, MsgMeta>& GetMsgInfo()const {
             return this->msgInfo;
