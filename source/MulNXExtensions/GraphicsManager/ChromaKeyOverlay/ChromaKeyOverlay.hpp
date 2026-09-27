@@ -29,14 +29,14 @@ class ChromaKeyOverlay final :public MulNX::Module<ChromaKeyOverlay> {
     ID3D11InputLayout* m_pGreenLayout = nullptr;
     ID3D11Buffer* m_pGreenCB = nullptr;
     ID3D11SamplerState* m_pPointSampler = nullptr;
-    ID3D11BlendState* m_pBlendState = nullptr;   // 可选，用于半透明混合   
+    ID3D11BlendState* m_pBlendState = nullptr;   // 可选，用于半透明混合 
+
+    std::atomic<bool>enabled = false;
+    std::atomic<float>m_GreenThreshold = 0.5;// 绿幕阈值
 
     void EnsureCopyResources();   // 创建/重建颜色和深度副本
     void CopyColorBuffer();       // 从后备缓冲区拷贝到颜色副本
     void RenderGreenScreen();
-
-    std::atomic<bool>enabled{ false };
-    std::atomic<float>m_GreenThreshold{ 0.5 };// 绿幕阈值
 
     bool Menu();
     bool Init()override;
@@ -44,8 +44,6 @@ class ChromaKeyOverlay final :public MulNX::Module<ChromaKeyOverlay> {
     void CreateGreenScreenAssets();
 
     void ReleaseOld();
-    std::atomic<bool> needReBuild = false;
-    void BuildNew();
 
     void OnClearDepthStencilView(ID3D11DeviceContext* pCtx, ID3D11DepthStencilView* pDSV, UINT ClearFlags);
     void OnPresent();

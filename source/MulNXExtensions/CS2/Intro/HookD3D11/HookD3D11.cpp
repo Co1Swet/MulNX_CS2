@@ -111,9 +111,18 @@ MulNX::Hook::Then HookD3D11::D3D11AndImGuiInit(MulNX::Hook* hk, RegContext* ctx)
     this->pUISystem->FrameBehind = [this]() {
         ImGui::EndFrame();
         ImGui::Render();
-        this->pGraphicsManager->pd3dContext->OMSetRenderTargets(
-            1, this->pGraphicsManager->view.GetAddressOf(), nullptr);
+
+        auto ctx = this->pGraphicsManager->pd3dContext;
+        ComPtr<ID3D11RenderTargetView> savedRTV = nullptr;
+        ComPtr<ID3D11DepthStencilView> savedDSV = nullptr;
+        ctx->OMGetRenderTargets(1, &savedRTV, &savedDSV);
+
+        ID3D11RenderTargetView* rtv = this->pGraphicsManager->refBackBufferView.Get();
+        ctx->OMSetRenderTargets(1, &rtv, nullptr);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+        
+        ID3D11RenderTargetView* rawRTV = savedRTV.Get();
+        ctx->OMSetRenderTargets(1, &rawRTV, savedDSV.Get());
         };
     this->Core->Driver()->CreateMainDraw();
     this->pGlobalVars->SystemReady.store(true);
@@ -136,9 +145,19 @@ MulNX::Hook::Then HookD3D11::HandleOnPresent(MulNX::Hook* hk, RegContext* ctx) {
 }
 MulNX::Hook::Then HookD3D11::HandleOnResizeBuffers(MulNX::Hook* hk, RegContext* ctx) {
     this->pGraphicsManager->pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);
+    auto BufferCount = *(UINT*)&ctx->rdx;
+    auto Width = *(UINT*)&ctx->r8;
+    auto Height = *(UINT*)&ctx->r9;
+    auto NewFormat = *hk->GetStackParam<DXGI_FORMAT>(ctx, 4);
+    auto SwapChainFlags = *hk->GetStackParam<UINT>(ctx, 5);
+
+    using Raw = HRESULT(*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT);
+
     this->PublishSync("Hook/IDXGISwapChain/ResizeBuffers/Pre"_hash);
     ImGui_ImplDX11_InvalidateDeviceObjects();
-    hk->CallMaybeOrigin(2, ctx);
+    auto result = hk->CallMaybeAs<Raw>(this->pGraphicsManager->pSwapChain,
+        BufferCount, Width, Height, NewFormat, SwapChainFlags);
+    *(HRESULT*)&ctx->rax = result;
     if (!ImGui_ImplDX11_CreateDeviceObjects()) {
         MulNX::ErrorTerminate("在重置后台缓冲区触发的ImGui资源重建中遇到错误！");
     }

@@ -15,6 +15,6 @@ namespace MulNX {
         ID3D11DeviceContext* pd3dContext = nullptr;
 
         // 视图指针
-        ComPtr<ID3D11RenderTargetView> view = nullptr;
+        ComPtr<ID3D11RenderTargetView> refBackBufferView = nullptr;
     };
 }

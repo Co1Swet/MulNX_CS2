@@ -30,7 +30,6 @@ bool ChromaKeyOverlay::Init() {
 
     this->SubscribeSync("Hook/Present", [this](auto&&...) {
         // 绿幕渲染
-        this->BuildNew();
         this->OnPresent();
         });
 
@@ -38,12 +37,10 @@ bool ChromaKeyOverlay::Init() {
 }
 
 void ChromaKeyOverlay::ReleaseOld() {
-    this->pGraphicsManager->view = nullptr;
     this->pDepthSRV = nullptr;
     this->pDepthCopyTex = nullptr;
     this->pColorCopySRV = nullptr;
     this->pColorCopyTex = nullptr;
-    this->needReBuild.store(true, std::memory_order_release);
 }
 
 // ------------------------------------------------------------------
@@ -88,16 +85,6 @@ void ChromaKeyOverlay::CreateGreenScreenAssets() {
     device->CreateBlendState(&blendDesc, &m_pBlendState);
 
     this->LogSucc("绿幕着色器资源创建成功");
-}
-
-void ChromaKeyOverlay::BuildNew() {
-    if (!this->needReBuild.load(std::memory_order_acquire)) return;
-    ComPtr<ID3D11Texture2D> buf = nullptr;
-    this->pGraphicsManager->pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buf);
-    if (!buf) return;
-    this->pGraphicsManager->pd3dDevice->CreateRenderTargetView(
-        buf.Get(), nullptr, this->pGraphicsManager->view.GetAddressOf());
-    this->needReBuild.store(false, std::memory_order_release);
 }
 
 void ChromaKeyOverlay::OnClearDepthStencilView(ID3D11DeviceContext* pCtx, ID3D11DepthStencilView* pDSV, UINT ClearFlags) {
@@ -261,7 +248,7 @@ void ChromaKeyOverlay::CopyColorBuffer() {
 // ------------------------------------------------------------------
 void ChromaKeyOverlay::RenderGreenScreen() {
     auto ctx = this->pGraphicsManager->pd3dContext;
-    auto view = this->pGraphicsManager->view;
+    auto view = this->pGraphicsManager->refBackBufferView;
 
     if (!ctx || !view ||
         !this->pDepthSRV || !this->pColorCopySRV ||
