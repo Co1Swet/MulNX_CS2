@@ -21,13 +21,10 @@ namespace MulNX {
     private:
         // 元数据
         std::unordered_map<MulNX::MsgType, MsgMeta>msgInfo{};
-        // 异步
-        std::shared_mutex asyncMutex;
+
         std::unordered_map<MulNX::MsgType, std::vector<MessageChannel*>>asyncMap{};
         std::unordered_map<MulNXHandle, std::unique_ptr<MessageChannel>>asyncChannels;
         moodycamel::BlockingConcurrentQueue<MulNX::Message> asyncMsgBuffer;
-        // 同步
-        std::shared_mutex syncMutex;
         std::unordered_map<MulNX::MsgType, std::vector<SyncMsgCallback>>syncMap{};
 
         bool Init()override;

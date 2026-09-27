@@ -6,5 +6,4 @@ class SceneSystem final :public CSModuleBase {
     void* pRaw = nullptr;
 
     bool Init()override;
-    void OnSceneSystemLoad(MulNX::Message& msg) {};
 };

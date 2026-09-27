@@ -51,6 +51,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<ResourceSystem>("ResourceSystem")
         .CreateModule<ParticleSystemMgr>("ParticleSystemMgr")
         .CreateModule<VFileSystem>("VFileSystem")
+        .CreateModule<SceneSystem>("SceneSystem")
 
         // CS2 自定义支持
         .CreateModule<ConsoleOutput>("ConsoleOutput")

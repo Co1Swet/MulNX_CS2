@@ -9,7 +9,7 @@ enum TeamSytle :uint64_t {
 
 void PlayerSpotRenderController::Menu() {
     MulNX::UI::Checkbox("隐藏雷达玩家头像数字显示", this->hideNumLabel);
-    MulNX::UI::Checkbox("当观战具体玩家时转换观战外框", this->hideNumLabel);
+    MulNX::UI::Checkbox("当观战具体玩家时转换观战外框", this->transSpecLabel);
     MulNX::UI::Checkbox("强制雷达敌人渲染为红色", this->forceEnemyRed);
     MulNX::UI::Checkbox("强制雷达队友显示", this->forceTeammateDraw);
 }

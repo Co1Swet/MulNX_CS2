@@ -5,8 +5,9 @@
 bool SceneSystem::Init() {
     this->pMaterialSystem = this->FindModule<MaterialSystem>("MaterialSystem");
 
-    this->SubscribeSync("Hook/LoadLibraryExW/scenesystem.dll", [this](MulNX::Message& msg) {return this->OnSceneSystemLoad(msg);});
+    this->SubscribeSync("Hook/LoadLibraryExW/scenesystem.dll", [this](MulNX::Message& msg) {
 
+        });
 
     return true;
 }
