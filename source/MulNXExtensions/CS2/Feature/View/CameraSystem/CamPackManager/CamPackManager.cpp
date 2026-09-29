@@ -21,7 +21,7 @@ bool CamPackManager::Init() {
             this->LogError(std::format("创建运镜包文件夹失败，错误信息：{}", e.what()));
             return false;
         }
-        this->LogSucc(std::format("成功创建运镜包文件夹：", dirCamPack.string()));
+        this->LogSucc(std::format("成功创建运镜包文件夹：{}", dirCamPack.string()));
         return true;
         });
     this->Path()->KeyBindDynamic("kCurrentPack", "kCamPacks");
@@ -253,7 +253,7 @@ bool CamPackManager::CamPackLoad(const std::filesystem::path& dir, const std::st
         YAML::Node root = YAML::LoadFile(pathCamPack.string());
         std::string loadName = root["name"].as<std::string>();
         if (this->camPacks.find(loadName) != this->camPacks.end()) {
-            this->LogError(std::format("运镜包名已占用，无法从文件加载：", loadName));
+            this->LogError(std::format("运镜包名已占用，无法从文件加载：{}", loadName));
             return false;
         }
         auto loadCamPack = std::make_shared<CamPack>(loadName);

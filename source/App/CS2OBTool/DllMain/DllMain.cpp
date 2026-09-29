@@ -105,9 +105,12 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
         .CreateModule<BombSpotController>("BombSpotController")
         .CreateModule<HookTeamCounter>("HookTeamCounter")
-        .CreateModule<HookDamageReport>("HookDamageReport")
+        //.CreateModule<HookDamageReport>("HookDamageReport")
         .CreateModule<FlashRenderController>("FlashRenderController")
         .CreateModule<HookHealthAmmoCenter>("HookHealthAmmoCenter")
+
+        // CS2 渲染管线控制模块
+        .CreateModule<CloudController>("CloudController")
 
         // CS2 声音功能模块
         .CreateModule<AntiVoiceBan>("AntiVoiceBan")

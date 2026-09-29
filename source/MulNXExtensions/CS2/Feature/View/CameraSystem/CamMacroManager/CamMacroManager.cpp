@@ -233,7 +233,7 @@ bool CamMacroManager::CamMacroDelete(const std::string& name) {
             this->pOperatingMacro = nullptr;
     }
     this->camMacros.erase(it);
-    this->LogSucc(std::format("成功删除运镜宏：", name));
+    this->LogSucc(std::format("成功删除运镜宏：{}", name));
     return true;
 }
 bool CamMacroManager::CamMacroClearAll() {

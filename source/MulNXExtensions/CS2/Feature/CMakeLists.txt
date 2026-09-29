@@ -8,6 +8,7 @@ add_subdirectory("Record")
 add_subdirectory("Sound")
 add_subdirectory("View")
 add_subdirectory("Visual")
+add_subdirectory("Rending")
 
 target_link_libraries(CS2Feature INTERFACE
     DemoSystem
@@ -17,4 +18,5 @@ target_link_libraries(CS2Feature INTERFACE
     CS2Sound
     CS2View
     CS2Visual
+    CS2Rending
 )

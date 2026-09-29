@@ -9,9 +9,10 @@ namespace MulNX {
     class GraphicsManager final :public MulNX::Module<GraphicsManager> {
         bool Init()override;
     public:
-        // D3D11 核心指针
-        ID3D11Device* pd3dDevice = nullptr;
+        // 这个指针从Present函数等绑定，不要管引用计数
         IDXGISwapChain* pSwapChain = nullptr;
+        
+        ID3D11Device* pd3dDevice = nullptr;
         ID3D11DeviceContext* pd3dContext = nullptr;
 
         // 视图指针

@@ -98,7 +98,7 @@ std::pair<bool, std::string> CamMacro::Save(const std::filesystem::path& folderP
         return { true, std::format("保存成功：运镜宏名：{}  运镜数：{}",this->name ,this->wrapCampaths.size()) };
     }
     catch (const std::exception& e) {
-        return { false, std::format("保存失败：" ,e.what()) };
+        return { false, std::format("保存失败：{}" ,e.what()) };
     }
 }
 std::pair<bool, std::string> CamMacro::Load(YAML::Node& root) {

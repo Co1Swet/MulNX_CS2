@@ -16,13 +16,12 @@ bool HookD3D11::Init() {
             static std::atomic<int> i = 0;
             if (++i < 64)return MulNX::Hook::Then::Continue;
             this->hkPosCallPresent->Detach();
-            IDXGISwapChain* pRealSwapChain = nullptr;
+            ComPtr<IDXGISwapChain> pRealSwapChain = nullptr;
             // 如果加载了reshade，这里拿原始对象
             HRESULT hr = pSwapChain->QueryInterface(IID_UnwrappedObject, (void**)&pRealSwapChain);
             if (SUCCEEDED(hr)) {
                 this->LogWarning("检测到ReShade加载！已经反查原始交换链对象并部署钩子！");
-                this->HookD3D11SwapChain(pRealSwapChain);
-                pRealSwapChain->Release();
+                this->HookD3D11SwapChain(pRealSwapChain.Get());
             }
             else {
                 this->HookD3D11SwapChain(pSwapChain);
@@ -61,6 +60,16 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     pSwapChain->GetDevice(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
     dxgiDevice->QueryInterface(__uuidof(ID3D11Device), (void**)&this->pGraphicsManager->pd3dDevice);
     this->pGraphicsManager->pd3dDevice->GetImmediateContext(&this->pGraphicsManager->pd3dContext);
+
+    MulNX::Message device("GraphicsSync/ID3D11Device/Ready"_hash);
+    auto&& [pDevice] = device.Access<ID3D11Device*>();
+    pDevice = this->pGraphicsManager->pd3dDevice;
+    this->PublishSync(device);
+
+    MulNX::Message context("GraphicsSync/ID3D11DeviceContext/Ready"_hash);
+    auto&& [pContext] = context.Access<ID3D11DeviceContext*>();
+    pContext = this->pGraphicsManager->pd3dContext;
+    this->PublishSync(context);
 
     this->HookD3D11DeviceAndContext();
     // 函数开头：
