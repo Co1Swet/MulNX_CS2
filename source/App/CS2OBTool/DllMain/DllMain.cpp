@@ -109,6 +109,8 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookHealthAmmoCenter>("HookHealthAmmoCenter")
 
         // CS2 渲染管线控制模块
+        .CreateModule<RendCtrlAPI>("RendCtrlAPI")
+        .CreateModule<RendCtrlCenter>("RendCtrlCenter")
         .CreateModule<CloudController>("CloudController")
 
         // CS2 声音功能模块
