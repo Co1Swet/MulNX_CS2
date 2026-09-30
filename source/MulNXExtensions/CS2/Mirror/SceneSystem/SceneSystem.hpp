@@ -18,10 +18,10 @@ namespace CS2 {
     };
 
     class SoftwareCommandList {
-        using QueueCallbackFn = void(__fastcall*)(void* pThis, void* pCallback);
+        using QueueCallbackFn = void(*)(SoftwareCommandList* pThis, IRenderThreadCallback* pCallback);
     public:
-        void QueueCallback(void* pCallback) {
-            auto f = IVClass::Assume(this)->GetVFunc<void(void*)>(142);
+        void QueueCallback(IRenderThreadCallback* pCallback) {
+            auto f = IVClass::Assume(this)->GetVFunc<void(IRenderThreadCallback*)>(142);
             f(pCallback);
         }
     };
@@ -32,20 +32,6 @@ namespace CS2 {
         CS2::SoftwareCommandList* pSoftwareCommandList;
     };
 }
-
-class WrapCS2RenderCallback final :public CS2::IRenderThreadCallback {
-    std::function<void(void)> callback{};
-
-    ~WrapCS2RenderCallback() = default;
-public:
-    WrapCS2RenderCallback(std::function<void(void)>&& call) {
-        this->callback = std::move(call);
-    }
-    virtual void OnCallback(void)override {
-        this->callback();
-        delete this;
-    }
-};
 
 class SceneSystem final :public CSModuleBase {
     MulNX::Memory::DllModule scenesystem{};
