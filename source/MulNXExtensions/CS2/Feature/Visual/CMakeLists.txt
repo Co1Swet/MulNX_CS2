@@ -2,7 +2,6 @@ add_library(CS2Visual STATIC
     ESPBox/ESPBox.cpp
     GlowController/GlowController.cpp
     PlayerFlashController/PlayerFlashController.cpp
-    SkinController/SkinController.cpp
     SmokeController/SmokeController.cpp
     TeamIDColorController/TeamIDColorController.cpp
     TeamIDRenderController/TeamIDRenderController.cpp

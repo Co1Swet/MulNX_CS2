@@ -92,7 +92,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<PlayerFlashController>("PlayerFlashController")
         .CreateModule<DeathMsgController>("DeathMsgController")
         .CreateModule<SkyController>("SkyController")
-        //.CreateModule<SkinController>("SkinController")
         .CreateModule<TrailsController>("TrailsController")
         .CreateModule<SmokeController>("SmokeController")
         .CreateModule<ViewModelController>("ViewModelController")

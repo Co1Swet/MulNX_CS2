@@ -2,7 +2,6 @@
 #include "ESPBox/ESPBox.hpp"
 #include "ESPSkeleton/ESPSkeleton.hpp"
 #include "PlayerFlashController/PlayerFlashController.hpp"
-#include "SkinController/SkinController.hpp"
 #include "SmokeController/SmokeController.hpp"
 #include "TeamIDRenderController/TeamIDRenderController.hpp"
 #include "TeamIDColorController/TeamIDColorController.hpp"
