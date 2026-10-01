@@ -19,15 +19,15 @@ bool RendCtrlCenter::Init() {
 
             auto OnExit = [&]()->MulNX::Hook::Then {
                 if (hide) {
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET_blockDepth);
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET_blockColor);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_blockDepth);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_blockColor);
                 }
                 auto pRawFunc = (SceneSystem::DrawSceneData_t)hk->pMaybeRawFunc;
                 pRawFunc(pDrawingData, pSceneData);
                 this->pDrawCurrentPrimitives(pDrawingData);
                 if (hide) {
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET_unblockDepth);
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET_unblockColor);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_unblockDepth);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_unblockColor);
                 }
                 return MulNX::Hook::Then::Return;
                 };

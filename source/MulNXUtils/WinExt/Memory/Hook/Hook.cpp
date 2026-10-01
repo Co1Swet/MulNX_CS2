@@ -10,7 +10,7 @@ uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     auto rsp = ctx->rsp;
     auto test = rsp % 16;
     if (test) {
-        MulNX::ErrorTerminate("DEBUG 栈对齐错误！");
+        __debugbreak();
     }
 #endif
     auto then = this->callback(this, ctx);

@@ -104,7 +104,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
         .CreateModule<BombSpotController>("BombSpotController")
         .CreateModule<HookTeamCounter>("HookTeamCounter")
-        //.CreateModule<HookDamageReport>("HookDamageReport")
+        .CreateModule<HookDamageReport>("HookDamageReport")
         .CreateModule<FlashRenderController>("FlashRenderController")
         .CreateModule<HookHealthAmmoCenter>("HookHealthAmmoCenter")
 

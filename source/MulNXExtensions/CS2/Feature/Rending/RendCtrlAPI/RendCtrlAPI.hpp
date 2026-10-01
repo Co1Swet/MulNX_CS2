@@ -21,7 +21,7 @@ class RendCtrlAPI final :public CSModuleBase {
     ComPtr<ID3D11DepthStencilState> RT_pDSSNoDrawDepth = nullptr;
     std::unique_ptr<MulNX::Hook> hkOMSetDepthStencilState = nullptr;
     using OMSetDepthStencilState_t = void(*)(ID3D11DeviceContext*, ID3D11DepthStencilState*, UINT);
-    OMSetDepthStencilState_t pRawOMSetDepthStencilState;
+    OMSetDepthStencilState_t pRawOMSetDepthStencilState = nullptr;
 
     bool RT_bBlockDepth = false;
     ComPtr<ID3D11DepthStencilState> pSavedDepthStencilState = nullptr;
@@ -32,35 +32,35 @@ class RendCtrlAPI final :public CSModuleBase {
 
     bool Init()override;
 
-    class ET_BlockColor final :public CS2::IRenderThreadCallback {
+    class ET2RT_BlockColor final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_BlockColor(); }
     public:
-        ET_BlockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
+        ET2RT_BlockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
-    class ET_UnblockColor final :public CS2::IRenderThreadCallback {
+    class ET2RT_UnblockColor final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_UnblockColor(); }
     public:
-        ET_UnblockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
+        ET2RT_UnblockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
 public:
-    ET_BlockColor ET_blockColor{ this };
-    ET_UnblockColor ET_unblockColor{ this };
+    ET2RT_BlockColor ET2RT_blockColor{ this };
+    ET2RT_UnblockColor ET2RT_unblockColor{ this };
 private:
-    class ET_BlockDepth final :public CS2::IRenderThreadCallback {
+    class ET2RT_BlockDepth final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_BlockDepth(); }
     public:
-        ET_BlockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
+        ET2RT_BlockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
-    class ET_UnblockDepth final :public CS2::IRenderThreadCallback {
+    class ET2RT_UnblockDepth final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_UnblockDepth(); }
     public:
-        ET_UnblockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
+        ET2RT_UnblockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
 public:
-    ET_BlockDepth ET_blockDepth{ this };
-    ET_UnblockDepth ET_unblockDepth{ this };
+    ET2RT_BlockDepth ET2RT_blockDepth{ this };
+    ET2RT_UnblockDepth ET2RT_unblockDepth{ this };
 };
