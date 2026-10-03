@@ -58,6 +58,8 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<VFileSystem>("VFileSystem")
 
         // CS2 自定义支持
+        .CreateModule<ClientPanorama>("ClientPanorama")
+        .CreateModule<DamageRecorder>("DamageRecorder")
         .CreateModule<ImGuiBinder>("ImGuiBinder")
         .CreateModule<ConsoleOutput>("ConsoleOutput")
         .CreateModule<TargetPicker>("TargetPicker")

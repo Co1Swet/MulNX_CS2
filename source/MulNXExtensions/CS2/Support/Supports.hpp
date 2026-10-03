@@ -7,3 +7,5 @@
 #include "NameController/NameController.hpp"
 #include "FileInjector/FileInjector.hpp"
 #include "ImGuiBinder/ImGuiBinder.hpp"
+#include "ClientPanorama/ClientPanorama.hpp"
+#include "DamageRecorder/DamageRecorder.hpp"

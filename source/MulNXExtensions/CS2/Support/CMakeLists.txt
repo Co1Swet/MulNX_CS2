@@ -7,5 +7,7 @@ add_library(CS2Support STATIC
     NameController/NameController.cpp
     FileInjector/FileInjector.cpp
     ImGuiBinder/ImGuiBinder.cpp
+    DamageRecorder/DamageRecorder.cpp
+    ClientPanorama/ClientPanorama.cpp
 )
 target_link_libraries(CS2Support PUBLIC CS2Mirror)

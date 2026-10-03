@@ -116,7 +116,7 @@ namespace CS2 {
 
     class C_BaseModelEntity :public C_BaseEntity {
     public:
-
+        int32_t* m_iOldHealth() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_BaseModelEntity::m_iOldHealth); }
 
         CGlowProperty* Glow() { return Schema<CGlowProperty>(this, cs2_dumper::schemas::client_dll::C_BaseModelEntity::m_Glow); }
         DirectX::XMFLOAT3* vecViewOffset() { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + cs2_dumper::schemas::client_dll::C_BaseModelEntity::m_vecViewOffset); }

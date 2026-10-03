@@ -1,6 +1,8 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
 #include <Game/StaticWeapons/StaticWeaponBase.hpp>
+#include <Support/DamageRecorder/DamageRecorder.hpp>
+#include <Support/ClientPanorama/ClientPanorama.hpp>
 
 namespace CS2 {
     class CDamageRecord {
@@ -34,9 +36,17 @@ namespace CS2 {
 }
 
 class HookDamageReport final :public CSModuleBase {
+    ClientPanorama* pClientPanorama = nullptr;
+    DamageRecorder* pDamageRecorder = nullptr;
+    bool needUpdate = false;
     std::unique_ptr<MulNX::Hook> hkPos_Check_m_nSendUpdate = nullptr;
     std::unique_ptr<MulNX::Hook> hkPos_GettedController = nullptr;
     std::unique_ptr<MulNX::Hook> hkFunc_UpdateDamageReport = nullptr;
+    using UpdateDamageReport_t = uint64_t(*)(uint64_t);
+    UpdateDamageReport_t pFunc_UpdateDamageReport = nullptr;
+
+    std::atomic<bool> enable = true;
+    void Menu();
     bool Init()override;
     void RefreshPool(CS2::CCSPlayerController* pObservedController, CS2::CHandleBase hObserved);
 };

@@ -39,21 +39,20 @@ public:
     }
 };
 
+void HookDamageReport::Menu() {
+    MulNX::UI::Checkbox("启用伤害报告增强", this->enable);
+}
+
 bool HookDamageReport::Init() {
+    this->pClientPanorama = this->FindModule<ClientPanorama>("ClientPanorama");
+    this->pDamageRecorder = this->FindModule<DamageRecorder>("DamageRecorder");
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
 
         auto tPos_Check_m_nSendUpdate = this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Hud::DamageReport::Pos_Check_m_nSendUpdate).Data();
         this->hkPos_Check_m_nSendUpdate = MulNX::Hook::Create(tPos_Check_m_nSendUpdate, [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto* pDamageServices = reinterpret_cast<CS2::CCSPlayerController_DamageServices*>(ctx->rcx);
-            auto* pNewValue = reinterpret_cast<int32_t*>(ctx->r8);
-
-            if (pDamageServices->m_nSendUpdate == *pNewValue) {
-                static int32_t s_FakeSendUpdate = 0;
-                s_FakeSendUpdate = *pNewValue + 1;
-                ctx->r8 = reinterpret_cast<uint64_t>(&s_FakeSendUpdate);
-            }
+            this->needUpdate = true;
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->RegisterAttachHook(this->hkPos_Check_m_nSendUpdate, "Pos_Check_m_nSendUpdate");
@@ -79,6 +78,7 @@ bool HookDamageReport::Init() {
 
         auto tFunc_UpdateDamageReport = this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Hud::DamageReport::Func_UpdateDamageReport).Data();
+        this->pFunc_UpdateDamageReport = reinterpret_cast<UpdateDamageReport_t>(tFunc_UpdateDamageReport);
         this->hkFunc_UpdateDamageReport = MulNX::Hook::Create(tFunc_UpdateDamageReport, [this](MulNX::Hook* hk, RegContext* ctx) {
 
             auto* pObservingPawn = this->CS2Entitys->TryGetObservingPawn();
@@ -103,9 +103,8 @@ bool HookDamageReport::Init() {
             pDamageServices->m_DamageList.m_nSize = pool.Count();
             pDamageServices->m_DamageList.m_pData = pool.Data();
 
-            using RawFunc = __int64(__fastcall*)(__int64);
-            auto r = hk->CallMaybeAs<RawFunc>(ctx->rcx);
-            ctx->rax = static_cast<uint64_t>(r);
+            auto r = hk->CallMaybeAs<UpdateDamageReport_t>(ctx->rcx);
+            ctx->rax = r;
 
             // 恢复
             pDamageServices->m_DamageList.m_nSize = origSize;
@@ -116,7 +115,37 @@ bool HookDamageReport::Init() {
         this->RegisterAttachHook(this->hkFunc_UpdateDamageReport, "Func_UpdateDamageReport");
         });
 
+    this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
+        if (!this->needUpdate)return;
+        this->needUpdate = false;
+        if(this->enable == false)return;
+        // v4 = sub_180E7DF80("CCSGO_HudTeamCounter");
+        // v5 = (__int64(__fastcall***)(_QWORD))(v4 - 32);
+        // if (!v4)
+        //     v5 = 0;
+        // return sub_180EB9000(v5);
+
+        auto pCCSGO_HudTeamCounter = this->pClientPanorama->FindHudElement("CCSGO_HudTeamCounter");
+        auto v5 = pCCSGO_HudTeamCounter - 32;
+        if (!pCCSGO_HudTeamCounter)
+            v5 = 0;
+        auto r = this->pFunc_UpdateDamageReport(v5);
+        return;
+        });
+
+    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
+        this->Menu();
+        });
+
     return true;
+}
+
+namespace {
+    struct EnemyAgg {
+        float damage = 0.0f;
+        int   hits = 0;
+        CS2::EKillTypes_t killType = CS2::EKillTypes_t::KILL_NONE;
+    };
 }
 
 void HookDamageReport::RefreshPool(CS2::CCSPlayerController* pObservedController, CS2::CHandleBase hObserved) {
@@ -124,25 +153,49 @@ void HookDamageReport::RefreshPool(CS2::CCSPlayerController* pObservedController
     pool.Clear();
 
     auto observedTeam = MulNX::MRead(pObservedController->iTeamNum());
-    int nSpecialCount = 0;
+    auto observedSteamId = MulNX::MRead(pObservedController->m_steamID());
+    auto round = this->CS2->client.dwGameRules()->m_nRoundStartCount;
 
-    for (int i = 0; i < this->CS2->client.dwGameEntitySystem_highestEntityIndex(); ++i) {
-        auto* pController = this->CS2Entitys->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
-        if (!pController || !pController->IsPlayerController())continue;
-        if (pController == pObservedController)continue;
-        auto team = MulNX::MRead(pController->iTeamNum());
-        if (team == observedTeam) continue;
-        if (team != CS2::ui8TeamNum::T && team != CS2::ui8TeamNum::CT)continue;
+    auto gaveHits = this->pDamageRecorder->GetPlayerGiveDamageInfo(round, observedSteamId);
+    auto tookHits = this->pDamageRecorder->GetPlayerTakeDamageInfo(round, observedSteamId);
 
-        auto hEnemy = this->CS2Entitys->TryGetControllerHandle(pController).value_or(CS2::CHandleBase());
-        if (!hEnemy.Valid())continue;
-
-        if (nSpecialCount == 0) {
-            pool.Add(hEnemy, hObserved, 55.0f, 3, CS2::EKillTypes_t::KILL_DEFAULT);
-            ++nSpecialCount;
+    std::map<Steam64UID, EnemyAgg> gaveAgg;
+    for (const auto& h : gaveHits) {
+        auto& agg = gaveAgg[h.victim];
+        agg.damage += static_cast<float>(h.damage);
+        agg.hits += 1;
+        if (h.isKill) {
+            agg.killType = CS2::TranslateKillType(h.damageType);
         }
-        else {
-            pool.Add(hObserved, hEnemy, 88.0f, 5, CS2::EKillTypes_t::KILL_NONE);
+    }
+
+    std::map<Steam64UID, EnemyAgg> tookAgg;
+    for (const auto& h : tookHits) {
+        auto& agg = tookAgg[h.attacker];
+        agg.damage += static_cast<float>(h.damage);
+        agg.hits += 1;
+        if (h.isKill) {
+            agg.killType = CS2::TranslateKillType(h.damageType);
         }
+    }
+
+    for (const auto& [enemyId, agg] : gaveAgg) {
+        auto* pEnemy = this->CS2Entitys->FindControllerBySteam64UID(enemyId);
+        if (!pEnemy) continue;
+        if (MulNX::MRead(pEnemy->iTeamNum()) == observedTeam) continue;
+        auto hEnemy = this->CS2Entitys->TryGetControllerHandle(pEnemy).value_or(CS2::CHandleBase());
+        if (!hEnemy.Valid()) continue;
+
+        pool.Add(hObserved, hEnemy, agg.damage, agg.hits, agg.killType);
+    }
+
+    for (const auto& [enemyId, agg] : tookAgg) {
+        auto* pEnemy = this->CS2Entitys->FindControllerBySteam64UID(enemyId);
+        if (!pEnemy) continue;
+        if (MulNX::MRead(pEnemy->iTeamNum()) == observedTeam) continue;
+        auto hEnemy = this->CS2Entitys->TryGetControllerHandle(pEnemy).value_or(CS2::CHandleBase());
+        if (!hEnemy.Valid()) continue;
+
+        pool.Add(hEnemy, hObserved, agg.damage, agg.hits, agg.killType);
     }
 }
