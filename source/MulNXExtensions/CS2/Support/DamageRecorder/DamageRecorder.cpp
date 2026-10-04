@@ -52,6 +52,11 @@ void DamageRecorder::HandleOnPlayerHurt(MulNX::Message& msg) {
     auto damageValue = pEvent->GetInt(damage);
     auto pWeaponName = pEvent->GetString(weapon);
 
+    if (!pWeaponName|| pWeaponName[0] == '\0') {
+        this->LogWarning("无武器的player_hurt事件，已丢弃");
+        return;
+    }
+
     if (reallyDamage != damageValue) {
         //this->LogWarning(std::format("玩家 {} 对玩家 {} 造成的伤害不一致，实际伤害: {}, 事件伤害: {}", attackerId, victimId, reallyDamage, damageValue));
     }
