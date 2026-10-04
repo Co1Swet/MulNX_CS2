@@ -58,9 +58,7 @@ bool HookTeamCounter::Init() {
                 }
                 auto pGameRules = this->CS2->client.dwGameRules();
                 if (!pGameRules)return MulNX::Hook::Then::Continue;
-                auto bIsFreeze = MulNX::MRead(&pGameRules->m_bFreezePeriod);
-                auto flRestartRoundTime = MulNX::MRead(&pGameRules->m_flRestartRoundTime);
-                if (!bIsFreeze && !flRestartRoundTime) {
+                if (!pGameRules->IsGameInactive()) {
                     ctx->r8 = false;
                     return MulNX::Hook::Then::Continue;
                 }
@@ -86,9 +84,7 @@ bool HookTeamCounter::Init() {
                 if (this->noHideShowName) return MulNX::Hook::Then::Continue;
                 auto pGameRules = this->CS2->client.dwGameRules();
                 if (!pGameRules)return MulNX::Hook::Then::Continue;
-                auto bIsFreeze = MulNX::MRead(&pGameRules->m_bFreezePeriod);
-                auto flRestartRoundTime = MulNX::MRead(&pGameRules->m_flRestartRoundTime);
-                if (bIsFreeze || flRestartRoundTime)return MulNX::Hook::Then::Continue;
+                if (pGameRules->IsGameInactive())return MulNX::Hook::Then::Continue;
                 ctx->r8 = false;
             }
             catch (const MulNX::Exception& e) {

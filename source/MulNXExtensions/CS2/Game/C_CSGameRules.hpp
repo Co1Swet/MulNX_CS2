@@ -123,6 +123,17 @@ namespace CS2 {
         uint8_t m_nRoundStartCount; // 0x0F4C
         char pad_0x0F4D[0x400B]; // 0x0F4D
         double m_flLastPerfSampleTime; // 0x4F58
+
+        inline bool IsGameInactive() {
+            try {
+                auto bIsFreeze = MulNX::MRead(&this->m_bFreezePeriod);
+                auto flRestartRoundTime = MulNX::MRead(&this->m_flRestartRoundTime);
+                return bIsFreeze || flRestartRoundTime;
+            }
+            catch (...) {
+                return true;
+            }
+        }
     };
 #pragma pack(pop)
 }
