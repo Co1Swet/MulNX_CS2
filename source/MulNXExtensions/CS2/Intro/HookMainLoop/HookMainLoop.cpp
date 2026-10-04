@@ -24,5 +24,14 @@ bool HookMainLoop::Init() {
         this->RegisterAttachHook(this->hkPos_Call_CInputService_ProcessCommands, "Pos_Call_CInputService_ProcessCommands");
         });
 
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
+        auto t = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Physics::Pos_PhysicsCreated).Data();
+        this->hkPos_PhysicsCreated = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
+            this->PublishSync("Hook/Physics/Created"_hash);
+            return MulNX::Hook::Then::Continue;
+            }, true).value();
+        this->RegisterAttachHook(this->hkPos_PhysicsCreated, "Pos_PhysicsCreated");
+        });
+
     return true;
 }

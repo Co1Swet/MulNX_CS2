@@ -26,12 +26,12 @@ bool HookView::Init() {
         this->controlView.dofs.pFarCrisp = this->CS2Con->GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
         this->controlView.dofs.pFarBlurry = this->CS2Con->GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
 
-        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Pos_ClientModeCSNormal_MaybeWriteView_CallIsPlayingDemo).Data();
+        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::View::Pos_ClientModeCSNormal_CallIsPlayingDemo).Data();
         this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target, [this](MulNX::Hook* Hook, RegContext* ctx) {
             this->HandleOverrideView((CS2::CViewSetup*)ctx->rbx);
             return MulNX::Hook::Then::Continue;
             }, true).value();
-        this->RegisterAttachHook(this->hkPosCallIsPlayingDemo, "Pos_CViewRenderer_VFuncsSubFunc_MaybeWriteView_CallIsPlayingDemo where r14 is *CViewSetup");
+        this->RegisterAttachHook(this->hkPosCallIsPlayingDemo, "Pos_ClientModeCSNormal_CallIsPlayingDemo");
 
         this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
         });

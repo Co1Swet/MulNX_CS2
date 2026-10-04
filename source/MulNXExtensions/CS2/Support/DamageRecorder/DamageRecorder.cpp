@@ -13,6 +13,12 @@ bool DamageRecorder::Init() {
         }
         });
 
+    this->SubscribeSync("Hook/Physics/Created", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
+        this->info.RoundDamageMap.clear();
+        this->LogInfo("伤害记录已清空");
+        });
+
     return true;
 }
 
@@ -30,7 +36,7 @@ void DamageRecorder::HandleOnPlayerHurt(MulNX::Message& msg) {
     auto round = pGameRules->m_nRoundStartCount;
 
     auto pAttackerController = pEvent->GetPlayerController(attacker);
-    if(!pAttackerController) return;
+    if (!pAttackerController) return;
 
     auto pVictimController = pEvent->GetPlayerController(userid);
 
@@ -62,11 +68,13 @@ void DamageRecorder::HandleOnPlayerHurt(MulNX::Message& msg) {
         .isKill = (healthValue == 0),
     };
 
+    std::unique_lock lock(this->smutex);
     this->info.RoundDamageMap[round].Hits.insert(std::move(hit));
 }
 
 std::vector<OneHitInfo> DamageRecorder::GetPlayerGiveDamageInfo(int round, Steam64UID player) const {
     std::vector<OneHitInfo> result;
+    std::shared_lock lock(this->smutex);
     auto it = this->info.RoundDamageMap.find(round);
     if (it == this->info.RoundDamageMap.end()) return result;
     for (const auto& hit : it->second.Hits) {
@@ -77,6 +85,7 @@ std::vector<OneHitInfo> DamageRecorder::GetPlayerGiveDamageInfo(int round, Steam
 
 std::vector<OneHitInfo> DamageRecorder::GetPlayerTakeDamageInfo(int round, Steam64UID player) const {
     std::vector<OneHitInfo> result;
+    std::shared_lock lock(this->smutex);
     auto it = this->info.RoundDamageMap.find(round);
     if (it == this->info.RoundDamageMap.end()) return result;
     for (const auto& hit : it->second.Hits) {

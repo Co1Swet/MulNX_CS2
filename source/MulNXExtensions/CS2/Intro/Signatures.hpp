@@ -3,7 +3,12 @@
 
 namespace CS2 {
     namespace Signatures {
-        inline const static MulNX::Memory::Pattern Pos_ClientModeCSNormal_MaybeWriteView_CallIsPlayingDemo("48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 0F 57 FF 84 C0 74 5E");
+        namespace Physics {
+            inline const static MulNX::Memory::Pattern Pos_PhysicsCreated("48 8B 4C 24 30 48 85 C9 0F 84 ?? ?? ?? ?? 48 8B 01");
+        }
+        namespace View {
+            inline const static MulNX::Memory::Pattern Pos_ClientModeCSNormal_CallIsPlayingDemo("48 8B 0D ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 0F 57 FF 84 C0 74 5E");
+        }
         namespace Render {
             inline const static MulNX::Memory::Pattern Pos_Call_Present("FF 50 40 80 7C 24 ?? 00 44 8B E0 74 10");
         }
