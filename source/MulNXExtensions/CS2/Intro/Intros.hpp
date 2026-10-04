@@ -10,3 +10,4 @@
 #include "HookGSI/HookGSI.hpp"
 #include "GFuncBind/GFuncBind.hpp"
 #include "ClientEntitySystem/ClientEntitySystem.hpp"
+#include "HookMainLoop/HookMainLoop.hpp"

@@ -1,5 +1,4 @@
 #include "ReShowSpeaker.hpp"
-#include <Support/TimeController/TimeController.hpp>
 
 bool ReShowSpeaker::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
@@ -20,30 +19,20 @@ bool ReShowSpeaker::Init() {
         // }
         });
 
-    this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
+    this->SubscribeSync("Hook/MainLoop/TickJumpDetected", [this](auto&&...) {
         auto voiceStatus = this->pFuncGetVoiceStatus();
         if (!voiceStatus) return;
-        auto old = this->lastUpdateTick.load(std::memory_order_acquire);
-        if (old == 0) {
-            this->lastUpdateTick.store(this->CS2Time->GetDemoTick(), std::memory_order_release);
-            return;
+        for (uint32_t i = 0; i < 64; ++i) {
+            this->pFuncUpdateSpeakerStatus(voiceStatus, i, -1, 0);
         }
-        auto now = this->CS2Time->GetDemoTick();
-        if (std::abs(old - now) > 5) {
-            for (uint32_t i = 0; i < 64; ++i) {
-                this->pFuncUpdateSpeakerStatus(voiceStatus, i, -1, 0);
-            }
-        }
-        this->lastUpdateTick.store(now, std::memory_order_release);
+        });
+
+    this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
+        this->Update();
         });
 
     (*this)
         .SubscribeAsync<void>("ClearAllSpeakStatus");
-
-    this->SendTask("Update", "CSControl", [this]() {
-        this->Update();
-        return true;
-        });
 
     return true;
 }
@@ -51,7 +40,11 @@ bool ReShowSpeaker::Init() {
 void ReShowSpeaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type){
     case "ClearAllSpeakStatus"_hash: {
-        this->lastUpdateTick.store(1, std::memory_order_release);
+        auto voiceStatus = this->pFuncGetVoiceStatus();
+        if (!voiceStatus) return;
+        for (uint32_t i = 0; i < 64; ++i) {
+            this->pFuncUpdateSpeakerStatus(voiceStatus, i, -1, 0);
+        }
         break;
     }
     default:

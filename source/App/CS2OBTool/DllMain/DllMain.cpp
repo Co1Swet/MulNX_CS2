@@ -47,6 +47,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookEntitySystem>("HookEntitySystem")
         .CreateModule<HookGameEvents>("HookGameEvents")
         .CreateModule<HookGSI>("HookGSI")
+        .CreateModule<HookMainLoop>("HookMainLoop")
 
         // CS2 子系统镜像
         .CreateModule<CS2Hash>("CS2Hash")

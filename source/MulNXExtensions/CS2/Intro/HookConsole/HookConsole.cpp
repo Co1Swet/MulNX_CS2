@@ -3,15 +3,29 @@
 bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);
     (*this)
-        .SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {return this->OnTier0Load(msg);})
-        .SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {return this->OnEngine2Load(msg);})
         .SubscribeAsync("Game/Command")
         .SubscribeAsync("Game/Command/NoReport")
         ;
 
-    this->SendTask("Update", "CSControl", [this]() {
-        this->Update();
-        return true;
+    this->SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {
+        return this->OnTier0Load(msg);
+        });
+
+    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
+        return this->OnEngine2Load(msg);
+        });
+
+    this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
+        std::string cmd;
+        if (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
+            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+            while (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
+                this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+            }
+            return;
+        }
+        if (this->bufferGameCmds.try_dequeue(cmd))
+            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
         });
 
     this->SubscribeSync("System/Init/End", [this](MulNX::Message& msg) {
@@ -41,8 +55,11 @@ bool HookConsole::Init() {
             MulNXCmd cmd(std::move(full), "one MulNX Cmd", std::move(CmdCallback));
             this->CS2Cmds.push_back(std::move(cmd));
         }
+        });
 
-        return;
+    this->SendTask("Update", "CSControl", [this]() {
+        this->Update();
+        return true;
         });
 
     return true;
@@ -57,23 +74,6 @@ HookConsole& HookConsole::RegisterCmd(std::string&& name, std::function<void(CCo
 }
 void HookConsole::OnEngine2Load(MulNX::Message& msg) {
     this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int, double, int64_t)>(51);
-    auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
-    this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
-        if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
-        this->PublishSync("Hook/CSMainLoop"_hash);
-        std::string cmd;
-        if (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
-            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-            while (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
-                this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-            }
-            return MulNX::Hook::Then::Continue;
-        }
-        if (this->bufferGameCmds.try_dequeue(cmd))
-            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-        return MulNX::Hook::Then::Continue;
-        }, true).value();
-    this->RegisterAttachHook(this->hkPos_Call_CInputService_ProcessCommands, "Pos_Call_CInputService_ProcessCommands");
 }
 
 void HookConsole::OnTier0Load(MulNX::Message& msg) {

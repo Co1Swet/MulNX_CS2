@@ -13,7 +13,6 @@ class HookConsole final :public CSModuleBase {
     std::vector<MulNXCmd> CS2Cmds{};
 
     std::unique_ptr<MulNX::Hook>hkVEngineCvar007_RegisterConCommand = nullptr;
-    std::unique_ptr<MulNX::Hook>hkPos_Call_CInputService_ProcessCommands = nullptr;
     
     // 控制台指令执行器
     VExecutor<void(int, const char*, int, double, int64_t)> executor{};
