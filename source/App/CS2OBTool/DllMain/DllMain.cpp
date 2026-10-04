@@ -13,13 +13,10 @@ static HANDLE hInitCompleteEvent = nullptr;
 BOOL APIENTRY DllMain(HMODULE, DWORD, LPVOID) { return TRUE; }
 void StartImpl(HMODULE& hModule) {
     hModule = GetModuleHandleW(L"CS2OBTool.dll");
-    // 创建核心
     auto core = MulNX::Core::Core::Create("CS2OBTool");
-    // 将DLL模块句柄传递给核心，以便后续使用
     core->hMyOriginModule = hModule;
-    // 注册所有模块
     (*core->ModuleManager())
-        .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
+        .CreateSystemModules()
         .CreateModule<HookWindow>("HookWindow")
         .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
         .CreateModule<FileRedirector>("FileRedirector")
@@ -32,8 +29,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<MulNX::ShaderCompiler>("ShaderCompiler")
         .CreateModule<MulNX::GraphicsManager>("GraphicsManager")
         .CreateModule<ChromaKeyOverlay>("ChromaKeyOverlay")
-
-        // 以上为通用逻辑
 
         // 底层CS2支持
         .CreateModule<CSController>("CSController")
@@ -64,7 +59,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<ImGuiBinder>("ImGuiBinder")
         .CreateModule<ConsoleOutput>("ConsoleOutput")
         .CreateModule<TargetPicker>("TargetPicker")
-        .CreateModule<TimeController>("TimeController")// 承担了时间适配器责任
+        .CreateModule<TimeController>("TimeController")
         .CreateModule<NameController>("NameController")
         .CreateModule<PlayerHub>("PlayerHub")
         .CreateModule<FileInjector>("FileInjector")

@@ -42,6 +42,7 @@ namespace CS2 {
                 inline const static MulNX::Memory::Pattern Pos_Check_m_nSendUpdate("41 8B 00 39 41 40 74 3A 89 41 40 48 8B 05 ?? ?? ?? ?? 48 85 C0");
                 inline const static MulNX::Memory::Pattern Pos_GettedController("4C 8B E8 48 85 C0 0F 84 ?? ?? ?? ?? 0F B6 88 ?? ?? ?? ?? 80 E9 02");
                 inline const static MulNX::Memory::Pattern Func_UpdateDamageReport("41 56 48 83 EC 70 48 8B 05 ?? ?? ?? ?? 4C 8B F1 80 78");
+                inline const static MulNX::Memory::Pattern Pos_Call_DispatchClearAllPostRoundDamageReportPanels("E8 ?? ?? ?? ?? 48 8B 6C 24 30 48 8B 5C 24 60 48 83 C4 38");
             }
 
             inline const static MulNX::Memory::Pattern Pos_CheckFor_HudSpecplayerRoot__visible("65 48 8B 04 25 58 00 00 00 8B 0D ?? ?? ?? ?? 41 BD 68 00 00 00 4C 8B 24 C8");

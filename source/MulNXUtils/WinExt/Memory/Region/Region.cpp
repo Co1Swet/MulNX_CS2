@@ -86,3 +86,14 @@ MulNX::Memory::Region MulNX::Memory::Region::FindFuncStart() {
     // 在限定范围内未找到 int3，返回无效区域
     return Region::InValid();
 }
+
+uint8_t* MulNX::Memory::Region::TryGetCallTarget() {
+    if (!this->IsValid()) return nullptr;
+    if (this->Size < 5) return nullptr;
+    const uint8_t* p = this->Begin();
+    if (p[0] != 0xE8) return nullptr;
+    int32_t rel = 0;
+    std::memcpy(&rel, p + 1, sizeof(rel));
+    return reinterpret_cast<uint8_t*>(
+        static_cast<int64_t>(this->Base) + 5 + rel);
+}

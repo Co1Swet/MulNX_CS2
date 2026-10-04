@@ -1,43 +1,5 @@
 #include "HookDamageReport.hpp"
-
-class CFakeDamageRecordPool {
-    static constexpr size_t kMaxRecords = 64;
-    CS2::CDamageRecord m_Records[kMaxRecords];
-    int32_t        m_nCount = 0;
-
-    CFakeDamageRecordPool() = default;
-    CFakeDamageRecordPool(const CFakeDamageRecordPool&) = delete;
-    CFakeDamageRecordPool& operator=(const CFakeDamageRecordPool&) = delete;
-public:
-    static CFakeDamageRecordPool& Get() {
-        static CFakeDamageRecordPool s_Instance;
-        return s_Instance;
-    }
-
-    void Clear() { m_nCount = 0; }
-    int32_t Count() const { return m_nCount; }
-    CS2::CDamageRecord* Data() { return m_Records; }
-
-    void Add(const CS2::CHandleBase& hDamager,
-        const CS2::CHandleBase& hRecipient,
-        float flDamage,
-        int32_t nNumHits,
-        CS2::EKillTypes_t eKillType) {
-        if (m_nCount >= kMaxRecords)
-            return;
-
-        auto* pRecord = &m_Records[m_nCount++];
-        std::memset(pRecord, 0, sizeof(CS2::CDamageRecord));
-
-        pRecord->m_hPlayerControllerDamager.value = hDamager.value;
-        pRecord->m_hPlayerControllerRecipient.value = hRecipient.value;
-        pRecord->m_flDamage = flDamage;
-        pRecord->m_flActualHealthRemoved = flDamage;
-        pRecord->m_iNumHits = nNumHits;
-        pRecord->m_bIsOtherEnemy = true;
-        pRecord->m_killType = eKillType;
-    }
-};
+#include "CFakeDamageRecordPool.hpp"
 
 void HookDamageReport::Menu() {
     MulNX::UI::Checkbox("启用伤害报告增强", this->enable);
@@ -48,7 +10,6 @@ bool HookDamageReport::Init() {
     this->pDamageRecorder = this->FindModule<DamageRecorder>("DamageRecorder");
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
-
         auto tPos_Check_m_nSendUpdate = this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Hud::DamageReport::Pos_Check_m_nSendUpdate).Data();
         this->hkPos_Check_m_nSendUpdate = MulNX::Hook::Create(tPos_Check_m_nSendUpdate, [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -59,7 +20,6 @@ bool HookDamageReport::Init() {
 
         auto tPos_GettedController = this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Hud::DamageReport::Pos_GettedController).Data();
-
         this->hkPos_GettedController = MulNX::Hook::Create(tPos_GettedController, [this](MulNX::Hook* hk, RegContext* ctx) {
             CS2::C_CSPlayerPawn* pObservingPawn = this->CS2Entitys->TryGetObservingPawn();
             if (!pObservingPawn)
@@ -80,7 +40,6 @@ bool HookDamageReport::Init() {
             .FindRegion(CS2::Signatures::Hud::DamageReport::Func_UpdateDamageReport).Data();
         this->pFunc_UpdateDamageReport = reinterpret_cast<UpdateDamageReport_t>(tFunc_UpdateDamageReport);
         this->hkFunc_UpdateDamageReport = MulNX::Hook::Create(tFunc_UpdateDamageReport, [this](MulNX::Hook* hk, RegContext* ctx) {
-
             auto* pObservingPawn = this->CS2Entitys->TryGetObservingPawn();
             if (!pObservingPawn)return MulNX::Hook::Then::Continue;
 
@@ -94,7 +53,6 @@ bool HookDamageReport::Init() {
 
             auto hObserved = this->CS2Entitys->TryGetControllerHandle(pObservedController).value_or(CS2::CHandleBase());
             if (!hObserved.Valid())return MulNX::Hook::Then::Continue;
-            
             // 替换
             auto origSize = pDamageServices->m_DamageList.m_nSize;
             auto origData = pDamageServices->m_DamageList.m_pData;
@@ -105,32 +63,29 @@ bool HookDamageReport::Init() {
 
             auto r = hk->CallMaybeAs<UpdateDamageReport_t>(ctx->rcx);
             ctx->rax = r;
-
             // 恢复
             pDamageServices->m_DamageList.m_nSize = origSize;
             pDamageServices->m_DamageList.m_pData = origData;
-
             return MulNX::Hook::Then::Return;
             }).value();
         this->RegisterAttachHook(this->hkFunc_UpdateDamageReport, "Func_UpdateDamageReport");
+
+        this->pFunc_DispatchClearAllPostRoundDamageReportPanels =
+            std::bit_cast<DispatchClearAllPostRoundDamageReportPanels_t>(this->CS2->client.GetTextRegion()
+                .FindRegion(CS2::Signatures::Hud::DamageReport::Pos_Call_DispatchClearAllPostRoundDamageReportPanels)
+                .TryGetCallTarget());
         });
 
     this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
         if (!this->needUpdate)return;
         this->needUpdate = false;
-        if(this->enable == false)return;
-        // v4 = sub_180E7DF80("CCSGO_HudTeamCounter");
-        // v5 = (__int64(__fastcall***)(_QWORD))(v4 - 32);
-        // if (!v4)
-        //     v5 = 0;
-        // return sub_180EB9000(v5);
+        if (this->enable == false)return;
+        this->UpdateDamageReport(false);
+        });
 
-        auto pCCSGO_HudTeamCounter = this->pClientPanorama->FindHudElement("CCSGO_HudTeamCounter");
-        auto v5 = pCCSGO_HudTeamCounter - 32;
-        if (!pCCSGO_HudTeamCounter)
-            v5 = 0;
-        auto r = this->pFunc_UpdateDamageReport(v5);
-        return;
+    this->SubscribeSync("Hook/MainLoop/TickJumpDetected", [this](auto&&...) {
+        if (this->enable == false)return;
+        this->UpdateDamageReport(true);
         });
 
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
@@ -138,6 +93,19 @@ bool HookDamageReport::Init() {
         });
 
     return true;
+}
+
+void HookDamageReport::UpdateDamageReport(bool isClear) {
+    auto pCCSGO_HudTeamCounter = this->pClientPanorama->FindHudElement("CCSGO_HudTeamCounter");
+    auto v5 = pCCSGO_HudTeamCounter - 32;
+    if (!pCCSGO_HudTeamCounter)
+        v5 = 0;
+    if (isClear) {
+        this->pFunc_DispatchClearAllPostRoundDamageReportPanels(v5);
+    }
+    else {
+        auto r = this->pFunc_UpdateDamageReport(v5);
+    }
 }
 
 namespace {

@@ -44,9 +44,13 @@ class HookDamageReport final :public CSModuleBase {
     std::unique_ptr<MulNX::Hook> hkFunc_UpdateDamageReport = nullptr;
     using UpdateDamageReport_t = uint64_t(*)(uint64_t);
     UpdateDamageReport_t pFunc_UpdateDamageReport = nullptr;
+    using DispatchClearAllPostRoundDamageReportPanels_t = void(*)(uint64_t);
+    DispatchClearAllPostRoundDamageReportPanels_t pFunc_DispatchClearAllPostRoundDamageReportPanels = nullptr;
 
     std::atomic<bool> enable = true;
+
     void Menu();
     bool Init()override;
     void RefreshPool(CS2::CCSPlayerController* pObservedController, CS2::CHandleBase hObserved);
+    void UpdateDamageReport(bool isClear);
 };

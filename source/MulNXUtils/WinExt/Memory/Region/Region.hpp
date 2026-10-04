@@ -8,7 +8,6 @@ namespace MulNX {
         // 内存区域类，表示一个连续的内存块，提供迭代器支持
         // 左闭右开区间 [Base, End)，Size = End - Base
         class Region {
-        private:
             uintptr_t Base = 0;
             size_t Size = 0;
             const size_t RawSize;
@@ -33,6 +32,8 @@ namespace MulNX {
             Region FindRegion(const Pattern& pattern, std::source_location loc = std::source_location::current())const;
 
             Region FindFuncStart();
+
+            uint8_t* TryGetCallTarget();
         };
     }
 }
