@@ -6,16 +6,14 @@ class TimeController final :public CSModuleBase, public ITimeAdapter {
     void* pDemoPlayer = nullptr;
     float GetMinTime()override;
     float GetMaxTime()override;
-    float GetTime()override;
-    bool SetTime(float time)override;
-
+   
     bool Init()override;
 public:
-    VExecutor<int()>GetDemoTick{};
-    VExecutor<bool()>IsPlayingDemo{};
-    VExecutor<bool()>IsDemoPaused{};
+    VExecutor<int()> GetDemoTick{};
+    VExecutor<bool()> IsPlayingDemo{};
+    VExecutor<bool()> IsDemoPaused{};
 
-    float GetReal();
-    bool JumpReal(const float time);
+    float GetTime()override;
+    bool SetTime(float time)override;
     bool JumpRealRel(float time);
 };

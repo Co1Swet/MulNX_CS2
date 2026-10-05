@@ -70,7 +70,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
                 this->CS2View->spec_goto_ex(pos, rot);
                 this->CS2View->SetDOF(dof);
                 if (this->pInputSystem->IsKeyPressed(VK_MENU)) {
-                    this->CS2Time->JumpReal(keyframe.time);
+                    this->CS2Time->SetTime(keyframe.time);
                 }
             }
         }

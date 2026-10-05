@@ -81,7 +81,7 @@ void DemoHelper::ProcessMsg(MulNX::Message& msg) {
     case "DemoHelper/JumpTIme"_hash: {
         auto&& [jumpTime] = msg.Access<float>();
         this->LogInfo(std::format("跳转到{}", jumpTime));
-        this->CS2Time->JumpReal(jumpTime);
+        this->CS2Time->SetTime(jumpTime);
         break;
     }
     }
@@ -93,7 +93,7 @@ void DemoHelper::Main() {
 
 bool DemoHelper::MarkTime() {
     std::unique_lock lock(this->smutex);
-    this->Marks.push_back(this->CS2Time->GetReal());
+    this->Marks.push_back(this->CS2Time->GetTime());
 
     return true;
 }

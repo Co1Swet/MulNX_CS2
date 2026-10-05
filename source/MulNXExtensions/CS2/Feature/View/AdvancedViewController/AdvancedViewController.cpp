@@ -84,9 +84,9 @@ bool AdvancedViewController::Init() {
 bool AdvancedViewController::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool&) {
     if (!this->enable.load(std::memory_order_acquire)) return false;
 
-    // 通过时间桥判断是否需要更新视角，防止抖动
-    static auto lastTime = this->CS2Time->GetReal();
-    auto currentTime = this->CS2Time->GetReal();
+    // 判断是否需要更新视角，防止抖动
+    static auto lastTime = this->CS2Time->GetTime();
+    auto currentTime = this->CS2Time->GetTime();
     if (currentTime > lastTime || lastTime - currentTime > 0.015f || this->AlwaysCaulate.load(std::memory_order_acquire)) {}
     else return false;
 
