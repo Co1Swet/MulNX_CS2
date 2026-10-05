@@ -1,31 +1,34 @@
 #include "DeathMsgController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Mirror/CS2Hash/CS2Hash.hpp>
-#include <Support/TimeController/TimeController.hpp>
 
-void DeathMsgController::Window() {
-    auto w = MulNX::UI::RAIIWindow(I18n("dthmsg.window.name").c_str(), this->showWindow);
-    if (!w || !w.ShouldDraw())return;
-    MulNX::UI::Checkbox(I18n("dthmsg.enable").c_str(), this->enable);
+void DeathMsgController::Menu() {
+    ImGui::SeparatorText("击杀信息控制");
+    MulNX::UI::Checkbox("覆盖击杀信息显示时间", this->bOverrideLifeTime);
+    MulNX::UI::SliderFloat("目标击杀信息显示时长", this->fLifeTimeOverride, 0.01f, 1000.0f);
+    MulNX::UI::Checkbox("覆盖第一人称击杀信息显示时间倍率", this->bOverrideLifeTimeMod);
+    MulNX::UI::SliderFloat("目标第一人称击杀信息显示时间倍率", this->fLifeTimeModOverride, 0.01f, 50000.0f);
+    ImGui::Separator();
 }
 
 bool DeathMsgController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::HandlePlayerDeath).FindFuncStart();
-        this->hkHandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto event = reinterpret_cast<CS2::CGameEvent*>(ctx->rdx);
-            return this->HandleOnPlayerDeath(event);
+        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::HudDeathNotice_HandlePlayerDeath).FindFuncStart();
+        this->hkHudDeathNotice_HandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+            return this->OnPlayerDeath(ctx);
             }).value();
-        this->RegisterAttachHook(this->hkHandlePlayerDeath, "UI::OnPlayerDeath");
+        this->RegisterAttachHook(this->hkHudDeathNotice_HandlePlayerDeath, "HudDeathNotice_HandlePlayerDeath");
+        this->pRawHudDeathNotice_HandlePlayerDeath = reinterpret_cast<HudDeathNotice_HandlePlayerDeath_t>
+            (this->hkHudDeathNotice_HandlePlayerDeath->pMaybeRawFunc);
         });
-    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
+
     this->SendTask("Update", "CSControl", [this]()->bool {
         this->Update();
         return true;
         });
 
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
-        MulNX::UI::Checkbox(I18n("dthmsg.window.control").c_str(), this->showWindow);
+        this->Menu();
         });
 
     return true;
@@ -35,35 +38,30 @@ void DeathMsgController::ProcessMsg(MulNX::Message& msg) {
 
 }
 
-MulNX::Hook::Then DeathMsgController::HandleOnPlayerDeath(CS2::CGameEvent* event) {
+MulNX::Hook::Then DeathMsgController::OnPlayerDeath(RegContext* ctx) {
     static CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
     static CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
     static CS2::CKV3MemberName assister{ this->CS2Hashs->assister, -1, nullptr };
 
-    auto pKillerController = event->GetPlayerController(attacker);
-    auto pBeKillerController = event->GetPlayerController(userid);
-    auto pAssisterController = event->GetPlayerController(assister);
+    auto pHudDeathNotice = ctx->rcx;
 
-    try {
-        auto killerSteamID = MulNX::MRead(pKillerController->m_steamID());
-        auto beKillerSteamID = MulNX::MRead(pBeKillerController->m_steamID());
-        uint64_t assisterSteamID = 0;
-        if (pAssisterController) {
-            assisterSteamID = MulNX::MRead(pAssisterController->m_steamID());
-        }
+    float* pLifetime = (float*)(pHudDeathNotice + 0x78);
+    float* pLifetimeMod = (float*)(pHudDeathNotice + 0x7C);
 
-        if (!this->enable.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
-
-        auto currentObservingPawn = this->CS2Entitys->TryGetObservingPawn();
-        if (!currentObservingPawn)return MulNX::Hook::Then::Return;
-        auto hObservingCtrl = MulNX::MRead(currentObservingPawn->m_hController());
-        auto pObservingCtrl = this->CS2Entitys->GetBaseEntityFromHandle(hObservingCtrl)->As<CS2::CCSPlayerController>();
-        if (!pObservingCtrl)return MulNX::Hook::Then::Return;
-        auto currentObSteamID = MulNX::MRead(pObservingCtrl->m_steamID());
-        if (killerSteamID != currentObSteamID)return MulNX::Hook::Then::Return;
+    auto originLifetime = *pLifetime;
+    auto originLifetimeMod = *pLifetimeMod;
+    if (this->fLifeTimeOverride.load(std::memory_order_acquire) < 0.0f)
+        this->fLifeTimeOverride.store(*pLifetime, std::memory_order_release);
+    if (this->bOverrideLifeTime.load(std::memory_order_acquire)) {
+        *pLifetime = this->fLifeTimeOverride.load(std::memory_order_acquire);
     }
-    catch (...) {
-        return MulNX::Hook::Then::Return;
+    if (this->fLifeTimeModOverride.load(std::memory_order_acquire) < 0.0f)
+        this->fLifeTimeModOverride.store(*pLifetimeMod, std::memory_order_release);
+    if (this->bOverrideLifeTimeMod.load(std::memory_order_acquire)) {
+        *pLifetimeMod = this->fLifeTimeModOverride.load(std::memory_order_acquire);
     }
-    return MulNX::Hook::Then::Continue;
+    ctx->rax = (uint64_t)this->pRawHudDeathNotice_HandlePlayerDeath(ctx->rcx, ctx->rdx);
+    *pLifetime = originLifetime;
+    *pLifetimeMod = originLifetimeMod;
+    return MulNX::Hook::Then::Return;
 }

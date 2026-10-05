@@ -29,7 +29,7 @@ namespace CS2 {
             inline const static MulNX::Memory::Pattern FindHudElement("40 53 48 83 EC 20 48 8B 05 ?? ?? ?? ?? 48 8B D9 48 85 C0 74 79");
         }
         namespace Hud {
-            inline const static MulNX::Memory::Pattern HandlePlayerDeath("4C 8B F2 41 B8 FA DA 03 3E BA 02 00 00 00 48 8B 58 50 E8 ?? ?? ?? ??");
+            inline const static MulNX::Memory::Pattern HudDeathNotice_HandlePlayerDeath("4C 8B F2 41 B8 FA DA 03 3E BA 02 00 00 00 48 8B 58 50 E8 ?? ?? ?? ??");
             inline const static MulNX::Memory::Pattern CLayoutFile_LoadFromFile("48 89 5C 24 08 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 83 EC 60 48 8D 05 ?? ?? ?? ?? 48 C7 45 D0 ?? ?? 00 00 48");
 
             inline const static MulNX::Memory::Pattern PosTeamID_CmpForHide("66 44 0F 6E D1 45 0F 5B D2 44 0F 2F D0 0F 82 ?? ?? ?? 00");
