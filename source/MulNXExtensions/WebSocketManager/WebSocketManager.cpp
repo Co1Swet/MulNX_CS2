@@ -54,13 +54,16 @@ bool WebSocketManager::Init() {
                 }
                 this->server.listen(this->port);
                 this->server.start_accept();
-                this->LogSucc(std::format("正在监听端口：{}", this->port));
+                this->LogSucc(std::format("即将监听端口：{}", this->port));
                 // 阻塞调用
+                this->serverRunning = true;
                 this->server.run();
             }
             catch (const std::exception& e) {
-                MulNX::ErrorTerminate("网络功能启动失败！\n" + *e.what());
+                this->LogError(std::format("网络功能启动失败！报错：{}", e.what()));
             }
+            this->serverRunning = false;
+            this->LogWarning("网络功能已停止运行！");
             return false;
             });
         });
@@ -119,6 +122,7 @@ void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message
 }
 
 void WebSocketManager::PostWebMsg(std::string& msg) {
+    if(!this->serverRunning.load())return;
     auto& ios = this->server.get_io_service();
     ios.post([this, msg]()mutable {
         // 遍历所有连接并发送
