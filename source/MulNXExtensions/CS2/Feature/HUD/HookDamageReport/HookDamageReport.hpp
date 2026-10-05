@@ -38,6 +38,7 @@ namespace CS2 {
 class HookDamageReport final :public CSModuleBase {
     ClientPanorama* pClientPanorama = nullptr;
     DamageRecorder* pDamageRecorder = nullptr;
+    // 由于player_hurt在Check_m_nSendUpdate之后才会触发，通过这个标记来判断是否需要刷新，然后在下一次主循环刷新
     bool needUpdate = false;
     std::unique_ptr<MulNX::Hook> hkPos_Check_m_nSendUpdate = nullptr;
     std::unique_ptr<MulNX::Hook> hkPos_GettedController = nullptr;

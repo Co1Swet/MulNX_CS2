@@ -61,7 +61,11 @@ void DamageRecorder::HandleOnPlayerHurt(MulNX::Message& msg) {
         //this->LogWarning(std::format("玩家 {} 对玩家 {} 造成的伤害不一致，实际伤害: {}, 事件伤害: {}", attackerId, victimId, reallyDamage, damageValue));
     }
 
-    CS2::DamageTypes_t damageType = CS2::FindWeapon(pWeaponName)->damageType;
+    auto* pStaticWeapon = CS2::FindWeapon(pWeaponName);
+    CS2::DamageTypes_t damageType = CS2::DamageTypes_t::DMG_BULLET;
+    if (pStaticWeapon) {
+        damageType = pStaticWeapon->damageType;
+    }
 
     OneHitInfo hit{
         .lastHealth = healthValue,
