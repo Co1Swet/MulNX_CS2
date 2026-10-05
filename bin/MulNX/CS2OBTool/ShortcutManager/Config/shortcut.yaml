@@ -90,6 +90,16 @@ binds:
       vkCode: 45
       comboClick: 1
 
+  - desc: "切换时间轴显示（Shift+F1）"
+    msg: "TimeLine/Show/Toggle"
+    KCP:
+      usable: true
+      ctrl: false
+      shift: true
+      alt: false
+      vkCode: 112
+      comboClick: 1
+
   - desc: "开启自瞄"
     msg: "AutoAim/Enable"
     KCP:

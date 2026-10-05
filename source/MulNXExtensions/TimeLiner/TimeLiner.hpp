@@ -13,6 +13,7 @@ class TimeLiner :public MulNX::Module<TimeLiner> {
     float m_clickRatio = 0.0f;
     void Menu();
     bool Init()override;
+    void ProcessMsg(MulNX::Message& msg)override;
     void UpdateTime();
     void UpdatePos();
     ITimeAdapter* pActiveTimeAdapter = nullptr;

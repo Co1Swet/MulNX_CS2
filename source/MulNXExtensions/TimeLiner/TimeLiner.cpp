@@ -4,7 +4,8 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 void TimeLiner::Menu() {
-    MulNX::UI::RAIIWindow w("时间轴");
+    this->Update();
+    MulNX::UI::RAIIWindow w("时间轴（使用shift+F1切换）", this->showWindow);
     if (!w || !w.ShouldDraw())return;
 
     if (!this->pActiveTimeAdapter) {
@@ -67,10 +68,27 @@ void TimeLiner::Menu() {
 }
 
 bool TimeLiner::Init() {
-    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Menu();});
-    this->SubscribeSync("System/Init/End", [this](auto&&...) {this->pActiveTimeAdapter = this->pTimeAdapter1;});
+    (*this)
+        .SubscribeAsync("TimeLine/Show/Toggle")
+        ;
 
+    this->SubscribeSync("System/Init/End", [this](auto&&...) {
+        this->pActiveTimeAdapter = this->pTimeAdapter1;
+        });
+
+    this->showWindow = true;
+    this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Menu();});
+    
     return true;
+}
+
+void TimeLiner::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "TimeLine/Show/Toggle"_hash: {
+        this->showWindow = !this->showWindow.load();
+        break;
+    }
+    }
 }
 
 void TimeLiner::UpdateTime() {
