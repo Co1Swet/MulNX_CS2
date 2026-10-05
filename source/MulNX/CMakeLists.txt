@@ -6,7 +6,6 @@ add_library(MulNX
     Config/Config.cpp
 
     Core/Core.cpp
-    Core/Module/IModule.cpp
     Core/Module/ModuleBase.cpp
     Core/Driver/Driver.cpp
     Core/ModuleManager/ModuleManager.cpp

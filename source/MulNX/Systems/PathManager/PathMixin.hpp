@@ -11,7 +11,7 @@ namespace MulNX {
     public:
         PathMixin() {
             This()->preInits.push_back([this]() {
-                this->pPath = static_cast<PathManager*>(This()->FindModule("PathManager"));
+                this->pPath = This()->FindModule<PathManager>("PathManager");
                 return true;
                 });
         }

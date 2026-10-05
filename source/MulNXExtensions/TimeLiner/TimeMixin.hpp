@@ -8,7 +8,7 @@ public:
     TimeLiner* pTimeline = nullptr;
     TimeMixin() {
         This()->preInits.push_back([this]() {
-            this->pTimeline = static_cast<TimeLiner*>(This()->FindModule("TimeLiner"));
+            this->pTimeline = This()->FindModule<TimeLiner>("TimeLiner");
             return true;
             });
     }

@@ -1,8 +1,12 @@
 #include "ModuleBase.hpp"
 #include <MulNX/Core/Core.hpp>
+#include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/MessageManager/MessageChannel/MessageChannel.hpp>
 #include <ranges>
 
+MulNX::IModule* MulNX::ModuleBase::FindModule(const std::string& name) {
+    return this->Core->ModuleManager()->FindModule(name);
+}
 // 初始化
 bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {
     this->Core = core;

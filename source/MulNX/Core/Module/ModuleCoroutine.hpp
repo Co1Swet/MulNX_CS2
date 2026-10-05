@@ -1,11 +1,11 @@
 #pragma once
-#include "IModule.hpp"
+#include "ModuleData.hpp"
 #include <MulNX/Common/Time.hpp>
 #include <MulNX/Common/coroutine.hpp>
 #include <map>
 
 namespace MulNX {
-    class ModuleCoroutine : public IModule {
+    class ModuleCoroutine : public ModuleData {
         friend class ModuleBase;
         friend class Impl_WaitForCondition;
         friend class Impl_WaitForMessage;
