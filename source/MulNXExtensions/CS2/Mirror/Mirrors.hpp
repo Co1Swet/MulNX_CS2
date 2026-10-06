@@ -6,3 +6,4 @@
 #include "ResourceSystem/ResourceSystem.hpp"
 #include "ParticleSystemMgr/ParticleSystemMgr.hpp"
 #include "VFileSystem/VFileSystem.hpp"
+#include "CSDemoController/CSDemoController.hpp"

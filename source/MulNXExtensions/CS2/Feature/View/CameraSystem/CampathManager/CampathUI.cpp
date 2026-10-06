@@ -92,7 +92,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
     }
 
     static auto kAdd = this->Shortcut()->GetButton("place camera").value();
-    if (ImGui::Button("捕获当前位置以添加关键帧（或按下Tab键）") || this->pInputSystem->CheckWithPack(kAdd)) {        
+    if (ImGui::Button("捕获当前位置以添加关键帧（或按下 大写锁定 键）") || this->pInputSystem->CheckWithPack(kAdd)) {        
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/AddKeyframe"_hash);
         auto&& [t, x, y, z, fov, rx, ry, rz, d1, d2, d3, d4] =
             msg.Access<float, float, float, float, float, float, float, float, float, float, float, float>();

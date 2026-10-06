@@ -118,5 +118,8 @@ namespace CS2 {
             inline const static MulNX::Memory::Pattern Func_DrawSceneData("48 89 5c 24 20 55 48 83 ec 30 f6 81 ?? ?? 00 00 40");
             inline const static MulNX::Memory::Pattern Func_DrawCurrentPrimitives("4c 8b dc 53 48 81 ec d0 00 00 00 83 79 30 01 48 8b d9 0f 8c ?? ?? ?? ?? 48 8b 49 20 48 8d 15 ?? ?? ?? ??");
         }
+        namespace Demo {
+            inline const static MulNX::Memory::Pattern Pos_Call_GetCCSDemoController("E8 ?? ?? ?? ?? 0F 57 DB 45 33 C0 8B D3 48 8B C8");
+        }
     }
 }
