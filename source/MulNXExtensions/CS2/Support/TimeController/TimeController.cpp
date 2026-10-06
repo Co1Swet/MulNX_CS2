@@ -8,7 +8,6 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
     const bool paused = this->IsDemoPaused();
     const int  currentRound = this->pCSDemoController->GetCurrentRound();
     const int  totalRounds = this->pCSDemoController->GetTotalRound();
-    const bool canPrev = currentRound > 0;
     const bool canNext = currentRound >= 0 && currentRound < totalRounds;
 
     // 播放 / 暂停
@@ -18,28 +17,19 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
 
     // 上一回合
     ImGui::SameLine();
-    ImGui::BeginDisabled(!canPrev);
     if (ImGui::Button("◀ 上一回合")) {
         this->AsyncCommand("MulNX/Demo/PrevRound");
     }
-    ImGui::EndDisabled();
 
     // 当前回合显示
     ImGui::SameLine();
-    if (currentRound > 0) {
-        ImGui::Text("Round %d / %d", currentRound, totalRounds);
-    }
-    else {
-        ImGui::Text("Round -- / %d", totalRounds);
-    }
+    ImGui::Text("回合 %d / %d", currentRound, totalRounds);
 
     // 下一回合
     ImGui::SameLine();
-    ImGui::BeginDisabled(!canNext);
     if (ImGui::Button("下一回合 ▶")) {
         this->AsyncCommand("MulNX/Demo/NextRound");
     }
-    ImGui::EndDisabled();
 
     // 倍速循环
     ImGui::SameLine();

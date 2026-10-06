@@ -31,16 +31,12 @@ void CSDemoController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/PrevRound"_hash: {
         const int round = this->currentRound.load(std::memory_order_acquire);
-        if (round > 1) {
-            this->GotoRound(round - 1);
-        }
+        this->GotoRound(round - 1);
         break;
     }
     case "Demo/NextRound"_hash: {
         const int round = this->currentRound.load(std::memory_order_acquire);
-        if (round > 0) {
-            this->GotoRound(round + 1);
-        }
+        this->GotoRound(round + 1);
         break;
     }
     case "Demo/GotoRound"_hash: {
@@ -80,12 +76,15 @@ void CSDemoController::GotoRound(int round) {
     if (count == 0 || !pRounds) return;
 
     const int idx = round - 1;
-    if (idx < 0 || idx >= static_cast<int>(count)) {
-        this->LogError(std::format("无法跳跃至异常回合索引：{}", idx));
-        return;
+    if (idx < 0) {
+        this->AsyncCommand("demo_gototick 0");
     }
-
-    const int targetTick = MulNX::MRead(&pRounds[idx].nTickStart);
-
-    this->AsyncCommand(std::format("demo_gototick {}", targetTick));
+    else if (idx >= static_cast<int>(count)) {
+        const int targetTick = MulNX::MRead(&pRounds[0].nTickStart);
+        this->AsyncCommand(std::format("demo_gototick {}", targetTick));
+    }
+    else {
+        const int targetTick = MulNX::MRead(&pRounds[idx].nTickStart);
+        this->AsyncCommand(std::format("demo_gototick {}", targetTick));
+    }
 }
