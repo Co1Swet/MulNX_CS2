@@ -1,8 +1,59 @@
 #include "TimeController.hpp"
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
+#include <Mirror/CSDemoController/CSDemoController.hpp>
+
+void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
+    ImGui::SameLine();
+    // 状态快照
+    const bool paused = this->IsDemoPaused();
+    const int  currentRound = this->pCSDemoController->GetCurrentRound();
+    const int  totalRounds = this->pCSDemoController->GetTotalRound();
+    const bool canPrev = currentRound > 0;
+    const bool canNext = currentRound >= 0 && currentRound < totalRounds;
+
+    // 播放 / 暂停
+    if (ImGui::Button(paused ? "▶ 播放" : "⏸ 暂停")) {
+        this->AsyncCommand(paused ? "demo_resume" : "demo_pause");
+    }
+
+    // 上一回合
+    ImGui::SameLine();
+    ImGui::BeginDisabled(!canPrev);
+    if (ImGui::Button("◀ 上一回合")) {
+        this->AsyncCommand("MulNX/Demo/PrevRound");
+    }
+    ImGui::EndDisabled();
+
+    // 当前回合显示
+    ImGui::SameLine();
+    if (currentRound > 0) {
+        ImGui::Text("Round %d / %d", currentRound, totalRounds);
+    }
+    else {
+        ImGui::Text("Round -- / %d", totalRounds);
+    }
+
+    // 下一回合
+    ImGui::SameLine();
+    ImGui::BeginDisabled(!canNext);
+    if (ImGui::Button("下一回合 ▶")) {
+        this->AsyncCommand("MulNX/Demo/NextRound");
+    }
+    ImGui::EndDisabled();
+
+    // 倍速循环
+    ImGui::SameLine();
+    static const float kSpeeds[] = { 0.25f, 0.5f, 1.0f, 2.0f, 4.0f };
+    static int sSpeedIdx = 2;
+    if (ImGui::Button(std::format("{:.2f}x", kSpeeds[sSpeedIdx]).c_str())) {
+        sSpeedIdx = (sSpeedIdx + 1) % 5;
+        this->AsyncCommand(std::format("demo_timescale {:.2f}", kSpeeds[sSpeedIdx]));
+    }
+}
 
 bool TimeController::Init() {
     this->FindModule<TimeLiner>("TimeLiner")->pTimeAdapter1 = this;
+    this->pCSDemoController = this->FindModule<CSDemoController>("CSDemoController");
 
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
         auto demo = this->CS2->GetDemo();

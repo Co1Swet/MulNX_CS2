@@ -4,9 +4,11 @@
 
 class TimeController final :public CSModuleBase, public ITimeAdapter {
     void* pDemoPlayer = nullptr;
+    class CSDemoController* pCSDemoController = nullptr;
     float GetMinTime()override;
     float GetMaxTime()override;
-   
+    void TimeRend(TimeLiner* timeline, ImDrawList* dl)override;
+
     bool Init()override;
 public:
     VExecutor<int()> GetDemoTick{};

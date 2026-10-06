@@ -2,7 +2,6 @@
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-class ITimeLineModule;
 class ITimeAdapter;
 
 class TimeLiner :public MulNX::Module<TimeLiner> {
@@ -25,7 +24,7 @@ public:
     ITimeAdapter* pTimeAdapter1 = nullptr;
     ITimeAdapter* pTimeAdapter2 = nullptr;
 
-    std::vector<ITimeLineModule*>timeLineModules{};
+    std::vector<class ITimeRend*>timeLineModules{};
     ImVec2 Map(float time, int layer)const;
 
     float GetTime();

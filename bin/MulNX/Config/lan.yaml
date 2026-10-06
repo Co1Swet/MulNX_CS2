@@ -24,12 +24,6 @@ ui:
     load: 尝试加载UI风格文件：{}
     load_succ: UI风格文件加载成功：{}
     load_file_error: UI风格文件加载失败，可能是文件损坏：{}
-  font:
-    cfg:
-      load: 尝试解析字体配置：{}
-      load_succ: 字体配置解析成功！字体路径：{0}  字体大小：{1}
-    load: 尝试加载字体：{}
-    load_succ: 字体加载成功：{}
   padding:
     top: 上边距
     bottom: 下边距

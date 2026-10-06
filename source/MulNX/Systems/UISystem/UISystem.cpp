@@ -89,16 +89,22 @@ int MulNX::UISystem::Render() {
 void MulNX::UISystem::LoadFont() {
     try {
         auto cfgPath = this->PathGet("Config") / "ui.yaml";
-        this->LogInfo(I18n("ui.font.cfg.load", cfgPath.string()));
+        this->LogInfo(std::format("尝试加载字体配置：{}", cfgPath.string()));
         YAML::Node root = YAML::LoadFile(cfgPath.string());
-        auto fontFilePath = root["font"]["path"].as<std::string>();
+        
         auto fontSize = root["font"]["size"].as<float>();
-        this->LogSucc(I18n("ui.font.cfg.load_succ", fontFilePath, fontSize));
-        this->LogInfo(I18n("ui.font.load", fontFilePath));
+        this->LogInfo(std::format("解析字体大小：{}", fontSize));
+
+        auto fontFilePaths = root["font"]["path"].as<std::vector<std::string>>();
 
         ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->AddFontFromFileTTF(fontFilePath.c_str(), fontSize);
-        this->LogSucc(I18n("ui.font.load_succ", fontFilePath));
+        ImFontConfig cfg;
+
+        for (auto& path : fontFilePaths) {
+            io.Fonts->AddFontFromFileTTF(path.c_str(), fontSize, &cfg);
+            this->LogSucc(std::format("字体加载成功：{}", path));
+            cfg.MergeMode = true;
+        }
     }
     catch (const std::exception& e) {
         this->LogError(e.what());

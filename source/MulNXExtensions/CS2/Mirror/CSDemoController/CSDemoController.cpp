@@ -55,6 +55,7 @@ void CSDemoController::UpdateRound() {
     auto* pCtrler = this->pGetCCSDemoController();
 
     const auto count = MulNX::MRead(&pCtrler->m_nRoundCount);
+    this->totalRounds.store(count, std::memory_order_release);
     auto* pRounds = MulNX::MRead(&pCtrler->m_pRoundIntervals);
     if (count == 0 || !pRounds)return;
 
@@ -68,6 +69,7 @@ void CSDemoController::UpdateRound() {
             return;
         }
     }
+    this->currentRound.store(0, std::memory_order_release);
 }
 
 void CSDemoController::GotoRound(int round) {

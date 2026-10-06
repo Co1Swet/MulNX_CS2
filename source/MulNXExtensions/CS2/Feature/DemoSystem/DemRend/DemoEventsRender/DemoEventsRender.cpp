@@ -1,5 +1,6 @@
 #include "DemoEventsRender.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
 bool DemoEventsRender::Init() {
     // 注册到时间轴
@@ -32,7 +33,7 @@ void DemoEventsRender::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void DemoEventsRender::TimeLineCallback(TimeLiner* timeline, ImDrawList* dl) {
+void DemoEventsRender::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
     if (m_currentDemoName.empty())
         return;
 

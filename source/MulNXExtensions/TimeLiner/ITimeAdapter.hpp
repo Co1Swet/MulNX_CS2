@@ -1,6 +1,7 @@
 #pragma once
+#include "ITimeRend.hpp"
 
-class ITimeAdapter {
+class ITimeAdapter :public ITimeRend {
 public:
     virtual float GetMinTime() = 0;
     virtual float GetMaxTime() = 0;

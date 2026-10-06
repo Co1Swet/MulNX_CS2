@@ -1,6 +1,6 @@
 #include "TimeLiner.hpp"
 #include "ITimeAdapter.hpp"
-#include "TimeLineModuleBase.hpp"
+#include "ITimeRend.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
 void TimeLiner::Menu() {
@@ -57,12 +57,14 @@ void TimeLiner::Menu() {
     }
 
     // 显示当前时间数值
-    ImGui::SetCursorScreenPos(ImVec2(this->currentLeftX, this->currentBaseY + 20.f));
+    ImGui::SetCursorScreenPos(ImVec2(this->currentLeftX, this->currentBaseY + 15.0f));
     ImGui::Text("时间: %.2f / %.2f", curTime, maxTime);
+
+    this->pActiveTimeAdapter->TimeRend(this, draw);
 
     for (auto* pModule : this->timeLineModules) {
         ImGui::PushID(pModule);
-        pModule->TimeLineCallback(this, draw);
+        pModule->TimeRend(this, draw);
         ImGui::PopID();
     }
 }

@@ -21,6 +21,7 @@ class CSDemoController final :public CSModuleBase {
     GetCCSDemoController_t pGetCCSDemoController = nullptr;
 
     std::atomic<int> currentRound = 0;
+    std::atomic<int> totalRounds = 0;
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
@@ -28,4 +29,5 @@ class CSDemoController final :public CSModuleBase {
     void GotoRound(int round);
 public:
     inline int GetCurrentRound()const { return this->currentRound.load(std::memory_order_acquire); }
+    inline int GetTotalRound()const { return this->totalRounds.load(std::memory_order_acquire); }
 };
