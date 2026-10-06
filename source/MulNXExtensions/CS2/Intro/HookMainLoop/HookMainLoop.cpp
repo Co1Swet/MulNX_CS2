@@ -98,7 +98,7 @@ bool HookMainLoop::Init() {
             }
             this->lastUpdateTick.store(now, std::memory_order_release);
 
-            UpdateDemoRoundInfo(clientBase, now);
+            //UpdateDemoRoundInfo(clientBase, now);
 
             return MulNX::Hook::Then::Continue;
             }, true).value();
