@@ -9,7 +9,13 @@ bool CSDemoController::Init() {
         });
 
     this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
-        this->Update();// 驱动处理MulNX消息
+        try {
+            this->UpdateRound();
+            this->Update();
+        }
+        catch (const MulNX::Exception& e) {
+            this->LogError(e);
+        }
         });
 
     (*this)
@@ -24,34 +30,33 @@ bool CSDemoController::Init() {
 void CSDemoController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/PrevRound"_hash: {
-        const int currentRound = CheckCurrentRound();
-        if (currentRound > 1) {
-            GotoRound(currentRound - 1);
+        const int round = this->currentRound.load(std::memory_order_acquire);
+        if (round > 1) {
+            this->GotoRound(round - 1);
         }
         break;
     }
     case "Demo/NextRound"_hash: {
-        const int currentRound = CheckCurrentRound();
-        if (currentRound > 0) {
-            GotoRound(currentRound + 1);
+        const int round = this->currentRound.load(std::memory_order_acquire);
+        if (round > 0) {
+            this->GotoRound(round + 1);
         }
         break;
     }
     case "Demo/GotoRound"_hash: {
         auto&& [round] = msg.Access<int>();
-        GotoRound(round);
+        this->GotoRound(round);
         break;
     }
     }
 }
 
-int CSDemoController::CheckCurrentRound() {
+void CSDemoController::UpdateRound() {
     auto* pCtrler = this->pGetCCSDemoController();
-    if (!pCtrler) return 0;
 
     const auto count = MulNX::MRead(&pCtrler->m_nRoundCount);
     auto* pRounds = MulNX::MRead(&pCtrler->m_pRoundIntervals);
-    if (count == 0 || !pRounds) return 0;
+    if (count == 0 || !pRounds)return;
 
     const int currentTick = this->CS2Time->GetDemoTick();
 
@@ -59,22 +64,24 @@ int CSDemoController::CheckCurrentRound() {
         const int start = MulNX::MRead(&pRounds[i].nTickStart);
         const int end = MulNX::MRead(&pRounds[i].nTickEnd);
         if (currentTick >= start && currentTick < end) {
-            return static_cast<int>(i) + 1;
+            this->currentRound.store(static_cast<int>(i) + 1, std::memory_order_release);
+            return;
         }
     }
-    return 0;
 }
 
 void CSDemoController::GotoRound(int round) {
     auto* pCtrler = this->pGetCCSDemoController();
-    if (!pCtrler) return;
 
     const auto count = MulNX::MRead(&pCtrler->m_nRoundCount);
     auto* pRounds = MulNX::MRead(&pCtrler->m_pRoundIntervals);
     if (count == 0 || !pRounds) return;
 
     const int idx = round - 1;
-    if (idx < 0 || idx >= static_cast<int>(count)) return;
+    if (idx < 0 || idx >= static_cast<int>(count)) {
+        this->LogError(std::format("无法跳跃至异常回合索引：{}", idx));
+        return;
+    }
 
     const int targetTick = MulNX::MRead(&pRounds[idx].nTickStart);
 

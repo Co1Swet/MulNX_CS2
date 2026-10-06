@@ -19,8 +19,13 @@ namespace CS2 {
 class CSDemoController final :public CSModuleBase {
     using GetCCSDemoController_t = CS2::CCSDemoController* (*)(void);
     GetCCSDemoController_t pGetCCSDemoController = nullptr;
+
+    std::atomic<int> currentRound = 0;
+
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    int CheckCurrentRound();
+    void UpdateRound();
     void GotoRound(int round);
+public:
+    inline int GetCurrentRound()const { return this->currentRound.load(std::memory_order_acquire); }
 };
