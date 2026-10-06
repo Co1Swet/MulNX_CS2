@@ -1,26 +1,43 @@
 #include "HookDemo.hpp"
+#include <Support/TimeController/TimeController.hpp>
 
 bool HookDemo::Init() {
     this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
         auto&& [pCmd] = msg.Access<CCmd*>();
         std::string_view name = pCmd->m_pszName;
-        if (name == "playdemo") this->HookPlayDemo(pCmd);
-        if (name == "demo_gototick")  this->HookDemoGotoTick(pCmd);
+        if (name == "playdemo") {
+            this->hkPlaydemo = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
+                return this->OnCmdPlayDemo(hk, ctx);
+                }
+            ).value();
+            this->RegisterAttachHook(this->hkPlaydemo, "PlayDemo");
+        }
+        if (name == "demo_gototick") {
+            this->HookDemoGotoTick(pCmd);
+        }
         });
 
     return true;
 }
-void HookDemo::HookPlayDemo(CCmd* pCmd) {
-    this->hkPlaydemo = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
-        auto cmd = (CCommand*)ctx->rdx;
-        hk->CallMaybeOrigin(0, ctx);
-        std::string_view raw(cmd->pRawString);
-        raw = raw.substr(raw.find(' ') + 1);
-        this->BeforePlay(raw);
+MulNX::Hook::Then HookDemo::OnCmdPlayDemo(MulNX::Hook* hk, RegContext* ctx) {
+    auto cmd = (CCommand*)ctx->rdx;
+
+    if (this->CS2Time->IsPlayingDemo()) {
+        this->AsyncCommand("disconnect");
+        std::string cmdCopy = cmd->pRawString;
+        this->SendTask("AsyncPlayDemo", "CSControl", [this, asyncCmd = std::move(cmdCopy)]()mutable {
+            if (this->CS2Time->IsPlayingDemo())return true;
+            this->AsyncCommand(std::move(asyncCmd));
+            return false;
+            });
         return MulNX::Hook::Then::Return;
-        }
-    ).value();
-    this->RegisterAttachHook(this->hkPlaydemo, "PlayDemo");
+    }
+
+    hk->CallMaybeOrigin(0, ctx);
+    std::string_view raw(cmd->pRawString);
+    raw = raw.substr(raw.find(' ') + 1);
+    this->BeforePlay(raw);
+    return MulNX::Hook::Then::Return;
 }
 void HookDemo::HookDemoGotoTick(CCmd* pCmd) {
     auto pf = pCmd->m_pCommandCallback;
