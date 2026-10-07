@@ -10,6 +10,8 @@ add_subdirectory("Win32Starter")
 add_subdirectory("WinBaseHooks")
 add_subdirectory("TimeLiner")
 
+add_subdirectory("MulNXReShadeBridge")
+
 add_subdirectory("CS2Remoting")
 
 target_link_libraries(MulNXExtensions INTERFACE

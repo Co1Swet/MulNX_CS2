@@ -26,6 +26,7 @@ class HookView final :public CSModuleBase {
     std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo{};
     std::atomic<bool> cameraLeavePlayer = false;
     ControlView controlView{};
+    float* pfov_cs_debug = nullptr;
     void HandleOverrideView(CS2::CViewSetup* viewSetup);
 
     void Window(MulNX::UICoordinator* uico);
@@ -40,6 +41,7 @@ public:
 
     void spec_goto_ex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& rot);
     void SetDOF(const MulNX::Math::DOFParam& dof);
+    void SetFOV(const float fov);
 
     inline bool GetCameraLeavePlayerState()const { return this->cameraLeavePlayer.load(std::memory_order_acquire); }
 };

@@ -10,11 +10,11 @@ void HookView::Window(MulNX::UICoordinator* uico) {
     if (!w.ShouldDraw())return;
 
     MulNX::UI::SliderFloat("roll调整", this->controlView.InputRoll, -179.99f, 179.99f);
-    static auto* pGlobalFOV = this->CS2Con->GetCvar("fov_cs_debug")->GetPtr<float>();
-    ImGui::SliderFloat("fov调整", pGlobalFOV, 0, 179.99f);
+    
+    ImGui::SliderFloat("fov调整", this->pfov_cs_debug, 0, 179.99f);
     if (ImGui::Button("一键归正")) {
         this->controlView.InputRoll.store(0, std::memory_order_release);
-        *pGlobalFOV = 0;
+        *this->pfov_cs_debug = 0;
     }
 }
 
@@ -34,6 +34,10 @@ bool HookView::Init() {
         this->RegisterAttachHook(this->hkPosCallIsPlayingDemo, "Pos_ClientModeCSNormal_CallIsPlayingDemo");
 
         this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
+        });
+
+    this->SubscribeSync("Hook/Source2Client002::Inited", [this](auto&&...) {
+        this->pfov_cs_debug = this->CS2Con->GetCvar("fov_cs_debug")->GetPtr<float>();
         });
 
     return true;
@@ -112,4 +116,7 @@ void HookView::SetDOF(const MulNX::Math::DOFParam& dof) {
     *this->controlView.dofs.pNearCrisp = dof.NearCrisp;
     *this->controlView.dofs.pFarCrisp = dof.FarCrisp;
     *this->controlView.dofs.pFarBlurry = dof.FarBlurry;
+}
+void HookView::SetFOV(const float fov) {
+    *this->pfov_cs_debug = fov;
 }

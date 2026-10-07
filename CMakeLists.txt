@@ -60,3 +60,13 @@ set_target_properties(CS2OBTool PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CS2OBToolPath}"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CS2OBToolPath}"
 )
+
+# 处理 MulNXReShadeBridge 目标
+set(MulNXReShadeBridgePath ${MulNXPath}/Tools)
+set_target_properties(MulNXReShadeBridge PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${MulNXReShadeBridgePath}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${MulNXReShadeBridgePath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${MulNXReShadeBridgePath}"
+    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${MulNXReShadeBridgePath}"
+    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${MulNXReShadeBridgePath}"
+)
