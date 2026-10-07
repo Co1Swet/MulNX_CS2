@@ -32,35 +32,34 @@ class RendCtrlAPI final :public CSModuleBase {
 
     bool Init()override;
 
-    class ET2RT_BlockColor final :public CS2::IRenderThreadCallback {
+    class AT2RT_BlockColor final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_BlockColor(); }
     public:
-        ET2RT_BlockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
+        AT2RT_BlockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
-    class ET2RT_UnblockColor final :public CS2::IRenderThreadCallback {
+    class AT2RT_UnblockColor final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_UnblockColor(); }
     public:
-        ET2RT_UnblockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
+        AT2RT_UnblockColor(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
-public:
-    ET2RT_BlockColor ET2RT_blockColor{ this };
-    ET2RT_UnblockColor ET2RT_unblockColor{ this };
-private:
-    class ET2RT_BlockDepth final :public CS2::IRenderThreadCallback {
+    class AT2RT_BlockDepth final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_BlockDepth(); }
     public:
-        ET2RT_BlockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
+        AT2RT_BlockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
-    class ET2RT_UnblockDepth final :public CS2::IRenderThreadCallback {
+    class AT2RT_UnblockDepth final :public CS2::IRenderThreadCallback {
         RendCtrlAPI* pThis;
         void OnCallback(void)override { pThis->RT_UnblockDepth(); }
     public:
-        ET2RT_UnblockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
+        AT2RT_UnblockDepth(RendCtrlAPI* pThis) :pThis(pThis) {}
     };
 public:
-    ET2RT_BlockDepth ET2RT_blockDepth{ this };
-    ET2RT_UnblockDepth ET2RT_unblockDepth{ this };
+    AT2RT_BlockColor AT2RT_blockColor{ this };
+    AT2RT_UnblockColor AT2RT_unblockColor{ this };
+    
+    AT2RT_BlockDepth AT2RT_blockDepth{ this };
+    AT2RT_UnblockDepth AT2RT_unblockDepth{ this };
 };

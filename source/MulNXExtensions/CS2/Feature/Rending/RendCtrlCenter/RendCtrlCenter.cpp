@@ -19,15 +19,15 @@ bool RendCtrlCenter::Init() {
 
             auto OnExit = [&]()->MulNX::Hook::Then {
                 if (hide) {
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_blockDepth);
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_blockColor);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_blockDepth);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_blockColor);
                 }
                 auto pRawFunc = (SceneSystem::DrawSceneData_t)hk->pMaybeRawFunc;
                 pRawFunc(pDrawingData, pSceneData);
                 this->pDrawCurrentPrimitives(pDrawingData);
                 if (hide) {
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_unblockDepth);
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->ET2RT_unblockColor);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_unblockDepth);
+                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_unblockColor);
                 }
                 return MulNX::Hook::Then::Return;
                 };
@@ -52,7 +52,7 @@ bool RendCtrlCenter::Init() {
             auto& pszNameSuffix = *hk->GetStackParam<const char*>(ctx, 4);
 
             this->pRawInitDrawingData(pDrawingData, pSceneView, pSceneLayer, unkFlags4, pszNameSuffix);
-            
+
             auto pList = pDrawingData->pSoftwareCommandList;
             auto pCommit = pList->GetVPtrCommit();
             this->hkCommit = MulNX::Hook::Create(pCommit, [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -82,12 +82,10 @@ MulNX::Hook::Then RendCtrlCenter::OnInitDrawingData(MulNX::Hook* hk, RegContext*
 
     if (0 == strcmp("Player 0", viewName)) {
         if (0 == strcmp("PostProcessing", viewPass)) {
-            int a = 10;
-            ++a;
+            this->pLastListBeforePanorama = pDrawingData->pSoftwareCommandList;
         }
         else if (0 == strcmp("Legacy Sniper Scope", viewPass)) {
-            int b = 10;
-            ++b;
+            this->pLastListBeforePanorama = pDrawingData->pSoftwareCommandList;
         }
     }
 
@@ -95,6 +93,10 @@ MulNX::Hook::Then RendCtrlCenter::OnInitDrawingData(MulNX::Hook* hk, RegContext*
 }
 
 MulNX::Hook::Then RendCtrlCenter::OnCommit(MulNX::Hook* hk, RegContext* ctx) {
-
+    auto& pList = *(CS2::SoftwareCommandList**)(&ctx->rcx);
+    if (pList == this->pLastListBeforePanorama) {
+        this->pLastListBeforePanorama = nullptr;
+        // ToDo 主动Call ReShade
+    }
     return MulNX::Hook::Then::Continue;
 }

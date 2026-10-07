@@ -11,6 +11,7 @@ class RendCtrlCenter final :public CSModuleBase {
     SceneSystem::DrawCurrentPrimitives_t pDrawCurrentPrimitives = nullptr;
     SceneSystem::DrawSceneData_t pDrawSceneData = nullptr;
 
+    std::atomic<CS2::SoftwareCommandList*> pLastListBeforePanorama = nullptr;
     std::unique_ptr<MulNX::Hook> hkInitDrawingData = nullptr;
     SceneSystem::InitDrawingData_t pRawInitDrawingData = nullptr;
     MulNX::Hook::Then OnInitDrawingData(MulNX::Hook* hk, RegContext* ctx);

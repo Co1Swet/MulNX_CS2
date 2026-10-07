@@ -21,6 +21,16 @@ bool CSReShadeController::Init() {
         this->LogSucc("CreateInterface 对 MulNXReShadeBridge001 成功！");
         this->pMulNXReShadeBridge->SetEffectsState(true);
         });
-    
+
+    this->SubscribeSync("GraphicsSync/ID3D11DeviceContext/Ready", [this](MulNX::Message& msg) {
+        auto&& [pContext] = msg.Access<ID3D11DeviceContext*>();
+        auto t = (uint8_t*)IVClass::Assume(pContext)->GetVFuncPtr(33);
+        this->hkOMSetRenderTargets = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
+
+            return MulNX::Hook::Then::Continue;
+            }).value();
+        this->RegisterAttachHook(this->hkOMSetRenderTargets, "OMSetRenderTargets");
+        });
+
     return true;
 }
