@@ -23,6 +23,10 @@ void RegisterEvents() {
         reshade::api::resource_view rtv_srgb) {
             MulNXReShadeBridge.OnFinishEffects(runtime, cmd_list, rtv, rtv_srgb);
         });
+
+    reshade::register_event<reshade::addon_event::reshade_present>([](reshade::api::effect_runtime* runtime) {
+        MulNXReShadeBridge.OnPresent(runtime);
+        });
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved) {
