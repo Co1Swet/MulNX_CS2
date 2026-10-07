@@ -1,11 +1,13 @@
 #include "RendCtrlCenter.hpp"
 #include <Feature/Rending/RendCtrlAPI/RendCtrlAPI.hpp>
 #include <Feature/Rending/CloudController/CloudController.hpp>
+#include <Feature/Rending/CSReShadeController/CSReShadeController.hpp>
 
 bool RendCtrlCenter::Init() {
     this->pSceneSystem = this->FindModule<SceneSystem>("SceneSystem");
     this->pRendCtrlAPI = this->FindModule<RendCtrlAPI>("RendCtrlAPI");
     this->pCloudController = this->FindModule<CloudController>("CloudController");
+    this->pCSReShadeController = this->FindModule<CSReShadeController>("CSReShadeController");
 
     this->SubscribeSync("Hook/LoadLibraryExW/scenesystem.dll", [this](MulNX::Message& msg) {
         this->pDrawSceneData = this->pSceneSystem->pDrawSceneData;
@@ -85,6 +87,7 @@ MulNX::Hook::Then RendCtrlCenter::OnInitDrawingData(MulNX::Hook* hk, RegContext*
             this->pLastListBeforePanorama = pDrawingData->pSoftwareCommandList;
         }
         else if (0 == strcmp("Legacy Sniper Scope", viewPass)) {
+            pDrawingData->pSoftwareCommandList->QueueCallback(&this->pCSReShadeController->AT2RT_setIdle);
             this->pLastListBeforePanorama = pDrawingData->pSoftwareCommandList;
         }
     }
@@ -96,7 +99,7 @@ MulNX::Hook::Then RendCtrlCenter::OnCommit(MulNX::Hook* hk, RegContext* ctx) {
     auto& pList = *(CS2::SoftwareCommandList**)(&ctx->rcx);
     if (pList == this->pLastListBeforePanorama) {
         this->pLastListBeforePanorama = nullptr;
-        // ToDo 主动Call ReShade
+        pList->QueueCallback(&this->pCSReShadeController->AT2RT_setPending);
     }
     return MulNX::Hook::Then::Continue;
 }

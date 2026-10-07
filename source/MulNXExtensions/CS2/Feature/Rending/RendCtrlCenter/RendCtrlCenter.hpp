@@ -5,6 +5,7 @@ class RendCtrlCenter final :public CSModuleBase {
     SceneSystem* pSceneSystem = nullptr;
     class RendCtrlAPI* pRendCtrlAPI = nullptr;
     class CloudController* pCloudController = nullptr;
+    class CSReShadeController* pCSReShadeController = nullptr;
 
     std::unique_ptr<MulNX::Hook> hkDrawSceneData = nullptr;
 

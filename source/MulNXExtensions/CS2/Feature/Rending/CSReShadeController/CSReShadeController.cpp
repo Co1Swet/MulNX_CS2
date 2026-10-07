@@ -26,11 +26,28 @@ bool CSReShadeController::Init() {
         auto&& [pContext] = msg.Access<ID3D11DeviceContext*>();
         auto t = (uint8_t*)IVClass::Assume(pContext)->GetVFuncPtr(33);
         this->hkOMSetRenderTargets = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
-
+            if (this->RT_ePanoramaRend == PanoramaRend::Pending) {
+                this->RT_ePanoramaRend = PanoramaRend::Fired;
+                this->BeforeRendPanorama((ID3D11DeviceContext*)ctx->rcx);
+            }
             return MulNX::Hook::Then::Continue;
             }).value();
         this->RegisterAttachHook(this->hkOMSetRenderTargets, "OMSetRenderTargets");
         });
 
     return true;
+}
+void CSReShadeController::BeforeRendPanorama(ID3D11DeviceContext* pD3D11Ctx) {
+
+    ComPtr<ID3D11RenderTargetView> pRTV = nullptr;
+    ComPtr<ID3D11DepthStencilView> pDSV = nullptr;
+    pD3D11Ctx->OMGetRenderTargets(1, &pRTV, &pDSV);
+
+    if (pRTV) {
+        ComPtr<ID3D11Resource> pRes = nullptr;
+        pRTV->GetResource(&pRes);
+        if (pRes) {
+            this->pMulNXReShadeBridge->RendEffect(pRes.Get());
+        }
+    }
 }
