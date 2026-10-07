@@ -1,6 +1,7 @@
 #include "TimeController.hpp"
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <Mirror/CSDemoController/CSDemoController.hpp>
+#include <Intro/HookConsole/HookConsole.hpp>
 
 void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
     ImGui::SameLine();
@@ -8,36 +9,62 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
     const bool paused = this->IsDemoPaused();
     const int  currentRound = this->pCSDemoController->GetCurrentRound();
     const int  totalRounds = this->pCSDemoController->GetTotalRound();
-    const bool canNext = currentRound >= 0 && currentRound < totalRounds;
 
-    // 播放 / 暂停
     if (ImGui::Button(paused ? "▶ 播放" : "⏸ 暂停")) {
         this->AsyncCommand(paused ? "demo_resume" : "demo_pause");
     }
 
-    // 上一回合
+    static constexpr float kSteps[] = { -15.0f, -5.0f, -1.0f, 1.0f, 5.0f, 15.0f };
+    static constexpr const char* kLabels[] = { "-15s", "-5s", "-1s", "+1s", "+5s", "+15s" };
+
+    const float currentTime = this->GetTime();
+    const float maxTime = this->GetMaxTime();
+
+    for (int i = 0; i < 6; ++i) {
+        if (i > 0) ImGui::SameLine();
+
+        const float target = currentTime + kSteps[i];
+        const bool  valid = target >= 0.0f && target <= maxTime;
+
+        ImGui::SameLine();
+        ImGui::BeginDisabled(!valid);
+        if (ImGui::Button(kLabels[i])) {
+            this->JumpRealRel(kSteps[i]);
+        }
+        ImGui::EndDisabled();
+    }
+
     ImGui::SameLine();
     if (ImGui::Button("◀ 上一回合")) {
         this->AsyncCommand("MulNX/Demo/PrevRound");
     }
 
-    // 当前回合显示
     ImGui::SameLine();
     ImGui::Text("回合 %d / %d", currentRound, totalRounds);
 
-    // 下一回合
     ImGui::SameLine();
     if (ImGui::Button("下一回合 ▶")) {
         this->AsyncCommand("MulNX/Demo/NextRound");
     }
 
-    // 倍速循环
     ImGui::SameLine();
     static const float kSpeeds[] = { 0.25f, 0.5f, 1.0f, 2.0f, 4.0f };
+    static constexpr int kSpeedCount = IM_ARRAYSIZE(kSpeeds);
     static int sSpeedIdx = 2;
-    if (ImGui::Button(std::format("{:.2f}x", kSpeeds[sSpeedIdx]).c_str())) {
-        sSpeedIdx = (sSpeedIdx + 1) % 5;
-        this->AsyncCommand(std::format("demo_timescale {:.2f}", kSpeeds[sSpeedIdx]));
+
+    ImGui::SetNextItemWidth(80.0f);
+    if (ImGui::BeginCombo("##speed", std::format("{:.2f}x", kSpeeds[sSpeedIdx]).c_str())) {
+        for (int i = 0; i < kSpeedCount; ++i) {
+            const bool selected = (i == sSpeedIdx);
+            if (ImGui::Selectable(std::format("{:.2f}x", kSpeeds[i]).c_str(), selected)) {
+                sSpeedIdx = i;
+                this->AsyncCommand(std::format("demo_timescale {:.2f}", kSpeeds[i]));
+            }
+            if (selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
     }
 }
 
