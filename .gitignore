@@ -13,6 +13,7 @@ bin/**/Log/*.txt
 
 # bin/MulNX/Tools
 bin/MulNX/Tools/*[Rr]e[Ss]hade*
+!bin/MulNX/Tools/MulNXReShadeBridge.addon
 bin/MulNX/Tools/dxgi.dll
 
 # bin/Output/MulNX/Tools

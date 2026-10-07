@@ -29,3 +29,5 @@ target_link_libraries(MulNXExtensions INTERFACE
 
     CS2Remoting
 )
+
+add_dependencies(MulNXExtensions MulNXReShadeBridge)
