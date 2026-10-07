@@ -1,7 +1,6 @@
 #include "TimeController.hpp"
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <Mirror/CSDemoController/CSDemoController.hpp>
-#include <Intro/HookConsole/HookConsole.hpp>
 
 void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
     ImGui::SameLine();

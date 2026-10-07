@@ -7,13 +7,14 @@ disclaimer: |
 homepage: |
   欢迎使用MulNX
   使用 Insert 键开关UI系统
+  感谢星火杯制作的运镜包组！可在摄像机系统直接切换使用！
+  以热爱为名，为梦想而战，TYZ电子竞技俱乐部名下的民办比赛，赛事网址：tzyesports.top
 
 # 此部分归属UI系统，和主要的，公有的UI部分翻译
 ui:
   main: 首页
   camera_system: 摄像机系统
   game_settings: 游戏设置
-  mulnx_control: MulNX控制
   settings: UI个性配置
   style:
     info: 下方为ImGui官方提供的调整界面，您可以通过该界面调整UI风格
@@ -160,34 +161,6 @@ log:
   new: |
     +----------新的日志片段----------+
     日志系统已上线，欢迎使用MulNX
-# 摄像机系统
-camsys:  
-  proj:
-    settings: 项目设置
-    shortcut_enable: 项目快捷键检测系统
-    create: 项目创建
-    new_name: 新项目名：
-    list: 项目列表
-    name_label: "|项目名称："
-    debug_window: 项目调试
-    current: 当前项目：{}
-    current_label: 当前操作项目：
-    switch_to_current: 切换到当前项目
-    unload_current: 卸载当前项目
-    modify_keybind: 修改按键绑定
-    enter_new_round: 进入新回合
-    delete_on_new_round: 删除##OnNewRound
-    round_end: 回合结束
-    no_selected: 当前未选择任何项目
-    close_debug_page: 关闭项目调试页面
-
-  ws:
-    enter_status: 工作区状态:{}
-    current_workspace: 当前工作区:{}
-    current_null: 当前未打开任何工作区
-    open_default: 打开默认工作区
-    save: 保存工作区
-    target_name: 工作区名：
 
 freCamCon:
   status: 当前是否处于自由摄像机控制：{}
@@ -207,12 +180,6 @@ dthmsg:
 pov:
   enable: 启用POV修复
   disable: 禁用POV修复
-
-skin:
-  changer: 换肤器
-  apply: 应用皮肤设置
-  target:
-    index: 目标皮肤索引
 
 ob:
   Spec64:

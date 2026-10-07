@@ -3,7 +3,7 @@
 
 
 void EntityListScanner::Window() {
-    auto w = MulNX::UI::RAIIWindow("实体列表探测器");
+    auto w = MulNX::UI::RAIIWindow("实体列表探测器", this->showWindow);
     if (!w || !w.ShouldDraw())return;
 
     for (int i = 0;i < 30;++i) {
@@ -34,5 +34,10 @@ bool EntityListScanner::Init() {
             this->LogError(e);
         };
         });
+
+    this->UIRegisterCallback("UI.Advanced", [this](auto&&...) {
+        MulNX::UI::Checkbox("实体列表信息", this->showWindow);
+        });
+
     return true;
 }

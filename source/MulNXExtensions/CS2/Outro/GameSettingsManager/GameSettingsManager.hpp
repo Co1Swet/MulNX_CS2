@@ -12,7 +12,7 @@ class GameSettingsManager final :public CSModuleBase {
     float* r_dof_override_far_crisp{};// 远清晰
     float* r_dof_override_far_blurry{};// 远模糊
 
-    void Window();
+    void Menu();
     bool SoundMenu();
     bool DofMenu();
     bool GameHudMenu();

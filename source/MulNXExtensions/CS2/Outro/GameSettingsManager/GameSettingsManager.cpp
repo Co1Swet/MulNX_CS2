@@ -1,9 +1,6 @@
 #include "GameSettingsManager.hpp"
 
-void GameSettingsManager::Window() {
-    auto w = MulNX::UI::RAIIWindow(I18n("ui.game_settings").c_str());
-    if (!w || !w.ShouldDraw())return;
-    
+void GameSettingsManager::Menu() {
     ConvarCheckbox<"sv_cheats">("作弊模式");
     ConvarSliderFloat<"fps_max">("FPS上限", 0, 1000);
     ConvarSliderFloat<"host_timescale">("游戏速度", 0.001f, 10.000f);
@@ -120,11 +117,10 @@ bool GameSettingsManager::Init() {
         *this->CS2Con->GetCvar("cl_demo_predict")->GetPtr<bool>() = false;
         *this->CS2Con->GetCvar("cl_spec_show_bindings")->GetPtr<bool>() = false;
 
-        this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
+        this->UIRegisterCallback("UI.MulNXControl", [this](auto&&...) {return this->Menu();});
         this->UIRegisterCallback("UI.Sound", [this](auto&&...) {return this->SoundMenu();});
         this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {return this->DofMenu();});
         this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->GameHudMenu();});
-        return false;
         });
 
     return true;
