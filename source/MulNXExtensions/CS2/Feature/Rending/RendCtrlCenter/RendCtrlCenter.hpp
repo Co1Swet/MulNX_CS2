@@ -11,5 +11,8 @@ class RendCtrlCenter final :public CSModuleBase {
     SceneSystem::DrawCurrentPrimitives_t pDrawCurrentPrimitives = nullptr;
     SceneSystem::DrawSceneData_t pDrawSceneData = nullptr;
 
+    std::unique_ptr<MulNX::Hook> hkInitDrawingData = nullptr;
+    SceneSystem::InitDrawingData_t pRawInitDrawingData = nullptr;
+
     bool Init()override;
 };

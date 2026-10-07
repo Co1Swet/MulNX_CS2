@@ -29,10 +29,32 @@ namespace CS2 {
         }
     };
 
+    class CSceneView {
+    public:
+        virtual const char* GetName();
+        char pad[0x100];
+        // ...
+    };
+
+    class CSceneLayer {
+    public:
+        char pad[0x48];
+        uint32_t Flags;
+        char pad1[0x4b8 - 0x48 - 0x4];
+        char ViewPass[0x100];
+        char pad2[0x6f0 - 0x4b8 - 0x100];
+        CSceneView* pSceneView;
+        // ...
+    };
+
     class DrawingData {
     public:
-        std::byte pad[0x20];
+        CSceneView* pSceneView;
+        CSceneLayer* pSceneLayer;
+        void* pUnk2;
+        void* pUnk3;
         CS2::SoftwareCommandList* pSoftwareCommandList;
+        // ...
     };
 }
 
@@ -46,4 +68,8 @@ public:
 
     using DrawSceneData_t = void(*)(CS2::DrawingData* pDrawingData, CS2::CBaseSceneData* pSceneData);
     DrawSceneData_t pDrawSceneData = nullptr;
+
+    using InitDrawingData_t = void(*)(CS2::DrawingData* pDrawingData, CS2::CSceneView* pSceneView,
+        CS2::CSceneLayer* pSceneLayer, uint32_t unkFlags4, const char* pszNameSuffix);
+    InitDrawingData_t pInitDrawingData = nullptr;
 };

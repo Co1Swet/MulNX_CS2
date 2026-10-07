@@ -41,6 +41,34 @@ bool RendCtrlCenter::Init() {
             return OnExit();
             }).value();
         this->RegisterAttachHook(this->hkDrawSceneData, "DrawSceneData");
+
+        this->hkInitDrawingData = MulNX::Hook::Create((uint8_t*)this->pSceneSystem->pInitDrawingData, [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto& pDrawingData = *(CS2::DrawingData**)&ctx->rcx;
+            auto& pSceneView = *(CS2::CSceneView**)&ctx->rdx;
+            auto& pSceneLayer = *(CS2::CSceneLayer**)&ctx->r8;
+            auto& unkFlags4 = *(uint32_t*)&ctx->r9;
+            auto& pszNameSuffix = *hk->GetStackParam<const char*>(ctx, 4);
+
+            this->pRawInitDrawingData(pDrawingData, pSceneView, pSceneLayer, unkFlags4, pszNameSuffix);
+
+            const char* viewPass = pSceneLayer->ViewPass;
+            const char* viewName = pSceneView->GetName();
+
+            if (0 == strcmp("Player 0", viewName)) {
+                if (0 == strcmp("PostProcessing", viewPass)) {
+                    int a = 10;
+                    ++a;
+                }
+                else if (0 == strcmp("Legacy Sniper Scope", viewPass)) {
+                    int b = 10;
+                    ++b;
+                }
+            }
+
+            return MulNX::Hook::Then::Return;
+            }).value();
+        this->RegisterAttachHook(this->hkInitDrawingData, "InitDrawingData");
+        this->pRawInitDrawingData = (SceneSystem::InitDrawingData_t)this->hkInitDrawingData->pMaybeRawFunc;
         });
 
     return true;

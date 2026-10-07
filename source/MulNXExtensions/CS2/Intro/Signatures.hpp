@@ -116,7 +116,8 @@ namespace CS2 {
         }
         namespace SceneSystem {
             inline constexpr MulNX::Memory::Pattern Func_DrawSceneData("48 89 5c 24 20 55 48 83 ec 30 f6 81 ?? ?? 00 00 40");
-            inline constexpr MulNX::Memory::Pattern Func_DrawCurrentPrimitives("4c 8b dc 53 48 81 ec d0 00 00 00 83 79 30 01 48 8b d9 0f 8c ?? ?? ?? ?? 48 8b 49 20 48 8d 15 ?? ?? ?? ??");
+            inline constexpr MulNX::Memory::Pattern Func_DrawCurrentPrimitives("4c 8b dc 53 48 81 ec d0 00 00 00 83 79 30 01 48 8b d9 0f 8c ?? ?? ?? ?? 48 8b 49 20 48 8d 15");
+            inline constexpr MulNX::Memory::Pattern Func_InitDrawingData("48 89 5c 24 08 48 89 6c 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 81 ec ?? ?? 00 00 0f b6 81 ?? ?? 00 00 48 8b d9 4c 8b fa");
         }
         namespace Demo {
             inline constexpr MulNX::Memory::Pattern Pos_Call_GetCCSDemoController("E8 ?? ?? ?? ?? 0F 57 DB 45 33 C0 8B D3 48 8B C8");

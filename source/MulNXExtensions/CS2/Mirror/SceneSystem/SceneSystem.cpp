@@ -10,6 +10,9 @@ bool SceneSystem::Init() {
 
         this->pDrawSceneData = (DrawSceneData_t)this->scenesystem.GetTextRegion()
             .FindRegion(CS2::Signatures::SceneSystem::Func_DrawSceneData).Data();
+
+        this->pInitDrawingData = (InitDrawingData_t)this->scenesystem.GetTextRegion()
+            .FindRegion(CS2::Signatures::SceneSystem::Func_InitDrawingData).Data();
         });
 
     return true;
