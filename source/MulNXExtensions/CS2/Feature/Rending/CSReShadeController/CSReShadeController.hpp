@@ -20,7 +20,9 @@ class CSReShadeController final :public CSModuleBase {
     
     std::unique_ptr<MulNX::Hook> hkOMSetRenderTargets = nullptr;
 
+    void Menu()const;
     bool Init()override;
+    void ProcessMsg(MulNX::Message& msg);
     void BeforeRendPanorama(ID3D11DeviceContext* pD3D11Ctx);
 
     class AT2RT_SetPending final :public CS2::IRenderThreadCallback {
@@ -37,6 +39,8 @@ class CSReShadeController final :public CSModuleBase {
         AT2RT_SetIdle(CSReShadeController* pThis) :pThis(pThis) {}
     };
 public:
+    inline bool IsConnnect()const { return this->pMulNXReShadeBridge != nullptr; }
+    
     AT2RT_SetPending AT2RT_setPending{ this };
     AT2RT_SetIdle AT2RT_setIdle{ this };
 };

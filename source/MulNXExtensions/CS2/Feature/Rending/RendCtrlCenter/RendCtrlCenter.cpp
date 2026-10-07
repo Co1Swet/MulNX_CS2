@@ -71,6 +71,8 @@ bool RendCtrlCenter::Init() {
 }
 
 MulNX::Hook::Then RendCtrlCenter::OnInitDrawingData(MulNX::Hook* hk, RegContext* ctx) {
+    if (!this->pCSReShadeController->IsConnnect())return MulNX::Hook::Then::Continue;
+
     auto& pDrawingData = *(CS2::DrawingData**)&ctx->rcx;
     auto& pSceneView = *(CS2::CSceneView**)&ctx->rdx;
     auto& pSceneLayer = *(CS2::CSceneLayer**)&ctx->r8;

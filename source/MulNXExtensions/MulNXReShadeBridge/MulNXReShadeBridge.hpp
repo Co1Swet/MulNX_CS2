@@ -15,17 +15,17 @@ class CMulNXReShadeBridge final :public IMulNXReShadeBridge {
 public:
     constexpr static const char* implName = "MulNXReShadeBridge001";
 private:
-    std::atomic<bool> reshadeEffect = false;
+    std::atomic<bool> enable = false;
     bool inCallEffect = false;
     reshade::api::effect_runtime* pRuntime = nullptr;
 
-    const char* GetImplName()override;
-    const char* GetReShadeVersion()override;
+    const char* GetImplName()const override;
+    const char* GetReShadeVersion()const override;
 
     bool InitInterface()override;
     bool DeinitInterface()override;
 
-    bool GetEffectsState()override;
+    bool GetEffectsState()const override;
     void SetEffectsState(bool state)override;
 
     bool RendEffect(ID3D11Resource* resource)override;

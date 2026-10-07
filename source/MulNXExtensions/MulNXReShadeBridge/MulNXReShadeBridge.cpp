@@ -1,9 +1,9 @@
 #include "MulNXReShadeBridge.hpp"
 
-const char* CMulNXReShadeBridge::GetImplName() {
+const char* CMulNXReShadeBridge::GetImplName()const {
     return this->implName;
 }
-const char* CMulNXReShadeBridge::GetReShadeVersion() {
+const char* CMulNXReShadeBridge::GetReShadeVersion()const {
     return nullptr;
 }
 
@@ -14,11 +14,11 @@ bool CMulNXReShadeBridge::DeinitInterface() {
     return true;
 }
 
-bool CMulNXReShadeBridge::GetEffectsState() {
-    return true;
+bool CMulNXReShadeBridge::GetEffectsState()const {
+    return this->enable.load(std::memory_order_acquire);
 }
 void CMulNXReShadeBridge::SetEffectsState(bool state) {
-    this->reshadeEffect.store(state, std::memory_order_release);
+    this->enable.store(state, std::memory_order_release);
 }
 
 bool CMulNXReShadeBridge::EnsureRtvViews(reshade::api::resource res,
@@ -63,7 +63,7 @@ bool CMulNXReShadeBridge::EnsureRtvViews(reshade::api::resource res,
 }
 
 bool CMulNXReShadeBridge::RendEffect(ID3D11Resource* resource) {
-    if (!pRuntime || !resource) return false;
+    if (!this->pRuntime || !resource) return false;
 
     reshade::api::resource res{ reinterpret_cast<uint64_t>(resource) };
 
@@ -85,16 +85,12 @@ bool CMulNXReShadeBridge::RendEffect(ID3D11Resource* resource) {
     return true;
 }
 
-
 void CMulNXReShadeBridge::OnBeginEffects(reshade::api::effect_runtime* runtime,
     reshade::api::command_list* cmd_list,
     reshade::api::resource_view rtv,
     reshade::api::resource_view rtv_srgb) {
-    if (this->inCallEffect) {
-        runtime->set_effects_state(true);
-        return;
-    }
-    runtime->set_effects_state(this->reshadeEffect.load(std::memory_order_acquire));
+
+    runtime->set_effects_state(this->enable.load(std::memory_order_acquire));
 }
 
 void CMulNXReShadeBridge::OnFinishEffects(reshade::api::effect_runtime* runtime,
