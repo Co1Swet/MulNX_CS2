@@ -13,6 +13,10 @@ class RendCtrlCenter final :public CSModuleBase {
 
     std::unique_ptr<MulNX::Hook> hkInitDrawingData = nullptr;
     SceneSystem::InitDrawingData_t pRawInitDrawingData = nullptr;
+    MulNX::Hook::Then OnInitDrawingData(MulNX::Hook* hk, RegContext* ctx);
+
+    std::unique_ptr<MulNX::Hook> hkCommit = nullptr;
+    MulNX::Hook::Then OnCommit(MulNX::Hook* hk, RegContext* ctx);
 
     bool Init()override;
 };

@@ -43,6 +43,8 @@ bool RendCtrlCenter::Init() {
         this->RegisterAttachHook(this->hkDrawSceneData, "DrawSceneData");
 
         this->hkInitDrawingData = MulNX::Hook::Create((uint8_t*)this->pSceneSystem->pInitDrawingData, [this](MulNX::Hook* hk, RegContext* ctx) {
+            hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->OnInitDrawingData(hk, ctx);});
+
             auto& pDrawingData = *(CS2::DrawingData**)&ctx->rcx;
             auto& pSceneView = *(CS2::CSceneView**)&ctx->rdx;
             auto& pSceneLayer = *(CS2::CSceneLayer**)&ctx->r8;
@@ -50,21 +52,13 @@ bool RendCtrlCenter::Init() {
             auto& pszNameSuffix = *hk->GetStackParam<const char*>(ctx, 4);
 
             this->pRawInitDrawingData(pDrawingData, pSceneView, pSceneLayer, unkFlags4, pszNameSuffix);
-
-            const char* viewPass = pSceneLayer->ViewPass;
-            const char* viewName = pSceneView->GetName();
-
-            if (0 == strcmp("Player 0", viewName)) {
-                if (0 == strcmp("PostProcessing", viewPass)) {
-                    int a = 10;
-                    ++a;
-                }
-                else if (0 == strcmp("Legacy Sniper Scope", viewPass)) {
-                    int b = 10;
-                    ++b;
-                }
-            }
-
+            
+            auto pList = pDrawingData->pSoftwareCommandList;
+            auto pCommit = pList->GetVPtrCommit();
+            this->hkCommit = MulNX::Hook::Create(pCommit, [this](MulNX::Hook* hk, RegContext* ctx) {
+                return this->OnCommit(hk, ctx);
+                }).value();
+            this->RegisterAttachHook(this->hkCommit, "SoftwareCommandList::Commit");
             return MulNX::Hook::Then::Return;
             }).value();
         this->RegisterAttachHook(this->hkInitDrawingData, "InitDrawingData");
@@ -72,4 +66,35 @@ bool RendCtrlCenter::Init() {
         });
 
     return true;
+}
+
+MulNX::Hook::Then RendCtrlCenter::OnInitDrawingData(MulNX::Hook* hk, RegContext* ctx) {
+    auto& pDrawingData = *(CS2::DrawingData**)&ctx->rcx;
+    auto& pSceneView = *(CS2::CSceneView**)&ctx->rdx;
+    auto& pSceneLayer = *(CS2::CSceneLayer**)&ctx->r8;
+    auto& unkFlags4 = *(uint32_t*)&ctx->r9;
+    auto& pszNameSuffix = *hk->GetStackParam<const char*>(ctx, 4);
+
+    this->pRawInitDrawingData(pDrawingData, pSceneView, pSceneLayer, unkFlags4, pszNameSuffix);
+
+    const char* viewPass = pSceneLayer->ViewPass;
+    const char* viewName = pSceneView->GetName();
+
+    if (0 == strcmp("Player 0", viewName)) {
+        if (0 == strcmp("PostProcessing", viewPass)) {
+            int a = 10;
+            ++a;
+        }
+        else if (0 == strcmp("Legacy Sniper Scope", viewPass)) {
+            int b = 10;
+            ++b;
+        }
+    }
+
+    return MulNX::Hook::Then::Return;
+}
+
+MulNX::Hook::Then RendCtrlCenter::OnCommit(MulNX::Hook* hk, RegContext* ctx) {
+
+    return MulNX::Hook::Then::Continue;
 }

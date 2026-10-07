@@ -23,6 +23,10 @@ namespace CS2 {
     class SoftwareCommandList {
         using QueueCallbackFn = void(*)(SoftwareCommandList* pThis, IRenderThreadCallback* pCallback);
     public:
+        uint8_t* GetVPtrCommit() {
+            auto f = IVClass::Assume(this)->GetVFuncPtr(11);
+            return std::bit_cast<uint8_t*>(f);
+        }
         void QueueCallback(IRenderThreadCallback* pCallback) {
             auto f = IVClass::Assume(this)->GetVFunc<void(IRenderThreadCallback*)>(142);
             f(pCallback);
