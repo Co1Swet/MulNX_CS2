@@ -98,7 +98,7 @@ void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message
             it->second(msg, payload);
         }
         catch (std::exception& e) {
-            throw MulNX::Exception("trans fail" + *e.what());
+            throw MulNX::Exception(std::format("trans fail: {}", e.what()));
         }
 
         this->PublishAsync(std::move(msg));

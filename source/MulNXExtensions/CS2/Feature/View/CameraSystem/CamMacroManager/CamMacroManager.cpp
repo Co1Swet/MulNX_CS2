@@ -16,7 +16,6 @@ bool CamMacroManager::Init() {
     (*this)
         .SubscribeAsync("CamMacro/Create")
         .SubscribeAsync("CamMacro/Delete")
-        .SubscribeAsync("CamMacro/Play")
         .SubscribeAsync("CamMacro/OpenDebug")
         .SubscribeAsync("CamMacro/DebugKCP")
         .SubscribeAsync("CamMacro/ClearOne")
@@ -24,6 +23,13 @@ bool CamMacroManager::Init() {
         .SubscribeAsync("CamMacro/AddCampath")
         .SubscribeAsync("CamMacro/RemoveCampath")
         ;
+
+    // 将外部宏名称转换为内部播放消息。
+    this->MainMsgChannel->SubscribeAsync("CamMacro/Play", [](MulNX::Message& msg, std::string_view raw) {
+        auto [playMsg, rp] = MulNX::Message::Create<MulNX::NetExt>(msg.type);
+        rp->str1 = raw;
+        msg = std::move(playMsg);
+        });
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
         this->CamMacroClearAll();
