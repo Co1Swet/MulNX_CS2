@@ -12,9 +12,6 @@ class HookWindow final : public MulNX::Module<HookWindow>, public HookMixin<Hook
     bool CheckIme(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void FixMouse(UINT& uMsg, LPARAM& lParam);
     MulNX::Hook::Then HandleWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-    // 文件拖拽钩子
-    std::unique_ptr<MulNX::Hook> hkDrop = nullptr;
-    void HandleProcessDropFiles(IDataObject* pDataObj);
 
     bool Init()override;
 };

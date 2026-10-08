@@ -8,14 +8,6 @@ bool HookWindow::Init() {
     this->SubscribeSync("Hook/hWnd", [this](MulNX::Message& msg) {
         auto&& [hWnd] = msg.Access<HWND>();
         this->hCS2Wnd = hWnd;
-        // 文件拖拽钩子
-        HANDLE hProp = GetPropW(this->hCS2Wnd, L"OleDropTargetInterface");
-        IDropTarget* pTarget = static_cast<IDropTarget*>(hProp);
-        this->hkDrop = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pTarget)->GetVFuncPtr(6), [this](MulNX::Hook* hk, RegContext* ctx) {
-            this->HandleProcessDropFiles((IDataObject*)ctx->rdx);
-            return MulNX::Hook::Then::Continue;
-            }).value();
-        this->RegisterAttachHook(this->hkDrop, "OleDropTargetInterface::Drop");
         // 窗口过程钩子
         this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->hCS2Wnd, GWLP_WNDPROC), [this](MulNX::Hook* hk, RegContext* ctx) {
             auto then = this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
@@ -91,39 +83,4 @@ MulNX::Hook::Then HookWindow::HandleWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
         return MulNX::Hook::Then::Return;
     }
     return MulNX::Hook::Then::Continue;
-}
-void HookWindow::HandleProcessDropFiles(IDataObject* pDataObj) {
-    if (!pDataObj) return;
-    // 请求 CF_HDROP 格式
-    FORMATETC fmt = { CF_HDROP, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-    STGMEDIUM med{};
-    if (FAILED(pDataObj->GetData(&fmt, &med))) return;
-    // 锁住全局内存，拿到 HDROP
-    HDROP hDrop = static_cast<HDROP>(GlobalLock(med.hGlobal));
-    if (!hDrop) {
-        ReleaseStgMedium(&med);
-        return;
-    }
-    UINT numFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, nullptr, 0);
-    // try catch保证无论如何，占有的句柄必须释放回去
-    try {
-        for (UINT i = 0; i < numFiles; ++i) {
-            UINT len = DragQueryFileW(hDrop, i, nullptr, 0);  // 含 '\0'
-            if (len == 0) continue;
-            std::wstring buffer(len, L'\0');
-            if (!DragQueryFileW(hDrop, i, buffer.data(), len + 1))continue;
-            std::filesystem::path filePath{ buffer };
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Window/Drag/FileDrop"_hash);
-            rp->str1 = std::move(filePath.string());
-            this->PublishAsync(std::move(msg));
-        }
-    }
-    catch (const std::exception& e) {
-        this->LogError(I18n("win32.drag.analisy.error", e.what()));
-    }
-    catch (...) {
-        this->LogError(I18n("win32.drag.analisy.unk_error"));
-    }
-    GlobalUnlock(med.hGlobal);
-    ReleaseStgMedium(&med);
 }

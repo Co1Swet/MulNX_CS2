@@ -1,6 +1,18 @@
 #include "DemoSystem.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Support/TimeController/TimeController.hpp>
+#include <shellapi.h>
+
+void OpenFolder(const std::wstring& wpath) {
+    ::ShellExecuteW(
+        nullptr,          // 父窗口 HWND，可填你窗口句柄
+        L"open",          // 动词：open / explore 都行
+        wpath.c_str(),    // 文件夹路径
+        nullptr,          // 参数（文件夹不需要）
+        nullptr,          // 工作目录（默认）
+        SW_SHOWNORMAL     // 显示方式
+    );
+}
 
 void DemoSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("Demo系统", this->showWindow);
@@ -8,12 +20,14 @@ void DemoSystem::Window(MulNX::UICoordinator* uico) {
     uico->CallbackCall("UI.Demos"_hash, nullptr);
     if (!w.ShouldDraw())return;
     uico->CallbackCall("UI.Demo.Main"_hash, nullptr);
+    if (ImGui::Button("测试")) {
+        OpenFolder(this->CS2Paths->demo.wstring());
+    }
 }
 
 bool DemoSystem::Init() {
     (*this)
         .SubscribeAsync("Demo/Play")
-        .SubscribeAsync("Window/Drag/FileDrop")
         ;
 
     this->UIRegisterCallback("UI.Advanced", [this](auto&&...) {
@@ -36,20 +50,6 @@ bool DemoSystem::Init() {
 
 void DemoSystem::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Window/Drag/FileDrop"_hash: {
-        auto& path = msg.asp.get<MulNX::NetExt>()->str1;
-        std::filesystem::path file = path;
-        auto ext = file.extension();
-        if (ext != ".dem")break;
-        try {
-            std::filesystem::copy(file, this->CS2Paths->demo / file.filename(), std::filesystem::copy_options::overwrite_existing);
-        }
-        catch (const std::filesystem::filesystem_error& e) {
-            this->LogError(I18n("demo.copy_failed", e.what()).c_str());
-        }
-        this->PublishAsync("Demo/Refresh"_hash);
-        break;
-    }
     case "Demo/Play"_hash: {
         auto& path = msg.asp.get<MulNX::NetExt>()->str1;
         this->AsyncCommand(std::format("playdemo \"{}\"", path));
