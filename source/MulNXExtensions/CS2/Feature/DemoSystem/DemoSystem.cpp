@@ -3,19 +3,11 @@
 #include <Support/TimeController/TimeController.hpp>
 
 void DemoSystem::Window(MulNX::UICoordinator* uico) {
-    auto w = MulNX::UI::RAIIWindow("Demo", this->showWindow);
+    auto w = MulNX::UI::RAIIWindow("Demo系统", this->showWindow);
     if (!w) return;
     uico->CallbackCall("UI.Demos"_hash, nullptr);
     if (!w.ShouldDraw())return;
-
     uico->CallbackCall("UI.Demo.Main"_hash, nullptr);
-
-    ImGui::Separator();
-
-    ImGui::Text(I18n("demo.status.is_playing", this->CS2Time->IsPlayingDemo()).c_str());
-    ImGui::Text(I18n("demo.status.is_pausing", this->CS2Time->IsDemoPaused()).c_str());
-
-    ImGui::Separator();
 }
 
 bool DemoSystem::Init() {

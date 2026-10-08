@@ -4,6 +4,7 @@ void CSReShadeController::Menu()const {
     auto pBridge = this->pMulNXReShadeBridge.load(std::memory_order_acquire);
     if (!pBridge) {
         ImGui::Text("ReShade未连接");
+        return;
     }
     auto now = pBridge->GetEffectsState();
     if (ImGui::Checkbox("ReShade效果", &now)) {
@@ -36,7 +37,7 @@ bool CSReShadeController::Init() {
         }
         IMulNXReShadeBridge* pBridge = nullptr;
         pCreateInterface("MulNXReShadeBridge001", &pBridge);
-        if (pBridge) {
+        if (!pBridge) {
             this->LogError("CreateInterface 对 MulNXReShadeBridge001 失败！");
             return;
         }
