@@ -1,10 +1,11 @@
 #include "CSReShadeController.hpp"
 
 void CSReShadeController::Menu()const {
-    if (!this->pMulNXReShadeBridge) {
+    auto pBridge = this->pMulNXReShadeBridge.load(std::memory_order_acquire);
+    if (!pBridge) {
         ImGui::Text("ReShade未连接");
     }
-    auto now = this->pMulNXReShadeBridge->GetEffectsState();
+    auto now = pBridge->GetEffectsState();
     if (ImGui::Checkbox("ReShade效果", &now)) {
         if (now) {
             this->PublishAsync("ReShade/On"_hash);
@@ -33,13 +34,15 @@ bool CSReShadeController::Init() {
             this->LogError("尝试从 MulNXReShadeBridge.addon 中获取 CreateInterface 失败！");
             return;
         }
-        pCreateInterface("MulNXReShadeBridge001", &this->pMulNXReShadeBridge);
-        if (!this->pMulNXReShadeBridge) {
+        IMulNXReShadeBridge* pBridge = nullptr;
+        pCreateInterface("MulNXReShadeBridge001", &pBridge);
+        if (pBridge) {
             this->LogError("CreateInterface 对 MulNXReShadeBridge001 失败！");
             return;
         }
+        pBridge->SetEffectsState(true);
+        this->pMulNXReShadeBridge.store(pBridge, std::memory_order_release);
         this->LogSucc("CreateInterface 对 MulNXReShadeBridge001 成功！");
-        this->pMulNXReShadeBridge->SetEffectsState(true);
         });
 
     this->SubscribeSync("GraphicsSync/ID3D11DeviceContext/Ready", [this](MulNX::Message& msg) {
@@ -70,11 +73,11 @@ bool CSReShadeController::Init() {
 void CSReShadeController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "ReShade/On"_hash: {
-        this->pMulNXReShadeBridge->SetEffectsState(true);
+        this->pMulNXReShadeBridge.load(std::memory_order_acquire)->SetEffectsState(true);
         break;
     }
     case "ReShade/Off"_hash: {
-        this->pMulNXReShadeBridge->SetEffectsState(false);
+        this->pMulNXReShadeBridge.load(std::memory_order_acquire)->SetEffectsState(false);
         break;
     }
     }
@@ -89,5 +92,5 @@ void CSReShadeController::BeforeRendPanorama(ID3D11DeviceContext* pD3D11Ctx) {
     ComPtr<ID3D11Resource> pRes = nullptr;
     pRTV->GetResource(&pRes);
     if (!pRes)return;
-    this->pMulNXReShadeBridge->RendEffect(pRes.Get());
+    this->pMulNXReShadeBridge.load(std::memory_order_acquire)->RendEffect(pRes.Get());
 }

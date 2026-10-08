@@ -3,7 +3,7 @@
 #include <MulNXExtensions/MulNXReShadeBridge/IMulNXReShadeBridge.hpp>
 
 class CSReShadeController final :public CSModuleBase {
-    IMulNXReShadeBridge* pMulNXReShadeBridge = nullptr;
+    std::atomic<IMulNXReShadeBridge*> pMulNXReShadeBridge = nullptr;
 
     enum class PanoramaRend {
         Idle,
@@ -39,7 +39,9 @@ class CSReShadeController final :public CSModuleBase {
         AT2RT_SetIdle(CSReShadeController* pThis) :pThis(pThis) {}
     };
 public:
-    inline bool IsConnnect()const { return this->pMulNXReShadeBridge != nullptr; }
+    inline bool IsConnnect()const {
+        return this->pMulNXReShadeBridge.load(std::memory_order_acquire) != nullptr;
+    }
     
     AT2RT_SetPending AT2RT_setPending{ this };
     AT2RT_SetIdle AT2RT_setIdle{ this };
