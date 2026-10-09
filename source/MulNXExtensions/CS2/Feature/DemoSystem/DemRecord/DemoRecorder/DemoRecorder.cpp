@@ -99,14 +99,14 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
         // 构造完整路径并确保文件夹存在
         auto fullPath = this->dirOutput / target;
         std::error_code ec;
-        if (!std::filesystem::exists(fullPath, ec)) {
-            if (!std::filesystem::create_directories(fullPath, ec)) {
+        if (!fs::exists(fullPath, ec)) {
+            if (!fs::create_directories(fullPath, ec)) {
                 this->LogError("无法创建输出文件夹: " + fullPath.string() + " - " + ec.message());
                 return;
             }
             this->LogInfo("已创建输出文件夹: " + fullPath.string());
         }
-        else if (!std::filesystem::is_directory(fullPath, ec)) {
+        else if (!fs::is_directory(fullPath, ec)) {
             this->LogError("指定路径已存在但并非文件夹: " + fullPath.string());
             return;
         }

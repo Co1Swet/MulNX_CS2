@@ -21,7 +21,7 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Analyze"_hash: {
         std::string str = msg.asp.get<MulNX::NetExt>()->str1;
-        std::filesystem::path demoPath(str);
+        fs::path demoPath(str);
         // 确保为绝对路径（正常情况下已经是）
         if (!demoPath.is_absolute()) {
             this->LogError("收到非绝对路径: " + str);
@@ -36,12 +36,12 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void DemoAnalyzer::HandleAnalyzeRequest(std::filesystem::path demoPath) {
+void DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
     std::string stem = demoPath.stem().string();
-    std::filesystem::path jsonPath = this->dirData / (stem + ".json");
+    fs::path jsonPath = this->dirData / (stem + ".json");
 
     // JSON 已存在 → 直接发送加载消息
-    if (std::filesystem::exists(jsonPath)) {
+    if (fs::exists(jsonPath)) {
         this->LogInfo("分析结果已存在，直接加载: " + demoPath.string());
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
         rp->str1 = stem;
@@ -65,7 +65,7 @@ void DemoAnalyzer::HandleAnalyzeRequest(std::filesystem::path demoPath) {
     this->AnalyzeDemoWithCSDA(std::move(demoPath)).Fire();
 }
 
-MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(std::filesystem::path demoPath) {
+MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
     std::string stem = demoPath.stem().string();
 
     // RAII：分析结束时从队列移除

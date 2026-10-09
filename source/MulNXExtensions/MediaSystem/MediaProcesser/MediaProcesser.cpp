@@ -35,14 +35,14 @@ void MediaProcesser::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void MediaProcesser::BeginConcat(const std::filesystem::path& target) {
+void MediaProcesser::BeginConcat(const fs::path& target) {
     this->concatInputs.clear();
     this->concatTarget = target;
     this->concatActive = true;
     this->LogInfo(std::string("开始合并, 目标=") + (target.empty() ? "(未指定)" : target.string()));
 }
 
-void MediaProcesser::AddConcat(const std::filesystem::path& add) {
+void MediaProcesser::AddConcat(const fs::path& add) {
     if (!this->concatActive) {
         this->LogWarning("未处于合并状态，忽略 AddConcat");
         return;
@@ -52,8 +52,8 @@ void MediaProcesser::AddConcat(const std::filesystem::path& add) {
 }
 
 void MediaProcesser::EndConcat() {
-    std::vector<std::filesystem::path> inputs;
-    std::filesystem::path output;
+    std::vector<fs::path> inputs;
+    fs::path output;
     {
         if (!this->concatActive) {
             this->LogWarning("EndConcat 在非合并状态被调用，忽略");

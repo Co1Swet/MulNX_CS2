@@ -1,6 +1,6 @@
 #include "CamPack.hpp"
 #include <yaml-cpp/yaml.h>
-#include <filesystem>
+#include <MulNXThirdParty/ghc/fs.hpp>
 #include <fstream>
 
 void CamPack::ResetName(const std::string& newName) {
@@ -11,7 +11,7 @@ void CamPack::Refresh() {
     // 预留
 }
 
-std::pair<bool, std::string> CamPack::Save(const std::filesystem::path& dir) {
+std::pair<bool, std::string> CamPack::Save(const fs::path& dir) {
     try {
         if (dir.empty()) return { false, "文件夹路径为空，无法保存运镜包！" };
 

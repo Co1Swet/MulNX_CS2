@@ -6,8 +6,8 @@
 class RecordFileRedirect final :public CSModuleBase,
     public FileListenMixin<RecordFileRedirect>, public MediaModuleMixin<RecordFileRedirect> {
     
-    std::filesystem::path dirVideos;
-    std::atomic<std::shared_ptr<std::filesystem::path>> redirectBaseSnapshot{};
+    fs::path dirVideos;
+    std::atomic<std::shared_ptr<fs::path>> redirectBaseSnapshot{};
     bool Init()override;
 
     std::optional<MulNX::Hook::Then> OnCreateFileW(CreateFileWControl* pfc)override;

@@ -4,8 +4,8 @@
 class GameCfgManager final :public CSModuleBase {
     MulNX::IPCer* IPCer = nullptr;
 
-    std::filesystem::path ToolPath{};
-    std::filesystem::path GamePath{};
+    fs::path ToolPath{};
+    fs::path GamePath{};
 
     std::vector<std::string>ToolCfgs{};
     std::vector<std::string>GameCfgs{};

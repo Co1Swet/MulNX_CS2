@@ -24,7 +24,7 @@ bool DLLLoadDispatcher::Init() {
 
 void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {
     auto&& [lpLibFileName] = msg.Access<LPCWSTR>();
-    std::filesystem::path fsPath(lpLibFileName);
+    fs::path fsPath(lpLibFileName);
     std::unique_lock lock(this->smutex);
     if (this->loadedModules.find(fsPath) == this->loadedModules.end()) {
         this->loadedModules.insert(fsPath);
@@ -33,7 +33,7 @@ void DLLLoadDispatcher::OnModuleLoaded(MulNX::Message& msg) {
     }
 }
 
-void DLLLoadDispatcher::DispatchModuleLoadMessage(const std::filesystem::path& modulePath) {
+void DLLLoadDispatcher::DispatchModuleLoadMessage(const fs::path& modulePath) {
     auto filename = modulePath.filename().string();
     if (this->targets.find(filename) != this->targets.end()) {
         this->LogWarning(std::format("检测到目标模块加载：{}", filename));

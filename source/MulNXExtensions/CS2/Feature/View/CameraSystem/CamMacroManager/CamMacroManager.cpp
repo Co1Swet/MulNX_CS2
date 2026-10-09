@@ -184,9 +184,9 @@ bool CamMacroManager::CamMacroSaveAll() {
     this->LogSucc("成功保存所有运镜宏到文件！");
     return true;
 }
-bool CamMacroManager::CamMacroLoad(const std::filesystem::path& pathMacro) {
+bool CamMacroManager::CamMacroLoad(const fs::path& pathMacro) {
     this->LogInfo(std::format("尝试从yaml文件加载运镜宏：{}", pathMacro.string()));
-    if (!std::filesystem::exists(pathMacro)) {
+    if (!fs::exists(pathMacro)) {
         this->LogError(std::format("yaml文件不存在：", pathMacro.string()));
         return false;
     }

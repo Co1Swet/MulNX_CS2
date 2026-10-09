@@ -26,7 +26,7 @@ public:
     bool RemoveCampath(const std::string& campathName);
     inline const std::vector<WrapCampath>& GetVec()const { return this->wrapCampaths; }
 
-    std::pair<bool, std::string> Save(const std::filesystem::path& folderPath)const;
+    std::pair<bool, std::string> Save(const fs::path& folderPath)const;
     std::pair<bool, std::string> Load(YAML::Node& root);
 
     void Clear();

@@ -38,8 +38,8 @@ void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
         std::string filename = pNetExt->str1 + ".json";
 
         std::unique_lock lock(this->smutex);
-        std::filesystem::path filePath = this->dirData / filename;
-        if (!std::filesystem::exists(filePath)) {
+        fs::path filePath = this->dirData / filename;
+        if (!fs::exists(filePath)) {
             this->LogError("文件不存在: " + filePath.string());
             break;
         }
@@ -54,7 +54,7 @@ void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void DemoJSONReader::ReadJSON(const std::filesystem::path& filePath) {
+void DemoJSONReader::ReadJSON(const fs::path& filePath) {
     auto json = nlohmann::json::parse(std::ifstream(filePath));
     this->LogInfo("成功读取 JSON 文件: " + filePath.string());
     Demo::Info info{};

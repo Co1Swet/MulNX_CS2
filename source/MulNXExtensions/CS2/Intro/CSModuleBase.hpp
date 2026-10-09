@@ -15,16 +15,16 @@ class CSModuleMixin :public HookMixin<T>, public CSConMixin<T> {
     class CS2Paths {
     public:
         // Counter-Strike Global Offensive
-        std::filesystem::path root{};
-        std::filesystem::path exe{};
-        std::filesystem::path config{};
-        std::filesystem::path demo{};
+        fs::path root{};
+        fs::path exe{};
+        fs::path config{};
+        fs::path demo{};
 
         CS2Paths() {
             // 获取 cs2.exe 的完整路径（进程主模块）
             WCHAR cs2Path[MAX_PATH] = { 0 };
             GetModuleFileNameW(nullptr, cs2Path, MAX_PATH);// 注意这里不传句柄，拿CS2的exe的位置
-            this->exe = std::filesystem::path(cs2Path);
+            this->exe = fs::path(cs2Path);
             this->root = this->exe.parent_path().parent_path().parent_path().parent_path();
             this->demo = this->root / "game" / "csgo";
             this->config = this->root / "game" / "csgo" / "cfg";

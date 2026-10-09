@@ -70,9 +70,7 @@ void AutoCfgLoad::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void AutoCfgLoad::FireAsyncCfg(const std::filesystem::path& dir)const {
-    namespace fs = std::filesystem;
-
+void AutoCfgLoad::FireAsyncCfg(const fs::path& dir)const {
     if (!fs::exists(dir) || !fs::is_directory(dir)) {
         this->LogError(std::format("目录不存在或不是有效目录：{}", dir.string()));
         return;

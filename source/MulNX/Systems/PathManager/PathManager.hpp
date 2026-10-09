@@ -20,13 +20,13 @@ namespace MulNX {
         std::recursive_mutex MutexEx;
         
         // MulNX目录（根目录）
-        std::filesystem::path Root;
+        fs::path Root;
         // 核心名
         std::string CoreName;
         // 核心根目录
-        std::filesystem::path CoreRoot;
+        fs::path CoreRoot;
         // 路径缓存
-        std::unordered_map<std::string, std::filesystem::path>Cache;
+        std::unordered_map<std::string, fs::path>Cache;
 
         std::vector<std::string>Shareds;
         // 以字符串为Key
@@ -40,19 +40,19 @@ namespace MulNX {
 
         bool Init()override;
     public:
-        bool LoadPathLists(const std::filesystem::path& xmlPath);
+        bool LoadPathLists(const fs::path& xmlPath);
         bool CheckShared();
 
-        const std::filesystem::path& GetRoot()const { return this->Root; }
+        const fs::path& GetRoot()const { return this->Root; }
         // 通过模块名，将目标（如Saves）映射到该模块的对应的目录（如ModuleA/Saves）
-        std::filesystem::path PathGetForModule(const std::string& ModuleName, const std::string& Target);
+        fs::path PathGetForModule(const std::string& ModuleName, const std::string& Target);
         // 将目标映射到共享的目录
-        std::filesystem::path PathGetForShared(const std::string& Target);
+        fs::path PathGetForShared(const std::string& Target);
 
         void CreateKey(const std::string& Key, std::string&& Value, std::function<bool(PathManager*)>&& OnChange);
-        bool KeyBindStatic(const std::string& Key, const std::filesystem::path& Position);
+        bool KeyBindStatic(const std::string& Key, const fs::path& Position);
         bool KeyBindDynamic(const std::string& Key, const std::string& Parent);
         bool KeySetCurrent(const std::string& Key, const std::string& Current);
-        std::filesystem::path PathGetFromKey(const std::string& Key);
+        fs::path PathGetFromKey(const std::string& Key);
     };
 }

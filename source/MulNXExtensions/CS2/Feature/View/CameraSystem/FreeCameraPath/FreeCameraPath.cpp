@@ -147,9 +147,9 @@ bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const fl
     return true;
 }
 
-std::pair<bool, std::string> FreeCameraPath::Save(const std::filesystem::path& folderPath) {
+std::pair<bool, std::string> FreeCameraPath::Save(const fs::path& folderPath) {
     if (this->name.empty())return { false,"无法保存运镜轨道到磁盘，运镜名为空！" };
-    std::filesystem::path filePath = folderPath / (this->name + ".yaml");
+    fs::path filePath = folderPath / (this->name + ".yaml");
     try {
         YAML::Node root;
 

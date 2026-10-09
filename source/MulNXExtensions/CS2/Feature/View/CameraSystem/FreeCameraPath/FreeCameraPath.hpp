@@ -3,7 +3,7 @@
 #include <CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 #include <yaml-cpp/yaml.h>
 #include <string>
-#include <filesystem>
+#include <MulNXThirdParty/ghc/fs.hpp>
 
 class CameraDrawer;
 
@@ -47,7 +47,7 @@ public:
     const MulNX::Math::CameraKeyframe& GetKeyFrame(const size_t& index)const;// 获取特定关键帧    
 
     // 磁盘IO
-    std::pair<bool, std::string> Save(const std::filesystem::path& folderPath);
+    std::pair<bool, std::string> Save(const fs::path& folderPath);
     std::pair<bool, std::string> SaveImpl(YAML::Node& root);
     std::pair<bool, std::string> Load(YAML::Node& root);
 

@@ -15,7 +15,7 @@ bool MulNX::UISystem::Init() {
     ImGuiIO& io = ImGui::GetIO();
     auto IniPath = this->PathGet("Config") / "MulNXUIConfig.ini";
     // 这里需要进行转换，以适配ImGui的接口
-    this->strImguiIniPath = MulNX::CharUtility::FilePathToString(IniPath);
+    this->strImguiIniPath = IniPath.string();
     io.IniFilename = this->strImguiIniPath.c_str();
     this->LoadFont();
     this->LoadStyle();

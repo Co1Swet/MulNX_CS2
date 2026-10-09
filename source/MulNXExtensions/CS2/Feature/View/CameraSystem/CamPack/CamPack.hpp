@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <filesystem>
+#include <MulNXThirdParty/ghc/fs.hpp>
 #include <atomic>
 
 class CamPack {
@@ -26,5 +26,5 @@ public:
     void ResetName(const std::string& newName);
     void Refresh();
 
-    std::pair<bool, std::string> Save(const std::filesystem::path& dir);
+    std::pair<bool, std::string> Save(const fs::path& dir);
 };

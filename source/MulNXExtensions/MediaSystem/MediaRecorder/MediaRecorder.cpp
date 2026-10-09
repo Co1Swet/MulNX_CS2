@@ -88,19 +88,19 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
     }
     this->pMediaState->advancedMode = advance;
 
-    std::filesystem::path outputDir = std::filesystem::path(dirPath);
-    std::filesystem::path outputFile = outputDir / (fileName + ".mp4");
+    fs::path outputDir = fs::path(dirPath);
+    fs::path outputFile = outputDir / (fileName + ".mp4");
     std::string outFile = outputFile.string();
 
     std::error_code ec;
-    std::filesystem::create_directories(outputDir, ec);
+    fs::create_directories(outputDir, ec);
     if (ec) {
         this->LogError(std::format("创建输出目录失败: {} ({})", outputDir.string(), ec.message()));
         return false;
     }
 
     this->pMediaState->pCurrentOutputDir.store(
-        std::make_shared<std::filesystem::path>(outputDir),
+        std::make_shared<fs::path>(outputDir),
         std::memory_order_release
     );
 

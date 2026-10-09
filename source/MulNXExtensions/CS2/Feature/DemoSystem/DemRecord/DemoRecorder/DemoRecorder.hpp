@@ -4,7 +4,7 @@
 #include <deque>
 
 class DemoRecorder final : public CSModuleBase, public MediaModuleMixin<DemoRecorder> {
-    std::filesystem::path dirOutput{};
+    fs::path dirOutput{};
     std::string subOutput = "default";
     std::deque<RecordTask> recordTaskBufferQueue;
 

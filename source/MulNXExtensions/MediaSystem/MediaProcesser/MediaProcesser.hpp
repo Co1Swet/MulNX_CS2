@@ -6,11 +6,11 @@ class MediaProcesser final :public MediaModuleBase {
     void ProcessMsg(MulNX::Message& msg)override;
 
     bool concatActive = false;
-    std::filesystem::path concatTarget;
-    std::vector<std::filesystem::path> concatInputs;
+    fs::path concatTarget;
+    std::vector<fs::path> concatInputs;
 public:
     bool Init()override;
-    void BeginConcat(const std::filesystem::path& target);
-    void AddConcat(const std::filesystem::path& add);
+    void BeginConcat(const fs::path& target);
+    void AddConcat(const fs::path& add);
     void EndConcat();
 };

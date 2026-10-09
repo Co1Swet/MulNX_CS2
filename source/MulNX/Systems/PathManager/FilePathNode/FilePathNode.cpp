@@ -80,7 +80,7 @@ void MulNX::PathManager::CreateKey(const std::string& Key, std::string&& Value, 
     this->Nodes[Key].OnCurrentValueChange = std::move(OnChange);
     this->Nodes[Key].CurrentValue = std::move(Value);
 }
-bool MulNX::PathManager::KeyBindStatic(const std::string& Key, const std::filesystem::path& Position) {
+bool MulNX::PathManager::KeyBindStatic(const std::string& Key, const fs::path& Position) {
     std::unique_lock lock(this->MutexEx);
     auto* Node = this->NodeGetFromKey(Key);
     this->KeyUnbindParentKey(Key);
@@ -115,7 +115,7 @@ bool MulNX::PathManager::KeySetCurrent(const std::string& Key, const std::string
     return true;
 }
 // ToDo 后续再处理栈溢出，反正都是我自己写的，我相信我自己
-std::filesystem::path MulNX::PathManager::PathGetFromKey(const std::string& Key) {
+fs::path MulNX::PathManager::PathGetFromKey(const std::string& Key) {
     std::unique_lock lock(this->MutexEx);
     auto* Node = this->NodeGetFromKey(Key);
     if (!Node->Static.empty()) {

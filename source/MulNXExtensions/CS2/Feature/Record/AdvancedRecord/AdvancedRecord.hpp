@@ -5,7 +5,7 @@
 class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<AdvancedRecord> {
     class MediaParamManager* pMediaParamManager = nullptr;
     std::atomic<bool> startAsAdvanced = false;
-    std::filesystem::path dirVideos;
+    fs::path dirVideos;
     std::string outputFile = "record";
     // 基于时间槽的帧率限制状态
     std::atomic<std::chrono::steady_clock::time_point> recordStartTime;

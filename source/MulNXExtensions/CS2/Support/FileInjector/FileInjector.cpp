@@ -14,22 +14,22 @@ bool FileInjector::Init() {
         const auto materialRoot = cs2 / "materials";
         std::error_code ec;
 
-        if (!std::filesystem::exists(materialRoot, ec) || ec) {
+        if (!fs::exists(materialRoot, ec) || ec) {
             this->LogError(std::format("材质目录不存在: {}", materialRoot.string()));
             return;
         }
 
         size_t count = 0;
 
-        for (auto& entry : std::filesystem::recursive_directory_iterator(
+        for (auto& entry : fs::recursive_directory_iterator(
             materialRoot,
-            std::filesystem::directory_options::skip_permission_denied,
+            fs::directory_options::skip_permission_denied,
             ec)) {
             if (ec) { ec.clear(); continue; }
             if (!entry.is_regular_file(ec) || ec) { ec.clear(); continue; }
             if (entry.path().extension() != ".vmat_c") continue;
 
-            auto rel = std::filesystem::relative(entry.path(), materialRoot, ec);
+            auto rel = fs::relative(entry.path(), materialRoot, ec);
             if (ec) { ec.clear(); continue; }
 
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>(

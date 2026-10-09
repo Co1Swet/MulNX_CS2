@@ -2,12 +2,12 @@
 #include <Intro/CSModuleBase.hpp>
 
 class DemoAnalyzer final : public CSModuleBase {
-    std::filesystem::path csdaPath;
-    std::filesystem::path dirData;
-    std::set<std::filesystem::path> analyzingSet;            // 正在分析的 demo 绝对路径
+    fs::path csdaPath;
+    fs::path dirData;
+    std::set<fs::path> analyzingSet;            // 正在分析的 demo 绝对路径
 
-    void HandleAnalyzeRequest(std::filesystem::path demoPath);
-    MulNX::CoTask AnalyzeDemoWithCSDA(std::filesystem::path demoPath);
+    void HandleAnalyzeRequest(fs::path demoPath);
+    MulNX::CoTask AnalyzeDemoWithCSDA(fs::path demoPath);
 
     bool Init() override;
     void ProcessMsg(MulNX::Message& msg) override;

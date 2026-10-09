@@ -1,5 +1,5 @@
 #pragma once
-#include <filesystem>
+#include <MulNXThirdParty/ghc/fs.hpp>
 #include <functional>
 
 namespace MulNX {
@@ -7,7 +7,7 @@ namespace MulNX {
     class FilePathNode {
     public:
         // 记录静态绑定，查询时有静态绑定返回静态绑定
-        std::filesystem::path Static;
+        fs::path Static;
         // 记录动态绑定，是父节点的Key不是Node，查询时若没有静态绑定则通过Key向上追溯
         std::string KeyParent;
         // 当前值，用于拼接完整路径

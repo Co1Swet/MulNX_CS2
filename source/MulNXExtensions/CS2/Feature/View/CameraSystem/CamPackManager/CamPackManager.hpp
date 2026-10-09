@@ -25,7 +25,7 @@ class CamPackManager final :public CamSysModule {
     bool CamPackCreate(const std::string& name);
     bool CamPackSave();
     bool CamPackRefresh();
-    bool CamPackLoad(const std::filesystem::path& projectPath, const std::string& name);
+    bool CamPackLoad(const fs::path& projectPath, const std::string& name);
     bool CamPackApply(const std::shared_ptr<CamPack> pCamPack);
 public:
     std::shared_ptr<CamPack> pActiveCamPack = nullptr;

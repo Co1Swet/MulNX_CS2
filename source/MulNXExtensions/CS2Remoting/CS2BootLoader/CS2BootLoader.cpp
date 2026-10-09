@@ -150,7 +150,7 @@ bool CS2BootLoader::CheckEnvironment() {
 
 bool CS2BootLoader::LaunchAndInject() {
     // 验证游戏路径
-    if (gamePath.empty() || !std::filesystem::exists(gamePath)) {
+    if (gamePath.empty() || !fs::exists(gamePath)) {
         this->LogError(std::format("无效CS2路径: {}", gamePath.string()));
         return false;
     }

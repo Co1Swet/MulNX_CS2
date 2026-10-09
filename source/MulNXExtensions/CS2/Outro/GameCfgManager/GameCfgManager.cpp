@@ -139,7 +139,7 @@ bool GameCfgManager::UpdateCfgList() {
 	return true;
 }
 bool GameCfgManager::MoveToGame(const std::string& CfgName) {
-    const std::filesystem::path CfgPath = this->ToolPath / (CfgName + ".cfg");
+    const fs::path CfgPath = this->ToolPath / (CfgName + ".cfg");
     const std::string FullName = CfgName + ".cfg";
     if (!this->IPCer->FileMove(FullName, this->ToolPath, this->GamePath)) {
 		this->LogError("从工具目录移动到游戏目录失败，文件可能不存在或移动过程中出现错误！  路径：" + CfgPath.string());
@@ -148,8 +148,8 @@ bool GameCfgManager::MoveToGame(const std::string& CfgName) {
 	return true;
 }
 bool GameCfgManager::LoadCfg(const std::string& CfgName) {
-	const std::filesystem::path CfgPath = this->GamePath / (CfgName + ".cfg");
-	if (!std::filesystem::exists(CfgPath)) {
+	const fs::path CfgPath = this->GamePath / (CfgName + ".cfg");
+	if (!fs::exists(CfgPath)) {
 		this->LogError("指定的配置文件不存在，无法加载配置文件！  路径：" + CfgPath.string());
 		return false;
 	}
@@ -158,7 +158,7 @@ bool GameCfgManager::LoadCfg(const std::string& CfgName) {
 	return true;
 }
 bool GameCfgManager::MoveToTool(const std::string& CfgName) {
-    const std::filesystem::path CfgPath = this->ToolPath / (CfgName + ".cfg");
+    const fs::path CfgPath = this->ToolPath / (CfgName + ".cfg");
     const std::string FullName = CfgName + ".cfg";
     if (!this->IPCer->FileMove(FullName, this->GamePath, this->ToolPath)) {
 		this->LogError("从游戏目录移动到工具目录失败，文件可能不存在或移动过程中出现错误！  路径：" + CfgPath.string());
@@ -167,7 +167,7 @@ bool GameCfgManager::MoveToTool(const std::string& CfgName) {
 	return true;
 }
 bool GameCfgManager::DeleteCfg(const std::string& CfgName) {
-    const std::filesystem::path CfgPath = this->ToolPath / (CfgName + ".cfg");
+    const fs::path CfgPath = this->ToolPath / (CfgName + ".cfg");
     const std::string FullName = CfgName + ".cfg";
     if (!this->IPCer->FileDelete(FullName, this->ToolPath)) {
 		this->LogError("从工具目录删除配置文件失败，文件可能不存在或删除过程中出现错误！  路径：" + CfgPath.string());

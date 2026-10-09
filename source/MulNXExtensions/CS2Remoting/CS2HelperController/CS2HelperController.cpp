@@ -11,7 +11,7 @@ bool CS2HelperController::Init() {
     this->dirFFmpeg = this->dirTools / "ffmpeg";
 
     auto ffmpegListPath = this->dirFFmpeg / "list.yaml";
-    if (!std::filesystem::exists(ffmpegListPath)) {
+    if (!fs::exists(ffmpegListPath)) {
         MulNX::ErrorTerminate(std::format("ffmpeg list.yaml not found: {}", ffmpegListPath.string()));
     }
     auto ffmpegList = YAML::LoadFile(ffmpegListPath.string());
@@ -34,7 +34,7 @@ bool CS2HelperController::Init() {
 }
 
 void CS2HelperController::DoInject(PROCESS_INFORMATION& pi,
-    const std::filesystem::path& dllPath) {
+    const fs::path& dllPath) {
     bool helperInjected = this->pInjectHelper->InjectDll(pi.hProcess, dllPath.wstring());
     if (!helperInjected) {
         TerminateProcess(pi.hProcess, 0);  // 注入失败则终止进程
@@ -47,14 +47,14 @@ void CS2HelperController::DoInject(PROCESS_INFORMATION& pi,
 bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi) {
     // Reshade注入
     auto reshadedll = this->dirTools / "dxgi.dll";
-    if (std::filesystem::exists(reshadedll) && this->injectReshade) {
+    if (fs::exists(reshadedll) && this->injectReshade) {
         this->DoInject(pi, reshadedll);
     }
     // ffmpeg注入
     for (const auto& ffmpegDll : this->ffmpegsDll) {
         auto fullPath = this->dirFFmpeg / ffmpegDll;
         // 在自己进程加载Dll，这里千万不要删掉，不然算不出地址，没办法远程初始化了
-        LoadLibraryW(fullPath.c_str());
+        LoadLibraryW(fullPath.wstring().c_str());
         this->DoInject(pi, fullPath);
     }
     // CS2OBTool注入，同样先在自己进程加载Dll

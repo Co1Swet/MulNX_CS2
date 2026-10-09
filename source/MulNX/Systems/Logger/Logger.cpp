@@ -90,7 +90,7 @@ void MulNX::Logger::Log() {
         auto eventTime = MulNX::FromUnixUs(entry.timestamp_us);
         std::string levelStr = this->PraseLevel(entry.level);
 
-        auto file = std::filesystem::path(entry.where.file_name()).filename().string();
+        auto file = fs::path(entry.where.file_name()).filename().string();
         auto lineNum = entry.where.line();
 
         std::istringstream iss(rawMsg);

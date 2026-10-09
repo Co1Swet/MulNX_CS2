@@ -1,13 +1,5 @@
 #include "CharUtility.hpp"
-
 #include <Windows.h>
-
-std::string MulNX::CharUtility::FilePathToString(const std::filesystem::path& path) {
-	std::u8string u8path = path.u8string();
-	std::string utf8Path(u8path.begin(), u8path.end());
-	std::replace(utf8Path.begin(), utf8Path.end(), '\\', '/');
-	return utf8Path;
-}
 
 std::wstring MulNX::CharUtility::U8ToW(const std::string& u8String) {
     if (u8String.empty()) return {};

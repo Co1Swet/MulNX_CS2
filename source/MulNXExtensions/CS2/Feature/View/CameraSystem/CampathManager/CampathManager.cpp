@@ -40,7 +40,7 @@ bool CampathManager::Init() {
         });
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
-        std::filesystem::path dirCampaths = this->Path()->PathGetFromKey("kCampaths");
+        fs::path dirCampaths = this->Path()->PathGetFromKey("kCampaths");
         std::vector<std::string> campathNames = this->pIPCer->GetFileNamesByPath(dirCampaths);
         for (const std::string& campathName : campathNames) {
             if (!this->CampathLoad(dirCampaths / campathName)) {
@@ -228,10 +228,10 @@ bool CampathManager::CampathSaveAll() {
     this->LogSucc("成功保存所有运镜轨道到磁盘！");
     return true;
 }
-bool CampathManager::CampathLoad(const std::filesystem::path& pathCampath) {
+bool CampathManager::CampathLoad(const fs::path& pathCampath) {
     this->LogInfo(std::format("尝试从磁盘文件加载运镜轨道，文件路径：{}", pathCampath.string()));
     // 检查文件本身存在性
-    if (!std::filesystem::exists(pathCampath)) {
+    if (!fs::exists(pathCampath)) {
         this->LogError("磁盘文件不存在！文件路径：" + pathCampath.string());
         return false;
     }

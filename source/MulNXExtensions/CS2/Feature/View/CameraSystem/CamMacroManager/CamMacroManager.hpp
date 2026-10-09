@@ -23,7 +23,7 @@ class CamMacroManager final :public CamSysModule {
 
     bool CamMacroCreate(const std::string& name);
     bool CamMacroSaveAll();
-    bool CamMacroLoad(const std::filesystem::path& pathMacro);
+    bool CamMacroLoad(const fs::path& pathMacro);
     bool CamMacroDelete(const std::string& name);
     bool CamMacroClearAll();
 

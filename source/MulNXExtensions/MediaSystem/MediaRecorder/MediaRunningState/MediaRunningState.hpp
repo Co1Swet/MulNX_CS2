@@ -20,5 +20,5 @@ public:
 
     std::atomic<RecordState> recordState = RecordState::Free;
 
-    std::atomic<std::shared_ptr<std::filesystem::path>> pCurrentOutputDir{};
+    std::atomic<std::shared_ptr<fs::path>> pCurrentOutputDir{};
 };

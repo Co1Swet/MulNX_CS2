@@ -73,21 +73,21 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
     }
 
     auto& dirDemos = this->CS2Paths->demo;
-    std::filesystem::path demoPath(rawPath);
+    fs::path demoPath(rawPath);
     if (!demoPath.is_absolute()) {
         demoPath = dirDemos / demoPath;
     }
 
     // 检查文件是否存在，若不存在且缺少 .dem 后缀则自动补全
     bool fileFound = false;
-    if (std::filesystem::exists(demoPath) && std::filesystem::is_regular_file(demoPath)) {
+    if (fs::exists(demoPath) && fs::is_regular_file(demoPath)) {
         fileFound = true;   // 原路径直接有效
     }
     else if (demoPath.extension() != ".dem") {
         // 尝试追加 .dem
-        std::filesystem::path tryPath = demoPath;
+        fs::path tryPath = demoPath;
         tryPath += ".dem";
-        if (std::filesystem::exists(tryPath) && std::filesystem::is_regular_file(tryPath)) {
+        if (fs::exists(tryPath) && fs::is_regular_file(tryPath)) {
             demoPath = tryPath;
             fileFound = true;
             this->LogWarning(std::format("已自动补充 .dem 后缀: {}", demoPath.string()));

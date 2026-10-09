@@ -19,7 +19,7 @@ class CampathManager final : public CamSysModule {
 
     FreeCameraPath* CampathCreate(const std::string& name);
     bool CampathSaveAll();
-    bool CampathLoad(const std::filesystem::path& pathCampath);
+    bool CampathLoad(const fs::path& pathCampath);
     // 返回true表示名称现在可用
     bool CampathDelete(const std::string& name);
     bool CampathClearAll();

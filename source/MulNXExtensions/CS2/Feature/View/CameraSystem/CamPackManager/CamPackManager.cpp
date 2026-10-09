@@ -7,15 +7,15 @@ bool CamPackManager::Init() {
 
     this->Path()->CreateKey("kCurrentPack", {}, [this](MulNX::PathManager* PathManager)->bool {
         auto dirCamPack = PathManager->PathGetFromKey("kCurrentPack");
-        if (std::filesystem::exists(dirCamPack)) {
+        if (fs::exists(dirCamPack)) {
             this->LogSucc(std::format("成功设置运镜包路径为：{}", dirCamPack.string()));
             return true;
         }
         this->LogInfo(std::format("指定的运镜包文件夹不存在，正在创建路径：{}", dirCamPack.string()));
         try {
-            std::filesystem::create_directory(dirCamPack);
-            std::filesystem::create_directory(dirCamPack / "Campaths");
-            std::filesystem::create_directory(dirCamPack / "CamMacros");
+            fs::create_directory(dirCamPack);
+            fs::create_directory(dirCamPack / "Campaths");
+            fs::create_directory(dirCamPack / "CamMacros");
         }
         catch (const std::exception& e) {
             this->LogError(std::format("创建运镜包文件夹失败，错误信息：{}", e.what()));
@@ -238,14 +238,14 @@ bool CamPackManager::CamPackApply(const std::shared_ptr<CamPack> pCamPack) {
     this->LogSucc(std::format("已切换至运镜包：{}", pCamPack->GetName()));
     return true;
 }
-bool CamPackManager::CamPackLoad(const std::filesystem::path& dir, const std::string& yamlName) {
+bool CamPackManager::CamPackLoad(const fs::path& dir, const std::string& yamlName) {
     if (dir.empty() || yamlName.empty()) {
         this->LogError("文件夹路径或文件名为空，无法加载运镜包！");
         return false;
     }
-    std::filesystem::path pathCamPack = dir / (yamlName + ".yaml");
+    fs::path pathCamPack = dir / (yamlName + ".yaml");
     this->LogInfo(std::format("尝试加载运镜包：{}", pathCamPack.string()));
-    if (!std::filesystem::exists(pathCamPack)) {
+    if (!fs::exists(pathCamPack)) {
         this->LogError(std::format("运镜包不存在：{}", pathCamPack.string()));
         return false;
     }

@@ -98,11 +98,11 @@ void DemoFiles::ProcessMsg(MulNX::Message& msg) {
     case "Demo/Refresh"_hash: {
         std::unique_lock lock(this->smutex);
         this->demoFiles.clear();
-        for (const auto& entry : std::filesystem::directory_iterator(this->CS2Paths->demo)) {
+        for (const auto& entry : fs::directory_iterator(this->CS2Paths->demo)) {
             if (!entry.is_regular_file() || entry.path().extension() != ".dem")continue;
             DemoFile demFile{};
             demFile.path = entry.path();
-            if (std::filesystem::exists(this->dirData / (entry.path().stem().string() + ".json"))) {
+            if (fs::exists(this->dirData / (entry.path().stem().string() + ".json"))) {
                 demFile.anylized = true;
             }
             this->demoFiles.push_back(std::move(demFile));

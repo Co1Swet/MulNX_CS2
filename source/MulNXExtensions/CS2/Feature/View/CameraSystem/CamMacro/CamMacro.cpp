@@ -69,10 +69,10 @@ void CamMacro::SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack) {
     return;
 }
 
-std::pair<bool, std::string> CamMacro::Save(const std::filesystem::path& folderPath)const {
+std::pair<bool, std::string> CamMacro::Save(const fs::path& folderPath)const {
     if (!this->dirty)return { true,std::format("宏未修改，无需保存：{}",this->name) };
     if (folderPath.empty()) return { false, "文件夹路径为空，无法保存运镜宏！" };
-    std::filesystem::path filePath = folderPath / (this->name + ".yaml");
+    fs::path filePath = folderPath / (this->name + ".yaml");
     try {
         YAML::Node root;
 

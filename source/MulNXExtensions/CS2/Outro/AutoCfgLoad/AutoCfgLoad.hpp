@@ -6,6 +6,6 @@ class AutoCfgLoad final :public CSModuleBase {
     std::atomic<bool>nextNewRoundIsNewDemo = false;
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    void FireAsyncCfg(const std::filesystem::path& dir)const;
+    void FireAsyncCfg(const fs::path& dir)const;
     void Main();
 };

@@ -4,7 +4,7 @@
 class CS2BootLoader final : public MulNX::Module<CS2BootLoader> {
     class CS2HelperController* pHelperController = nullptr;
 
-    std::filesystem::path gamePath;
+    fs::path gamePath;
     std::string launchOptions;
 
     std::vector<std::string> patternsCheckDangerous;
