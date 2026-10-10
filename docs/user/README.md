@@ -22,7 +22,7 @@
 
 ### 安装与启动
 
-1. 从 [Releases](../../releases) 下载最新的 **MulNX.7z**，解压即用。
+1. 从 [Releases](../../../releases) 下载最新的 **MulNX.7z**，解压即用。
 2. 通过 **CS2Injector.exe** 启动，点击“启动 CS2”。
 3. 确认游戏以 `-insecure` 模式运行。
 4. 关闭所有第三方游戏平台。
