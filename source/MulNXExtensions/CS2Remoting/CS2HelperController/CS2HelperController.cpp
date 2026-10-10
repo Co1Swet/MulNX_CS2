@@ -14,7 +14,7 @@ bool CS2HelperController::Init() {
     if (!fs::exists(ffmpegListPath)) {
         MulNX::ErrorTerminate(std::format("ffmpeg list.yaml not found: {}", ffmpegListPath.string()));
     }
-    auto ffmpegList = YAML::LoadFile(ffmpegListPath.string());
+    auto ffmpegList = YAML::LoadFilePath(ffmpegListPath);
     if (!ffmpegList["DLLs"]) {
         MulNX::ErrorTerminate(std::format("ffmpeg list.yaml missing 'DLLs' key: {}", ffmpegListPath.string()));
     }

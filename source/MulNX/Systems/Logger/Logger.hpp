@@ -5,7 +5,6 @@
 
 namespace MulNX {
     class Logger final :public MulNX::Module<Logger> {
-    private:
         fs::path logPath{};
         std::ofstream target{};
 

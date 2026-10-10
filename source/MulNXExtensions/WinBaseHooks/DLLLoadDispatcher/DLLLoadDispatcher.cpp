@@ -14,7 +14,7 @@ bool DLLLoadDispatcher::Init() {
     this->RegisterAttachHook(this->hkLoadLibraryExW, "LoadLibraryExW");
 
     auto pthFile = this->PathGet("Config") / "dllTargets.yaml";
-    auto file= YAML::LoadFile(pthFile.string());
+    auto file= YAML::LoadFilePath(pthFile);
     for (const auto& target : file["targets"]) {
         this->targets.insert(target.as<std::string>());
         this->LogInfo(std::format("已添加拦截目标：{}", target.as<std::string>()));

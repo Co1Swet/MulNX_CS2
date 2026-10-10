@@ -85,7 +85,7 @@ void AutoCfgLoad::FireAsyncCfg(const fs::path& dir)const {
         std::string filePath = entry.path().string();
         this->LogInfo(std::format("正在加载配置文件：{}", filePath));
 
-        std::ifstream file(entry.path());
+        std::ifstream file(entry.path().wstring());
         if (!file.is_open()) {
             this->LogWarning(std::format("无法打开文件：{}", filePath));
             continue;

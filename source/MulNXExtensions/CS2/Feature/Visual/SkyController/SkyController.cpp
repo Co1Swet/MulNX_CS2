@@ -81,7 +81,7 @@ bool SkyController::Init() {
 
     auto dir = this->PathGet("Game");
     try {
-        YAML::Node config = YAML::LoadFile((dir / "Game.yaml").string());
+        YAML::Node config = YAML::LoadFilePath(dir / "Game.yaml");
         if (config["skyNames"]) {
             for (const auto& node : config["skyNames"]) {
                 std::string name = node.as<std::string>();

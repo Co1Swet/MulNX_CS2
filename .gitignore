@@ -1,21 +1,21 @@
 build/*
 !build/.gitkeep
 
-bin/**/*.pdb
-bin/**/*.zip
-bin/**/*.json
-bin/**/*.dem
-bin/**/*.mp4
-bin/**/*.wav
-bin/**/*.png
+u8测试/bin/**/*.pdb
+u8测试/bin/**/*.zip
+u8测试/bin/**/*.json
+u8测试/bin/**/*.dem
+u8测试/bin/**/*.mp4
+u8测试/bin/**/*.wav
+u8测试/bin/**/*.png
 
-bin/**/Log/*.txt
+u8测试/bin/**/Log/*.txt
 
-# bin/MulNX/Tools
-bin/MulNX/Tools/*[Rr]e[Ss]hade*
-!bin/MulNX/Tools/MulNXReShadeBridge.addon
-bin/MulNX/Tools/dxgi.dll
+# u8测试/bin/MulNX/Tools
+u8测试/bin/MulNX/Tools/*[Rr]e[Ss]hade*
+!u8测试/bin/MulNX/Tools/MulNXReShadeBridge.addon
+u8测试/bin/MulNX/Tools/dxgi.dll
 
-# bin/Output/MulNX/Tools
-bin/Output/MulNX/Tools/*[Rr]e[Ss]hade*
-bin/Output/MulNX/Tools/dxgi.dll
+# u8测试/bin/Output/MulNX/Tools
+u8测试/bin/Output/MulNX/Tools/*[Rr]e[Ss]hade*
+u8测试/bin/Output/MulNX/Tools/dxgi.dll

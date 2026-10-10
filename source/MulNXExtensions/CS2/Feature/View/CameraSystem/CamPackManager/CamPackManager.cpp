@@ -250,7 +250,7 @@ bool CamPackManager::CamPackLoad(const fs::path& dir, const std::string& yamlNam
         return false;
     }
     try {
-        YAML::Node root = YAML::LoadFile(pathCamPack.string());
+        YAML::Node root = YAML::LoadFilePath(pathCamPack);
         std::string loadName = root["name"].as<std::string>();
         if (this->camPacks.find(loadName) != this->camPacks.end()) {
             this->LogError(std::format("运镜包名已占用，无法从文件加载：{}", loadName));

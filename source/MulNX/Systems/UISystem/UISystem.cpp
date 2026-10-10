@@ -2,7 +2,7 @@
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Systems/Systems.hpp>
-#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/yaml.hpp>
 #include <MulNXThirdParty/ImGuiStyleSerializer.h>
 #include <Windows.h>
 #include <fstream>
@@ -90,7 +90,7 @@ void MulNX::UISystem::LoadFont() {
     try {
         auto cfgPath = this->PathGet("Config") / "ui.yaml";
         this->LogInfo(std::format("尝试加载字体配置：{}", cfgPath.string()));
-        YAML::Node root = YAML::LoadFile(cfgPath.string());
+        YAML::Node root = YAML::LoadFilePath(cfgPath);
         
         auto fontSize = root["font"]["size"].as<float>();
         this->LogInfo(std::format("解析字体大小：{}", fontSize));
@@ -118,7 +118,7 @@ void MulNX::UISystem::LoadStyle() {
         // 加载Style
         auto stylePath = this->Path()->PathGetForShared("Config") / "ImStyle.yaml";
         this->LogInfo(I18n("ui.style.load", stylePath.string()));
-        YAML::Node root = YAML::LoadFile(stylePath.string());
+        YAML::Node root = YAML::LoadFilePath(stylePath);
         ImGuiStyle newStyle;
         if (!ImGuiYaml::YamlToStyle(root, newStyle)) {
             this->LogError(I18n("ui.style.load_file_error", stylePath.string()));
@@ -141,7 +141,7 @@ void MulNX::UISystem::SaveStyle() {
         ImGuiStyle& style = ImGui::GetStyle();
         YAML::Node root;
         ImGuiYaml::StyleToYaml(style, root);
-        std::ofstream fout(stylePath);
+        std::ofstream fout(stylePath.wstring());
         fout << root;
         this->LogSucc(I18n("ui.style.save_succ", stylePath.string()));
     }

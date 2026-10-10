@@ -40,7 +40,7 @@ add_compile_definitions(MULNX_STRICT) # MulNX的严格模式宏
 add_subdirectory("source")
 
 # 定义目标路径
-set(MulNXPath ${CMAKE_SOURCE_DIR}/bin/MulNX)
+set(MulNXPath ${CMAKE_SOURCE_DIR}/u8测试/bin/MulNX)
 set(CS2OBToolPath ${MulNXPath}/CS2OBTool)
 set(CS2InjectorPath ${MulNXPath}/CS2Injector)
 

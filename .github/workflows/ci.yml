@@ -39,7 +39,7 @@ jobs:
 
       # 5. 运行 Python 打包脚本（失败则终止流程，避免发布无附件的 Release）
       - name: Run Python helper scripts
-        run: python bin/Pack.py
+        run: python u8测试/bin/Pack.py
 
       # 6. 上传构建产物（仅当推送的是标签或 main 分支）
       #    包含 Output 目录、MulNX.7z 和 MulNX 原始目录
@@ -49,9 +49,9 @@ jobs:
         with:
           name: build-outputs-${{ github.sha }}
           path: |
-            bin/Output/
-            bin/MulNX.7z
-            bin/MulNX/
+            u8测试/bin/Output/
+            u8测试/bin/MulNX.7z
+            u8测试/bin/MulNX/
           if-no-files-found: warn
 
       # 7. 如果是标签推送，准备 Release 信息（包含时间戳和标签消息）
@@ -89,7 +89,7 @@ jobs:
           # Release 说明：从 tag_body.txt 文件读取
           body_path: tag_body.txt
           # 要上传的文件（这里上传 7z 压缩包）
-          files: bin/MulNX.7z
+          files: u8测试/bin/MulNX.7z
           # 如果文件不存在，则失败（防止发布空 Release）
           fail_on_unmatched_files: true
           # 是否为预发布版本（默认 false）

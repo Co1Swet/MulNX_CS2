@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/Common/Message.hpp>
-#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/yaml.hpp>
 #include <atomic>
 
 namespace MulNX {

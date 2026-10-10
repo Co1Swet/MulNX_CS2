@@ -5,7 +5,7 @@
 
 bool MulNX::Logger::Init() {
     this->logPath = this->Path()->PathGetForShared("Log") / ("Log_" + this->Core->GetName() + ".txt");
-    this->target = std::ofstream(this->logPath, std::ios::out | std::ios::binary | std::ios::trunc);
+    this->target = std::ofstream(this->logPath.wstring(), std::ios::out | std::ios::binary | std::ios::trunc);
     if (!this->target) {
         MulNX::ErrorTerminate("Cannot Wirte Log!");
     }

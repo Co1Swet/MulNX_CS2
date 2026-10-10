@@ -21,7 +21,7 @@ bool MulNX::PathManager::Init() {
 
 bool MulNX::PathManager::LoadPathLists(const fs::path& xmlPath) {
     pugi::xml_document xml;
-    pugi::xml_parse_result result = xml.load_file(xmlPath.c_str());
+    pugi::xml_parse_result result = xml.load_file(xmlPath.wstring().c_str());
     if (!result)MulNX::ErrorTerminate("PathLists.xml加载失败，请检查");
     auto nodePath = xml.child("Path");
     auto nodeShared = nodePath.child("Shared");

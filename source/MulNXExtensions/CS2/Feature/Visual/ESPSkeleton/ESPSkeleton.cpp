@@ -39,7 +39,7 @@ void ESPSkeleton::Draw() {
 bool ESPSkeleton::Init() {
     auto pthConfig = this->PathGet("Config") / "Config.yaml";
 
-    YAML::Node fConfig = YAML::LoadFile(pthConfig.string());
+    YAML::Node fConfig = YAML::LoadFilePath(pthConfig);
     
     for (const auto& chain : fConfig) {
         std::vector<int> indices;

@@ -3,11 +3,11 @@
 #include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
-#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/yaml.hpp>
 
 bool MulNX::ShortcutManager::Init() {
     auto path = this->PathGet("Config");
-    auto config = YAML::LoadFile((path / "shortcut.yaml").string());
+    auto config = YAML::LoadFilePath(path / "shortcut.yaml");
 
     // 读取顶层 name
     std::string configName = config["name"].as<std::string>();

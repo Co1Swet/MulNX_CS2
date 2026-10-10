@@ -191,7 +191,7 @@ bool CamMacroManager::CamMacroLoad(const fs::path& pathMacro) {
         return false;
     }
     try {
-        YAML::Node root = YAML::LoadFile(pathMacro.string());
+        YAML::Node root = YAML::LoadFilePath(pathMacro);
         std::string newCamMacroName = root["name"].as<std::string>();
         if (newCamMacroName.empty()) {
             this->LogError("尝试从yaml文件加载运镜宏失败，名称为空！");

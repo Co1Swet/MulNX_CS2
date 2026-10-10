@@ -1,6 +1,6 @@
 #include "I18nManager.hpp"
 #include <MulNX/Systems/Systems.hpp>
-#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/yaml.hpp>
 #include <stack>
 
 MulNX::I18nManager::I18nManager() {
@@ -12,7 +12,7 @@ bool MulNX::I18nManager::Init() {
     auto filePath = path / "lan.yaml";
 
     this->strings.clear();
-    YAML::Node root = YAML::LoadFile(filePath.string());
+    YAML::Node root = YAML::LoadFilePath(filePath);
     this->LoadYaml(root, {});
     
     this->LogSucc(I18n("sys.i18n.load_succ", filePath.string()));

@@ -3,7 +3,7 @@
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 #include <MulNXExtensions/CS2Remoting/CS2HelperController/CS2HelperController.hpp>
 #include <commdlg.h>
-#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/yaml.hpp>
 #include <fstream>
 #include <TlHelp32.h>
 
@@ -59,7 +59,7 @@ bool CS2BootLoader::Init() {
     this->pHelperController = this->Core->ModuleManager()->FindModule<CS2HelperController>("CS2HelperController");
 
     auto configPath = this->PathGet("Config");
-    auto config = YAML::LoadFile((configPath / "config.yaml").string());
+    auto config = YAML::LoadFilePath(configPath / "config.yaml");
     this->gamePath = config["path"].as<std::string>();
     this->launchOptions = config["launchOptions"].as<std::string>();
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
@@ -70,7 +70,7 @@ bool CS2BootLoader::Init() {
         .SubscribeAsync("CS2BootLoader/Save")
         ;
 
-    auto autoCfg = YAML::LoadFile((configPath / "auto.yaml").string());
+    auto autoCfg = YAML::LoadFilePath(configPath / "auto.yaml");
     auto autoLaunch = autoCfg["autoLaunch"].as<bool>();
 #ifdef _DEBUG
     autoLaunch = true;
@@ -107,7 +107,7 @@ void CS2BootLoader::ProcessMsg(MulNX::Message& msg) {
         config["path"] = this->gamePath.string();
         config["launchOptions"] = this->launchOptions;
         config["patternsCheckDangerous"] = this->patternsCheckDangerous;
-        std::ofstream fout(configPath / "config.yaml");
+        std::ofstream fout((configPath / "config.yaml").wstring());
         fout << config;
         fout.close();
         break;

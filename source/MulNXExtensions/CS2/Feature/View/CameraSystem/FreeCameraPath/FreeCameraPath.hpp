@@ -1,8 +1,7 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 #include <CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
-#include <yaml-cpp/yaml.h>
-#include <string>
+#include <MulNXThirdParty/yaml.hpp>
 #include <MulNXThirdParty/ghc/fs.hpp>
 
 class CameraDrawer;

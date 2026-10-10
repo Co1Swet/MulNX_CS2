@@ -237,7 +237,7 @@ bool CampathManager::CampathLoad(const fs::path& pathCampath) {
     }
 
     try {
-        YAML::Node root = YAML::LoadFile(pathCampath.string());
+        YAML::Node root = YAML::LoadFilePath(pathCampath);
 
         std::string newCampathName = root["name"].as<std::string>();
         if (newCampathName.empty()) {

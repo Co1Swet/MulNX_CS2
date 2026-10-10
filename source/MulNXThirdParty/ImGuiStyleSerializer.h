@@ -1,11 +1,11 @@
-// ImGuiStyleYamlSerialization.h
-// Dear ImGui v1.92.7 -> YAML serialization (function-based, no template specialization)
 #pragma once
-
-#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/yaml.hpp>
 #include <MulNXThirdParty/imgui_d11/imgui.h>
 #include <unordered_map>
 #include <string>
+
+// ImGuiStyleYamlSerialization.h
+// Dear ImGui v1.92.7 -> YAML serialization (function-based, no template specialization)
 
 namespace ImGuiYaml {
 

@@ -8,7 +8,7 @@ bool WebSocketManager::Init() {
 
     auto path = this->PathGet("Config") / "config.yaml";
     try {
-        auto yaml = YAML::LoadFile(path.string());
+        auto yaml = YAML::LoadFilePath(path);
         this->port = yaml["port"].as<uint16_t>();
         this->LogSucc(std::format("从配置文件中读取到指定端口号：{}", this->port));
     }

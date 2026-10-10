@@ -1,5 +1,5 @@
 #include "CamPack.hpp"
-#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/yaml.hpp>
 #include <MulNXThirdParty/ghc/fs.hpp>
 #include <fstream>
 
@@ -23,7 +23,7 @@ std::pair<bool, std::string> CamPack::Save(const fs::path& dir) {
         root["OnRoundStart"] = this->OnRoundStart;
         root["OnRoundEnd"] = this->OnRoundEnd;
 
-        std::ofstream fout(pathSave);
+        std::ofstream fout(pathSave.wstring());
         fout << root;
         fout.close();
 

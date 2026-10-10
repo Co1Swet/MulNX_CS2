@@ -55,7 +55,7 @@ void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
 }
 
 void DemoJSONReader::ReadJSON(const fs::path& filePath) {
-    auto json = nlohmann::json::parse(std::ifstream(filePath));
+    auto json = nlohmann::json::parse(std::ifstream(filePath.wstring()));
     this->LogInfo("成功读取 JSON 文件: " + filePath.string());
     Demo::Info info{};
     info.demoFileName = json["demoFileName"].get<std::string>();
