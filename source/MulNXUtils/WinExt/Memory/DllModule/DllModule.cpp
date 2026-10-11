@@ -1,8 +1,41 @@
 #include "DllModule.hpp"
-
 #include <Windows.h>
 #include <Psapi.h>
 #pragma comment(lib, "Psapi.lib")
+
+bool MulNX::Memory::DllModule::GetModuleInfo(const wchar_t* moduleName, uintptr_t& baseAddr, size_t& moduleSize) {
+    HMODULE hModule = GetModuleHandleW(moduleName);
+    if (!hModule) return false;
+
+    MODULEINFO modInfo = { 0 };
+    if (!GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(modInfo)))
+        return false;
+
+    baseAddr = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
+    moduleSize = modInfo.SizeOfImage;
+    return true;
+}
+bool MulNX::Memory::DllModule::GetTextSectionRange(uintptr_t moduleBase, uintptr_t& textStart, size_t& textSize) {
+    // DOS头
+    IMAGE_DOS_HEADER* dosHeader = (IMAGE_DOS_HEADER*)moduleBase;
+    if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) return false;
+
+    // NT头
+    IMAGE_NT_HEADERS* ntHeaders = (IMAGE_NT_HEADERS*)(moduleBase + dosHeader->e_lfanew);
+    if (ntHeaders->Signature != IMAGE_NT_SIGNATURE) return false;
+
+    // 段表起始位置
+    IMAGE_SECTION_HEADER* sections = IMAGE_FIRST_SECTION(ntHeaders);
+    for (WORD i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++) {
+        // 检查段是否包含可执行代码（IMAGE_SCN_MEM_EXECUTE 标志）
+        if (sections[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) {
+            textStart = moduleBase + sections[i].VirtualAddress;
+            textSize = sections[i].Misc.VirtualSize;
+            return true;
+        }
+    }
+    return false;
+}
 
 MulNX::Memory::DllModule::DllModule(std::wstring&& Name) : Name(std::move(Name)) {
     this->hModule = GetModuleHandleW(this->Name.c_str());
@@ -27,37 +60,31 @@ MulNX::Memory::Region MulNX::Memory::DllModule::GetTextRegion()const {
     }
     return Region(textStart, textSize);
 }
+void** MulNX::Memory::DllModule::FindIatSlot(const char* dllName, const char* funcName)const {
+    if (!Valid) return nullptr;
+    auto base = (uint8_t*)hModule;
+    auto dos = (IMAGE_DOS_HEADER*)base;
+    if (dos->e_magic != IMAGE_DOS_SIGNATURE) return nullptr;
+    auto nt = (IMAGE_NT_HEADERS*)(base + dos->e_lfanew);
+    if (nt->Signature != IMAGE_NT_SIGNATURE) return nullptr;
 
-bool MulNX::Memory::GetModuleInfo(const wchar_t* moduleName, uintptr_t& baseAddr, size_t& moduleSize) {
-    HMODULE hModule = GetModuleHandleW(moduleName);
-    if (!hModule) return false;
+    auto& dir = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+    if (!dir.VirtualAddress) return nullptr;
 
-    MODULEINFO modInfo = { 0 };
-    if (!GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(modInfo)))
-        return false;
+    auto desc = (IMAGE_IMPORT_DESCRIPTOR*)(base + dir.VirtualAddress);
+    for (; desc->Name; ++desc) {
+        if (_stricmp((const char*)(base + desc->Name), dllName) != 0) continue;
+        if (!desc->OriginalFirstThunk) continue;
 
-    baseAddr = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
-    moduleSize = modInfo.SizeOfImage;
-    return true;
-}
-bool MulNX::Memory::GetTextSectionRange(uintptr_t moduleBase, uintptr_t& textStart, size_t& textSize) {
-    // DOS头
-    IMAGE_DOS_HEADER* dosHeader = (IMAGE_DOS_HEADER*)moduleBase;
-    if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) return false;
+        auto origThunk = (IMAGE_THUNK_DATA*)(base + desc->OriginalFirstThunk);
+        auto iatThunk = (IMAGE_THUNK_DATA*)(base + desc->FirstThunk);
 
-    // NT头
-    IMAGE_NT_HEADERS* ntHeaders = (IMAGE_NT_HEADERS*)(moduleBase + dosHeader->e_lfanew);
-    if (ntHeaders->Signature != IMAGE_NT_SIGNATURE) return false;
-
-    // 段表起始位置
-    IMAGE_SECTION_HEADER* sections = IMAGE_FIRST_SECTION(ntHeaders);
-    for (WORD i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++) {
-        // 检查段是否包含可执行代码（IMAGE_SCN_MEM_EXECUTE 标志）
-        if (sections[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) {
-            textStart = moduleBase + sections[i].VirtualAddress;
-            textSize = sections[i].Misc.VirtualSize;
-            return true;
+        for (; origThunk->u1.AddressOfData; ++origThunk, ++iatThunk) {
+            if (origThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG) continue;
+            auto byName = (IMAGE_IMPORT_BY_NAME*)(base + origThunk->u1.AddressOfData);
+            if (strcmp((const char*)byName->Name, funcName) != 0) continue;
+            return (void**)&iatThunk->u1.Function;
         }
     }
-    return false;
+    return nullptr;
 }

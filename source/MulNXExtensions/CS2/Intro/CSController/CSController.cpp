@@ -19,6 +19,10 @@ bool CSController::Init() {
         .SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {return this->OnPanoramaLoad(msg);})
         ;
 
+    this->SubscribeSync("Hook/LoadLibraryExW/scenesystem.dll", [this](MulNX::Message& msg) {
+        this->scenesystem = MulNX::Memory::DllModule(L"scenesystem.dll");
+        });
+
     this->SendTask("Update", "CSControl", [this]()->bool {
         this->Update();
         return true;

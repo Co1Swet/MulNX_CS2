@@ -177,10 +177,11 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<MediaRecorder>("MediaRecorder")
         .CreateModule<MediaProcesser>("MediaProcesser")
 
-        // CS2 录制合作
+        // CS2 录制
         .CreateModule<HookRecordCmd>("HookRecordCmd")
         .CreateModule<RecordFileRedirect>("RecordFileRedirect")
         .CreateModule<AdvancedRecord>("AdvancedRecord")
+        .CreateModule<AdTimeFix>("AdTimeFix")
 
         // 管理
         .CreateModule<MulNXController>("MulNXController")

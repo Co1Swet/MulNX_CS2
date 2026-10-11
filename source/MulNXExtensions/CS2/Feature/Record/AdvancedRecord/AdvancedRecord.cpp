@@ -23,10 +23,6 @@ bool AdvancedRecord::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
     this->dirVideos = this->Path()->PathGetForShared("Videos");
 
-    this->UIRegisterCallback("UI.MediaSys/Control", [this](auto&&...) {
-        this->Menu();
-        });
-
     this->SubscribeSync("MediaSync/BeforeCopyBackbuffer", [this](MulNX::Message& msg) {
         this->HandleBeforeCopyBackbuffer(msg);
         });
@@ -41,6 +37,10 @@ bool AdvancedRecord::Init() {
             this->AsyncCommandHighPriority("host_framerate 0; endmovie");
             this->startAsAdvanced.store(false, std::memory_order_release);
         }
+        });
+
+    this->UIRegisterCallback("UI.MediaSys/Control", [this](auto&&...) {
+        this->Menu();
         });
 
     return true;

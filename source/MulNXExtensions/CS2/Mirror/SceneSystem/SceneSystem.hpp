@@ -62,9 +62,7 @@ namespace CS2 {
     };
 }
 
-class SceneSystem final :public CSModuleBase {
-    MulNX::Memory::DllModule scenesystem{};
-    
+class SceneSystem final :public CSModuleBase {    
     bool Init()override;
 public:
     using DrawCurrentPrimitives_t = void(*)(CS2::DrawingData* pDrawingData);

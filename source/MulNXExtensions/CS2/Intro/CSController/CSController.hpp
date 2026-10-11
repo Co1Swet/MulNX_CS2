@@ -29,7 +29,8 @@ public:
     void* Source2EngineToClient001 = nullptr;
     MulNX::Memory::DllModule tier0{};
     MulNX::Memory::DllModule panorama{};
-    
+    MulNX::Memory::DllModule scenesystem{};
+
     VExecutor<void* ()> GetDemo{};
 
     // CS2全局变量
