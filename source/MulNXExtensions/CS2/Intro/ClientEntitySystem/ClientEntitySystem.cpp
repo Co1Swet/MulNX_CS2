@@ -101,7 +101,7 @@ std::optional<CS2::CHandleBase> ClientEntitySystem::TryGetControllerHandle(CS2::
     }
 }
 
-CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64UID uid) {
+CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64UID uid, int* pIndex) {
     try {
         for (int i = 0; i < 32; ++i) {
             auto* controller = this->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
@@ -109,6 +109,9 @@ CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64
             if (!controller->IsPlayerController())continue;
             auto steam64UID = MulNX::MRead(controller->m_steamID());
             if (steam64UID != uid)continue;
+            if (pIndex) {
+                *pIndex = i;
+            }
             return controller;
         }
     }

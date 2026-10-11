@@ -252,7 +252,6 @@ void CamMacroManager::PlayCamMacro(const std::string& name) {
         this->LogError(std::format("目标运镜宏不存在：{}", name));
         return;
     }
-    this->PublishAsync("CameraSystem/Play/Started"_hash);
     for (const auto& item : it->second->GetVec()) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Preview"_hash);
         auto&& [previewOffset] = msg.Access<float>();

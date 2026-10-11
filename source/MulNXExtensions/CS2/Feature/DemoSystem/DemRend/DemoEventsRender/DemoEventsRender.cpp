@@ -3,13 +3,12 @@
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
 bool DemoEventsRender::Init() {
-    // 注册到时间轴
     this->FindModule<TimeLiner>("TimeLiner")->timeLineModules.push_back(this);
 
-    // 订阅所需消息
-    this->SubscribeAsync("Observe/SpecSteam64UID");
-    this->SubscribeAsync("Demo/InfoLoad");
-    this->SubscribeAsync("Demo/SetOperating");
+    (*this)
+        .SubscribeAsync("Demo/InfoLoad")
+        .SubscribeAsync("Demo/SetOperating")
+        ;
 
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
