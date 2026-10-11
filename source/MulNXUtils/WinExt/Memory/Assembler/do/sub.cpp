@@ -25,7 +25,7 @@ Asm::Assembler& Asm::Assembler::sub(Reg dst, Mem src) {
     auto base_info = get_reg_info(src.base);
 
     int disp_bytes;
-    int mod = get_mod_and_disp(dst, src.disp, disp_bytes);
+    int mod = get_mod_and_disp(src.base, src.disp, disp_bytes);
     bool need_sib = (base_info.code & 7) == 4;
 
     uint8_t rex = 0x48;

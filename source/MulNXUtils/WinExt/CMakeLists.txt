@@ -22,6 +22,7 @@ add_library(WinExt STATIC
     Memory/AddrTool/AddrTool.cpp
     Memory/Hook/Hook.cpp
     Memory/Memory.cpp
+    Memory/Assembler/do/movups.cpp
 )
 target_link_libraries(WinExt PUBLIC
     MulNXThirdParty

@@ -1,12 +1,13 @@
 #pragma once
-
 #include <vector>
 #include <cstdint>
 
-class RegContext {
+class alignas(16) RegContext {
 public:
     uint64_t rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi;
     uint64_t r8, r9, r10, r11, r12, r13, r14, r15;
+
+    alignas(16) uint8_t xmm[6][16];   // XMM0~XMM5，覆盖全部易失浮点寄存器
 };
 
 namespace MulNX {
@@ -15,6 +16,11 @@ namespace MulNX {
             enum class Reg : uint8_t {
                 RAX, RCX, RDX, RBX, RSP, RBP, RSI, RDI,
                 R8, R9, R10, R11, R12, R13, R14, R15
+            };
+
+            enum class Xmm : uint8_t {
+                XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7,
+                XMM8, XMM9, XMM10, XMM11, XMM12, XMM13, XMM14, XMM15
             };
 
             class Mem {
@@ -99,6 +105,10 @@ namespace MulNX {
                 Assembler& sub(Mem dst, Reg src);                // sub [dst], src
                 Assembler& sub(Reg dst, int32_t imm);            // sub dst, imm (符号扩展)
                 Assembler& sub(Mem dst, int32_t imm);            // sub [dst], imm (符号扩展)
+
+                // SSE 非对齐移动：xmm <-> mem
+                Assembler& movups(Mem m, Xmm src);   // 0F 11 /r
+                Assembler& movups(Xmm dst, Mem m);   // 0F 10 /r
 
                 Assembler& SaveReg();
                 Assembler& LoadReg();
