@@ -24,6 +24,7 @@ import os
 import shutil
 import sys
 import io
+import tempfile
 from pathlib import Path
 import py7zr  # 第三方库，用于创建 7z 压缩包
 
@@ -129,11 +130,28 @@ def compress_MulNX_folder(MulNX_folder: Path, output_7z_path: Path) -> Path:
     # 确保输出目录存在
     output_7z_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # 使用 py7zr 创建 7z 文件
-    with py7zr.SevenZipFile(output_7z_path, 'w') as archive:
-        # writeall 的第一个参数是要压缩的文件夹路径
-        # 第二个参数是归档内的根目录名（这里使用 'MulNX'，即解压后会出现 MulNX 文件夹）
-        archive.writeall(MulNX_folder, 'MulNX')
+    # Write and validate a temporary archive before replacing the published file.
+    with tempfile.NamedTemporaryFile(
+        prefix=f".{output_7z_path.stem}.",
+        suffix=".tmp",
+        dir=output_7z_path.parent,
+        delete=False,
+    ) as temp_file:
+        temp_archive_path = Path(temp_file.name)
+
+    try:
+        with py7zr.SevenZipFile(temp_archive_path, 'w') as archive:
+            archive.writeall(MulNX_folder, 'MulNX')
+
+        with py7zr.SevenZipFile(temp_archive_path, 'r') as archive:
+            corrupted_file = archive.testzip()
+            if corrupted_file is not None:
+                raise RuntimeError(f"压缩包校验失败: {corrupted_file}")
+
+        temp_archive_path.replace(output_7z_path)
+    finally:
+        if temp_archive_path.exists():
+            temp_archive_path.unlink()
 
     # 统计压缩包内容信息（用于打印）
     total_files = 0
@@ -191,10 +209,13 @@ def main():
     MulNX_source = script_dir / "MulNX"          # 源文件夹
     MulNX_7z_path = script_dir / "MulNX.7z"      # 最终压缩包路径
 
-    # ---- 步骤 0：检查 Output 文件夹是否存在 ----
-    if not output_path.exists():
+    # ---- 步骤 0：检查打包所需目录 ----
+    if not output_path.is_dir():
         print(f"错误: Output文件夹不存在: {output_path}")
         print("请确保脚本位于bin目录中，且存在Output文件夹")
+        return False
+    if not MulNX_source.is_dir():
+        print(f"错误: MulNX文件夹不存在: {MulNX_source}")
         return False
 
     # ---- 步骤 1：清空 Output 文件夹 ----
@@ -205,10 +226,6 @@ def main():
     # ---- 步骤 2：复制 MulNX 到 Output ----
     print("\n步骤2: 复制MulNX文件夹到Output")
     print("-" * 40)
-    if not MulNX_source.exists():
-        print(f"错误: MulNX文件夹不存在: {MulNX_source}")
-        return False
-
     MulNX_output_dir = copy_MulNX_without_pdb(MulNX_source, output_path)
 
     # ---- 步骤 3：压缩为 7z ----
@@ -229,22 +246,17 @@ def main():
     print("\n输出内容结构:")
     print("-" * 40)
     with py7zr.SevenZipFile(compress_result, 'r') as archive:
-        all_items = archive.getnames()  # 获取所有条目名称（文件或目录）
-        dirs = set()
-        files = []
-        for item in all_items:
-            if item.endswith('/'):       # 以 / 结尾的是目录
-                dirs.add(item)
-            else:
-                files.append(item)
+        archive_items = archive.list()
+        dirs = sorted(item.filename for item in archive_items if item.is_directory)
+        files = sorted(item.filename for item in archive_items if item.is_file)
 
         print("目录:")
-        for d in sorted(dirs):
-            print(f"  {d}")
+        for directory in dirs:
+            print(f"  {directory}")
 
         print("\n文件 (前20个):")
-        for f in sorted(files)[:20]:
-            print(f"  {f}")
+        for file in files[:20]:
+            print(f"  {file}")
         if len(files) > 20:
             print(f"  ... 和 {len(files) - 20} 个其他文件")
 
@@ -258,7 +270,7 @@ if __name__ == "__main__":
             sys.exit(1)
     except KeyboardInterrupt:
         print("\n\n操作被用户中断")
-        sys.exit(0)
+        sys.exit(130)
     except Exception as e:
         print(f"\n错误: {e}")
         import traceback
