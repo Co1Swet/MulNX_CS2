@@ -109,12 +109,12 @@ namespace MulNX {
         std::vector<std::string> quoted;   // 引号内的字符串，最多 maxQuoted 个
         std::string_view rest;             // 剩余部分，交给 CreateFiller
     };
-
     // 解析 payload 最前面的引号字符串
     // 约定：
     //   - 引号字符串必须位于最前面，最多 maxQuoted 个
     //   - 引号内可含空格
-    //   - 不支持转义，字符串内不能出现双引号
+    //   - 支持转义：\" -> "，\\ -> \
+    //   - 其他 \x 原样保留（宽容策略）
     //   - 未闭合引号抛 std::runtime_error
     inline ParsedPayload ParseQuotedPayload(std::string_view payload, size_t maxQuoted = 2) {
         ParsedPayload result;
@@ -125,24 +125,45 @@ namespace MulNX {
             // 跳过前导空格
             while (pos < n && payload[pos] == ' ') ++pos;
             if (pos >= n) break;
-            if (payload[pos] != '"') break;   // 不是引号，停止
+            if (payload[pos] != '"') break;
 
             ++pos; // 跳过开引号
-            size_t start = pos;
-            while (pos < n && payload[pos] != '"') ++pos;
-            if (pos >= n)
+            std::string value;
+            bool closed = false;
+
+            while (pos < n) {
+                char c = payload[pos];
+                if (c == '\\' && pos + 1 < n) {
+                    char next = payload[pos + 1];
+                    if (next == '"' || next == '\\') {
+                        value += next;
+                        pos += 2;
+                        continue;
+                    }
+                    // 未知转义：原样保留反斜杠
+                    value += c;
+                    ++pos;
+                    continue;
+                }
+                if (c == '"') {
+                    closed = true;
+                    ++pos;
+                    break;
+                }
+                value += c;
+                ++pos;
+            }
+
+            if (!closed)
                 throw std::runtime_error("ParseQuotedPayload: unterminated quote");
 
-            result.quoted.emplace_back(payload.substr(start, pos - start));
-            ++pos; // 跳过闭引号
+            result.quoted.push_back(std::move(value));
         }
-
         // 跳过引号与 Pod 之间的空格
         while (pos < n && payload[pos] == ' ') ++pos;
         result.rest = payload.substr(pos);
         return result;
     }
-
     // 判断参数包是否包含“真正的 Pod 参数”
     // 空包和 <void> 都视为“没有 Pod 参数”
     template<typename... Args>
@@ -150,7 +171,6 @@ namespace MulNX {
         sizeof...(Args) > 0 &&
         !(sizeof...(Args) == 1 &&
             std::is_same_v<void, std::tuple_element_t<0, std::tuple<Args...>>>);
-
     // Ex 包装器：
     //   1. 先解析 payload 最前面的引号字符串，存入 msg.asp 的 NetExt
     //   2. 剩余部分交给原 CreateFiller<PodArgs...> 写入 msg.extra

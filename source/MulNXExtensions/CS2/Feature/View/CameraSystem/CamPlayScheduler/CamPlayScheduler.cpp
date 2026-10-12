@@ -7,8 +7,8 @@ bool CamPlayScheduler::Init() {
 
     (*this)
         .SubscribeAsync("CamPlay/Request")
-        .SubscribeAsync("CamPlay/Clear")
-        .SubscribeAsync("CamPlay/ClearForce")
+        .SubscribeAsync<void>("CamPlay/Clear")
+        .SubscribeAsync<void>("CamPlay/ClearForce")
 
         .SubscribeAsync<void>("CamPlay/Draw/Enable")
         .SubscribeAsync<void>("CamPlay/Draw/Disable")
