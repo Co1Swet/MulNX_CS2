@@ -175,7 +175,7 @@ MulNX::Hook::Then TrailsController::HandleOnCreate(CS2::C_BaseCSGrenadeProjectil
             return MulNX::Hook::Then::Continue;
 
         *pProjectile->m_nSnapshotTrajectoryEffectIndex() = newIdx;
-        *pProjectile->m_flTrajectoryTrailEffectCreationTime() = MulNX::MRead(this->CS2->CSGlobalVars->fCurrentTime());
+        *pProjectile->m_flTrajectoryTrailEffectCreationTime() = MulNX::MRead(&this->CS2->CSGlobalVars->curtime);
         this->pParticleMgr->UpdateParticle(newIdx, 0x3, &this->prop, 0);
         this->pParticleMgr->UpdateParticle(newIdx, 0x10, &bColor.value(), 0);
         return MulNX::Hook::Then::Continue;

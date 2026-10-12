@@ -16,7 +16,7 @@ bool CamMacroManager::Init() {
     (*this)
         .SubscribeAsync("CamMacro/Create")
         .SubscribeAsync("CamMacro/Delete")
-        .SubscribeAsync("CamMacro/Play")
+        .SubscribeAsyncEx<void>("CamMacro/Play")
         .SubscribeAsync("CamMacro/OpenDebug")
         .SubscribeAsync("CamMacro/DebugKCP")
         .SubscribeAsync("CamMacro/ClearOne")

@@ -61,6 +61,16 @@ namespace MulNX {
             }
             return *this;
         }
+        template<typename... PodArgs>
+        auto& SubscribeAsyncEx(const std::string& msgType, Detail::InitOnly = {}) {
+            auto handler = MulNX::MakeExFiller<PodArgs...>();
+            This()->MainMsgChannel->SubscribeAsync(msgType, std::move(handler));
+
+            auto full = std::format("{} Ex With PodArgs: {}",
+                msgType, MulNX::GetTypeString<PodArgs...>());
+            This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+            return *this;
+        }
 
         void PublishAsync(MulNX::Message&& msg)const {
             this->pMsgManager->PublishAsync(std::move(msg));

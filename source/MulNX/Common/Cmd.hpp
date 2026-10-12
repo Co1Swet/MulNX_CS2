@@ -103,4 +103,77 @@ namespace MulNX {
             }(std::make_index_sequence<sizeof...(ArgTs)>{});
             };
     }
+
+    // 前导引号字符串 + 剩余 payload
+    struct ParsedPayload {
+        std::vector<std::string> quoted;   // 引号内的字符串，最多 maxQuoted 个
+        std::string_view rest;             // 剩余部分，交给 CreateFiller
+    };
+
+    // 解析 payload 最前面的引号字符串
+    // 约定：
+    //   - 引号字符串必须位于最前面，最多 maxQuoted 个
+    //   - 引号内可含空格
+    //   - 不支持转义，字符串内不能出现双引号
+    //   - 未闭合引号抛 std::runtime_error
+    inline ParsedPayload ParseQuotedPayload(std::string_view payload, size_t maxQuoted = 2) {
+        ParsedPayload result;
+        size_t pos = 0;
+        const size_t n = payload.size();
+
+        while (result.quoted.size() < maxQuoted) {
+            // 跳过前导空格
+            while (pos < n && payload[pos] == ' ') ++pos;
+            if (pos >= n) break;
+            if (payload[pos] != '"') break;   // 不是引号，停止
+
+            ++pos; // 跳过开引号
+            size_t start = pos;
+            while (pos < n && payload[pos] != '"') ++pos;
+            if (pos >= n)
+                throw std::runtime_error("ParseQuotedPayload: unterminated quote");
+
+            result.quoted.emplace_back(payload.substr(start, pos - start));
+            ++pos; // 跳过闭引号
+        }
+
+        // 跳过引号与 Pod 之间的空格
+        while (pos < n && payload[pos] == ' ') ++pos;
+        result.rest = payload.substr(pos);
+        return result;
+    }
+
+    // 判断参数包是否包含“真正的 Pod 参数”
+    // 空包和 <void> 都视为“没有 Pod 参数”
+    template<typename... Args>
+    inline constexpr bool HasPodArgs =
+        sizeof...(Args) > 0 &&
+        !(sizeof...(Args) == 1 &&
+            std::is_same_v<void, std::tuple_element_t<0, std::tuple<Args...>>>);
+
+    // Ex 包装器：
+    //   1. 先解析 payload 最前面的引号字符串，存入 msg.asp 的 NetExt
+    //   2. 剩余部分交给原 CreateFiller<PodArgs...> 写入 msg.extra
+    //   3. <void> / <> 视为无 Pod 参数，只处理字符串，忽略剩余部分
+    // 约束：
+    //   - 字符串最多两个，位于最前，用双引号包裹
+    //   - 字符串内不允许出现双引号，暂不支持转义
+    //   - SubscribeAsyncEx 必须是该消息类型的首次订阅
+    template<typename... PodArgs>
+    std::function<void(Message&, std::string_view)> MakeExFiller() {
+        return [](Message& msg, std::string_view payload) {
+            auto parsed = ParseQuotedPayload(payload, 2);
+
+            if (!parsed.quoted.empty()) {
+                auto [asp, pNetExt] = MulNX::make_any_shared<MulNX::NetExt>();
+                if (parsed.quoted.size() >= 1) pNetExt->str1 = std::move(parsed.quoted[0]);
+                if (parsed.quoted.size() >= 2) pNetExt->str2 = std::move(parsed.quoted[1]);
+                msg.asp = std::move(asp);
+            }
+
+            if constexpr (HasPodArgs<PodArgs...>) {
+                CreateFiller<PodArgs...>()(msg, parsed.rest);
+            }
+            };
+    }
 } // namespace MulNX
