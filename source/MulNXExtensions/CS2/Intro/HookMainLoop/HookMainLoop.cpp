@@ -1,4 +1,5 @@
 #include "HookMainLoop.hpp"
+#include <Intro/HookConsole/HookConsole.hpp>
 #include <Support/TimeController/TimeController.hpp>
 
 bool HookMainLoop::Init() {
@@ -31,6 +32,27 @@ bool HookMainLoop::Init() {
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->RegisterAttachHook(this->hkPos_PhysicsCreated, "Pos_PhysicsCreated");
+        });
+
+    this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
+        auto&& [pCmd] = msg.Access<CCmd*>();
+        std::string_view name = pCmd->m_pszName;
+        if (name == "quit") {
+            this->hkQuit = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
+                int result = MessageBoxW(NULL,
+                    L"要关闭游戏前，必须先卸载 MulNX。\n点击“确定”卸载 MulNX，之后可再次尝试关闭游戏。",
+                    L"MulNX 警告",
+                    MB_OKCANCEL | MB_ICONWARNING | MB_TOPMOST
+                    );
+                if (result == IDOK) {
+                    this->LogWarning(I18n("sys.shutdown_warning"));
+                    this->Core->Driver()->smutex.unlock();
+                }
+                ctx->rax = 0;
+                return MulNX::Hook::Then::Return;
+                }).value();
+            this->RegisterAttachHook(this->hkQuit, "Quit");
+        }
         });
 
     return true;

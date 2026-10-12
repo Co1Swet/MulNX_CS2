@@ -16,20 +16,12 @@ bool HookDemo::Init() {
             this->HookDemoGotoTick(pCmd);
         }
         if (name == "demo_timescale") {
-            auto static hkdemo_timescale = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
+            this->hkDemeTimescale = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
                 this->LogError("demo_timescale 被禁用！请使用host_timescale替代！");
                 ctx->rax = 0;
                 return MulNX::Hook::Then::Return;
                 }).value();
-            hkdemo_timescale->Attach();
-        }
-        if (name == "quit") {
-            auto static hkdemo_timescale = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
-                this->LogError("demo_timescale 被禁用！请使用host_timescale替代！");
-                ctx->rax = 0;
-                return MulNX::Hook::Then::Return;
-                }).value();
-            hkdemo_timescale->Attach();
+            this->RegisterAttachHook(this->hkDemeTimescale, "DemeTimescale");
         }
         });
 

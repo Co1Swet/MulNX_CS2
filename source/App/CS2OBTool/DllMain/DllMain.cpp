@@ -35,6 +35,7 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 关键底层支持
         .CreateModule<GFuncBind>("GFuncBind")
+        .CreateModule<HookDemo>("HookDemo")
         .CreateModule<ClientEntitySystem>("ClientEntitySystem")
         .CreateModule<BackgroundEntityScan>("BackgroundEntityScan")
         .CreateModule<HookConsole>("HookConsole")
@@ -122,7 +123,6 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 Demo 相关模块
         .CreateModule<DemState>("DemState")
-        .CreateModule<HookDemo>("HookDemo")
         .CreateModule<DemoHelper>("DemoHelper")
         
         .CreateModule<DemoFiles>("DemoFiles")
