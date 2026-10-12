@@ -10,7 +10,6 @@ class TextureMapper final :public MediaModuleBase {
     DXGI_FORMAT stagingFormat = DXGI_FORMAT_UNKNOWN;
     int stagingWidth = 0, stagingHeight = 0;
     av::PixelFormat srcPixelFormat = AV_PIX_FMT_NONE;
-    std::vector<uint8_t> readbackBuf;
     std::atomic<bool> nextFrameRelease = false;
 
     bool Init()override;

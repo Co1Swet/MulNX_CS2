@@ -12,8 +12,6 @@ bool TextureMapper::Init() {
 }
 
 void TextureMapper::ReleaseStagingTexture() {
-    this->readbackBuf.clear();
-    this->readbackBuf.shrink_to_fit();
     this->srcPixelFormat = AV_PIX_FMT_NONE;
     if (this->pStagingTex) {
         this->pStagingTex->Release();
@@ -78,14 +76,11 @@ std::optional<av::VideoFrame> TextureMapper::MapFrame(MidTex& tex) {
         return std::nullopt;
     size_t rowBytes = (size_t)this->stagingWidth * 4;
     size_t total = rowBytes * (size_t)this->stagingHeight;
-    if (this->readbackBuf.size() < total) this->readbackBuf.resize(total);
-    for (UINT r = 0; r < (UINT)this->stagingHeight; ++r)
-        memcpy(this->readbackBuf.data() + rowBytes * r,
-            (const uint8_t*)map.pData + (size_t)map.RowPitch * r, rowBytes);
-    this->pVCD3D11Manager->pReadSideContext->Unmap(this->pStagingTex, 0);
 
-    av::VideoFrame frame(this->readbackBuf.data(), total, this->srcPixelFormat,
+    av::VideoFrame frame((uint8_t*)map.pData, total, this->srcPixelFormat,
         this->stagingWidth, this->stagingHeight);
+
+    this->pVCD3D11Manager->pReadSideContext->Unmap(this->pStagingTex, 0);
 
     return frame;
 }
