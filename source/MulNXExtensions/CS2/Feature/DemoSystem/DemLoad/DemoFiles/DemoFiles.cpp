@@ -1,9 +1,24 @@
 #include "DemoFiles.hpp"
 
+void OpenFolder(const std::wstring& wpath) {
+    ::ShellExecuteW(
+        nullptr,          // 父窗口 HWND，可填你窗口句柄
+        L"open",          // 动词：open / explore 都行
+        wpath.c_str(),    // 文件夹路径
+        nullptr,          // 参数（文件夹不需要）
+        nullptr,          // 工作目录（默认）
+        SW_SHOWNORMAL     // 显示方式
+    );
+}
+
 void DemoFiles::Menu() {
     std::unique_lock lock(this->smutex);
 
-    if (ImGui::Button(I18n("demo.refresh").c_str())) {
+    if (ImGui::Button("打开Demo文件夹")) {
+        OpenFolder(this->CS2Paths->demo.wstring());
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("刷新软件Demo列表")) {
         this->PublishAsync("Demo/Refresh"_hash);
     }
 

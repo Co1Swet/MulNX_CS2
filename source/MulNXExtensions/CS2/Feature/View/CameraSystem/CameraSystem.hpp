@@ -13,7 +13,6 @@ class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraS
     CamMacroManager* pCamMacroManager = nullptr;
     CamPackManager* pCamPackManager = nullptr;
     class CamPlayScheduler* pCamPlayScheduler = nullptr;
-    MulNX::IPCer* pIPCer = nullptr;
 
     void ProcessMsg(MulNX::Message& msg)override;
     void Window(MulNX::UICoordinator* uico);

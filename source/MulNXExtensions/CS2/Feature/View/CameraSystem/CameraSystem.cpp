@@ -67,7 +67,6 @@ bool CameraSystem::Init() {
     this->pCamMacroManager = this->FindModule<CamMacroManager>("CamMacroManager");
     this->pCamPackManager = this->FindModule<CamPackManager>("CamPackManager");
     this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>("CamPlayScheduler");
-    this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     this->Path()->CreateKey("kCamPacks", {}, [this](MulNX::PathManager* PathManager)->bool {
         return true;
