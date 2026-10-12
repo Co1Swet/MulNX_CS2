@@ -3,8 +3,8 @@
 bool HookConsole::Init() {
     this->CS2Cmds.reserve(100);
     (*this)
-        .SubscribeAsync("Game/Command")
-        .SubscribeAsync("Game/Command/NoReport")
+        .SubscribeAsyncEx<void>("Game/Command")
+        .SubscribeAsyncEx<void>("Game/Command/NoReport")
         ;
 
     this->SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {

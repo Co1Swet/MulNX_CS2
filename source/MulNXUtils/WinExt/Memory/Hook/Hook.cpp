@@ -233,6 +233,7 @@ MulNX::Hook::Result MulNX::Hook::Attach() {
         DWORD old;
         VirtualProtect(this->hookTarget, this->overrideSize, PAGE_EXECUTE_READWRITE, &old);
         memcpy(this->hookTarget, this->jumperAsmCode.data(), this->overrideSize);
+        FlushInstructionCache(GetCurrentProcess(), this->hookTarget, this->overrideSize);
         VirtualProtect(this->hookTarget, this->overrideSize, old, &old);
 
         this->attached = true;
@@ -250,6 +251,7 @@ MulNX::Hook::Result MulNX::Hook::Detach() {
         DWORD old;
         VirtualProtect(this->hookTarget, this->overrideSize, PAGE_EXECUTE_READWRITE, &old);
         memcpy(this->hookTarget, this->hookTargetRawCode.data(), this->overrideSize);
+        FlushInstructionCache(GetCurrentProcess(), this->hookTarget, this->overrideSize);
         VirtualProtect(this->hookTarget, this->overrideSize, old, &old);
 
         this->attached = false;
