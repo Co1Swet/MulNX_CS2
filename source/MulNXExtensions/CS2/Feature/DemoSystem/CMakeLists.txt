@@ -1,5 +1,4 @@
 add_library(DemoSystem STATIC
-    DemBase/HookDemo/HookDemo.cpp
     DemBase/DemoHelper/DemoHelper.cpp
 
     DemLoad/DemoAnalyzer/DemoAnalyzer.cpp

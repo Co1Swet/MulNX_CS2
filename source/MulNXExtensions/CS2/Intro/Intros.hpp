@@ -11,3 +11,4 @@
 #include "GFuncBind/GFuncBind.hpp"
 #include "ClientEntitySystem/ClientEntitySystem.hpp"
 #include "HookMainLoop/HookMainLoop.hpp"
+#include "HookDemo/HookDemo.hpp"

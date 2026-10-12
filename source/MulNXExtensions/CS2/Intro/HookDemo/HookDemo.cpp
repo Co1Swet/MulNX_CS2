@@ -79,7 +79,6 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
     }
     size_t end = rawPath.find_last_not_of(" \t");
     rawPath = rawPath.substr(start, end - start + 1);
-
     // 去除可能存在的成对引号
     if (rawPath.size() >= 2) {
         if ((rawPath.front() == '"' && rawPath.back() == '"') ||
@@ -87,13 +86,11 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
             rawPath = rawPath.substr(1, rawPath.size() - 2);
         }
     }
-
     auto& dirDemos = this->CS2Paths->demo;
     fs::path demoPath(rawPath);
     if (!demoPath.is_absolute()) {
         demoPath = dirDemos / demoPath;
     }
-
     // 检查文件是否存在，若不存在且缺少 .dem 后缀则自动补全
     bool fileFound = false;
     if (fs::exists(demoPath) && fs::is_regular_file(demoPath)) {
@@ -106,30 +103,23 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
         if (fs::exists(tryPath) && fs::is_regular_file(tryPath)) {
             demoPath = tryPath;
             fileFound = true;
-            this->LogWarning(std::format("已自动补充 .dem 后缀: {}", demoPath.string()));
+            this->LogInfo(std::format("已自动补充 .dem 后缀: {}", demoPath.string()));
         }
     }
-
     if (!fileFound) {
         this->LogError(std::format("找不到Demo文件: {}", demoPath.string()));
         return;
     }
-
     // 最终确定，输出播放日志
     this->LogInfo(std::format("播放Demo: {}", demoPath.string()));
 
-    // 发送分析请求（包含完整路径）
-    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
+    // 发送设置当前播放的 Demo（全文件系统路径）
+    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetPlaying"_hash);
     rp->str1 = demoPath.string();
     this->PublishAsync(std::move(msg));
 
-    auto name = demoPath.stem().string();
-    this->pDemState->currentPlayingDemoName = std::make_shared<std::string>(name);
-
     // 发送设置当前操作的 Demo（使用不带扩展名的文件名）
     auto [msg2, rp2] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-    rp2->str1 = std::move(name);
+    rp2->str1 = std::move(demoPath.stem().string());
     this->PublishAsync(std::move(msg2));
-
-    this->PublishAsync("Demo/NewPlay"_hash);
 }

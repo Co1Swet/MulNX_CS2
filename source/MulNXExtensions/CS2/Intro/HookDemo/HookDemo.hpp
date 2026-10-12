@@ -1,8 +1,7 @@
 #pragma once
 #include <Intro/HookConsole/HookConsole.hpp>
-#include <Feature/DemoSystem/DemBase/DemModuleBase.hpp>
 
-class HookDemo final :public DemModuleBase {
+class HookDemo final :public CSModuleBase {
     std::unique_ptr<MulNX::Hook> hkPlaydemo{};
     std::unique_ptr<MulNX::Hook> hkDemoGotoTick{};
     MulNX::Hook::Then OnCmdPlayDemo(MulNX::Hook* hk, RegContext* ctx);
