@@ -8,4 +8,5 @@
 #include "DemRecord/DemoRecorder/DemoRecorder.hpp"
 #include "DemRend/DemoEventsRender/DemoEventsRender.hpp"
 #include "DemRend/DemoPlayerInfoRender/DemoPlayerInfoRender.hpp"
+#include "TaskMaking/DemOneKillMaker/DemOneKillMaker.hpp"
 #include "DemoSystem.hpp"

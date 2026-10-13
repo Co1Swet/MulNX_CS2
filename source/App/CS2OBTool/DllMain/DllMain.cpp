@@ -128,6 +128,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<DemoFiles>("DemoFiles")
         .CreateModule<DemoAnalyzer>("DemoAnalyzer")
         .CreateModule<DemoJSONReader>("DemoJSONReader")
+        .CreateModule<DemOneKillMaker>("DemOneKillMaker")
 
         .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
         .CreateModule<RecordTaskMaker>("RecordTaskMaker")

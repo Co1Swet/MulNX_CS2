@@ -9,7 +9,7 @@ void RecordTaskMaker::PublishRecordTask(RecordTask&& rTask) {
     this->PublishAsync(std::move(msg));
 }
 
-bool RecordTaskMaker::DemoChooseMenu(Demo::Info*& pDemoInfo) {
+std::shared_ptr<const Demo::Info> RecordTaskMaker::DemoChooseMenu(MulNX::UICoordinator* uico) {
     ImGui::Text("选择demo：");
 
     auto pPlaying = this->pDemState->currentPlayingDemoName.load();
@@ -23,30 +23,19 @@ bool RecordTaskMaker::DemoChooseMenu(Demo::Info*& pDemoInfo) {
         }
     }
 
-    for (const auto& [name, demo] : this->demos) {
-        if (ImGui::Button(name.c_str())) {
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-            rp->str1 = name;
-            this->PublishAsync(std::move(msg));
-        }
-        ImGui::SameLine();
-    }
-    ImGui::NewLine();
+    uico->CallbackCall("UI.Demo.Choose"_hash, nullptr);
 
     auto pOperating = this->pDemState->currentOperatingDemoName.load();
     if (!pOperating) {
         ImGui::Text("未选中任何demo");
-        return false;
+        return nullptr;
     }
-
-    const auto& curOpDemoName = *pOperating;
-    auto it = this->demos.find(curOpDemoName);
-    if (it == this->demos.end()) {
+    auto pDemo = this->pDemState->GetDemoInfo(*pOperating);
+    if (!pDemo) {
         ImGui::Text("未选中任何demo");
-        return false;
+        return nullptr;
     }
-    pDemoInfo = &it->second;
-    return true;
+    return pDemo;
 }
 
 void RecordTaskMaker::DemoMetaMenu(const Demo::Info& demoInfo) {
@@ -136,9 +125,11 @@ std::optional<RecordTask> RecordTaskMaker::CreatePlayFullRoundRTask(const int& r
     return rTask;
 }
 
-void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::PlayerRoundInfo& info,
-    const Demo::Player& player, const Demo::Info& demoInfo) {
-    
+void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& player, const Demo::Info& demoInfo) {
+    auto pOperating = this->pDemState->currentOperatingDemoName.load();
+    if (!pOperating)return;
+    const auto& info = player.roundInfo.at(round);
+
     if (!this->showBekillEvent && info.killEvents.empty())return;
     ImGui::Separator();
 
@@ -181,28 +172,22 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::PlayerRoundI
         // 列0：单事件录制按钮
         ImGui::TableSetColumnIndex(0);
         if (btn.Next("录制")) {
-            RecordTask rTask;
-            rTask.uid = ev.killerSteamId;
-            rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
-            rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
-            rTask.desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
-                demoInfo.GetPlayerName(ev.killerSteamId),
-                demoInfo.GetPlayerName(ev.victimSteamId),
-                rTask.tickStart, rTask.tickEnd);
-
-            this->PublishRecordTask(std::move(rTask));
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/Kill"_hash);
+            rp->str1 = *pOperating;
+            auto&& [uid, rRound, rIdx] = msg.Access<Steam64UID, size_t, size_t>();
+            uid = ev.killerSteamId;
+            rRound = round;
+            rIdx = idx;
+            this->PublishAsync(std::move(msg));
         }
         ImGui::SameLine();
         if (btn.Next("受害者视角")) {
-            RecordTask rTask;
-            rTask.uid = ev.victimSteamId;
-            rTask.tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
-            rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
-            rTask.desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
-                demoInfo.GetPlayerName(ev.victimSteamId),
-                demoInfo.GetPlayerName(ev.killerSteamId),
-                rTask.tickStart, rTask.tickEnd);
-            this->PublishRecordTask(std::move(rTask));
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/Death"_hash);
+            rp->str1 = *pOperating;
+            auto&& [uid, rRound] = msg.Access<Steam64UID, size_t>();
+            uid = ev.victimSteamId;
+            rRound = round;
+            this->PublishAsync(std::move(msg));
         }
 
         // 列1-4：事件信息
@@ -239,15 +224,12 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::PlayerRoundI
 
         ImGui::TableSetColumnIndex(0);
         if (btn.Next("录制被击杀")) {
-            RecordTask rTask;
-            rTask.uid = ev.victimSteamId;
-            rTask.tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
-            rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
-            rTask.desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
-                demoInfo.GetPlayerName(ev.victimSteamId),
-                demoInfo.GetPlayerName(ev.killerSteamId),
-                rTask.tickStart, rTask.tickEnd);
-            this->PublishRecordTask(std::move(rTask));
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/Death"_hash);
+            rp->str1 = *pOperating;
+            auto&& [uid, rRound] = msg.Access<Steam64UID, size_t>();
+            uid = ev.victimSteamId;
+            rRound = round;
+            this->PublishAsync(std::move(msg));
         }
 
         ImGui::TableSetColumnIndex(1); ImGui::Text("%d", ev.tick);
@@ -262,10 +244,10 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     if (!w || !w.ShouldDraw())return;
     std::shared_lock lock(this->smutex);
 
-    Demo::Info* pDemoInfo = nullptr;
-    if (!this->DemoChooseMenu(pDemoInfo))return;
+    auto pDemoInfo = this->DemoChooseMenu(uico);
+    if (!pDemoInfo)return;
     ImGui::Separator();
-    Demo::Info& demoInfo = *pDemoInfo;
+    auto& demoInfo = *pDemoInfo;
 
     this->DemoMetaMenu(demoInfo);
     ImGui::Separator();
@@ -314,42 +296,13 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
         }
 
         if (player.roundInfo.contains(i)) {
-            const auto& info = player.roundInfo.at(i);
-            this->RoundPlayerMenu(i, info, player, demoInfo);
+            this->RoundPlayerMenu(i, player, demoInfo);
         }
     }
 }
 
 bool RecordTaskMaker::Init() {
-    this->pConfiger = this->Core->ModuleManager()->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
-
-    (*this)
-        .SubscribeAsync("Demo/SetOperating")
-        .SubscribeAsync("Demo/InfoLoad");
-
+    this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
     this->UIRegisterCallback("UI.Demos", [this](auto uico, auto&&...) {return this->Window(uico);});
-
-    this->SendTask("Update", "DemoSys", [this]()->bool {
-        this->Update();
-        return true;
-        });
-
     return true;
-}
-
-void RecordTaskMaker::ProcessMsg(MulNX::Message& msg) {
-    switch (msg.type) {
-    case "Demo/InfoLoad"_hash: {
-        std::unique_lock lock(this->smutex);
-        auto demoInfo = *msg.asp.get<Demo::Info>();
-        this->demos[demoInfo.demoFileName] = std::move(demoInfo);
-        break;
-    }
-    case "Demo/SetOperating"_hash: {
-        std::unique_lock lock(this->smutex);
-        this->pDemState->currentOperatingDemoName =
-            std::make_shared<std::string>(msg.asp.get<MulNX::NetExt>()->str1);
-        break;
-    }
-    }
 }
