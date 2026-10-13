@@ -26,14 +26,17 @@ bool CamMacroManager::Init() {
         ;
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         this->CamMacroClearAll();
         });
 
     this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         this->CamMacroSaveAll();
         });
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         auto dirCamMacros = this->Path()->PathGetFromKey("kCamMacros");
         auto camMacroNames = this->pIPCer->GetFileNamesByPath(dirCamMacros);
         for (const auto& camMacroName : camMacroNames) {
@@ -187,7 +190,7 @@ bool CamMacroManager::CamMacroSaveAll() {
 bool CamMacroManager::CamMacroLoad(const fs::path& pathMacro) {
     this->LogInfo(std::format("尝试从yaml文件加载运镜宏：{}", pathMacro.string()));
     if (!fs::exists(pathMacro)) {
-        this->LogError(std::format("yaml文件不存在：", pathMacro.string()));
+        this->LogError(std::format("yaml文件不存在：{}", pathMacro.string()));
         return false;
     }
     try {

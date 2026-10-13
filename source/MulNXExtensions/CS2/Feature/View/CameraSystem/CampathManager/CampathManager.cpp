@@ -12,7 +12,7 @@ bool CampathManager::Init() {
     auto* PathManager = this->Path();
     PathManager->CreateKey("kCampaths", "Campaths", [this](MulNX::PathManager* PathManager)->bool {
         auto Path = PathManager->PathGetFromKey("kCampaths");
-        this->LogSucc("成功设置运镜轨道资源路径为：" + Path.string());
+        this->LogSucc(std::format("成功设置运镜轨道资源路径为：{}", Path.string()));
         return true;
         });
     PathManager->KeyBindDynamic("kCampaths", "kCurrentPack");
@@ -32,14 +32,17 @@ bool CampathManager::Init() {
         ;
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         this->CampathClearAll();
         });
 
     this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         this->CampathSaveAll();
         });
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         fs::path dirCampaths = this->Path()->PathGetFromKey("kCampaths");
         std::vector<std::string> campathNames = this->pIPCer->GetFileNamesByPath(dirCampaths);
         for (const std::string& campathName : campathNames) {
@@ -232,7 +235,7 @@ bool CampathManager::CampathLoad(const fs::path& pathCampath) {
     this->LogInfo(std::format("尝试从磁盘文件加载运镜轨道，文件路径：{}", pathCampath.string()));
     // 检查文件本身存在性
     if (!fs::exists(pathCampath)) {
-        this->LogError("磁盘文件不存在！文件路径：" + pathCampath.string());
+        this->LogError(std::format("磁盘文件不存在！文件路径：{}", pathCampath.string()));
         return false;
     }
 
@@ -257,6 +260,7 @@ bool CampathManager::CampathLoad(const fs::path& pathCampath) {
         auto [ok, msg] = pCampath->Load(root);
         if (!ok) {
             this->LogError(std::move(msg));
+            this->campaths.erase(newCampathName);
             return false;
         }
         this->LogSucc(std::move(msg));

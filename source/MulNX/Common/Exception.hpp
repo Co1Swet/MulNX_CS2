@@ -11,7 +11,7 @@ namespace MulNX {
             std::source_location loc = std::source_location::current())
             : std::runtime_error(msg), where(loc) {}
 
-        std::string Where() {
+        std::string Where()const {
             return std::format("{}:{}", this->where.file_name(), this->where.line());
         }
     };

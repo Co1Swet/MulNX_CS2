@@ -91,14 +91,14 @@ void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message
         auto hash = MulNX::HashString(type);
 
         auto it = this->trans.find(hash);
-        if (it == this->trans.end())throw MulNX::Exception("unregister cmd" + type);
+        if (it == this->trans.end())throw MulNX::Exception(std::format("unregister cmd: {}", type));
 
         MulNX::Message msg(hash);
         try {
             it->second(msg, payload);
         }
         catch (std::exception& e) {
-            throw MulNX::Exception("trans fail" + *e.what());
+            throw MulNX::Exception(std::format("trans fail: {}", e.what()));
         }
 
         this->PublishAsync(std::move(msg));
@@ -108,10 +108,10 @@ void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message
     catch (const websocketpp::exception& e) {
         error = std::format("error: {} desc: {}", netMsg->get_payload(), e.what());
     }
-    catch (MulNX::Exception& e) {
+    catch (const MulNX::Exception& e) {
         error = std::format("error: {} desc: {} on: {}", netMsg->get_payload(), e.what(), e.Where());
     }
-    catch (std::exception& e) {
+    catch (const std::exception& e) {
         error = std::format("error: {} desc: {}", netMsg->get_payload(), e.what());
     }
     catch (...) {

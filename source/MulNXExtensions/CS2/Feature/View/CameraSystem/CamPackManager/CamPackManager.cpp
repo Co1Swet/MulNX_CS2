@@ -28,7 +28,7 @@ bool CamPackManager::Init() {
 
     (*this)
         .SubscribeAsync("CamPack/Create")
-        .SubscribeAsync("CamPack/Apply")
+        .SubscribeAsyncEx<void>("CamPack/Apply")
         .SubscribeAsync("CamPack/Delete")
         .SubscribeAsync("CamPack/ClearAll")
         .SubscribeAsync("CamPack/Save")
@@ -40,6 +40,7 @@ bool CamPackManager::Init() {
         ;
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         auto dirCamPacks = this->Path()->PathGetFromKey("kCamPacks");
         auto camPackNames = this->pIPCer->GetDirNamesByPath(dirCamPacks);
         if (camPackNames.empty())return;
@@ -53,6 +54,7 @@ bool CamPackManager::Init() {
         });
 
     this->SubscribeSync("CamSync/SaveAll", [this](auto&&...) {
+        std::unique_lock lock(this->smutex);
         this->CamPackSave();
         });
 
