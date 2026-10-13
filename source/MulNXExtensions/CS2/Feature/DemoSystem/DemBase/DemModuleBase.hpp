@@ -13,7 +13,8 @@ public:
     int tickEnd{};
     // 回合开始tick（用于跳转到起点）
     int tickRoundStart{};
-
+    // 没有扩展名的文件名，不包括路径
+    std::string fileNameNoExt{};
     // 一个在录制时每帧调用的回调
     std::function<bool(int curTick, RecordTask* pRTask)>onPlaying{};
 };

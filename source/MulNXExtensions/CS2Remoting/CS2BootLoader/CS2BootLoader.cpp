@@ -31,19 +31,19 @@ VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
 
 
     if (ImGui::Button(I18n("boot.game_path.select").c_str())) {
-        static char filePath[MAX_PATH] = {};
+        static wchar_t filePath[MAX_PATH] = {};
 
-        OPENFILENAMEA ofn = {};
+        OPENFILENAMEW ofn = {};
         ofn.lStructSize = sizeof(ofn);
         ofn.hwndOwner = GetActiveWindow();
-        ofn.lpstrFilter = "可执行文件\0*.exe\0所有文件\0*.*\0";
+        ofn.lpstrFilter = L"可执行文件\0*.exe\0所有文件\0*.*\0";
         ofn.lpstrFile = filePath;
         ofn.nMaxFile = MAX_PATH;
         ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
 
-        if (GetOpenFileNameA(&ofn)) {
+        if (GetOpenFileNameW(&ofn)) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CS2BootLoader/PathUpdate"_hash);
-            rp->str1 = filePath;
+            rp->str1 = MulNX::CharUtility::WToU8(filePath);
             this->PublishAsync(std::move(msg));
         }
     }

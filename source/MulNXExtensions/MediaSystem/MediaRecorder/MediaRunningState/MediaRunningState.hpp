@@ -21,4 +21,6 @@ public:
     std::atomic<RecordState> recordState = RecordState::Free;
 
     std::atomic<std::shared_ptr<fs::path>> pCurrentOutputDir{};
+
+    bool IsBusy()const;
 };

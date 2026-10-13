@@ -95,27 +95,23 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
             this->LogError("不能使用空子路径作为输出路径");
             return;
         }
-
         // 构造完整路径并确保文件夹存在
         auto fullPath = this->dirOutput / target;
         std::error_code ec;
         if (!fs::exists(fullPath, ec)) {
             if (!fs::create_directories(fullPath, ec)) {
-                this->LogError("无法创建输出文件夹: " + fullPath.string() + " - " + ec.message());
+                this->LogError(std::format("无法创建输出文件夹: {}，错误：{}", fullPath.string(), ec.message()));
                 return;
             }
-            this->LogInfo("已创建输出文件夹: " + fullPath.string());
+            this->LogInfo(std::format("已创建输出文件夹: {}" , fullPath.string()));
         }
         else if (!fs::is_directory(fullPath, ec)) {
-            this->LogError("指定路径已存在但并非文件夹: " + fullPath.string());
+            this->LogError(std::format("指定路径已存在但并非文件夹: {}", fullPath.string()));
             return;
         }
-
         this->subOutput = std::move(target);
         break;
     }
-    default:
-        break;
     }
 }
 
@@ -129,11 +125,17 @@ bool DemoRecorder::PeekQueue(RecordTask& task) {
     }
     return true;
 }
-void DemoRecorder::StartRecord() {
+void DemoRecorder::StartRecord(const RecordTask& task) {
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
     ++this->num;
+    // str1为绝对文件夹路径，str2为无扩展的文件名
     rp->str1 = (this->dirOutput / this->subOutput).string();
-    rp->str2 = std::to_string(this->num);
+    if (task.fileNameNoExt.empty()) {
+        rp->str2 = std::to_string(this->num);
+    }
+    else {
+        rp->str2 = task.fileNameNoExt;
+    }
     this->PublishAsync(std::move(msg));
 }
 
@@ -189,10 +191,10 @@ MulNX::CoTask DemoRecorder::Main() {
             continue;
         }
         // 验证音视频系统状态
-        if (this->pMediaState->MediaSystemGlobalWorkFlag || this->pMediaState->recordState == RecordState::Recording) {
+        if (this->pMediaState->IsBusy()) {
             this->LogWarning("音视频系统忙碌，正在等待结束。如果在录制状态中，用户可能需要手动停止录制。");
             co_await this->WaitUntil([this]() {
-                return this->pMediaState->MediaSystemGlobalWorkFlag == false && this->pMediaState->recordState == RecordState::Free;
+                return !this->pMediaState->IsBusy();
                 });
         }
         // 跳转时间点，以设置观战目标
@@ -316,7 +318,7 @@ MulNX::CoTask DemoRecorder::Main() {
         }
 
         // 开始录制
-        this->StartRecord();
+        this->StartRecord(rTask);
         // 输出提示信息
         this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
             rTask.uid, rTask.tickStart, rTask.tickEnd));

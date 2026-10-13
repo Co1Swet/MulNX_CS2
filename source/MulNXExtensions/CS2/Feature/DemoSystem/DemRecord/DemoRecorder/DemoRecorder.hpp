@@ -11,7 +11,7 @@ class DemoRecorder final : public CSModuleBase, public MediaModuleMixin<DemoReco
     std::atomic<bool> moduleActive = false;
 
     bool PeekQueue(RecordTask& task);
-    void StartRecord();
+    void StartRecord(const RecordTask& task);
 
     MulNX::CoTask Main();
     std::atomic<uint64_t> num = 0;

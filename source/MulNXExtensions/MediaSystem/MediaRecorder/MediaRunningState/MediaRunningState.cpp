@@ -19,3 +19,12 @@ void MediaRunningState::ProcessMsg(MulNX::Message& msg) {
         break;
     }
 }
+bool MediaRunningState::IsBusy()const {
+    if (this->MediaSystemGlobalWorkFlag.load(std::memory_order_acquire)) {
+        return true;
+    }
+    if (this->recordState.load(std::memory_order_acquire) == RecordState::Recording) {
+        return true;
+    }
+    return false;
+}
