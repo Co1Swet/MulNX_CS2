@@ -10,7 +10,7 @@ void RecordTaskConfiger::Window() {
     ImGui::SliderInt("被击杀前预留tick", &this->preRecordTicksBekilled, 1, 640);
     ImGui::SliderInt("被击杀后保留tick", &this->postRecordTicksBekilled, 1, 640);
 
-    ImGui::SliderFloat("击杀合并阈值tick", &this->mergeThresholdTicks, 0.0f, 1000.0f);
+    MulNX::UI::SliderFloat("击杀合并阈值tick", this->mergeThresholdSeconds, 0.0f, 200.0f);
 
     ImGui::SeparatorText("回合配置");
     ImGui::SliderInt("回合结束额外停留tick", &this->postTickRoundEnd, 0, 500);
@@ -35,4 +35,9 @@ bool RecordTaskConfiger::Init() {
 
 void RecordTaskConfiger::ProcessMsg(MulNX::Message& msg) {
     
+}
+
+int RecordTaskConfiger::GetMergeThresholdTicks()const {
+    auto t = this->mergeThresholdSeconds.load(std::memory_order_acquire);
+    return static_cast<int>(t * 64.0f);
 }

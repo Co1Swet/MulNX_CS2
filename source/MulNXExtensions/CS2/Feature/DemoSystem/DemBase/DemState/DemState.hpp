@@ -14,6 +14,8 @@ namespace Demo {
         int tickEnd{};
         // 回合开始tick（用于跳转到起点）
         int tickRoundStart{};
+        // 回合编号
+        int roundNumber{};
         // 没有扩展名的文件名，不包括路径
         std::string fileNameNoExt{};
     };

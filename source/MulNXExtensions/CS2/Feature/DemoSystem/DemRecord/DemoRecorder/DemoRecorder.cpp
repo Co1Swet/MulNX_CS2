@@ -172,7 +172,6 @@ MulNX::CoTask DemoRecorder::Main() {
                 }
                 else if (i < 3) {
                     this->LogWarning("暂停失败，继续尝试暂停");
-                    ++i;
                     continue;
                 }
                 else {
@@ -277,7 +276,6 @@ MulNX::CoTask DemoRecorder::Main() {
                 break;
             }
             else if (i < 3) {
-                ++i;
                 this->LogWarning("正在等待回复播放");
                 continue;
             }
@@ -302,7 +300,6 @@ MulNX::CoTask DemoRecorder::Main() {
                 break;
             }
             else if (i < 2) {
-                ++i;
                 this->LogWarning("正在等待播放到指定位置");
                 continue;
             }

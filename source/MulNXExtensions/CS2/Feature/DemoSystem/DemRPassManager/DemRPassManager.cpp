@@ -1,9 +1,13 @@
 #include "DemRPassManager.hpp"
 
 bool DemRPassManager::Init() {
+    this->pDemClassifyPass = this->FindModule<DemClassifyPass>("DemClassifyPass");
+    this->pDemSortPass = this->FindModule<DemSortPass>("DemSortPass");
+    this->pDemMergePass = this->FindModule<DemMergePass>("DemMergePass");
 
     (*this)
         .SubscribeAsync("Demo/Record/Enqueue")
+        .SubscribeAsync("Demo/Record/Commit")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -27,5 +31,22 @@ void DemRPassManager::ProcessMsg(MulNX::Message& msg) {
         this->bufferTasks.push_back(std::move(task));
         break;
     }
+    case "Demo/Record/Commit"_hash: {
+        this->Commit();
+        break;
+    }
+    }
+}
+
+void DemRPassManager::Commit() {
+    auto rTasks = std::move(this->bufferTasks);
+    if (rTasks.empty()) return;
+
+    // 分类：形态从 vector<RecordTask> 转换为 vector<RecordPass>
+    auto passes = this->pDemClassifyPass->ApplyPass(std::move(rTasks));
+    for (auto& pass : passes) {
+        this->pDemSortPass->ApplyPass(pass.rTasks);      // 就地对每个 demo 的任务排序
+        this->pDemMergePass->ApplyPass(pass.rTasks);     // 依赖前一步的有序性
+        // ...
     }
 }

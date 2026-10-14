@@ -39,6 +39,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         rTask.uid = ev.killerSteamId;
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+        rTask.roundNumber = static_cast<int>(round);
         rTask.desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
             pDemoInfo->GetPlayerName(ev.killerSteamId),
             pDemoInfo->GetPlayerName(ev.victimSteamId),
@@ -58,6 +59,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         rTask.uid = ev.victimSteamId;
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
+        rTask.roundNumber = static_cast<int>(round);
         rTask.desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
             pDemoInfo->GetPlayerName(ev.victimSteamId),
             pDemoInfo->GetPlayerName(ev.killerSteamId),
@@ -96,6 +98,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         rTask.uid = player.steamId;
         rTask.tickStart = startTickFull;
         rTask.tickEnd = endTickFull;
+        rTask.roundNumber = static_cast<int>(round);
         rTask.desc = std::format("玩家 {} 第 {} 回合整段录制（{} ~ {} tick）",
             player.name, round, rTask.tickStart, rTask.tickEnd);
         rTask.fileNameNoExt = std::format("{}_{}_{}_full", pExt->str1, uid, round);

@@ -19,6 +19,8 @@ add_library(DemoSystem STATIC
     MenuRendering/DemEasyView/DemEasyView.cpp
     DemRPassManager/DemRPassManager.cpp
     DemRPassManager/DemMergePass/DemMergePass.cpp
+    DemRPassManager/DemClassifyPass/DemClassifyPass.cpp
+    DemRPassManager/DemSortPass/DemSortPass.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC
