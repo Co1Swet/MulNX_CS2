@@ -11,4 +11,5 @@
 #include "MenuRendering/DemEasyView/DemEasyView.hpp"
 #include "TaskMaking/DemOneKillMaker/DemOneKillMaker.hpp"
 #include "TaskMaking/DemWrapMaker/DemWrapMaker.hpp"
+#include "DemRPassManager/DemRPassManager.hpp"
 #include "DemoSystem.hpp"

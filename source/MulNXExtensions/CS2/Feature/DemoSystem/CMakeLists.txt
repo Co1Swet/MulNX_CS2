@@ -17,6 +17,8 @@ add_library(DemoSystem STATIC
     TaskMaking/DemOneKillMaker/DemOneKillMaker.cpp
     TaskMaking/DemWrapMaker/DemWrapMaker.cpp
     MenuRendering/DemEasyView/DemEasyView.cpp
+    DemRPassManager/DemRPassManager.cpp
+    DemRPassManager/DemMergePass/DemMergePass.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

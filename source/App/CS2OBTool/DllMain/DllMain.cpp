@@ -132,6 +132,8 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<DemWrapMaker>("DemWrapMaker")
         .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
         .CreateModule<RecordTaskMaker>("RecordTaskMaker")
+        .CreateModule<DemRPassManager>("DemRPassManager")
+        .CreateModule<DemMergePass>("DemMergePass")
         .CreateModule<DemoRecorder>("DemoRecorder")
         .CreateModule<DemoEventsRender>("DemoEventsRender")
         .CreateModule<DemoPlayerInfoRender>("DemoPlayerInfoRender")
