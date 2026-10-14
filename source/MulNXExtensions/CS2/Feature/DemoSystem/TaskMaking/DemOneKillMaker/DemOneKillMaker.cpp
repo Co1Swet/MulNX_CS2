@@ -36,6 +36,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         const auto& ev = info.killEvents[idx];
 
         Demo::RecordTask rTask{};
+        rTask.demoName = pExt->str1;
         rTask.uid = ev.killerSteamId;
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
@@ -55,7 +56,9 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
         if (!info.Bekilled)break;
         auto& ev = *info.Bekilled;
+
         Demo::RecordTask rTask{};
+        rTask.demoName = pExt->str1;
         rTask.uid = ev.victimSteamId;
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
@@ -95,6 +98,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         endTickFull += this->pConfiger->postTickRoundEnd;
 
         Demo::RecordTask rTask{};
+        rTask.demoName = pExt->str1;
         rTask.uid = player.steamId;
         rTask.tickStart = startTickFull;
         rTask.tickEnd = endTickFull;

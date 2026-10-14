@@ -231,7 +231,6 @@ MulNX::CoTask DemoRecorder::Main() {
             }
             else if (i < 3) {
                 this->LogWarning("观战设置失败，重新尝试");
-                ++i;
                 continue;
             }
             else {
