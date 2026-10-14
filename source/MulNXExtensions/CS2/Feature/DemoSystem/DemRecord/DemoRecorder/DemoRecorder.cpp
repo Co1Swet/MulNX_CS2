@@ -44,7 +44,6 @@ void DemoRecorder::Window() {
 bool DemoRecorder::Init() {
     this->dirOutput = this->Path()->PathGetForShared("Output");
     (*this)
-        .SubscribeAsync("Demo/Record/Enqueue")
         .SubscribeAsync("Demo/Record/Start")
         .SubscribeAsync("Demo/Record/Clear")
         .SubscribeAsync("Demo/Record/Stop")
@@ -70,7 +69,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Record/Enqueue"_hash: {
         std::unique_lock lock(this->smutex);
-        auto task = std::move(*msg.asp.get<RecordTask>());
+        auto task = std::move(*msg.asp.get<Demo::RecordTask>());
         this->recordTaskBufferQueue.push_back(std::move(task));
         break;
     }
@@ -115,7 +114,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-bool DemoRecorder::PeekQueue(RecordTask& task) {
+bool DemoRecorder::PeekQueue(Demo::RecordTask& task) {
     std::unique_lock lock(this->smutex);
     if (this->recordTaskBufferQueue.empty()) return false;
     task = std::move(this->recordTaskBufferQueue.front());
@@ -125,7 +124,7 @@ bool DemoRecorder::PeekQueue(RecordTask& task) {
     }
     return true;
 }
-void DemoRecorder::StartRecord(const RecordTask& task) {
+void DemoRecorder::StartRecord(const Demo::RecordTask& task) {
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
     ++this->num;
     // str1为绝对文件夹路径，str2为无扩展的文件名
@@ -145,7 +144,7 @@ MulNX::CoTask DemoRecorder::Main() {
         co_await this->WaitUntil([this]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
 
         // 等待队列中有任务
-        RecordTask rTask;
+        Demo::RecordTask rTask;
         co_await this->WaitUntil([&]()->bool { return this->PeekQueue(rTask); });
         this->LogInfo("进行新片段录制");
 
@@ -325,9 +324,6 @@ MulNX::CoTask DemoRecorder::Main() {
         // 等待录制结束 tick
         co_await this->WaitUntil([&] {
             auto curTick = this->CS2Time->GetDemoTick();
-            if (rTask.onPlaying) {
-                rTask.onPlaying(curTick, &rTask);
-            }
             return curTick >= rTask.tickEnd;
             });
         // 停止录制

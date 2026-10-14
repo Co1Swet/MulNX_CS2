@@ -18,9 +18,9 @@ bool DemOneKillMaker::Init() {
     return true;
 }
 
-void DemOneKillMaker::PublishRecordTask(RecordTask&& rTask)const {
+void DemOneKillMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
     this->LogInfo(std::format("准备录制任务：{}", rTask.desc));
-    auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
+    auto [msg, rp] = MulNX::Message::Create<Demo::RecordTask>("Demo/Record/Enqueue"_hash);
     *rp = std::move(rTask);
     this->PublishAsync(std::move(msg));
 }
@@ -35,7 +35,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
         const auto& ev = info.killEvents[idx];
 
-        RecordTask rTask{};
+        Demo::RecordTask rTask{};
         rTask.uid = ev.killerSteamId;
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
@@ -54,7 +54,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
         if (!info.Bekilled)break;
         auto& ev = *info.Bekilled;
-        RecordTask rTask{};
+        Demo::RecordTask rTask{};
         rTask.uid = ev.victimSteamId;
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
@@ -92,7 +92,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         }
         endTickFull += this->pConfiger->postTickRoundEnd;
 
-        RecordTask rTask{};
+        Demo::RecordTask rTask{};
         rTask.uid = player.steamId;
         rTask.tickStart = startTickFull;
         rTask.tickEnd = endTickFull;

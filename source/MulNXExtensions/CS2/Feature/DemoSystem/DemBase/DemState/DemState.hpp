@@ -1,25 +1,28 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
 
-class RecordTask {
-public:
-    // 任务描述
-    std::string desc{};
-    // 目标SteamUID
-    Steam64UID uid{};
-    // 开始录制tick
-    int tickStart{};
-    // 结束录制tick
-    int tickEnd{};
-    // 回合开始tick（用于跳转到起点）
-    int tickRoundStart{};
-    // 没有扩展名的文件名，不包括路径
-    std::string fileNameNoExt{};
-    // 一个在录制时每帧调用的回调
-    std::function<bool(int curTick, RecordTask* pRTask)>onPlaying{};
-};
-
 namespace Demo {
+    struct RecordTask {
+        std::string demoName{};
+        // 任务描述
+        std::string desc{};
+        // 目标SteamUID
+        Steam64UID uid{};
+        // 开始录制tick
+        int tickStart{};
+        // 结束录制tick
+        int tickEnd{};
+        // 回合开始tick（用于跳转到起点）
+        int tickRoundStart{};
+        // 没有扩展名的文件名，不包括路径
+        std::string fileNameNoExt{};
+    };
+
+    struct RecordPass {
+        std::string demoFileName{};
+        std::vector<RecordTask> rTasks{};
+    };
+
     struct Team {
         std::string name{};
         std::string letter{};

@@ -6,5 +6,5 @@ class DemOneKillMaker final :public DemModuleBase {
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    void PublishRecordTask(RecordTask&& rTask)const;
+    void PublishRecordTask(Demo::RecordTask&& rTask)const;
 };

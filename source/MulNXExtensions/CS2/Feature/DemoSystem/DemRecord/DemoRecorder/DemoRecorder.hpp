@@ -6,12 +6,12 @@
 class DemoRecorder final : public CSModuleBase, public MediaModuleMixin<DemoRecorder> {
     fs::path dirOutput{};
     std::string subOutput = "default";
-    std::deque<RecordTask> recordTaskBufferQueue;
+    std::deque<Demo::RecordTask> recordTaskBufferQueue;
 
     std::atomic<bool> moduleActive = false;
 
-    bool PeekQueue(RecordTask& task);
-    void StartRecord(const RecordTask& task);
+    bool PeekQueue(Demo::RecordTask& task);
+    void StartRecord(const Demo::RecordTask& task);
 
     MulNX::CoTask Main();
     std::atomic<uint64_t> num = 0;

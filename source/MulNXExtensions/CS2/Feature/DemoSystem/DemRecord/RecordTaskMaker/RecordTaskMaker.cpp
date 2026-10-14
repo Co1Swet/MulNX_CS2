@@ -55,8 +55,8 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     }
 }
 
-void RecordTaskMaker::PublishRecordTask(RecordTask&& rTask) {
-    auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
+void RecordTaskMaker::PublishRecordTask(Demo::RecordTask&& rTask) {
+    auto [msg, rp] = MulNX::Message::Create<Demo::RecordTask>("Demo/Record/Enqueue"_hash);
     *rp = std::move(rTask);
     this->PublishAsync(std::move(msg));
 }
@@ -221,7 +221,7 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
             ImGui::TableSetColumnIndex(0);
             // 合并按钮：录制选中玩家的视角
             if (btn.Next("合并记录")) {
-                RecordTask rTask;
+                Demo::RecordTask rTask;
                 rTask.uid = player.steamId;   // 当前查看的玩家
                 rTask.tickStart = mi.startTick;
                 rTask.tickEnd = mi.endTick;
