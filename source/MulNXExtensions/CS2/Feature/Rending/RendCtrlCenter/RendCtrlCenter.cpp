@@ -9,6 +9,16 @@ bool RendCtrlCenter::Init() {
     this->pCloudController = this->FindModule<CloudController>("CloudController");
     this->pCSReShadeController = this->FindModule<CSReShadeController>("CSReShadeController");
 
+    this->SubscribeSync("Hook/LoadLibraryExW/rendersystemdx11.dll", [this](MulNX::Message& msg) {
+        auto rendersystemdx11 = MulNX::Memory::DllModule(L"rendersystemdx11.dll");
+        auto pCommit = (uint8_t*)rendersystemdx11.GetTextRegion()
+            .FindRegion(CS2::Signatures::Render::Func_SoftwareCommandList_Commit).Data();
+        this->hkCommit = MulNX::Hook::Create(pCommit, [this](MulNX::Hook* hk, RegContext* ctx) {
+            return this->OnCommit(hk, ctx);
+            }).value();
+        this->RegisterAttachHook(this->hkCommit, "SoftwareCommandList::Commit");
+        });
+
     this->SubscribeSync("Hook/LoadLibraryExW/scenesystem.dll", [this](MulNX::Message& msg) {
         this->pDrawSceneData = this->pSceneSystem->pDrawSceneData;
         this->pDrawCurrentPrimitives = this->pSceneSystem->pDrawCurrentPrimitives;
@@ -45,23 +55,7 @@ bool RendCtrlCenter::Init() {
         this->RegisterAttachHook(this->hkDrawSceneData, "DrawSceneData");
 
         this->hkInitDrawingData = MulNX::Hook::Create((uint8_t*)this->pSceneSystem->pInitDrawingData, [this](MulNX::Hook* hk, RegContext* ctx) {
-            hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->OnInitDrawingData(hk, ctx);});
-
-            auto& pDrawingData = *(CS2::DrawingData**)&ctx->rcx;
-            auto& pSceneView = *(CS2::CSceneView**)&ctx->rdx;
-            auto& pSceneLayer = *(CS2::CSceneLayer**)&ctx->r8;
-            auto& unkFlags4 = *(uint32_t*)&ctx->r9;
-            auto& pszNameSuffix = *hk->GetStackParam<const char*>(ctx, 4);
-
-            this->pRawInitDrawingData(pDrawingData, pSceneView, pSceneLayer, unkFlags4, pszNameSuffix);
-
-            auto pList = pDrawingData->pSoftwareCommandList;
-            auto pCommit = pList->GetVPtrCommit();
-            this->hkCommit = MulNX::Hook::Create(pCommit, [this](MulNX::Hook* hk, RegContext* ctx) {
-                return this->OnCommit(hk, ctx);
-                }).value();
-            this->RegisterAttachHook(this->hkCommit, "SoftwareCommandList::Commit");
-            return MulNX::Hook::Then::Return;
+            return this->OnInitDrawingData(hk, ctx);
             }).value();
         this->RegisterAttachHook(this->hkInitDrawingData, "InitDrawingData");
         this->pRawInitDrawingData = (SceneSystem::InitDrawingData_t)this->hkInitDrawingData->pMaybeRawFunc;
