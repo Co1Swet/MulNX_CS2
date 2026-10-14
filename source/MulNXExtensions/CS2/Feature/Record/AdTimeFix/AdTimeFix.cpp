@@ -30,12 +30,9 @@ bool AdTimeFix::Init() {
 
 double AdTimeFix::OnGetTime(void) {
     std::lock_guard<std::mutex> lock(m_mutex);
-
     const double raw = this->pRawPlat_FloatTime();
-    auto gv = this->CS2->CSGlobalVars;
-    if (!gv)return raw;
 
-    // ---------- 初始化：虚拟时间 = raw ----------
+    // 初始化：虚拟时间 = raw
     if (!m_initialized) {
         m_initialized = true;
         m_lastResult = raw;
@@ -44,13 +41,32 @@ double AdTimeFix::OnGetTime(void) {
         m_frameTime = 0.0;
         return m_lastResult;
     }
+    double delta = raw - m_lastTime;
+    auto Fail = [&]()->double {
+        // 加载 / 未初始化：直接跟随 raw
+        m_lastResult += m_frameTime + delta;
+        m_frameTime = 0.0;
+        m_lastTime = raw;
+        m_lastFrameCount = 0;
+        return m_lastResult;
+        };
 
-    // ---------- 计算自上次基准以来的 raw 增量 ----------
-    const double delta = raw - m_lastTime;
-    const int    frame_count = gv->framecount;
-    const double frametime = gv->frametime;
+    int frame_count = 0;
+    double frametime = 0.0f;
+    try {
+        // 计算自上次基准以来的 raw 增量
+        auto gv = this->CS2->CSGlobalVars;
+        if (!gv)return Fail();
+        frame_count = MulNX::MRead(&gv->framecount);
+        frametime = MulNX::MRead(&gv->frametime);
+    }
+    catch (const MulNX::Exception& e) {
+        this->LogWarning(e);
+        return Fail();
+    }
 
-    // ---------- 始终生效的平滑分支 ----------
+
+    // 始终生效的平滑分支
     if (0 != frame_count) {
         // 帧边界：catch-up + 重置基准
         if (frame_count != m_lastFrameCount) {
@@ -69,13 +85,7 @@ double AdTimeFix::OnGetTime(void) {
         m_frameTime -= useTime;
         m_lastResult += useTime;
     }
-    else {
-        // 加载 / 未初始化：直接跟随 raw
-        m_lastResult += m_frameTime + delta;
-        m_frameTime = 0.0;
-        m_lastTime = raw;
-        m_lastFrameCount = 0;
-    }
+    else return Fail();
 
     return m_lastResult;
 }

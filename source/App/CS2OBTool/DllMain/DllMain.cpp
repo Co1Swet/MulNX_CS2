@@ -124,20 +124,17 @@ void StartImpl(HMODULE& hModule) {
         // CS2 Demo 相关模块
         .CreateModule<DemState>("DemState")
         .CreateModule<DemoHelper>("DemoHelper")
-        
         .CreateModule<DemoFiles>("DemoFiles")
         .CreateModule<DemoAnalyzer>("DemoAnalyzer")
         .CreateModule<DemoJSONReader>("DemoJSONReader")
+        .CreateModule<DemEasyView>("DemEasyView")
         .CreateModule<DemOneKillMaker>("DemOneKillMaker")
         .CreateModule<DemWrapMaker>("DemWrapMaker")
-
         .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
         .CreateModule<RecordTaskMaker>("RecordTaskMaker")
         .CreateModule<DemoRecorder>("DemoRecorder")
-        
         .CreateModule<DemoEventsRender>("DemoEventsRender")
         .CreateModule<DemoPlayerInfoRender>("DemoPlayerInfoRender")
-
         .CreateModule<DemoSystem>("DemoSystem")
 
         // CS2 地图更换功能模块

@@ -22,7 +22,7 @@ void DemWrapMaker::ProcessMsg(MulNX::Message& msg) {
         auto* pExt = msg.asp.get<MulNX::NetExt>();
         auto&& [uid] = msg.Access<Steam64UID>();
         auto pDemoInfo = this->pDemState->GetDemoInfo(pExt->str1);
-
+        this->LogInfo(std::format("为玩家 {} 准备所有回合录制", pDemoInfo->players.at(uid).name));
         for (int i = pDemoInfo->rounds.front().number;i <= pDemoInfo->rounds.back().number;++i) {
             auto [one, p] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/FullRound"_hash);
             p->str1 = pDemoInfo->demoFileName;

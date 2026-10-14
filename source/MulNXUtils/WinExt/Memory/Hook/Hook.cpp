@@ -230,14 +230,13 @@ void MulNX::Hook::ResetCallback(std::function<MulNX::Hook::Then(Hook*, RegContex
 MulNX::Hook::Result MulNX::Hook::Attach() {
     __try {
         if (this->attached)return MulNX::Hook::Result::Attached;
-        DWORD old;
+        DWORD old{};
+        DWORD temp{};
         VirtualProtect(this->hookTarget, this->overrideSize, PAGE_EXECUTE_READWRITE, &old);
         memcpy(this->hookTarget, this->jumperAsmCode.data(), this->overrideSize);
         FlushInstructionCache(GetCurrentProcess(), this->hookTarget, this->overrideSize);
-        VirtualProtect(this->hookTarget, this->overrideSize, old, &old);
-
+        VirtualProtect(this->hookTarget, this->overrideSize, old, &temp);
         this->attached = true;
-
         return MulNX::Hook::Result::AttachSuccess;
     }
     __except (EXCEPTION_EXECUTE_HANDLER) {
@@ -248,14 +247,13 @@ MulNX::Hook::Result MulNX::Hook::Attach() {
 MulNX::Hook::Result MulNX::Hook::Detach() {
     __try {
         if (!this->attached)return MulNX::Hook::Result::Detached;
-        DWORD old;
+        DWORD old{};
+        DWORD temp{};
         VirtualProtect(this->hookTarget, this->overrideSize, PAGE_EXECUTE_READWRITE, &old);
         memcpy(this->hookTarget, this->hookTargetRawCode.data(), this->overrideSize);
         FlushInstructionCache(GetCurrentProcess(), this->hookTarget, this->overrideSize);
-        VirtualProtect(this->hookTarget, this->overrideSize, old, &old);
-
+        VirtualProtect(this->hookTarget, this->overrideSize, old, &temp);
         this->attached = false;
-
         return MulNX::Hook::Result::DetachSuccess;
     }
     __except (EXCEPTION_EXECUTE_HANDLER) {

@@ -2,8 +2,8 @@
 
 void OpenFolder(const std::wstring& wpath) {
     ::ShellExecuteW(
-        nullptr,          // 父窗口 HWND，可填你窗口句柄
-        L"open",          // 动词：open / explore 都行
+        nullptr,          // 父窗口 HWND
+        L"open",          // 动词：open / explore
         wpath.c_str(),    // 文件夹路径
         nullptr,          // 参数（文件夹不需要）
         nullptr,          // 工作目录（默认）
