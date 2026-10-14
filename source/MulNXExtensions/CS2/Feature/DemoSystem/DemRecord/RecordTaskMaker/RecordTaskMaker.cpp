@@ -3,6 +3,58 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/DemoSystem/DemRecord/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
+void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
+    auto w = MulNX::UI::RAIIWindow("录制任务创建");
+    if (!w || !w.ShouldDraw())return;
+    std::shared_lock lock(this->smutex);
+
+    auto pDemoInfo = this->DemoChooseMenu(uico);
+    if (!pDemoInfo)return;
+    ImGui::Separator();
+    auto& demoInfo = *pDemoInfo;
+
+    this->DemoMetaMenu(demoInfo);
+    ImGui::Separator();
+
+    auto ctrlTarget = this->TeamPlayerMenu(demoInfo);
+    ImGui::Separator();
+
+    auto itPlayer = demoInfo.players.find(ctrlTarget);
+    if (itPlayer == demoInfo.players.end()) {
+        ImGui::SeparatorText("未选中玩家");
+        return;
+    }
+
+    const auto& player = itPlayer->second;
+    ImGui::SeparatorText(player.name.c_str());
+    ImGui::Checkbox("展示被击杀记录", &this->showBekillEvent);
+
+    if (ImGui::Button(std::format("为所有回合生成录制任务##{}", player.steamId).c_str())) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/FullRoundAll"_hash);
+        rp->str1 = pDemoInfo->demoFileName;
+        auto&& [rUid] = msg.Access<Steam64UID>();
+        rUid = player.steamId;
+        this->PublishAsync(std::move(msg));
+    }
+
+    for (int i = demoInfo.rounds.front().number;i <= demoInfo.rounds.back().number;++i) {
+        ImGui::SeparatorText(std::format("第 {} 回合", i).c_str());
+
+        if (ImGui::Button(std::format("录制整回合##round_{}", i).c_str())) {
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/FullRound"_hash);
+            rp->str1 = pDemoInfo->demoFileName;
+            auto&& [rUid, rRound] = msg.Access<Steam64UID, size_t>();
+            rUid = player.steamId;
+            rRound = i;
+            this->PublishAsync(std::move(msg));
+        }
+
+        if (player.roundInfo.contains(i)) {
+            this->RoundPlayerMenu(i, player, demoInfo);
+        }
+    }
+}
+
 void RecordTaskMaker::PublishRecordTask(RecordTask&& rTask) {
     auto [msg, rp] = MulNX::Message::Create<RecordTask>("Demo/Record/Enqueue"_hash);
     *rp = std::move(rTask);
@@ -89,40 +141,6 @@ Steam64UID RecordTaskMaker::TeamPlayerMenu(const Demo::Info& demoInfo) {
     showPlayers(false);
 
     return ctrlTarget;
-}
-
-std::optional<RecordTask> RecordTaskMaker::CreatePlayFullRoundRTask(const int& round,
-    const Demo::Player& player, const Demo::Info& demoInfo) {
-    // 查找当前回合的元数据（startTick, endTick）
-    auto itRound = std::find_if(demoInfo.rounds.begin(), demoInfo.rounds.end(),
-        [round](const Demo::Round& r) { return r.number == round; });
-
-    if (itRound == demoInfo.rounds.end())return std::nullopt;
-
-    const auto& roundMeta = *itRound;
-
-    // 计算起点：提前3秒（3 * 64 = 192 ticks）
-    int startTickFull = std::max(0, roundMeta.freezeTimeEndTick - 192);
-
-    // 计算终点
-    int endTickFull = roundMeta.endTick;
-    if (player.roundInfo.contains(round)) {
-        auto info = player.roundInfo.at(round);
-        if (info.Bekilled.has_value()) {
-            endTickFull = std::min(info.Bekilled->tick + 64, endTickFull);
-        }
-    }
-    endTickFull += this->pConfiger->postTickRoundEnd;
-
-    // 确保有效范围（防止死亡时间在回合开始前或极端情况）
-    if (startTickFull >= endTickFull)return std::nullopt;
-
-    RecordTask rTask{};
-    rTask.uid = player.steamId;
-    rTask.tickStart = startTickFull;
-    rTask.tickEnd = endTickFull;
-
-    return rTask;
 }
 
 void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& player, const Demo::Info& demoInfo) {
@@ -238,69 +256,6 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
         ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
     }
 }
-
-void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
-    auto w = MulNX::UI::RAIIWindow("录制任务创建");
-    if (!w || !w.ShouldDraw())return;
-    std::shared_lock lock(this->smutex);
-
-    auto pDemoInfo = this->DemoChooseMenu(uico);
-    if (!pDemoInfo)return;
-    ImGui::Separator();
-    auto& demoInfo = *pDemoInfo;
-
-    this->DemoMetaMenu(demoInfo);
-    ImGui::Separator();
-
-    auto ctrlTarget = this->TeamPlayerMenu(demoInfo);
-    ImGui::Separator();
-
-    auto itPlayer = demoInfo.players.find(ctrlTarget);
-    if (itPlayer == demoInfo.players.end()) {
-        ImGui::SeparatorText("未选中玩家");
-        return;
-    }
-
-    const auto& player = itPlayer->second;
-    ImGui::SeparatorText(player.name.c_str());
-    ImGui::Checkbox("展示被击杀记录", &this->showBekillEvent);
-
-    if (ImGui::Button(std::format("为所有回合生成录制任务##{}", player.steamId).c_str())) {
-        for (int i = demoInfo.rounds.front().number;i <= demoInfo.rounds.back().number;++i) {
-            if (auto oRTask = this->CreatePlayFullRoundRTask(i, player, demoInfo)) {
-                auto rTask = oRTask.value();
-                rTask.desc = std::format("玩家 {} 第 {} 回合整段录制（{} ~ {} tick）",
-                    player.name, i, rTask.tickStart, rTask.tickEnd);
-                this->PublishRecordTask(std::move(rTask));
-            }
-        }
-    }
-
-    for (int i = demoInfo.rounds.front().number;i <= demoInfo.rounds.back().number;++i) {
-        ImGui::SeparatorText(std::format("第 {} 回合", i).c_str());
-
-        // ========== 录制整回合按钮 ==========
-        if (auto oRTask = this->CreatePlayFullRoundRTask(i, player, demoInfo)) {
-            auto rTask = oRTask.value();
-            if (ImGui::Button(std::format("录制整回合##round_{}", i).c_str())) {
-                rTask.desc = std::format("玩家 {} 第 {} 回合整段录制（{} ~ {} tick）",
-                    player.name, i, rTask.tickStart, rTask.tickEnd);
-                this->PublishRecordTask(std::move(rTask));
-            }
-            ImGui::SameLine();
-            // 友好显示时间范围（方便调试）
-            ImGui::Text("范围: %d ~ %d ticks", rTask.tickStart, rTask.tickEnd);
-        }
-        else {
-            ImGui::Text("警告：该回合录制范围无效");
-        }
-
-        if (player.roundInfo.contains(i)) {
-            this->RoundPlayerMenu(i, player, demoInfo);
-        }
-    }
-}
-
 bool RecordTaskMaker::Init() {
     this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
     this->UIRegisterCallback("UI.Demos", [this](auto uico, auto&&...) {return this->Window(uico);});

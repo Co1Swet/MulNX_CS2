@@ -9,4 +9,5 @@
 #include "DemRend/DemoEventsRender/DemoEventsRender.hpp"
 #include "DemRend/DemoPlayerInfoRender/DemoPlayerInfoRender.hpp"
 #include "TaskMaking/DemOneKillMaker/DemOneKillMaker.hpp"
+#include "TaskMaking/DemWrapMaker/DemWrapMaker.hpp"
 #include "DemoSystem.hpp"

@@ -15,6 +15,7 @@ add_library(DemoSystem STATIC
     DemLoad/DemoFiles/DemoFiles.cpp
     DemBase/DemState/DemState.cpp
     TaskMaking/DemOneKillMaker/DemOneKillMaker.cpp
+    TaskMaking/DemWrapMaker/DemWrapMaker.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC
