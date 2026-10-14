@@ -12,10 +12,10 @@ u8测试/bin/**/*.png
 u8测试/bin/**/Log/*.txt
 
 # u8测试/bin/MulNX/Tools
-u8测试/bin/MulNX/Tools/*[Rr]e[Ss]hade*
-!u8测试/bin/MulNX/Tools/MulNXReShadeBridge.addon
-u8测试/bin/MulNX/Tools/dxgi.dll
+u8测试/bin/MulNX/Tools/reshade/*[Rr]e[Ss]hade*
+!u8测试/bin/MulNX/Tools/reshade/MulNXReShadeBridge.addon
+u8测试/bin/MulNX/Tools/reshade/dxgi.dll
 
 # u8测试/bin/Output/MulNX/Tools
-u8测试/bin/Output/MulNX/Tools/*[Rr]e[Ss]hade*
-u8测试/bin/Output/MulNX/Tools/dxgi.dll
+u8测试/bin/Output/MulNX/Tools/reshade/*[Rr]e[Ss]hade*
+u8测试/bin/Output/MulNX/Tools/reshade/dxgi.dll

@@ -46,7 +46,7 @@ void CS2HelperController::DoInject(PROCESS_INFORMATION& pi,
 
 bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi) {
     // Reshade注入
-    auto reshadedll = this->dirTools / "dxgi.dll";
+    auto reshadedll = this->dirTools / "reshade" / "dxgi.dll";
     if (fs::exists(reshadedll) && this->injectReshade) {
         this->DoInject(pi, reshadedll);
     }

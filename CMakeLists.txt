@@ -62,7 +62,7 @@ set_target_properties(CS2OBTool PROPERTIES
 )
 
 # 处理 MulNXReShadeBridge 目标
-set(MulNXReShadeBridgePath ${MulNXPath}/Tools)
+set(MulNXReShadeBridgePath ${MulNXPath}/Tools/reshade)
 set_target_properties(MulNXReShadeBridge PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${MulNXReShadeBridgePath}"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${MulNXReShadeBridgePath}"
