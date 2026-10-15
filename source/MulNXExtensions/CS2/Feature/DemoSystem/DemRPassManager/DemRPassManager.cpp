@@ -2,6 +2,10 @@
 
 void DemRPassManager::Window() {
     auto w = MulNX::UI::RAIIWindow("预备录制队列");
+    if (this->setFocus.load(std::memory_order_acquire)) {
+        ImGui::SetWindowFocus("预备录制队列");
+        this->setFocus.store(false, std::memory_order_release);
+    }
     if (!w || !w.ShouldDraw())return;
 
     if (ImGui::Button("清空队列")) {
@@ -13,6 +17,7 @@ void DemRPassManager::Window() {
         auto&& [autoRecord] = msg.Access<int>();
         autoRecord = 0;
         this->PublishAsync(std::move(msg));
+        ImGui::SetWindowFocus("录制执行");
     }
     ImGui::SameLine();
     if (ImGui::Button("提交所有任务并开始录制")) {
@@ -20,8 +25,8 @@ void DemRPassManager::Window() {
         auto&& [autoRecord] = msg.Access<int>();
         autoRecord = 1;
         this->PublishAsync(std::move(msg));
+        ImGui::SetWindowFocus("录制执行");
     }
-
 
     ImGui::SeparatorText("缓冲队列");
     auto btn = MulNX::UI::SmartButton(0);
@@ -67,6 +72,7 @@ void DemRPassManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Record/Enqueue"_hash: {
         std::unique_lock lock(this->smutex);
+        this->setFocus.store(true, std::memory_order_release);
         auto task = std::move(*msg.asp.get<Demo::RecordTask>());
         auto name = task.demoName;
         if (name.empty()) {

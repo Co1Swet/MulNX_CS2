@@ -10,6 +10,8 @@ class DemRPassManager final :public DemModuleBase {
     DemMergePass* pDemMergePass = nullptr;
     std::vector<Demo::RecordTask>bufferTasks{};
 
+    std::atomic<bool> setFocus = false;
+
     void Window();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);

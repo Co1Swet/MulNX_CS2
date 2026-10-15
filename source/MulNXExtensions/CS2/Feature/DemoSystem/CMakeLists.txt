@@ -21,6 +21,7 @@ add_library(DemoSystem STATIC
     DemRPassManager/DemMergePass/DemMergePass.cpp
     DemRPassManager/DemClassifyPass/DemClassifyPass.cpp
     DemRPassManager/DemSortPass/DemSortPass.cpp
+    DemRecord/DemoRecorder/RecordCoTaskImpl.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

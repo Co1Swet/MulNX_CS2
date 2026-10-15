@@ -1,20 +1,25 @@
 #include "DemoRecorder.hpp"
-#include <MulNX/Base/UI/UI.hpp>
-#include <Support/TimeController/TimeController.hpp>
 
 void DemoRecorder::Window() {
     auto w = MulNX::UI::RAIIWindow("录制执行");
-    if (!w || !w.ShouldDraw())return;
+    if (!w || !w.ShouldDraw()) return;
     std::shared_lock lock(this->smutex);
-    
+
+    // ---- 顶部操作区 ----
     if (ImGui::Button("启动")) {
         this->PublishAsync("Demo/Pass/Start"_hash);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("停止")) {
+        this->PublishAsync("Demo/Pass/Stop"_hash);
     }
     ImGui::SameLine();
     if (ImGui::Button("清空剩余任务")) {
         this->PublishAsync("Demo/Pass/Clear"_hash);
     }
-    ImGui::Text(
+
+    // ---- 输出路径设置 ----
+    ImGui::TextUnformatted(
         std::format("当前输出文件夹：{}", (this->dirOutput / this->subOutput).string()).c_str()
     );
     static std::string buf;
@@ -24,31 +29,76 @@ void DemoRecorder::Window() {
         rp->str1 = buf;
         this->PublishAsync(std::move(msg));
     }
-    
-    auto curPass = this->currentPass.load(std::memory_order_acquire);
-    if (!curPass) {
-        ImGui::Text("当前无执行中录制批次");
-        return;
-    }
 
-    ImGui::Text("待录制时间：");
+    auto curPass = this->currentPass.load(std::memory_order_acquire);
+    const int curIdx = this->indexTask.load(std::memory_order_acquire);
+
+    // ---- 待录制总时间：当前 pass 剩余 + 后续所有 pass ----
     int ticksToRecord = 0;
-    for (const auto& recordTask : curPass->rTasks) {
-        ticksToRecord += (recordTask.tickEnd - recordTask.tickStart);
+    if (curPass) {
+        const int start = std::max(0, curIdx);
+        for (int i = start; i < static_cast<int>(curPass->rTasks.size()); ++i) {
+            const auto& t = curPass->rTasks[i];
+            ticksToRecord += (t.tickEnd - t.tickStart);
+        }
     }
+    for (const auto& pass : this->recordPasses) {
+        for (const auto& t : pass->rTasks) {
+            ticksToRecord += (t.tickEnd - t.tickStart);
+        }
+    }
+    ImGui::TextUnformatted("待录制时间：");
+    ImGui::SameLine();
     MulNX::UI::ShowTime(ticksToRecord);
 
-    ImGui::SeparatorText("当前队列");
-    ImGui::Text(std::format("当前索引：{}", this->num.load()).c_str());
+    // 通用：渲染一个 pass 内所有任务的列表
+    auto DrawTasks = [](const Demo::RecordPass& pass, int highlightIdx) {
+        for (int i = 0; i < static_cast<int>(pass.rTasks.size()); ++i) {
+            const auto& t = pass.rTasks[i];
 
-    auto now = this->indexTask.load(std::memory_order_acquire);
-    for (int i = 0;i < curPass->rTasks.size();++i) {
-        const auto& recordTask = curPass->rTasks[i];
-        if (i != now) {
-            ImGui::Text(recordTask.desc.c_str());
+            // 主行：desc (+ 正在录制标记)
+            std::string line = t.desc;
+            if (i == highlightIdx) line += "    ---正在录制";
+            ImGui::TextUnformatted(line.c_str());
+
+            // 次行：UID / tick 范围（灰色小字，用 "%s" 防止格式串注入）
+            std::string sub = std::format("   UID:{}   tick:{}-{}",
+                t.uid, t.tickStart, t.tickEnd);
+            ImGui::TextDisabled("%s", sub.c_str());
         }
-        else {
-            ImGui::Text(std::format("{}     ---正在录制", recordTask.desc).c_str());
+        };
+
+    // ---- 当前执行批次 ----
+    ImGui::SeparatorText("当前执行批次");
+    if (!curPass) {
+        ImGui::TextUnformatted("当前无执行中录制批次");
+    }
+    else {
+        std::string title = std::format("{}  ({} 个任务)",
+            curPass->demoFileName.empty() ? "<未命名批次>" : curPass->demoFileName,
+            curPass->rTasks.size());
+        if (ImGui::CollapsingHeader(title.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+            DrawTasks(*curPass, curIdx);
+        }
+    }
+
+    // ---- 所有待录制 pass ----
+    ImGui::SeparatorText(
+        std::format("待录制批次队列（{}）", this->recordPasses.size()).c_str()
+    );
+    if (this->recordPasses.empty()) {
+        ImGui::TextUnformatted("（队列为空）");
+    }
+    else {
+        for (const auto& pass : this->recordPasses) {
+
+            std::string title = std::format("#{}  ({} 个任务)",
+                pass->demoFileName.empty() ? "<未命名批次>" : pass->demoFileName,
+                pass->rTasks.size());
+
+            if (ImGui::CollapsingHeader(title.c_str())) {
+                DrawTasks(*pass, /*highlightIdx=*/-1);
+            }
         }
     }
 }
@@ -126,35 +176,6 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
     }
 }
-
-bool DemoRecorder::PeekQueue(Demo::RecordTask& task) {
-    std::unique_lock lock(this->smutex);
-
-    auto cur = currentPass.load(std::memory_order_acquire);
-    int nextIdx = indexTask.load(std::memory_order_acquire) + 1;
-
-    // 当前 pass 不存在，或已耗尽 → 推进到下一个 pass
-    while (!cur || nextIdx >= (int)cur->rTasks.size()) {
-        if (cur) {
-            // 当前 pass 跑完：清掉快照，让 UI 短暂处于"无当前批次"
-            currentPass.store(nullptr, std::memory_order_release);
-            indexTask.store(-1, std::memory_order_release);
-        }
-        if (recordPasses.empty()) {
-            // 全部处理完：自动待机
-            moduleActive.store(false, std::memory_order_release);
-            return false;
-        }
-        cur = recordPasses.front();
-        recordPasses.pop_front();
-        currentPass.store(cur, std::memory_order_release);
-        nextIdx = 0;
-    }
-
-    task = cur->rTasks[nextIdx];                 // 出参
-    indexTask.store(nextIdx, std::memory_order_release);  // 更新进度
-    return true;
-}
 void DemoRecorder::StartRecord(const Demo::RecordTask& task) {
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
     ++this->num;
@@ -167,196 +188,4 @@ void DemoRecorder::StartRecord(const Demo::RecordTask& task) {
         rp->str2 = task.fileNameNoExt;
     }
     this->PublishAsync(std::move(msg));
-}
-
-MulNX::CoTask DemoRecorder::Main() {
-    while (true) {
-        // 等待模块激活
-        co_await this->WaitUntil([this]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
-
-        // 等待队列中有任务
-        Demo::RecordTask rTask;
-        co_await this->WaitUntil([&]()->bool { return this->PeekQueue(rTask); });
-        // 检验窗口安全
-        if (rTask.tickStart < 1) {
-            this->LogWarning(std::format("录制窗口起点从 {} 修正至1", rTask.tickStart));
-            rTask.tickStart = 1;
-        }
-        this->LogInfo("进行新片段录制");
-        co_await this->RecordOne(rTask);
-    }
-}
-MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
-    this->LogInfo(std::format("汇报当前片段信息---UID:{},开始tick:{},结束tick:{}",
-        rTask.uid, rTask.tickStart, rTask.tickEnd));
-
-    // 首先暂停Demo
-    if (!this->CS2Time->IsDemoPaused()) {
-        this->LogInfo("当前Demo未暂停，尝试暂停");
-        for (int i = 0;;++i) {
-            this->AsyncCommand("demo_pause");
-            bool ok;
-            co_await this->WaitTimed(ok, 500, [&]() {
-                return this->CS2Time->IsDemoPaused();
-                });
-            if (ok) {
-                this->LogInfo("已经暂停，下一步");
-                break;
-            }
-            else if (i < 3) {
-                this->LogWarning("暂停失败，继续尝试暂停");
-                continue;
-            }
-            else {
-                this->LogError("多次暂停尝试失败");
-                break;
-            }
-        }
-    }
-    else {
-        this->LogInfo("当前Demo已暂停，继续步骤");
-    }
-    // 验证暂停状态
-    if (!this->CS2Time->IsDemoPaused()) {
-        this->LogError("当前Demo不处于暂停状态，已丢弃一个片段");
-        co_return;
-    }
-    // 验证音视频系统状态
-    if (this->pMediaState->IsBusy()) {
-        this->LogWarning("音视频系统忙碌，正在等待结束。如果在录制状态中，用户可能需要手动停止录制。");
-        co_await this->WaitUntil([this]() {
-            return !this->pMediaState->IsBusy();
-            });
-    }
-    // 跳转时间点，以设置观战目标
-    auto tick10before = rTask.tickStart - 10;
-    this->AsyncCommand(std::format("demo_gototick {}", tick10before));
-    // 等待跳转完成
-    MulNX::Message* gotoCplt = nullptr;
-    co_await this->WaitMsgForever("Demo/GotoTick/Complete"_hash, gotoCplt);
-    auto&& [jmped] = gotoCplt->Access<int>();
-    if (jmped != tick10before) {
-        this->LogError(std::format("期望跳到tick:{} 而接收到了跳转到tick:{}，已丢弃此片段",
-            tick10before, jmped));
-        co_return;
-    }
-
-    co_await this->WaitMilliseconds(750);
-
-    // 设置观战目标
-    for (int i = 0;;++i) {
-        auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-        if (!obUID || (obUID.value() != rTask.uid)) {
-            // 发送设置观察目标消息
-            MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
-            auto&& [uidRef] = specMsg.Access<Steam64UID>();
-            uidRef = rTask.uid;
-            this->PublishAsync(std::move(specMsg));
-        }
-        bool ok = false;
-        co_await this->WaitTimed(ok, 500, [&]() {
-            auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-            if (!obUID || (obUID.value() != rTask.uid))return false;
-            return true;
-            });
-        if (ok) {
-            break;
-        }
-        else if (i < 3) {
-            this->LogWarning("观战设置失败，重新尝试");
-            continue;
-        }
-        else {
-            this->LogError("多次尝试设置观战失败！");
-            break;
-        }
-    }
-    // 验证观战目标
-    auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-    if (!obUID || (obUID.value() != rTask.uid)) {
-        this->LogError("由于观战设置尝试失败，丢弃一个片段");
-        co_return;
-    }
-    this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
-
-    co_await this->WaitMilliseconds(750);
-
-    // 跳转到稍微靠前的时间点，刷新雷达状态等等
-    int beforeRecord = rTask.tickStart - 150;
-    this->AsyncCommand(std::format("demo_gototick {}", beforeRecord));
-    // 等待跳转完成
-    MulNX::Message* gotoCplt2 = nullptr;
-    co_await this->WaitMsgForever("Demo/GotoTick/Complete"_hash, gotoCplt2);
-    auto&& [jmped2] = gotoCplt2->Access<int>();
-    if (jmped2 != beforeRecord) {
-        this->LogError(std::format("期望跳到tick:{}而接收到了跳转到tick:{}，已丢弃此片段",
-            beforeRecord, jmped2));
-        co_return;
-    }
-
-    co_await this->WaitMilliseconds(750);
-
-    // 恢复Demo播放
-    for (int i = 0;;++i) {
-        bool ok = false;
-        this->AsyncCommand("demo_resume");
-        co_await this->WaitTimed(ok, 500, [&]() {
-            // 这里直接验证有没有向下走，如果走了自然播放了
-            return this->CS2Time->GetDemoTick() > beforeRecord;
-            });
-        if (ok) {
-            break;
-        }
-        else if (i < 3) {
-            this->LogWarning("正在等待回复播放");
-            continue;
-        }
-        else {
-            this->LogError("多次尝试恢复播放未成功");
-            break;
-        }
-    }
-    // 验证一下是不是确实走了
-    if (this->CS2Time->GetDemoTick() <= beforeRecord) {
-        this->LogError("播放未成功，已丢弃一个片段");
-        co_return;
-    }
-
-    // 等待播放到片段起点
-    for (int i = 0;;++i) {
-        bool ok = false;
-        co_await this->WaitTimed(ok, 2500, [&]() {
-            return this->CS2Time->GetDemoTick() > rTask.tickStart - 5;
-            });
-        if (ok) {
-            break;
-        }
-        else if (i < 2) {
-            this->LogWarning("正在等待播放到指定位置");
-            continue;
-        }
-        else {
-            this->LogError("多次等待播放到指定位置尝试均未成功");
-            break;
-        }
-    }
-    if (std::abs(rTask.tickStart - this->CS2Time->GetDemoTick()) > 32) {
-        this->LogError("恢复播放后，Tick流动不符合起点预期，丢弃一个片段");
-        co_return;
-    }
-
-    // 开始录制
-    this->StartRecord(rTask);
-    // 输出提示信息
-    this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
-        rTask.uid, rTask.tickStart, rTask.tickEnd));
-    // 等待录制结束 tick
-    co_await this->WaitUntil([&] {
-        auto curTick = this->CS2Time->GetDemoTick();
-        return curTick >= rTask.tickEnd;
-        });
-    // 停止录制
-    this->PublishAsync("Media/Record/Stop"_hash);
-    // 输出成功信息并重置状态
-    this->LogSucc(std::format("录制结束，UID={}", rTask.uid));
 }
