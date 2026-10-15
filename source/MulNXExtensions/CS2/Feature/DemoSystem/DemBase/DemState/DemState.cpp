@@ -57,7 +57,7 @@ void DemState::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-std::shared_ptr<const Demo::Info> DemState::GetDemoInfo(const std::string& demoName) {
+std::shared_ptr<const Demo::Info> DemState::GetDemoInfo(const std::string& demoName)const {
     std::shared_lock lock(this->smutex);
     auto it = this->demos.find(demoName);
     if (it == this->demos.end())return nullptr;

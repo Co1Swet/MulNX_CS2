@@ -45,8 +45,14 @@ void DemRPassManager::Commit() {
     // 分类：形态从 vector<RecordTask> 转换为 vector<RecordPass>
     auto passes = this->pDemClassifyPass->ApplyPass(std::move(rTasks));
     for (auto& pass : passes) {
-        this->pDemSortPass->ApplyPass(pass.rTasks);      // 就地对每个 demo 的任务排序
-        this->pDemMergePass->ApplyPass(pass.rTasks);     // 依赖前一步的有序性
-        // ...
+        this->pDemSortPass->ApplyPass(pass.rTasks); // 就地对每个 demo 的任务排序
+        this->pDemMergePass->ApplyPass(pass.rTasks); // 依赖前一步的有序性
+        this->pDemSortPass->ApplyPass(pass.rTasks); // 再跑一次排序
+
+        auto [msg, rp] = MulNX::Message::Create<Demo::RecordPass>("Demo/Record/Pass/Commit"_hash);
+        *rp = std::move(pass);
+        this->PublishAsync(std::move(msg));
     }
+
+    this->LogInfo(std::format("已提交 {} 个 RecordPass 到录制器", passes.size()));
 }

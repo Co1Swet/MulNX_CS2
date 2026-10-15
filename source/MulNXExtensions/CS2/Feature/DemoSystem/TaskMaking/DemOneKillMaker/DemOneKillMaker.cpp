@@ -8,6 +8,7 @@ bool DemOneKillMaker::Init() {
         .SubscribeAsyncEx<Steam64UID, size_t, size_t>("Demo/Record/Make/Kill")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/Death")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/FullRound")
+        .SubscribeAsync<void>("Demo/Record/Make/Flush")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -27,6 +28,10 @@ void DemOneKillMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
 
 void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
+    case "Demo/Record/Make/Flush"_hash: {
+        this->PublishAsync("Demo/Record/Commit"_hash);
+        break;
+    }
     case "Demo/Record/Make/Kill"_hash: {
         auto* pExt = msg.asp.get<MulNX::NetExt>();
         auto&& [uid, round, idx] = msg.Access<Steam64UID, size_t, size_t>();

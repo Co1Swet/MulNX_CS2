@@ -99,5 +99,5 @@ public:
     std::atomic<std::shared_ptr<const std::string>>currentOperatingDemoName = nullptr;
     std::atomic<std::shared_ptr<const std::string>>currentPlayingDemoName = nullptr;
 
-    std::shared_ptr<const Demo::Info> GetDemoInfo(const std::string& demoName);
+    std::shared_ptr<const Demo::Info> GetDemoInfo(const std::string& demoName)const;
 };
