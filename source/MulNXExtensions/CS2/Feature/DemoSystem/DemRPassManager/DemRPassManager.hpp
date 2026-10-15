@@ -9,7 +9,9 @@ class DemRPassManager final :public DemModuleBase {
     DemSortPass* pDemSortPass = nullptr;
     DemMergePass* pDemMergePass = nullptr;
     std::vector<Demo::RecordTask>bufferTasks{};
+
+    void Window();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
-    void Commit();
+    void Commit(const int autoRecord);
 };

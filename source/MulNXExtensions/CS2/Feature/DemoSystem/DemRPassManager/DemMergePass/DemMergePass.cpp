@@ -28,32 +28,47 @@ void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks) {
 
     std::vector<Demo::RecordTask> out;
     std::vector<int>              counts;
+    std::vector<int>              lastKillIdx;      // 平行数组：合并块内最后一个 killIndex
     out.reserve(rTasks.size());
     counts.reserve(rTasks.size());
+    lastKillIdx.reserve(rTasks.size());
 
     for (auto& t : rTasks) {
         if (!out.empty() && sameDomain(out.back(), t)) {
             mergeWindow(out.back(), t);
             ++counts.back();
+            lastKillIdx.back() = t.killIndex;       // 已排序，后者一定更大
         }
         else {
             out.push_back(std::move(t));
             counts.push_back(1);
+            lastKillIdx.push_back(out.back().killIndex);   // move 后再取，安全
         }
     }
 
-    // 统一重写描述：带上杀手 uid / 名字
     for (size_t i = 0; i < out.size(); ++i) {
         if (counts[i] <= 1) continue;
 
         auto& task = out[i];
+
         std::string killer = std::to_string(task.uid);
         if (auto info = this->pDemState->GetDemoInfo(task.demoName)) {
             killer = info->GetPlayerName(task.uid);
         }
 
-        task.desc = std::format("连续 {} 击杀（{}，uid {}），tick {} ~ {}",
-            counts[i], killer, task.uid, task.tickStart, task.tickEnd);
+        const int firstIdx = task.killIndex;    // push 时写入，merge 时未动，天然是"首"
+        const int lastIdx = lastKillIdx[i];    // 平行数组给出"尾"
+
+        task.desc = std::format(
+            "第 {} 回合连续 {} 击杀（{}，uid {}），击杀序号 {}-{} / 共 {}，tick {} ~ {}",
+            task.roundNumber, counts[i], killer, task.uid,
+            firstIdx, lastIdx, task.roundKill,
+            task.tickStart, task.tickEnd);
+
+        // 1 和 3 → "13"（首尾直接拼接）
+        task.fileNameNoExt = std::format("{}_{}_r{}_kill_{}{}_{}",
+            task.demoName, task.uid, task.roundNumber,
+            firstIdx, lastIdx, task.roundKill);
     }
 
     this->LogInfo(std::format("合并完成：{} -> {}", rTasks.size(), out.size()));

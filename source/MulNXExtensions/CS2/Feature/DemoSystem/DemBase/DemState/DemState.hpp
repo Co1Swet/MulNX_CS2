@@ -3,6 +3,7 @@
 
 namespace Demo {
     struct RecordTask {
+        // demo文件的裸名称
         std::string demoName{};
         // 任务描述
         std::string desc{};
@@ -16,6 +17,10 @@ namespace Demo {
         int tickRoundStart{};
         // 回合编号
         int roundNumber{};
+        // uid这个回合的击杀总量
+        int roundKill{};
+        // 这是回合的第几个击杀
+        int killIndex{};
         // 没有扩展名的文件名，不包括路径
         std::string fileNameNoExt{};
     };

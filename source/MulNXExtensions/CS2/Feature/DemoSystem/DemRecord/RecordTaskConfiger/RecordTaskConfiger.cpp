@@ -1,5 +1,4 @@
 #include "RecordTaskConfiger.hpp"
-#include <MulNX/Base/UI/UI.hpp>
 
 void RecordTaskConfiger::Window() {
     auto w = MulNX::UI::RAIIWindow("录制参数调节");
@@ -10,7 +9,7 @@ void RecordTaskConfiger::Window() {
     ImGui::SliderInt("被击杀前预留tick", &this->preRecordTicksBekilled, 1, 640);
     ImGui::SliderInt("被击杀后保留tick", &this->postRecordTicksBekilled, 1, 640);
 
-    MulNX::UI::SliderFloat("击杀合并阈值tick", this->mergeThresholdSeconds, 0.0f, 200.0f);
+    MulNX::UI::SliderFloat("击杀合并阈值秒数", this->mergeThresholdSeconds, 0.0f, 200.0f);
 
     ImGui::SeparatorText("回合配置");
     ImGui::SliderInt("回合结束额外停留tick", &this->postTickRoundEnd, 0, 500);

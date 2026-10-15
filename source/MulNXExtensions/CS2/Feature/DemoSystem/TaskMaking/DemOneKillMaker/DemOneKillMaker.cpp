@@ -8,7 +8,7 @@ bool DemOneKillMaker::Init() {
         .SubscribeAsyncEx<Steam64UID, size_t, size_t>("Demo/Record/Make/Kill")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/Death")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/FullRound")
-        .SubscribeAsync<void>("Demo/Record/Make/Flush")
+        .SubscribeAsync<int>("Demo/Record/Make/Flush")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -29,7 +29,9 @@ void DemOneKillMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
 void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Record/Make/Flush"_hash: {
-        this->PublishAsync("Demo/Record/Commit"_hash);
+        MulNX::Message commit(msg);
+        commit.type = "Demo/Record/Commit"_hash;
+        this->PublishAsync(std::move(commit));
         break;
     }
     case "Demo/Record/Make/Kill"_hash: {
@@ -46,11 +48,13 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
         rTask.roundNumber = static_cast<int>(round);
+        rTask.roundKill = info.killEvents.size();
+        rTask.killIndex = idx;
         rTask.desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
             pDemoInfo->GetPlayerName(ev.killerSteamId),
             pDemoInfo->GetPlayerName(ev.victimSteamId),
             rTask.tickStart, rTask.tickEnd);
-        rTask.fileNameNoExt = std::format("{}_{}_{}_kill_{}", pExt->str1, uid, round, idx);
+        rTask.fileNameNoExt = std::format("{}_{}_r{}_kill_{}", pExt->str1, uid, round, idx);
         this->PublishRecordTask(std::move(rTask));
         break;
     }
@@ -72,7 +76,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
             pDemoInfo->GetPlayerName(ev.victimSteamId),
             pDemoInfo->GetPlayerName(ev.killerSteamId),
             rTask.tickStart, rTask.tickEnd);
-        rTask.fileNameNoExt = std::format("{}_{}_{}_death", pExt->str1, uid, round);
+        rTask.fileNameNoExt = std::format("{}_{}_r{}_death", pExt->str1, uid, round);
         this->PublishRecordTask(std::move(rTask));
         break;
     }
@@ -110,7 +114,7 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
         rTask.roundNumber = static_cast<int>(round);
         rTask.desc = std::format("玩家 {} 第 {} 回合整段录制（{} ~ {} tick）",
             player.name, round, rTask.tickStart, rTask.tickEnd);
-        rTask.fileNameNoExt = std::format("{}_{}_{}_full", pExt->str1, uid, round);
+        rTask.fileNameNoExt = std::format("{}_{}_r{}_full", pExt->str1, uid, round);
         this->PublishRecordTask(std::move(rTask));
         break;
     }

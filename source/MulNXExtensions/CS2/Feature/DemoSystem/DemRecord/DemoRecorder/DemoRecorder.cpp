@@ -3,19 +3,16 @@
 #include <Support/TimeController/TimeController.hpp>
 
 void DemoRecorder::Window() {
-    auto w = MulNX::UI::RAIIWindow("Demo Recorder");
+    auto w = MulNX::UI::RAIIWindow("录制执行");
     if (!w || !w.ShouldDraw())return;
     std::shared_lock lock(this->smutex);
-
-    if (ImGui::Button("提交任务")) {
-        this->PublishAsync("Demo/Record/Make/FlushHigh"_hash);
-    }
+    
     if (ImGui::Button("启动")) {
-        this->PublishAsync("Demo/Record/Start"_hash);
+        this->PublishAsync("Demo/Pass/Start"_hash);
     }
     ImGui::SameLine();
-    if (ImGui::Button("清空队列")) {
-        this->PublishAsync("Demo/Record/Clear"_hash);
+    if (ImGui::Button("清空剩余任务")) {
+        this->PublishAsync("Demo/Pass/Clear"_hash);
     }
     ImGui::Text(
         std::format("当前输出文件夹：{}", (this->dirOutput / this->subOutput).string()).c_str()
@@ -23,26 +20,26 @@ void DemoRecorder::Window() {
     static std::string buf;
     ImGui::InputText("新的输出子路径", &buf);
     if (ImGui::Button("更新子路径")) {
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/SetOutput"_hash);
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Pass/SetOutput"_hash);
         rp->str1 = buf;
         this->PublishAsync(std::move(msg));
     }
-    ImGui::Text(std::format("当前索引：{}", this->num.load()).c_str());
-
-    int ticksToRecord = 0;
-
+    
     auto curPass = this->currentPass.load(std::memory_order_acquire);
     if (!curPass) {
         ImGui::Text("当前无执行中录制批次");
         return;
     }
+
+    ImGui::Text("待录制时间：");
+    int ticksToRecord = 0;
     for (const auto& recordTask : curPass->rTasks) {
         ticksToRecord += (recordTask.tickEnd - recordTask.tickStart);
     }
-
-    ImGui::Text("待录制时间：");
     MulNX::UI::ShowTime(ticksToRecord);
+
     ImGui::SeparatorText("当前队列");
+    ImGui::Text(std::format("当前索引：{}", this->num.load()).c_str());
 
     auto now = this->indexTask.load(std::memory_order_acquire);
     for (int i = 0;i < curPass->rTasks.size();++i) {
@@ -59,11 +56,11 @@ void DemoRecorder::Window() {
 bool DemoRecorder::Init() {
     this->dirOutput = this->Path()->PathGetForShared("Output");
     (*this)
-        .SubscribeAsync("Demo/Record/Pass/Commit")
-        .SubscribeAsync("Demo/Record/Start")
-        .SubscribeAsync("Demo/Record/Clear")
-        .SubscribeAsync("Demo/Record/Stop")
-        .SubscribeAsync("Demo/Record/SetOutput")
+        .SubscribeAsync("Demo/Pass/Commit")
+        .SubscribeAsync("Demo/Pass/Start")
+        .SubscribeAsync("Demo/Pass/Clear")
+        .SubscribeAsync("Demo/Pass/Stop")
+        .SubscribeAsync("Demo/Pass/SetOutput")
         .SubscribeAsync("Demo/GotoTick/Complete")
         ;
 
@@ -83,27 +80,27 @@ bool DemoRecorder::Init() {
 
 void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Demo/Record/Pass/Commit"_hash: {
+    case "Demo/Pass/Commit"_hash: {
         std::unique_lock lock(this->smutex);
         auto pass = std::move(*msg.asp.get<Demo::RecordPass>());
         this->recordPasses.push_back(std::make_shared<Demo::RecordPass>(std::move(pass)));
         break;
     }
-    case "Demo/Record/Clear"_hash: {
+    case "Demo/Pass/Clear"_hash: {
         std::unique_lock lock(this->smutex);
         this->recordPasses.clear();
         break;
     }
-    case "Demo/Record/Start"_hash: {
+    case "Demo/Pass/Start"_hash: {
         this->moduleActive.store(true, std::memory_order_release);
         this->LogInfo("Module activated.");
         break;
     }
-    case "Demo/Record/Stop"_hash: {
+    case "Demo/Pass/Stop"_hash: {
         this->moduleActive.store(false, std::memory_order_release);
         break;
     }
-    case "Demo/Record/SetOutput"_hash: {
+    case "Demo/Pass/SetOutput"_hash: {
         std::unique_lock lock(this->smutex);
         auto target = msg.asp.get<MulNX::NetExt>()->str1;
         if (target.empty()) {
