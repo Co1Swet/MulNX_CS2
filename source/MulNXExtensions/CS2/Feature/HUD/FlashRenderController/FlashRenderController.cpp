@@ -23,7 +23,6 @@ bool FlashRenderController::Init() {
         this->RegisterAttachHook(this->hkDrawUp, "PosCallCmpDrawFlashUpHUD");
 
         auto down = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Flash::PosCallCmpDrawFlashDownHUD).Data();
-        down -= 5;
         this->hkDrawDown = MulNX::Hook::Create(down, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->rendFlashDownHUD.load(std::memory_order_relaxed)) {
                 ctx->rax = 1ULL;

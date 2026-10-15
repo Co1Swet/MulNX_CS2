@@ -60,15 +60,15 @@ namespace CS2 {
         }
         namespace Flash {
             inline constexpr MulNX::Memory::Pattern PosCallCmpDrawFlashUpHUD("48 8B F2 48 8B E9 E8 ?? ?? ?? ?? 84 C0 0F 85");
-            inline constexpr MulNX::Memory::Pattern PosCallCmpDrawFlashDownHUD("84 C0 74 4C 8B 85 ?? ?? ?? ?? 49 8D 8D ?? ?? ?? ?? 0F 10 85");
+            inline constexpr MulNX::Memory::Pattern PosCallCmpDrawFlashDownHUD("E8 ?? ?? ?? ?? 84 C0 74 4C 8B 85 ?? ?? ?? ?? 49 8D 8F");
         }
         namespace Spot {
-            inline constexpr MulNX::Memory::Pattern Pos_CallGetPawnMaybeSetAllHUD("0F B6 9F ?? ?? ?? ?? 48 8B F0 41 BD 80 00 00 00 84 DB");
+            inline constexpr MulNX::Memory::Pattern Pos_CallGetPawnMaybeSetAllHUD("48 8B D8 41 BE 80 00 00 00 0F B6 87 ?? ?? ?? ?? 84 C0");
 
             inline constexpr MulNX::Memory::Pattern Pos_CmpToSetShow("38 5C 24 ?? 0F 84 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? F3 41 0F 10 8E ?? ?? ?? ?? F3 0F 10 41");// 从cvar定位
             inline constexpr MulNX::Memory::Pattern Pos_WriteMaybeEnumToChangeRadarPlayerDraw("48 8B 6C 24 ?? 41 39 9E ?? ?? ?? ?? 74 ?? 33 D2");// 交叉引用
             inline constexpr MulNX::Memory::Pattern Func_FinallyUpdatePlayerState("44 8B F2 41 81 E6 FF FF FF ?? 8B D8 41 33 DE");// 交叉引用
-            inline constexpr MulNX::Memory::Pattern Pos_WriteBombState("41 FF D0 65 48 8B 04 25 ?? ?? ?? ?? BB 68 00 00 00");// 交叉引用
+            inline constexpr MulNX::Memory::Pattern Pos_WriteBombState("41 FF D0 65 48 8B 04 25 ?? ?? ?? ?? 41 8B CF 48 8B 04 C8");// 交叉引用
 
             inline constexpr MulNX::Memory::Pattern Pos_CmpToSetColor("4C 89 6C 24 ?? 84 DB 0F 84");// 附近引用了 字符串： CCSGO_HudTeamCounter
             inline constexpr MulNX::Memory::Pattern Pos_CmpToSetTColor("E8 ?? ?? ?? ?? 41 3B C5 0F 85 ?? ?? ?? ?? F6 86");// 附近引用了 字符串： CCSGO_HudTeamCounter

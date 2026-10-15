@@ -9,9 +9,9 @@ namespace CS2 {
     };
     class CCSDemoController {
     public:
-        char pad_0000[0x40]; //0x0000
-        size_t m_nRoundCount; //0x0040
-        DemoRoundInterval* m_pRoundIntervals; //0x0048
+        char pad_0000[0x50];
+        size_t m_nRoundCount;
+        DemoRoundInterval* m_pRoundIntervals;
     };
 #pragma pack(pop)
 }
