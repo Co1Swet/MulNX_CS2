@@ -1,21 +1,10 @@
 #include "DemoFiles.hpp"
 
-void OpenFolder(const std::wstring& wpath) {
-    ::ShellExecuteW(
-        nullptr,          // 父窗口 HWND
-        L"open",          // 动词：open / explore
-        wpath.c_str(),    // 文件夹路径
-        nullptr,          // 参数（文件夹不需要）
-        nullptr,          // 工作目录（默认）
-        SW_SHOWNORMAL     // 显示方式
-    );
-}
-
 void DemoFiles::Menu() {
-    std::unique_lock lock(this->smutex);
+    std::unique_lock lock(this->smutex); // 真的，你不需要担心这个几乎不会竞争的锁
 
     if (ImGui::Button("打开Demo文件夹")) {
-        OpenFolder(this->CS2Paths->demo.wstring());
+        fs::OpenFolderWindow(this->CS2Paths->demo);
     }
     ImGui::SameLine();
     if (ImGui::Button("刷新软件Demo列表")) {
@@ -81,6 +70,11 @@ void DemoFiles::Menu() {
     }
     if (ImGui::Button("尝试加载所选分析文件")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
+        rp->str1 = demFile.path.stem().string();
+        this->PublishAsync(std::move(msg));
+    }
+    if (ImGui::Button("选中以准备生成录制")) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
         rp->str1 = demFile.path.stem().string();
         this->PublishAsync(std::move(msg));
     }

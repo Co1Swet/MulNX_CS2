@@ -1,6 +1,6 @@
 #pragma once
+#include "ghc/filesystem.hpp"
 #include <yaml-cpp/yaml.h>
-#include <MulNXThirdParty/ghc/fs.hpp>
 
 namespace YAML {
     inline Node LoadFilePath(const ghc::filesystem::path& path) {

@@ -1,6 +1,5 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <MulNXThirdParty/ghc/fs.hpp>
 #include <atomic>
 
 class CamPack {

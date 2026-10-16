@@ -1,5 +1,5 @@
 #pragma once
-#include <MulNXThirdParty/ghc/fs.hpp>
+#include <MuLNX/Base/fs.hpp>
 #include <string>
 
 namespace MulNX {

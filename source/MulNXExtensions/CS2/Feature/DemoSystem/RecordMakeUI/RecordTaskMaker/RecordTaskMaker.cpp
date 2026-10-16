@@ -56,8 +56,6 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
 }
 
 std::shared_ptr<const Demo::Info> RecordTaskMaker::DemoChooseMenu(MulNX::UICoordinator* uico) {
-    ImGui::Text("选择demo：");
-
     auto pPlaying = this->pDemSys->GetCurrentPlayingDemoName();
     if (pPlaying) {
         ImGui::SameLine();
@@ -69,8 +67,6 @@ std::shared_ptr<const Demo::Info> RecordTaskMaker::DemoChooseMenu(MulNX::UICoord
         }
     }
 
-    uico->CallbackCall("UI.Demo.Choose"_hash, nullptr);
-
     auto pOperating = this->pDemSys->GetCurrentOperatingDemoName();
     if (!pOperating) {
         ImGui::Text("未选中任何demo");
@@ -78,7 +74,7 @@ std::shared_ptr<const Demo::Info> RecordTaskMaker::DemoChooseMenu(MulNX::UICoord
     }
     auto pDemo = this->pDemSys->GetDemoInfo(*pOperating);
     if (!pDemo) {
-        ImGui::Text("未选中任何demo");
+        ImGui::Text(std::format("选中Demo：{} ，而尚未加载信息！", *pOperating).c_str());
         return nullptr;
     }
     return pDemo;

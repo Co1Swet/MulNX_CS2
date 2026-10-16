@@ -2,7 +2,6 @@
 #include <MulNX/MulNX.hpp>
 #include <CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
 #include <MulNXThirdParty/yaml.hpp>
-#include <MulNXThirdParty/ghc/fs.hpp>
 
 class CameraDrawer;
 

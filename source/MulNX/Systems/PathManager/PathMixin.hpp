@@ -1,6 +1,5 @@
 #pragma once
-#include <MulNX/Core/Module/IModule.hpp>
-#include <MulNXThirdParty/ghc/fs.hpp>
+#include <MulNX/Base/fs.hpp>
 
 namespace MulNX {
     class PathManager;

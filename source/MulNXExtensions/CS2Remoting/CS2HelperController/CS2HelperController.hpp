@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <MulNXThirdParty/ghc/fs.hpp>
+#include <MulNX/Base/fs.hpp>
 
 class CS2HelperController final :public MulNX::Module<CS2HelperController> {
     class DLLInjectHelper* pInjectHelper = nullptr;

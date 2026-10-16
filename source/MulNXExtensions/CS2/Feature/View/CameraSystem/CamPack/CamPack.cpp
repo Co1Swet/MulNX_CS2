@@ -1,6 +1,5 @@
 #include "CamPack.hpp"
 #include <MulNXThirdParty/yaml.hpp>
-#include <MulNXThirdParty/ghc/fs.hpp>
 #include <fstream>
 
 void CamPack::ResetName(const std::string& newName) {
