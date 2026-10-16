@@ -10,7 +10,7 @@ bool SkinController::Init() {
     this->pSkinConfigger = this->FindModule<SkinConfigger>("SkinConfigger");
 
     this->SubscribeSync("Hook/MainLoop/TickJumpDetected", [this](auto&&...) {
-        this->AsyncCommand("regenerate_weapon_skins");
+        //this->AsyncCommand("regenerate_weapon_skins");
         });
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {

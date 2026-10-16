@@ -39,6 +39,8 @@ namespace CS2 {
     class CGameSceneNode {
     public:
         C_BaseEntity** m_pOwner() { return Schema<C_BaseEntity*>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_pOwner); }
+        CGameSceneNode** m_pChild() { return Schema<CGameSceneNode*>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_pChild); }
+
         DirectX::XMFLOAT3* vecAbsOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecAbsOrigin); }
         DirectX::XMFLOAT3* vecOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecOrigin); }
         DirectX::XMFLOAT3* angAbsRotation() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_angAbsRotation); }
@@ -148,6 +150,7 @@ namespace CS2 {
 
     class CEconItemAttribute {
     public:
+        inline static constexpr size_t ofsize = 0x48;
         uint16_t* m_iAttributeDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_iAttributeDefinitionIndex); }
         float* m_flValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flValue); }
         float* m_flInitialValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flInitialValue); }
@@ -263,12 +266,15 @@ namespace CS2 {
         SpottedMask* m_bSpottedByMask() { return Schema<SpottedMask>(this, cs2_dumper::schemas::client_dll::EntitySpottedState_t::m_bSpottedByMask); }  // uint32[2]
     };
 
+    class C_CS2HudModelArms;
     class C_CSPlayerPawn :public C_CSPlayerPawnBase {
     public:
         DirectX::XMFLOAT3* angEyeAngles() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_angEyeAngles); }
         EntitySpottedState_t* m_entitySpottedState() { return Schema<EntitySpottedState_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_entitySpottedState); }
         int32_t* m_ArmorValue() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_ArmorValue); }
         bool* m_bPrevHelmet() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_bPrevHelmet); }
+
+        CHandle<C_CS2HudModelArms>* m_hHudModelArms() { return Schema<CHandle<C_CS2HudModelArms>>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_hHudModelArms); }
 
         float* m_flViewmodelOffsetX() { return Schema<float>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_flViewmodelOffsetX); }
         float* m_flViewmodelOffsetY() { return Schema<float>(this, cs2_dumper::schemas::client_dll::C_CSPlayerPawn::m_flViewmodelOffsetY); }
