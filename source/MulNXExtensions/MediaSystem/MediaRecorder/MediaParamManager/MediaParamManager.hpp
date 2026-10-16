@@ -10,7 +10,7 @@ class MediaParamManager :public MediaModuleBase {
 public:
     // ── 编码器 ──
     EncodeMode  mode = EncodeMode::Auto;
-    RateControl rc = RateControl::VBR;
+    RateControl rc = RateControl::CBR;
     int         bitrate = 80'000'000;  // bps, CBR/VBR 时有效
     int         cq = 23;          // CQ 质量 0-51, 越小越好
     int         maxBFrames = 0;           // 0=无 B 帧

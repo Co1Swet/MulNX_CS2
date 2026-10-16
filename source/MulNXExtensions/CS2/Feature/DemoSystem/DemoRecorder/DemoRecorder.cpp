@@ -1,6 +1,6 @@
 #include "DemoRecorder.hpp"
 
-void DemoRecorder::Window() {
+void DemoRecorder::Window()const {
     auto w = MulNX::UI::RAIIWindow("录制执行");
     if (!w || !w.ShouldDraw()) return;
     std::shared_lock lock(this->smutex);
@@ -88,17 +88,14 @@ void DemoRecorder::Window() {
     );
     if (this->recordPasses.empty()) {
         ImGui::TextUnformatted("（队列为空）");
+        return;
     }
-    else {
-        for (const auto& pass : this->recordPasses) {
-
-            std::string title = std::format("#{}  ({} 个任务)",
-                pass->demoFileName.empty() ? "<未命名批次>" : pass->demoFileName,
-                pass->rTasks.size());
-
-            if (ImGui::CollapsingHeader(title.c_str())) {
-                DrawTasks(*pass, /*highlightIdx=*/-1);
-            }
+    for (const auto& pass : this->recordPasses) {
+        std::string title = std::format("#{}  ({} 个任务)",
+            pass->demoFileName.empty() ? "<未命名批次>" : pass->demoFileName,
+            pass->rTasks.size());
+        if (ImGui::CollapsingHeader(title.c_str())) {
+            DrawTasks(*pass, /*highlightIdx=*/-1);
         }
     }
 }

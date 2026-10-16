@@ -20,7 +20,7 @@ class DemoRecorder final : public DemModuleBase, public MediaModuleMixin<DemoRec
     MulNX::CoTask Main();
     MulNX::CoTask RecordOne(const Demo::RecordTask& rTask);
     std::atomic<uint64_t> num = 0;
-    void Window();
-    bool Init() override;
-    void ProcessMsg(MulNX::Message& msg) override;
+    void Window()const;
+    bool Init()override;
+    void ProcessMsg(MulNX::Message& msg)override;
 };
