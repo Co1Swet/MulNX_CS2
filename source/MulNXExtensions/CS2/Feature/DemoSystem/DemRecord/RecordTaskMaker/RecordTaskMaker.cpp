@@ -55,12 +55,6 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     }
 }
 
-void RecordTaskMaker::PublishRecordTask(Demo::RecordTask&& rTask) {
-    auto [msg, rp] = MulNX::Message::Create<Demo::RecordTask>("Demo/Record/Enqueue"_hash);
-    *rp = std::move(rTask);
-    this->PublishAsync(std::move(msg));
-}
-
 std::shared_ptr<const Demo::Info> RecordTaskMaker::DemoChooseMenu(MulNX::UICoordinator* uico) {
     ImGui::Text("选择demo：");
 
@@ -189,7 +183,7 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
         ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
     }
 
-    // ---------- 被击杀事件（不参与合并）----------
+    // 被击杀事件
     if (this->showBekillEvent && info.Bekilled.has_value()) {
         const auto& ev = info.Bekilled.value();
         ImGui::TableNextRow();

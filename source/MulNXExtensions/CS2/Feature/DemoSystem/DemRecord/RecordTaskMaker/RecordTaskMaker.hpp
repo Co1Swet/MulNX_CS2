@@ -5,8 +5,6 @@ class RecordTaskConfiger;
 class RecordTaskMaker final :public DemModuleBase {
     RecordTaskConfiger* pConfiger = nullptr;
 
-    void PublishRecordTask(Demo::RecordTask&& rTask);
-
     bool showBekillEvent = true;
     std::shared_ptr<const Demo::Info> DemoChooseMenu(MulNX::UICoordinator* uico);
     void DemoMetaMenu(const Demo::Info& demoInfo);

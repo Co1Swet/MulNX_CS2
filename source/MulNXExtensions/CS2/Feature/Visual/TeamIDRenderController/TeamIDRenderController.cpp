@@ -51,10 +51,7 @@ MulNX::Hook::Then TeamIDRenderController::HandleForShowTeamID(CS2::C_CSPlayerPaw
             return MulNX::Hook::Then::Continue; // 继续按照旧有距离规则进行判断
         }
         // 跳转到使得迭代器更新的循环尾，继续下一个对象
-        // 注意到，这样只是跳过了
-        // comiss xmm7,xmm6
-        // jb client + rel32
-        // 寄存器没有变化，标记位的变化应该也是安全的
+        // xmm寄存器已经被新版本钩子保存了，这里应当认为安全
         return MulNX::Hook::Then::JmpUserSettedTarget;
     }
     catch (const std::exception& e) {

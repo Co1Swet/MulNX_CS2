@@ -123,7 +123,6 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 Demo 相关模块
         .CreateModule<DemState>("DemState")
-        .CreateModule<DemoHelper>("DemoHelper")
         .CreateModule<DemoFiles>("DemoFiles")
         .CreateModule<DemoAnalyzer>("DemoAnalyzer")
         .CreateModule<DemoJSONReader>("DemoJSONReader")

@@ -1,7 +1,4 @@
 #include "DemoSystem.hpp"
-#include <MulNX/Base/UI/UI.hpp>
-#include <Support/TimeController/TimeController.hpp>
-#include <shellapi.h>
 
 void DemoSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("Demo系统", this->showWindow);

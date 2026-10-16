@@ -1,6 +1,4 @@
 add_library(DemoSystem STATIC
-    DemBase/DemoHelper/DemoHelper.cpp
-
     DemLoad/DemoAnalyzer/DemoAnalyzer.cpp
     DemLoad/DemoJSONReader/DemoJSONReader.cpp
 
