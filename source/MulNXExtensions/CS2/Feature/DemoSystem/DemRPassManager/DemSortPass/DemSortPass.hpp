@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemBase/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemModuleBase.hpp>
 
 class DemSortPass final : public DemModuleBase {
     bool Init() override;

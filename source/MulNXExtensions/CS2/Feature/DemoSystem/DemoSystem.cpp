@@ -11,6 +11,9 @@ void DemoSystem::Window(MulNX::UICoordinator* uico) {
 bool DemoSystem::Init() {
     (*this)
         .SubscribeAsync("Demo/Play")
+        .SubscribeAsync("Demo/SetPlaying")
+        .SubscribeAsync("Demo/Info/Load")
+        .SubscribeAsync("Demo/SetOperating")
         ;
 
     this->UIRegisterCallback("UI.Advanced", [this](auto&&...) {
@@ -38,5 +41,43 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         this->AsyncCommand(std::format("playdemo \"{}\"", path));
         break;
     }
+    case "Demo/SetPlaying"_hash: {
+        const auto full = fs::path(msg.asp.get<MulNX::NetExt>()->str1);
+        this->currentPlayingDemoName = std::make_shared<std::string>(full.stem().string());
+        // 发送分析请求（包含完整路径）
+        auto [ana, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
+        rp->str1 = full.string();
+        this->PublishAsync(std::move(ana));
+        break;
     }
+    case "Demo/Info/Load"_hash: {
+        std::unique_lock lock(this->smutex);
+        auto demoInfo = *msg.asp.get<Demo::Info>();
+        auto name = demoInfo.demoFileName;
+        this->demos[name] = std::make_shared<Demo::Info>(std::move(demoInfo));
+        auto [notify, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Info/Notify"_hash);
+        rp->str1 = std::move(name);
+        this->PublishAsync(std::move(notify));
+        break;
+    }
+    case "Demo/SetOperating"_hash: {
+        std::unique_lock lock(this->smutex);
+        this->currentOperatingDemoName =
+            std::make_shared<std::string>(msg.asp.get<MulNX::NetExt>()->str1);
+        break;
+    }
+    }
+}
+
+std::shared_ptr<const std::string> DemoSystem::GetCurrentOperatingDemoName()const {
+    return this->currentOperatingDemoName.load(std::memory_order_acquire);
+}
+std::shared_ptr<const std::string> DemoSystem::GetCurrentPlayingDemoName()const {
+    return this->currentPlayingDemoName.load(std::memory_order_acquire);
+}
+std::shared_ptr<const Demo::Info> DemoSystem::GetDemoInfo(const std::string& demoName)const {
+    std::shared_lock lock(this->smutex);
+    auto it = this->demos.find(demoName);
+    if (it == this->demos.end())return nullptr;
+    return it->second;
 }

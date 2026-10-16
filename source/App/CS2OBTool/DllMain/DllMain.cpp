@@ -122,7 +122,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<SoundCircleFix>("SoundCircleFix")
 
         // CS2 Demo 相关模块
-        .CreateModule<DemState>("DemState")
+        .CreateModule<DemoSystem>("DemoSystem")
         .CreateModule<DemoFiles>("DemoFiles")
         .CreateModule<DemoAnalyzer>("DemoAnalyzer")
         .CreateModule<DemoJSONReader>("DemoJSONReader")
@@ -138,7 +138,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<DemoRecorder>("DemoRecorder")
         .CreateModule<DemoEventsRender>("DemoEventsRender")
         .CreateModule<DemoPlayerInfoRender>("DemoPlayerInfoRender")
-        .CreateModule<DemoSystem>("DemoSystem")
 
         // CS2 地图更换功能模块
         .CreateModule<MapState>("MapState")

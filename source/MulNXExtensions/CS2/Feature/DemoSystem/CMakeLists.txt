@@ -1,25 +1,27 @@
 add_library(DemoSystem STATIC
-    DemLoad/DemoAnalyzer/DemoAnalyzer.cpp
-    DemLoad/DemoJSONReader/DemoJSONReader.cpp
-
-    DemRecord/DemoRecorder/DemoRecorder.cpp
-    DemRecord/RecordTaskMaker/RecordTaskMaker.cpp
-    DemRecord/RecordTaskConfiger/RecordTaskConfiger.cpp
-
-    DemRend/DemoEventsRender/DemoEventsRender.cpp
-    DemRend/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
-
     DemoSystem.cpp
-    DemLoad/DemoFiles/DemoFiles.cpp
-    DemBase/DemState/DemState.cpp
-    TaskMaking/DemOneKillMaker/DemOneKillMaker.cpp
-    TaskMaking/DemWrapMaker/DemWrapMaker.cpp
-    MenuRendering/DemEasyView/DemEasyView.cpp
+    DemLoading/DemoAnalyzer/DemoAnalyzer.cpp
+    DemLoading/DemoFiles/DemoFiles.cpp
+    DemLoading/DemoJSONReader/DemoJSONReader.cpp
+
+    RecordTaskConfiger/RecordTaskConfiger.cpp
+
+    DemoRecorder/DemoRecorder.cpp
+    DemoRecorder/RecordCoTaskImpl.cpp
+
     DemRPassManager/DemRPassManager.cpp
     DemRPassManager/DemMergePass/DemMergePass.cpp
     DemRPassManager/DemClassifyPass/DemClassifyPass.cpp
     DemRPassManager/DemSortPass/DemSortPass.cpp
-    DemRecord/DemoRecorder/RecordCoTaskImpl.cpp
+
+    DemUI/DemoEventsRender/DemoEventsRender.cpp
+    DemUI/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
+
+    RecordMakeUI/DemEasyView/DemEasyView.cpp
+    RecordMakeUI/RecordTaskMaker/RecordTaskMaker.cpp
+
+    RecordMaking/DemOneKillMaker/DemOneKillMaker.cpp
+    RecordMaking/DemWrapMaker/DemWrapMaker.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

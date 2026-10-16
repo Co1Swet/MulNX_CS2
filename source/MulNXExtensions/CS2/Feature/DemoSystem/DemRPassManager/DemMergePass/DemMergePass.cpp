@@ -1,5 +1,5 @@
 #include "DemMergePass.hpp"
-#include <Feature/DemoSystem/DemRecord/RecordTaskConfiger/RecordTaskConfiger.hpp>
+#include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
 bool DemMergePass::Init() {
     this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
@@ -52,7 +52,7 @@ void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks) {
         auto& task = out[i];
 
         std::string killer = std::to_string(task.uid);
-        if (auto info = this->pDemState->GetDemoInfo(task.demoName)) {
+        if (auto info = this->pDemSys->GetDemoInfo(task.demoName)) {
             killer = info->GetPlayerName(task.uid);
         }
 
