@@ -115,4 +115,5 @@ public:
     std::shared_ptr<const std::string> GetCurrentOperatingDemoName()const;
     std::shared_ptr<const std::string> GetCurrentPlayingDemoName()const;
     std::shared_ptr<const Demo::Info> GetDemoInfo(const std::string& demoName)const;
+    std::shared_ptr<const Demo::Info> GetCurOpDemoInfo()const;
 };

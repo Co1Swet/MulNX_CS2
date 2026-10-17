@@ -81,3 +81,11 @@ std::shared_ptr<const Demo::Info> DemoSystem::GetDemoInfo(const std::string& dem
     if (it == this->demos.end())return nullptr;
     return it->second;
 }
+std::shared_ptr<const Demo::Info> DemoSystem::GetCurOpDemoInfo()const {
+    std::shared_lock lock(this->smutex);
+    auto pCurOp = this->currentOperatingDemoName.load(std::memory_order_acquire);
+    if (!pCurOp)return nullptr;
+    auto it = this->demos.find(*pCurOp);
+    if (it == this->demos.end())return nullptr;
+    return it->second;
+}

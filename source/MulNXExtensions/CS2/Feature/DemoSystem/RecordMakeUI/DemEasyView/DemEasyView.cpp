@@ -5,6 +5,7 @@ void DemEasyView::Window() {
     if (!w.ShouldDraw())return;
     std::shared_lock lock(this->smutex);
 
+    // 自动探测
     auto uid = this->localUid.load(std::memory_order_acquire);
     if (uid == 0) try {
         auto pCtrl = this->CS2->client.dwLocalPlayerController();
@@ -25,13 +26,46 @@ void DemEasyView::Window() {
         this->LogWarning(e);
         return;
     }
-
-    ImGui::Text(std::format("您的Steam数字ID是：{}", uid).c_str());
-    ImGui::Text(std::format("您的Steam账户名是：{}", this->localName).c_str());
-    if (ImGui::Button("不是您？点我刷新")) {
-        this->localUid.store(0, std::memory_order_release);
+    // 状态显示
+    ImGui::TextUnformatted(std::format("您的Steam数字ID是：{}", uid).c_str());
+    ImGui::TextUnformatted(std::format("您的Steam账户名是：{}", this->localName).c_str());
+    if (ImGui::CollapsingHeader("不是您？点我")) {
+        if (ImGui::Button("自动更新")) {
+            this->localUid.store(0, std::memory_order_release);
+        }
+        static ImU64 uidBuf = 0;
+        ImGui::InputScalar("Steam数字ID", ImGuiDataType_U64, &uidBuf, nullptr, nullptr, "%llu");
+        if (ImGui::Button("提交")) {
+            this->localUid.store(uidBuf, std::memory_order_release);
+        }
     }
+    
     ImGui::SeparatorText("立刻生成");
+
+    auto pDemo = this->pDemSys->GetCurOpDemoInfo();
+    if (!pDemo) {
+        ImGui::TextUnformatted("当前没有选中Demo！您需要先选择一个哦");
+        return;
+    }
+    auto it = pDemo->players.find(this->localUid.load(std::memory_order_acquire));
+    if (it == pDemo->players.end()) {
+        ImGui::TextUnformatted("当前选中的Demo中没有您！");
+        return;
+    }
+    const auto& player = it->second;
+    for (const auto& [idx, round] : player.roundInfo) {
+        auto count = round.killEvents.size();
+        if (count < 3)continue;
+        ImGui::SeparatorText(std::format("第 {} 回合", idx).c_str());
+        if (ImGui::Button(std::format("{}杀  一键生成##{}", count, idx).c_str())) {
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/RoundKill"_hash);
+            rp->str1 = pDemo->demoFileName;
+            auto&& [rUid, rRound] = msg.Access<Steam64UID, size_t>();
+            rUid = uid;
+            rRound = idx;
+            this->PublishAsync(std::move(msg));
+        }
+    }
 }
 
 bool DemEasyView::Init() {
