@@ -17,7 +17,14 @@ bool HookDemo::Init() {
         }
         if (name == "demo_timescale") {
             this->hkDemeTimescale = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
-                this->LogError("demo_timescale 被禁用！请使用host_timescale替代！");
+                auto cmd = (CCommand*)ctx->rdx;
+                if (std::string_view(cmd->pRawString) == "demo_timescale 1.000000")
+                    return MulNX::Hook::Then::Continue;
+                static std::atomic<bool> first = true;
+                if (first) {
+                    this->LogError("demo_timescale 被禁用！请使用host_timescale替代！");
+                    first = false;
+                }
                 ctx->rax = 0;
                 return MulNX::Hook::Then::Return;
                 }).value();

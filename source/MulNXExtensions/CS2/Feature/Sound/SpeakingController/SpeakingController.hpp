@@ -4,7 +4,10 @@
 
 class SpeakingController :public CSModuleBase {
     int* tv_listen_voice_indices = nullptr;
+    int* tv_listen_voice_indices_h = nullptr;
+
     int bufferMask = 0;
+    int bufferMaskHigh = 0;
 
     std::unordered_map<Steam64UID, bool>checkList{};
 

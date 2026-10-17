@@ -6,7 +6,7 @@ void EntityListScanner::Window() {
     auto w = MulNX::UI::RAIIWindow("实体列表探测器", this->showWindow);
     if (!w || !w.ShouldDraw())return;
 
-    for (int i = 0;i < 30;++i) {
+    for (int i = 0;i < 64;++i) {
         auto* entity = this->CS2Entitys->GetBaseEntity(i);
         if (!entity)continue;
 
