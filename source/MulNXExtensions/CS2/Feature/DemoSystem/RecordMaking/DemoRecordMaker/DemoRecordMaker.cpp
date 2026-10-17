@@ -1,11 +1,12 @@
-#include "DemWrapMaker.hpp"
+#include "DemoRecordMaker.hpp"
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
-bool DemWrapMaker::Init() {
+bool DemoRecordMaker::Init() {
     this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
 
     (*this)
         .SubscribeAsyncEx<Steam64UID>("Demo/Record/Make/FullRoundAll")
+        .SubscribeAsyncEx<Steam64UID>("Demo/Record/Make/RoundKillAll")
         .SubscribeAsync<int>("Demo/Record/Make/FlushHigh")
         ;
 
@@ -17,7 +18,7 @@ bool DemWrapMaker::Init() {
     return true;
 }
 
-void DemWrapMaker::ProcessMsg(MulNX::Message& msg) {
+void DemoRecordMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Record/Make/FullRoundAll"_hash: {
         auto* pExt = msg.asp.get<MulNX::NetExt>();
@@ -26,6 +27,21 @@ void DemWrapMaker::ProcessMsg(MulNX::Message& msg) {
         this->LogInfo(std::format("为玩家 {} 准备所有回合录制", pDemoInfo->players.at(uid).name));
         for (int i = pDemoInfo->rounds.front().number;i <= pDemoInfo->rounds.back().number;++i) {
             auto [one, p] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/FullRound"_hash);
+            p->str1 = pDemoInfo->demoFileName;
+            auto&& [rUid, rRound] = one.Access<Steam64UID, size_t>();
+            rUid = uid;
+            rRound = i;
+            this->PublishAsync(std::move(one));
+        }
+        break;
+    }
+    case "Demo/Record/Make/RoundKillAll"_hash: {
+        auto* pExt = msg.asp.get<MulNX::NetExt>();
+        auto&& [uid] = msg.Access<Steam64UID>();
+        auto pDemoInfo = this->pDemSys->GetDemoInfo(pExt->str1);
+        this->LogInfo(std::format("为玩家 {} 准备所有击杀录制", pDemoInfo->players.at(uid).name));
+        for (int i = pDemoInfo->rounds.front().number;i <= pDemoInfo->rounds.back().number;++i) {
+            auto [one, p] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/RoundKill"_hash);
             p->str1 = pDemoInfo->demoFileName;
             auto&& [rUid, rRound] = one.Access<Steam64UID, size_t>();
             rUid = uid;

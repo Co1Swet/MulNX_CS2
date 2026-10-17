@@ -68,12 +68,11 @@ void DemoFiles::Menu() {
         rp->str1 = demFile.path.string();
         this->PublishAsync(std::move(msg));
     }
-    if (ImGui::Button("尝试加载所选分析文件")) {
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
-        rp->str1 = demFile.path.stem().string();
-        this->PublishAsync(std::move(msg));
-    }
     if (ImGui::Button("选中以准备生成录制")) {
+        auto [msg0, rp0] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
+        rp0->str1 = demFile.path.string();
+        this->PublishAsync(std::move(msg0));
+
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
         rp->str1 = demFile.path.stem().string();
         this->PublishAsync(std::move(msg));

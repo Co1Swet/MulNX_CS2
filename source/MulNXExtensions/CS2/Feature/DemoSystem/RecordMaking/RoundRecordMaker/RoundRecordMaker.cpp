@@ -1,11 +1,12 @@
-#include "DemOneKillMaker.hpp"
+#include "RoundRecordMaker.hpp"
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
-bool DemOneKillMaker::Init() {
+bool RoundRecordMaker::Init() {
     this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
 
     (*this)
         .SubscribeAsyncEx<Steam64UID, size_t, size_t>("Demo/Record/Make/Kill")
+        .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/RoundKill")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/Death")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/FullRound")
         .SubscribeAsync<int>("Demo/Record/Make/Flush")
@@ -19,14 +20,14 @@ bool DemOneKillMaker::Init() {
     return true;
 }
 
-void DemOneKillMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
+void RoundRecordMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
     this->LogInfo(std::format("准备录制任务：{}", rTask.desc));
     auto [msg, rp] = MulNX::Message::Create<Demo::RecordTask>("Demo/Record/Enqueue"_hash);
     *rp = std::move(rTask);
     this->PublishAsync(std::move(msg));
 }
 
-void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
+void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Record/Make/Flush"_hash: {
         MulNX::Message commit(msg);
@@ -56,6 +57,37 @@ void DemOneKillMaker::ProcessMsg(MulNX::Message& msg) {
             rTask.tickStart, rTask.tickEnd);
         rTask.fileNameNoExt = std::format("{}_{}_r{}_kill_{}", pExt->str1, uid, round, idx);
         this->PublishRecordTask(std::move(rTask));
+        break;
+    }
+    case "Demo/Record/Make/RoundKill"_hash: {
+        try {
+            auto* pExt = msg.asp.get<MulNX::NetExt>();
+            auto&& [uid, round] = msg.Access<Steam64UID, size_t>();
+
+            auto pDemoInfo = this->pDemSys->GetDemoInfo(pExt->str1);
+            const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
+
+            for (int i = 0;i < info.killEvents.size();++i) {
+                const auto& ev = info.killEvents[i];
+                Demo::RecordTask rTask{};
+                rTask.demoName = pExt->str1;
+                rTask.uid = ev.killerSteamId;
+                rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
+                rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+                rTask.roundNumber = static_cast<int>(round);
+                rTask.roundKill = info.killEvents.size();
+                rTask.killIndex = i;
+                rTask.desc = std::format("玩家 {} 击杀了 玩家 {}，录制从 {} tick到 {} tick",
+                    pDemoInfo->GetPlayerName(ev.killerSteamId),
+                    pDemoInfo->GetPlayerName(ev.victimSteamId),
+                    rTask.tickStart, rTask.tickEnd);
+                rTask.fileNameNoExt = std::format("{}_{}_r{}_kill_{}", pExt->str1, uid, round, i);
+                this->PublishRecordTask(std::move(rTask));
+            }
+        }
+        catch (...) {
+            this->LogInfo("无有效数据，忽略一条请求");
+        }
         break;
     }
     case "Demo/Record/Make/Death"_hash: {

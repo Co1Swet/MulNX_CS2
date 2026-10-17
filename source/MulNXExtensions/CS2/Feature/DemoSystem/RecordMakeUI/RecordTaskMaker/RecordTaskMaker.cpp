@@ -36,6 +36,14 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
         rUid = player.steamId;
         this->PublishAsync(std::move(msg));
     }
+    ImGui::SameLine();
+    if (ImGui::Button(std::format("为所有击杀生成录制任务##{}", player.steamId).c_str())) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/RoundKillAll"_hash);
+        rp->str1 = pDemoInfo->demoFileName;
+        auto&& [rUid] = msg.Access<Steam64UID>();
+        rUid = player.steamId;
+        this->PublishAsync(std::move(msg));
+    }
 
     for (int i = demoInfo.rounds.front().number;i <= demoInfo.rounds.back().number;++i) {
         ImGui::SeparatorText(std::format("第 {} 回合", i).c_str());

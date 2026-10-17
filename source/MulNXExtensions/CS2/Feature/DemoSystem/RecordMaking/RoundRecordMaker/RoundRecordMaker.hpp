@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class DemOneKillMaker final :public DemModuleBase {
+class RoundRecordMaker final :public DemModuleBase {
     class RecordTaskConfiger* pConfiger = nullptr;
 
     bool Init()override;

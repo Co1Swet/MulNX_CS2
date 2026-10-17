@@ -13,15 +13,15 @@ add_library(DemoSystem STATIC
     DemRPassManager/DemMergePass/DemMergePass.cpp
     DemRPassManager/DemClassifyPass/DemClassifyPass.cpp
     DemRPassManager/DemSortPass/DemSortPass.cpp
-
+    
     DemUI/DemoEventsRender/DemoEventsRender.cpp
     DemUI/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
 
     RecordMakeUI/DemEasyView/DemEasyView.cpp
     RecordMakeUI/RecordTaskMaker/RecordTaskMaker.cpp
 
-    RecordMaking/DemOneKillMaker/DemOneKillMaker.cpp
-    RecordMaking/DemWrapMaker/DemWrapMaker.cpp
+    RecordMaking/RoundRecordMaker/RoundRecordMaker.cpp
+    RecordMaking/DemoRecordMaker/DemoRecordMaker.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

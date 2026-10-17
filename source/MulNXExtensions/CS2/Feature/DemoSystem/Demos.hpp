@@ -9,5 +9,5 @@
 #include "DemUI/DemoEventsRender/DemoEventsRender.hpp"
 #include "DemUI/DemoPlayerInfoRender/DemoPlayerInfoRender.hpp"
 #include "DemRPassManager/DemRPassManager.hpp"
-#include "RecordMaking/DemOneKillMaker/DemOneKillMaker.hpp"
-#include "RecordMaking/DemWrapMaker/DemWrapMaker.hpp"
+#include "RecordMaking/RoundRecordMaker/RoundRecordMaker.hpp"
+#include "RecordMaking/DemoRecordMaker/DemoRecordMaker.hpp"

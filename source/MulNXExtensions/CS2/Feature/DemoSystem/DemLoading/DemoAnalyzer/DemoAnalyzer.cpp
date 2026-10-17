@@ -7,7 +7,7 @@ bool DemoAnalyzer::Init() {
     this->csdaPath = toolsPath / "csda.exe";
     this->dirData = this->Path()->PathGetForShared("Data");
 
-    this->SubscribeAsync("Demo/Analyze");
+    this->SubscribeAsyncEx<void>("Demo/Analyze");
 
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
@@ -20,14 +20,14 @@ bool DemoAnalyzer::Init() {
 void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Analyze"_hash: {
-        std::string str = msg.asp.get<MulNX::NetExt>()->str1;
+        const std::string& str = msg.asp.get<MulNX::NetExt>()->str1;
         fs::path demoPath(str);
         // 确保为绝对路径（正常情况下已经是）
         if (!demoPath.is_absolute()) {
-            this->LogError("收到非绝对路径: " + str);
+            this->LogError(std::format("收到非绝对路径: {}", str));
             break;
         }
-        this->LogInfo("Received demo path: " + demoPath.string());
+        this->LogInfo(std::format("接收到分析请求: {}", demoPath.string()));
         this->HandleAnalyzeRequest(std::move(demoPath));
         break;
     }
@@ -42,7 +42,7 @@ void DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
 
     // JSON 已存在 → 直接发送加载消息
     if (fs::exists(jsonPath)) {
-        this->LogInfo("分析结果已存在，直接加载: " + demoPath.string());
+        this->LogInfo(std::format("分析结果已存在，直接加载: {}", demoPath.string()));
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
         rp->str1 = stem;
         this->PublishAsync(std::move(msg));
@@ -61,8 +61,8 @@ void DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
         }
     }
 
-    this->LogInfo("开始分析: " + demoPath.string());
-    this->AnalyzeDemoWithCSDA(std::move(demoPath)).Fire();
+    this->LogInfo(std::format("开始分析: {}", demoPath.string()));
+    this->AnalyzeDemoWithCSDA(demoPath).Fire();
 }
 
 MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
