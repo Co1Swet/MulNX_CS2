@@ -3,18 +3,26 @@
 
 namespace Demo {
     struct RecordTask {
+        enum class Type :int {
+            None,
+            Normal, // 给击杀分配这个，让合并智能一点
+            Death,
+            Campath
+        };
+        // demo文件所在的key，后面也许可以和路径系统联动，暂且为空吧
+        std::string kPath{};
         // demo文件的裸名称
         std::string demoName{};
         // 任务描述
         std::string desc{};
         // 目标SteamUID
         Steam64UID uid{};
+        // 录制类型，和优化有关
+        Type type = Type::None;
         // 开始录制tick
         int tickStart{};
         // 结束录制tick
         int tickEnd{};
-        // 回合开始tick（用于跳转到起点）
-        int tickRoundStart{};
         // 回合编号
         int roundNumber{};
         // uid这个回合的击杀总量

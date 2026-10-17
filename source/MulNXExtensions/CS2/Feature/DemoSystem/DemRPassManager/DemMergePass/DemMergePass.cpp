@@ -18,7 +18,8 @@ void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks) {
         return a.demoName == b.demoName
             && a.uid == b.uid
             && a.roundNumber == b.roundNumber
-            && (b.tickStart - a.tickEnd) <= gap;
+            && (b.tickStart - a.tickEnd) <= gap
+            && a.type == b.type && a.type == Demo::RecordTask::Type::Normal;
         };
 
     auto mergeWindow = [](Demo::RecordTask& dst, const Demo::RecordTask& src) {

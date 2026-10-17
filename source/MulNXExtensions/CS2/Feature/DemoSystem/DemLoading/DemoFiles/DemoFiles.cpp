@@ -12,7 +12,8 @@ void DemoFiles::Menu() {
     }
 
     if (this->demoFiles.empty()) {
-        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", I18n("demo.empty").c_str());
+        ImGui::Text("当前未检测到Demo文件");
+        return;
     }
 
     // 可复制的列表控件标识
@@ -26,11 +27,11 @@ void DemoFiles::Menu() {
         for (int i = 0;i < this->demoFiles.size();++i) {
             auto& demFile = this->demoFiles[i];
             // 用 Selectable 展示条目，支持高亮
-            std::string fileName = std::format("{}    ---{}",
+            auto line = std::format("{}    ---{}",
                 demFile.path.filename().string(),
                 demFile.anylized ? "已分析" : "未分析");
 
-            if (ImGui::Selectable(fileName.c_str(), demFile.beChoosing, ImGuiSelectableFlags_AllowDoubleClick)) {
+            if (ImGui::Selectable(line.c_str(), demFile.beChoosing, ImGuiSelectableFlags_AllowDoubleClick)) {
                 demFile.beChoosing = !demFile.beChoosing;
             }
             if (demFile.beChoosing) {

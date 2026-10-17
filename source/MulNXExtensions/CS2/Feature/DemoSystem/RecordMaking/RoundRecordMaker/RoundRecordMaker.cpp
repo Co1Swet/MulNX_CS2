@@ -46,6 +46,7 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
         Demo::RecordTask rTask{};
         rTask.demoName = pExt->str1;
         rTask.uid = ev.killerSteamId;
+        rTask.type = Demo::RecordTask::Type::Normal;
         rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
         rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
         rTask.roundNumber = static_cast<int>(round);
@@ -72,6 +73,7 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
                 Demo::RecordTask rTask{};
                 rTask.demoName = pExt->str1;
                 rTask.uid = ev.killerSteamId;
+                rTask.type = Demo::RecordTask::Type::Normal;
                 rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
                 rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
                 rTask.roundNumber = static_cast<int>(round);
