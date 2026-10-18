@@ -154,8 +154,6 @@ namespace CS2 {
 
     class CEconItemAttribute {
     public:
-        inline static constexpr size_t ofsize = 0x48;
-
         uint16_t* m_iAttributeDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_iAttributeDefinitionIndex); }
         float* m_flValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flValue); }
         float* m_flInitialValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flInitialValue); }
@@ -165,7 +163,7 @@ namespace CS2 {
 
     class CAttributeManager {
     public:
-
+        CHandle<C_BaseEntity>* m_hOuter() { return Schema<CHandle<C_BaseEntity>>(this, cs2_dumper::schemas::client_dll::CAttributeManager::m_hOuter); }
     };
 
     class CAttributeList {
@@ -176,7 +174,9 @@ namespace CS2 {
 
     class C_EconItemView {
     public:
+        uint16_t* m_iItemDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemDefinitionIndex); }
         uint32_t* m_iItemIDHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemIDHigh); }
+        uint32_t* m_iAccountID() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iAccountID); }
         using name161 = char[161];
         name161* m_szCustomName() { return Schema<name161>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_szCustomName); }
         name161* m_szCustomNameOverride() { return Schema<name161>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_szCustomNameOverride); }
@@ -190,8 +190,11 @@ namespace CS2 {
         C_EconItemView* m_Item() { return Schema<C_EconItemView>(this, cs2_dumper::schemas::client_dll::C_AttributeContainer::m_Item); }
     };
 
-    class C_EconEntity :public C_BaseFlex {
+    // 这里原来继承C_BaseFlex，但是v社似乎在做crtp改造，这其实很微妙
+    class C_EconEntity {
     public:
+        uint32_t* m_OriginalOwnerXuidLow() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_OriginalOwnerXuidLow); }
+        uint32_t* m_OriginalOwnerXuidHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_OriginalOwnerXuidHigh); }        
         C_AttributeContainer* m_AttributeManager() { return Schema<C_AttributeContainer>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_AttributeManager); }
         int32_t* m_nFallbackPaintKit() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackPaintKit); }
         int32_t* m_nFallbackSeed() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackSeed); }
@@ -204,7 +207,7 @@ namespace CS2 {
 
     };
 
-    class C_BasePlayerWeapon :public C_EconEntity {
+    class C_BasePlayerWeapon :public CBaseAnimGraph, public C_EconEntity {
     public:
 
     };

@@ -94,7 +94,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<SkyController>("SkyController")
         .CreateModule<TrailsController>("TrailsController")
         .CreateModule<SmokeController>("SmokeController")
-        .CreateModule<ViewModelController>("ViewModelController")
         //.CreateModule<WorldDraw>("WorldDraw")
 
         // CS2 视觉（HUD）功能模块
@@ -107,6 +106,10 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookDamageReport>("HookDamageReport")
         .CreateModule<FlashRenderController>("FlashRenderController")
         .CreateModule<HookHealthAmmoCenter>("HookHealthAmmoCenter")
+
+        // CS2 模型相关模块
+        .CreateModule<ViewModelController>("ViewModelController")
+        .CreateModule<SkinController>("SkinController")
 
         // CS2 渲染管线控制模块
         .CreateModule<CSReShadeController>("CSReShadeController")
