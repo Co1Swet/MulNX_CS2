@@ -9,5 +9,4 @@
 #include "GlowController/GlowController.hpp"
 #include "SkyController/SkyController.hpp"
 #include "SpecTargetUI/SpecTargetUI.hpp"
-#include "ViewModelController/ViewModelController.hpp"
 #include "WorldDraw/WorldDraw.hpp"

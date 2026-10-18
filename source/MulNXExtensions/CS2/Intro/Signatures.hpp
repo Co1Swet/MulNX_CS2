@@ -18,7 +18,6 @@ namespace CS2 {
             inline constexpr MulNX::Memory::Pattern CUtlStringRef__Assign("48 89 5C 24 10 57 48 83 EC 20 48 8B 41 18 49 8B F8 48 8B D9 4C 3B C0 77 34");
             inline constexpr MulNX::Memory::Pattern Pos_Call_CInputService_ProcessCommands("E8 ?? ?? ?? ?? 4C 8B BC 24 ?? ?? 00 00 45 84 ED");
             inline constexpr MulNX::Memory::Pattern Pos_CGameEventManager_FireEvents_AcquiredLock("C7 44 24 ?? 00 00 00 00 33 D2 48 8B CE");
-            inline constexpr MulNX::Memory::Pattern RegenerateWeaponSkins("48 83 EC ?? E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10");
             inline constexpr MulNX::Memory::Pattern SetGlowColor("40 53 48 83 EC 20 48 8B D9 48 83 C1 40 39 11 74 02 89 11 E8 ?? ?? ?? ?? 48 8B 4B 18 48 85 C9");
             inline constexpr MulNX::Memory::Pattern GetDecoratedPlayerName("48 8B 01 FF 50 10 48 8B ?? 48 85 C0 0F 84 ?? ?? ?? ?? 80 38 00");
         }
@@ -122,6 +121,13 @@ namespace CS2 {
         }
         namespace Demo {
             inline constexpr MulNX::Memory::Pattern Pos_Call_GetCCSDemoController("E8 ?? ?? ?? ?? 0F 57 DB 45 33 C0 8B D3 48 8B C8");
+        }
+        namespace Skin {
+            inline constexpr MulNX::Memory::Pattern RegenerateWeaponSkins("48 83 EC ?? E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10");
+
+            namespace CEconItemView {
+                inline constexpr MulNX::Memory::Pattern GetPaint("48 89 5C 24 08 57 48 83 EC 40 8B 15 ?? ?? ?? ?? 48 8B F9 65 48 8B 04 25 ?? ?? ?? ?? B9 68 00 00 00 48 8B 04 D0 8B 04 01 39 05 ?? ?? ?? ?? 0F 8F 95");
+            }
         }
     }
 }
