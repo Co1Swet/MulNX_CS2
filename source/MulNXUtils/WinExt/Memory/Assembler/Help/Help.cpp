@@ -22,12 +22,12 @@ Asm::Assembler& Asm::Assembler::SaveReg() {
         .mov(Mem(RSP, offsetof(RegContext, r13)), R13)
         .mov(Mem(RSP, offsetof(RegContext, r14)), R14)
         .mov(Mem(RSP, offsetof(RegContext, r15)), R15)
-        .movups(Mem(RSP, offsetof(RegContext, xmm[0])), Asm::Xmm::XMM0)
-        .movups(Mem(RSP, offsetof(RegContext, xmm[1])), Asm::Xmm::XMM1)
-        .movups(Mem(RSP, offsetof(RegContext, xmm[2])), Asm::Xmm::XMM2)
-        .movups(Mem(RSP, offsetof(RegContext, xmm[3])), Asm::Xmm::XMM3)
-        .movups(Mem(RSP, offsetof(RegContext, xmm[4])), Asm::Xmm::XMM4)
-        .movups(Mem(RSP, offsetof(RegContext, xmm[5])), Asm::Xmm::XMM5)
+        .movups(Mem(RSP, offsetof(RegContext, xmm0)), Asm::Xmm::XMM0)
+        .movups(Mem(RSP, offsetof(RegContext, xmm1)), Asm::Xmm::XMM1)
+        .movups(Mem(RSP, offsetof(RegContext, xmm2)), Asm::Xmm::XMM2)
+        .movups(Mem(RSP, offsetof(RegContext, xmm3)), Asm::Xmm::XMM3)
+        .movups(Mem(RSP, offsetof(RegContext, xmm4)), Asm::Xmm::XMM4)
+        .movups(Mem(RSP, offsetof(RegContext, xmm5)), Asm::Xmm::XMM5)
         ;
     return *this;
 }
@@ -51,12 +51,12 @@ Asm::Assembler& Asm::Assembler::LoadReg() {
         .mov(R13, Mem(RSP, offsetof(RegContext, r13)))
         .mov(R14, Mem(RSP, offsetof(RegContext, r14)))
         .mov(R15, Mem(RSP, offsetof(RegContext, r15)))
-        .movups(Asm::Xmm::XMM0, Mem(RSP, offsetof(RegContext, xmm[0])))
-        .movups(Asm::Xmm::XMM1, Mem(RSP, offsetof(RegContext, xmm[1])))
-        .movups(Asm::Xmm::XMM2, Mem(RSP, offsetof(RegContext, xmm[2])))
-        .movups(Asm::Xmm::XMM3, Mem(RSP, offsetof(RegContext, xmm[3])))
-        .movups(Asm::Xmm::XMM4, Mem(RSP, offsetof(RegContext, xmm[4])))
-        .movups(Asm::Xmm::XMM5, Mem(RSP, offsetof(RegContext, xmm[5])))
+        .movups(Asm::Xmm::XMM0, Mem(RSP, offsetof(RegContext, xmm0)))
+        .movups(Asm::Xmm::XMM1, Mem(RSP, offsetof(RegContext, xmm1)))
+        .movups(Asm::Xmm::XMM2, Mem(RSP, offsetof(RegContext, xmm2)))
+        .movups(Asm::Xmm::XMM3, Mem(RSP, offsetof(RegContext, xmm3)))
+        .movups(Asm::Xmm::XMM4, Mem(RSP, offsetof(RegContext, xmm4)))
+        .movups(Asm::Xmm::XMM5, Mem(RSP, offsetof(RegContext, xmm5)))
         ;
     return *this;
 }

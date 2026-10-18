@@ -109,6 +109,7 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 模型相关模块
         .CreateModule<ViewModelController>("ViewModelController")
+        .CreateModule<SkinConfigger>("SkinConfigger")
         .CreateModule<SkinController>("SkinController")
 
         // CS2 渲染管线控制模块

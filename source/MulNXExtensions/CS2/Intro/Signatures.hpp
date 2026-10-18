@@ -126,7 +126,7 @@ namespace CS2 {
             inline constexpr MulNX::Memory::Pattern RegenerateWeaponSkins("48 83 EC ?? E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10");
 
             namespace CEconItemView {
-                inline constexpr MulNX::Memory::Pattern GetPaint("48 89 5C 24 08 57 48 83 EC 40 8B 15 ?? ?? ?? ?? 48 8B F9 65 48 8B 04 25 ?? ?? ?? ?? B9 68 00 00 00 48 8B 04 D0 8B 04 01 39 05 ?? ?? ?? ?? 0F 8F 95");
+                inline constexpr MulNX::Memory::Pattern GetPaintKit("48 89 5C 24 08 57 48 83 EC 40 8B 15 ?? ?? ?? ?? 48 8B F9 65 48 8B 04 25 ?? ?? ?? ?? B9 68 00 00 00 48 8B 04 D0 8B 04 01 39 05 ?? ?? ?? ?? 0F 8F 95");
             }
         }
     }

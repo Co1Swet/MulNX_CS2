@@ -1,4 +1,5 @@
 #include "SkinController.hpp"
+#include <MulNXThirdParty/hlae/binutils.h>
 
 void SkinController::Window() {
     auto w = MulNX::UI::RAIIWindow("模型修改");
@@ -6,23 +7,62 @@ void SkinController::Window() {
 }
 
 bool SkinController::Init() {
+    this->pSkinConfigger = this->FindModule<SkinConfigger>("SkinConfigger");
+
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
-        auto t = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Skin::CEconItemView::GetPaint).Data();
-        this->hkGetPaint = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto pRaw = (CEconItemView_GetPaint_t)hk->pMaybeRawFunc;
+        auto t = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Skin::CEconItemView::GetPaintKit).Data();
+        void** vtable = (void**)Afx::BinUtils::FindClassVtable(this->CS2->client.hModule,
+            ".?AVC_EconItemView@@", 0, 0);
+        if (!vtable)MulNX::ErrorTerminate(".?AVC_EconItemView@@ 查找失败");
+        if ((uint8_t*)(vtable[3]) != t)MulNX::ErrorTerminate("GetPaintKit 查找异常");
+
+        this->hkGetPaintKit = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto pRaw = (CEconItemView_GetPaintKit_t)hk->pMaybeRawFunc;
             auto pEconItemView = (CS2::C_EconItemView*)ctx->rcx;
             ctx->rax = pRaw(pEconItemView);
             try {
-                if (auto oIndex = this->GetPaintIndex(pEconItemView)) {
-                    ctx->rax = *oIndex;
-                }
+                auto o = this->OnGetPaintKit(pEconItemView);
+                if (!o)return MulNX::Hook::Then::Return;
+                ctx->rax = *o;
             }
             catch (const MulNX::Exception& e) {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Return;
             }).value();
-        this->RegisterAttachHook(this->hkGetPaint, "GetPaint");
+        this->RegisterAttachHook(this->hkGetPaintKit, "GetPaintKit");
+
+        this->hkGetSeed = MulNX::Hook::Create((uint8_t*)(vtable[4]), [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto pRaw = (CEconItemView_GetSeed_t)hk->pMaybeRawFunc;
+            auto pEconItemView = (CS2::C_EconItemView*)ctx->rcx;
+            ctx->rax = pRaw(pEconItemView);
+            try {
+                auto o = this->OnGetSeed(pEconItemView);
+                if (!o)return MulNX::Hook::Then::Return;
+                ctx->rax = *o;
+            }
+            catch (const MulNX::Exception& e) {
+                this->LogError(e);
+            }
+            return MulNX::Hook::Then::Return;
+            }).value();
+        this->RegisterAttachHook(this->hkGetSeed, "GetSeed");
+
+        this->hkGetWear = MulNX::Hook::Create((uint8_t*)(vtable[5]), [this](MulNX::Hook* hk, RegContext* ctx) {
+            auto pRaw = (CEconItemView_GetWear_t)hk->pMaybeRawFunc;
+            auto pEconItemView = (CS2::C_EconItemView*)ctx->rcx;
+            ctx->xmm0.m128_f32[0] = pRaw(pEconItemView, ctx->xmm1.m128_f32[0]);
+            try {
+                auto o = this->OnGetWear(pEconItemView);
+                if (!o)return MulNX::Hook::Then::Return;
+                ctx->xmm0.m128_f32[0] = *o;
+            }
+            catch (const MulNX::Exception& e) {
+                this->LogError(e);
+            }
+            return MulNX::Hook::Then::Return;
+            }).value();
+        this->RegisterAttachHook(this->hkGetWear, "GetWear");
         });
 
     this->SendUIRoot("Models", [this](auto&&...) {
@@ -31,33 +71,67 @@ bool SkinController::Init() {
 
     return true;
 }
+std::optional<Steam64UID> SkinController::GetBuyerSteamID(CS2::C_EconItemView* pEconItemView) {
+    try {
+        auto id = MulNX::MRead(pEconItemView->m_iAccountID());
+        uint64_t originalOwnerXuid = 0x0110000100000000ULL + id;
+        return originalOwnerXuid;
+    }
+    catch (...) {
+        
+    }
+    return std::nullopt;
+}
+CS2::C_CSWeaponBase* SkinController::GetWeapon(CS2::C_EconItemView* pEconItemView) {
+    try {
+        auto pAttributeList = pEconItemView->m_AttributeList();
+        auto pManager = MulNX::MRead(pAttributeList->m_pManager());
+        if (!pManager)return nullptr;
+        auto hOuter = MulNX::MRead(pManager->m_hOuter());
+        auto pWeapon = this->CS2Entitys->GetBaseEntityFromHandle(hOuter)->As<CS2::C_CSWeaponBase>();
+        return pWeapon;
+    }
+    catch (...) {
 
-std::optional<uint64_t> SkinController::GetPaintIndex(CS2::C_EconItemView* pEconItemView) {
-    auto id = MulNX::MRead(pEconItemView->m_iAccountID());
-    auto defId = MulNX::MRead(pEconItemView->m_iItemDefinitionIndex());
+    }
+    return nullptr;
+}
 
-    auto pAttributeList = pEconItemView->m_AttributeList();
-    auto pManager = MulNX::MRead(pAttributeList->m_pManager());
-    if (!pManager)return std::nullopt;
-    auto hOuter = MulNX::MRead(pManager->m_hOuter());
-    auto pWeapon = this->CS2Entitys->GetBaseEntityFromHandle(hOuter)->As<CS2::C_CSWeaponBase>();
+std::optional<uint32_t> SkinController::OnGetPaintKit(CS2::C_EconItemView* pEconItemView) {
+    auto o = this->GetBuyerSteamID(pEconItemView);
+    if (!o)return std::nullopt;
+    auto buyerID = *o;
+    auto pWeapon = this->GetWeapon(pEconItemView);
     if (!pWeapon)return std::nullopt;
+    auto o2 = this->CS2Entitys->GetWeaponOwnerSteamID(pWeapon);
+    if (!o2)return std::nullopt;
+    auto ownerID = *o2;
 
-    uint32_t low = MulNX::MRead(pWeapon->m_OriginalOwnerXuidLow());
-    uint32_t high = MulNX::MRead(pWeapon->m_OriginalOwnerXuidHigh());
-    auto id2 = ((uint64_t)high << 32) | low;
+    return std::nullopt;
+}
 
-    auto name = pWeapon->GetName();
+std::optional<uint32_t> SkinController::OnGetSeed(CS2::C_EconItemView* pEconItemView) {
+    auto o = this->GetBuyerSteamID(pEconItemView);
+    if (!o)return std::nullopt;
+    auto buyerID = *o;
+    auto pWeapon = this->GetWeapon(pEconItemView);
+    if (!pWeapon)return std::nullopt;
+    auto o2 = this->CS2Entitys->GetWeaponOwnerSteamID(pWeapon);
+    if (!o2)return std::nullopt;
+    auto ownerID = *o2;
 
-    auto hOwner = MulNX::MRead(pWeapon->m_hOwnerEntity());
-    auto pOwner = this->CS2Entitys->GetBaseEntityFromHandle(hOwner)->As<CS2::C_CSPlayerPawn>();
-    if (!pOwner)return std::nullopt;
-    auto hCtrl = MulNX::MRead(pOwner->m_hController());
-    auto pCtrl = this->CS2Entitys->GetBaseEntityFromHandle(hCtrl)->As<CS2::CCSPlayerController>();
-    if (!pCtrl)return std::nullopt;
-    auto steamID = MulNX::MRead(pCtrl->m_steamID());
+    return std::nullopt;
+}
 
-    uint64_t originalOwnerXuid = 0x0110000100000000ULL + MulNX::MRead(pEconItemView->m_iAccountID());
+std::optional<float> SkinController::OnGetWear(CS2::C_EconItemView* pEconItemView) {
+    auto o = this->GetBuyerSteamID(pEconItemView);
+    if (!o)return std::nullopt;
+    auto buyerID = *o;
+    auto pWeapon = this->GetWeapon(pEconItemView);
+    if (!pWeapon)return std::nullopt;
+    auto o2 = this->CS2Entitys->GetWeaponOwnerSteamID(pWeapon);
+    if (!o2)return std::nullopt;
+    auto ownerID = *o2;
 
-    return this->index.load(std::memory_order_acquire);
+    return std::nullopt;
 }

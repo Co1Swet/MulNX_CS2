@@ -86,6 +86,7 @@ namespace CS2 {
 
         DirectX::XMFLOAT3 GetBonePos(int index);
         std::string GetName();
+        const char* GetEntityClassName();
 
         bool IsPlayerController();
         bool IsPlayerPawn();

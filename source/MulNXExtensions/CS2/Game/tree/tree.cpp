@@ -11,13 +11,26 @@ DirectX::XMFLOAT3 CS2::C_BaseEntity::GetBonePos(int index) {
 }
 
 std::string CS2::C_BaseEntity::GetName() {
-    auto* pClassInfo = MulNX::MRead(this->pClassInfo());
-    if (!pClassInfo) return{};
-    auto* pName= MulNX::MRead(pClassInfo->pName());
-    if (!pName) return{};
-    auto classNameOrE = MulNX::Memory::ReadString(pName);
-    if (classNameOrE.has_value())return classNameOrE.value();
+    try {
+        auto* pClassInfo = MulNX::MRead(this->pClassInfo());
+        if (!pClassInfo) return{};
+        auto* pName = MulNX::MRead(pClassInfo->pName());
+        if (!pName) return{};
+        auto classNameOrE = MulNX::Memory::ReadString(pName);
+        if (classNameOrE.has_value())return classNameOrE.value();
+    }
+    catch (...) {}
     return {};
+}
+const char* CS2::C_BaseEntity::GetEntityClassName() {
+    try {
+        auto* pClassInfo = MulNX::MRead(this->pClassInfo());
+        if (!pClassInfo) return{};
+        auto* pName = MulNX::MRead(pClassInfo->pName());
+        return pName;
+    }
+    catch (...) {}
+    return nullptr;
 }
 
 bool CS2::C_BaseEntity::IsPlayerController() {

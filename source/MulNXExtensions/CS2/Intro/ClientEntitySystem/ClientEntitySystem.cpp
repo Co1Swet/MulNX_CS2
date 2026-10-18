@@ -100,7 +100,6 @@ std::optional<CS2::CHandleBase> ClientEntitySystem::TryGetControllerHandle(CS2::
         return std::nullopt;
     }
 }
-
 CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64UID uid, int* pIndex) {
     try {
         for (int i = 0; i < 32; ++i) {
@@ -119,4 +118,18 @@ CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64
         this->LogError("FindControllerBySteam64UID 失败");
     }
     return nullptr;
+}
+std::optional<Steam64UID> ClientEntitySystem::GetWeaponOwnerSteamID(CS2::C_CSWeaponBase* pWeapon) {
+    try {
+        auto hOwner = MulNX::MRead(pWeapon->m_hOwnerEntity());
+        auto pOwner = this->GetBaseEntityFromHandle(hOwner)->As<CS2::C_CSPlayerPawn>();
+        if (!pOwner)return std::nullopt;
+        auto hCtrl = MulNX::MRead(pOwner->m_hController());
+        auto pCtrl = this->GetBaseEntityFromHandle(hCtrl)->As<CS2::CCSPlayerController>();
+        if (!pCtrl)return std::nullopt;
+        auto steamID = MulNX::MRead(pCtrl->m_steamID());
+        return steamID;
+    }
+    catch (...) {}
+    return std::nullopt;
 }

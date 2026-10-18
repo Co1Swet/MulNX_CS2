@@ -1,5 +1,4 @@
 #include "TeamIDColorController.hpp"
-#include <MulNX/Base/UI/UI.hpp>
 #include <MulNXThirdParty/hlae/binutils.h>
 #include <Support/PlayerHub/PlayerHub.hpp>
 
@@ -40,12 +39,8 @@ void TeamIDColorController::HubTeam(MulNX::Message* umsg) {
 
 bool TeamIDColorController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/panorama.dll", [this](MulNX::Message& msg) {
-        auto& panorama = this->CS2->panorama;
-        auto textRegion = panorama.GetTextRegion();
-        auto hMod = panorama.hModule;  // 获取 panorama.dll 句柄
-
         // Hook CLayoutFile::LoadFromFile
-        auto target = textRegion.FindRegion(CS2::Signatures::Hud::CLayoutFile_LoadFromFile).Data();
+        auto target = this->CS2->panorama.GetTextRegion().FindRegion(CS2::Signatures::Hud::CLayoutFile_LoadFromFile).Data();
 
         this->hkLoadFromFile = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
             // RCX=this, RDX=filePath, R8=unk
@@ -63,12 +58,12 @@ bool TeamIDColorController::Init() {
         this->RegisterAttachHook(this->hkLoadFromFile, "CLayoutFile::LoadFromFile");
 
         // 获取 CStylePropertyWashColor 的虚表
-        void** vtable = (void**)Afx::BinUtils::FindClassVtable(
-            (HMODULE)hMod,
-            ".?AVCStylePropertyWashColor@panorama@@",
-            0, 0
-        );
-        if (!vtable) return;
+        void** vtable = (void**)Afx::BinUtils::FindClassVtable(this->CS2->panorama.hModule,
+            ".?AVCStylePropertyWashColor@panorama@@", 0, 0);
+        if (!vtable) {
+            this->LogError("查找失败");
+            return;
+        }
 
         // 从虚表取出 Parse（vtable[6]）和 Clone（vtable[1]）
         auto parseFunc = (void(__fastcall*)(void*, void*, const char*))(vtable[6]);

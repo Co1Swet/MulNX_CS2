@@ -18,4 +18,5 @@ public:
     std::optional<Steam64UID> TryGetObservingSteam64UID();
     std::optional<CS2::CHandleBase> TryGetControllerHandle(CS2::CCSPlayerController* pController);
     CS2::CCSPlayerController* FindControllerBySteam64UID(Steam64UID uid, int* pIndex = nullptr);
+    std::optional<Steam64UID> GetWeaponOwnerSteamID(CS2::C_CSWeaponBase* pWeapon);
 };
