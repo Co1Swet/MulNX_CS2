@@ -96,42 +96,32 @@ CS2::C_CSWeaponBase* SkinController::GetWeapon(CS2::C_EconItemView* pEconItemVie
     }
     return nullptr;
 }
-
-std::optional<uint32_t> SkinController::OnGetPaintKit(CS2::C_EconItemView* pEconItemView) {
+std::pair<std::optional<Steam64UID>, std::optional<Steam64UID>> SkinController::GetViewInfo(CS2::C_EconItemView* pEconItemView) {
     auto o = this->GetBuyerSteamID(pEconItemView);
-    if (!o)return std::nullopt;
+    if (!o)return { std::nullopt,std::nullopt };
     auto buyerID = *o;
     auto pWeapon = this->GetWeapon(pEconItemView);
-    if (!pWeapon)return std::nullopt;
+    if (!pWeapon)return { buyerID,std::nullopt };
     auto o2 = this->CS2Entitys->GetWeaponOwnerSteamID(pWeapon);
-    if (!o2)return std::nullopt;
+    if (!o2)return { buyerID,std::nullopt };
     auto ownerID = *o2;
+    return { buyerID,ownerID };
+}
+
+std::optional<uint32_t> SkinController::OnGetPaintKit(CS2::C_EconItemView* pEconItemView) {
+    auto [oBuyer, oOwner] = this->GetViewInfo(pEconItemView);
 
     return std::nullopt;
 }
 
 std::optional<uint32_t> SkinController::OnGetSeed(CS2::C_EconItemView* pEconItemView) {
-    auto o = this->GetBuyerSteamID(pEconItemView);
-    if (!o)return std::nullopt;
-    auto buyerID = *o;
-    auto pWeapon = this->GetWeapon(pEconItemView);
-    if (!pWeapon)return std::nullopt;
-    auto o2 = this->CS2Entitys->GetWeaponOwnerSteamID(pWeapon);
-    if (!o2)return std::nullopt;
-    auto ownerID = *o2;
+    auto [oBuyer, oOwner] = this->GetViewInfo(pEconItemView);
 
     return std::nullopt;
 }
 
 std::optional<float> SkinController::OnGetWear(CS2::C_EconItemView* pEconItemView) {
-    auto o = this->GetBuyerSteamID(pEconItemView);
-    if (!o)return std::nullopt;
-    auto buyerID = *o;
-    auto pWeapon = this->GetWeapon(pEconItemView);
-    if (!pWeapon)return std::nullopt;
-    auto o2 = this->CS2Entitys->GetWeaponOwnerSteamID(pWeapon);
-    if (!o2)return std::nullopt;
-    auto ownerID = *o2;
+    auto [oBuyer, oOwner] = this->GetViewInfo(pEconItemView);
 
     return std::nullopt;
 }

@@ -10,17 +10,19 @@ class SkinController final :public CSModuleBase {
     using CEconItemView_GetWear_t = float(*)(CS2::C_EconItemView* pEconItemView, float defaultWear);
 
     std::unique_ptr<MulNX::Hook> hkGetPaintKit = nullptr;
-    std::optional<uint32_t> OnGetPaintKit(CS2::C_EconItemView* pEconItemView);
     std::unique_ptr<MulNX::Hook> hkGetSeed = nullptr;
-    std::optional<uint32_t> OnGetSeed(CS2::C_EconItemView* pEconItemView);
     std::unique_ptr<MulNX::Hook> hkGetWear = nullptr;
+
+    std::optional<Steam64UID> GetBuyerSteamID(CS2::C_EconItemView* pEconItemView);
+    CS2::C_CSWeaponBase* GetWeapon(CS2::C_EconItemView* pEconItemView);
+    std::pair<std::optional<Steam64UID>, std::optional<Steam64UID>> GetViewInfo(CS2::C_EconItemView* pEconItemView);
+
+    std::optional<uint32_t> OnGetPaintKit(CS2::C_EconItemView* pEconItemView);
+    std::optional<uint32_t> OnGetSeed(CS2::C_EconItemView* pEconItemView);
     std::optional<float> OnGetWear(CS2::C_EconItemView* pEconItemView);
 
     std::atomic<int> index{};
 
     void Window();
     bool Init()override;
-
-    std::optional<Steam64UID> GetBuyerSteamID(CS2::C_EconItemView* pEconItemView);
-    CS2::C_CSWeaponBase* GetWeapon(CS2::C_EconItemView* pEconItemView);
 };
