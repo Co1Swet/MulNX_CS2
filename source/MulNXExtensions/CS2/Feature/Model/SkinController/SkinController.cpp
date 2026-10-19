@@ -77,8 +77,8 @@ std::optional<Steam64UID> SkinController::GetBuyerSteamID(CS2::C_EconItemView* p
         uint64_t originalOwnerXuid = 0x0110000100000000ULL + id;
         return originalOwnerXuid;
     }
-    catch (...) {
-        
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
     }
     return std::nullopt;
 }
@@ -91,8 +91,8 @@ CS2::C_CSWeaponBase* SkinController::GetWeapon(CS2::C_EconItemView* pEconItemVie
         auto pWeapon = this->CS2Entitys->GetBaseEntityFromHandle(hOuter)->As<CS2::C_CSWeaponBase>();
         return pWeapon;
     }
-    catch (...) {
-
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
     }
     return nullptr;
 }
@@ -110,18 +110,26 @@ std::pair<std::optional<Steam64UID>, std::optional<Steam64UID>> SkinController::
 
 std::optional<uint32_t> SkinController::OnGetPaintKit(CS2::C_EconItemView* pEconItemView) {
     auto [oBuyer, oOwner] = this->GetViewInfo(pEconItemView);
-
-    return std::nullopt;
+    auto pWeapon = this->GetWeapon(pEconItemView);
+    if (!pWeapon)return std::nullopt;
+    auto oPlayerWeaponCfg = this->pSkinConfigger->GetWeaponConfig(oBuyer, oOwner, pWeapon->GetEntityClassName());
+    return this->index.load();
+    if (!oPlayerWeaponCfg)return std::nullopt;
+    return oPlayerWeaponCfg->paintKit;
 }
-
 std::optional<uint32_t> SkinController::OnGetSeed(CS2::C_EconItemView* pEconItemView) {
     auto [oBuyer, oOwner] = this->GetViewInfo(pEconItemView);
-
-    return std::nullopt;
+    auto pWeapon = this->GetWeapon(pEconItemView);
+    if (!pWeapon)return std::nullopt;
+    auto oPlayerWeaponCfg = this->pSkinConfigger->GetWeaponConfig(oBuyer, oOwner, pWeapon->GetEntityClassName());
+    if (!oPlayerWeaponCfg)return std::nullopt;
+    return oPlayerWeaponCfg->seed;
 }
-
 std::optional<float> SkinController::OnGetWear(CS2::C_EconItemView* pEconItemView) {
     auto [oBuyer, oOwner] = this->GetViewInfo(pEconItemView);
-
-    return std::nullopt;
+    auto pWeapon = this->GetWeapon(pEconItemView);
+    if (!pWeapon)return std::nullopt;
+    auto oPlayerWeaponCfg = this->pSkinConfigger->GetWeaponConfig(oBuyer, oOwner, pWeapon->GetEntityClassName());
+    if (!oPlayerWeaponCfg)return std::nullopt;
+    return oPlayerWeaponCfg->wear;
 }
