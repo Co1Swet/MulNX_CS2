@@ -9,7 +9,7 @@ class HookMixin {
     std::vector<std::pair<std::string, MulNX::Memory::IatHook&>> iatHooks;
 protected:
     HookMixin() {
-        This()->postDeinits.push_back([this]() {
+        This()->preDeinits.push_back([this]() {
             for (auto& [name, hook] : this->hooks) {
                 hook = nullptr;
                 This()->LogInfo(std::format("内联钩子已销毁：{}", name));

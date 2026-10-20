@@ -1,6 +1,8 @@
 #include "SkinController.hpp"
 #include <MulNXThirdParty/hlae/binutils.h>
 
+// 很多人喜欢做好一样东西后拆除脚手架，我也一样
+
 void SkinController::Window() {
     auto w = MulNX::UI::RAIIWindow("模型修改");
     MulNX::UI::SliderInt("皮肤编号", this->index, 0, 2000);
@@ -16,6 +18,7 @@ bool SkinController::Init() {
         if (!vtable)MulNX::ErrorTerminate(".?AVC_EconItemView@@ 查找失败");
         if ((uint8_t*)(vtable[3]) != t)MulNX::ErrorTerminate("GetPaintKit 查找异常");
 
+        this->pGetPaintDef = (GetPaintDef_t)t;
         this->hkGetPaintKit = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pRaw = (CEconItemView_GetPaintKit_t)hk->pMaybeRawFunc;
             auto pEconItemView = (CS2::C_EconItemView*)ctx->rcx;
@@ -109,11 +112,12 @@ std::pair<std::optional<Steam64UID>, std::optional<Steam64UID>> SkinController::
 }
 
 std::optional<uint32_t> SkinController::OnGetPaintKit(CS2::C_EconItemView* pEconItemView) {
+    return this->index.load();
     auto [oBuyer, oOwner] = this->GetViewInfo(pEconItemView);
     auto pWeapon = this->GetWeapon(pEconItemView);
     if (!pWeapon)return std::nullopt;
     auto oPlayerWeaponCfg = this->pSkinConfigger->GetWeaponConfig(oBuyer, oOwner, pWeapon->GetEntityClassName());
-    return this->index.load();
+    
     if (!oPlayerWeaponCfg)return std::nullopt;
     return oPlayerWeaponCfg->paintKit;
 }

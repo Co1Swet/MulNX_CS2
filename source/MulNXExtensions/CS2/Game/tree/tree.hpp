@@ -35,8 +35,10 @@ namespace CS2 {
         char** pName() { return reinterpret_cast<char**>(reinterpret_cast<uintptr_t>(this) + 0x20); }
     };
 
+    class C_BaseEntity;
     class CGameSceneNode {
     public:
+        C_BaseEntity** m_pOwner() { return Schema<C_BaseEntity*>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_pOwner); }
         DirectX::XMFLOAT3* vecAbsOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecAbsOrigin); }
         DirectX::XMFLOAT3* vecOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecOrigin); }
         DirectX::XMFLOAT3* angAbsRotation() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_angAbsRotation); }
@@ -47,10 +49,11 @@ namespace CS2 {
         bool* bDebugAbsOriginChanges() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_bDebugAbsOriginChanges); }
     };
 
+    class CSkeletonInstance;
     class CModelState {
     public:
+        CSkeletonInstance* GetOwner() { return Schema<CSkeletonInstance>(this, -cs2_dumper::schemas::client_dll::CSkeletonInstance::m_modelState); }
         uint64_t* m_MeshGroupMask() { return Schema<uint64_t>(this, cs2_dumper::schemas::client_dll::CModelState::m_MeshGroupMask); }
-
     };
 
     class BoneArray {
@@ -143,16 +146,6 @@ namespace CS2 {
 
     };
 
-    class C_BaseFlex :public CBaseAnimGraph {
-    public:
-
-    };
-
-    class C_BaseCombatCharacter :public C_BaseFlex {
-    public:
-
-    };
-
     class CEconItemAttribute {
     public:
         uint16_t* m_iAttributeDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_iAttributeDefinitionIndex); }
@@ -191,11 +184,12 @@ namespace CS2 {
         C_EconItemView* m_Item() { return Schema<C_EconItemView>(this, cs2_dumper::schemas::client_dll::C_AttributeContainer::m_Item); }
     };
 
-    // 这里原来继承C_BaseFlex，但是v社似乎在做crtp改造，这其实很微妙
-    class C_EconEntity {
+    // 这里原来继承C_BaseFlex（在最新的二进制文件里已经不存在），但是v社似乎在做改造，这其实很微妙
+    // 但是abi层面确实继承CBaseAnimGraph，这很奇怪
+    class C_EconEntity :public CBaseAnimGraph {
     public:
         uint32_t* m_OriginalOwnerXuidLow() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_OriginalOwnerXuidLow); }
-        uint32_t* m_OriginalOwnerXuidHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_OriginalOwnerXuidHigh); }        
+        uint32_t* m_OriginalOwnerXuidHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_OriginalOwnerXuidHigh); }
         C_AttributeContainer* m_AttributeManager() { return Schema<C_AttributeContainer>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_AttributeManager); }
         int32_t* m_nFallbackPaintKit() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackPaintKit); }
         int32_t* m_nFallbackSeed() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_nFallbackSeed); }
@@ -208,7 +202,7 @@ namespace CS2 {
 
     };
 
-    class C_BasePlayerWeapon :public CBaseAnimGraph, public C_EconEntity {
+    class C_BasePlayerWeapon :public C_EconEntity {
     public:
 
     };
@@ -235,7 +229,7 @@ namespace CS2 {
     };
 
     class CBasePlayerController;
-    class C_BasePlayerPawn :public C_BaseCombatCharacter {
+    class C_BasePlayerPawn :public CBaseAnimGraph {
     public:
         CPlayer_ItemServices** pItemServices() { return Schema<CPlayer_ItemServices*>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_pItemServices); }
         CPlayer_ObserverServices** pObserverServices() { return Schema<CPlayer_ObserverServices*>(this, cs2_dumper::schemas::client_dll::C_BasePlayerPawn::m_pObserverServices); }
@@ -304,7 +298,7 @@ namespace CS2 {
 
     };
 
-    class C_BaseGrenade :public C_BaseFlex {
+    class C_BaseGrenade :public CBaseAnimGraph {
     public:
         CHandle<C_CSPlayerPawn>* m_hThrower() { return Schema<CHandle<C_CSPlayerPawn>>(this, cs2_dumper::schemas::client_dll::C_BaseGrenade::m_hThrower); }
 
