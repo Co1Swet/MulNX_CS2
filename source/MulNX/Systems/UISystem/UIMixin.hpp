@@ -15,15 +15,15 @@ namespace MulNX {
         }
     public:
         void SendUIRoot(std::string&& name, std::function<void(UICoordinator*, Message*)>&& func) {
+            This()->LogInfo(std::format("发送UI节点：{}", name));
             auto [msg, rp] = this->CreateUINode(std::move(name), std::move(func));
             This()->PublishAsync(std::move(msg));
-            This()->LogInfo(I18n("module.send_ui"));
         }
         void UIRegisterBackground(std::string&& name, std::function<void(UICoordinator*, Message*)>&& func) {
+            This()->LogInfo(std::format("发送UI节点并作为背景：{}", name));
             auto [msg, rp] = this->CreateUINode(std::move(name), std::move(func));
             msg.type = "UISystem/ModulePush/Background"_hash;
             This()->PublishAsync(std::move(msg));
-            This()->LogInfo(I18n("module.send_ui") + " 并作为背景");
         }
         void UIRegisterCallback(const char* name, std::function<void(UICoordinator*, Message*)>&& func) {
             MulNX::UINode UINode = MulNX::UINode::Create(This());

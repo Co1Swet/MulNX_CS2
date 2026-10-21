@@ -70,10 +70,20 @@ int MulNX::UISystem::Render() {
         this->WantTextInput.store(false, std::memory_order_release);
         return 0;
     }
+
+    try {
+        this->FrameBefore();
+        this->pCoordinator->Render(this->ifDrawMid.load(std::memory_order_acquire));
+        this->FrameBehind();
+    }
+    catch (const MulNX::Exception& e) {
+        MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的MulNX异常：{} \n该异常抛出于：{}",
+            e.what(), e.Where()));
+    }
+    catch (const std::exception& e) {
+        MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的异常：{}", e.what()));
+    }
     
-    this->FrameBefore();
-    this->pCoordinator->Render(this->ifDrawMid.load(std::memory_order_acquire));
-    this->FrameBehind();
 
     ImGuiIO& io = ImGui::GetIO();
     if (this->WantCaptureMouse.load(std::memory_order_acquire) != io.WantCaptureMouse) {
