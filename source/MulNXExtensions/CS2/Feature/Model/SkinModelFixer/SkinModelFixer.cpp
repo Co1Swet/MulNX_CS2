@@ -3,7 +3,8 @@
 bool SkinModelFixer::Init() {
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
-        this->pGetPaintDef = this->FindModule<SkinController>("SkinController")->pGetPaintDef;
+        this->pGetPaintDef = (GetPaintDef_t)this->CS2->client.GetTextRegion()
+            .FindRegion(CS2::Signatures::Skin::CEconItemView::GetPaintDef).Data();
 
         this->pUpdateMeshGroupMask = (UpdateMeshGroupMask_t)this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::UpdateMeshGroupMask).Data();
