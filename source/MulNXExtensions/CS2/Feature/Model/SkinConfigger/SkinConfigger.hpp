@@ -16,7 +16,7 @@ class SkinConfigger final :public CSModuleBase {
         OwnBuy // 回退
     };
 
-    std::atomic<Policy> policy = Policy::Disable;
+    std::atomic<Policy> policy = Policy::BuyOwn;
 
     std::unordered_map<Steam64UID, std::unordered_map<std::string, PlayerWeaponCfg>>cfgs{};
 
@@ -26,4 +26,6 @@ class SkinConfigger final :public CSModuleBase {
 public:
     std::optional<PlayerWeaponCfg> GetWeaponConfig(std::optional<Steam64UID> oBuyerID, std::optional<Steam64UID> oOwner,
         const char* weaponClassName)const;
+
+    void Menu()const;
 };

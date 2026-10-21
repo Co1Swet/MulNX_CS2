@@ -21,8 +21,6 @@ class SkinController final :public CSModuleBase {
     std::optional<uint32_t> OnGetSeed(CS2::C_EconItemView* pEconItemView);
     std::optional<float> OnGetWear(CS2::C_EconItemView* pEconItemView);
     
-    std::atomic<int> index = 559;
-
     void Window();
     bool Init()override;
 };

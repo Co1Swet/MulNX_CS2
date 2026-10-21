@@ -8,10 +8,17 @@ bool SkinConfigger::Init() {
         .SubscribeAsync<void>("SkinChange/BuyOwn")
         .SubscribeAsync<void>("SkinChange/OwnNoBuy")
         .SubscribeAsync<void>("SkinChange/OwnBuy")
+        .SubscribeAsync<void>("SkinChange/ClearAll")
+        .SubscribeAsync<void>("SkinChange/Refresh")
         .SubscribeAsyncEx<Steam64UID, int>("SkinChange/PaintKit/Set")
         .SubscribeAsyncEx<Steam64UID, int>("SkinChange/Seed/Set")
         .SubscribeAsyncEx<Steam64UID, float>("SkinChange/Wear/Set")
         ;
+
+    this->SendTask("Update", "CSControl", [this]() {
+        this->Update();
+        return true;
+        });
 
     return true;
 }
@@ -84,24 +91,33 @@ void SkinConfigger::ProcessMsg(MulNX::Message& msg) {
         this->policy = Policy::OwnBuy;
         break;
     }
+    case "SkinChange/ClearAll"_hash: {
+        std::unique_lock lock(this->smutex);
+        this->cfgs.clear();
+        break;
+    }
+    case "SkinChange/Refresh"_hash: {
+        this->AsyncCommand("regenerate_weapon_skins");
+        break;
+    }
     case "SkinChange/PaintKit/Set"_hash: {
+        std::unique_lock lock(this->smutex);
         auto pNetExt = msg.asp.get<MulNX::NetExt>();
         auto&& [steamID, paintKit] = msg.Access<Steam64UID, int>();
-        std::unique_lock lock(this->smutex);
         this->cfgs[steamID][pNetExt->str1].paintKit = paintKit;
         break;
     }
     case "SkinChange/Seed/Set"_hash: {
+        std::unique_lock lock(this->smutex);
         auto pNetExt = msg.asp.get<MulNX::NetExt>();
         auto&& [steamID, seed] = msg.Access<Steam64UID, int>();
-        std::unique_lock lock(this->smutex);
         this->cfgs[steamID][pNetExt->str1].seed = seed;
         break;
     }
     case "SkinChange/Wear/Set"_hash: {
+        std::unique_lock lock(this->smutex);
         auto pNetExt = msg.asp.get<MulNX::NetExt>();
         auto&& [steamID, wear] = msg.Access<Steam64UID, float>();
-        std::unique_lock lock(this->smutex);
         this->cfgs[steamID][pNetExt->str1].wear = wear;
         break;
     }

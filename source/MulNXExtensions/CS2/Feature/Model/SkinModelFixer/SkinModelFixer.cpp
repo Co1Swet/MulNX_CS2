@@ -1,7 +1,6 @@
 #include "SkinModelFixer.hpp"
 
 bool SkinModelFixer::Init() {
-
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
         this->pGetPaintDef = (GetPaintDef_t)this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Skin::CEconItemView::GetPaintDef).Data();
@@ -36,7 +35,22 @@ bool SkinModelFixer::Init() {
 
     return true;
 }
-
+std::optional<bool> SkinModelFixer::UseLegacyModel(const char* name, CS2::C_CSWeaponBase* pWeapon) {
+    auto sv = std::string_view(name);
+    if (sv == "weapon_hkp2000") {
+        return std::nullopt; // 疑似V社神秘屎山发力
+    }
+    auto pAttributeContainer = pWeapon->m_AttributeManager();
+    auto pItem = pAttributeContainer->m_Item();
+    auto def = this->pGetPaintDef(pItem);
+    if (!def)return std::nullopt;
+    if (def->m_bUseLegacyModel) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 MulNX::Hook::Then SkinModelFixer::OnUpdateMeshGroupMask(MulNX::Hook* hk, RegContext* ctx) {
     auto pS = (CS2::CSkeletonInstance*)ctx->rcx;
     auto pEntity = MulNX::MRead(pS->m_pOwner());
@@ -44,11 +58,9 @@ MulNX::Hook::Then SkinModelFixer::OnUpdateMeshGroupMask(MulNX::Hook* hk, RegCont
     if (std::string_view(name) != "cs2_hudmodel_weapon")return MulNX::Hook::Then::Continue;
     auto hWeapon = MulNX::MRead(pEntity->m_hOwnerEntity());
     auto pWeapon = this->CS2Entitys->GetBaseEntityFromHandle(hWeapon)->As<CS2::C_CSWeaponBase>();
-    auto pAttributeContainer = pWeapon->m_AttributeManager();
-    auto pItem = pAttributeContainer->m_Item();
-    auto def = this->pGetPaintDef(pItem);
-    if (!def)return MulNX::Hook::Then::Continue;
-    if (def->m_bUseLegacyModel) {
+    auto o = this->UseLegacyModel(name, pWeapon);
+    if (!o.has_value())return MulNX::Hook::Then::Continue;
+    if (*o) {
         ctx->rdx = 2;
     }
     else {
@@ -59,18 +71,13 @@ MulNX::Hook::Then SkinModelFixer::OnUpdateMeshGroupMask(MulNX::Hook* hk, RegCont
 MulNX::Hook::Then SkinModelFixer::OnPos_NetUpdateMeshGroupMask_GettedValue(MulNX::Hook* hk, RegContext* ctx) {
     auto pModelState = (CS2::CModelState*)ctx->rcx;
     auto pS = pModelState->GetOwner();
-
     auto pWeapon = MulNX::MRead(pS->m_pOwner())->As<CS2::C_CSWeaponBase>();
     auto name = pWeapon->GetEntityClassName();
     if (!name)return MulNX::Hook::Then::Continue;
     if (!std::string_view(name).starts_with("weapon_"))return MulNX::Hook::Then::Continue;
-
-    auto pAttributeContainer = pWeapon->m_AttributeManager();
-    auto pItem = pAttributeContainer->m_Item();
-    auto def = this->pGetPaintDef(pItem);
-    if (!def)return MulNX::Hook::Then::Continue;
-
-    if (def->m_bUseLegacyModel) {
+    auto o = this->UseLegacyModel(name, pWeapon);
+    if (!o.has_value())return MulNX::Hook::Then::Continue;
+    if (*o) {
         ctx->r8 = 2;
     }
     else {
