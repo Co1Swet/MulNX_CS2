@@ -7,5 +7,6 @@ add_library(CS2Mirror STATIC
     ParticleSystemMgr/ParticleSystemMgr.cpp
     VFileSystem/VFileSystem.cpp
     CSDemoController/CSDemoController.cpp
+    CCStrike15ItemSystem/CCStrike15ItemSystem.cpp
 )
 target_link_libraries(CS2Mirror PUBLIC CS2Intro)

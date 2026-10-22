@@ -1,9 +1,10 @@
 #include "SkinModelFixer.hpp"
 
 bool SkinModelFixer::Init() {
+    this->pCCStrike15ItemSystem = this->FindModule<CCStrike15ItemSystem>("CCStrike15ItemSystem");
+
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
-        this->pGetPaintDef = (GetPaintDef_t)this->CS2->client.GetTextRegion()
-            .FindRegion(CS2::Signatures::Skin::CEconItemView::GetPaintDef).Data();
+        this->pGetPaintKit = this->FindModule<SkinController>("SkinController")->pGetPaintKit;
 
         this->pUpdateMeshGroupMask = (UpdateMeshGroupMask_t)this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::UpdateMeshGroupMask).Data();
@@ -19,8 +20,7 @@ bool SkinModelFixer::Init() {
         this->RegisterAttachHook(this->hkUpdateMeshGroupMask, "UpdateMeshGroupMask");
 
         auto tPos_NetUpdateMeshGroupMask_GettedValue = this->CS2->client.GetTextRegion()
-            .FindRegion(CS2::Signatures::Skin::CSkeletonInstance
-                ::Pos_NetUpdateMeshGroupMask_GettedValue).Data();
+            .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::Pos_NetUpdateMeshGroupMask_GettedValue).Data();
         this->hkPos_NetUpdateMeshGroupMask_GettedValue = MulNX::Hook::Create(tPos_NetUpdateMeshGroupMask_GettedValue, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 return this->OnPos_NetUpdateMeshGroupMask_GettedValue(hk, ctx);
@@ -40,9 +40,11 @@ std::optional<bool> SkinModelFixer::UseLegacyModel(const char* name, CS2::C_CSWe
     if (sv == "weapon_hkp2000") {
         return std::nullopt; // 疑似V社神秘屎山发力
     }
+
     auto pAttributeContainer = pWeapon->m_AttributeManager();
     auto pItem = pAttributeContainer->m_Item();
-    auto def = this->pGetPaintDef(pItem);
+    auto index = this->pGetPaintKit(pItem);
+    auto def = this->pCCStrike15ItemSystem->FindPaintDefByIndex(index);
     if (!def)return std::nullopt;
     if (def->m_bUseLegacyModel) {
         return true;

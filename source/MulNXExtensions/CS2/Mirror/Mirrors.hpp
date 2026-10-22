@@ -7,3 +7,4 @@
 #include "ParticleSystemMgr/ParticleSystemMgr.hpp"
 #include "VFileSystem/VFileSystem.hpp"
 #include "CSDemoController/CSDemoController.hpp"
+#include "CCStrike15ItemSystem/CCStrike15ItemSystem.hpp"

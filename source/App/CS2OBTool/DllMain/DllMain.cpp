@@ -54,6 +54,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<ParticleSystemMgr>("ParticleSystemMgr")
         .CreateModule<VFileSystem>("VFileSystem")
         .CreateModule<CSDemoController>("CSDemoController")
+        .CreateModule<CCStrike15ItemSystem>("CCStrike15ItemSystem")
 
         // CS2 自定义支持
         .CreateModule<ClientPanorama>("ClientPanorama")

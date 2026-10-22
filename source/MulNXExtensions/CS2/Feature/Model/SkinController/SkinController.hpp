@@ -4,11 +4,12 @@
 
 class SkinController final :public CSModuleBase {
     SkinConfigger* pSkinConfigger = nullptr;
-
+public:
     using CEconItemView_GetPaintKit_t = uint32_t(*)(CS2::C_EconItemView* pEconItemView);
+    CEconItemView_GetPaintKit_t pGetPaintKit = nullptr;
     using CEconItemView_GetSeed_t = uint32_t(*)(CS2::C_EconItemView* pEconItemView);
     using CEconItemView_GetWear_t = float(*)(CS2::C_EconItemView* pEconItemView, float defaultWear);
-
+private:
     std::unique_ptr<MulNX::Hook> hkGetPaintKit = nullptr;
     std::unique_ptr<MulNX::Hook> hkGetSeed = nullptr;
     std::unique_ptr<MulNX::Hook> hkGetWear = nullptr;

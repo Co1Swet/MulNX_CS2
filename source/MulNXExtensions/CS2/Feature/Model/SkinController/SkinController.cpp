@@ -20,6 +20,7 @@ bool SkinController::Init() {
         if (!vtable)MulNX::ErrorTerminate(".?AVC_EconItemView@@ 查找失败");
         if ((uint8_t*)(vtable[3]) != t)MulNX::ErrorTerminate("GetPaintKit 查找异常");
 
+        this->pGetPaintKit = (CEconItemView_GetPaintKit_t)t;
         this->hkGetPaintKit = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pRaw = (CEconItemView_GetPaintKit_t)hk->pMaybeRawFunc;
             auto pEconItemView = (CS2::C_EconItemView*)ctx->rcx;
