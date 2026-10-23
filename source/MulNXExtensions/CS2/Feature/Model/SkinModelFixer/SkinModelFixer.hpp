@@ -10,13 +10,15 @@ class SkinModelFixer final :public CSModuleBase {
     UpdateMeshGroupMask_t pUpdateMeshGroupMask = nullptr;
 
     std::unique_ptr<MulNX::Hook> hkUpdateMeshGroupMask = nullptr;
-    std::unique_ptr<MulNX::Hook> hkPos_NetUpdateMeshGroupMask_GettedValue = nullptr;
+    std::unique_ptr<MulNX::Hook> hkNetUpdateMeshGroupMask = nullptr;
     std::unique_ptr<MulNX::Hook> hkRegenerateWeaponSkins = nullptr;
 
-    std::optional<bool> UseLegacyModel(const char* name, CS2::C_CSWeaponBase* pWeapon);
+    std::optional<bool> UseLegacyModel(CS2::C_CSWeaponBase* pWeapon);
     MulNX::Hook::Then OnUpdateMeshGroupMask(MulNX::Hook* hk, RegContext* ctx);
-    MulNX::Hook::Then OnPos_NetUpdateMeshGroupMask_GettedValue(MulNX::Hook* hk, RegContext* ctx);
+    MulNX::Hook::Then OnNetUpdateMeshGroupMask(MulNX::Hook* hk, RegContext* ctx);
     MulNX::Hook::Then OnRegenerateWeaponSkins(MulNX::Hook* hk, RegContext* ctx);
+
+    void CheckHudWeaponMesh(CS2::C_CSPlayerPawn* pPawn);
 
     bool Init()override;
 };

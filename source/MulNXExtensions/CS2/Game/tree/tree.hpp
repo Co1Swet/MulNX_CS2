@@ -133,6 +133,9 @@ namespace CS2 {
     // 但是abi层面确实继承CBaseAnimGraph，这很奇怪
     class C_EconEntity :public CBaseAnimGraph {
     public:
+        CHandle<CBaseAnimGraph>* m_hViewmodelAttachment() { return Schema<CHandle<CBaseAnimGraph>>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_hViewmodelAttachment); }
+        CHandle<C_BaseEntity>* m_hOldProvidee() { return Schema<CHandle<C_BaseEntity>>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_hOldProvidee); }
+        
         uint32_t* m_OriginalOwnerXuidLow() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_OriginalOwnerXuidLow); }
         uint32_t* m_OriginalOwnerXuidHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_OriginalOwnerXuidHigh); }
         C_AttributeContainer* m_AttributeManager() { return Schema<C_AttributeContainer>(this, cs2_dumper::schemas::client_dll::C_EconEntity::m_AttributeManager); }

@@ -19,18 +19,18 @@ bool SkinModelFixer::Init() {
             }).value();
         this->RegisterAttachHook(this->hkUpdateMeshGroupMask, "UpdateMeshGroupMask");
 
-        auto tPos_NetUpdateMeshGroupMask_GettedValue = this->CS2->client.GetTextRegion()
-            .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::Pos_NetUpdateMeshGroupMask_GettedValue).Data();
-        this->hkPos_NetUpdateMeshGroupMask_GettedValue = MulNX::Hook::Create(tPos_NetUpdateMeshGroupMask_GettedValue, [this](MulNX::Hook* hk, RegContext* ctx) {
+        auto tNetUpdateMeshGroupMask = this->CS2->client.GetTextRegion()
+            .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::CModelState::NetUpdateMeshGroupMask).Data();
+        this->hkNetUpdateMeshGroupMask = MulNX::Hook::Create(tNetUpdateMeshGroupMask, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
-                return this->OnPos_NetUpdateMeshGroupMask_GettedValue(hk, ctx);
+                return this->OnNetUpdateMeshGroupMask(hk, ctx);
             }
             catch (const MulNX::Exception& e) {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }, true).value();
-        this->RegisterAttachHook(this->hkPos_NetUpdateMeshGroupMask_GettedValue, "Pos_NetUpdateMeshGroupMask_GettedValue");
+            }).value();
+        this->RegisterAttachHook(this->hkNetUpdateMeshGroupMask, "NetUpdateMeshGroupMask");
 
         auto tRegenerateWeaponSkins = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Skin::RegenerateWeaponSkins).Data();
         this->hkRegenerateWeaponSkins = MulNX::Hook::Create(tRegenerateWeaponSkins, [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -47,7 +47,7 @@ bool SkinModelFixer::Init() {
 
     return true;
 }
-std::optional<bool> SkinModelFixer::UseLegacyModel(const char* name, CS2::C_CSWeaponBase* pWeapon) {
+std::optional<bool> SkinModelFixer::UseLegacyModel(CS2::C_CSWeaponBase* pWeapon) {
     auto pAttributeContainer = pWeapon->m_AttributeManager();
     auto pItem = pAttributeContainer->m_Item();
     auto index = this->pGetPaintKit(pItem);
@@ -67,7 +67,7 @@ MulNX::Hook::Then SkinModelFixer::OnUpdateMeshGroupMask(MulNX::Hook* hk, RegCont
     if (std::string_view(name) != "cs2_hudmodel_weapon")return MulNX::Hook::Then::Continue;
     auto hWeapon = MulNX::MRead(pEntity->m_hOwnerEntity());
     auto pWeapon = this->CS2Entitys->GetBaseEntityFromHandle(hWeapon)->As<CS2::C_CSWeaponBase>();
-    auto o = this->UseLegacyModel(name, pWeapon);
+    auto o = this->UseLegacyModel(pWeapon);
     if (!o.has_value())return MulNX::Hook::Then::Continue;
     if (*o) {
         ctx->rdx = 2;
@@ -77,78 +77,86 @@ MulNX::Hook::Then SkinModelFixer::OnUpdateMeshGroupMask(MulNX::Hook* hk, RegCont
     }
     return MulNX::Hook::Then::Continue;
 }
-MulNX::Hook::Then SkinModelFixer::OnPos_NetUpdateMeshGroupMask_GettedValue(MulNX::Hook* hk, RegContext* ctx) {
+MulNX::Hook::Then SkinModelFixer::OnNetUpdateMeshGroupMask(MulNX::Hook* hk, RegContext* ctx) {
     auto pModelState = (CS2::CModelState*)ctx->rcx;
-    auto pS = pModelState->GetOwner();
-    auto pWeapon = MulNX::MRead(pS->m_pOwner())->As<CS2::C_CSWeaponBase>();
+    auto pWeaponSkeletonInstance = pModelState->GetOwner();
+    auto pWeapon = MulNX::MRead(pWeaponSkeletonInstance->m_pOwner())->As<CS2::C_CSWeaponBase>();
     auto name = pWeapon->GetEntityClassName();
     if (!name)return MulNX::Hook::Then::Continue;
     if (!std::string_view(name).starts_with("weapon_"))return MulNX::Hook::Then::Continue;
-    auto o = this->UseLegacyModel(name, pWeapon);
+
+    auto h = MulNX::MRead(pWeapon->m_hOwnerEntity());
+    auto pEntity = this->CS2Entitys->GetBaseEntityFromHandle(h)->As<CS2::C_CSPlayerPawn>();
+    if (pEntity) {
+        this->CheckHudWeaponMesh(pEntity);
+    }
+
+    auto o = this->UseLegacyModel(pWeapon);
     if (!o.has_value())return MulNX::Hook::Then::Continue;
+    uint64_t mask;
     if (*o) {
-        ctx->r8 = 2;
+        mask = 2;
     }
     else {
-        ctx->r8 = 1;
+        mask = 1;
+    }
+    using NetUpdateMeshGroupMask_t = void(*)(CS2::CModelState*, uint64_t*);
+    reinterpret_cast<NetUpdateMeshGroupMask_t>(hk->pMaybeRawFunc)(pModelState, &mask);
+    return MulNX::Hook::Then::Return;
+}
+MulNX::Hook::Then SkinModelFixer::OnRegenerateWeaponSkins(MulNX::Hook* hk, RegContext* ctx) {
+    for (int i = 0;i < 64;++i) {
+        auto pCtrl = this->CS2Entitys->GetBaseEntity(i)->As<CS2::CCSPlayerController>();
+        if (!pCtrl || !pCtrl->IsPlayerController())continue;
+        auto hPawn = MulNX::MRead(pCtrl->m_hPawn());
+        auto pPawn = this->CS2Entitys->GetBaseEntityFromHandle(hPawn)->As<CS2::C_CSPlayerPawn>();
+        if (!pPawn || !pPawn->IsPlayerPawn())continue;
+        this->CheckHudWeaponMesh(pPawn);
     }
     return MulNX::Hook::Then::Continue;
 }
-MulNX::Hook::Then SkinModelFixer::OnRegenerateWeaponSkins(MulNX::Hook* hk, RegContext* ctx) {
-    auto pPawn = this->CS2Entitys->TryGetObservingPawn();
-    if (!pPawn) return MulNX::Hook::Then::Continue;
-
+void SkinModelFixer::CheckHudWeaponMesh(CS2::C_CSPlayerPawn* pPawn) {
     auto hHudModelArms = MulNX::MRead(pPawn->m_hHudModelArms());
     auto pArmsEntity = this->CS2Entitys->GetBaseEntityFromHandle(hHudModelArms);
-    if (!pArmsEntity) return MulNX::Hook::Then::Continue;
+    if (!pArmsEntity)return;
 
-    auto pArmsSkel = reinterpret_cast<CS2::CSkeletonInstance*>(
-        MulNX::MRead(pArmsEntity->pGameSceneNode()));
-    if (!pArmsSkel) return MulNX::Hook::Then::Continue;
+    auto pArmsSkel = static_cast<CS2::CSkeletonInstance*>(MulNX::MRead(pArmsEntity->pGameSceneNode()));
+    if (!pArmsSkel)return;
 
     CS2::C_BaseEntity* pHudWeaponEntity = nullptr;
     CS2::CSkeletonInstance* pHudWeaponSkel = nullptr;
 
-    auto pChild = MulNX::MRead(pArmsSkel->m_pChild());
-    while (pChild) {
+    for (auto pChild = MulNX::MRead(pArmsSkel->m_pChild());
+        pChild != nullptr;
+        pChild = MulNX::MRead(pChild->m_pNextSibling())) {
+
         auto pOwner = MulNX::MRead(pChild->m_pOwner());
-        if (pOwner) {
-            auto name = pOwner->GetEntityClassName();
-            if (name && std::string_view(name) == "cs2_hudmodel_weapon") {
-                pHudWeaponEntity = pOwner;
-                pHudWeaponSkel = reinterpret_cast<CS2::CSkeletonInstance*>(pChild);
-                break;
-            }
+        if (!pOwner)continue;
+        auto name = pOwner->GetEntityClassName();
+        if (name && std::string_view(name) == "cs2_hudmodel_weapon") {
+            pHudWeaponEntity = pOwner;
+            pHudWeaponSkel = static_cast<CS2::CSkeletonInstance*>(pChild);
+            break;
         }
-        pChild = MulNX::MRead(pChild->m_pNextSibling());
     }
-    if (!pHudWeaponSkel || !pHudWeaponEntity)
-        return MulNX::Hook::Then::Continue;
+    if (!pHudWeaponSkel || !pHudWeaponEntity)return;
 
     auto hWorldWeapon = MulNX::MRead(pHudWeaponEntity->m_hOwnerEntity());
     auto pWorldWeapon = this->CS2Entitys->GetBaseEntityFromHandle(hWorldWeapon);
-    if (!pWorldWeapon) return MulNX::Hook::Then::Continue;
+    if (!pWorldWeapon)return;
 
-    auto pWorldSkel = reinterpret_cast<CS2::CSkeletonInstance*>(
-        MulNX::MRead(pWorldWeapon->pGameSceneNode()));
-    if (!pWorldSkel) return MulNX::Hook::Then::Continue;
+    auto pWorldSkel = static_cast<CS2::CSkeletonInstance*>(MulNX::MRead(pWorldWeapon->pGameSceneNode()));
+    if (!pWorldSkel)return;
 
     auto* pWorldModelState = pWorldSkel->m_modelState();
     auto ppWorldModel = pWorldModelState->m_hModel();
 
-    if (MulNX::MRead(&ppWorldModel->m_pObject) == nullptr) return MulNX::Hook::Then::Continue;
+    if (MulNX::MRead(&ppWorldModel->m_pObject) == nullptr)return;
 
     auto* pHudModelState = pHudWeaponSkel->m_modelState();
-
-    auto* pHudMS = pHudWeaponSkel->m_modelState();
     auto* pWorldMS = pWorldSkel->m_modelState();
 
-    uint64_t worldMask = *pWorldMS->m_MeshGroupMask();
-    if (*pHudMS->m_MeshGroupMask() != worldMask) {
-        this->pUpdateMeshGroupMask(pHudWeaponSkel, worldMask);
-    }
-
-    using RegenerateWeaponSkins_t = uint64_t(*)(void);
-    reinterpret_cast<RegenerateWeaponSkins_t>(hk->pMaybeRawFunc)();
-    return MulNX::Hook::Then::Return;
+    uint64_t worldMask = MulNX::MRead(pWorldMS->m_MeshGroupMask());
+    if (MulNX::MRead(pHudModelState->m_MeshGroupMask()) == worldMask)return;
+    this->pUpdateMeshGroupMask(pHudWeaponSkel, worldMask);
 }
