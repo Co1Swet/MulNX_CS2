@@ -48,7 +48,6 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
         .CreateModule<MulNX::TaskSystem>("TaskSystem")// 任务系统
         .CreateModule<MulNX::Logger>("Logger")
         .CreateModule<MulNX::Debugger>("Debugger")// 调试器模块
-        .CreateModule<MulNX::HandleSystem>("HandleSystem")// 句柄系统模块
         .CreateModule<MulNX::InputSystem>("InputSystem")// 输入系统模块
         .CreateModule<ShortcutManager>("ShortcutManager")// 快捷键管理器模块
         .CreateModule<MulNX::GlobalVars>("GlobalVars")// 全局变量模块

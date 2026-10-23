@@ -11,7 +11,6 @@ add_library(MulNX
     Core/ModuleManager/ModuleManager.cpp
 
     Systems/Debugger/Debugger.cpp
-    Systems/HandleSystem/HandleSystem.cpp
     Systems/IPCer/IPCer.cpp
     Systems/InputSystem/Key/Key.cpp
     Systems/InputSystem/InputSystem.cpp
