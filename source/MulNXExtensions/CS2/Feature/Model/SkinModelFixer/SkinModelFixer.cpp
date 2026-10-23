@@ -48,11 +48,6 @@ bool SkinModelFixer::Init() {
     return true;
 }
 std::optional<bool> SkinModelFixer::UseLegacyModel(const char* name, CS2::C_CSWeaponBase* pWeapon) {
-    auto sv = std::string_view(name);
-    if (sv == "weapon_hkp2000") {
-        return std::nullopt; // 疑似V社神秘屎山发力
-    }
-
     auto pAttributeContainer = pWeapon->m_AttributeManager();
     auto pItem = pAttributeContainer->m_Item();
     auto index = this->pGetPaintKit(pItem);
@@ -125,8 +120,7 @@ MulNX::Hook::Then SkinModelFixer::OnRegenerateWeaponSkins(MulNX::Hook* hk, RegCo
                 break;
             }
         }
-        pChild = *reinterpret_cast<CS2::CGameSceneNode**>(
-            reinterpret_cast<uint8_t*>(pChild) + 0x48);
+        pChild = MulNX::MRead(pChild->m_pNextSibling());
     }
     if (!pHudWeaponSkel || !pHudWeaponEntity)
         return MulNX::Hook::Then::Continue;
@@ -140,18 +134,14 @@ MulNX::Hook::Then SkinModelFixer::OnRegenerateWeaponSkins(MulNX::Hook* hk, RegCo
     if (!pWorldSkel) return MulNX::Hook::Then::Continue;
 
     auto* pWorldModelState = pWorldSkel->m_modelState();
-    void* worldModel = *reinterpret_cast<void**>(
-        reinterpret_cast<uint8_t*>(pWorldModelState) + 0xA0);
-    if (!worldModel) return MulNX::Hook::Then::Continue;
+    auto ppWorldModel = pWorldModelState->m_hModel();
+
+    if (MulNX::MRead(&ppWorldModel->m_pObject) == nullptr) return MulNX::Hook::Then::Continue;
 
     auto* pHudModelState = pHudWeaponSkel->m_modelState();
-    void* hudModel = *reinterpret_cast<void**>(
-        reinterpret_cast<uint8_t*>(pHudModelState) + 0xA0);
 
     auto* pHudMS = pHudWeaponSkel->m_modelState();
     auto* pWorldMS = pWorldSkel->m_modelState();
-
-    auto pMesh = pHudModelState->m_MeshGroupMask();
 
     uint64_t worldMask = *pWorldMS->m_MeshGroupMask();
     if (*pHudMS->m_MeshGroupMask() != worldMask) {

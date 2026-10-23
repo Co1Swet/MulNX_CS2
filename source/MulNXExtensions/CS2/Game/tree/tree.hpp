@@ -3,72 +3,14 @@
 #include <MulNXUtils/WinExt/vtable/vtable.hpp>
 #include <MulNXThirdParty/cs2_dumpers.hpp>
 #include <Game/CSUtils/CSUtils.hpp>
+#include "CHandle.hpp"
+#include "CSkeletonInstance.hpp"
 #include "PawnsServices.hpp"
 
 namespace CS2 {
-    class CHandleBase {
-    public:
-        uint32_t value;
-        CHandleBase(uint32_t handle) :value(handle) {}
-        int GetIndexInEntityList() { return this->value & 0x7FFF; }
-        bool Valid() { return this->value != 0xFFFFFFFF; }
-
-        bool operator<(const CHandleBase& rhs) const noexcept {
-            return this->value < rhs.value;
-        }
-
-        bool operator==(const CHandleBase& rhs) const noexcept {
-            return this->value == rhs.value;
-        }
-
-        CHandleBase() :value(0xFFFFFFFF) {}
-    };
-
-    template<typename T>
-    class CHandle :public CHandleBase {
-    public:
-
-    };
-
     class C_ClassInfo {
     public:
         char** pName() { return reinterpret_cast<char**>(reinterpret_cast<uintptr_t>(this) + 0x20); }
-    };
-
-    class C_BaseEntity;
-    class CGameSceneNode {
-    public:
-        C_BaseEntity** m_pOwner() { return Schema<C_BaseEntity*>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_pOwner); }
-        CGameSceneNode** m_pChild() { return Schema<CGameSceneNode*>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_pChild); }
-
-        DirectX::XMFLOAT3* vecAbsOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecAbsOrigin); }
-        DirectX::XMFLOAT3* vecOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecOrigin); }
-        DirectX::XMFLOAT3* angAbsRotation() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_angAbsRotation); }
-        DirectX::XMFLOAT3* angRotation() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_angRotation); }
-        DirectX::XMFLOAT3* vecWrappedLocalOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vecWrappedLocalOrigin); }
-        DirectX::XMFLOAT3* angWrappedLocalRotation() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_angWrappedLocalRotation); }
-        //DirectX::XMFLOAT3* vRenderOrigin() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_vRenderOrigin); }
-        bool* bDebugAbsOriginChanges() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::CGameSceneNode::m_bDebugAbsOriginChanges); }
-    };
-
-    class CSkeletonInstance;
-    class CModelState {
-    public:
-        CSkeletonInstance* GetOwner() { return Schema<CSkeletonInstance>(this, -cs2_dumper::schemas::client_dll::CSkeletonInstance::m_modelState); }
-        uint64_t* m_MeshGroupMask() { return Schema<uint64_t>(this, cs2_dumper::schemas::client_dll::CModelState::m_MeshGroupMask); }
-    };
-
-    class BoneArray {
-        constexpr static int32_t unkSize = 32;
-    public:
-        DirectX::XMFLOAT3* at(int32_t index) { return reinterpret_cast<DirectX::XMFLOAT3*>(reinterpret_cast<uintptr_t>(this) + index * unkSize); }
-    };
-
-    class CSkeletonInstance :public CGameSceneNode {
-        constexpr static uintptr_t unkSchema = 0x80;
-    public:
-        CModelState* m_modelState() { return Schema<CModelState>(this, cs2_dumper::schemas::client_dll::CSkeletonInstance::m_modelState); }
-        BoneArray** unkBoneArray() { return Schema<BoneArray*>(this, cs2_dumper::schemas::client_dll::CSkeletonInstance::m_modelState + unkSchema); }
     };
 
     class C_BaseEntity :public IVClass {
