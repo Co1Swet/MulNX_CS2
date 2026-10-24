@@ -8,6 +8,7 @@
 #include <MulNX/Systems/InputSystem/InputMixin.hpp>
 #include <MulNX/Systems/GlobalVars/GlobalVarMixin.hpp>
 #include <MulNX/Systems/ShortcutManager/ShortcutMixin.hpp>
+#include <MulNX/Systems/VarReflSystem/VarReflMixin.hpp>
 
 namespace MulNX {
     namespace Core{
@@ -17,7 +18,7 @@ namespace MulNX {
     class Module :public ModuleBase,
         public LogMixin<T>, public MsgMixin<T>, public TaskMixin<T>,
         public UIMixin<T>, public PathMixin<T>, public InputMixin<T>,
-        public GlobalVarMixin<T>, public ShortcutMixin<T> {
+        public GlobalVarMixin<T>, public ShortcutMixin<T>, public VarReflMixin<T> {
         friend MulNX::Core::Driver;
     public:
         Module() {

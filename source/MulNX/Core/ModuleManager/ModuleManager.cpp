@@ -41,6 +41,7 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
     (*this)
         .CreateModule<MulNX::PathManager>("PathManager")// 路径管理器模块
         .CreateModule<MulNX::I18nManager>("I18nManager")
+        .CreateModule<MulNX::VarReflSystem>("VarReflSystem")// 消息管理器模块
         .CreateModule<MulNX::MessageManager>("MessageManager")// 消息管理器模块
         .CreateModule<MulNX::UICoordinator>("UICoordinator")
         .CreateModule<MulNX::UISystem>("UISystem")// UI系统模块
