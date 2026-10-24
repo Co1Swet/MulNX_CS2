@@ -71,8 +71,9 @@ void MulNX::ModuleBase::Update() {
     for (auto& [type, waiters] : this->msgWaiters) {
         for (auto it = waiters.begin();it != waiters.end();) {
             if (it->first(nullptr)) {
-                it->second.resume();
+                auto h = it->second;
                 it = waiters.erase(it);
+                h.resume();
             }
             else {
                 ++it;

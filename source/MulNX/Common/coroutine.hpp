@@ -7,69 +7,79 @@ namespace MulNX {
     class CoTask {
     public:
         struct promise_type {
-            std::coroutine_handle<promise_type> continue_coroutine_handle = nullptr;
+            std::coroutine_handle<promise_type> hContinueCoroutine = nullptr;
+            std::shared_ptr<std::exception_ptr> ppException = nullptr;
+
             CoTask get_return_object() {
-                return CoTask{ std::coroutine_handle<promise_type>::from_promise(*this) };
+                auto task = CoTask{ std::coroutine_handle<promise_type>::from_promise(*this) };
+                this->ppException = task.ppException;
+                return task;
             }
-            std::suspend_always initial_suspend() noexcept { return {}; }
+
             void return_void() {}
-            void unhandled_exception() { std::terminate(); }
+
+            void unhandled_exception() {
+                if (this->hContinueCoroutine == nullptr) {
+                    // 自动销毁
+                    throw;
+                }
+                *this->ppException = std::current_exception();
+            }
+
+            std::suspend_always initial_suspend() noexcept { return {}; }
+            
             auto final_suspend() noexcept {
                 struct FinalAwaitable {
-                    std::coroutine_handle<> continuation;
+                    
+                    std::coroutine_handle<promise_type> hContinuation;
+                    
+                    bool await_ready() noexcept { return false; }
 
-                    bool await_ready() noexcept {
-                        return false;
-                    }
-                    std::coroutine_handle<> await_suspend(std::coroutine_handle<promise_type> handle) noexcept {
-                        auto next = this->continuation ? this->continuation : std::noop_coroutine();
-                        handle.destroy();
+                    std::coroutine_handle<> await_suspend(std::coroutine_handle<promise_type> hChild) noexcept {
+                        std::coroutine_handle<> next = std::noop_coroutine();
+                        if (this->hContinuation) {
+                            next = this->hContinuation;
+                        }
+                        hChild.destroy();
                         return next;
                     }
                     void await_resume() noexcept {}
                 };
-                return FinalAwaitable{ this->continue_coroutine_handle };
+                return FinalAwaitable{ this->hContinueCoroutine };
             }
         };
-
-        std::coroutine_handle<promise_type> handle = nullptr;
-
+    private:
+        std::coroutine_handle<promise_type> hCoroutine = nullptr;
+        std::shared_ptr<std::exception_ptr> ppException = std::make_shared<std::exception_ptr>();
+    public:
         bool await_ready() { return false; }
 
         std::coroutine_handle<> await_suspend(std::coroutine_handle<promise_type> caller) {
-            this->handle.promise().continue_coroutine_handle = caller;
-            auto next = this->handle;
-            this->handle = nullptr;
-            return next;   // 对称转移
+            this->hCoroutine.promise().hContinueCoroutine = caller;
+            return this->hCoroutine;   // 对称转移
         }
 
-        void await_resume() { return; }
+        void await_resume() {
+            auto e = *this->ppException;
+            if (!e)return;
+            std::rethrow_exception(e);
+        }
 
-        explicit CoTask(std::coroutine_handle<promise_type> h) : handle(h) {}
-        void Fire() {
-            auto h = this->handle;
-            this->handle = nullptr;
-            return h.resume();
-        }
-        ~CoTask() {
-            if (this->handle)
-                this->handle.destroy();
-        }
+        explicit CoTask(std::coroutine_handle<promise_type> h) : hCoroutine(h) {}
+        void Fire() { this->hCoroutine.resume(); }
 
         CoTask(const CoTask&) = delete;
         CoTask& operator=(const CoTask&) = delete;
 
         CoTask(CoTask&& other) noexcept {
             if (this == &other)return;
-            if (this->handle)this->handle.destroy();
-            this->handle = other.handle;
-            other.handle = nullptr;
+            this->hCoroutine = other.hCoroutine;
+            this->ppException = other.ppException;
         }
         CoTask& operator=(CoTask&& other) noexcept {
             if (this == &other)return *this;
-            if (this->handle)this->handle.destroy();
-            this->handle = other.handle;
-            other.handle = nullptr;
+            this->hCoroutine = other.hCoroutine;
+            this->ppException = other.ppException;
             return *this;
         }
     };
