@@ -39,7 +39,6 @@ bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase
 }
 MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
     (*this)
-        .CreateModule<MulNX::IPCer>("IPCer")// IPC模块
         .CreateModule<MulNX::PathManager>("PathManager")// 路径管理器模块
         .CreateModule<MulNX::I18nManager>("I18nManager")
         .CreateModule<MulNX::MessageManager>("MessageManager")// 消息管理器模块

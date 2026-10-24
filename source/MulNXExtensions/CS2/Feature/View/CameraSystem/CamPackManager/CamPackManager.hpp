@@ -3,7 +3,6 @@
 #include <CameraSystem/CamPack/CamPack.hpp>
 
 class CamPackManager final :public CamSysModule {
-    MulNX::IPCer* pIPCer = nullptr;
     std::unordered_map<std::string, std::shared_ptr<CamPack>> camPacks{};
 
     mutable std::atomic<bool> shortcutEnable = true;

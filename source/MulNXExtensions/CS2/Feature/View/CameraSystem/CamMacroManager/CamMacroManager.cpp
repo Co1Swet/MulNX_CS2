@@ -2,8 +2,6 @@
 #include <CameraSystem/CameraSystem.hpp>
 
 bool CamMacroManager::Init() {
-    this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
-
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
     this->Path()->CreateKey("kCamMacros", "CamMacros", [this](MulNX::PathManager* PathManager)->bool {
@@ -38,7 +36,12 @@ bool CamMacroManager::Init() {
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
         std::unique_lock lock(this->smutex);
         auto dirCamMacros = this->Path()->PathGetFromKey("kCamMacros");
-        auto camMacroNames = this->pIPCer->GetFileNamesByPath(dirCamMacros);
+        auto res = fs::SubFileNames(dirCamMacros);
+        if (!res.has_value()) {
+            this->LogError(res.error().message());
+            return;
+        }
+        auto camMacroNames = res.value();
         for (const auto& camMacroName : camMacroNames) {
             this->CamMacroLoad(dirCamMacros / camMacroName);
         }

@@ -1,8 +1,6 @@
 #include "CamPackManager.hpp"
 
 bool CamPackManager::Init() {
-    this->pIPCer = this->Core->ModuleManager()->FindModule<MulNX::IPCer>("IPCer");
-
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
     this->Path()->CreateKey("kCurrentPack", {}, [this](MulNX::PathManager* PathManager)->bool {
@@ -42,7 +40,12 @@ bool CamPackManager::Init() {
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         std::unique_lock lock(this->smutex);
         auto dirCamPacks = this->Path()->PathGetFromKey("kCamPacks");
-        auto camPackNames = this->pIPCer->GetDirNamesByPath(dirCamPacks);
+        auto res = fs::SubDirectoryNames(dirCamPacks);
+        if (!res.has_value()) {
+            this->LogError(res.error().message());
+            return;
+        }
+        auto camPackNames = *res;
         if (camPackNames.empty())return;
         for (const auto& camPackName : camPackNames) {
             this->CamPackLoad(dirCamPacks / camPackName, camPackName);

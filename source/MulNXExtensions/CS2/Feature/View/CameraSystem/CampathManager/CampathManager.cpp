@@ -5,7 +5,6 @@
 
 bool CampathManager::Init() {
     this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
-    this->pIPCer = this->FindModule<MulNX::IPCer>("IPCer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
@@ -44,7 +43,12 @@ bool CampathManager::Init() {
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
         std::unique_lock lock(this->smutex);
         fs::path dirCampaths = this->Path()->PathGetFromKey("kCampaths");
-        std::vector<std::string> campathNames = this->pIPCer->GetFileNamesByPath(dirCampaths);
+        auto res = fs::SubFileNames(dirCampaths);
+        if (!res.has_value()) {
+            this->LogError(res.error().message());
+            return;
+        }
+        auto campathNames = res.value();
         for (const std::string& campathName : campathNames) {
             if (!this->CampathLoad(dirCampaths / campathName)) {
                 this->LogError(std::format("运镜轨道加载失败：{}", campathName));

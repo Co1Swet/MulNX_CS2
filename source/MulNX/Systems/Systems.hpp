@@ -3,7 +3,6 @@
 #include "Logger/Logger.hpp"
 #include "GlobalVars/GlobalVars.hpp"
 #include "ShortcutManager/ShortcutManager.hpp"
-#include "IPCer/IPCer.hpp"
 #include "PathManager/PathManager.hpp"
 #include "I18nManager/I18nManager.hpp"
 #include "Debugger/Debugger.hpp"

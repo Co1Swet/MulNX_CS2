@@ -2,7 +2,6 @@
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
-#include <MulNX/Systems/IPCer/IPCer.hpp>
 #include <MulNXThirdParty/pugixml/pugixml.hpp>
 
 bool MulNX::PathManager::Init() {

@@ -5,7 +5,6 @@
 
 class CampathManager final : public CamSysModule {
     CameraDrawer* CamDrawer = nullptr;
-    MulNX::IPCer* pIPCer = nullptr;
 
     std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> campaths;
     std::atomic<std::shared_ptr<FreeCameraPath>> pOperatingCampath = nullptr;

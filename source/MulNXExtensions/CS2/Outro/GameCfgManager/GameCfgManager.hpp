@@ -2,8 +2,6 @@
 #include <Intro/CSModuleBase.hpp>
 
 class GameCfgManager final :public CSModuleBase {
-    MulNX::IPCer* IPCer = nullptr;
-
     fs::path ToolPath{};
     fs::path GamePath{};
 

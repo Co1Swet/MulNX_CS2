@@ -3,7 +3,6 @@
 #include <CameraSystem/CameraSystem.hpp>
 
 class CamMacroManager final :public CamSysModule {
-    MulNX::IPCer* pIPCer = nullptr;
     std::unordered_map<std::string, std::unique_ptr<CamMacro>> camMacros{};
     CamMacro* pOperatingMacro = nullptr;
 
