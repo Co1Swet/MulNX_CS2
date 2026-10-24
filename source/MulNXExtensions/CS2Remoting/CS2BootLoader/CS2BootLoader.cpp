@@ -6,6 +6,7 @@
 #include <MulNXThirdParty/yaml.hpp>
 #include <fstream>
 #include <TlHelp32.h>
+#include <system_error>
 
 VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("CS2 Boot Loader");
@@ -75,7 +76,7 @@ bool CS2BootLoader::Init() {
 #ifdef _DEBUG
     autoLaunch = true;
 #endif
-    if (autoLaunch) {
+    if (autoLaunch && !this->externalLaunch) {
         this->PublishAsync("CS2BootLoader/Launch"_hash);
     }
     
@@ -148,7 +149,15 @@ bool CS2BootLoader::CheckEnvironment() {
     return true;
 }
 
-bool CS2BootLoader::LaunchAndInject() {
+bool CS2BootLoader::LaunchChecked(std::atomic<const char*>& stage, const std::function<void(const PROCESS_INFORMATION&)>& created) {
+    std::unique_lock lock(this->smutex);
+    stage = "environment";
+    if (!this->CheckEnvironment())return false;
+    stage = "launch";
+    return this->LaunchAndInject(created);
+}
+
+bool CS2BootLoader::LaunchAndInject(const std::function<void(const PROCESS_INFORMATION&)>& created) {
     // 验证游戏路径
     if (gamePath.empty() || !fs::exists(gamePath)) {
         this->LogError(std::format("无效CS2路径: {}", gamePath.string()));
@@ -184,14 +193,19 @@ bool CS2BootLoader::LaunchAndInject() {
         &si, &pi
     );
     if (!ok) {
+        if (this->externalLaunch)
+            throw std::system_error(GetLastError(), std::system_category(), "创建CS2进程失败");
         this->LogError(std::format("创建CS2进程失败. Error: {}", GetLastError()));
         return false;
     }
 
+    if (created)created(pi);
     if (!this->pHelperController->Remoting(pi))return false;
 
     // 恢复游戏主线程
-    ResumeThread(pi.hThread);
+    auto resumed = ResumeThread(pi.hThread);
+    if (this->externalLaunch && resumed == static_cast<DWORD>(-1))
+        throw std::system_error(GetLastError(), std::system_category(), "恢复CS2主线程失败");
 
     // 清理句柄
     CloseHandle(pi.hThread);
