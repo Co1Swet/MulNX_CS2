@@ -32,7 +32,7 @@ class Win32Starter final :public MulNX::Module<Win32Starter> {
 public:
     Win32Starter();
     bool Init()override;
-    void Deinit()override;
+    bool Deinit()override;
 
     void Run();
 };

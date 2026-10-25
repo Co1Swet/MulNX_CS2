@@ -253,7 +253,8 @@ void AudioCapturer::CommitAudioSamples(av::AudioSamples&& samples) {
     this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(samples));
 }
 
-void AudioCapturer::Deinit() {
+bool AudioCapturer::Deinit() {
     this->exitFlag.store(true);
     std::unique_lock lock(this->smutex);
+    return true;
 }

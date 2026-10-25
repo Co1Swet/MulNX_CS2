@@ -1,11 +1,10 @@
 #include "UISystem.hpp"
-#include <MulNX/Base/CharUtility/CharUtility.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Systems/Systems.hpp>
 #include <MulNXThirdParty/yaml.hpp>
 #include <MulNXThirdParty/ImGuiStyleSerializer.h>
-#include <Windows.h>
-#include <fstream>
+#include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
+#include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
 
 bool MulNX::UISystem::Init() {
     this->pCoordinator = this->FindModule<UICoordinator>("UICoordinator");
@@ -35,7 +34,7 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     case "UISystem/Start"_hash: {
         this->rendEnable.store(true);
         this->ifDrawMid.store(true);
-        this->LogWarning("接收到启动消息，UI系统开始启动");
+        this->LogInfo("已处理启动请求");
         break;
     }
     case "UISystem/Toggle"_hash: {
@@ -52,7 +51,6 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     }
     }
 }
-
 // ImGui窗口处理函数导入
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void MulNX::UISystem::HandleUpdate() {
@@ -161,4 +159,10 @@ void MulNX::UISystem::SaveStyle() {
     catch (...) {
         this->LogError(I18n("ui.style.save_error"));
     }
+}
+bool MulNX::UISystem::Deinit() {
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+    return true;
 }

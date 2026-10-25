@@ -77,9 +77,9 @@ bool Win32Starter::Init() {
         //HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync
         this->SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
         };
-    // 通过MainDraw字符串发送UI启动命令
-    this->Core->Driver()->CreateMainDraw();
-
+    
+    // 发送UI启动命令
+    this->PublishAsync("UISystem/Start"_hash);
     // 设置系统标志位
     this->pGlobalVars->SystemReady.store(true);
     return true;
@@ -103,17 +103,11 @@ void Win32Starter::Run() {
     this->Core->Driver()->smutex.unlock();
     return;
 }
-void Win32Starter::Deinit() {
-    // UISystem 已析构，而该指针指向其所有的缓冲区，这里手动置空，防止UB
-    ImGui::GetIO().IniFilename = nullptr;
-    // Cleanup
-    ImGui_ImplDX11_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
-
+bool Win32Starter::Deinit() {
     CleanupDeviceD3D();
     DestroyWindow(this->hwnd);
     UnregisterClassW(this->wc.lpszClassName, this->wc.hInstance);
+    return true;
 }
 
 bool Win32Starter::CreateDeviceD3D(HWND hWnd) {

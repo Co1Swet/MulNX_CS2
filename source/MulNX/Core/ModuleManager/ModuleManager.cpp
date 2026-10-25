@@ -5,6 +5,8 @@
 #include <ranges>
 
 bool MulNX::Core::ModuleManager::Init() {
+    this->postDeinits.clear();
+
     (*this)
         .SubscribeAsync("ModuleManager/ModuleInfo/Request");
 
@@ -89,16 +91,17 @@ void MulNX::Core::ModuleManager::DeinitModules() {
     for (auto& [hModule, pModule] : this->modules | std::views::reverse) {
         if (pModule->GetName() == "TaskSystem")continue;
         if (!pModule->EntryDeinit()) {
-            MulNX::ErrorTerminate("在模块关闭时出现错误，模块名：" + pModule->GetName());
+            MulNX::ErrorTerminate(std::format("在模块关闭时出现错误，模块名：{}", pModule->GetName()));
         }
     }
     this->LogSucc(I18n("sys.bye"));
 }
 
-void MulNX::Core::ModuleManager::Deinit() {
+bool MulNX::Core::ModuleManager::Deinit() {
     std::unique_lock lock(this->smutex);
     for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
         if (it->second->GetName() == "TaskSystem")continue;
         it->second = nullptr;
     }
+    return true;
 }

@@ -23,12 +23,12 @@ namespace MulNX {
     public:
         Module() {
             this->postInits.push_back([this]() {
-                this->LogSucc(I18n("module.inited"));
+                this->LogSucc("初始化成功");
                 return true;
                 });
 
             this->postDeinits.push_back([this]() {
-                this->LogInfo(I18n("module.deinited"));
+                this->LogInfo("模块已关闭");
                 return true;
                 });
         }

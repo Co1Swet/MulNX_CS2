@@ -27,7 +27,9 @@ bool MulNX::ModuleBase::EntryDeinit() {
     for (auto& deinit : this->preDeinits) {
         if (!deinit())return false;
     }
-    this->Deinit();
+    if (!this->Deinit()) {
+        return false;
+    }
     for (auto& deinit : this->postDeinits | std::views::reverse) {
         if (!deinit())return false;
     }

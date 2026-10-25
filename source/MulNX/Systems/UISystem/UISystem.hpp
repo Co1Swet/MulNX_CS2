@@ -16,6 +16,7 @@ namespace MulNX {
         void SaveStyle();
 
         bool Init()override;
+        bool Deinit()override;
         void ProcessMsg(MulNX::Message& Msg)override;
     public:
         std::atomic<bool>WantCaptureMouse{ false };

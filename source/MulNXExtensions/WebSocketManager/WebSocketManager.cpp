@@ -41,8 +41,8 @@ bool WebSocketManager::Init() {
             this->trans[type] = meta.makingHandler;
         }
 
-        this->SendTask("Main", "MulNXMain", [this]() {
-            this->Main();
+        this->SendTask("Update", "MulNXMain", [this]() {
+            this->Update();
             return true;
             });
 
@@ -71,12 +71,9 @@ bool WebSocketManager::Init() {
     return true;
 }
 
-void WebSocketManager::Deinit() {
+bool WebSocketManager::Deinit() {
     this->server.stop();
-}
-
-void WebSocketManager::Main() {
-    this->Update();
+    return true;
 }
 
 void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message_ptr netMsg) {

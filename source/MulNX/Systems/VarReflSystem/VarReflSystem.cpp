@@ -9,8 +9,8 @@ using namespace MulNX;
 static YAML::Node config{};
 
 bool VarReflSystem::Init() {
-    auto p = this->PathGet("Vars");
-    config = YAML::LoadFilePath(p / "config.yaml");
+    this->pthCfg = this->PathGet("Vars") / "config.yaml";
+    config = YAML::LoadFilePath(this->pthCfg);
     auto enable = config["enable"].as<bool>();
     if (!enable)return true;
 
@@ -35,5 +35,10 @@ bool VarReflSystem::Register(std::unique_ptr<IReflVar> var) {
         }
     }
     this->vars[name] = std::move(var);
+    return true;
+}
+
+bool VarReflSystem::Deinit() {
+
     return true;
 }
