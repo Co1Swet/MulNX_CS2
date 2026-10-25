@@ -3,7 +3,7 @@
 bool CamMacroManager::Menu() {
     std::shared_lock lock(this->smutex);
     if (ImGui::CollapsingHeader("运镜宏总控")) {
-        ImGui::Checkbox("启用运镜宏快捷键触发", &this->shortcutEnable);
+        MulNX::UI::Checkbox("启用运镜宏快捷键触发", this->shortcutEnable);
     }
     if (ImGui::CollapsingHeader("创建新宏")) {
         static std::string createMacroName = "";

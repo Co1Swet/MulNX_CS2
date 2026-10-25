@@ -11,7 +11,7 @@ public:
 };
 
 class ViewSmoother final :public CSModuleBase, public CSViewControlMixin<ViewSmoother> {
-    std::atomic<bool> enable = false;
+    MulReflBool(enable, false);
     ViewBuffer buffer;
     void Menu();
     bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;

@@ -54,6 +54,7 @@ void MulNXController::ProcessMsg(MulNX::Message& Msg) {
         for (auto& [name, handle] : pInfo->Info) {
             this->LogInfo(std::move(name));
         }
+        break;
     }
     }
 }

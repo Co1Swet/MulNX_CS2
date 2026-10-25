@@ -60,7 +60,7 @@ void VEncodeController::SetEncoderParams(av::VideoEncoderContext* encoder) {
     encoder->setTimeBase(this->timeBase);
 
     encoder->setMaxBFrames(rp.maxBFrames);
-    encoder->setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate);
+    encoder->setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate.load());
 
     if (rp.gopSize > 0) {
         encoder->setGopSize(rp.gopSize);

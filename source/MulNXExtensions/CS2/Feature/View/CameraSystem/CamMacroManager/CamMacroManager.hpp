@@ -6,7 +6,7 @@ class CamMacroManager final :public CamSysModule {
     std::unordered_map<std::string, std::unique_ptr<CamMacro>> camMacros{};
     CamMacro* pOperatingMacro = nullptr;
 
-    bool shortcutEnable = true;
+    MulReflBool(shortcutEnable, true);
 
     mutable std::atomic<MulNX::KeyCheckPack> bufKCPack{};
     mutable std::atomic<bool> bKCPWindow = false;

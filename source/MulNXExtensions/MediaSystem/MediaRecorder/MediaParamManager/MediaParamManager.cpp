@@ -16,7 +16,7 @@ void MediaParamManager::Menu() {
         if (this->rc == RateControl::CQ)
             ImGui::SliderInt("CQ 质量", &this->cq, 0, 51, "%d");
         else
-            ImGui::InputInt("码率(Kbps)", &this->bitrate, 1000, 10000);
+            MulNX::UI::SliderInt("码率(Kbps)", this->bitrate, 1000, INT_MAX);
 
         ImGui::InputInt("关键帧间隔", &this->gopSize);
         if (this->gopSize < 0) this->gopSize = 0;

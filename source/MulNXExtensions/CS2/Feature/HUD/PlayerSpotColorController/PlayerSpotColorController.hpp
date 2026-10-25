@@ -6,8 +6,8 @@ class PlayerSpotColorController :public CSModuleBase {
     std::unique_ptr<MulNX::Hook>hkPos_CmpToSetTColor = nullptr;
     std::unique_ptr<MulNX::Hook>hkPos_CmpToSetCTColor = nullptr;
 
-    std::atomic<bool>TColorMulti = true;
-    std::atomic<bool>CTColorMulti = true;
+    MulReflBool(TColorMulti, true);
+    MulReflBool(CTColorMulti, true);
 
     void Menu();
     bool Init()override;

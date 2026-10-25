@@ -1,3 +1,13 @@
+BombSpotController.forceBombRedWhenSpecCT: true
+HookTeamCounter.hideEnemyHP: true
+HookTeamCounter.forceHideEquipmentInfo: false
+HookTeamCounter.hideEnemyDefuseOrKit: true
+HookTeamCounter.noHideShowName: false
+HookDamageReport.enable: true
+FlashRenderController.rendFlashUpHUD: true
+FlashRenderController.rendFlashDownHUD: false
+HookHealthAmmoCenter.hideHudSpecplayerRoot: true
 SpeakingController.listMode: false
+HookHealthAmmoCenter.show_Hud_HA__stroke: true
 SpeakingController.autoActiveTeamVoice: false
 SpeakingController.onlyCurOBingSameTeam: false

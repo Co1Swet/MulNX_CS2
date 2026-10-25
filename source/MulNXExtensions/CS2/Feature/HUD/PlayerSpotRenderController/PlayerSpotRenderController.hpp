@@ -7,10 +7,10 @@ class PlayerSpotRenderController :public CSModuleBase {
     std::unique_ptr<MulNX::Hook>hkFunc_FinallyUpdatePlayerState = nullptr;
     std::unique_ptr<MulNX::Hook>hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = nullptr;
 
-    std::atomic<bool>hideNumLabel = true;
-    std::atomic<bool>transSpecLabel = true;
-    std::atomic<bool>forceTeammateDraw = true;
-    std::atomic<bool>forceEnemyRed = true;
+    MulReflBool(hideNumLabel, true);
+    MulReflBool(transSpecLabel, true);
+    MulReflBool(forceTeammateDraw, true);
+    MulReflBool(forceEnemyRed, true);
     void Menu();
     bool Init()override;
 };
