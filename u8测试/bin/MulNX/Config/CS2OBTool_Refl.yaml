@@ -1,4 +1,4 @@
-TrailsController.trailsEnable: true
+TrailsController.trailsEnable: false
 PlayerSpotColorController.CTColorMulti: true
 UISystem.rendEnable: false
 UISystem.ifDrawMid: true
