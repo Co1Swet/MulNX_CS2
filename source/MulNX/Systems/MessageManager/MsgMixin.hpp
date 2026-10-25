@@ -31,14 +31,14 @@ namespace MulNX {
         MsgMixin() {
             This()->preInits.push_back([this]() {
                 this->pMsgManager = This()->FindModule<MessageManager>("MessageManager");
-                This()->MainMsgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());
+                This()->msgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());
                 return true;
                 });
         }
 
         // 异步消息
         auto& SubscribeAsync(const std::string& msgType, Detail::InitOnly = {}) {
-            This()->MainMsgChannel->SubscribeAsync(msgType);
+            This()->msgChannel->SubscribeAsync(msgType);
             auto full = std::format("{}  Args: <void>", msgType);
             This()->LogSucc(I18n("sys.msg.async.subed{}", full));
             return *this;
@@ -48,14 +48,14 @@ namespace MulNX {
         auto& SubscribeAsync(const std::string& msgType, Detail::InitOnly = {}) {
             if constexpr (sizeof...(Args) == 1 && std::is_same_v<void, std::tuple_element_t<0, std::tuple<Args...>>>) {
                 auto h = [](MulNX::Message& msg, std::string_view raw) {return; };
-                This()->MainMsgChannel->SubscribeAsync(msgType, std::move(h));
+                This()->msgChannel->SubscribeAsync(msgType, std::move(h));
                 auto full = std::format("{} Also Externed With Args: <void>", msgType);
                 This()->LogSucc(I18n("sys.msg.async.subed{}", full));
             }
             else {
                 auto h = MulNX::CreateFiller<Args...>();
                 auto typeDesc = MulNX::GetTypeString<Args...>();
-                This()->MainMsgChannel->SubscribeAsync(msgType, std::move(h));
+                This()->msgChannel->SubscribeAsync(msgType, std::move(h));
                 auto full = std::format("{} Also Externed With Args: {}", msgType, typeDesc);
                 This()->LogSucc(I18n("sys.msg.async.subed{}", full));
             }
@@ -64,7 +64,7 @@ namespace MulNX {
         template<typename... PodArgs>
         auto& SubscribeAsyncEx(const std::string& msgType, Detail::InitOnly = {}) {
             auto handler = MulNX::MakeExFiller<PodArgs...>();
-            This()->MainMsgChannel->SubscribeAsync(msgType, std::move(handler));
+            This()->msgChannel->SubscribeAsync(msgType, std::move(handler));
 
             auto full = std::format("{} Ex With PodArgs: {}",
                 msgType, MulNX::GetTypeString<PodArgs...>());

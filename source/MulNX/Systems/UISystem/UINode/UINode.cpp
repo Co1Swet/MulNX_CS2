@@ -5,6 +5,6 @@
 MulNX::UINode MulNX::UINode::Create(MulNX::ModuleBase* MB) {
     MulNX::UINode node;
     node.hSelf = MulNXHandle::CreateHandle();
-    node.HModule = MB->HModule;
+    node.HModule = MB->hModule;
     return std::move(node);
 }

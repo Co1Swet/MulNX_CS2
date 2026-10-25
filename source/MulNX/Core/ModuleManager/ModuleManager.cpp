@@ -31,12 +31,12 @@ void MulNX::Core::ModuleManager::ProcessMsg(MulNX::Message& Msg) {
     }
 }
 
-bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module) {
+bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& pModule) {
     std::unique_lock lock(this->smutex);
     MulNXHandle hModule = MulNXHandle::CreateHandle();
-    Module->HModule = hModule;
-    this->NameToHandleMap[Module->GetName()] = hModule;
-    this->modules[hModule] = std::move(Module);
+    pModule->hModule = hModule;
+    this->NameToHandleMap[pModule->GetName()] = hModule;
+    this->modules[hModule] = std::move(pModule);
     return true;
 }
 MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {

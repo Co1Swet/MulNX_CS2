@@ -103,12 +103,11 @@ namespace MulNX {
     };
 
     class RegisterVar {
-    public:
         template <typename Sys>
         static bool EmplaceRefl(Sys* pSys, std::unique_ptr<IReflVar> iVar) {
             return pSys->Register(std::move(iVar));
         }
-        
+    public:
         template<typename U>
         inline RegisterVar(VarReflHost* pHost, std::atomic<U>* pVar, const char* name) {
             auto up = std::make_unique<ReflVarT<std::atomic<U>>>(pVar, pHost->pModuleBase, name);
@@ -121,8 +120,8 @@ namespace MulNX {
 
 #define MulReflInt(name, defaultValue) \
     std::atomic<int> name{defaultValue}; \
-    MulNX::RegisterVar name##_MulRefl_re{this, &this->name, #name};
+    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
 
 #define MulReflBool(name, defaultValue) \
     std::atomic<bool> name{defaultValue}; \
-    MulNX::RegisterVar name##_MulRefl_re{this, &this->name, #name};
+    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};

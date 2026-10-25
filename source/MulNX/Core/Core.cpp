@@ -5,7 +5,7 @@
 
 MulNX::Core::Core::Core(std::string&& name) :
     createTime(std::chrono::steady_clock::now()) {
-    this->ModuleName = std::move(name);
+    this->moduleName = std::move(name);
     // 设置启动器
     this->pDriver = std::make_unique<MulNX::Core::Driver>();
     this->pDriver->SetName("Driver");
