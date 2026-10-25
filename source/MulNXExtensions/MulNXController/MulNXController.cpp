@@ -27,8 +27,8 @@ void MulNXController::Window(MulNX::UICoordinator* uico) {
 bool MulNXController::Init() {
     (*this)
         .SubscribeAsync("ModuleManager/ModuleInfo/Response")
-        .SubscribeAsync<void>("System/Stop");
-    
+        ;
+
     this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
 
     this->SendTask("Main", "MulNXMain", [this]()->bool {
@@ -41,13 +41,6 @@ bool MulNXController::Init() {
 
 void MulNXController::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
-    case "System/Stop"_hash: {
-        if (this->stopping)break;
-        this->stopping = true;
-        // 只通知原有线程收尾，不能在工作线程中执行 WaitEnd 并等待自身退出。
-        this->Core->Driver()->smutex.unlock();
-        break;
-    }
     case "ModuleManager/ModuleInfo/Response"_hash: {
         auto* pInfo = Msg.asp.get<ModuleInfo>();
         this->LogInfo("检测到以下注册模块");

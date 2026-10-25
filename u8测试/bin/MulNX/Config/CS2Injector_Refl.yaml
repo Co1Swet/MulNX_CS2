@@ -1,0 +1,3 @@
+UISystem.rendEnable: false
+UISystem.ifDrawMid: true
+CS2HelperController.injectReshade: true

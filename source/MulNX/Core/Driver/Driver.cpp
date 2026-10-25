@@ -12,8 +12,12 @@ MulNX::Core::Driver::Driver() {
     this->postDeinits.clear();
 }
 bool MulNX::Core::Driver::Init() {
-    // 初始加锁以提供安全跨线程终止能力
-    this->smutex.lock();
+    std::unique_lock lock(this->endMtx);
+    this->SubscribeSync("Driver/End/Notify", [this](auto&&...) {
+        std::unique_lock lock(this->endMtx);
+        this->endFlag = true;
+        this->cv.notify_one();
+        });
     // 初始化模块管理器
     this->Core->ModuleManager()->EntryInit(this->Core);
     // 初始化注册模块
@@ -33,7 +37,8 @@ bool MulNX::Core::Driver::Init() {
     return true;
 }
 void MulNX::Core::Driver::WaitEnd() {
-    this->smutex.lock();
+    std::unique_lock lock(this->endMtx);
+    this->cv.wait(lock, [this] { return this->endFlag; });
     // 设置系统标志位
     this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(false, std::memory_order_release);
     // 通知所有模块，以清理资源，包括线程停止

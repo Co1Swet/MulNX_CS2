@@ -46,7 +46,7 @@ bool HookMainLoop::Init() {
                     );
                 if (result == IDOK) {
                     this->LogWarning(I18n("sys.shutdown_warning"));
-                    this->Core->Driver()->smutex.unlock();
+                    this->PublishAsync("System/Stop"_hash);
                 }
                 ctx->rax = 0;
                 return MulNX::Hook::Then::Return;

@@ -8,8 +8,8 @@ namespace MulNX {
         UICoordinator* pCoordinator = nullptr;        
         std::string strImguiIniPath;
 
-        std::atomic<bool> rendEnable = false;
-        std::atomic<bool> ifDrawMid = false;
+        MulReflBool(rendEnable, false);
+        MulReflBool(ifDrawMid, false);
 
         void LoadFont();
         void LoadStyle();
@@ -26,6 +26,6 @@ namespace MulNX {
         std::function<void(void)>FrameBehind = nullptr;
 
         void HandleUpdate();
-        int Render();
+        void Render();
     };
 }

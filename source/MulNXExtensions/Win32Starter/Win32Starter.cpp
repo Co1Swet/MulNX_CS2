@@ -100,8 +100,11 @@ void Win32Starter::Run() {
         }
     }
     this->LogWarning(I18n("sys.shutdown_warning"));
-    this->Core->Driver()->smutex.unlock();
-    return;
+    this->PublishAsync("System/Stop"_hash);
+    this->SendTask("Stop", "MulNXMain", [this]() {
+        this->pUISystem->HandleUpdate();
+        return true;
+        });
 }
 bool Win32Starter::Deinit() {
     CleanupDeviceD3D();

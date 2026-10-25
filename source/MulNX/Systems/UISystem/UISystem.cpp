@@ -1,4 +1,6 @@
 #include "UISystem.hpp"
+#include <Core/Core.hpp>
+#include <Core/Driver/Driver.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Systems/Systems.hpp>
 #include <MulNXThirdParty/yaml.hpp>
@@ -22,9 +24,11 @@ bool MulNX::UISystem::Init() {
 
     (*this)
         .SubscribeAsync("UISystem/Start")
+        .SubscribeAsync<void>("System/Stop")
         .SubscribeAsync<void>("UISystem/Toggle")
         .SubscribeAsync<void>("UISystem/Hide")
-        .SubscribeAsync("UISystem/SaveStyle");
+        .SubscribeAsync("UISystem/SaveStyle")
+        ;
 
     return true;
 }
@@ -35,6 +39,14 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
         this->rendEnable.store(true);
         this->ifDrawMid.store(true);
         this->LogInfo("已处理启动请求");
+        break;
+    }
+    case "System/Stop"_hash: {
+        this->rendEnable.store(false);
+        ImGui_ImplDX11_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+        this->PublishSync("Driver/End/Notify"_hash);
         break;
     }
     case "UISystem/Toggle"_hash: {
@@ -62,17 +74,18 @@ void MulNX::UISystem::HandleUpdate() {
         ImGui_ImplWin32_WndProcHandler(msg4.hWnd, msg4.uMsg, msg4.wParam, msg4.lParam);
     }
 }
-int MulNX::UISystem::Render() {
+void MulNX::UISystem::Render() {
     if (!this->rendEnable.load()) {
         this->WantCaptureMouse.store(false, std::memory_order_release);
         this->WantTextInput.store(false, std::memory_order_release);
-        return 0;
+        return;
     }
 
     try {
-        this->FrameBefore();
-        this->pCoordinator->Render(this->ifDrawMid.load(std::memory_order_acquire));
-        this->FrameBehind();
+        if (this->FrameBefore()) {
+            this->pCoordinator->Render(this->ifDrawMid.load(std::memory_order_acquire));
+            this->FrameBehind();
+        }
     }
     catch (const MulNX::Exception& e) {
         MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的MulNX异常：{} \n该异常抛出于：{}",
@@ -82,7 +95,6 @@ int MulNX::UISystem::Render() {
         MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的异常：{}", e.what()));
     }
     
-
     ImGuiIO& io = ImGui::GetIO();
     if (this->WantCaptureMouse.load(std::memory_order_acquire) != io.WantCaptureMouse) {
         this->WantCaptureMouse.store(io.WantCaptureMouse, std::memory_order_release);
@@ -90,8 +102,6 @@ int MulNX::UISystem::Render() {
     if (this->WantTextInput.load(std::memory_order_acquire) != io.WantTextInput) {
         this->WantTextInput.store(io.WantTextInput, std::memory_order_release);
     }
-
-    return 0;
 }
 
 void MulNX::UISystem::LoadFont() {
@@ -161,8 +171,6 @@ void MulNX::UISystem::SaveStyle() {
     }
 }
 bool MulNX::UISystem::Deinit() {
-    ImGui_ImplDX11_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
+    
     return true;
 }
