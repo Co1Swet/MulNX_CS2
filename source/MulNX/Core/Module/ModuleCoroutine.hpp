@@ -9,19 +9,30 @@ namespace MulNX {
         friend class ModuleBase;
         friend class Impl_WaitForCondition;
         friend class Impl_WaitForMessage;
-        std::vector<std::pair<std::function<bool()>, std::coroutine_handle<>>>conditionWaiters;
-        std::map<MsgType, std::vector<std::pair<std::function<bool(Message*)>, std::coroutine_handle<>>>>msgWaiters;
+        std::vector<std::pair<std::function<bool()>, std::coroutine_handle<>>> conditionWaiters;
+        std::map<MsgType, std::vector<std::pair<std::function<bool(Message*)>, std::coroutine_handle<>>>> msgWaiters;
+
+        static void DestroyCoroutineChain(std::coroutine_handle<MulNX::CoTask::promise_type> handle) {
+            if (!handle) return;
+            auto next = handle.promise().hContinueCoroutine;
+            if (next) {
+                DestroyCoroutineChain(next);
+            }
+            handle.destroy();
+        }
     protected:
         ModuleCoroutine() {
             this->preDeinits.push_back([this]() {
                 // 销毁所有挂起的条件等待协程
                 for (auto& [condition, waiter] : conditionWaiters) {
-                    waiter.destroy();
+                    DestroyCoroutineChain(std::coroutine_handle<MulNX::CoTask::promise_type>::from_address(
+                        waiter.address()));
                 }
                 // 销毁所有挂起的消息等待协程
                 for (auto& [type, vec] : msgWaiters) {
                     for (auto& [check, h] : vec) {
-                        h.destroy();
+                        DestroyCoroutineChain(std::coroutine_handle<MulNX::CoTask::promise_type>::from_address(
+                            h.address()));
                     }
                 }
                 return true;

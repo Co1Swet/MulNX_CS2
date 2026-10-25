@@ -84,7 +84,10 @@ void MulNX::ModuleBase::Update() {
         }
     }
     // 清掉空 key
-    std::erase_if(this->msgWaiters, [](auto& kv) { return kv.second.empty(); });
+    std::erase_if(this->msgWaiters, [](auto& kv) {
+        auto& [type, vec] = kv;
+        return vec.empty();
+        });
     for (auto h : toResume) {
         h.resume();
     }
