@@ -10,25 +10,25 @@ MulNX::IModule* MulNX::ModuleBase::FindModule(const std::string& name) {
 // 初始化
 bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {
     this->Core = core;
-    for (const auto& init : this->preInits) {
+    for (auto& init : this->preInits) {
         if (!init())return false;
     }
     this->preInits.clear();
     if (!this->Init()) {
         return false;
     }
-    for (const auto& init : this->postInits | std::views::reverse) {
+    for (auto& init : this->postInits | std::views::reverse) {
         if (!init())return false;
     }
     this->postInits.clear();
     return true;
 }
 bool MulNX::ModuleBase::EntryDeinit() {
-    for (const auto& deinit : this->preDeinits) {
+    for (auto& deinit : this->preDeinits) {
         if (!deinit())return false;
     }
     this->Deinit();
-    for (const auto& deinit : this->postDeinits | std::views::reverse) {
+    for (auto& deinit : this->postDeinits | std::views::reverse) {
         if (!deinit())return false;
     }
     return true;
