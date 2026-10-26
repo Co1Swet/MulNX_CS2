@@ -100,8 +100,9 @@ void StartImpl(HMODULE& hModule) {
         // CS2 视觉（HUD）功能模块
         .CreateModule<TeamIDColorController>("TeamIDColorController")
         .CreateModule<TeamIDRenderController>("TeamIDRenderController")
-        .CreateModule<PlayerSpotRenderController>("PlayerSpotRenderController")
-        .CreateModule<PlayerSpotColorController>("PlayerSpotColorController")
+        .CreateModule<HookSpotVisible>("HookSpotVisible")
+        .CreateModule<HookSpotStyle>("HookSpotStyle")
+        .CreateModule<HookSpotColor>("HookSpotColor")
         .CreateModule<BombSpotController>("BombSpotController")
         .CreateModule<HookTeamCounter>("HookTeamCounter")
         .CreateModule<HookDamageReport>("HookDamageReport")

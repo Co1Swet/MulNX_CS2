@@ -93,7 +93,6 @@ bool GameSettingsManager::GameHudMenu() {
     ConvarCheckbox<"cl_drawhud_force_radar">("强制雷达渲染");
     ConvarCheckbox<"cl_radar_square_when_spectating">("在观战时使用方形雷达");
     ConvarCheckbox<"cl_radar_square_always">("永远使用方形雷达");
-    ConvarCheckbox<"cl_radar_show_all_players_when_spectating">("雷达在观战时显示所有人");
 
     ConvarCheckbox<"crosshair">("准星");
     if (ImGui::Button("切换Demo进度条UI显示")) {
@@ -111,7 +110,6 @@ bool GameSettingsManager::Init() {
         this->r_dof_override_far_blurry = this->CS2Con->GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
 
         *this->CS2Con->GetCvar("cl_trueview_show_status")->GetPtr<int>() = 0;
-        *this->CS2Con->GetCvar("cl_radar_show_all_players_when_spectating")->GetPtr<bool>() = false;
         *this->CS2Con->GetCvar("cl_radar_square_always")->GetPtr<bool>() = false;
         *this->CS2Con->GetCvar("cl_radar_square_when_spectating")->GetPtr<bool>() = false;
         *this->CS2Con->GetCvar("cl_demo_predict")->GetPtr<bool>() = false;

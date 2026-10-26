@@ -2,9 +2,12 @@ add_library(CS2HUD STATIC
     BombSpotController/BombSpotController.cpp
     DeathMsgController/DeathMsgController.cpp
     KeyboardOverlay/KeyboardOverlay.cpp
-    PlayerSpotColorController/PlayerSpotColorController.cpp
     HookTeamCounter/HookTeamCounter.cpp
-    PlayerSpotRenderController/PlayerSpotRenderController.cpp
+
+    HookSpotVisible/HookSpotVisible.cpp
+    HookSpotStyle/HookSpotStyle.cpp
+    HookSpotColor/HookSpotColor.cpp
+    
     FlashRenderController/FlashRenderController.cpp
     HookHealthAmmoCenter/HookHealthAmmoCenter.cpp
     HookDamageReport/HookDamageReport.cpp
