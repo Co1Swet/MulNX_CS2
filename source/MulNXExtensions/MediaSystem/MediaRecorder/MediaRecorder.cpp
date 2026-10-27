@@ -2,6 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
 #include <VPipeline/VEncodeController/VEncodeController.hpp>
+#include <MediaParamManager/MediaParamManager.hpp>
 
 void MediaRecorder::CaptureCallback() {
     ImGui::GetBackgroundDrawList()->AddCallback(
@@ -45,6 +46,7 @@ void MediaRecorder::ReportCtxState() {
 }
 
 bool MediaRecorder::Init() {
+    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
     this->pVEncodeController = this->FindModule<VEncodeController>("VEncodeController");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
 
@@ -84,6 +86,11 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string& fileName, bool advance) {
     if (this->pMediaState->recordState.load() != RecordState::Free) {
         this->LogWarning("已在录制中");
+        return false;
+    }
+    const int fps = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
+    if (advance && fps <= 0) {
+        this->LogWarning("高级录制需要大于 0 的捕获帧率");
         return false;
     }
     this->pMediaState->advancedMode = advance;
@@ -135,6 +142,7 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
         rInfo.pOutCtx = &this->ofctx;
         rInfo.startTime = std::chrono::steady_clock::now();
         rInfo.pFilenameWithoutStem = &fileName;
+        rInfo.targetFPS = fps;
         this->PublishSync(SetOnMsg);
         this->LogSucc("音视频系统SetOn完毕");
 
