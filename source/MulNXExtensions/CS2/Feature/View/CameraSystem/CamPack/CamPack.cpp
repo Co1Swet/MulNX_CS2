@@ -23,6 +23,7 @@ std::pair<bool, std::string> CamPack::Save(const fs::path& dir) {
         root["OnRoundEnd"] = this->OnRoundEnd;
 
         std::ofstream fout(pathSave.wstring());
+        fout.exceptions(std::ios::failbit | std::ios::badbit);
         fout << root;
         fout.close();
 

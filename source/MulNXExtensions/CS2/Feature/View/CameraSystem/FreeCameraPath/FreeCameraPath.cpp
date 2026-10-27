@@ -167,6 +167,7 @@ std::pair<bool, std::string> FreeCameraPath::Save(const fs::path& folderPath) {
         std::ofstream fout(filePath.wstring());
         if (!fout.is_open()) return { false, "无法打开文件进行写入！ 文件路径：" + filePath.string() };
 
+        fout.exceptions(std::ios::failbit | std::ios::badbit);
         fout << out.c_str();
         fout.close();
 

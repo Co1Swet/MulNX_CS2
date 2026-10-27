@@ -91,6 +91,7 @@ std::pair<bool, std::string> CamMacro::Save(const fs::path& folderPath)const {
         }
 
         std::ofstream fout(filePath.wstring());
+        fout.exceptions(std::ios::failbit | std::ios::badbit);
         fout << root;
         fout.close();
 
