@@ -82,12 +82,14 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
             }
         }
     }
-    std::unique_lock lock(this->smutex);
-    if (this->recordPasses.empty() || this->recordPasses.front() != tryPass) {
-        co_return;
+    {
+        std::unique_lock lock(this->smutex);
+        if (this->recordPasses.empty() || this->recordPasses.front() != tryPass) {
+            co_return;
+        }
+        this->recordPasses.pop_front();
+        this->currentPass.store(tryPass, std::memory_order_release);
     }
-    this->recordPasses.pop_front();
-    this->currentPass.store(tryPass, std::memory_order_release);
     co_await this->WaitMilliseconds(1000);
 }
 
