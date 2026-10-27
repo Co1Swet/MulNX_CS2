@@ -171,6 +171,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
 
         this->CamDrawer->DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
         if (ImGui::Button("修改选中的关键帧")) {
+            const auto dof = keyframe.GetDOF();
             auto [del, r] = MulNX::Message::Create<MulNX::NetExt>("Campath/DeleteKeyframe"_hash);
             r->str1 = campath->GetName();
             auto&& [index] = del.Access<size_t>();
@@ -188,10 +189,10 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
             rx = tempRotationEuler.x;
             ry = tempRotationEuler.y;
             rz = tempRotationEuler.z;
-            d1 = -1000.0f;
-            d2 = 0.0f;
-            d3 = 1000.0f;
-            d4 = 3000.0f;
+            d1 = dof.NearBlurry;
+            d2 = dof.NearCrisp;
+            d3 = dof.FarCrisp;
+            d4 = dof.FarBlurry;
             rp->str1 = campath->GetName();
             this->PublishAsync(std::move(msg));
             PreIndex = -1;
