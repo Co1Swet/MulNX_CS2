@@ -30,7 +30,7 @@ namespace MulNX {
         };
     private:
         bool attached = false;
-        std::function<Then(Hook*, RegContext*)> callback;
+        std::move_only_function<Then(Hook*, RegContext*)> callback;
         std::atomic<size_t> threadNumInAsm = 0;
 
         void* pAsmDispatcher = nullptr;
@@ -68,14 +68,14 @@ namespace MulNX {
         uintptr_t GetHookTarget()const { return std::bit_cast<uintptr_t>(this->hookTarget); }
 
         static std::expected<std::unique_ptr<Hook>, std::string> Create(
-            uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
+            uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
             bool extraStackAdjust = false, bool callRawFisrt = false,
             uintptr_t userJmpTarget = 0, int len = 0);
 
         Result Attach();
         Result Detach();
 
-        void ResetCallback(std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback);
+        void ResetCallback(std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback);
         uintptr_t pMaybeRawFunc = 0;
         uint64_t CallMaybeOrigin(size_t copyStackParamNum, RegContext* ctx);
         void* GetRawStackAddr(RegContext* ctx);

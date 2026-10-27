@@ -115,8 +115,8 @@ namespace MulNX {
                 Assembler& movups(Mem m, Xmm src);   // 0F 11 /r
                 Assembler& movups(Xmm dst, Mem m);   // 0F 10 /r
 
-                Assembler& SaveReg();
-                Assembler& LoadReg();
+                Assembler& SaveReg(uint64_t offset);
+                Assembler& LoadReg(uint64_t offset);
 
                 Code Release();
             };

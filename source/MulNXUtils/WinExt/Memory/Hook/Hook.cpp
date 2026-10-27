@@ -103,14 +103,14 @@ std::optional<std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool 
 
     Asm
         .sub(RSP, this->frameSize)
-        .SaveReg();
+        .SaveReg(0);
 
     this->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
     return std::nullopt;
 }
 
-std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
+std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
     bool extraStackAdjust, bool callRawFirst, uintptr_t userJmpTarget, int len) {
     if (target == nullptr)MulNX::ErrorTerminate("不能为nullptr创建Hook！");
 
@@ -136,7 +136,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
     HookInstance->jmpTarget.Return = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg()
+        .LoadReg(0)
         .add(RSP, HookInstance->frameSize)
         .ret();
 
@@ -144,7 +144,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
     HookInstance->jmpTarget.Continue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg()
+        .LoadReg(0)
         .add(RSP, HookInstance->frameSize);
 
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
@@ -158,14 +158,14 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
     HookInstance->jmpTarget.SkipAllAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg()
+        .LoadReg(0)
         .add(RSP, HookInstance->frameSize)
         .jmp64((uintptr_t)target + HookInstance->overrideSize);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
     HookInstance->jmpTarget.UserSettedTarget = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg()
+        .LoadReg(0)
         .add(RSP, HookInstance->frameSize)
         .jmp64(userJmpTarget);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
@@ -223,7 +223,7 @@ void* MulNX::Hook::GetRawStackAddr(RegContext* ctx) {
     return reinterpret_cast<void*>(ctx->rsp + this->frameSize);
 }
 
-void MulNX::Hook::ResetCallback(std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback) {
+void MulNX::Hook::ResetCallback(std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback) {
     this->callback = std::move(callback);
 }
 
