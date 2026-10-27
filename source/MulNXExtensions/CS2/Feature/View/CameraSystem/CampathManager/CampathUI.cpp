@@ -49,7 +49,7 @@ void CampathManager::CampathShowOneLine(const FreeCameraPath* pCampath)const {
     }
 
     ImGui::SameLine();
-    ImGui::Text(std::format("运镜轨道持续时长：{}", pCampath->GetDurationTime()).c_str());
+    ImGui::TextUnformatted(std::format("运镜轨道持续时长：{}", pCampath->GetDurationTime()).c_str());
 }
 
 void CampathManager::DebugUI(const FreeCameraPath* campath)const {
@@ -79,10 +79,10 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
             }
         }
         ImGui::SameLine();
-        ImGui::Text(I18n("free_campath.fmt", i, keyframe.GetMsg()).c_str());
+        ImGui::TextUnformatted(I18n("free_campath.fmt", i, keyframe.GetMsg()).c_str());
     }
 
-    ImGui::Text(std::format("当前轨道是否绘制：{}", campath->draw.load(std::memory_order_acquire) ? "绘制" : "不绘制").c_str());
+    ImGui::TextUnformatted(std::format("当前轨道是否绘制：{}", campath->draw.load(std::memory_order_acquire) ? "绘制" : "不绘制").c_str());
     if (ImGui::Button("为该轨道开启绘制")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/DrawOne"_hash);
         rp->str1 = campath->GetName();
@@ -149,7 +149,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
 
     if (0 <= indexForReset && indexForReset < campath->CameraKeyframes.size()) {
         const auto& keyframe = campath->GetKeyFrame(indexForReset);
-        ImGui::Text(I18n("free_campath.fmt_edit", indexForReset, keyframe.GetMsg()).c_str());
+        ImGui::TextUnformatted(I18n("free_campath.fmt_edit", indexForReset, keyframe.GetMsg()).c_str());
         ImGui::Separator();
 
         static float temptime{};

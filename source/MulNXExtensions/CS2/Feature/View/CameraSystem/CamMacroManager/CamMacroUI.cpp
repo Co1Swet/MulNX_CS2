@@ -75,7 +75,7 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
     auto w = MulNX::UI::RAIIWindow("运镜宏调试", this->showWindow);
     if (!w || !w.ShouldDraw()) return;
 
-    ImGui::Text(std::format("宏名称：{}", pMacro->GetName()).c_str());
+    ImGui::TextUnformatted(std::format("宏名称：{}", pMacro->GetName()).c_str());
 
     if (ImGui::Button("使用运镜宏")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/Play"_hash);

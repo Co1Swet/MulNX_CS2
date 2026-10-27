@@ -16,7 +16,7 @@ VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
     std::unique_lock lock(this->smutex);
 
     // 显示当前游戏路径
-    ImGui::Text(I18n("boot.game_path.show", gamePath.string()).c_str());
+    ImGui::TextUnformatted(I18n("boot.game_path.show", gamePath.string()).c_str());
 
     if (this->environmentChecked) {
         if (ImGui::Button(I18n("boot.launch").c_str())) {

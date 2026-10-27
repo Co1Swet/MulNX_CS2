@@ -30,7 +30,7 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
             bool InProject = false;
             if (this->pCamPackManager->pActiveCamPack) {
                 InProject = true;
-                ImGui::Text(std::format("当前运镜包名：{}", this->pCamPackManager->pActiveCamPack->GetName()).c_str());
+                ImGui::TextUnformatted(std::format("当前运镜包名：{}", this->pCamPackManager->pActiveCamPack->GetName()).c_str());
             }
             else {
                 ImGui::Text("还未打开任何运镜包，请打开一个运镜包");
