@@ -103,7 +103,7 @@ std::optional<std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool 
 
     Asm
         .sub(RSP, this->frameSize)
-        .SaveReg(0);
+        .SaveReg();
 
     this->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
@@ -128,15 +128,13 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         .mov(RCX, (uintptr_t)HookInstance.get())
         .mov(RDX, RSP)
         .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::Dispatch))
-        .sub(RSP, 32)
         .call(RAX)
-        .add(RSP, 32)
         .jmp(RAX);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
     HookInstance->jmpTarget.Return = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg(0)
+        .LoadReg()
         .add(RSP, HookInstance->frameSize)
         .ret();
 
@@ -144,7 +142,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
     HookInstance->jmpTarget.Continue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg(0)
+        .LoadReg()
         .add(RSP, HookInstance->frameSize);
 
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
@@ -158,14 +156,14 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
     HookInstance->jmpTarget.SkipAllAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg(0)
+        .LoadReg()
         .add(RSP, HookInstance->frameSize)
         .jmp64((uintptr_t)target + HookInstance->overrideSize);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
     HookInstance->jmpTarget.UserSettedTarget = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
     Asm
-        .LoadReg(0)
+        .LoadReg()
         .add(RSP, HookInstance->frameSize)
         .jmp64(userJmpTarget);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
