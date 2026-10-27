@@ -18,8 +18,8 @@ void SpecTargetUI::Window(MulNX::UICoordinator* uico) {
     auto playerName = MulNX::Memory::ReadString(pCon->m_iszPlayerName()).value_or("读取失败");
     auto uid = MulNX::MRead(pCon->m_steamID());
 
-    ImGui::Text(std::format("当前正在观战玩家： {}", playerName).c_str());
-    ImGui::Text(std::format("玩家64位Steam uid： {}", uid).c_str());
+    ImGui::TextUnformatted(std::format("当前正在观战玩家： {}", playerName).c_str());
+    ImGui::TextUnformatted(std::format("玩家64位Steam uid： {}", uid).c_str());
 
     MulNX::Message msg;
     auto&& [ruid] = msg.Access<Steam64UID>();

@@ -82,7 +82,7 @@ std::shared_ptr<const Demo::Info> RecordTaskMaker::DemoChooseMenu(MulNX::UICoord
     }
     auto pDemo = this->pDemSys->GetDemoInfo(*pOperating);
     if (!pDemo) {
-        ImGui::Text(std::format("选中Demo：{} ，而尚未加载信息！", *pOperating).c_str());
+        ImGui::TextUnformatted(std::format("选中Demo：{} ，而尚未加载信息！", *pOperating).c_str());
         return nullptr;
     }
     return pDemo;
@@ -129,7 +129,7 @@ Steam64UID RecordTaskMaker::TeamPlayerMenu(const Demo::Info& demoInfo) {
             if (ImGui::Button(std::to_string(player.steamId).c_str())) {
                 ctrlTarget = player.steamId;
             }
-            ImGui::TableSetColumnIndex(2); ImGui::Text(std::format("{}--{}--{}", player.killCount, player.deathCount, player.assistCount).c_str());
+            ImGui::TableSetColumnIndex(2); ImGui::TextUnformatted(std::format("{}--{}--{}", player.killCount, player.deathCount, player.assistCount).c_str());
         }
         };
 
@@ -203,7 +203,7 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
         }
 
         ImGui::TableSetColumnIndex(1); ImGui::Text("%d", ev.tick);
-        ImGui::TableSetColumnIndex(2); ImGui::Text(std::format("{} (由 {} 击杀)", demoInfo.GetPlayerName(ev.victimSteamId), demoInfo.GetPlayerName(ev.killerSteamId)).c_str());
+        ImGui::TableSetColumnIndex(2); ImGui::TextUnformatted(std::format("{} (由 {} 击杀)", demoInfo.GetPlayerName(ev.victimSteamId), demoInfo.GetPlayerName(ev.killerSteamId)).c_str());
         ImGui::TableSetColumnIndex(3); ImGui::Text("%s", demoInfo.GetPlayerName(ev.assisterSteamId).c_str());
         ImGui::TableSetColumnIndex(4); ImGui::Text("%s", ev.weaponName.c_str());
     }

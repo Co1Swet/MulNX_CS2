@@ -20,11 +20,11 @@ void MediaRecorder::Menu() {
         break;
     case RecordState::Recording:
         ImGui::Text("录制编解码中");
-        ImGui::Text(std::format("正在进行的录制是否是高级录制：{}",
+        ImGui::TextUnformatted(std::format("正在进行的录制是否是高级录制：{}",
             this->pMediaState->advancedMode ? "是" : "否").c_str());
         break;
     }
-    ImGui::Text(std::format("捕获状态：{}",
+    ImGui::TextUnformatted(std::format("捕获状态：{}",
         this->pMediaState->MediaSystemGlobalWorkFlag ? "正在捕获" : "无新捕获").c_str());
 }
 

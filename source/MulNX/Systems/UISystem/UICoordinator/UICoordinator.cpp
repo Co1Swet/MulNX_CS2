@@ -29,7 +29,7 @@ void MulNX::UICoordinator::Window() {
         this->PublishAsync(std::move(msg));
     }
 
-    ImGui::Text(I18n("ui.style.info").c_str());
+    ImGui::TextUnformatted(I18n("ui.style.info").c_str());
     if (ImGui::Button(I18n("ui.style.save").c_str())) {
         this->PublishAsync("UISystem/SaveStyle"_hash);
     }
