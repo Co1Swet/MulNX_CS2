@@ -96,7 +96,7 @@ float TimeController::GetTime() {
     return tick * (1.0f / 64.0f);
 }
 bool TimeController::SetTime(float time) {
-    this->AsyncCommand(std::format("demo_gototick {}", static_cast<int>(time) * 64));
+    this->AsyncCommand(std::format("demo_gototick {}", static_cast<int>(time * 64.0f)));
     return true;
 }
 bool TimeController::JumpRealRel(float time) {
