@@ -18,7 +18,7 @@ bool VEncodeController::Init() {
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
         try {
-            this->SetOn(info.pOutCtx);
+            info.videoReady = this->SetOn(info.pOutCtx);
         }
         catch (const std::exception& e) {
             this->LogError(std::format("视频编码器SetOn失败：{}", e.what()));
@@ -101,13 +101,14 @@ bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& co
     return true;
 }
 
-void VEncodeController::SetOn(av::FormatContext* oCtx) {
+bool VEncodeController::SetOn(av::FormatContext* oCtx) {
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
     this->pMediaState->encodingOverload = false;
 
     auto codec = this->pEncoder->GetAVCodec();
     if (!this->OpenEncoder(oCtx, *codec)) {
         this->LogError("编码器打开失败");
+        return false;
     }
     else {
         this->LogSucc(std::format("创建编码器上下文成功: {}", codec->name()));
@@ -117,6 +118,7 @@ void VEncodeController::SetOn(av::FormatContext* oCtx) {
     auto fps = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
     this->LogInfo(std::format("目标帧率: {} fps", fps > 0 ? fps : 60));
     this->LogSucc(std::format("编码器已开启: {}", this->encoder.codec().name()));
+    return true;
 }
 
 void VEncodeController::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
@@ -201,6 +203,8 @@ std::optional<av::Packet> VEncodeController::TrySetOff() {
 }
 
 void VEncodeController::Reset() {
+    this->encoder = {};
+    this->vstream = {};
     av::VideoFrame clear;
     while (this->bufferVFrames.try_dequeue(clear)) {
 
