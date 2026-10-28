@@ -9,7 +9,16 @@ bool DemoAnalyzer::Init() {
 
     this->SubscribeAsyncEx<void>("Demo/Analyze");
 
+    // 必须先停下 Update，再执行基类注册的协程销毁回调。
+    this->preDeinits.insert(this->preDeinits.begin(), [this]() {
+        std::lock_guard lock(this->updateMutex);
+        this->stopping = true;
+        return true;
+        });
+
     this->SendTask("Update", "DemoSys", [this]() {
+        std::lock_guard lock(this->updateMutex);
+        if (this->stopping)return false;
         this->Update();
         return true;
         });
@@ -92,14 +101,17 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
         co_return;   // cleanup 自动执行，不发送消息
     }
 
+    auto closeHandles = scope_exit([&pi]() {
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+        });
+
     co_await this->WaitUntil([h = pi.hProcess] {
         return WaitForSingleObject(h, 0) == WAIT_OBJECT_0;
         });
 
     DWORD exitCode = 0;
     GetExitCodeProcess(pi.hProcess, &exitCode);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
 
     if (exitCode != 0) {
         this->LogError("csda.exe 退出码: " + std::to_string(exitCode));
