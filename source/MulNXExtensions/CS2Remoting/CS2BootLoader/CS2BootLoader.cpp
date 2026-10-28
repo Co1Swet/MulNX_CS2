@@ -297,7 +297,6 @@ bool CS2BootLoader::LaunchAndInject(LaunchResult& result) {
     auto suspended = ResumeThread(pi.hThread);
     if (suspended == static_cast<DWORD>(-1))return fail("恢复CS2主线程失败", GetLastError());
     if (suspended != 1)return fail("CS2主线程挂起计数异常");
-    this->gameResumed = true;
     result.stage = "resumed";
 
     // 保留进程句柄用于去重和确认ACK，正常退出时不终止游戏。
@@ -305,6 +304,7 @@ bool CS2BootLoader::LaunchAndInject(LaunchResult& result) {
     pi.hThread = nullptr;
 
     this->LogInfo(std::format("CS2启动并注入成功: {}", gamePath.string()));
+    this->gameResumed = true;
     return true;
 }
 
