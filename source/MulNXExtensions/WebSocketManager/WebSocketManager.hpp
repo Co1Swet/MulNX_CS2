@@ -9,7 +9,6 @@ class WebSocketManager final :public MulNX::Module<WebSocketManager> {
     using ConnectionHandle = websocketpp::connection_hdl;
     Server server;
     uint16_t port = 55202;
-    bool loopbackOnly = false;
     std::set<ConnectionHandle, std::owner_less<ConnectionHandle>>connectionHandles;
     std::atomic<bool> serverRunning = false;
 

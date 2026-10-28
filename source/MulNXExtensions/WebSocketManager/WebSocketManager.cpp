@@ -6,15 +6,11 @@ bool WebSocketManager::Init() {
     this->server.clear_access_channels(websocketpp::log::alevel::all);
     this->server.clear_error_channels(websocketpp::log::elevel::all);
 
-    this->loopbackOnly = this->Core->GetName() == "CS2Injector";
-    if (this->loopbackOnly)this->port = 55203;
+    if (this->Core->GetName() == "CS2Injector")this->port = 55203;
     auto path = this->PathGet("Config") / "config.yaml";
     try {
         auto yaml = YAML::LoadFilePath(path);
-        auto port = yaml["port"].as<uint16_t>();
-        if (this->loopbackOnly && (port == 0 || port == 55202))
-            throw std::invalid_argument("启动器不能使用游戏端口55202或随机端口");
-        this->port = port;
+        this->port = yaml["port"].as<uint16_t>();
         this->LogSucc(std::format("从配置文件中读取到指定端口号：{}", this->port));
     }
     catch (const std::exception& e) {
@@ -57,7 +53,7 @@ bool WebSocketManager::Init() {
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     return true;
                 }
-                if (this->loopbackOnly)this->server.listen("127.0.0.1", std::to_string(this->port));
+                if (this->Core->GetName() == "CS2Injector")this->server.listen("127.0.0.1", std::to_string(this->port));
                 else this->server.listen(this->port);
                 this->server.start_accept();
                 this->LogSucc(std::format("即将监听端口：{}", this->port));

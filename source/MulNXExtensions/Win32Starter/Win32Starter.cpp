@@ -78,10 +78,6 @@ bool Win32Starter::Init() {
         this->SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
         };
     
-    this->SubscribeSync("Win32Starter/Close", [this](MulNX::Message& msg) {
-        PostMessageW(this->hwnd, WM_CLOSE, 0, 0);
-        });
-
     // 发送UI启动命令
     this->PublishAsync("UISystem/Start"_hash);
     // 设置系统标志位
