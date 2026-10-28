@@ -125,3 +125,7 @@ namespace MulNX {
 #define MulReflBool(name, defaultValue) \
     std::atomic<bool> name{defaultValue}; \
     MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
+
+#define MulReflFloat(name, defaultValue) \
+    std::atomic<float> name{defaultValue}; \
+    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};

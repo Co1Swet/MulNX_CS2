@@ -47,8 +47,8 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
         rTask.demoName = pExt->str1;
         rTask.uid = ev.killerSteamId;
         rTask.type = Demo::RecordTask::Type::Normal;
-        rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
-        rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+        rTask.tickStart = ev.tick - this->pConfiger->GetPreRecordTicks();
+        rTask.tickEnd = ev.tick + this->pConfiger->GetPostRecordTicks();
         rTask.roundNumber = static_cast<int>(round);
         rTask.roundKill = info.killEvents.size();
         rTask.killIndex = idx;
@@ -74,8 +74,8 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
                 rTask.demoName = pExt->str1;
                 rTask.uid = ev.killerSteamId;
                 rTask.type = Demo::RecordTask::Type::Normal;
-                rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
-                rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+                rTask.tickStart = ev.tick - this->pConfiger->GetPreRecordTicks();
+                rTask.tickEnd = ev.tick + this->pConfiger->GetPostRecordTicks();
                 rTask.roundNumber = static_cast<int>(round);
                 rTask.roundKill = info.killEvents.size();
                 rTask.killIndex = i;
@@ -103,8 +103,8 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
         Demo::RecordTask rTask{};
         rTask.demoName = pExt->str1;
         rTask.uid = ev.victimSteamId;
-        rTask.tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
-        rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
+        rTask.tickStart = ev.tick - this->pConfiger->GetPreBekilledTicks();
+        rTask.tickEnd = ev.tick + this->pConfiger->GetPostBekilledTicks();
         rTask.roundNumber = static_cast<int>(round);
         rTask.desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
             pDemoInfo->GetPlayerName(ev.victimSteamId),
@@ -138,7 +138,7 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
                 endTickFull = std::min(info.Bekilled->tick + 64, endTickFull);
             }
         }
-        endTickFull += this->pConfiger->postTickRoundEnd;
+        endTickFull += this->pConfiger->GetPostRoundEndTicks();
 
         Demo::RecordTask rTask{};
         rTask.demoName = pExt->str1;

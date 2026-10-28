@@ -10,8 +10,8 @@ void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks) {
     this->LogInfo("开始执行合并优化");
     if (rTasks.size() < 2) return;
 
-    const int pre = this->pConfiger->preRecordTicks;
-    const int post = this->pConfiger->postRecordTicks;
+    const int pre = this->pConfiger->GetPreRecordTicks();
+    const int post = this->pConfiger->GetPostRecordTicks();
     const int gap = std::max(0, this->pConfiger->GetMergeThresholdTicks() - (pre + post));
 
     auto sameDomain = [&](const Demo::RecordTask& a, const Demo::RecordTask& b) {

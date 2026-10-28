@@ -6,23 +6,46 @@ class RecordTaskConfiger final :public DemModuleBase {
     void ProcessMsg(MulNX::Message& msg)override;
     bool Init()override;
 
-    // 邻近拼合阈值（秒）
-    std::atomic<float> mergeThresholdSeconds = 12.0f;
+    // 所有设置为秒
+
+    // 击杀者视角
+    MulReflFloat(preRecordSeconds, 3.5f);
+    MulReflFloat(postRecordSeconds, 3.5f);
+    // 邻近拼合阈值
+    MulReflFloat(mergeThresholdSeconds, 12.0f);
+    // 被击杀者视角
+    MulReflFloat(preBekilledSeconds, 1.8f);
+    MulReflFloat(postBekilledSeconds, 1.8f);
+    // 回合后保留秒数
+    MulReflFloat(postRoundEndSeconds, 1.0f);
 public:
-    int preRecordTicks = 200;
-    int postRecordTicks = 200;
+    inline int GetPreRecordTicks()const {
+        auto t = this->preRecordSeconds.load(std::memory_order_acquire);
+        return static_cast<int>(t * 64.0f);
+    }
 
-    int preRecordTicksBekilled = 100;
-    int postRecordTicksBekilled = 100;
+    inline int GetPostRecordTicks()const {
+        auto t = this->postRecordSeconds.load(std::memory_order_acquire);
+        return static_cast<int>(t * 64.0f);
+    }
 
-    bool enableShotingTime = false;
-    int preTicksShotingTime = 40;
-    int postTicksShotingTime = 40;
-    float ShotingTimeRate = 0.2;
+    inline int GetMergeThresholdTicks()const {
+        auto t = this->mergeThresholdSeconds.load(std::memory_order_acquire);
+        return static_cast<int>(t * 64.0f);
+    }
 
-    
+    inline int GetPreBekilledTicks()const {
+        auto t = this->preBekilledSeconds.load(std::memory_order_acquire);
+        return static_cast<int>(t * 64.0f);
+    }
 
-    int postTickRoundEnd = 64;
+    inline int GetPostBekilledTicks()const {
+        auto t = this->postBekilledSeconds.load(std::memory_order_acquire);
+        return static_cast<int>(t * 64.0f);
+    }
 
-    int GetMergeThresholdTicks()const;
+    inline int GetPostRoundEndTicks()const {
+        auto t = this->postRoundEndSeconds.load(std::memory_order_acquire);
+        return static_cast<int>(t * 64.0f);
+    }
 };
