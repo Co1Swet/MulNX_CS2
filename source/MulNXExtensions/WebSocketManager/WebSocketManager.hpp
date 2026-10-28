@@ -8,7 +8,7 @@ class WebSocketManager final :public MulNX::Module<WebSocketManager> {
     using Server = websocketpp::server<websocketpp::config::asio>;
     using ConnectionHandle = websocketpp::connection_hdl;
     Server server;
-    uint16_t port = 55202;
+    uint16_t port = 55203;
     std::set<ConnectionHandle, std::owner_less<ConnectionHandle>>connectionHandles;
     std::atomic<bool> serverRunning = false;
 
