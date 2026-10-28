@@ -28,6 +28,7 @@ namespace MulNX {
         av::FormatContext* pOutCtx = nullptr;
         std::chrono::steady_clock::time_point startTime{};
         const std::string* pFilenameWithoutStem = nullptr;
+        bool videoReady = false;
     };
 }
 

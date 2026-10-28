@@ -104,53 +104,40 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
         std::memory_order_release
     );
 
+    this->pMediaState->MediaSystemGlobalWorkFlag = false;
     try {
         if (this->ofctx.isOpened()) {
-            this->LogWarning("输出上下文正处于打开状态！将尝试关闭");
             this->ofctx.close();
         }
-    }
-    catch (const std::exception& e) {
-        this->LogError(std::format("在验证上下文状态时发生错误： {}", e.what()));
-    }
-
-    this->LogInfo("准备Reset");
-    try {
         this->PublishSync("MediaSync/Reset"_hash);
-    }
-    catch(const std::exception& e) {
-        this->LogError(std::format("Reset异常: {}", e.what()));
-        return false;
-    }
-    this->LogSucc("Reset完成");
-
-    try {
-        this->LogInfo(std::format("准备打开输出上下文: {}", outFile));
         this->ofctx.openOutput(outFile);
-        this->LogSucc(std::format("已打开输出上下文: {}", outFile));
 
-        this->LogInfo("准备SetOn");
         MulNX::Message SetOnMsg("MediaSync/SetOn"_hash);
         auto&& [rInfo] = SetOnMsg.Access<MulNX::AVStartInfo>();
         rInfo.pOutCtx = &this->ofctx;
         rInfo.startTime = std::chrono::steady_clock::now();
         rInfo.pFilenameWithoutStem = &fileName;
+        rInfo.videoReady = false;
         this->PublishSync(SetOnMsg);
-        this->LogSucc("音视频系统SetOn完毕");
-
-        this->ofctx.writeHeader();
-        this->LogInfo(std::format("输出头已写入, 流数={}", this->ofctx.streamsCount()));
-        this->LogSucc(std::format("开始录制: {}", outFile));
-
-        this->pMediaState->MediaSystemGlobalWorkFlag = true;
-        this->pMediaState->recordState.store(RecordState::Recording);
-        return true;
+        if (rInfo.videoReady) {
+            this->ofctx.writeHeader();
+            this->LogSucc(std::format("开始录制: {}", outFile));
+            this->pMediaState->MediaSystemGlobalWorkFlag = true;
+            this->pMediaState->recordState.store(RecordState::Recording);
+            return true;
+        }
+        this->LogError("视频编码器未就绪，取消录制");
     }
     catch (const std::exception& e) {
         this->LogError(std::format("启动失败: {}", e.what()));
-        this->ofctx.close();
-        return false;
     }
+
+    this->PublishSync("MediaSync/SetOff"_hash);
+    this->PublishSync("Media/Record/Stop/FastNotify"_hash);
+    this->PublishSync("MediaSync/Reset"_hash);
+    this->ofctx.close();
+    this->pMediaState->pCurrentOutputDir.store(nullptr, std::memory_order_release);
+    return false;
 }
 
 bool MediaRecorder::StopRecording() {
