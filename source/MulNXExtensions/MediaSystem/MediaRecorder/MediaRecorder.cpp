@@ -1,4 +1,5 @@
 #include "MediaRecorder.hpp"
+#include <MulNX/Common/Misc.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 #include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
 #include <VPipeline/VEncodeController/VEncodeController.hpp>
@@ -158,6 +159,13 @@ bool MediaRecorder::StopRecording() {
         this->LogWarning("未在录制中");
         return false;
     }
+    this->pMediaState->MediaSystemGlobalWorkFlag = false;
+    auto cleanup = scope_exit([this]() {
+        this->ofctx.close();
+        this->pMediaState->pCurrentOutputDir.store(nullptr, std::memory_order_release);
+        this->pMediaState->recordState.store(RecordState::Free);
+        });
+    bool completed = true;
     this->LogInfo("准备停止录制");
     this->ReportCtxState();
 
@@ -179,21 +187,27 @@ bool MediaRecorder::StopRecording() {
         }
     }
     catch (const std::exception& e) {
+        completed = false;
         this->LogError(std::format("停止时异常: {}", e.what()));
     }
 
     this->LogInfo("冲刷完毕，准备写入尾部");
     this->ReportCtxState();
 
-    this->ofctx.writeTrailer();
-    this->LogInfo("尾部写入完毕");
+    std::error_code ec;
+    this->ofctx.writeTrailer(ec);
+    if (ec) {
+        completed = false;
+        this->LogError(std::format("录制文件尾部写入失败: {}", ec.message()));
+    }
 
-    this->ofctx.close();
-    this->pMediaState->pCurrentOutputDir.store(nullptr, std::memory_order_release);
-    this->LogSucc("录制结束");
-    this->pMediaState->recordState.store(RecordState::Free);
-
-    return true;
+    if (completed) {
+        this->LogSucc("录制结束");
+    }
+    else {
+        this->LogError("本次录制文件未完成");
+    }
+    return completed;
 }
 
 void MediaRecorder::Main() {
