@@ -58,6 +58,11 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
 
     static int indexForReset = -1;
     static int PreIndex = -2;
+    if (this->resetKeyframeEditor) {
+        indexForReset = -1;
+        PreIndex = -2;
+        this->resetKeyframeEditor = false;
+    }
 
     for (size_t i = 0; i < campath->CameraKeyframes.size(); ++i) {
         const MulNX::Math::CameraKeyframe& keyframe = campath->CameraKeyframes.at(i);
@@ -195,7 +200,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
             d4 = dof.FarBlurry;
             rp->str1 = campath->GetName();
             this->PublishAsync(std::move(msg));
-            PreIndex = -1;
+            indexForReset = -1;
         }
         if (ImGui::Button("删除选中的关键帧")) {
             auto [del, r] = MulNX::Message::Create<MulNX::NetExt>("Campath/DeleteKeyframe"_hash);
@@ -203,7 +208,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
             auto&& [index] = del.Access<size_t>();
             index = indexForReset;
             this->PublishAsync(std::move(del));
-            PreIndex = -1;
+            indexForReset = -1;
         }
         if (ImGui::Button("复制选中的关键帧")) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/CopyKeyframe"_hash);
@@ -211,7 +216,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
             auto&& [index] = msg.Access<size_t>();
             index = indexForReset;
             this->PublishAsync(std::move(msg));
-            PreIndex = -1;
+            indexForReset = -1;
         }
     }
     PreIndex = indexForReset;

@@ -119,6 +119,11 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
     static int selectedIndex = -1;
     static int lastSelected = -2;
     static float tempOffset = 0.0f;
+    if (this->resetOffsetEditor) {
+        selectedIndex = -1;
+        lastSelected = -2;
+        this->resetOffsetEditor = false;
+    }
 
     if (vec.empty()) {
         selectedIndex = -1;
@@ -181,6 +186,7 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
             pAdd->str1 = pMacro->GetName();
             pAdd->str2 = item.campathName;
             this->PublishAsync(std::move(add));
+            selectedIndex = -1;
         }
 
         ImGui::SameLine();
@@ -190,6 +196,7 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
             rp->str1 = pMacro->GetName();
             rp->str2 = item.campathName;
             this->PublishAsync(std::move(msg));
+            selectedIndex = -1;
         }
     }
 }

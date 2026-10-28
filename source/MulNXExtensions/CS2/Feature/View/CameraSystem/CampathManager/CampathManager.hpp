@@ -8,6 +8,7 @@ class CampathManager final : public CamSysModule {
 
     std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> campaths;
     std::atomic<std::shared_ptr<FreeCameraPath>> pOperatingCampath = nullptr;
+    mutable bool resetKeyframeEditor = true;
 
     void CampathShowOneLine(const FreeCameraPath* pCampath)const;
     void DebugUI(const FreeCameraPath* campath)const;

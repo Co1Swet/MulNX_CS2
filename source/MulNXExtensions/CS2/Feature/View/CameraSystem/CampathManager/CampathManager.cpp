@@ -88,6 +88,7 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
         this->pOperatingCampath.store(pCampath, std::memory_order_release);
+        this->resetKeyframeEditor = true;
         this->showWindow.store(true, std::memory_order_release);
         break;
     }
@@ -112,6 +113,9 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         keyframe.dof = view.ToDOFPack();
         keyframe.time = t;
         pCampath->AddKeyframe(std::move(keyframe));
+        if (pCampath == this->pOperatingCampath.load(std::memory_order_acquire)) {
+            this->resetKeyframeEditor = true;
+        }
         break;
     }
     case "Campath/DeleteKeyframe"_hash: {
@@ -122,6 +126,9 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         auto&& [index] = msg.Access<size_t>();
         pCampath->CameraKeyframes.erase(pCampath->CameraKeyframes.begin() + index);
         pCampath->Refresh();
+        if (pCampath == this->pOperatingCampath.load(std::memory_order_acquire)) {
+            this->resetKeyframeEditor = true;
+        }
         break;
     }
     case "Campath/CopyKeyframe"_hash: {
@@ -131,6 +138,9 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         if (!pCampath)break;
         auto&& [index] = msg.Access<size_t>();
         pCampath->AddKeyframe(pCampath->GetKeyFrame(index));
+        if (pCampath == this->pOperatingCampath.load(std::memory_order_acquire)) {
+            this->resetKeyframeEditor = true;
+        }
         break;
     }
     case "Campath/ClearOne"_hash: {
@@ -139,6 +149,9 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
         pCampath->Clear();
+        if (pCampath == this->pOperatingCampath.load(std::memory_order_acquire)) {
+            this->resetKeyframeEditor = true;
+        }
         break;
     }
     case "Campath/Preview"_hash: {

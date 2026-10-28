@@ -5,6 +5,7 @@
 class CamMacroManager final :public CamSysModule {
     std::unordered_map<std::string, std::unique_ptr<CamMacro>> camMacros{};
     CamMacro* pOperatingMacro = nullptr;
+    mutable bool resetOffsetEditor = true;
 
     MulReflBool(shortcutEnable, true);
 

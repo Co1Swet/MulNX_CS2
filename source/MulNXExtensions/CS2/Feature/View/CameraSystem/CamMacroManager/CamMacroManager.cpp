@@ -82,6 +82,7 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         auto pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
         this->pOperatingMacro = pCamMacro;
+        this->resetOffsetEditor = true;
         this->showWindow.store(true, std::memory_order_release);
         break;
     }
@@ -100,6 +101,9 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         auto* pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
         pCamMacro->Clear();
+        if (pCamMacro == this->pOperatingMacro) {
+            this->resetOffsetEditor = true;
+        }
         this->LogSucc(std::format("成功清空宏 {} 的所有运镜", name));
         break;
     }
@@ -125,6 +129,9 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         auto* pCamMacro = this->FindCamMacro(pNetExt->str1);
         if (!pCamMacro)break;
         if (pCamMacro->AddCampath(pNetExt->str2, offset)) {
+            if (pCamMacro == this->pOperatingMacro) {
+                this->resetOffsetEditor = true;
+            }
             this->LogSucc(std::format("成功添加运镜到宏 。宏：{}，运镜：{}",
                 pNetExt->str1, pNetExt->str2));
         }
@@ -140,6 +147,9 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         auto* pCamMacro = this->FindCamMacro(pNetExt->str1);
         if (!pCamMacro)break;
         pCamMacro->RemoveCampath(pNetExt->str2);
+        if (pCamMacro == this->pOperatingMacro) {
+            this->resetOffsetEditor = true;
+        }
         break;
     }
     }
