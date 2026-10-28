@@ -65,7 +65,7 @@ bool CS2BootLoader::Init() {
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
 
     (*this)
-        .SubscribeAsync("CS2BootLoader/Launch")
+        .SubscribeAsync<void>("CS2BootLoader/Launch")
         .SubscribeAsync("CS2BootLoader/PathUpdate")
         .SubscribeAsync("CS2BootLoader/Save")
         ;
@@ -93,6 +93,7 @@ void CS2BootLoader::ProcessMsg(MulNX::Message& msg) {
     std::unique_lock lock(this->smutex);
     switch (msg.type) {
     case "CS2BootLoader/Launch"_hash: {
+        if (!this->CheckEnvironment())break;
         this->LaunchAndInject();
         break;
     }

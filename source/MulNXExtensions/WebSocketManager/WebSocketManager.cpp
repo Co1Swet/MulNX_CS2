@@ -6,6 +6,7 @@ bool WebSocketManager::Init() {
     this->server.clear_access_channels(websocketpp::log::alevel::all);
     this->server.clear_error_channels(websocketpp::log::elevel::all);
 
+    if (this->Core->GetName() == "CS2Injector")this->port = 55203;
     auto path = this->PathGet("Config") / "config.yaml";
     try {
         auto yaml = YAML::LoadFilePath(path);
@@ -14,7 +15,7 @@ bool WebSocketManager::Init() {
     }
     catch (const std::exception& e) {
         this->LogError(e.what());
-        this->LogError("解析 yaml 配置出错，端口保持默认55202");
+        this->LogError(std::format("解析 yaml 配置出错，端口保持默认{}", this->port));
     }
     
 
@@ -52,7 +53,8 @@ bool WebSocketManager::Init() {
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     return true;
                 }
-                this->server.listen(this->port);
+                if (this->Core->GetName() == "CS2Injector")this->server.listen("127.0.0.1", std::to_string(this->port));
+                else this->server.listen(this->port);
                 this->server.start_accept();
                 this->LogSucc(std::format("即将监听端口：{}", this->port));
                 // 阻塞调用
