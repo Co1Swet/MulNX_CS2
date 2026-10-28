@@ -6,15 +6,20 @@ bool WebSocketManager::Init() {
     this->server.clear_access_channels(websocketpp::log::alevel::all);
     this->server.clear_error_channels(websocketpp::log::elevel::all);
 
+    this->loopbackOnly = this->Core->GetName() == "CS2Injector";
+    if (this->loopbackOnly)this->port = 55203;
     auto path = this->PathGet("Config") / "config.yaml";
     try {
         auto yaml = YAML::LoadFilePath(path);
-        this->port = yaml["port"].as<uint16_t>();
+        auto port = yaml["port"].as<uint16_t>();
+        if (this->loopbackOnly && (port == 0 || port == 55202))
+            throw std::invalid_argument("启动器不能使用游戏端口55202或随机端口");
+        this->port = port;
         this->LogSucc(std::format("从配置文件中读取到指定端口号：{}", this->port));
     }
     catch (const std::exception& e) {
         this->LogError(e.what());
-        this->LogError("解析 yaml 配置出错，端口保持默认55202");
+        this->LogError(std::format("解析 yaml 配置出错，端口保持默认{}", this->port));
     }
     
 
@@ -41,8 +46,8 @@ bool WebSocketManager::Init() {
             this->trans[type] = meta.makingHandler;
         }
 
-        this->SendTask("Main", "MulNXMain", [this]() {
-            this->Main();
+        this->SendTask("Update", "MulNXMain", [this]() {
+            this->Update();
             return true;
             });
 
@@ -52,7 +57,8 @@ bool WebSocketManager::Init() {
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                     return true;
                 }
-                this->server.listen(this->port);
+                if (this->loopbackOnly)this->server.listen("127.0.0.1", std::to_string(this->port));
+                else this->server.listen(this->port);
                 this->server.start_accept();
                 this->LogSucc(std::format("即将监听端口：{}", this->port));
                 // 阻塞调用
@@ -71,12 +77,9 @@ bool WebSocketManager::Init() {
     return true;
 }
 
-void WebSocketManager::Deinit() {
+bool WebSocketManager::Deinit() {
     this->server.stop();
-}
-
-void WebSocketManager::Main() {
-    this->Update();
+    return true;
 }
 
 void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message_ptr netMsg) {

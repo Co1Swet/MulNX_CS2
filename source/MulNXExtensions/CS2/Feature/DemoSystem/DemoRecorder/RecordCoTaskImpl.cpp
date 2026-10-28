@@ -1,5 +1,28 @@
 #include "DemoRecorder.hpp"
+#include <Intro/HookConsole/HookConsole.hpp>
 #include <Support/TimeController/TimeController.hpp>
+
+MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target) {
+    ok = false;
+    // 设置观战目标
+    for (int i = 0;i < 3;++i) {
+        auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
+        if (!obUID || *obUID != target) {
+            // 发送设置观察目标消息
+            MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
+            auto&& [uidRef] = specMsg.Access<Steam64UID>();
+            uidRef = target;
+            this->PublishAsync(std::move(specMsg));
+        }
+        co_await this->WaitTimed(ok, 500, [&]() {
+            auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
+            if (!obUID || (obUID.value() != target))return false;
+            return true;
+            });
+        if (ok)break;
+        this->LogWarning("观战设置失败，重新尝试");
+    }
+}
 
 MulNX::CoTask DemoRecorder::EnsurePassChange() {
     std::shared_ptr<Demo::RecordPass> tryPass = nullptr;
@@ -59,12 +82,14 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
             }
         }
     }
-    std::unique_lock lock(this->smutex);
-    if (this->recordPasses.empty() || this->recordPasses.front() != tryPass) {
-        co_return;
+    {
+        std::unique_lock lock(this->smutex);
+        if (this->recordPasses.empty() || this->recordPasses.front() != tryPass) {
+            co_return;
+        }
+        this->recordPasses.pop_front();
+        this->currentPass.store(tryPass, std::memory_order_release);
     }
-    this->recordPasses.pop_front();
-    this->currentPass.store(tryPass, std::memory_order_release);
     co_await this->WaitMilliseconds(1000);
 }
 
@@ -141,18 +166,13 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
                 continue;
             }
             else {
-                this->LogError("多次暂停尝试失败");
-                break;
+                this->LogError("多次暂停尝试失败，丢弃一个片段");
+                co_return;
             }
         }
     }
     else {
         this->LogInfo("当前Demo已暂停，继续步骤");
-    }
-    // 验证暂停状态
-    if (!this->CS2Time->IsDemoPaused()) {
-        this->LogError("当前Demo不处于暂停状态，已丢弃一个片段");
-        co_return;
     }
     // 验证音视频系统状态
     if (this->pMediaState->IsBusy()) {
@@ -174,43 +194,7 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
         co_return;
     }
 
-    co_await this->WaitMilliseconds(750);
-
-    // 设置观战目标
-    for (int i = 0;;++i) {
-        auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-        if (!obUID || (obUID.value() != rTask.uid)) {
-            // 发送设置观察目标消息
-            MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
-            auto&& [uidRef] = specMsg.Access<Steam64UID>();
-            uidRef = rTask.uid;
-            this->PublishAsync(std::move(specMsg));
-        }
-        bool ok = false;
-        co_await this->WaitTimed(ok, 500, [&]() {
-            auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-            if (!obUID || (obUID.value() != rTask.uid))return false;
-            return true;
-            });
-        if (ok) {
-            break;
-        }
-        else if (i < 3) {
-            this->LogWarning("观战设置失败，重新尝试");
-            continue;
-        }
-        else {
-            this->LogError("多次尝试设置观战失败！");
-            break;
-        }
-    }
-    // 验证观战目标
-    auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-    if (!obUID || (obUID.value() != rTask.uid)) {
-        this->LogError("由于观战设置尝试失败，丢弃一个片段");
-        co_return;
-    }
-    this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
+    this->AsyncCommandHighPriority("spec_mode 4");
 
     co_await this->WaitMilliseconds(750);
 
@@ -229,6 +213,15 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
 
     co_await this->WaitMilliseconds(750);
 
+    bool OBOK = false;
+    co_await this->CoSetOBTarget(OBOK, rTask.uid);
+    if (!OBOK) {
+        this->LogError("多次尝试设置观战失败！丢弃一个片段");
+        co_return;
+    }
+
+    this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
+
     // 恢复Demo播放
     for (int i = 0;;++i) {
         bool ok = false;
@@ -245,21 +238,17 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
             continue;
         }
         else {
-            this->LogError("多次尝试恢复播放未成功");
-            break;
+            this->LogError("多次尝试恢复播放未成功，丢弃一个片段");
+            co_return;
         }
-    }
-    // 验证一下是不是确实走了
-    if (this->CS2Time->GetDemoTick() <= beforeRecord) {
-        this->LogError("播放未成功，已丢弃一个片段");
-        co_return;
     }
 
     // 等待播放到片段起点
     for (int i = 0;;++i) {
         bool ok = false;
         co_await this->WaitTimed(ok, 2500, [&]() {
-            return this->CS2Time->GetDemoTick() > rTask.tickStart - 5;
+            return this->CS2Time->GetDemoTick() > rTask.tickStart - 5 &&
+                std::abs(rTask.tickStart - this->CS2Time->GetDemoTick()) <= 32;
             });
         if (ok) {
             break;
@@ -269,13 +258,9 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
             continue;
         }
         else {
-            this->LogError("多次等待播放到指定位置尝试均未成功");
-            break;
+            this->LogError("多次等待播放到指定位置尝试均未成功，丢弃一个片段");
+            co_return;
         }
-    }
-    if (std::abs(rTask.tickStart - this->CS2Time->GetDemoTick()) > 32) {
-        this->LogError("恢复播放后，Tick流动不符合起点预期，丢弃一个片段");
-        co_return;
     }
 
     // 开始录制

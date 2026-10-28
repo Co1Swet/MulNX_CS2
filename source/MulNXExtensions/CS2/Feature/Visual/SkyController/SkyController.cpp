@@ -52,7 +52,7 @@ void SkyController::Menu() {
         ImGui::EndListBox();
     }
     auto pName = this->wantedSkyName.load();
-    ImGui::Text(std::format("目标天空：{}", pName ? pName->c_str() : "无").c_str());
+    ImGui::TextUnformatted(std::format("目标天空：{}", pName ? pName->c_str() : "无").c_str());
     if (ImGui::Button("刷新天空")) {
         this->AsyncCommand("MulNX/Sky/UpdateOnMainThread");
     }

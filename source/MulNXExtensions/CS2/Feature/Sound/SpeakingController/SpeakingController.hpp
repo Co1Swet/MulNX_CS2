@@ -11,9 +11,10 @@ class SpeakingController :public CSModuleBase {
 
     std::unordered_map<Steam64UID, bool>checkList{};
 
-    std::atomic<bool> listMode = false;
-    std::atomic<bool> autoActiveTeamVoice = false;
-    std::atomic<bool> onlyCurOBingSameTeam = false;
+    MulReflBool(listMode, false);
+    MulReflBool(autoActiveTeamVoice, false);
+    MulReflBool(onlyCurOBingSameTeam, false);
+
     void OnItPlayer(int index, CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn);
     bool CheckState(int index, CS2::CCSPlayerController* controller, CS2::C_CSPlayerPawn* pawn)const;
 

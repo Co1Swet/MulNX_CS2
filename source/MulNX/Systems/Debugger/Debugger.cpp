@@ -79,8 +79,8 @@ bool MulNX::Debugger::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Window();});
     this->UIRegisterCallback("UI.MulNXControl", [this](auto&&...) {return this->DeMe();});
 
-    this->SendTask("Main", "MulNXMain", [this]()->bool {
-        this->Main();
+    this->SendTask("Update", "MulNXMain", [this]()->bool {
+        this->Update();
         return true;
         });
 
@@ -117,16 +117,11 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
             this->needAutoScroll = true;
         auto fmtted = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
-        this->debugMsg.push_back(fmtted);
+        this->debugMsg.push_back(std::move(fmtted));
         break;
     }
-
     }
 }
-void MulNX::Debugger::Main() {
-    this->Update();
-}
-
 void MulNX::Debugger::ResetMaxMsgCount(const int max) {
     std::unique_lock lock(this->smutex);
     if (max < 1) {

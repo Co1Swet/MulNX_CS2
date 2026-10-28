@@ -48,6 +48,9 @@ MulNX::Memory::Region MulNX::Memory::Region::FindRegion(const Pattern& pattern, 
         if (!FoundHead.has_value()) {
             break;//未找到更多匹配
         }
+        if (pattern.size() > static_cast<size_t>(this->End() - FoundHead.value())) {
+            break;
+        }
         if (this->MatchPattern(FoundHead.value(), pattern)) {
             //找到匹配，返回对应内存区域
             return MulNX::Memory::Region(reinterpret_cast<uintptr_t>(FoundHead.value()), pattern.size());

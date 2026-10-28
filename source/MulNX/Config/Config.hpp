@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <source_location>
-#include <functional>
 
 class MulNXInfo {
 public:
@@ -17,8 +16,6 @@ public:
 };
 
 namespace MulNX {
-    // 非交互入口可接管本进程的致命错误；未设置或处理后返回时，仍按原流程弹窗并终止。
-    extern std::function<void(const std::string&)> errorTerminateHandler;
     [[noreturn]] void ErrorTerminate(const std::string& Msg,
         const std::source_location& loc = std::source_location::current());
 }

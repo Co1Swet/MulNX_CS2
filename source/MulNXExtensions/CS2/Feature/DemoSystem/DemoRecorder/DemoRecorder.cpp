@@ -174,6 +174,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
 }
 void DemoRecorder::StartRecord(const Demo::RecordTask& task) {
+    std::shared_lock lock(this->smutex);
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
     ++this->num;
     // str1为绝对文件夹路径，str2为无扩展的文件名

@@ -30,10 +30,9 @@ class Win32Starter final :public MulNX::Module<Win32Starter> {
     LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     inline static Win32Starter* pThis = nullptr;
 public:
-    bool quiet = false;
     Win32Starter();
     bool Init()override;
-    void Deinit()override;
+    bool Deinit()override;
 
     void Run();
 };

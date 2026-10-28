@@ -110,7 +110,7 @@ std::optional<std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool 
     return std::nullopt;
 }
 
-std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
+std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
     bool extraStackAdjust, bool callRawFirst, uintptr_t userJmpTarget, int len) {
     if (target == nullptr)MulNX::ErrorTerminate("不能为nullptr创建Hook！");
 
@@ -128,9 +128,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         .mov(RCX, (uintptr_t)HookInstance.get())
         .mov(RDX, RSP)
         .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::Dispatch))
-        .sub(RSP, 32)
         .call(RAX)
-        .add(RSP, 32)
         .jmp(RAX);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
@@ -223,7 +221,7 @@ void* MulNX::Hook::GetRawStackAddr(RegContext* ctx) {
     return reinterpret_cast<void*>(ctx->rsp + this->frameSize);
 }
 
-void MulNX::Hook::ResetCallback(std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback) {
+void MulNX::Hook::ResetCallback(std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback) {
     this->callback = std::move(callback);
 }
 

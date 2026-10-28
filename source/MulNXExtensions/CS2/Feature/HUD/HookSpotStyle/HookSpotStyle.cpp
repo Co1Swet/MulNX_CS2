@@ -1,5 +1,4 @@
-#include "PlayerSpotRenderController.hpp"
-#include <MulNX/Base/UI/UI.hpp>
+#include "HookSpotStyle.hpp"
 
 enum TeamSytle :uint64_t {
     CT = 9,
@@ -7,38 +6,18 @@ enum TeamSytle :uint64_t {
     Enemy = 17
 };
 
-void PlayerSpotRenderController::Menu() {
+void HookSpotStyle::Menu() {
     MulNX::UI::Checkbox("隐藏雷达玩家头像数字显示", this->hideNumLabel);
     MulNX::UI::Checkbox("当观战具体玩家时转换观战外框", this->transSpecLabel);
-    MulNX::UI::Checkbox("强制雷达敌人渲染为红色", this->forceEnemyRed);
-    MulNX::UI::Checkbox("强制雷达队友显示", this->forceTeammateDraw);
+    MulNX::UI::Checkbox("修复敌方玩家使用红色图标", this->repairEnenyStyle);
 }
 
-bool PlayerSpotRenderController::Init() {
+bool HookSpotStyle::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        // 修改绘制状态
-        auto Pos_Spot_CmpToSetShow = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_CmpToSetShow).Data();
-        this->hkPos_Spot_CmpToSetShow = MulNX::Hook::Create(Pos_Spot_CmpToSetShow, [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->forceTeammateDraw.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
-            auto pPawn = (CS2::C_CSPlayerPawn*)ctx->r15;
-            try {
-                auto pOBing = this->CS2Entitys->TryGetObservingPawn();
-                if (!pOBing)return MulNX::Hook::Then::Continue;
-                auto teamOBing = MulNX::MRead(pOBing->iTeamNum());
-                auto team = MulNX::MRead(pPawn->iTeamNum());
-                if (teamOBing == team)return MulNX::Hook::Then::JmpUserSettedTarget;
-            }
-            catch (MulNX::Exception& e) {
-                this->LogError(e);
-            }
-            return MulNX::Hook::Then::Continue;
-            }, true, false, (uintptr_t)(Pos_Spot_CmpToSetShow + 10)).value();
-        this->RegisterAttachHook(this->hkPos_Spot_CmpToSetShow, "Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*");
-
-        // 修改小地图上玩家图标的绘制样式
+        // 修改小地图上地方玩家图标的绘制样式
         auto Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_WriteMaybeEnumToChangeRadarPlayerDraw);
         this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = MulNX::Hook::Create(Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
-            if (!this->forceEnemyRed.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
+            if (!this->repairEnenyStyle.load(std::memory_order_acquire))return MulNX::Hook::Then::Continue;
             uint64_t Enum = ctx->rbx;
             auto pOBing = this->CS2Entitys->TryGetObservingPawn();
             if (!pOBing)return MulNX::Hook::Then::Continue;
@@ -52,13 +31,12 @@ bool PlayerSpotRenderController::Init() {
                 }
             }
             catch (...) {
-                
+
             }
             return MulNX::Hook::Then::Continue;
             }, true).value();
         this->RegisterAttachHook(this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw, "Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw");
-
-        // 修改玩家图标的具体绘制组件可见性
+        // 修改玩家图标的具体绘制组件样式
         auto pFunc_FinallyUpdatePlayerState = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Func_FinallyUpdatePlayerState).FindFuncStart();
         this->hkFunc_FinallyUpdatePlayerState = MulNX::Hook::Create(pFunc_FinallyUpdatePlayerState.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->hideNumLabel.load(std::memory_order_acquire)) {
@@ -74,8 +52,6 @@ bool PlayerSpotRenderController::Init() {
             }).value();
         this->RegisterAttachHook(this->hkFunc_FinallyUpdatePlayerState, "Func_FinallyUpdatePlayerState");
         });
-
-    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
 
     return true;
 }

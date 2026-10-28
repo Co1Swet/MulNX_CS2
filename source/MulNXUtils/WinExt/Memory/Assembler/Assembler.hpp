@@ -4,9 +4,12 @@
 
 class alignas(16) RegContext {
 public:
+    // 除非你完全知道你究竟在干什么，不然不要使用这个
+    std::byte MULNX_HOOK_SHADOW_SPACE[0x20];
+    // 通用寄存器
     uint64_t rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi;
     uint64_t r8, r9, r10, r11, r12, r13, r14, r15;
-
+    // 6个xmm寄存器
     alignas(16) __m128 xmm0;
     alignas(16) __m128 xmm1;
     alignas(16) __m128 xmm2;

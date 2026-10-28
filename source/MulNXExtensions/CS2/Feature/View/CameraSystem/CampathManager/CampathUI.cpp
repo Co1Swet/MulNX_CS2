@@ -49,7 +49,7 @@ void CampathManager::CampathShowOneLine(const FreeCameraPath* pCampath)const {
     }
 
     ImGui::SameLine();
-    ImGui::Text(std::format("运镜轨道持续时长：{}", pCampath->GetDurationTime()).c_str());
+    ImGui::TextUnformatted(std::format("运镜轨道持续时长：{}", pCampath->GetDurationTime()).c_str());
 }
 
 void CampathManager::DebugUI(const FreeCameraPath* campath)const {
@@ -79,10 +79,10 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
             }
         }
         ImGui::SameLine();
-        ImGui::Text(I18n("free_campath.fmt", i, keyframe.GetMsg()).c_str());
+        ImGui::TextUnformatted(I18n("free_campath.fmt", i, keyframe.GetMsg()).c_str());
     }
 
-    ImGui::Text(std::format("当前轨道是否绘制：{}", campath->draw.load(std::memory_order_acquire) ? "绘制" : "不绘制").c_str());
+    ImGui::TextUnformatted(std::format("当前轨道是否绘制：{}", campath->draw.load(std::memory_order_acquire) ? "绘制" : "不绘制").c_str());
     if (ImGui::Button("为该轨道开启绘制")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/DrawOne"_hash);
         rp->str1 = campath->GetName();
@@ -149,7 +149,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
 
     if (0 <= indexForReset && indexForReset < campath->CameraKeyframes.size()) {
         const auto& keyframe = campath->GetKeyFrame(indexForReset);
-        ImGui::Text(I18n("free_campath.fmt_edit", indexForReset, keyframe.GetMsg()).c_str());
+        ImGui::TextUnformatted(I18n("free_campath.fmt_edit", indexForReset, keyframe.GetMsg()).c_str());
         ImGui::Separator();
 
         static float temptime{};
@@ -171,6 +171,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
 
         this->CamDrawer->DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
         if (ImGui::Button("修改选中的关键帧")) {
+            const auto dof = keyframe.GetDOF();
             auto [del, r] = MulNX::Message::Create<MulNX::NetExt>("Campath/DeleteKeyframe"_hash);
             r->str1 = campath->GetName();
             auto&& [index] = del.Access<size_t>();
@@ -188,10 +189,10 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
             rx = tempRotationEuler.x;
             ry = tempRotationEuler.y;
             rz = tempRotationEuler.z;
-            d1 = -1000.0f;
-            d2 = 0.0f;
-            d3 = 1000.0f;
-            d4 = 3000.0f;
+            d1 = dof.NearBlurry;
+            d2 = dof.NearCrisp;
+            d3 = dof.FarCrisp;
+            d4 = dof.FarBlurry;
             rp->str1 = campath->GetName();
             this->PublishAsync(std::move(msg));
             PreIndex = -1;

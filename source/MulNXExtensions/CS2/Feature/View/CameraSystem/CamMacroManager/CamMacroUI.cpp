@@ -3,7 +3,7 @@
 bool CamMacroManager::Menu() {
     std::shared_lock lock(this->smutex);
     if (ImGui::CollapsingHeader("运镜宏总控")) {
-        ImGui::Checkbox("启用运镜宏快捷键触发", &this->shortcutEnable);
+        MulNX::UI::Checkbox("启用运镜宏快捷键触发", this->shortcutEnable);
     }
     if (ImGui::CollapsingHeader("创建新宏")) {
         static std::string createMacroName = "";
@@ -75,7 +75,7 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
     auto w = MulNX::UI::RAIIWindow("运镜宏调试", this->showWindow);
     if (!w || !w.ShouldDraw()) return;
 
-    ImGui::Text(std::format("宏名称：{}", pMacro->GetName()).c_str());
+    ImGui::TextUnformatted(std::format("宏名称：{}", pMacro->GetName()).c_str());
 
     if (ImGui::Button("使用运镜宏")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/Play"_hash);

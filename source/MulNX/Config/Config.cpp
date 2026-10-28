@@ -4,8 +4,6 @@
 #include <Windows.h>
 #include <sstream>
 
-std::function<void(const std::string&)> MulNX::errorTerminateHandler;
-
 void MulNX::ErrorTerminate(const std::string& Msg,
     const std::source_location& loc) {
     std::ostringstream oss{};
@@ -30,7 +28,6 @@ void MulNX::ErrorTerminate(const std::string& Msg,
     oss << "MulNX将在您点击确定后关闭当前进程";
 
     std::string Full = oss.str();
-    if (errorTerminateHandler)errorTerminateHandler(Full);
     std::wstring wFull = MulNX::CharUtility::U8ToW(Full);
 
     MessageBoxW(nullptr, wFull.c_str(), L"MulNX 错误中断！", MB_OK);

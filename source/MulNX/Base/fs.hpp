@@ -41,7 +41,7 @@ namespace ghc::filesystem {
                 return e.is_regular_file();}
                 )
                 | std::views::filter([&](const fs::directory_entry& e) {
-                if (!filter.empty())return true;
+                if (filter.empty())return true;
                 return filter.contains(e.path().extension());
                     })
                 | std::views::transform([](const fs::directory_entry& e) {return e.path().filename().string();})

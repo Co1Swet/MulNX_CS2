@@ -15,6 +15,8 @@ class DemoRecorder final : public DemModuleBase, public MediaModuleMixin<DemoRec
 
     void StartRecord(const Demo::RecordTask& task);
 
+    MulNX::CoTask CoSetOBTarget(bool& ok, Steam64UID target);
+
     MulNX::CoTask EnsurePassChange();
     MulNX::CoTask GoNextTask(const Demo::RecordTask*& pTask);
     MulNX::CoTask Main();

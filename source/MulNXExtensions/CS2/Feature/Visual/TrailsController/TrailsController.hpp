@@ -9,7 +9,7 @@ class TrailsController final :public CSModuleBase {
     constexpr static ParticleColor TRaw{ 224.0f, 175.0f, 86.0f };
     constexpr static ParticleColor CTRaw{ 114.0f, 155.0f, 221.0f };
 
-    std::atomic<bool> trailsEnable = true;
+    MulReflBool(trailsEnable, true);
     bool* sv_grenade_trajectory_prac_pipreview = nullptr;      // 开启投掷前预览(小窗户)
     float* sv_grenade_trajectory_time_spectator = nullptr;     // 生存期
 

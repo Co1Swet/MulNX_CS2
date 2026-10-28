@@ -34,7 +34,7 @@ bool VEncodeController::Init() {
         });
 
     this->UIRegisterCallback("UI.MediaSys/Control", [this](auto&&...) {
-        ImGui::Text(std::format("视频帧大致缓存(压力系数): {} 帧",
+        ImGui::TextUnformatted(std::format("视频帧大致缓存(压力系数): {} 帧",
             this->bufferSize.load(std::memory_order_relaxed)).c_str());
             });
 
@@ -60,7 +60,7 @@ void VEncodeController::SetEncoderParams(av::VideoEncoderContext* encoder) {
     encoder->setTimeBase(this->timeBase);
 
     encoder->setMaxBFrames(rp.maxBFrames);
-    encoder->setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate);
+    encoder->setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate.load());
 
     if (rp.gopSize > 0) {
         encoder->setGopSize(rp.gopSize);

@@ -16,6 +16,7 @@ namespace MulNX {
             std::map<MulNXHandle, std::unique_ptr<MulNX::ModuleBase>>modules{};
 
             bool Init()override;
+            bool Deinit()override;
             void ProcessMsg(MulNX::Message& Msg)override;
             // 注册模块，需要传入模块指针和名称
             bool RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module);
@@ -40,7 +41,6 @@ namespace MulNX {
             // 初始化最后部分使用
             bool ModulesInit();
             void DeinitModules();
-            void Deinit()override;
         };
     }
 }

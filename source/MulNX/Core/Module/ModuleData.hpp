@@ -11,9 +11,9 @@ namespace MulNX {
     class ModuleData :public IModule {
     public:
         MulNX::Core::Core* Core = nullptr;
-        std::vector<std::function<bool()>>preInits{};
-        std::vector<std::function<bool()>>postInits{};
-        std::vector<std::function<bool()>>preDeinits{};
-        std::vector<std::function<bool()>>postDeinits{};
+        std::vector<std::move_only_function<bool()>> preInits{};
+        std::vector<std::move_only_function<bool()>> postInits{};
+        std::vector<std::move_only_function<bool()>> preDeinits{};
+        std::vector<std::move_only_function<bool()>> postDeinits{};
     };
 }

@@ -98,7 +98,7 @@ std::pair<std::optional<MulNX::KeyCheckPack>, bool> MulNX::KeyCheckPack::DebugWi
     auto w = MulNX::UI::RAIIWindow(windowName, openWindow);
     if (!w || !w.ShouldDraw())return { std::nullopt,false };
 
-    ImGui::Text(("当前绑键：" + GetMsg()).c_str());
+    ImGui::TextUnformatted(("当前绑键：" + GetMsg()).c_str());
     ImGui::Separator();
 
     auto temp = *this;

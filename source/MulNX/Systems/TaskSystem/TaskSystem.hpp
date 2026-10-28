@@ -15,9 +15,9 @@ namespace MulNX {
         MessageManager* pMessageManager = nullptr;
         std::unordered_map<std::string, std::unique_ptr<Worker>>workers{};
         bool Init()override;
+        bool Deinit()override;
         void ProcessMsg(MulNX::Message& msg)override;
     public:
-        void Deinit()override;
         void HandleAddTask(MulNX::Task&& msg);
     };
 }

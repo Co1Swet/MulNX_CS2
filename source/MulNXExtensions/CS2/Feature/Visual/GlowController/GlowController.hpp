@@ -9,7 +9,7 @@ class GlowController final :public CSModuleBase {
 
     static_assert(std::atomic<std::optional<uint32_t>>::is_always_lock_free, "This type is not always lock-free");
 
-    std::atomic<bool>disableGlow = true;
+    MulReflBool(disableGlow, true);
     
     bool Init()override;
     void ProcessMsg(MulNX::Message& Msg)override;

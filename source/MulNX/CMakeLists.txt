@@ -27,6 +27,7 @@ add_library(MulNX
     Systems/UISystem/UINode/UINode.cpp
     Systems/UISystem/UICoordinator/UICoordinator.cpp
     Systems/UISystem/UICoordinator/UIPack/UIPack.cpp
+    Systems/VarReflSystem/VarReflSystem.cpp
 )
 target_link_libraries(MulNX PUBLIC
     MulNXThirdParty

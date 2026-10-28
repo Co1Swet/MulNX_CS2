@@ -78,7 +78,7 @@ MulNX::Hook::Then HookWindow::HandleWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
         if (result == IDOK) {
             this->hkWndProc->Detach();
             this->LogWarning(I18n("sys.shutdown_warning"));
-            this->Core->Driver()->smutex.unlock();
+            this->PublishAsync("System/Stop"_hash);
         }
         return MulNX::Hook::Then::Return;
     }

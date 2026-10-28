@@ -26,8 +26,9 @@ void MulNXController::Window(MulNX::UICoordinator* uico) {
 
 bool MulNXController::Init() {
     (*this)
-        .SubscribeAsync("ModuleManager/ModuleInfo/Response");
-    
+        .SubscribeAsync("ModuleManager/ModuleInfo/Response")
+        ;
+
     this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});
 
     this->SendTask("Main", "MulNXMain", [this]()->bool {
@@ -46,6 +47,7 @@ void MulNXController::ProcessMsg(MulNX::Message& Msg) {
         for (auto& [name, handle] : pInfo->Info) {
             this->LogInfo(std::move(name));
         }
+        break;
     }
     }
 }

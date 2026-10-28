@@ -23,7 +23,7 @@ class AudioCapturer final :public MediaModuleBase {
     void OnFirstPresent();
 
     bool Init()override;
-    void Deinit()override;
+    bool Deinit()override;
 public:    
     int GetSampleRate() const { return wfx ? wfx->nSamplesPerSec : 0; }
 };

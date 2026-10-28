@@ -87,7 +87,7 @@ void MulNX::TaskSystem::HandleAddTask(MulNX::Task&& task) {
     this->workers[task.targetWorker]->queue.enqueue(std::move(task));
 }
 
-void MulNX::TaskSystem::Deinit() {
+bool MulNX::TaskSystem::Deinit() {
     for (auto& [name, worker] : this->workers) {
         if (name == "Messaging")continue;
         worker->t.request_stop();
@@ -101,4 +101,5 @@ void MulNX::TaskSystem::Deinit() {
     this->pMessageManager->dispatchEnable.store(false, std::memory_order_release);
     worker->t.request_stop();
     worker->t.join();
+    return true;
 }

@@ -11,9 +11,9 @@ namespace MulNX {
         mutable std::atomic<bool> showWindow = false;
         mutable std::shared_mutex smutex;
 
-        MulNXHandle HModule;        
-        MulNX::MessageChannel* MainMsgChannel;
-        std::string ModuleName{};
+        MulNXHandle hModule;        
+        MulNX::MessageChannel* msgChannel;
+        std::string moduleName{};
     };
     class ModuleBase :public ModuleCoroutine, public ModuleComponents {
         MulNX::IModule* FindModule(const std::string& name);
@@ -22,8 +22,8 @@ namespace MulNX {
         void Update();  
     public:
         // 设置模块名称
-        void SetName(std::string&& Name) { this->ModuleName = std::move(Name); }
-        std::string GetName()const { return this->ModuleName; };
+        void SetName(std::string&& name) { this->moduleName = std::move(name); }
+        std::string GetName()const { return this->moduleName; };
         // 初始化入口
         bool EntryInit(MulNX::Core::Core* core);
         bool EntryDeinit();

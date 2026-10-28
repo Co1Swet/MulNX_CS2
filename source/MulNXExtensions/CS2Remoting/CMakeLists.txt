@@ -6,4 +6,5 @@ add_library(CS2Remoting
 
 target_link_libraries(CS2Remoting PUBLIC
     MulNX
+    WebSocketManager
 )

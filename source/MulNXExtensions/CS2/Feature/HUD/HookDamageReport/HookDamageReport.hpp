@@ -48,7 +48,7 @@ class HookDamageReport final :public CSModuleBase {
     using DispatchClearAllPostRoundDamageReportPanels_t = void(*)(uint64_t);
     DispatchClearAllPostRoundDamageReportPanels_t pFunc_DispatchClearAllPostRoundDamageReportPanels = nullptr;
 
-    std::atomic<bool> enable = true;
+    MulReflBool(enable, true);
 
     void Menu();
     bool Init()override;

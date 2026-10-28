@@ -5,6 +5,8 @@
 #include <ranges>
 
 bool MulNX::Core::ModuleManager::Init() {
+    this->postDeinits.clear();
+
     (*this)
         .SubscribeAsync("ModuleManager/ModuleInfo/Request");
 
@@ -29,18 +31,19 @@ void MulNX::Core::ModuleManager::ProcessMsg(MulNX::Message& Msg) {
     }
 }
 
-bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& Module) {
+bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& pModule) {
     std::unique_lock lock(this->smutex);
     MulNXHandle hModule = MulNXHandle::CreateHandle();
-    Module->HModule = hModule;
-    this->NameToHandleMap[Module->GetName()] = hModule;
-    this->modules[hModule] = std::move(Module);
+    pModule->hModule = hModule;
+    this->NameToHandleMap[pModule->GetName()] = hModule;
+    this->modules[hModule] = std::move(pModule);
     return true;
 }
 MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
     (*this)
         .CreateModule<MulNX::PathManager>("PathManager")// 路径管理器模块
         .CreateModule<MulNX::I18nManager>("I18nManager")
+        .CreateModule<MulNX::VarReflSystem>("VarReflSystem")// 消息管理器模块
         .CreateModule<MulNX::MessageManager>("MessageManager")// 消息管理器模块
         .CreateModule<MulNX::UICoordinator>("UICoordinator")
         .CreateModule<MulNX::UISystem>("UISystem")// UI系统模块
@@ -88,16 +91,17 @@ void MulNX::Core::ModuleManager::DeinitModules() {
     for (auto& [hModule, pModule] : this->modules | std::views::reverse) {
         if (pModule->GetName() == "TaskSystem")continue;
         if (!pModule->EntryDeinit()) {
-            MulNX::ErrorTerminate("在模块关闭时出现错误，模块名：" + pModule->GetName());
+            MulNX::ErrorTerminate(std::format("在模块关闭时出现错误，模块名：{}", pModule->GetName()));
         }
     }
     this->LogSucc(I18n("sys.bye"));
 }
 
-void MulNX::Core::ModuleManager::Deinit() {
+bool MulNX::Core::ModuleManager::Deinit() {
     std::unique_lock lock(this->smutex);
     for (auto it = this->modules.rbegin();it != this->modules.rend();++it) {
         if (it->second->GetName() == "TaskSystem")continue;
         it->second = nullptr;
     }
+    return true;
 }

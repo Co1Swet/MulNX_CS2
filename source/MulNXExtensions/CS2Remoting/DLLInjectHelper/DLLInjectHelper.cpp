@@ -33,15 +33,15 @@ bool DLLInjectHelper::InjectDll(HANDLE hProcess, const std::wstring& dllPath) {
     }
 
     // 等待注入完成
-    WaitForSingleObject(hThread, INFINITE);
+    auto wait = WaitForSingleObject(hThread, INFINITE);
 
     DWORD exitCode = 0;
-    GetExitCodeThread(hThread, &exitCode);
+    bool completed = wait == WAIT_OBJECT_0 && GetExitCodeThread(hThread, &exitCode);
 
     CloseHandle(hThread);
     VirtualFreeEx(hProcess, pRemoteMem, 0, MEM_RELEASE);
 
-    return exitCode != 0;  // LoadLibrary 返回非零表示成功
+    return completed && exitCode != 0;  // LoadLibrary 返回非零表示成功
 }
 
 bool DLLInjectHelper::InitDLL(HANDLE hProcess, const std::wstring& dllName, const char* initFuncName) {
@@ -61,14 +61,14 @@ bool DLLInjectHelper::InitDLL(HANDLE hProcess, const std::wstring& dllName, cons
     }
 
     // 等待初始化完成
-    WaitForSingleObject(hThread, INFINITE);
+    auto wait = WaitForSingleObject(hThread, INFINITE);
 
     DWORD exitCode = 0;
-    GetExitCodeThread(hThread, &exitCode);
+    bool completed = wait == WAIT_OBJECT_0 && GetExitCodeThread(hThread, &exitCode);
     CloseHandle(hThread);
 
     // MulNX_CS2_Start 成功时返回 0
-    if (exitCode != 0) {
+    if (!completed || exitCode != 0) {
         this->LogError(std::format("Remote initialization failed with code: {}", exitCode));
         return false;
     }

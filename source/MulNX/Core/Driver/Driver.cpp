@@ -4,14 +4,20 @@
 #include <MulNX/Systems/Systems.hpp>
 
 MulNX::Core::Driver::Driver() {
-    this->postInits.clear();
     this->preInits.push_back([this]() {
         this->LogSucc("驱动就绪");
         return true;
         });
+    this->postInits.clear();
+    this->postDeinits.clear();
 }
 bool MulNX::Core::Driver::Init() {
-    this->smutex.lock();
+    std::unique_lock lock(this->endMtx);
+    this->SubscribeSync("Driver/End/Notify", [this](auto&&...) {
+        std::unique_lock lock(this->endMtx);
+        this->endFlag = true;
+        this->cv.notify_one();
+        });
     // 初始化模块管理器
     this->Core->ModuleManager()->EntryInit(this->Core);
     // 初始化注册模块
@@ -30,26 +36,20 @@ bool MulNX::Core::Driver::Init() {
     this->LogWarning(I18n("disclaimer"));
     return true;
 }
-void MulNX::Core::Driver::CreateMainDraw() {
-    // UI系统主界面初始化
-    auto [msg2, rp] = MulNX::Message::Create<std::string>("UISystem/Start"_hash, "MainDraw");
-    this->PublishAsync(std::move(msg2));
-    this->LogWarning("发送了UI启动指令！渲染即将开始！");
-}
 void MulNX::Core::Driver::WaitEnd() {
-    this->smutex.lock();
+    std::unique_lock lock(this->endMtx);
+    this->cv.wait(lock, [this] { return this->endFlag; });
     // 设置系统标志位
     this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>("GlobalVars")->SystemReady.store(false, std::memory_order_release);
     // 通知所有模块，以清理资源，包括线程停止
     this->Core->ModuleManager()->DeinitModules();
     // 任务系统汇合
-    this->Core->ModuleManager()->FindModule<MulNX::TaskSystem>("TaskSystem")->Deinit();
+    this->Core->ModuleManager()->FindModule<MulNX::TaskSystem>("TaskSystem")->EntryDeinit();
     // 让日志最后一次打印
     this->Core->ModuleManager()->FindModule<MulNX::MessageManager>("MessageManager")->HandleDispatch();
-    this->Core->ModuleManager()->FindModule<MulNX::Debugger>("Debugger")->Update();
     this->Core->ModuleManager()->FindModule<MulNX::Logger>("Logger")->Log();
     // 析构所有模块
-    this->Core->ModuleManager()->Deinit();
+    this->Core->ModuleManager()->EntryDeinit();
     // 清理自身资源
-    this->Deinit();
+    this->EntryDeinit();
 }

@@ -9,13 +9,13 @@ class WebSocketManager final :public MulNX::Module<WebSocketManager> {
     using ConnectionHandle = websocketpp::connection_hdl;
     Server server;
     uint16_t port = 55202;
+    bool loopbackOnly = false;
     std::set<ConnectionHandle, std::owner_less<ConnectionHandle>>connectionHandles;
     std::atomic<bool> serverRunning = false;
 
     std::unordered_map<MulNX::MsgType, std::function<void(MulNX::Message&, std::string_view)>>trans{};
     bool Init()override;
-    void Main();
-    void Deinit()override;
+    bool Deinit()override;
 
     void OnWebMsg(websocketpp::connection_hdl hdl, Server::message_ptr netMsg);
 public:

@@ -33,38 +33,42 @@ bool CS2HelperController::Init() {
     return true;
 }
 
-void CS2HelperController::DoInject(PROCESS_INFORMATION& pi,
-    const fs::path& dllPath) {
-    bool helperInjected = this->pInjectHelper->InjectDll(pi.hProcess, dllPath.wstring());
-    if (!helperInjected) {
-        TerminateProcess(pi.hProcess, 0);  // 注入失败则终止进程
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
-        MulNX::ErrorTerminate(std::format("Dll Load Failed : {}", dllPath.string()));
+bool CS2HelperController::DoInject(PROCESS_INFORMATION& pi,
+    const fs::path& dllPath, std::string& error) {
+    if (!this->pInjectHelper->InjectDll(pi.hProcess, dllPath.wstring())) {
+        error = std::format("Dll Load Failed : {}", dllPath.string());
+        return false;
     }
+    return true;
 }
 
-bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi) {
+bool CS2HelperController::Remoting(PROCESS_INFORMATION& pi, std::string& error) {
     // Reshade注入
     auto reshadedll = this->dirTools / "reshade" / "dxgi.dll";
     if (fs::exists(reshadedll) && this->injectReshade) {
-        this->DoInject(pi, reshadedll);
+        if (!this->DoInject(pi, reshadedll, error))return false;
     }
     // ffmpeg注入
     for (const auto& ffmpegDll : this->ffmpegsDll) {
         auto fullPath = this->dirFFmpeg / ffmpegDll;
         // 在自己进程加载Dll，这里千万不要删掉，不然算不出地址，没办法远程初始化了
-        LoadLibraryW(fullPath.wstring().c_str());
-        this->DoInject(pi, fullPath);
+        if (!LoadLibraryW(fullPath.wstring().c_str())) {
+            auto code = GetLastError();
+            error = std::format("本地加载DLL失败: {}, Error: {}", fullPath.string(), code);
+            return false;
+        }
+        if (!this->DoInject(pi, fullPath, error))return false;
     }
     // CS2OBTool注入，同样先在自己进程加载Dll
-    LoadLibraryW(this->CS2OBToolPath.wstring().c_str());
-    this->DoInject(pi, this->CS2OBToolPath);
+    if (!LoadLibraryW(this->CS2OBToolPath.wstring().c_str())) {
+        auto code = GetLastError();
+        error = std::format("本地加载DLL失败: {}, Error: {}", this->CS2OBToolPath.string(), code);
+        return false;
+    }
+    if (!this->DoInject(pi, this->CS2OBToolPath, error))return false;
     // 远程初始化CS2OBTool.dll
     if (!this->pInjectHelper->InitDLL(pi.hProcess, L"CS2OBTool.dll", "MulNX_CS2_Start")) {
-        TerminateProcess(pi.hProcess, 0);
-        CloseHandle(pi.hThread);
-        CloseHandle(pi.hProcess);
+        error = "CS2OBTool远程初始化调用失败，详细原因见日志";
         return false;
     }
     return true;

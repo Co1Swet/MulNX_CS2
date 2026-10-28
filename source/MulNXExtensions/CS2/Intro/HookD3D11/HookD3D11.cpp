@@ -97,7 +97,7 @@ MulNX::Hook::Then HookD3D11::D3D11Init(MulNX::Hook* hk, RegContext* ctx) {
     this->PublishSync("GraphicsSync/D3D11/Init/Pre"_hash);
     this->PublishSync("GraphicsSync/D3D11/Init/Post"_hash);
 
-    this->Core->Driver()->CreateMainDraw();
+    this->PublishAsync("UISystem/Start"_hash);
     this->pGlobalVars->SystemReady.store(true);
 
     this->hkResizeBuffers = MulNX::Hook::Create(
