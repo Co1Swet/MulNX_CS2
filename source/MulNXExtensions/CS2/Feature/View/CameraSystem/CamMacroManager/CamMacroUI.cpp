@@ -137,23 +137,24 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
     ImGui::SeparatorText("运镜轨道列表");
 
     std::string listBoxId = std::format("##campath_list_{}", pMacro->GetName());
-    ImGui::BeginListBox(listBoxId.c_str(), ImVec2(-FLT_MIN, 8 * ImGui::GetTextLineHeightWithSpacing()));
+    if (ImGui::BeginListBox(listBoxId.c_str(), ImVec2(-FLT_MIN, 8 * ImGui::GetTextLineHeightWithSpacing()))) {
 
-    for (int i = 0; i < static_cast<int>(vec.size()); ++i) {
-        const auto& item = vec[i];
-        const bool isSelected = (selectedIndex == i);
+        for (int i = 0; i < static_cast<int>(vec.size()); ++i) {
+            const auto& item = vec[i];
+            const bool isSelected = (selectedIndex == i);
 
-        std::string label = std::format(
-            "[{}] {}    偏移: {}",
-            i, item.campathName, item.offset
-        );
+            std::string label = std::format(
+                "[{}] {}    偏移: {}",
+                i, item.campathName, item.offset
+            );
 
-        if (ImGui::Selectable(label.c_str(), isSelected)) {
-            selectedIndex = i;
+            if (ImGui::Selectable(label.c_str(), isSelected)) {
+                selectedIndex = i;
+            }
         }
-    }
 
-    ImGui::EndListBox();
+        ImGui::EndListBox();
+    }
 
     if (selectedIndex >= 0 && selectedIndex < static_cast<int>(vec.size())) {
         const auto& item = vec[selectedIndex];

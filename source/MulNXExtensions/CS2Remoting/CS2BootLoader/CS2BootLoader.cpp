@@ -170,7 +170,7 @@ bool CS2BootLoader::LaunchAndInject() {
     // 构建命令行参数
     std::wstring cmdLine = L"\"" + gamePath.wstring() + L"\"";
     cmdLine += L" -insecure ";// 强制insecure
-    cmdLine += std::wstring(this->launchOptions.begin(), this->launchOptions.end());
+    cmdLine += MulNX::CharUtility::U8ToW(this->launchOptions);
 
     // 以 CREATE_SUSPENDED 方式创建游戏进程
     STARTUPINFOW si{ sizeof(si) };
