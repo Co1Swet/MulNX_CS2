@@ -1,9 +1,9 @@
 #include "VarReflSystem.hpp"
+#include <MulNX/Base/yaml.hpp>
 #include <Core/Core.hpp>
 #include <Systems/PathManager/PathManager.hpp>
 #include <Systems/MessageManager/MessageManager.hpp>
 #include <Systems/Logger/Logger.hpp>
-#include <MulNXThirdParty/yaml.hpp>
 
 using namespace MulNX;
 

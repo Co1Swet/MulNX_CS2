@@ -1,6 +1,6 @@
 #include "I18nManager.hpp"
 #include <MulNX/Systems/Systems.hpp>
-#include <MulNXThirdParty/yaml.hpp>
+#include <MulNX/Base/yaml.hpp>
 #include <stack>
 
 MulNX::I18nManager::I18nManager() {

@@ -1,9 +1,9 @@
 #include "CS2BootLoader.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
+#include <MulNX/Base/yaml.hpp>
 #include <MulNXExtensions/CS2Remoting/CS2HelperController/CS2HelperController.hpp>
 #include <commdlg.h>
-#include <MulNXThirdParty/yaml.hpp>
 #include <fstream>
 #include <TlHelp32.h>
 

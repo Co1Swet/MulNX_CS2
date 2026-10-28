@@ -1,5 +1,5 @@
 #pragma once
-#include <MulNXThirdParty/yaml.hpp>
+#include <yaml-cpp/yaml.h>
 #include <MulNXThirdParty/imgui_d11/imgui.h>
 #include <unordered_map>
 #include <string>

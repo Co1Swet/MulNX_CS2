@@ -1,5 +1,5 @@
 #include "CamMacro.hpp"
-#include <MulNXThirdParty/yaml.hpp>
+#include <MulNX/Base/yaml.hpp>
 #include <fstream>
 
 bool CamMacro::AddCampath(const std::string& name, const float offset) {
@@ -90,9 +90,7 @@ std::pair<bool, std::string> CamMacro::Save(const fs::path& folderPath)const {
             elementsNode.push_back(elemNode);
         }
 
-        std::ofstream fout(filePath.wstring());
-        fout << root;
-        fout.close();
+        YAML::SaveFilePath(filePath, root);
 
         this->dirty = false;
         return { true, std::format("保存成功：运镜宏名：{}  运镜数：{}",this->name ,this->wrapCampaths.size()) };

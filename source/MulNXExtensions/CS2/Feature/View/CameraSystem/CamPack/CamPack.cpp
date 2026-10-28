@@ -1,5 +1,5 @@
 #include "CamPack.hpp"
-#include <MulNXThirdParty/yaml.hpp>
+#include <MulNX/Base/yaml.hpp>
 #include <fstream>
 
 void CamPack::ResetName(const std::string& newName) {
@@ -22,9 +22,7 @@ std::pair<bool, std::string> CamPack::Save(const fs::path& dir) {
         root["OnRoundStart"] = this->OnRoundStart;
         root["OnRoundEnd"] = this->OnRoundEnd;
 
-        std::ofstream fout(pathSave.wstring());
-        fout << root;
-        fout.close();
+        YAML::SaveFilePath(pathSave, root);
 
         return { true, std::format("运镜包保存成功：{}", this->name) };
     }

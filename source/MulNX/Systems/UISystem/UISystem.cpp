@@ -2,8 +2,8 @@
 #include <Core/Core.hpp>
 #include <Core/Driver/Driver.hpp>
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNX/Base/yaml.hpp>
 #include <MulNX/Systems/Systems.hpp>
-#include <MulNXThirdParty/yaml.hpp>
 #include <MulNXThirdParty/ImGuiStyleSerializer.h>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
 #include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>

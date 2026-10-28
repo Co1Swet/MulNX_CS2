@@ -1,9 +1,9 @@
 #include "ShortcutManager.hpp"
+#include <MulNX/Base/yaml.hpp>
 #include <MulNX/Systems/InputSystem/InputSystem.hpp>
 #include <MulNX/Systems/PathManager/PathManager.hpp>
 #include <MulNX/Systems/Logger/Logger.hpp>
 #include <MulNX/Systems/MessageManager/MessageManager.hpp>
-#include <MulNXThirdParty/yaml.hpp>
 
 bool MulNX::ShortcutManager::Init() {
     auto path = this->PathGet("Config");

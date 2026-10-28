@@ -1,5 +1,5 @@
 #pragma once
-#include "ghc/filesystem.hpp"
+#include "fs.hpp"
 #include <yaml-cpp/yaml.h>
 
 namespace YAML {
@@ -9,5 +9,12 @@ namespace YAML {
             throw BadFile(path.string());   // UTF-8 模式下是 UTF-8 字符串
         }
         return Load(fin);
+    }
+
+    inline void SaveFilePath(const ghc::filesystem::path& path,const Node& node) {
+        std::ofstream fout(path.wstring());
+        fout.exceptions(std::ios::failbit | std::ios::badbit);
+        fout << node;
+        fout.close();
     }
 }
