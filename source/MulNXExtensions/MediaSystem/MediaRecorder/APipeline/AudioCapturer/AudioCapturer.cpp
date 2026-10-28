@@ -3,6 +3,7 @@
 #include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
 #include <mmdeviceapi.h>
 #include <wrl/client.h>
+#include <cstring>
 using Microsoft::WRL::ComPtr;
 
 bool AudioCapturer::Init() {
@@ -140,12 +141,16 @@ void AudioCapturer::Main() {
         });
     if (!this->needCaptuer)return;
     if (!this->pMediaState->MediaSystemGlobalWorkFlag)return;
-    if (!data)return;
+    const bool silent = (flags & AUDCLNT_BUFFERFLAGS_SILENT) != 0;
+    if (!silent && !data)return;
     if (framesAvailable <= 0)return;
 
     int samplesCount = static_cast<int>(framesAvailable);
     size_t totalBytes = static_cast<size_t>(framesAvailable) * channels * (this->wfx->wBitsPerSample / 8);
-    std::vector<uint8_t> copied(data, data + totalBytes);
+    std::vector<uint8_t> copied(totalBytes, this->wfx->wBitsPerSample == 8 ? 0x80 : 0);
+    if (!silent) {
+        std::memcpy(copied.data(), data, totalBytes);
+    }
     uint64_t chLayout = 0;
     switch (channels) {
     case 1: chLayout = AV_CH_LAYOUT_MONO; break;
