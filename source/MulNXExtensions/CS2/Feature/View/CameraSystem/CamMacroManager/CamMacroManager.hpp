@@ -28,6 +28,7 @@ class CamMacroManager final :public CamSysModule {
 
     void PlayCamMacro(const std::string& name);
 public:
+    bool GetMacroPaths(const std::string& name, std::vector<WrapCampath>& paths);
     bool Menu();
     void HandleUpdate();
 };

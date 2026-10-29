@@ -267,3 +267,11 @@ void CamMacroManager::PlayCamMacro(const std::string& name) {
     }
     this->LogInfo(std::format("播放运镜宏：{}", name));
 }
+
+bool CamMacroManager::GetMacroPaths(const std::string& name, std::vector<WrapCampath>& paths) {
+    std::shared_lock lock(this->smutex);
+    auto* macro = this->FindCamMacro(name);
+    if (!macro) return false;
+    paths = macro->GetVec();
+    return true;
+}
