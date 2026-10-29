@@ -1,6 +1,6 @@
 #pragma once
-#include <MulNXThirdParty/imgui_d11/imgui.h>
-#include <MulNXThirdParty/imgui_d11/imgui_stdlib.h>
+#include <MulNXThirdParty/imgui/imgui.h>
+#include <MulNXThirdParty/imgui/imgui_stdlib.h>
 #include <atomic>
 #include <vector>
 

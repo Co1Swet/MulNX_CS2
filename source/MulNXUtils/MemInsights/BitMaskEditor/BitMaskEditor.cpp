@@ -1,5 +1,5 @@
 #include "BitMaskEditor.hpp"
-#include <MulNXThirdParty/imgui_d11/imgui.h>
+#include <MulNXThirdParty/imgui/imgui.h>
 
 // 渲染 64 个复选框，按 8 位一组分行
 void BitMaskEditor::Render(const char* label) {
