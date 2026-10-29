@@ -20,5 +20,6 @@ add_library(CameraSystem
 
 target_link_libraries(CameraSystem PUBLIC
     CS2Support
+    WebSocketManager
 )
 target_include_directories(CameraSystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

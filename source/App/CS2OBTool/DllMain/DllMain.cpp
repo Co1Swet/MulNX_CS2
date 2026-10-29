@@ -10,6 +10,7 @@
 #include <MulNXExtensions/TimeLiner/FlowClock/FlowClock.hpp>
 
 static HANDLE hInitCompleteEvent = nullptr;
+static HANDLE hUnloadReadyEvent = nullptr;
 BOOL APIENTRY DllMain(HMODULE, DWORD, LPVOID) { return TRUE; }
 void StartImpl(HMODULE& hModule) {
     hModule = GetModuleHandleW(L"CS2OBTool.dll");
@@ -205,6 +206,10 @@ DWORD WINAPI StartWrapper(LPVOID lpParam) {
     HMODULE hModule;
     try {
         StartImpl(hModule);
+        if (hUnloadReadyEvent) {
+            SetEvent(hUnloadReadyEvent);
+            CloseHandle(hUnloadReadyEvent);
+        }
     }
     catch (std::exception& e) {
         SetEvent(hInitCompleteEvent);
@@ -217,6 +222,9 @@ DWORD WINAPI StartWrapper(LPVOID lpParam) {
     FreeLibraryAndExitThread(hModule, 0);
 }
 DWORD WINAPI MulNX_CS2_Start(void*) {
+    auto eventName = L"Local\\MulNX_CS2_UnloadReady_" + std::to_wstring(GetCurrentProcessId());
+    hUnloadReadyEvent = CreateEventW(NULL, TRUE, FALSE, eventName.c_str());
+    if (hUnloadReadyEvent) ResetEvent(hUnloadReadyEvent);
     hInitCompleteEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     HANDLE hInitThread = CreateThread(NULL, 0, StartWrapper, NULL, 0, NULL);
     WaitForSingleObject(hInitCompleteEvent, INFINITE);

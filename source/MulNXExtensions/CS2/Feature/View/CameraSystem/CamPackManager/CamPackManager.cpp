@@ -1,4 +1,5 @@
 #include "CamPackManager.hpp"
+#include <nlohmann/json.hpp>
 
 bool CamPackManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
@@ -27,6 +28,7 @@ bool CamPackManager::Init() {
     (*this)
         .SubscribeAsync("CamPack/Create")
         .SubscribeAsyncEx<void>("CamPack/Apply")
+        .SubscribeAsyncEx<void>("CamPack/Status")
         .SubscribeAsync("CamPack/Delete")
         .SubscribeAsync("CamPack/ClearAll")
         .SubscribeAsync("CamPack/Save")
@@ -121,6 +123,22 @@ void CamPackManager::ProcessMsg(MulNX::Message& msg) {
         auto pack = this->FindCamPack(ext->str1);
         if (!pack) break;
         this->CamPackApply(pack);
+        break;
+    }
+    case "CamPack/Status"_hash: {
+        std::shared_lock lock(this->smutex);
+        nlohmann::json status;
+        status["type"] = "CamPack/Status";
+        const auto* ext = msg.asp.get<MulNX::NetExt>();
+        status["requestId"] = ext ? ext->str1 : "";
+        status["active"] = nullptr;
+        if (this->pActiveCamPack) {
+            status["active"] = this->pActiveCamPack->GetName();
+            status["OnNewRoundEmpty"] = this->pActiveCamPack->OnNewRound.empty();
+            status["OnRoundStartEmpty"] = this->pActiveCamPack->OnRoundStart.empty();
+            status["OnRoundEndEmpty"] = this->pActiveCamPack->OnRoundEnd.empty();
+        }
+        this->WebPost(status.dump());
         break;
     }
     case "CamPack/Delete"_hash: {
@@ -232,7 +250,7 @@ bool CamPackManager::CamPackSave() {
 
 bool CamPackManager::CamPackApply(const std::shared_ptr<CamPack> pCamPack) {
     this->CamPackSave();
-    this->pActiveCamPack = pCamPack;
+    this->pActiveCamPack = nullptr;
     this->PublishSync("CamSync/Clear"_hash);
     if (!this->Path()->KeySetCurrent("kCurrentPack", pCamPack->GetName())) {
         this->LogError("尝试切换运镜包时出现问题，设置运镜包路径失败！");
@@ -264,6 +282,8 @@ bool CamPackManager::CamPackLoad(const fs::path& dir, const std::string& yamlNam
         auto loadCamPack = std::make_shared<CamPack>(loadName);
         loadCamPack->SetKeyCheckPack(root["KCP"].as<MulNX::KeyCheckPack>());
         loadCamPack->OnNewRound = root["OnNewRound"].as<std::vector<std::string>>();
+        if (root["OnRoundStart"]) loadCamPack->OnRoundStart = root["OnRoundStart"].as<std::vector<std::string>>();
+        if (root["OnRoundEnd"]) loadCamPack->OnRoundEnd = root["OnRoundEnd"].as<std::vector<std::string>>();
 
         loadCamPack->Refresh();
         this->LogSucc(std::format("成功从文件加载运镜包：{}", loadName));
