@@ -11,3 +11,4 @@
 #include "DemRecordPassManager/DemRecordPassManager.hpp"
 #include "RecordMaking/RoundRecordMaker/RoundRecordMaker.hpp"
 #include "RecordMaking/DemoRecordMaker/DemoRecordMaker.hpp"
+#include "RecordMaking/PassRecordMaker/PassRecordMaker.hpp"

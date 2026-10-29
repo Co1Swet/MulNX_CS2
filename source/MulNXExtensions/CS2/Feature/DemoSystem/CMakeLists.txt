@@ -19,9 +19,10 @@ add_library(DemoSystem STATIC
 
     RecordMakeUI/DemEasyView/DemEasyView.cpp
     RecordMakeUI/RecordTaskMaker/RecordTaskMaker.cpp
-    
+
     RecordMaking/RoundRecordMaker/RoundRecordMaker.cpp
     RecordMaking/DemoRecordMaker/DemoRecordMaker.cpp
+    RecordMaking/PassRecordMaker/PassRecordMaker.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC
