@@ -20,7 +20,6 @@ class CamPlayScheduler final :public CamSysModule {
     bool tracked = false;
     bool started = false;
     uint64_t requestId = 0;
-    uint64_t generation = 0;
 
     void TrackedState(const char* state, const std::string& reason = {});
     void ClearTracked(const char* state, const std::string& reason);

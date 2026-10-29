@@ -66,38 +66,26 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
             break;
         }
         this->requestId = batch->requestId;
-        this->generation = batch->generation;
         this->started = false;
         this->tracked = true;
         this->playslots.insert(this->playslots.end(), slots.begin(), slots.end());
         break;
     }
-    case "CamPlay/CancelTracked"_hash: {
-        auto&& [id, gen] = msg.Access<uint64_t, uint64_t>();
-        const bool matched = gen == this->currentGeneration;
-        if (matched) {
+    case "CamPlay/CancelTracked"_hash:
+    case "CamPlay/StatusTracked"_hash: {
+        const auto id = std::get<0>(msg.Access<uint64_t>());
+        const bool cancel = msg.type == "CamPlay/CancelTracked"_hash;
+        if (cancel && std::get<1>(msg.Access<uint64_t, uint64_t>()) == this->currentGeneration) {
             if (this->tracked) this->ClearTracked("cancelled", "cancelled");
             ++this->currentGeneration;
         }
         CamPlayEvent event{};
-        event.type = "CamPlay/CancelTracked";
+        event.type = cancel ? "CamPlay/CancelTracked" : "CamPlay/StatusTracked";
         event.requestId = id;
         event.generation = this->currentGeneration;
-        event.matched = matched;
-        this->PostEvent(std::move(event));
-        break;
-    }
-    case "CamPlay/StatusTracked"_hash: {
-        auto&& [id] = msg.Access<uint64_t>();
-        CamPlayEvent event{};
-        event.type = "CamPlay/StatusTracked";
-        event.requestId = id;
-        event.generation = this->currentGeneration;
-        event.hasCurrent = this->tracked;
         if (this->tracked) {
             event.currentRequestId = this->requestId;
-            event.currentGeneration = this->generation;
-            event.currentState = this->started ? "started" : "pending";
+            event.state = this->started ? "started" : "pending";
         }
         this->PostEvent(std::move(event));
         break;
@@ -120,8 +108,8 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "CamPlay/Clear"_hash: {
-        ++this->currentGeneration;
         if (this->tracked) this->ClearTracked("cancelled", "clear");
+        ++this->currentGeneration;
         for (auto it = this->playslots.begin();it != this->playslots.end();) {
             if (it->isActiveMode) {
                 ++it;
@@ -133,8 +121,8 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "CamPlay/ClearForce"_hash: {
-        ++this->currentGeneration;
         if (this->tracked) this->ClearTracked("cancelled", "clear_force");
+        ++this->currentGeneration;
         for (auto& slot : this->playslots) {
             this->LogInfo(std::format("因强制清理请求移除运镜：{}", slot.pCampath->GetName()));
         }
@@ -155,8 +143,8 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     }
     case "CamPlay/Override/Disable"_hash: {
         this->camOverride.store(false, std::memory_order_release);
-        ++this->currentGeneration;
         if (this->tracked) this->ClearTracked("cancelled", "override_disabled");
+        ++this->currentGeneration;
         break;
     }
     }
@@ -235,15 +223,15 @@ void CamPlayScheduler::TrackedState(const char* state, const std::string& reason
     CamPlayEvent event{};
     event.type = "CamPlay/State";
     event.requestId = this->requestId;
-    event.generation = this->generation;
+    event.generation = this->currentGeneration;
     event.state = state;
     event.reason = reason;
     this->PostEvent(std::move(event));
 }
 
 void CamPlayScheduler::Invalidate() {
-    ++this->currentGeneration;
     if (this->tracked) this->ClearTracked("failed", "pack_changed");
+    ++this->currentGeneration;
 }
 
 void CamPlayScheduler::ClearTracked(const char* state, const std::string& reason) {

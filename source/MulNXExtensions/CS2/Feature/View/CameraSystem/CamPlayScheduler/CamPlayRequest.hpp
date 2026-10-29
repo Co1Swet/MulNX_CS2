@@ -25,9 +25,5 @@ public:
     uint64_t generation = 0;
     std::string state;
     std::string reason;
-    bool matched = false;
-    bool hasCurrent = false;
     uint64_t currentRequestId = 0;
-    uint64_t currentGeneration = 0;
-    std::string currentState;
 };

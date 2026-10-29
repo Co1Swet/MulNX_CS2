@@ -104,13 +104,10 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
             out["state"] = event->state;
             out["reason"] = event->reason;
         }
-        else if (event->type == "CamPlay/CancelTracked") {
-            out["matched"] = event->matched;
-        }
-        else if (event->type == "CamPlay/StatusTracked") {
+        else {
             out["current"] = nullptr;
-            if (event->hasCurrent) out["current"] = {{"requestId", event->currentRequestId},
-                {"generation", event->currentGeneration}, {"state", event->currentState}};
+            if (!event->state.empty()) out["current"] = {{"requestId", event->currentRequestId},
+                {"generation", event->generation}, {"state", event->state}};
         }
         this->WebPost(out.dump());
         break;
