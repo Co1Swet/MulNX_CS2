@@ -7,6 +7,10 @@ namespace CS2 {
 }
 class HSI final :public CSModuleBase, public WebSocketMixin<HSI> {
     struct KillEvent {
+        bool hurt{};
+        int damage{};
+        int health{};
+        int hitgroup{};
         Steam64UID attacker{};
         Steam64UID victim{};
         Steam64UID assister{};
@@ -23,5 +27,6 @@ class HSI final :public CSModuleBase, public WebSocketMixin<HSI> {
     moodycamel::ConcurrentQueue<KillEvent>buffer{};
     bool Init()override;
     void OnDeathEvent(CS2::CGameEvent*);
+    void OnHurtEvent(CS2::CGameEvent*);
     void Main();
 };
