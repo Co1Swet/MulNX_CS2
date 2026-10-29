@@ -47,7 +47,7 @@ bool HookWindow::CheckIme(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return false;
 }
 MulNX::Hook::Then HookWindow::HandleWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (uMsg == WM_ACTIVATEAPP && !wParam) {
+    if (uMsg == WM_ACTIVATEAPP) {
         this->pInputSystem->ResetInput();
     }
     if (uMsg == WM_IME_CHAR) {
