@@ -9,17 +9,17 @@ add_library(DemoSystem STATIC
     DemoRecorder/DemoRecorder.cpp
     DemoRecorder/RecordCoTaskImpl.cpp
 
-    DemRPassManager/DemRPassManager.cpp
-    DemRPassManager/DemMergePass/DemMergePass.cpp
-    DemRPassManager/DemClassifyPass/DemClassifyPass.cpp
-    DemRPassManager/DemSortPass/DemSortPass.cpp
+    DemRecordPassManager/DemRecordPassManager.cpp
+    DemRecordPassManager/DemMergePass/DemMergePass.cpp
+    DemRecordPassManager/DemClassifyPass/DemClassifyPass.cpp
+    DemRecordPassManager/DemSortPass/DemSortPass.cpp
     
     DemUI/DemoEventsRender/DemoEventsRender.cpp
     DemUI/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
 
     RecordMakeUI/DemEasyView/DemEasyView.cpp
     RecordMakeUI/RecordTaskMaker/RecordTaskMaker.cpp
-
+    
     RecordMaking/RoundRecordMaker/RoundRecordMaker.cpp
     RecordMaking/DemoRecordMaker/DemoRecordMaker.cpp
 )

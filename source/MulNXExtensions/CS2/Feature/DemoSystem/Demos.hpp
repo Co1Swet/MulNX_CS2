@@ -8,6 +8,6 @@
 #include "RecordMakeUI/DemEasyView/DemEasyView.hpp"
 #include "DemUI/DemoEventsRender/DemoEventsRender.hpp"
 #include "DemUI/DemoPlayerInfoRender/DemoPlayerInfoRender.hpp"
-#include "DemRPassManager/DemRPassManager.hpp"
+#include "DemRecordPassManager/DemRecordPassManager.hpp"
 #include "RecordMaking/RoundRecordMaker/RoundRecordMaker.hpp"
 #include "RecordMaking/DemoRecordMaker/DemoRecordMaker.hpp"

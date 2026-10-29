@@ -139,7 +139,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<DemoRecordMaker>("DemoRecordMaker")
         .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
         .CreateModule<RecordTaskMaker>("RecordTaskMaker")
-        .CreateModule<DemRPassManager>("DemRPassManager")
+        .CreateModule<DemRecordPassManager>("DemRecordPassManager")
         .CreateModule<DemClassifyPass>("DemClassifyPass")
         .CreateModule<DemSortPass>("DemSortPass")
         .CreateModule<DemMergePass>("DemMergePass")

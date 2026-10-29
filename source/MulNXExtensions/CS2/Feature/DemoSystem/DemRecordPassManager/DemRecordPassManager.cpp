@@ -1,6 +1,6 @@
-#include "DemRPassManager.hpp"
+#include "DemRecordPassManager.hpp"
 
-void DemRPassManager::Window() {
+void DemRecordPassManager::Window() {
     auto w = MulNX::UI::RAIIWindow("预备录制队列");
     if (this->setFocus.load(std::memory_order_acquire)) {
         ImGui::SetWindowFocus("预备录制队列");
@@ -44,7 +44,7 @@ void DemRPassManager::Window() {
     }
 }
 
-bool DemRPassManager::Init() {
+bool DemRecordPassManager::Init() {
     this->pDemClassifyPass = this->FindModule<DemClassifyPass>("DemClassifyPass");
     this->pDemSortPass = this->FindModule<DemSortPass>("DemSortPass");
     this->pDemMergePass = this->FindModule<DemMergePass>("DemMergePass");
@@ -68,7 +68,7 @@ bool DemRPassManager::Init() {
     return true;
 }
 
-void DemRPassManager::ProcessMsg(MulNX::Message& msg) {
+void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Record/Enqueue"_hash: {
         std::unique_lock lock(this->smutex);
@@ -109,7 +109,7 @@ void DemRPassManager::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-void DemRPassManager::Commit(const int autoRecord) {
+void DemRecordPassManager::Commit(const int autoRecord) {
     auto rTasks = std::move(this->bufferTasks);
     if (rTasks.empty()) return;
 

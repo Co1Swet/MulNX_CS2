@@ -4,7 +4,7 @@
 #include "DemMergePass/DemMergePass.hpp"
 #include "DemSortPass/DemSortPass.hpp"
 
-class DemRPassManager final :public DemModuleBase {
+class DemRecordPassManager final :public DemModuleBase {
     DemClassifyPass* pDemClassifyPass = nullptr;
     DemSortPass* pDemSortPass = nullptr;
     DemMergePass* pDemMergePass = nullptr;
