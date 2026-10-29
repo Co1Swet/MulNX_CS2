@@ -20,7 +20,7 @@ bool CamPlayScheduler::Init() {
         ;
 
     this->SubscribeSync("CamSync/Clear", [this](auto&&...) { this->Invalidate(); });
-    this->SubscribeSync("CamPlay/Invalidate", [this](auto&&...) { this->Invalidate(); });
+    this->SubscribeSync("CamSync/Invalidate", [this](auto&&...) { this->Invalidate(); });
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->UIRegisterBackground("DrawPlayCamera", [this](auto&&...) {

@@ -15,7 +15,7 @@ bool CamMacroManager::Init() {
         .SubscribeAsync("CamMacro/Create")
         .SubscribeAsync("CamMacro/Delete")
         .SubscribeAsyncEx<void>("CamMacro/Play")
-        .SubscribeAsyncEx<uint64_t, uint64_t>("CamMacro/PlayTracked")
+        .SubscribeAsyncEx<uint64_t, uint64_t>("CamPlay/Tracked")
         .SubscribeAsync("CamMacro/OpenDebug")
         .SubscribeAsync("CamMacro/DebugKCP")
         .SubscribeAsync("CamMacro/ClearOne")
@@ -77,7 +77,7 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         this->PlayCamMacro(name);
         break;
     }
-    case "CamMacro/PlayTracked"_hash: {
+    case "CamPlay/Tracked"_hash: {
         const auto* ext = msg.asp.get<MulNX::NetExt>();
         auto&& [id, gen] = msg.Access<uint64_t, uint64_t>();
         auto [out, batch] = MulNX::Message::Create<CamPlayBatch>("CamPlay/Batch"_hash);
