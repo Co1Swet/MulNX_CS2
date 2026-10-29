@@ -173,7 +173,10 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
                 break;
             }
         }
-        if (invalidFrame) this->ClearTracked("failed", "no_frame");
+        if (invalidFrame) {
+            this->ClearTracked("failed", "no_frame");
+            ++this->currentGeneration;
+        }
     }
     for (auto slot = this->playslots.begin();slot != this->playslots.end();) {
         IO->ElementTime = time + slot->offsetTime;
@@ -199,6 +202,7 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
         [](const auto& slot) { return slot.tracked; })) {
         this->TrackedState(this->started ? "completed" : "failed", this->started ? "" : "no_frame");
         this->tracked = false;
+        ++this->currentGeneration;
     }
 
     if (ret) {
