@@ -15,7 +15,6 @@ bool CamPlayScheduler::Init() {
         .SubscribeAsyncEx<uint64_t, uint64_t>("CamPlay/Tracked")
         .SubscribeAsync<uint64_t, uint64_t>("CamPlay/CancelTracked")
         .SubscribeAsync<uint64_t>("CamPlay/StatusTracked")
-        .SubscribeAsyncEx<uint64_t>("CamPack/CheckMacro")
         .SubscribeAsync<void>("CamPlay/Clear")
         .SubscribeAsync<void>("CamPlay/ClearForce")
 
@@ -36,30 +35,14 @@ bool CamPlayScheduler::Init() {
 
 void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "CamPack/CheckMacro"_hash: {
-        const auto* ext = msg.asp.get<MulNX::NetExt>();
-        auto&& [id] = msg.Access<uint64_t>();
-        nlohmann::json out{{"type", "CamPack/CheckMacro"}, {"requestId", id},
-            {"macro", ext ? ext->str1 : ""}, {"expectedPack", ext ? ext->str2 : ""}};
-        std::string reason;
-        std::vector<PlaySlot> slots;
-        {
-            std::shared_lock lock(this->pCamPackManager->smutex);
-            auto pack = this->pCamPackManager->pActiveCamPack;
-            if (!ext || !pack || pack->GetName() != ext->str2) reason = "pack_mismatch";
-            else this->ResolveMacro(ext->str1, slots, reason);
-        }
-        out["available"] = reason.empty();
-        out["reason"] = reason;
-        this->WebPost(out.dump());
-        break;
-    }
     case "CamPlay/Tracked"_hash: {
         const auto* ext = msg.asp.get<MulNX::NetExt>();
         auto&& [id, gen] = msg.Access<uint64_t, uint64_t>();
-        if (this->tracked) {
+        if (this->tracked || gen != this->currentGeneration || !this->camOverride.load(std::memory_order_acquire)) {
+            const char* reason = gen != this->currentGeneration ? "stale_generation" :
+                (this->tracked ? "busy" : "override_disabled");
             nlohmann::json out{{"type", "CamPlay/State"}, {"requestId", id},
-                {"generation", gen}, {"state", "failed"}, {"reason", "busy"}};
+                {"generation", gen}, {"state", "failed"}, {"reason", reason}};
             this->WebPost(out.dump());
             break;
         }
@@ -71,12 +54,10 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         {
             std::shared_lock lock(this->pCamPackManager->smutex);
             auto pack = this->pCamPackManager->pActiveCamPack;
-            if (this->hasCancellation && gen <= this->cancelledGeneration) reason = "cancelled_generation";
-            else if (!ext || !pack || pack->GetName() != ext->str2) reason = "pack_mismatch";
+            if (!ext || !pack || pack->GetName() != ext->str2) reason = "pack_mismatch";
             else {
                 this->expectedPack = ext->str2;
                 this->macroName = ext->str1;
-                this->packRevision = this->pCamPackManager->revision;
                 this->ResolveMacro(ext->str1, slots, reason);
             }
         }
@@ -90,17 +71,20 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     }
     case "CamPlay/CancelTracked"_hash: {
         auto&& [id, gen] = msg.Access<uint64_t, uint64_t>();
-        if (!this->hasCancellation || gen > this->cancelledGeneration) this->cancelledGeneration = gen;
-        this->hasCancellation = true;
-        if (this->tracked && this->generation <= gen) this->ClearTracked("cancelled", "cancelled");
+        const bool matched = gen == this->currentGeneration;
+        if (matched) {
+            if (this->tracked) this->ClearTracked("cancelled", "cancelled");
+            ++this->currentGeneration;
+        }
         nlohmann::json out{{"type", "CamPlay/CancelTracked"}, {"requestId", id},
-            {"generation", gen}, {"state", "cancelled"}};
+            {"generation", this->currentGeneration}, {"matched", matched}};
         this->WebPost(out.dump());
         break;
     }
     case "CamPlay/StatusTracked"_hash: {
         auto&& [id] = msg.Access<uint64_t>();
-        nlohmann::json out{{"type", "CamPlay/StatusTracked"}, {"requestId", id}, {"current", nullptr}};
+        nlohmann::json out{{"type", "CamPlay/StatusTracked"}, {"requestId", id},
+            {"generation", this->currentGeneration}, {"current", nullptr}};
         if (this->tracked) out["current"] = {{"requestId", this->requestId},
             {"generation", this->generation}, {"state", this->started ? "started" : "pending"},
             {"expectedPack", this->expectedPack}, {"macro", this->macroName}};
@@ -125,6 +109,7 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "CamPlay/Clear"_hash: {
+        ++this->currentGeneration;
         if (this->tracked) this->ClearTracked("cancelled", "clear");
         for (auto it = this->playslots.begin();it != this->playslots.end();) {
             if (it->isActiveMode) {
@@ -137,12 +122,8 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "CamPlay/ClearForce"_hash: {
-        if (this->tracked) {
-            if (!this->hasCancellation || this->generation > this->cancelledGeneration)
-                this->cancelledGeneration = this->generation;
-            this->hasCancellation = true;
-            this->ClearTracked("cancelled", "clear_force");
-        }
+        ++this->currentGeneration;
+        if (this->tracked) this->ClearTracked("cancelled", "clear_force");
         for (auto& slot : this->playslots) {
             this->LogInfo(std::format("因强制清理请求移除运镜：{}", slot.pCampath->GetName()));
         }
@@ -163,54 +144,64 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     }
     case "CamPlay/Override/Disable"_hash: {
         this->camOverride.store(false, std::memory_order_release);
+        ++this->currentGeneration;
+        if (this->tracked) this->ClearTracked("cancelled", "override_disabled");
         break;
     }
     }
 }
 
 bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
+    {
+        std::shared_lock lock(this->pCamPackManager->smutex);
+        if (this->pCamPackManager->revision != this->observedPackRevision) {
+            this->observedPackRevision = this->pCamPackManager->revision;
+            ++this->currentGeneration;
+            if (this->tracked) this->ClearTracked("failed", "pack_changed");
+        }
+    }
     this->Update();
 
-    if (this->tracked) {
-        std::shared_lock lock(this->pCamPackManager->smutex);
-        if (this->pCamPackManager->revision != this->packRevision)
-            this->ClearTracked("failed", "pack_changed");
-    }
     if (this->playslots.empty()) {
         this->needDrawCamera = false;
         return false;
     }
 
     bool ret = false;
-    bool invalidFrame = false;
+    bool trackedIn = false;
+    const float time = this->pTimeline->GetTime();
+    if (this->tracked) {
+        CameraSystemIO check{};
+        bool invalidFrame = false;
+        for (const auto& slot : this->playslots) {
+            if (!slot.tracked) continue;
+            check.FrameGameTime = time;
+            check.ElementTime = time + slot.offsetTime;
+            if (slot.pCampath->CalculateFrame(&check) == FreeCameraPath::CalResult::NoFrame) {
+                invalidFrame = true;
+                break;
+            }
+        }
+        if (invalidFrame) this->ClearTracked("failed", "no_frame");
+    }
     for (auto slot = this->playslots.begin();slot != this->playslots.end();) {
-        IO->ElementTime = this->pTimeline->GetTime();
-        IO->FrameGameTime = this->pTimeline->GetTime();
-
-        IO->ElementTime += slot->offsetTime;
+        IO->ElementTime = time + slot->offsetTime;
+        IO->FrameGameTime = time;
         auto calResult = slot->pCampath->CalculateFrame(IO);
         if (calResult == FreeCameraPath::CalResult::Back && slot->isActiveMode == false) {
             this->LogInfo(std::format("移除播放结束的运镜：{}", slot->pCampath->GetName()));
             slot = this->playslots.erase(slot);
             continue;
         }
-        if (slot->tracked && calResult == FreeCameraPath::CalResult::NoFrame) {
-            invalidFrame = true;
-            break;
-        }
         if (calResult == FreeCameraPath::CalResult::In) {
-            if (slot->tracked && !this->started) {
-                this->started = true;
-                this->TrackedState("started");
-            }
+            trackedIn = slot->tracked;
             ret = true;
         }
         ++slot;
     }
-
-    if (invalidFrame) {
-        this->ClearTracked("failed", "no_frame");
-        ret = false;
+    if (trackedIn && !this->started && this->camOverride.load(std::memory_order_acquire)) {
+        this->started = true;
+        this->TrackedState("started");
     }
 
     if (this->tracked && std::none_of(this->playslots.begin(), this->playslots.end(),

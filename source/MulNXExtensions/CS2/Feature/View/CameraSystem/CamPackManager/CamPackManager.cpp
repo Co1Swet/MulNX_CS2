@@ -144,7 +144,6 @@ void CamPackManager::ProcessMsg(MulNX::Message& msg) {
     case "CamPack/Delete"_hash: {
         std::unique_lock lock(this->smutex);
         const auto* ext = msg.asp.get<MulNX::NetExt>();
-        ++this->revision;
         this->CamPackDelete(ext->str1);
 
         if (this->pOperatingCamPack && this->pOperatingCamPack->GetName() == ext->str1) {
@@ -152,6 +151,7 @@ void CamPackManager::ProcessMsg(MulNX::Message& msg) {
             this->showWindow.store(false, std::memory_order_release);
         }
         if (this->pActiveCamPack && this->pActiveCamPack->GetName() == ext->str1) {
+            ++this->revision;
             this->pActiveCamPack = nullptr;
         }
         break;

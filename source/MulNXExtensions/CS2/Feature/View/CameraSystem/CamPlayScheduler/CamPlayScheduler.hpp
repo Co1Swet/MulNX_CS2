@@ -19,13 +19,12 @@ class CamPlayScheduler final :public CamSysModule, public WebSocketMixin<CamPlay
     CameraDrawer* pCamDrawer = nullptr;
     class CamMacroManager* pCamMacroManager = nullptr;
     class CamPackManager* pCamPackManager = nullptr;
-    uint64_t cancelledGeneration = 0;
-    bool hasCancellation = false;
+    uint64_t currentGeneration = 0;
+    uint64_t observedPackRevision = 0;
     bool tracked = false;
     bool started = false;
     uint64_t requestId = 0;
     uint64_t generation = 0;
-    uint64_t packRevision = 0;
     std::string expectedPack;
     std::string macroName;
 
