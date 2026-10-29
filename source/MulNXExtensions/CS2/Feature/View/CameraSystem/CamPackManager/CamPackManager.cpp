@@ -129,6 +129,8 @@ void CamPackManager::ProcessMsg(MulNX::Message& msg) {
         std::shared_lock lock(this->smutex);
         nlohmann::json status;
         status["type"] = "CamPack/Status";
+        const auto* ext = msg.asp.get<MulNX::NetExt>();
+        status["requestId"] = ext ? ext->str1 : "";
         status["active"] = nullptr;
         if (this->pActiveCamPack) {
             status["active"] = this->pActiveCamPack->GetName();
