@@ -37,7 +37,6 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "UISystem/Start"_hash: {
         this->rendEnable.store(true);
-        this->ifDrawMid.store(true);
         this->LogInfo("已处理启动请求");
         break;
     }
