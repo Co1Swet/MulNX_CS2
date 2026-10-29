@@ -2,6 +2,22 @@
 #include <MulNX/Common/Misc.hpp>
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 
+namespace csda {
+    inline constexpr std::array<std::string_view, 11> kDemoSources = {
+        "challengermode",
+        "ebot",
+        "esea",
+        "esl",
+        "esportal",
+        "faceit",
+        "fastcup",
+        "5eplay",
+        "perfectworld",
+        "popflash",
+        "valve",
+    };
+}
+
 bool DemoAnalyzer::Init() {
     auto toolsPath = this->Path()->PathGetForShared("Tools");
     this->csdaPath = toolsPath / "csda.exe";
@@ -53,7 +69,7 @@ void DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
     {
         std::unique_lock lock(this->smutex);
         if (this->analyzingSet.find(demoPath) != this->analyzingSet.end()) {
-            this->LogWarning("该 Demo 正在分析中: " + demoPath.string());
+            this->LogWarning(std::format("该 Demo 正在分析中: {}", demoPath.string()));
             return;
         }
         else {
@@ -69,47 +85,54 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
     std::string stem = demoPath.stem().string();
 
     // RAII：分析结束时从队列移除
-    auto cleanup = scope_exit([this, demoPath] {
+    auto cleanup = scope_exit([&] {
         std::unique_lock lock(this->smutex);
-        analyzingSet.erase(demoPath);
+        this->analyzingSet.erase(demoPath);
         });
 
-    // 构造 csda 命令行，确保路径包含引号以处理空格
-    std::string cmdStr = "\"" + this->csdaPath.string() + "\" "
-        + "-demo-path=\"" + demoPath.string() + "\" "
-        + "-output=\"" + this->dirData.string() + "\" "
-        + "-format=json";
+    for (int i = -1;i < std::ssize(csda::kDemoSources);++i) {
+        std::string cmdStr = std::format(
+            "\"{}\" -demo-path=\"{}\" -output=\"{}\" -format=json",
+            this->csdaPath.string(), demoPath.string(), this->dirData.string());
 
-    this->LogInfo("执行: " + cmdStr);
+        if (i >= 0) {
+            cmdStr += std::format(" -source={}",
+                csda::kDemoSources[static_cast<std::size_t>(i)]);
+        }
 
-    STARTUPINFOW si{ sizeof(si) };
-    PROCESS_INFORMATION pi{};
-    auto cmdBuffer = MulNX::CharUtility::U8ToW(cmdStr);
+        this->LogInfo(std::format("尝试执行: {}", cmdStr));
 
-    if (!CreateProcessW(nullptr, cmdBuffer.data(), nullptr, nullptr,
-        FALSE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) {
-        this->LogError("创建进程失败，错误码: " + std::to_string(GetLastError()));
-        co_return;   // cleanup 自动执行，不发送消息
+        STARTUPINFOW si{ sizeof(si) };
+        PROCESS_INFORMATION pi{};
+        auto cmdBuffer = MulNX::CharUtility::U8ToW(cmdStr);
+
+        if (!CreateProcessW(nullptr, cmdBuffer.data(), nullptr, nullptr,
+            FALSE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) {
+            this->LogError("创建进程失败，错误码: " + std::to_string(GetLastError()));
+            co_return;   // cleanup 自动执行，不发送消息
+        }
+        auto onExit = scope_exit([&] {
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+            });
+
+        co_await this->WaitUntil([&] {
+            return WaitForSingleObject(pi.hProcess, 0) == WAIT_OBJECT_0;
+            });
+
+        DWORD exitCode = 0;
+        GetExitCodeProcess(pi.hProcess, &exitCode);
+
+        if (exitCode == 0) {
+            this->LogInfo("Demo 分析成功完成");
+            // 仅成功时发送加载消息
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
+            rp->str1 = stem;
+            this->PublishAsync(std::move(msg));
+            co_return;
+        }
+        this->LogWarning(std::format("csda.exe 退出码: {}，正在加路径反复尝试", exitCode));
     }
-
-    co_await this->WaitUntil([h = pi.hProcess] {
-        return WaitForSingleObject(h, 0) == WAIT_OBJECT_0;
-        });
-
-    DWORD exitCode = 0;
-    GetExitCodeProcess(pi.hProcess, &exitCode);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-
-    if (exitCode != 0) {
-        this->LogError("csda.exe 退出码: " + std::to_string(exitCode));
-    }
-    else {
-        this->LogInfo("Demo 分析成功完成。");
-        // 仅成功时发送加载消息
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
-        rp->str1 = stem;
-        this->PublishAsync(std::move(msg));
-    }
+    this->LogError("所有尝试均失败，无法分析");
     // cleanup 析构，移除队列
 }
