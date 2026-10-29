@@ -15,6 +15,7 @@ bool CamMacroManager::Init() {
         .SubscribeAsync("CamMacro/Create")
         .SubscribeAsync("CamMacro/Delete")
         .SubscribeAsyncEx<void>("CamMacro/Play")
+        .SubscribeAsyncEx<uint64_t, uint64_t>("CamMacro/PlayTracked")
         .SubscribeAsync("CamMacro/OpenDebug")
         .SubscribeAsync("CamMacro/DebugKCP")
         .SubscribeAsync("CamMacro/ClearOne")
@@ -74,6 +75,19 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         auto name = msg.asp.get<MulNX::NetExt>()->str1;
         std::unique_lock lock(this->smutex);
         this->PlayCamMacro(name);
+        break;
+    }
+    case "CamMacro/PlayTracked"_hash: {
+        const auto* ext = msg.asp.get<MulNX::NetExt>();
+        auto&& [id, gen] = msg.Access<uint64_t, uint64_t>();
+        auto [out, batch] = MulNX::Message::Create<CamPlayBatch>("CamPlay/Batch"_hash);
+        batch->requestId = id;
+        batch->generation = gen;
+        {
+            std::shared_lock lock(this->smutex);
+            this->PlayCamMacro(ext ? ext->str1 : "", batch);
+        }
+        this->PublishAsync(std::move(out));
         break;
     }
     case "CamMacro/OpenDebug"_hash: {
@@ -252,13 +266,23 @@ bool CamMacroManager::CamMacroClearAll() {
     this->LogSucc("成功删除所有运镜宏！");
     return true;
 }
-void CamMacroManager::PlayCamMacro(const std::string& name) {
+void CamMacroManager::PlayCamMacro(const std::string& name, CamPlayBatch* batch) {
     auto it = this->camMacros.find(name);
     if (it == this->camMacros.end()) {
         this->LogError(std::format("目标运镜宏不存在：{}", name));
+        if (batch) batch->error = "macro_not_found";
         return;
     }
-    for (const auto& item : it->second->GetVec()) {
+    const auto& paths = it->second->GetVec();
+    if (batch && paths.empty()) batch->error = "macro_empty";
+    for (const auto& item : paths) {
+        if (batch) {
+            CamPlayRequest request{};
+            request.campathName = item.campathName;
+            request.offsetTime = -item.offset;
+            batch->paths.push_back(std::move(request));
+            continue;
+        }
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Preview"_hash);
         auto&& [previewOffset] = msg.Access<float>();
         previewOffset = 0.0f - item.offset;
@@ -266,12 +290,4 @@ void CamMacroManager::PlayCamMacro(const std::string& name) {
         this->PublishAsync(std::move(msg));
     }
     this->LogInfo(std::format("播放运镜宏：{}", name));
-}
-
-bool CamMacroManager::GetMacroPaths(const std::string& name, std::vector<WrapCampath>& paths) {
-    std::shared_lock lock(this->smutex);
-    auto* macro = this->FindCamMacro(name);
-    if (!macro) return false;
-    paths = macro->GetVec();
-    return true;
 }

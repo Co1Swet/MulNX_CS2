@@ -29,7 +29,6 @@ class CamPackManager final :public CamSysModule, public WebSocketMixin<CamPackMa
     bool CamPackApply(const std::shared_ptr<CamPack> pCamPack);
 public:
     std::shared_ptr<CamPack> pActiveCamPack = nullptr;
-    uint64_t revision = 0;
     void Menu()const;
     void HandleUpdate();
 };

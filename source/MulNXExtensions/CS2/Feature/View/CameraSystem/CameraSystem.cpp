@@ -2,6 +2,7 @@
 #include "CamSysExt.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookView/HookView.hpp>
+#include <nlohmann/json.hpp>
 
 void CameraSystem::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow(I18n("ui.camera_system").c_str());
@@ -81,6 +82,7 @@ bool CameraSystem::Init() {
         .SubscribeAsync("Global/Save")
         .SubscribeAsync("Global/Save/Strong")
         .SubscribeAsync("Command/SpecPlayer")
+        .SubscribeAsync("CamPlay/Event")
         ;
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
@@ -94,6 +96,25 @@ bool CameraSystem::Init() {
 
 void CameraSystem::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
+    case "CamPlay/Event"_hash: {
+        const auto* event = msg.asp.get<CamPlayEvent>();
+        nlohmann::json out{{"type", event->type}, {"requestId", event->requestId},
+            {"generation", event->generation}};
+        if (event->type == "CamPlay/State") {
+            out["state"] = event->state;
+            out["reason"] = event->reason;
+        }
+        else if (event->type == "CamPlay/CancelTracked") {
+            out["matched"] = event->matched;
+        }
+        else if (event->type == "CamPlay/StatusTracked") {
+            out["current"] = nullptr;
+            if (event->hasCurrent) out["current"] = {{"requestId", event->currentRequestId},
+                {"generation", event->currentGeneration}, {"state", event->currentState}};
+        }
+        this->WebPost(out.dump());
+        break;
+    }
     case "Global/Save"_hash: {
         this->PublishSync("CamSync/SaveAll"_hash);
         this->LogSucc("摄像机系统保存成功");

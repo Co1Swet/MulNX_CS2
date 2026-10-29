@@ -151,14 +151,14 @@ void CamPackManager::ProcessMsg(MulNX::Message& msg) {
             this->showWindow.store(false, std::memory_order_release);
         }
         if (this->pActiveCamPack && this->pActiveCamPack->GetName() == ext->str1) {
-            ++this->revision;
+            this->PublishSync("CamPlay/Invalidate"_hash);
             this->pActiveCamPack = nullptr;
         }
         break;
     }
     case "CamPack/ClearAll"_hash: {
         std::unique_lock lock(this->smutex);
-        ++this->revision;
+        if (this->pActiveCamPack) this->PublishSync("CamPlay/Invalidate"_hash);
         this->CamPackClearAll();
         this->pOperatingCamPack = nullptr;
         this->showWindow.store(false, std::memory_order_release);
@@ -252,7 +252,6 @@ bool CamPackManager::CamPackSave() {
 
 bool CamPackManager::CamPackApply(const std::shared_ptr<CamPack> pCamPack) {
     this->CamPackSave();
-    ++this->revision;
     this->pActiveCamPack = nullptr;
     this->PublishSync("CamSync/Clear"_hash);
     if (!this->Path()->KeySetCurrent("kCurrentPack", pCamPack->GetName())) {

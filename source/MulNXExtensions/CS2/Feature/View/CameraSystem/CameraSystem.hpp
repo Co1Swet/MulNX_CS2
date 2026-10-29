@@ -2,13 +2,14 @@
 #include <Intro/CSModuleBase.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
+#include <MulNXExtensions/WebSocketManager/WebSocketMixin.hpp>
 #include "CameraDrawer/CameraDrawer.hpp"
 
 class CampathManager;
 class CamMacroManager;
 class CamPackManager;
 
-class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem> {
+class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem>, public WebSocketMixin<CameraSystem> {
     CampathManager* pCampathManager = nullptr;
     CamMacroManager* pCamMacroManager = nullptr;
     CamPackManager* pCamPackManager = nullptr;

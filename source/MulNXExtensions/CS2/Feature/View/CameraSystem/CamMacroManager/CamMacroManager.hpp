@@ -26,9 +26,8 @@ class CamMacroManager final :public CamSysModule {
     bool CamMacroDelete(const std::string& name);
     bool CamMacroClearAll();
 
-    void PlayCamMacro(const std::string& name);
+    void PlayCamMacro(const std::string& name, CamPlayBatch* batch = nullptr);
 public:
-    bool GetMacroPaths(const std::string& name, std::vector<WrapCampath>& paths);
     bool Menu();
     void HandleUpdate();
 };

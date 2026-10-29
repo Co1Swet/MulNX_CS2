@@ -1,18 +1,13 @@
 #include "CamPlayScheduler.hpp"
 #include <CameraSystem/CampathManager/CampathManager.hpp>
-#include <CameraSystem/CamMacroManager/CamMacroManager.hpp>
-#include <CameraSystem/CamPackManager/CamPackManager.hpp>
-#include <nlohmann/json.hpp>
 
 bool CamPlayScheduler::Init() {
     this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
-    this->pCamMacroManager = this->FindModule<CamMacroManager>("CamMacroManager");
-    this->pCamPackManager = this->FindModule<CamPackManager>("CamPackManager");
     this->pCamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
 
     (*this)
         .SubscribeAsync("CamPlay/Request")
-        .SubscribeAsyncEx<uint64_t, uint64_t>("CamPlay/Tracked")
+        .SubscribeAsync("CamPlay/Batch")
         .SubscribeAsync<uint64_t, uint64_t>("CamPlay/CancelTracked")
         .SubscribeAsync<uint64_t>("CamPlay/StatusTracked")
         .SubscribeAsync<void>("CamPlay/Clear")
@@ -23,6 +18,9 @@ bool CamPlayScheduler::Init() {
         .SubscribeAsync<void>("CamPlay/Override/Enable")
         .SubscribeAsync<void>("CamPlay/Override/Disable")
         ;
+
+    this->SubscribeSync("CamSync/Clear", [this](auto&&...) { this->Invalidate(); });
+    this->SubscribeSync("CamPlay/Invalidate", [this](auto&&...) { this->Invalidate(); });
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->UIRegisterBackground("DrawPlayCamera", [this](auto&&...) {
@@ -35,36 +33,41 @@ bool CamPlayScheduler::Init() {
 
 void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "CamPlay/Tracked"_hash: {
-        const auto* ext = msg.asp.get<MulNX::NetExt>();
-        auto&& [id, gen] = msg.Access<uint64_t, uint64_t>();
-        if (this->tracked || gen != this->currentGeneration || !this->camOverride.load(std::memory_order_acquire)) {
-            const char* reason = gen != this->currentGeneration ? "stale_generation" :
-                (this->tracked ? "busy" : "override_disabled");
-            nlohmann::json out{{"type", "CamPlay/State"}, {"requestId", id},
-                {"generation", gen}, {"state", "failed"}, {"reason", reason}};
-            this->WebPost(out.dump());
-            break;
-        }
-        this->requestId = id;
-        this->generation = gen;
-        this->started = false;
+    case "CamPlay/Batch"_hash: {
+        const auto* batch = msg.asp.get<CamPlayBatch>();
+        CamPlayEvent event{};
+        event.type = "CamPlay/State";
+        event.requestId = batch->requestId;
+        event.generation = batch->generation;
+        event.state = "failed";
+        if (batch->generation != this->currentGeneration) event.reason = "stale_generation";
+        else if (this->tracked) event.reason = "busy";
+        else if (!this->camOverride.load(std::memory_order_acquire)) event.reason = "override_disabled";
+        else event.reason = batch->error;
         std::vector<PlaySlot> slots;
-        std::string reason;
-        {
-            std::shared_lock lock(this->pCamPackManager->smutex);
-            auto pack = this->pCamPackManager->pActiveCamPack;
-            if (!ext || !pack || pack->GetName() != ext->str2) reason = "pack_mismatch";
-            else {
-                this->expectedPack = ext->str2;
-                this->macroName = ext->str1;
-                this->ResolveMacro(ext->str1, slots, reason);
+        if (event.reason.empty()) {
+            std::shared_lock lock(this->pCampathManager->smutex);
+            const float time = this->pTimeline->GetTime();
+            for (const auto& request : batch->paths) {
+                auto path = this->pCampathManager->FindCampath(request.campathName);
+                if (!path || path->CameraKeyframes.size() < 2) {
+                    event.reason = "path_unavailable";
+                    break;
+                }
+                PlaySlot slot{};
+                slot.offsetTime = path->GetStartTime() - time + request.offsetTime;
+                slot.pCampath = std::move(path);
+                slot.tracked = true;
+                slots.push_back(std::move(slot));
             }
         }
-        if (!reason.empty()) {
-            this->TrackedState("failed", reason);
+        if (!event.reason.empty()) {
+            this->PostEvent(std::move(event));
             break;
         }
+        this->requestId = batch->requestId;
+        this->generation = batch->generation;
+        this->started = false;
         this->tracked = true;
         this->playslots.insert(this->playslots.end(), slots.begin(), slots.end());
         break;
@@ -76,19 +79,27 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
             if (this->tracked) this->ClearTracked("cancelled", "cancelled");
             ++this->currentGeneration;
         }
-        nlohmann::json out{{"type", "CamPlay/CancelTracked"}, {"requestId", id},
-            {"generation", this->currentGeneration}, {"matched", matched}};
-        this->WebPost(out.dump());
+        CamPlayEvent event{};
+        event.type = "CamPlay/CancelTracked";
+        event.requestId = id;
+        event.generation = this->currentGeneration;
+        event.matched = matched;
+        this->PostEvent(std::move(event));
         break;
     }
     case "CamPlay/StatusTracked"_hash: {
         auto&& [id] = msg.Access<uint64_t>();
-        nlohmann::json out{{"type", "CamPlay/StatusTracked"}, {"requestId", id},
-            {"generation", this->currentGeneration}, {"current", nullptr}};
-        if (this->tracked) out["current"] = {{"requestId", this->requestId},
-            {"generation", this->generation}, {"state", this->started ? "started" : "pending"},
-            {"expectedPack", this->expectedPack}, {"macro", this->macroName}};
-        this->WebPost(out.dump());
+        CamPlayEvent event{};
+        event.type = "CamPlay/StatusTracked";
+        event.requestId = id;
+        event.generation = this->currentGeneration;
+        event.hasCurrent = this->tracked;
+        if (this->tracked) {
+            event.currentRequestId = this->requestId;
+            event.currentGeneration = this->generation;
+            event.currentState = this->started ? "started" : "pending";
+        }
+        this->PostEvent(std::move(event));
         break;
     }
     case "CamPlay/Request"_hash: {
@@ -152,14 +163,6 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
 }
 
 bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
-    {
-        std::shared_lock lock(this->pCamPackManager->smutex);
-        if (this->pCamPackManager->revision != this->observedPackRevision) {
-            this->observedPackRevision = this->pCamPackManager->revision;
-            ++this->currentGeneration;
-            if (this->tracked) this->ClearTracked("failed", "pack_changed");
-        }
-    }
     this->Update();
 
     if (this->playslots.empty()) {
@@ -222,10 +225,25 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
     return ret;
 }
 
+void CamPlayScheduler::PostEvent(CamPlayEvent event) {
+    auto [msg, out] = MulNX::Message::Create<CamPlayEvent>("CamPlay/Event"_hash);
+    *out = std::move(event);
+    this->PublishAsync(std::move(msg));
+}
+
 void CamPlayScheduler::TrackedState(const char* state, const std::string& reason) {
-    nlohmann::json out{{"type", "CamPlay/State"}, {"requestId", this->requestId},
-        {"generation", this->generation}, {"state", state}, {"reason", reason}};
-    this->WebPost(out.dump());
+    CamPlayEvent event{};
+    event.type = "CamPlay/State";
+    event.requestId = this->requestId;
+    event.generation = this->generation;
+    event.state = state;
+    event.reason = reason;
+    this->PostEvent(std::move(event));
+}
+
+void CamPlayScheduler::Invalidate() {
+    ++this->currentGeneration;
+    if (this->tracked) this->ClearTracked("failed", "pack_changed");
 }
 
 void CamPlayScheduler::ClearTracked(const char* state, const std::string& reason) {
@@ -233,30 +251,4 @@ void CamPlayScheduler::ClearTracked(const char* state, const std::string& reason
     this->needDrawCamera.store(false, std::memory_order_release);
     this->TrackedState(state, reason);
     this->tracked = false;
-}
-
-bool CamPlayScheduler::ResolveMacro(const std::string& name, std::vector<PlaySlot>& slots, std::string& reason) {
-    std::vector<WrapCampath> paths;
-    if (!this->pCamMacroManager->GetMacroPaths(name, paths)) {
-        reason = "macro_not_found";
-        return false;
-    }
-    if (paths.empty()) {
-        reason = "macro_empty";
-        return false;
-    }
-    std::shared_lock lock(this->pCampathManager->smutex);
-    for (const auto& path : paths) {
-        auto campath = this->pCampathManager->FindCampath(path.campathName);
-        if (!campath || campath->CameraKeyframes.size() < 2) {
-            reason = "path_unavailable";
-            return false;
-        }
-        PlaySlot slot{};
-        slot.offsetTime = campath->GetStartTime() - this->pTimeline->GetTime() - path.offset;
-        slot.pCampath = std::move(campath);
-        slot.tracked = true;
-        slots.push_back(std::move(slot));
-    }
-    return true;
 }
