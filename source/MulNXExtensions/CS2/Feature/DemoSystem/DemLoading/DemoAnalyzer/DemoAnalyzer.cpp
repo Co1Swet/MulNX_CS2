@@ -25,7 +25,6 @@ bool DemoAnalyzer::Init() {
 
     (*this)
         .SubscribeAsyncEx<void>("Demo/Analyze")
-        .SubscribeAsyncEx<void>("Demo/JSON/Read/Callback")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -48,10 +47,6 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
         }
         this->LogInfo(std::format("接收到分析请求: {}", demoPath.string()));
         this->HandleAnalyzeRequest(std::move(demoPath)).Fire();
-        break;
-    }
-    case "Demo/JSON/Read/Callback"_hash: {
-        auto [callback, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze/Callback"_hash);
         break;
     }
     default:
@@ -115,7 +110,7 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path&& demoPath) {
 
         if (!CreateProcessW(nullptr, cmdBuffer.data(), nullptr, nullptr,
             FALSE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) {
-            this->LogError("创建进程失败，错误码: " + std::to_string(GetLastError()));
+            this->LogError(std::format("创建进程失败，错误码: {}", GetLastError()));
             co_return;   // cleanup 自动执行，不发送消息
         }
         auto onExit = scope_exit([&] {

@@ -56,6 +56,8 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         auto name = demoInfo.demoFileName;
         this->demos[name] = std::make_shared<Demo::Info>(std::move(demoInfo));
         auto [notify, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Info/Notify"_hash);
+        auto&& [succ] = notify.Access<int>();
+        succ = 0;
         rp->str1 = std::move(name);
         this->PublishAsync(std::move(notify));
         break;
