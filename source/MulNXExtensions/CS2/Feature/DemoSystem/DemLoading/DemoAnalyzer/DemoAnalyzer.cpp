@@ -23,7 +23,10 @@ bool DemoAnalyzer::Init() {
     this->csdaPath = toolsPath / "csda.exe";
     this->dirData = this->Path()->PathGetForShared("Data");
 
-    this->SubscribeAsyncEx<void>("Demo/Analyze");
+    (*this)
+        .SubscribeAsyncEx<void>("Demo/Analyze")
+        .SubscribeAsyncEx<void>("Demo/JSON/Read/Callback")
+        ;
 
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
@@ -47,19 +50,23 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
         this->HandleAnalyzeRequest(std::move(demoPath));
         break;
     }
+    case "Demo/JSON/Read/Callback"_hash: {
+        auto [callback, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze/Callback"_hash);
+        break;
+    }
     default:
         break;
     }
 }
 
-void DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
+void DemoAnalyzer::HandleAnalyzeRequest(fs::path&& demoPath) {
     std::string stem = demoPath.stem().string();
     fs::path jsonPath = this->dirData / (stem + ".json");
 
     // JSON 已存在 → 直接发送加载消息
     if (fs::exists(jsonPath)) {
         this->LogInfo(std::format("分析结果已存在，直接加载: {}", demoPath.string()));
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Result"_hash);
         rp->str1 = stem;
         this->PublishAsync(std::move(msg));
         return;
@@ -78,10 +85,10 @@ void DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
     }
 
     this->LogInfo(std::format("开始分析: {}", demoPath.string()));
-    this->AnalyzeDemoWithCSDA(demoPath).Fire();
+    this->AnalyzeDemoWithCSDA(std::move(demoPath)).Fire();
 }
 
-MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
+MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path&& demoPath) {
     std::string stem = demoPath.stem().string();
 
     // RAII：分析结束时从队列移除
@@ -126,7 +133,7 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
         if (exitCode == 0) {
             this->LogInfo("Demo 分析成功完成");
             // 仅成功时发送加载消息
-            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Load"_hash);
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Result"_hash);
             rp->str1 = stem;
             this->PublishAsync(std::move(msg));
             co_return;

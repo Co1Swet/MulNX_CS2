@@ -7,7 +7,7 @@ bool DemoRecordMaker::Init() {
     (*this)
         .SubscribeAsyncEx<Steam64UID>("Demo/Record/Make/FullRoundAll")
         .SubscribeAsyncEx<Steam64UID>("Demo/Record/Make/RoundKillAll")
-        .SubscribeAsync<int>("Demo/Record/Make/FlushHigh")
+        .SubscribeAsync<int>("Demo/Record/Commit/Demo")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -50,9 +50,9 @@ void DemoRecordMaker::ProcessMsg(MulNX::Message& msg) {
         }
         break;
     }
-    case "Demo/Record/Make/FlushHigh"_hash: { // 依赖无锁队列的特性，当所有其它任务处理投入之后，最后投入 FlushHigh ，以推动所有任务完成后一次性提交
+    case "Demo/Record/Commit/Demo"_hash: { // 依赖无锁队列的特性，当所有其它任务处理投入之后，最后投入 FlushHigh ，以推动所有任务完成后一次性提交
         MulNX::Message flush(msg);
-        flush.type = "Demo/Record/Make/Flush"_hash;
+        flush.type = "Demo/Record/Commit/Round"_hash;
         this->PublishAsync(std::move(flush));
         break;
     }

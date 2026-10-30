@@ -9,7 +9,7 @@ bool RoundRecordMaker::Init() {
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/RoundKill")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/Death")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/FullRound")
-        .SubscribeAsync<int>("Demo/Record/Make/Flush")
+        .SubscribeAsync<int>("Demo/Record/Commit/Round")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -29,7 +29,7 @@ void RoundRecordMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
 
 void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Demo/Record/Make/Flush"_hash: {
+    case "Demo/Record/Commit/Round"_hash: {
         MulNX::Message commit(msg);
         commit.type = "Demo/Record/Commit"_hash;
         this->PublishAsync(std::move(commit));

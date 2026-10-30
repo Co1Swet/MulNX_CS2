@@ -13,7 +13,7 @@ void DemRecordPassManager::Window() {
     }
 
     if (ImGui::Button("提交所有任务")) {
-        MulNX::Message msg("Demo/Record/Make/FlushHigh"_hash);
+        MulNX::Message msg("Demo/Record/Commit/Demo"_hash);
         auto&& [autoRecord] = msg.Access<int>();
         autoRecord = 0;
         this->PublishAsync(std::move(msg));
@@ -21,7 +21,7 @@ void DemRecordPassManager::Window() {
     }
     ImGui::SameLine();
     if (ImGui::Button("提交所有任务并开始录制")) {
-        MulNX::Message msg("Demo/Record/Make/FlushHigh"_hash);
+        MulNX::Message msg("Demo/Record/Commit/Demo"_hash);
         auto&& [autoRecord] = msg.Access<int>();
         autoRecord = 1;
         this->PublishAsync(std::move(msg));
