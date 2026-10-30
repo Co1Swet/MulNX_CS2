@@ -5,7 +5,7 @@ bool DemSortPass::Init() {
     return true;
 }
 
-void DemSortPass::ApplyPass(std::vector<Demo::RecordTask>& rTasks) {
+void DemSortPass::ApplyPass(std::vector<Demo::RecordTask>& rTasks)const {
     const size_t count = rTasks.size();
     if (count < 2) return;
 

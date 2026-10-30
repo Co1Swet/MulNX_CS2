@@ -7,7 +7,7 @@ bool DemClassifyPass::Init() {
 }
 
 std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(
-    std::vector<Demo::RecordTask>&& rTasks) {
+    std::vector<Demo::RecordTask>&& rTasks)const {
     const size_t inputCount = rTasks.size();
     this->LogInfo(std::format("开始分类：输入 {} 条录制任务", inputCount));
 

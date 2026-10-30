@@ -15,5 +15,5 @@ class DemRecordPassManager final :public DemModuleBase {
     void Window();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
-    void Commit(const int autoRecord);
+    void Commit(std::vector<Demo::RecordTask>&& rTasks, const int autoRecord)const;
 };

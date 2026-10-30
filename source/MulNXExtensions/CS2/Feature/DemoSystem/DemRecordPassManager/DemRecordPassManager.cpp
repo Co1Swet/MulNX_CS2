@@ -101,18 +101,21 @@ void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Demo/Record/Commit"_hash: {
-        std::unique_lock lock(this->smutex);
         auto&& [autoRecord] = msg.Access<int>();
-        this->Commit(autoRecord);
+        std::vector<Demo::RecordTask> rTasks;
+        {
+            std::unique_lock lock(this->smutex);
+            rTasks = std::move(this->bufferTasks);
+            this->bufferTasks = {};
+        }
+        if (rTasks.empty())break;
+        this->Commit(std::move(rTasks), autoRecord);
         break;
     }
     }
 }
 
-void DemRecordPassManager::Commit(const int autoRecord) {
-    auto rTasks = std::move(this->bufferTasks);
-    if (rTasks.empty()) return;
-
+void DemRecordPassManager::Commit(std::vector<Demo::RecordTask>&& rTasks, const int autoRecord)const {
     // 分类：形态从 vector<RecordTask> 转换为 vector<RecordPass>
     auto passes = this->pDemClassifyPass->ApplyPass(std::move(rTasks));
     for (auto& pass : passes) {

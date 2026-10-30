@@ -6,7 +6,7 @@ bool DemMergePass::Init() {
     return true;
 }
 
-void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks) {
+void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks)const {
     this->LogInfo("开始执行合并优化");
     if (rTasks.size() < 2) return;
 

@@ -17,7 +17,7 @@ bool DemoJSONReader::Window() {
 
 bool DemoJSONReader::Init() {
     this->dirData = this->Path()->PathGetForShared("Data");
-    this->SubscribeAsync("Demo/JSON/Result");
+    this->SubscribeAsync("Demo/JSON/Read");
 
     this->UIRegisterCallback("UI.Demos", [this](auto&&...) {return this->Window();});
 
@@ -31,7 +31,7 @@ bool DemoJSONReader::Init() {
 
 void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Demo/JSON/Result"_hash: {
+    case "Demo/JSON/Read"_hash: {
         auto* pNetExt = msg.asp.get<MulNX::NetExt>();
         std::string filename = pNetExt->str1 + ".json";
 
