@@ -11,13 +11,40 @@ bool MulNX::InputSystem::Init() {
         });
     return true;
 }
+void MulNX::InputSystem::SetInputWindow(void* window) {
+    this->ResetInput();
+    this->InputWindow = window;
+    this->LimitToForegroundWindow = true;
+}
+void MulNX::InputSystem::ResetInput() {
+    this->InputReset++;
+}
+bool MulNX::InputSystem::IsInputActive()const {
+    return !this->LimitToForegroundWindow ||
+        (this->InputReady && this->InputReset == this->ProcessedInputReset &&
+            this->InputWindow && GetForegroundWindow() == this->InputWindow);
+}
 bool MulNX::InputSystem::UpdateKeysState() {
     unsigned int Threshold = this->Threshold;
     unsigned int DThreshold = Threshold * 2;
     this->CurrentTimeMs = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - this->ClockEpoch).count());
+    auto reset = this->InputReset.load();
+    bool active = !this->LimitToForegroundWindow ||
+        (this->InputWindow && GetForegroundWindow() == this->InputWindow);
+    if (!active || reset != this->ProcessedInputReset) {
+        this->InputReady = false;
+        active = false;
+    }
     for (int vkCode = 0; vkCode < 256; ++vkCode) {
         SHORT keyState = GetAsyncKeyState(vkCode);
-        this->KeysState[vkCode].Current = (keyState & 0x8000) != 0;
+        bool pressed = (keyState & 0x8000) != 0;
+        this->KeysState[vkCode].Current = active && pressed;
+        if (!active) {
+            this->KeysState[vkCode].ComboClick = 0;
+            this->KeysState[vkCode].BufferComboClick = 0;
+            this->KeysState[vkCode].Previous = pressed;
+            continue;
+        }
         //this->KeysState[vkCode].Current = (keyboardState[vkCode] & 0x80) != 0;
         if (this->KeysState[vkCode].BufferComboClick) {
             if (this->CurrentTimeMs - this->KeysState[vkCode].LastPressTimeMs > DThreshold) {
@@ -41,10 +68,13 @@ bool MulNX::InputSystem::UpdateKeysState() {
             this->KeysState[vkCode].Previous = false;
         }
     }
+    this->ProcessedInputReset = reset;
+    if (active)this->InputReady = true;
     return true;
 }
 
 bool MulNX::InputSystem::IsKeyPressed(const unsigned char vkCode)const {
+    if (!this->IsInputActive())return false;
     auto state = this->KeysState[vkCode].Current.load(std::memory_order_acquire);
     return state;//返回指定键的当前状态
 }
@@ -73,6 +103,7 @@ bool MulNX::InputSystem::IsKeyPackPressed(const KeyCheckPack& Pack)const {
 }
 
 bool MulNX::InputSystem::CheckComboClick(const unsigned char vkCode, unsigned char TargetCombo) {
+    if (!this->IsInputActive())return false;
     if (TargetCombo < 0)return false;
     return this->KeysState[vkCode].BufferComboClick.compare_exchange_strong(TargetCombo, 0);
 }
@@ -102,6 +133,7 @@ bool MulNX::InputSystem::CheckWithPack(const KeyCheckPack& Pack) {
 }
 
 unsigned char MulNX::InputSystem::CheckComboClickUnremove(const unsigned char vkCode)const {
+    if (!this->IsInputActive())return 0;
     return this->KeysState[vkCode].ComboClick;
 }
 

@@ -3,11 +3,13 @@
 #include <shellapi.h>
 
 bool HookWindow::Init() {
+    this->pInputSystem->SetInputWindow(nullptr);
     this->pUISystem = this->FindModule<MulNX::UISystem>("UISystem");
 
     this->SubscribeSync("Hook/hWnd", [this](MulNX::Message& msg) {
         auto&& [hWnd] = msg.Access<HWND>();
         this->hCS2Wnd = hWnd;
+        this->pInputSystem->SetInputWindow(hWnd);
         // 窗口过程钩子
         this->hkWndProc = MulNX::Hook::Create((uint8_t*)GetWindowLongPtrW(this->hCS2Wnd, GWLP_WNDPROC), [this](MulNX::Hook* hk, RegContext* ctx) {
             auto then = this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
@@ -45,6 +47,9 @@ bool HookWindow::CheckIme(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return false;
 }
 MulNX::Hook::Then HookWindow::HandleWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    if (uMsg == WM_ACTIVATEAPP) {
+        this->pInputSystem->ResetInput();
+    }
     if (uMsg == WM_IME_CHAR) {
         uMsg = WM_CHAR;
     }
