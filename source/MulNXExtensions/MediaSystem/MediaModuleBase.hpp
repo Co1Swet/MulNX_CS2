@@ -28,6 +28,7 @@ namespace MulNX {
         av::FormatContext* pOutCtx = nullptr;
         std::chrono::steady_clock::time_point startTime{};
         const std::string* pFilenameWithoutStem = nullptr;
+        int targetFPS = 0; // 本次录制启动时的帧率，0 表示普通模式不限帧
     };
 }
 

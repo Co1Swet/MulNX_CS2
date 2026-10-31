@@ -20,7 +20,6 @@ void AdvancedRecord::Menu() {
 }
 
 bool AdvancedRecord::Init() {
-    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
     this->dirVideos = this->Path()->PathGetForShared("Videos");
 
     this->SubscribeSync("MediaSync/BeforeCopyBackbuffer", [this](MulNX::Message& msg) {
@@ -52,15 +51,15 @@ void AdvancedRecord::SetRecordStart(const MulNX::AVStartInfo& sInfo) {
 
     this->frameCount = 0;
     this->startAsAdvanced = this->pMediaState->advancedMode.load(std::memory_order_acquire);
-    if (!this->startAsAdvanced)return;
-
-    int fps = this->pMediaParamManager->targetFPS.load();
+    int fps = sInfo.targetFPS;
     if (fps > 0) {
         this->minIntervalUs.store(1000000LL / fps, std::memory_order_release);
     }
     else {
-        this->minIntervalUs.store(1, std::memory_order_release);
+        this->minIntervalUs.store(0, std::memory_order_release);
     }
+
+    if (!this->startAsAdvanced)return;
 
     this->AsyncCommandHighPriority(std::format("host_framerate {}; startmovie {} wav framerate {}",
         fps, *sInfo.pFilenameWithoutStem, fps));
@@ -70,19 +69,19 @@ void AdvancedRecord::HandleBeforeCopyBackbuffer(MulNX::Message& msg) {
     auto&& [info] = msg.Access<MulNX::VFrameExInfo>();
     if (this->OnAdvanceRecord(info))return;
     // 基于时间槽的帧率上限：捕获落在当前时间槽的首帧，并量化 PTS 为槽边界
-    int cap = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
+    const auto intervalUs = this->minIntervalUs.load(std::memory_order_acquire);
     int64_t quantizedPtsUs = -1; // -1 表示不量化，使用实际 now
-    if (cap > 0) {
+    if (intervalUs > 0) {
         auto now = std::chrono::steady_clock::now();
         int64_t elapsedUs = std::chrono::duration_cast<std::chrono::microseconds>(
             now - this->recordStartTime.load()).count();
-        int64_t slot = elapsedUs / this->minIntervalUs;
+        int64_t slot = elapsedUs / intervalUs;
         if (slot == this->lastSlot) {
             info.needDrop = true;
             return; // 同一时间槽内不再重复捕获
         }
         this->lastSlot = slot;
-        quantizedPtsUs = slot * this->minIntervalUs;
+        quantizedPtsUs = slot * intervalUs;
     }
 
     // PTS：有帧率上限时量化为时间槽边界，否则取实际 now
@@ -103,8 +102,6 @@ bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
 
     info.needDrop = false;
 
-    // 获取设定的固定帧率
-    int fps = this->pMediaParamManager->targetFPS.load();
     // 录制起始时间（原子读取）
     auto startTime = this->recordStartTime.load();
 
@@ -112,7 +109,7 @@ bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
     int frameIdx = this->frameCount++;
 
     // 计算固定帧间隔（微秒）
-    std::chrono::microseconds frameDuration(1000000 / fps);
+    std::chrono::microseconds frameDuration(this->minIntervalUs.load(std::memory_order_acquire));
 
     // 生成虚构的捕获时间：起始时间 + 帧序号 × 帧间隔
     info.captureTime = startTime + frameIdx * frameDuration;
