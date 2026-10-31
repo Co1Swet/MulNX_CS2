@@ -116,8 +116,9 @@ namespace MulNX {
     //   - 支持转义：\" -> "，\\ -> \
     //   - 其他 \x 原样保留（宽容策略）
     //   - 未闭合引号抛 std::runtime_error
-    inline ParsedPayload ParseQuotedPayload(std::string_view payload, size_t maxQuoted = 2) {
+    inline ParsedPayload ParseQuotedPayload(std::string_view payload, size_t maxQuoted) {
         ParsedPayload result;
+        result.quoted.reserve(maxQuoted);
         size_t pos = 0;
         const size_t n = payload.size();
 
@@ -176,21 +177,20 @@ namespace MulNX {
     //   2. 剩余部分交给原 CreateFiller<PodArgs...> 写入 msg.extra
     //   3. <void> / <> 视为无 Pod 参数，只处理字符串，忽略剩余部分
     // 约束：
-    //   - 字符串最多两个，位于最前，用双引号包裹
+    //   - 字符串最多三个，位于最前，用双引号包裹
     //   - 字符串内不允许出现双引号，暂不支持转义
     //   - SubscribeAsyncEx 必须是该消息类型的首次订阅
     template<typename... PodArgs>
     std::function<void(Message&, std::string_view)> MakeExFiller() {
         return [](Message& msg, std::string_view payload) {
-            auto parsed = ParseQuotedPayload(payload, 2);
-
+            auto parsed = ParseQuotedPayload(payload, 3);
             if (!parsed.quoted.empty()) {
                 auto [asp, pNetExt] = MulNX::make_any_shared<MulNX::NetExt>();
                 if (parsed.quoted.size() >= 1) pNetExt->str1 = std::move(parsed.quoted[0]);
                 if (parsed.quoted.size() >= 2) pNetExt->str2 = std::move(parsed.quoted[1]);
+                if (parsed.quoted.size() >= 3) pNetExt->str3 = std::move(parsed.quoted[2]);
                 msg.asp = std::move(asp);
             }
-
             if constexpr (HasPodArgs<PodArgs...>) {
                 CreateFiller<PodArgs...>()(msg, parsed.rest);
             }
