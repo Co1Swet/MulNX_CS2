@@ -1,4 +1,6 @@
 #pragma once
+#include <MulNX/Core/Module/Module.hpp>
+#include "FilePathNode/FilePathNode.hpp"
 
 // MulNX 框架的核心模块：路径管理器
 // 由于同一项目中可能并存多个使用 MulNX 框架的二进制文件（如 CS2Injector.exe、CS2OBTool.dll），
@@ -11,14 +13,9 @@
 //     MulNX/CS2OBTool/CameraSystem/Saves
 // 共享目录（如 Shared/Saves）不受核心名影响，为所有二进制文件共用。
 
-#include <MulNX/Core/Module/Module.hpp>
-#include "FilePathNode/FilePathNode.hpp"
-
 namespace MulNX {
     class PathManager :public Module<PathManager> {
-    private:
-        std::recursive_mutex MutexEx;
-        
+        std::recursive_mutex recursive_mutex;
         // MulNX目录（根目录）
         fs::path Root;
         // 核心名
@@ -54,5 +51,7 @@ namespace MulNX {
         bool KeyBindDynamic(const std::string& Key, const std::string& Parent);
         bool KeySetCurrent(const std::string& Key, const std::string& Current);
         fs::path PathGetFromKey(const std::string& Key);
+
+        std::vector<std::string> PathFindStaticKeys(const fs::path& Target);
     };
 }

@@ -69,7 +69,7 @@ void HookDemo::HookDemoGotoTick(CCmd* pCmd) {
     this->RegisterAttachHook(this->hkDemoGotoTick, "DemoGotoTick");
 }
 void HookDemo::BeforePlay(std::string_view rawArg) {
-    // 去除首尾空白
+    // ---------- 1. 去首尾空白 ----------
     std::string rawPath(rawArg);
     size_t start = rawPath.find_first_not_of(" \t");
     if (start == std::string::npos) {
@@ -78,25 +78,49 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
     }
     size_t end = rawPath.find_last_not_of(" \t");
     rawPath = rawPath.substr(start, end - start + 1);
-    // 去除可能存在的成对引号
+
+    // ---------- 2. 判断成对引号 ----------
+    bool hasQuote = false;
     if (rawPath.size() >= 2) {
         if ((rawPath.front() == '"' && rawPath.back() == '"') ||
             (rawPath.front() == '\'' && rawPath.back() == '\'')) {
             rawPath = rawPath.substr(1, rawPath.size() - 2);
+            hasQuote = true;
         }
     }
+    if (rawPath.empty()) {
+        this->LogError("Demo 名为空");
+        return;
+    }
+
+    // ---------- 3. 构建路径（按 hasQuote 分流） ----------
     auto& dirDemos = this->CS2Paths->demo;
     fs::path demoPath(rawPath);
-    if (!demoPath.is_absolute()) {
+
+    if (!hasQuote) {
+        // 无引号：语义上只能是 CS2 默认 demo 目录下的相对名
+        if (demoPath.is_absolute()) {
+            this->LogError(std::format(
+                "无引号的 demo 路径不会被当作绝对路径（会被当作 {} 下的相对名）。"
+                "如需使用绝对路径，请用双引号包裹: {}",
+                dirDemos.string(), rawPath));
+            return;
+        }
         demoPath = dirDemos / demoPath;
     }
-    // 检查文件是否存在，若不存在且缺少 .dem 后缀则自动补全
+    else {
+        // 有引号：绝对路径原样使用，相对路径拼到 demo 目录
+        if (!demoPath.is_absolute()) {
+            demoPath = dirDemos / demoPath;
+        }
+    }
+
+    // ---------- 4. .dem 补全 + 存在性检查 ----------
     bool fileFound = false;
     if (fs::exists(demoPath) && fs::is_regular_file(demoPath)) {
-        fileFound = true;   // 原路径直接有效
+        fileFound = true;
     }
     else if (demoPath.extension() != ".dem") {
-        // 尝试追加 .dem
         fs::path tryPath = demoPath;
         tryPath += ".dem";
         if (fs::exists(tryPath) && fs::is_regular_file(tryPath)) {
@@ -109,16 +133,43 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
         this->LogError(std::format("找不到Demo文件: {}", demoPath.string()));
         return;
     }
-    // 最终确定，输出播放日志
-    this->LogInfo(std::format("播放Demo: {}", demoPath.string()));
 
-    // 发送设置当前播放的 Demo（全文件系统路径）
+    // ---------- 5. 确定 key ----------
+    std::string key;
+    if (!hasQuote) {
+        // 无引号：固定标记为 kGAMEDEMOS
+        key = "kGAMEDEMOS";
+    }
+    else {
+        // 有引号：反查所在目录对应的静态 key
+        auto* pPath = this->Path();
+        if (!pPath) {
+            this->LogError("PathManager 不可用");
+            return;
+        }
+        const fs::path parentPath = demoPath.parent_path();
+        auto keys = pPath->PathFindStaticKeys(parentPath);
+        if (keys.empty()) {
+            this->LogError(std::format(
+                "Demo 所在目录未注册到 PathManager: {}", parentPath.string()));
+            return;
+        }
+        key = std::move(keys.front());
+    }
+
+    // ---------- 6. demoName（无扩展名） ----------
+    const std::string demoName = demoPath.stem().string();
+
+    this->LogInfo(std::format("播放Demo: {} (key={}, name={})",
+        demoPath.string(), key, demoName));
+
+    // ---------- 7. 发消息 ----------
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetPlaying"_hash);
-    rp->str1 = demoPath.string();
+    rp->str1 = std::move(key);
+    rp->str2 = demoName;
     this->PublishAsync(std::move(msg));
 
-    // 发送设置当前操作的 Demo（使用不带扩展名的文件名）
     auto [msg2, rp2] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-    rp2->str1 = std::move(demoPath.stem().string());
+    rp2->str1 = demoName;
     this->PublishAsync(std::move(msg2));
 }

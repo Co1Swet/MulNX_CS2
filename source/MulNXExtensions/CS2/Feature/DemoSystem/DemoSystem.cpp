@@ -49,12 +49,13 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Demo/SetPlaying"_hash: {
-        const auto full = fs::path(msg.asp.get<MulNX::NetExt>()->str1);
-        this->currentPlayingDemoName = std::make_shared<std::string>(full.stem().string());
-        // 发送分析请求（包含完整路径）
+        const auto& key = msg.asp.get<MulNX::NetExt>()->str1;
+        const auto& demoName = msg.asp.get<MulNX::NetExt>()->str2;
+        this->currentPlayingDemoName = std::make_shared<std::string>(demoName);
+        // 发送分析请求
         auto [ana, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-        rp->str1 = "kGAMEDEMOS";
-        rp->str2 = full.stem().string();
+        rp->str1 = key;
+        rp->str2 = demoName;
         this->PublishAsync(std::move(ana));
         break;
     }
