@@ -106,6 +106,10 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
                 dirDemos.string(), rawPath));
             return;
         }
+        if (rawPath.find(' ') != std::string::npos) {
+            this->LogError("含空格的 demo 名/路径必须用引号包裹");
+            return;
+        }
         demoPath = dirDemos / demoPath;
     }
     else {
