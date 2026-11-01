@@ -3,8 +3,9 @@
 
 class DemoFiles :public DemModuleBase {
     struct DemoFile {
-        fs::path path{};
-        bool anylized = false;
+        std::string kDir{};
+        std::string demoName{};
+        bool analyzed = false;
         bool beChoosing = false;
     };
     std::vector<DemoFile> demoFiles{};

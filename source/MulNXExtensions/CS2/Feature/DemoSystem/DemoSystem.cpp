@@ -42,8 +42,10 @@ bool DemoSystem::Init() {
 void DemoSystem::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Play"_hash: {
-        auto& path = msg.asp.get<MulNX::NetExt>()->str1;
-        this->AsyncCommand(std::format("playdemo \"{}\"", path));
+        auto& key = msg.asp.get<MulNX::NetExt>()->str1;
+        auto& demoName = msg.asp.get<MulNX::NetExt>()->str2;
+        auto path = this->Path()->PathGetFromKey(key) / (demoName + ".dem");
+        this->AsyncCommand(std::format("playdemo \"{}\"", path.string()));
         break;
     }
     case "Demo/SetPlaying"_hash: {

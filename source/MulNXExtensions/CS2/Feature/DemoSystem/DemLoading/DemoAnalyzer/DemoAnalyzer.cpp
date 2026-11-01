@@ -54,8 +54,7 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(fs::path&& n) {
-    auto demoPath = std::move(n);
+MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
     std::string stem = demoPath.stem().string();
     fs::path jsonPath = this->dirData / (stem + ".json");
 
@@ -84,7 +83,7 @@ MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(fs::path&& n) {
     co_await this->AnalyzeDemoWithCSDA(std::move(demoPath));
 }
 
-MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path&& demoPath) {
+MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
     std::string stem = demoPath.stem().string();
 
     // RAII：分析结束时从队列移除

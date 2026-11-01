@@ -28,8 +28,8 @@ void DemoFiles::Menu() {
             auto& demFile = this->demoFiles[i];
             // 用 Selectable 展示条目，支持高亮
             auto line = std::format("{}    ---{}",
-                demFile.path.filename().string(),
-                demFile.anylized ? "已分析" : "未分析");
+                demFile.demoName,
+                demFile.analyzed ? "已分析" : "未分析");
 
             if (ImGui::Selectable(line.c_str(), demFile.beChoosing, ImGuiSelectableFlags_AllowDoubleClick)) {
                 demFile.beChoosing = !demFile.beChoosing;
@@ -51,7 +51,7 @@ void DemoFiles::Menu() {
                 if(!demFile.beChoosing)continue;
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
                 rp->str1 = "kGAMEDEMOS";
-                rp->str2 = demFile.path.stem().string();
+                rp->str2 = demFile.demoName;
                 this->PublishAsync(std::move(msg));
             }
         }
@@ -62,27 +62,29 @@ void DemoFiles::Menu() {
     // 底部操作按钮
     if (ImGui::Button("播放所选")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Play"_hash);
-        rp->str1 = demFile.path.string();
+        rp->str1 = demFile.kDir;
+        rp->str2 = demFile.demoName;
         this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("分析所选")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
         rp->str1 = "kGAMEDEMOS";
-        rp->str2 = demFile.path.stem().string();
+        rp->str2 = demFile.demoName;
         this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("选中以准备生成录制")) {
         auto [msg0, rp0] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
         rp0->str1 = "kGAMEDEMOS";
-        rp0->str2 = demFile.path.stem().string();
+        rp0->str2 = demFile.demoName;
         this->PublishAsync(std::move(msg0));
 
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-        rp->str1 = demFile.path.stem().string();
+        rp->str1 = demFile.demoName;
         this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("复制路径到剪贴板")) {
-        ImGui::SetClipboardText(demFile.path.string().c_str());
+        auto fullPath = this->Path()->PathGetFromKey(demFile.kDir) / (demFile.demoName + ".dem");
+        ImGui::SetClipboardText(fullPath.string().c_str());
     }
 }
 
@@ -113,9 +115,10 @@ void DemoFiles::ProcessMsg(MulNX::Message& msg) {
         for (const auto& entry : fs::directory_iterator(this->CS2Paths->demo)) {
             if (!entry.is_regular_file() || entry.path().extension() != ".dem")continue;
             DemoFile demFile{};
-            demFile.path = entry.path();
-            if (fs::exists(this->dirData / (entry.path().stem().string() + ".json"))) {
-                demFile.anylized = true;
+            demFile.kDir = "kGAMEDEMOS";
+            demFile.demoName = entry.path().stem().string();
+            if (fs::exists(this->dirData / (demFile.demoName + ".json"))) {
+                demFile.analyzed = true;
             }
             this->demoFiles.push_back(std::move(demFile));
         }

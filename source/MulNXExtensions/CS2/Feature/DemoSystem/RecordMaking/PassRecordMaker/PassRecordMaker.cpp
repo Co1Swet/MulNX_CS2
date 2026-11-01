@@ -45,9 +45,7 @@ MulNX::CoTask PassRecordMaker::AsyncWaitInfo(bool& succ, const std::string& demo
     }
 }
 
-MulNX::CoTask PassRecordMaker::EnsureMake(std::string&& n) {
-    auto demoName = std::move(n);
-
+MulNX::CoTask PassRecordMaker::EnsureMake(std::string demoName) {
     auto p = this->pDemSys->GetDemoInfo(demoName);
     if (!p) {
         this->LogInfo(std::format("Demo {} 的信息尚未加载，即将发送分析请求", demoName));
