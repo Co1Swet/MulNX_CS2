@@ -50,7 +50,7 @@ void DemoFiles::Menu() {
             for (auto& demFile : this->demoFiles) {
                 if(!demFile.beChoosing)continue;
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-                rp->str1 = "kGAMEDEMOS";
+                rp->str1 = demFile.kDir;
                 rp->str2 = demFile.demoName;
                 this->PublishAsync(std::move(msg));
             }
@@ -68,18 +68,19 @@ void DemoFiles::Menu() {
     }
     if (ImGui::Button("分析所选")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-        rp->str1 = "kGAMEDEMOS";
+        rp->str1 = demFile.kDir;
         rp->str2 = demFile.demoName;
         this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("选中以准备生成录制")) {
         auto [msg0, rp0] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-        rp0->str1 = "kGAMEDEMOS";
+        rp0->str1 = demFile.kDir;
         rp0->str2 = demFile.demoName;
         this->PublishAsync(std::move(msg0));
 
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-        rp->str1 = demFile.demoName;
+        rp->str1 = demFile.kDir;
+        rp->str2 = demFile.demoName;
         this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("复制路径到剪贴板")) {
@@ -112,6 +113,7 @@ void DemoFiles::ProcessMsg(MulNX::Message& msg) {
     case "Demo/Refresh"_hash: {
         std::unique_lock lock(this->smutex);
         this->demoFiles.clear();
+        // 扫描来自CS2的Demo文件夹，寻找所有的 .dem 文件，并使用kGAMEDEMOS作为kDir
         for (const auto& entry : fs::directory_iterator(this->CS2Paths->demo)) {
             if (!entry.is_regular_file() || entry.path().extension() != ".dem")continue;
             DemoFile demFile{};

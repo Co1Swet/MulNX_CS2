@@ -14,14 +14,9 @@ bool DemoEventsRender::Init() {
 }
 
 void DemoEventsRender::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
-    auto pPlaying = this->pDemSys->GetCurrentPlayingDemoName();
-    if (!pPlaying)return;
-    auto playingName = *pPlaying;
-    if (playingName.empty())return;
-
-    auto pInfo = this->pDemSys->GetDemoInfo(playingName);
-    if (!pInfo)return;
-    const auto& info = *pInfo;
+    auto pCurOp = this->pDemSys->GetCurOpDemoInfo();
+    if (!pCurOp)return;
+    const auto& info = *pCurOp;
 
     auto oSteam64uid = this->CS2Entitys->TryGetObservingSteam64UID();
     if (!oSteam64uid)return;

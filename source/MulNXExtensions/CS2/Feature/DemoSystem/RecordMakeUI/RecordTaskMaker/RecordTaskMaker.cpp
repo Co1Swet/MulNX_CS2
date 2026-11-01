@@ -31,7 +31,8 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
 
     if (ImGui::Button(std::format("为所有回合生成录制任务##{}", player.steamId).c_str())) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/FullRoundAll"_hash);
-        rp->str1 = pDemoInfo->demoFileName;
+        rp->str1 = pDemoInfo->kDir;
+        rp->str2 = pDemoInfo->demoFileName;
         auto&& [rUid] = msg.Access<Steam64UID>();
         rUid = player.steamId;
         this->PublishAsync(std::move(msg));
@@ -39,7 +40,8 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
     ImGui::SameLine();
     if (ImGui::Button(std::format("为所有击杀生成录制任务##{}", player.steamId).c_str())) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/RoundKillAll"_hash);
-        rp->str1 = pDemoInfo->demoFileName;
+        rp->str1 = pDemoInfo->kDir;
+        rp->str2 = pDemoInfo->demoFileName;
         auto&& [rUid] = msg.Access<Steam64UID>();
         rUid = player.steamId;
         this->PublishAsync(std::move(msg));
@@ -50,7 +52,8 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
 
         if (ImGui::Button(std::format("录制整回合##round_{}", i).c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/FullRound"_hash);
-            rp->str1 = pDemoInfo->demoFileName;
+            rp->str1 = pDemoInfo->kDir;
+            rp->str2 = pDemoInfo->demoFileName;
             auto&& [rUid, rRound] = msg.Access<Steam64UID, size_t>();
             rUid = player.steamId;
             rRound = i;
@@ -64,23 +67,24 @@ void RecordTaskMaker::Window(MulNX::UICoordinator* uico) {
 }
 
 std::shared_ptr<const Demo::Info> RecordTaskMaker::DemoChooseMenu(MulNX::UICoordinator* uico) {
-    auto pPlaying = this->pDemSys->GetCurrentPlayingDemoName();
+    auto pPlaying = this->pDemSys->GetCurrentPlayingDemo();
     if (pPlaying) {
         ImGui::SameLine();
         const auto& cp = *pPlaying;
         if (ImGui::Button(std::format("切换到当前播放Demo:{}", cp).c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-            rp->str1 = cp;
+            rp->str1 = cp.first;
+            rp->str2 = cp.second;
             this->PublishAsync(std::move(msg));
         }
     }
 
-    auto pOperating = this->pDemSys->GetCurrentOperatingDemoName();
+    auto pOperating = this->pDemSys->GetCurrentOperatingDemo();
     if (!pOperating) {
         ImGui::Text("未选中任何demo");
         return nullptr;
     }
-    auto pDemo = this->pDemSys->GetDemoInfo(*pOperating);
+    auto pDemo = this->pDemSys->GetDemoInfo(pOperating->first, pOperating->second);
     if (!pDemo) {
         ImGui::TextUnformatted(std::format("选中Demo：{} ，而尚未加载信息！", *pOperating).c_str());
         return nullptr;
@@ -142,7 +146,7 @@ Steam64UID RecordTaskMaker::TeamPlayerMenu(const Demo::Info& demoInfo) {
 }
 
 void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& player, const Demo::Info& demoInfo) {
-    auto pOperating = this->pDemSys->GetCurrentOperatingDemoName();
+    auto pOperating = this->pDemSys->GetCurrentOperatingDemo();
     if (!pOperating)return;
     const auto& info = player.roundInfo.at(round);
 
@@ -163,7 +167,8 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
         ImGui::TableSetColumnIndex(0);
         if (btn.Next("录制")) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/Kill"_hash);
-            rp->str1 = *pOperating;
+            rp->str1 = pOperating->first;
+            rp->str2 = pOperating->second;
             auto&& [uid, rRound, rIdx] = msg.Access<Steam64UID, size_t, size_t>();
             uid = ev.killerSteamId;
             rRound = round;
@@ -173,7 +178,8 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
         ImGui::SameLine();
         if (btn.Next("受害者视角")) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/Death"_hash);
-            rp->str1 = *pOperating;
+            rp->str1 = pOperating->first;
+            rp->str2 = pOperating->second;
             auto&& [uid, rRound] = msg.Access<Steam64UID, size_t>();
             uid = ev.victimSteamId;
             rRound = round;
@@ -195,7 +201,8 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
         ImGui::TableSetColumnIndex(0);
         if (btn.Next("录制被击杀")) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/Death"_hash);
-            rp->str1 = *pOperating;
+            rp->str1 = pOperating->first;
+            rp->str2 = pOperating->second;
             auto&& [uid, rRound] = msg.Access<Steam64UID, size_t>();
             uid = ev.victimSteamId;
             rRound = round;

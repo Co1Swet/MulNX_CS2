@@ -18,8 +18,12 @@ class DemModuleBase :public CSModuleBase, public DemModuleMixin<DemModuleBase> {
 protected:
     // 立即从有效消息转换出信息，并摆脱消息本身生命周期
     inline std::expected<std::tuple<std::string, std::string, fs::path>, std::string> ParseDemoPath(MulNX::Message& msg) {
-        const auto& key = msg.asp.get<MulNX::NetExt>()->str1;
-        const auto& demoName = msg.asp.get<MulNX::NetExt>()->str2;
+        auto* pExt = msg.asp.get<MulNX::NetExt>();
+        if (!pExt) {
+            return std::unexpected("消息中缺少 NetExt");
+        }
+        const auto& key = pExt->str1;
+        const auto& demoName = pExt->str2;
         auto demoPath = this->Path()->PathGetFromKey(key) / (demoName + ".dem");
         // 确保可拼接为绝对路径
         if (!demoPath.is_absolute()) {

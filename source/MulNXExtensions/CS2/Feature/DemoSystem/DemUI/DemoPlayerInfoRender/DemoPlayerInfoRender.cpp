@@ -49,8 +49,10 @@ bool DemoPlayerInfoRender::Init() {
 void DemoPlayerInfoRender::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Info/Notify"_hash: {
-        auto pNet = msg.asp.get<MulNX::NetExt>();
-        auto pInfo = this->pDemSys->GetDemoInfo(pNet->str2);
+        auto r = this->ParseDemoPath(msg);
+        if (!r)break;
+        auto&& [kDir, demoName, path] = *r;
+        auto pInfo = this->pDemSys->GetDemoInfo(kDir, demoName);
         if (!pInfo)break;
         for (const auto& [uid, player] : pInfo->players) {
             this->crosshairShareCodes[uid] = player.crosshairShareCode;

@@ -49,9 +49,10 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Demo/SetPlaying"_hash: {
-        const auto& key = msg.asp.get<MulNX::NetExt>()->str1;
-        const auto& demoName = msg.asp.get<MulNX::NetExt>()->str2;
-        this->currentPlayingDemoName = std::make_shared<std::string>(demoName);
+        auto pExt = msg.asp.get<MulNX::NetExt>();
+        const auto& key = pExt->str1;
+        const auto& demoName = pExt->str2;
+        this->currentPlayingDemo = std::make_shared<std::pair<std::string, std::string>>(key, demoName);
         // 发送分析请求
         auto [ana, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
         rp->str1 = key;
@@ -64,7 +65,7 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         auto demoInfo = *msg.asp.get<Demo::Info>();
         auto kDir = demoInfo.kDir;
         auto demoName = demoInfo.demoFileName;
-        this->demos[demoInfo.kDir][demoName] = std::make_shared<Demo::Info>(std::move(demoInfo));
+        this->demos[kDir][demoName] = std::make_shared<Demo::Info>(std::move(demoInfo));
         auto [notify, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Info/Notify"_hash);
         auto&& [succ] = notify.Access<int>();
         succ = 0;
@@ -74,39 +75,37 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Demo/SetOperating"_hash: {
-        std::unique_lock lock(this->smutex);
-        this->currentOperatingDemoName =
-            std::make_shared<std::string>(msg.asp.get<MulNX::NetExt>()->str1);
+        auto pExt = msg.asp.get<MulNX::NetExt>();
+        const auto& key = pExt->str1;
+        const auto& demoName = pExt->str2;
+        this->currentOperatingDemo =
+            std::make_shared<std::pair<std::string, std::string>>(key, demoName);
         break;
     }
     }
 }
 
-std::shared_ptr<const std::string> DemoSystem::GetCurrentOperatingDemoName()const {
-    return this->currentOperatingDemoName.load(std::memory_order_acquire);
+std::shared_ptr<std::pair<std::string, std::string>> DemoSystem::GetCurrentOperatingDemo()const {
+    return this->currentOperatingDemo.load(std::memory_order_acquire);
 }
-std::shared_ptr<const std::string> DemoSystem::GetCurrentPlayingDemoName()const {
-    return this->currentPlayingDemoName.load(std::memory_order_acquire);
+std::shared_ptr<std::pair<std::string, std::string>> DemoSystem::GetCurrentPlayingDemo()const {
+    return this->currentPlayingDemo.load(std::memory_order_acquire);
 }
-std::shared_ptr<const Demo::Info> DemoSystem::GetDemoInfo(const std::string& demoName)const {
+std::shared_ptr<const Demo::Info> DemoSystem::GetDemoInfo(const std::string& kDir, const std::string& demoName)const {
     std::shared_lock lock(this->smutex);
-    for (const auto& [kDir, demoMap] : this->demos) {
-        auto it = demoMap.find(demoName);
-        if (it != demoMap.end()) {
-            return it->second;
-        }
-    }
-    return nullptr;
+    auto it = this->demos.find(kDir);
+    if (it == this->demos.end())return nullptr;
+    auto demoIt = it->second.find(demoName);
+    if (demoIt == it->second.end())return nullptr;
+    return demoIt->second;
 }
 std::shared_ptr<const Demo::Info> DemoSystem::GetCurOpDemoInfo()const {
     std::shared_lock lock(this->smutex);
-    auto pCurOp = this->currentOperatingDemoName.load(std::memory_order_acquire);
+    auto pCurOp = this->currentOperatingDemo.load(std::memory_order_acquire);
     if (!pCurOp)return nullptr;
-    for (const auto& [kDir, demoMap] : this->demos) {
-        auto it = demoMap.find(*pCurOp);
-        if (it != demoMap.end()) {
-            return it->second;
-        }
-    }
-    return nullptr;
+    auto it = this->demos.find(pCurOp->first);
+    if (it == this->demos.end())return nullptr;
+    auto demoIt = it->second.find(pCurOp->second);
+    if (demoIt == it->second.end())return nullptr;
+    return demoIt->second;
 }

@@ -169,11 +169,12 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
 
     // ---------- 7. 发消息 ----------
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetPlaying"_hash);
-    rp->str1 = std::move(key);
+    rp->str1 = key;
     rp->str2 = demoName;
     this->PublishAsync(std::move(msg));
 
     auto [msg2, rp2] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);
-    rp2->str1 = demoName;
+    rp2->str1 = std::move(key);
+    rp2->str2 = std::move(demoName);
     this->PublishAsync(std::move(msg2));
 }

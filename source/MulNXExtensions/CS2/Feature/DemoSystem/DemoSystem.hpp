@@ -9,7 +9,7 @@ namespace Demo {
             Death,
             Campath
         };
-        // demo文件所在的key，后面也许可以和路径系统联动，暂且为空吧
+        // demo文件所在的key
         std::string kPath{};
         // demo文件的裸名称
         std::string demoName{};
@@ -34,6 +34,7 @@ namespace Demo {
     };
 
     struct RecordPass {
+        std::string kPath{};
         std::string demoFileName{};
         std::vector<RecordTask> rTasks{};
     };
@@ -107,15 +108,16 @@ namespace Demo {
 class DemoSystem final :public CSModuleBase {
     std::map<std::string, // 先kDir，再demoName
         std::map<std::string, std::shared_ptr<Demo::Info>>> demos;
-    std::atomic<std::shared_ptr<const std::string>>currentOperatingDemoName = nullptr;
-    std::atomic<std::shared_ptr<const std::string>>currentPlayingDemoName = nullptr;
+    
+    std::atomic<std::shared_ptr<std::pair<std::string, std::string>>>currentOperatingDemo = nullptr;
+    std::atomic<std::shared_ptr<std::pair<std::string, std::string>>>currentPlayingDemo = nullptr;
 
     void Window(MulNX::UICoordinator* uico);
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
 public:
-    std::shared_ptr<const std::string> GetCurrentOperatingDemoName()const;
-    std::shared_ptr<const std::string> GetCurrentPlayingDemoName()const;
-    std::shared_ptr<const Demo::Info> GetDemoInfo(const std::string& demoName)const;
+    std::shared_ptr<std::pair<std::string, std::string>> GetCurrentOperatingDemo()const;
+    std::shared_ptr<std::pair<std::string, std::string>> GetCurrentPlayingDemo()const;
+    std::shared_ptr<const Demo::Info> GetDemoInfo(const std::string& kDir, const std::string& demoName)const;
     std::shared_ptr<const Demo::Info> GetCurOpDemoInfo()const;
 };

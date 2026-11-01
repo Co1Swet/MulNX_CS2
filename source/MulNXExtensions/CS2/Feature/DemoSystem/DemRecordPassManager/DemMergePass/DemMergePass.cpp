@@ -53,7 +53,7 @@ void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks)const {
         auto& task = out[i];
 
         std::string killer = std::to_string(task.uid);
-        if (auto info = this->pDemSys->GetDemoInfo(task.demoName)) {
+        if (auto info = this->pDemSys->GetDemoInfo(task.kPath, task.demoName)) {
             killer = info->GetPlayerName(task.uid);
         }
 

@@ -6,8 +6,7 @@ bool DemClassifyPass::Init() {
     return true;
 }
 
-std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(
-    std::vector<Demo::RecordTask>&& rTasks)const {
+std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(std::vector<Demo::RecordTask>&& rTasks)const {
     const size_t inputCount = rTasks.size();
     this->LogInfo(std::format("开始分类：输入 {} 条录制任务", inputCount));
 
@@ -23,9 +22,9 @@ std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(
 
     size_t droppedCount = 0;
     for (auto& task : rTasks) {
-        if (task.demoName.empty()) {
+        if (task.kPath.empty() || task.demoName.empty()) {
             this->LogWarning(std::format(
-                "丢弃无 demoName 的任务：uid={}, tick {}~{}",
+                "丢弃无 kPath 或 demoName 的任务：uid={}, tick {}~{}",
                 task.uid, task.tickStart, task.tickEnd));
             ++droppedCount;
             continue;
@@ -34,6 +33,7 @@ std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(
         auto [it, inserted] = indexByDemo.emplace(task.demoName, passes.size());
         if (inserted) {
             Demo::RecordPass pass;
+            pass.kPath = task.kPath;
             pass.demoFileName = task.demoName;
             pass.rTasks.reserve(1);
             pass.rTasks.push_back(std::move(task));
@@ -49,8 +49,7 @@ std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(
         inputCount, passes.size(), droppedCount));
 
     for (const auto& pass : passes) {
-        this->LogInfo(std::format("  [{}] {} 条任务",
-            pass.demoFileName, pass.rTasks.size()));
+        this->LogInfo(std::format("[{}({})] {} 条任务", pass.demoFileName, pass.kPath, pass.rTasks.size()));
     }
 
     return passes;

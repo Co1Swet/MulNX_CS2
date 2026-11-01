@@ -32,12 +32,12 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
         tryPass = this->recordPasses.front();
     }
     // 尝试发生Pass切换
-    auto pNowPlaying = this->pDemSys->GetCurrentPlayingDemoName();
+    auto pNowPlaying = this->pDemSys->GetCurrentPlayingDemo();
     bool needChange = false;
     if (!pNowPlaying) {
         needChange = true;
     }
-    else if (*pNowPlaying != tryPass->demoFileName) {
+    else if (pNowPlaying->first != tryPass->kPath || pNowPlaying->second != tryPass->demoFileName) {
         needChange = true;
         this->AsyncCommand("disconnect");
         std::chrono::steady_clock::time_point lastSent = std::chrono::steady_clock::now();
@@ -60,9 +60,9 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
             bool ok;
             auto nowTick = this->CS2Time->GetDemoTick();
             co_await this->WaitTimed(ok, 3000, [&]() {
-                auto pNow = this->pDemSys->GetCurrentPlayingDemoName();
+                auto pNow = this->pDemSys->GetCurrentPlayingDemo();
                 if (!pNow)return false;
-                if (*pNow != tryPass->demoFileName)return false;
+                if (pNow->first != tryPass->kPath || pNow->second != tryPass->demoFileName) return false;
                 auto curTick = this->CS2Time->GetDemoTick();
                 if (curTick < 17 || std::abs(curTick - nowTick) < 64)return false; // 0x11
                 if (!this->CS2Time->IsPlayingDemo())return false;
