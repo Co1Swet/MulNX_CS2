@@ -27,6 +27,11 @@ void PassRecordMaker::ProcessMsg(MulNX::Message& msg) {
 }
 
 MulNX::CoTask PassRecordMaker::AsyncWaitInfo(bool& succ, const std::string& demoName) {
+    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
+    rp->str1 = "kGAMEDEMOS";
+    rp->str2 = demoName;
+    this->PublishAsync(std::move(msg));
+
     while (true) {
         MulNX::Message* pMsg = nullptr;
         co_await this->WaitMsgForever("Demo/Info/Notify"_hash, pMsg);
@@ -47,9 +52,6 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string&& n) {
     if (!p) {
         this->LogInfo(std::format("Demo {} 的信息尚未加载，即将发送分析请求", demoName));
 
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-        rp->str1 = (this->CS2Paths->demo / (demoName + ".dem")).string();
-        this->PublishAsync(std::move(msg));
         bool ok = false;
         co_await this->AsyncWaitInfo(ok, demoName);
         if (!ok) {

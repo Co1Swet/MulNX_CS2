@@ -29,6 +29,11 @@ bool DemoSystem::Init() {
         return true;
         });
 
+    this->Path()->CreateKey("kGAMEDEMOS", "csgo", [this](auto* pm) {
+        return true;
+        });
+    this->Path()->KeyBindStatic("kGAMEDEMOS", this->CS2Paths->root / "game");
+
     this->PublishAsync("Demo/Refresh"_hash);
 
     return true;
@@ -46,7 +51,8 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         this->currentPlayingDemoName = std::make_shared<std::string>(full.stem().string());
         // 发送分析请求（包含完整路径）
         auto [ana, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-        rp->str1 = full.string();
+        rp->str1 = "kGAMEDEMOS";
+        rp->str2 = full.stem().string();
         this->PublishAsync(std::move(ana));
         break;
     }

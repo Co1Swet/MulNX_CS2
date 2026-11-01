@@ -9,8 +9,9 @@ void MulNX::Worker::Start() {
         std::mutex dummyMutex;
         std::condition_variable_any cv;
         constexpr auto cycleDuration = std::chrono::milliseconds(10);
-
+#ifdef _RELEASE
         try {
+#endif
             while (!stoken.stop_requested()) {
                 auto cycleStart = std::chrono::steady_clock::now();
 
@@ -40,11 +41,13 @@ void MulNX::Worker::Start() {
                 }
                 // 如果 stop_token 被触发，wait_for 会提前返回，外层 while 检查后退出
             }
+#ifdef _RELEASE
         }
         catch (const std::exception& e) {
             MulNX::ErrorTerminate(std::format("线程 {} 抛出了未经捕获的异常：{}",
                 this->name, e.what()));
         }
+#endif
         });
 }
 
@@ -53,7 +56,7 @@ bool MulNX::TaskSystem::Init() {
         .SubscribeAsync("Task/Create");
 
     this->pMessageManager = this->Core->ModuleManager()->FindModule<MessageManager>("MessageManager");
-    
+
     this->ImCreateTask("Update", "MulNXMain", [this]() {
         this->Update();
         return true;

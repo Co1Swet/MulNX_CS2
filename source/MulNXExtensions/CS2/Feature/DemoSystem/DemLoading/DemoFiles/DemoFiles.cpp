@@ -50,7 +50,8 @@ void DemoFiles::Menu() {
             for (auto& demFile : this->demoFiles) {
                 if(!demFile.beChoosing)continue;
                 auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-                rp->str1 = demFile.path.string();
+                rp->str1 = "kGAMEDEMOS";
+                rp->str2 = demFile.path.stem().string();
                 this->PublishAsync(std::move(msg));
             }
         }
@@ -66,12 +67,14 @@ void DemoFiles::Menu() {
     }
     if (ImGui::Button("分析所选")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-        rp->str1 = demFile.path.string();
+        rp->str1 = "kGAMEDEMOS";
+        rp->str2 = demFile.path.stem().string();
         this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("选中以准备生成录制")) {
         auto [msg0, rp0] = MulNX::Message::Create<MulNX::NetExt>("Demo/Analyze"_hash);
-        rp0->str1 = demFile.path.string();
+        rp0->str1 = "kGAMEDEMOS";
+        rp0->str2 = demFile.path.stem().string();
         this->PublishAsync(std::move(msg0));
 
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/SetOperating"_hash);

@@ -37,11 +37,12 @@ bool DemoAnalyzer::Init() {
 void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Analyze"_hash: {
-        const std::string& str = msg.asp.get<MulNX::NetExt>()->str1;
-        fs::path demoPath(str);
+        const auto& key = msg.asp.get<MulNX::NetExt>()->str1;
+        const auto& demoName = msg.asp.get<MulNX::NetExt>()->str2;
+        auto demoPath = this->Path()->PathGetFromKey(key) / (demoName + ".dem");
         // 确保为绝对路径（正常情况下已经是）
         if (!demoPath.is_absolute()) {
-            this->LogError(std::format("收到非绝对路径: {}", str));
+            this->LogError(std::format("收到非绝对路径: {}", demoPath.string()));
             break;
         }
         this->LogInfo(std::format("接收到分析请求: {}", demoPath.string()));
@@ -53,7 +54,8 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(fs::path&& demoPath) {
+MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(fs::path&& n) {
+    auto demoPath = std::move(n);
     std::string stem = demoPath.stem().string();
     fs::path jsonPath = this->dirData / (stem + ".json");
 
