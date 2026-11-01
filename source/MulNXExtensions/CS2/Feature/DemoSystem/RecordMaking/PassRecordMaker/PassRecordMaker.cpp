@@ -18,7 +18,7 @@ bool PassRecordMaker::Init() {
 }
 
 void PassRecordMaker::ProcessMsg(MulNX::Message& msg) {
-    switch (msg.type) {
+    switch (msg.type) { 
     case "Demo/Record/Make/Auto"_hash: {
         this->EnsureMake("111").Fire();
         break;
@@ -35,8 +35,10 @@ MulNX::CoTask PassRecordMaker::AsyncWaitInfo(bool& succ, const std::string& demo
     while (true) {
         MulNX::Message* pMsg = nullptr;
         co_await this->WaitMsgForever("Demo/Info/Notify"_hash, pMsg);
-        auto pNet = pMsg->asp.get<MulNX::NetExt>();
-        const auto& name = pNet->str1;
+        auto r = this->ParseDemoPath(*pMsg);
+        if (!r)continue;
+        auto&& [kDir, name, path] = *r;
+        if (kDir != "kGAMEDEMOS")continue;
         if (name != demoName)continue;
 
         auto&& [suc] = pMsg->Access<int>();
@@ -49,7 +51,6 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string demoName) {
     auto p = this->pDemSys->GetDemoInfo(demoName);
     if (!p) {
         this->LogInfo(std::format("Demo {} 的信息尚未加载，即将发送分析请求", demoName));
-
         bool ok = false;
         co_await this->AsyncWaitInfo(ok, demoName);
         if (!ok) {
@@ -62,6 +63,7 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string demoName) {
         this->LogError(std::format("理论上 {} 已经被分析，但是无法得到有效信息，已丢弃自动生成", demoName));
         co_return;
     }
+    
 
     co_return;
 }

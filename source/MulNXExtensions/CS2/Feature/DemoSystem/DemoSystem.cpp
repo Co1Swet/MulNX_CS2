@@ -62,12 +62,14 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
     case "Demo/Info/Load"_hash: {
         std::unique_lock lock(this->smutex);
         auto demoInfo = *msg.asp.get<Demo::Info>();
-        auto name = demoInfo.demoFileName;
-        this->demos[name] = std::make_shared<Demo::Info>(std::move(demoInfo));
+        auto kDir = demoInfo.kDir;
+        auto demoName = demoInfo.demoFileName;
+        this->demos[demoInfo.kDir][demoName] = std::make_shared<Demo::Info>(std::move(demoInfo));
         auto [notify, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Info/Notify"_hash);
         auto&& [succ] = notify.Access<int>();
         succ = 0;
-        rp->str1 = std::move(name);
+        rp->str1 = std::move(kDir);
+        rp->str2 = std::move(demoName);
         this->PublishAsync(std::move(notify));
         break;
     }
@@ -88,15 +90,23 @@ std::shared_ptr<const std::string> DemoSystem::GetCurrentPlayingDemoName()const 
 }
 std::shared_ptr<const Demo::Info> DemoSystem::GetDemoInfo(const std::string& demoName)const {
     std::shared_lock lock(this->smutex);
-    auto it = this->demos.find(demoName);
-    if (it == this->demos.end())return nullptr;
-    return it->second;
+    for (const auto& [kDir, demoMap] : this->demos) {
+        auto it = demoMap.find(demoName);
+        if (it != demoMap.end()) {
+            return it->second;
+        }
+    }
+    return nullptr;
 }
 std::shared_ptr<const Demo::Info> DemoSystem::GetCurOpDemoInfo()const {
     std::shared_lock lock(this->smutex);
     auto pCurOp = this->currentOperatingDemoName.load(std::memory_order_acquire);
     if (!pCurOp)return nullptr;
-    auto it = this->demos.find(*pCurOp);
-    if (it == this->demos.end())return nullptr;
-    return it->second;
+    for (const auto& [kDir, demoMap] : this->demos) {
+        auto it = demoMap.find(*pCurOp);
+        if (it != demoMap.end()) {
+            return it->second;
+        }
+    }
+    return nullptr;
 }

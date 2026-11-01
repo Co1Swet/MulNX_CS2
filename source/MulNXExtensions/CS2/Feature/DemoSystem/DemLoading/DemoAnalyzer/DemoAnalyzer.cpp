@@ -37,16 +37,7 @@ bool DemoAnalyzer::Init() {
 void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Analyze"_hash: {
-        const auto& key = msg.asp.get<MulNX::NetExt>()->str1;
-        const auto& demoName = msg.asp.get<MulNX::NetExt>()->str2;
-        auto demoPath = this->Path()->PathGetFromKey(key) / (demoName + ".dem");
-        // 确保为绝对路径（正常情况下已经是）
-        if (!demoPath.is_absolute()) {
-            this->LogError(std::format("收到非绝对路径: {}", demoPath.string()));
-            break;
-        }
-        this->LogInfo(std::format("接收到分析请求: {}", demoPath.string()));
-        this->HandleAnalyzeRequest(std::move(demoPath)).Fire();
+        this->OnAnalyzeRequest(msg).Fire();
         break;
     }
     default:
@@ -54,19 +45,27 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
-    std::string stem = demoPath.stem().string();
-    fs::path jsonPath = this->dirData / (stem + ".json");
-
+MulNX::CoTask DemoAnalyzer::OnAnalyzeRequest(MulNX::Message& msg) {
+    auto r = this->ParseDemoPath(msg);
+    if(!r) {
+        this->LogError(std::format("解析 demo 路径请求处理失败: {}", r.error()));
+        co_return;
+    }
+    auto&& [kDir, demoName, demoPath] = *r;
+    this->LogInfo(std::format("接收到分析请求: {}", demoPath.string()));
+    co_await this->HandleAnalyzeRequest(kDir, demoName, demoPath);
+}
+MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(const std::string& key, const std::string& demoName, const fs::path& demoPath) {
+    auto jsonPath = this->dirData / (demoName + ".json");
     // JSON 已存在 → 直接发送加载消息
     if (fs::exists(jsonPath)) {
         this->LogInfo(std::format("分析结果已存在，直接加载: {}", demoPath.string()));
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Read"_hash);
-        rp->str1 = stem;
+        rp->str1 = key;
+        rp->str2 = demoName;
         this->PublishAsync(std::move(msg));
         co_return;
     }
-
     // 检查是否正在分析
     {
         std::unique_lock lock(this->smutex);
@@ -78,14 +77,11 @@ MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(fs::path demoPath) {
             this->analyzingSet.insert(demoPath);
         }
     }
-
     this->LogInfo(std::format("开始分析: {}", demoPath.string()));
-    co_await this->AnalyzeDemoWithCSDA(std::move(demoPath));
+    co_await this->AnalyzeDemoWithCSDA(key, demoName, demoPath);
 }
 
-MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
-    std::string stem = demoPath.stem().string();
-
+MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(const std::string& key, const std::string& demoName, const fs::path& demoPath) {
     // RAII：分析结束时从队列移除
     auto cleanup = scope_exit([&] {
         std::unique_lock lock(this->smutex);
@@ -111,7 +107,7 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
         if (!CreateProcessW(nullptr, cmdBuffer.data(), nullptr, nullptr,
             FALSE, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi)) {
             this->LogError(std::format("创建进程失败，错误码: {}", GetLastError()));
-            co_return;   // cleanup 自动执行，不发送消息
+            co_return this->PublishAsync(this->MakeDemoInfoErrorNotify(key, demoName));   // cleanup 自动执行，不发送消息
         }
         auto onExit = scope_exit([&] {
             CloseHandle(pi.hProcess);
@@ -129,12 +125,14 @@ MulNX::CoTask DemoAnalyzer::AnalyzeDemoWithCSDA(fs::path demoPath) {
             this->LogInfo("Demo 分析成功完成");
             // 仅成功时发送加载消息
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/JSON/Read"_hash);
-            rp->str1 = stem;
+            rp->str1 = key;
+            rp->str2 = demoName;
             this->PublishAsync(std::move(msg));
             co_return;
         }
         this->LogWarning(std::format("csda.exe 退出码: {}，正在加路径反复尝试", exitCode));
     }
     this->LogError("所有尝试均失败，无法分析");
+    co_return this->PublishAsync(this->MakeDemoInfoErrorNotify(key, demoName));
     // cleanup 析构，移除队列
 }

@@ -84,6 +84,7 @@ namespace Demo {
     };
 
     struct Info {
+        std::string kDir{};
         std::string demoFileName{};
         std::string mapName{};
         int tickCount{};
@@ -104,7 +105,8 @@ namespace Demo {
 }
 
 class DemoSystem final :public CSModuleBase {
-    std::map<std::string, std::shared_ptr<Demo::Info>> demos;
+    std::map<std::string, // 先kDir，再demoName
+        std::map<std::string, std::shared_ptr<Demo::Info>>> demos;
     std::atomic<std::shared_ptr<const std::string>>currentOperatingDemoName = nullptr;
     std::atomic<std::shared_ptr<const std::string>>currentPlayingDemoName = nullptr;
 

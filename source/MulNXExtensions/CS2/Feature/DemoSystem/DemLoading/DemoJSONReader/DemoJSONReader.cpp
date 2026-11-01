@@ -32,30 +32,36 @@ bool DemoJSONReader::Init() {
 void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/JSON/Read"_hash: {
-        auto* pNetExt = msg.asp.get<MulNX::NetExt>();
-        std::string filename = pNetExt->str1 + ".json";
+        auto r = this->ParseDemoPath(msg);
+        if (!r) {
+            this->LogError(std::format("解析 demo 路径请求处理失败: {}", r.error()));
+            break;
+        }
+        auto&& [kDir, name, path] = *r;
+        std::string filename = name + ".json";
 
         std::unique_lock lock(this->smutex);
         fs::path filePath = this->dirData / filename;
         if (!fs::exists(filePath)) {
-            this->LogError("文件不存在: " + filePath.string());
+            this->LogError(std::format("文件不存在: {}", filePath.string()));
             break;
         }
         try {
-            this->ReadJSON(filePath);
+            this->ReadJSON(std::move(kDir), filePath);
         }
         catch (const std::exception& e) {
-            this->LogError("读取 JSON 文件时发生错误: " + filePath.string());
+            this->LogError(std::format("读取 JSON 文件时发生错误: {}", filePath.string()));
         }
         break;
     }
     }
 }
 
-void DemoJSONReader::ReadJSON(const fs::path& filePath) {
+void DemoJSONReader::ReadJSON(std::string&& kDir, const fs::path& filePath) {
     auto json = nlohmann::json::parse(std::ifstream(filePath.wstring()));
     this->LogInfo("成功读取 JSON 文件: " + filePath.string());
     Demo::Info info{};
+    info.kDir = kDir;
     info.demoFileName = json["demoFileName"].get<std::string>();
     info.mapName = json["mapName"].get<std::string>();
     info.tickCount = json["tickCount"].get<int>();
