@@ -184,6 +184,10 @@ bool CS2BootLoader::LaunchAndInject() {
         nullptr, nullptr,
         &si, &pi
     );
+    auto cleanup = scope_exit([&]() {
+        if (pi.hThread)CloseHandle(pi.hThread);
+        if (pi.hProcess)CloseHandle(pi.hProcess);
+        });
     if (!ok) {
         this->LogError(std::format("创建CS2进程失败. Error: {}", GetLastError()));
         return false;
@@ -193,10 +197,6 @@ bool CS2BootLoader::LaunchAndInject() {
 
     // 恢复游戏主线程
     ResumeThread(pi.hThread);
-
-    // 清理句柄
-    CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
 
     this->LogInfo(std::format("CS2启动并注入成功: {}", gamePath.string()));
     return true;

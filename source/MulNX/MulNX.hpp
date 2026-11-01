@@ -3,3 +3,4 @@
 #include "Core/Driver/Driver.hpp"
 #include "Core/ModuleManager/ModuleManager.hpp"
 #include "Systems/Systems.hpp"
+#include <MulNX/Common/Misc.hpp>

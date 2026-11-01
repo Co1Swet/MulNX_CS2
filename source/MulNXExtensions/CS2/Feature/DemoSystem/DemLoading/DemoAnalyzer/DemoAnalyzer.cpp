@@ -1,5 +1,4 @@
 #include "DemoAnalyzer.hpp"
-#include <MulNX/Common/Misc.hpp>
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
 
 namespace csda {
