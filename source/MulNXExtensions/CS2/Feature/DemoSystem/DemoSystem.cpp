@@ -61,17 +61,7 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Demo/Info/Load"_hash: {
-        std::unique_lock lock(this->smutex);
-        auto demoInfo = *msg.asp.get<Demo::Info>();
-        auto kDir = demoInfo.kDir;
-        auto demoName = demoInfo.demoFileName;
-        this->demos[kDir][demoName] = std::make_shared<Demo::Info>(std::move(demoInfo));
-        auto [notify, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Info/Notify"_hash);
-        auto&& [succ] = notify.Access<int>();
-        succ = 0;
-        rp->str1 = std::move(kDir);
-        rp->str2 = std::move(demoName);
-        this->PublishAsync(std::move(notify));
+        this->OnInfoLoad(msg);
         break;
     }
     case "Demo/SetOperating"_hash: {
@@ -82,6 +72,43 @@ void DemoSystem::ProcessMsg(MulNX::Message& msg) {
             std::make_shared<std::pair<std::string, std::string>>(key, demoName);
         break;
     }
+    }
+}
+void DemoSystem::OnInfoLoad(MulNX::Message& msg) {
+    std::unique_lock lock(this->smutex);
+    auto pDemoInfo = msg.asp.get<Demo::Info>();
+    if(!pDemoInfo){
+        this->LogError("Demo/Info/Load 消息中缺少 Demo::Info");
+        return;
+    }
+    auto demoInfo = std::move(*pDemoInfo);
+
+    auto [notify, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Info/Notify"_hash);
+    auto kDir = demoInfo.kDir;
+    auto demoName = demoInfo.demoFileName;
+    try {
+        this->demos[kDir][demoName] = std::make_shared<Demo::Info>(std::move(demoInfo));
+        auto&& [succ] = notify.Access<int>();
+        succ = 0;
+        rp->str1 = std::move(kDir);
+        rp->str2 = std::move(demoName);
+        this->PublishAsync(std::move(notify));
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("处理 Demo/Info/Load 消息时发生异常: {}", e.what()));
+        auto&& [succ] = notify.Access<int>();
+        succ = 1;
+        rp->str1 = std::move(kDir);
+        rp->str2 = std::move(demoName);
+        this->PublishAsync(std::move(notify));
+    }
+    catch (...) {
+        this->LogError("处理 Demo/Info/Load 消息时发生未知异常");
+        auto&& [succ] = notify.Access<int>();
+        succ = 1;
+        rp->str1 = std::move(kDir);
+        rp->str2 = std::move(demoName);
+        this->PublishAsync(std::move(notify));
     }
 }
 

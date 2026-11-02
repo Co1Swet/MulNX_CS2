@@ -32,29 +32,41 @@ bool DemoJSONReader::Init() {
 void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/JSON/Read"_hash: {
-        auto r = this->ParseDemoPath(msg);
-        if (!r) {
-            this->LogError(std::format("解析 demo 路径请求处理失败: {}", r.error()));
-            break;
-        }
-        auto&& [kDir, name, path] = *r;
-        std::string filename = name + ".json";
-
-        std::unique_lock lock(this->smutex);
-        fs::path filePath = this->dirData / filename;
-        if (!fs::exists(filePath)) {
-            this->LogError(std::format("文件不存在: {}", filePath.string()));
-            break;
-        }
-        try {
-            this->ReadJSON(std::move(kDir), filePath);
-        }
-        catch (const std::exception& e) {
-            this->LogError(std::format("读取 JSON 文件时发生错误: {}", filePath.string()));
-        }
+        this->OnJSONMsg(msg);
         break;
     }
     }
+}
+
+void DemoJSONReader::OnJSONMsg(MulNX::Message& msg) {
+    auto r = this->ParseDemoPath(msg);
+    if (!r) {
+        auto&& [key, demoName, errorMsg] = r.error();
+        this->PublishAsync(this->MakeDemoInfoErrorNotify(key, demoName));
+        this->LogError(std::format("解析 demo 路径请求处理失败: {}", errorMsg));
+        return;
+    }
+    auto&& [kDir, name, path] = *r;
+    std::string filename = name + ".json";
+
+    std::unique_lock lock(this->smutex);
+
+    fs::path filePath = this->dirData / filename;
+    if (!fs::exists(filePath)) {
+        this->LogError(std::format("文件不存在: {}", filePath.string()));
+        this->PublishAsync(this->MakeDemoInfoErrorNotify(kDir, name));
+        return;
+    }
+    try {
+        return this->ReadJSON(std::move(kDir), filePath);
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("读取 JSON 文件时发生错误: {}，错误：{}", filePath.string(), e.what()));  
+    }
+    catch (...) {
+        this->LogError(std::format("读取 JSON 文件时发生未知错误: {}", filePath.string()));
+    }
+    this->PublishAsync(this->MakeDemoInfoErrorNotify(kDir, name));
 }
 
 void DemoJSONReader::ReadJSON(std::string&& kDir, const fs::path& filePath) {

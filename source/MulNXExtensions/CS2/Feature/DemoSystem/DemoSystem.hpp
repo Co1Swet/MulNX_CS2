@@ -115,6 +115,8 @@ class DemoSystem final :public CSModuleBase {
     void Window(MulNX::UICoordinator* uico);
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
+
+    void OnInfoLoad(MulNX::Message& msg);
 public:
     std::shared_ptr<std::pair<std::string, std::string>> GetCurrentOperatingDemo()const;
     std::shared_ptr<std::pair<std::string, std::string>> GetCurrentPlayingDemo()const;

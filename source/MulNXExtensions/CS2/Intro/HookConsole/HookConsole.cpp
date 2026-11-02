@@ -1,7 +1,6 @@
 ﻿#include "HookConsole.hpp"
 
 bool HookConsole::Init() {
-    this->CS2Cmds.reserve(100);
     (*this)
         .SubscribeAsyncEx<void>("Game/Command")
         .SubscribeAsyncEx<void>("Game/Command/NoReport")

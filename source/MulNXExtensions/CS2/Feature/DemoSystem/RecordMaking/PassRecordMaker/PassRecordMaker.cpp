@@ -1,4 +1,5 @@
 #include "PassRecordMaker.hpp"
+#include <Intro/HookConsole/HookConsole.hpp>
 
 bool PassRecordMaker::Init() {
 
@@ -11,6 +12,14 @@ bool PassRecordMaker::Init() {
         this->Update();
         return true;
         });
+
+    // this->CS2Con->RegisterCmd("一键开豪", [this](auto&&...) {
+    //     this->LogInfo("一键开豪");
+    //     });
+
+    // this->CS2Con->RegisterCmd("yijiankaihao", [this](auto&&...) {
+    //     this->LogInfo("一键开豪");
+    //     });
 
     return true;
 }

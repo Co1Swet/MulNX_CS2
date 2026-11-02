@@ -45,15 +45,27 @@ void DemoAnalyzer::ProcessMsg(MulNX::Message& msg) {
     }
 }
 
-MulNX::CoTask DemoAnalyzer::OnAnalyzeRequest(MulNX::Message& msg) {
+MulNX::CoTask DemoAnalyzer::OnAnalyzeRequest(MulNX::Message& msg)noexcept {
     auto r = this->ParseDemoPath(msg);
-    if(!r) {
-        this->LogError(std::format("解析 demo 路径请求处理失败: {}", r.error()));
+    if (!r) {
+        auto&& [key, demoName, errorMsg] = r.error();
+        this->PublishAsync(this->MakeDemoInfoErrorNotify(key, demoName));
+        this->LogError(std::format("解析 demo 路径请求处理失败: {}", errorMsg));
         co_return;
     }
     auto&& [kDir, demoName, demoPath] = *r;
-    this->LogInfo(std::format("接收到分析请求: {}", demoPath.string()));
-    co_await this->HandleAnalyzeRequest(kDir, demoName, demoPath);
+    try {
+        this->LogInfo(std::format("接收到分析请求: {}", demoPath.string()));
+        co_await this->HandleAnalyzeRequest(kDir, demoName, demoPath);
+        co_return;
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("分析请求处理失败: {}", e.what()));
+    }
+    catch (...) {
+        this->LogError("分析请求处理失败: 未知异常");
+    }
+    co_return this->PublishAsync(this->MakeDemoInfoErrorNotify(kDir, demoName));
 }
 MulNX::CoTask DemoAnalyzer::HandleAnalyzeRequest(const std::string& key, const std::string& demoName, const fs::path& demoPath) {
     auto jsonPath = this->dirData / (demoName + ".json");
