@@ -21,10 +21,18 @@ namespace MulNX {
 		const std::chrono::steady_clock::time_point ClockEpoch = std::chrono::steady_clock::now();//常量，只读，不需要原子化
 		unsigned int CurrentTimeMs{};//线程内，非原子化，单位为毫秒
 		std::atomic<unsigned int> Threshold = 200;//跨线程，原子化，单位为毫秒
+		std::atomic<bool> LimitToForegroundWindow{};
+		std::atomic<void*> InputWindow{};
+		std::atomic<unsigned int> InputReset{};
+		std::atomic<unsigned int> ProcessedInputReset{};
+		std::atomic<bool> InputReady{ true };
+		bool IsInputActive()const;
 		KeyState KeysState[256]{};//跨线程，内部有关跨线程的内容已经原子化
 	public:
 		bool Init()override;
 
+		void SetInputWindow(void* window);//限制输入到前台窗口
+		void ResetInput();//丢弃待处理的输入
 		bool UpdateKeysState();//更新
         bool IsKeyPressed(const unsigned char vkCode)const;//读取是否被按下
         bool IsKeyPackPressed(const KeyCheckPack& Pack)const;//读取是否被按下（带修饰键和连击）
