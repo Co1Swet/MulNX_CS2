@@ -7,13 +7,14 @@ add_library(DemoSystem STATIC
     RecordTaskConfiger/RecordTaskConfiger.cpp
 
     DemoRecorder/DemoRecorder.cpp
-    DemoRecorder/RecordCoTaskImpl.cpp
+    DemoRecorder/TaskDoing.cpp
+    DemoRecorder/TaskPicking.cpp
 
     DemRecordPassManager/DemRecordPassManager.cpp
     DemRecordPassManager/DemMergePass/DemMergePass.cpp
     DemRecordPassManager/DemClassifyPass/DemClassifyPass.cpp
     DemRecordPassManager/DemSortPass/DemSortPass.cpp
-    
+
     DemUI/DemoEventsRender/DemoEventsRender.cpp
     DemUI/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
 

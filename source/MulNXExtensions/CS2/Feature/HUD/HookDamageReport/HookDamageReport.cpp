@@ -88,6 +88,12 @@ bool HookDamageReport::Init() {
         this->UpdateDamageReport(true);
         });
 
+    this->SubscribeSync("Demo/Record/PreRecord", [this](auto&&...) {
+        // 录制前清空伤害报告
+        if (this->enable == false)return;
+        this->UpdateDamageReport(true);
+        });
+
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {
         this->Menu();
         });

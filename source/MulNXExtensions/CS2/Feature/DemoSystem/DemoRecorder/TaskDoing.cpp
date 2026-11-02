@@ -2,7 +2,7 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Support/TimeController/TimeController.hpp>
 
-MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target) {
+MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target)const {
     ok = false;
     // 设置观战目标
     for (int i = 0;i < 3;++i) {
@@ -23,117 +23,20 @@ MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target) {
         this->LogWarning("观战设置失败，重新尝试");
     }
 }
-
-MulNX::CoTask DemoRecorder::EnsurePassChange() {
-    std::shared_ptr<Demo::RecordPass> tryPass = nullptr;
-    {
-        std::unique_lock lock(this->smutex);
-        if (this->recordPasses.empty())co_return;
-        tryPass = this->recordPasses.front();
-    }
-    // 尝试发生Pass切换
-    auto pNowPlaying = this->pDemSys->GetCurrentPlayingDemo();
-    bool needChange = false;
-    if (!pNowPlaying) {
-        needChange = true;
-    }
-    else if (pNowPlaying->first != tryPass->kPath || pNowPlaying->second != tryPass->demoFileName) {
-        needChange = true;
-        this->AsyncCommand("disconnect");
-        std::chrono::steady_clock::time_point lastSent = std::chrono::steady_clock::now();
-        co_await this->WaitUntil([&]() -> bool {
-            if (!this->CS2Time->IsPlayingDemo()) return true;
-            auto now = std::chrono::steady_clock::now();
-            if (now - lastSent >= std::chrono::seconds(5)) {
-                this->AsyncCommand("disconnect");
-                lastSent = now;
-            }
-            return false;
-            });
-    }
-    if (needChange) {
-        for (int i = 0;;++i) {
-            this->LogInfo(std::format("尝试为新Pass切换到指定Demo：{}", tryPass->demoFileName));
-            if (!this->CS2Time->IsPlayingDemo()) { // 这个检验是防止在触发过程中发新playdemo
-                this->AsyncCommand(std::format("playdemo {}", tryPass->demoFileName));
-            }
-            bool ok;
-            auto nowTick = this->CS2Time->GetDemoTick();
-            co_await this->WaitTimed(ok, 3000, [&]() {
-                auto pNow = this->pDemSys->GetCurrentPlayingDemo();
-                if (!pNow)return false;
-                if (pNow->first != tryPass->kPath || pNow->second != tryPass->demoFileName) return false;
-                auto curTick = this->CS2Time->GetDemoTick();
-                if (curTick < 17 || std::abs(curTick - nowTick) < 64)return false; // 0x11
-                if (!this->CS2Time->IsPlayingDemo())return false;
-                return true;
-                });
-            if (ok) {
-                this->LogInfo("切换Demo成功");
-                break;
-            }
-            else if (i < 3) {
-                this->LogWarning("切换尚未完成，继续尝试");
-                continue;
-            }
-            else {
-                this->LogError("多次尝试切换失败");
-                co_return;
-            }
-        }
-    }
-    {
-        std::unique_lock lock(this->smutex);
-        if (this->recordPasses.empty() || this->recordPasses.front() != tryPass) {
-            co_return;
-        }
-        this->recordPasses.pop_front();
-        this->currentPass.store(tryPass, std::memory_order_release);
-    }
-    co_await this->WaitMilliseconds(1000);
-}
-
-MulNX::CoTask DemoRecorder::GoNextTask(const Demo::RecordTask*& pTask) {
-    auto curPass = this->currentPass.load(std::memory_order_acquire);
-    while (true) {
-        if (!curPass) {
-            co_await this->EnsurePassChange();
-            curPass = this->currentPass.load(std::memory_order_acquire);
-            if (!curPass)co_return;
-            this->indexTask.store(-1, std::memory_order_release);
-        }
-
-        int curIdx = this->indexTask.load(std::memory_order_acquire);
-        int nextIdx = curIdx + 1;
-
-        if (nextIdx < curPass->rTasks.size()) {
-            pTask = &curPass->rTasks[nextIdx];
-            this->indexTask.store(nextIdx, std::memory_order_release);
-            co_return;
-        }
-        else {
-            this->AsyncCommand("demo_pause");
-            this->LogSucc(std::format("录制Pass已经完整结束：{}", curPass->demoFileName));
-            this->currentPass.store(nullptr, std::memory_order_release);
-            this->indexTask.store(-1, std::memory_order_release);
-            curPass = nullptr;
-            continue;
-        }
-    }
-}
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
         // 等待模块激活
         co_await this->WaitUntil([this]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
 
         while (this->moduleActive.load(std::memory_order_acquire)) {
-            const Demo::RecordTask* pTask = nullptr;
-            co_await this->GoNextTask(pTask);
-            if (!pTask) {
+            std::optional<Demo::RecordTask> o = std::nullopt;
+            co_await this->GoNextTask(o);
+            if (!o.has_value()) {
+                this->LogWarning("没有更多的录制任务，模块将自动关闭");
                 this->moduleActive.store(false, std::memory_order_release);
                 break;
             }
-            const auto& rTask = *pTask;
+            const auto& rTask = *o;
             // 检验窗口安全
             if (rTask.tickStart < 151) {
                 this->LogError(std::format("错误的录制窗口起点：{} ，已丢弃：{}", rTask.tickStart, rTask.desc));
@@ -144,7 +47,7 @@ MulNX::CoTask DemoRecorder::Main() {
         }
     }
 }
-MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
+MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
     this->LogInfo(std::format("汇报当前片段信息---UID:{},开始tick:{},结束tick:{}",
         rTask.uid, rTask.tickStart, rTask.tickEnd));
 
@@ -219,9 +122,7 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
         this->LogError("多次尝试设置观战失败！丢弃一个片段");
         co_return;
     }
-
     this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
-
     // 恢复Demo播放
     for (int i = 0;;++i) {
         bool ok = false;
@@ -242,7 +143,8 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
             co_return;
         }
     }
-
+    // 预留录制前钩子
+    this->PublishSync("Demo/Record/PreRecord"_hash);
     // 等待播放到片段起点
     for (int i = 0;;++i) {
         bool ok = false;
@@ -262,19 +164,53 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask) {
             co_return;
         }
     }
-
     // 开始录制
     this->StartRecord(rTask);
     // 输出提示信息
     this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
         rTask.uid, rTask.tickStart, rTask.tickEnd));
-    // 等待录制结束 tick
+    // 等待录制结束
     co_await this->WaitUntil([&] {
-        auto curTick = this->CS2Time->GetDemoTick();
-        return curTick >= rTask.tickEnd;
+        return !this->OnRecording(rTask);
         });
     // 停止录制
     this->PublishAsync("Media/Record/Stop"_hash);
     // 输出成功信息并重置状态
     this->LogSucc(std::format("录制结束，UID={}", rTask.uid));
+}
+
+// 返回true以表示保持录制状态，返回false以表示录制结束
+bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask)const {
+    if (this->moduleActive.load(std::memory_order_acquire) == false) {
+        this->LogWarning("模块已被外部关闭，停止录制");
+        return false;
+    }
+
+    if (curRecordTask.uid != 0) {
+        auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
+        if (!obUID || *obUID != curRecordTask.uid) {
+            this->LogError(std::format("当前观战目标={}，意外地不等于录制目标={}，结束当前片段录制",
+                obUID ? std::to_string(*obUID) : "无", curRecordTask.uid));
+            return false;
+        }
+    }
+
+    auto curTick = this->CS2Time->GetDemoTick();
+    if (curTick < 5) {
+        this->LogWarning(std::format("当前tick={}，意外地小于5，继续等待", curTick));
+        return true;
+    }
+
+    if (curTick >= curRecordTask.tickEnd) {
+        this->LogInfo(std::format("当前tick={}，已经超过录制终点tick={}，结束录制",
+            curTick, curRecordTask.tickEnd));
+        return false;
+    }
+    if (curTick < curRecordTask.tickStart - 5) {
+        this->LogError(std::format("当前tick={}，意外地小于录制起点tick={}，丢弃录制",
+            curTick, curRecordTask.tickStart));
+        return false;
+    }
+
+    return true;
 }

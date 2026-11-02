@@ -16,7 +16,7 @@ namespace Demo {
         // 任务描述
         std::string desc{};
         // 目标SteamUID
-        Steam64UID uid{};
+        Steam64UID uid = 0;
         // 录制类型，和优化有关
         Type type = Type::None;
         // 开始录制tick
