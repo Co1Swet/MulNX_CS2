@@ -1,5 +1,6 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
+#include <optional>
 #include <MulNXExtensions/WebSocketManager/WebSocketMixin.hpp>
 
 namespace CS2 {
@@ -19,6 +20,8 @@ class HSI final :public CSModuleBase, public WebSocketMixin<HSI> {
         int attackerblind{};
         int attackerinair{};
         std::string weapon{};  // weapon 是字符串，单独处理
+        int64_t capturedAtUnixMs{};
+        std::optional<int> clientTick{};
     };
     moodycamel::ConcurrentQueue<KillEvent>buffer{};
     bool Init()override;

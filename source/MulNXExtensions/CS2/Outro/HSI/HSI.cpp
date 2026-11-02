@@ -2,6 +2,8 @@
 #include <Intro/HookGameEvents/HookGameEvents.hpp>
 #include <Mirror/CS2Hash/CS2Hash.hpp>
 #include <nlohmann/json.hpp>
+#include <MulNXThirdParty/cs2_dumpers.hpp>
+#include <chrono>
 
 bool HSI::Init() {
     this->SubscribeSync("Hook/FireEventClientSide/player_death", [this](MulNX::Message& msg) {
@@ -18,6 +20,17 @@ bool HSI::Init() {
 }
 
 void HSI::OnDeathEvent(CS2::CGameEvent* event) {
+    KillEvent kEvent;
+    kEvent.capturedAtUnixMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    auto base = this->CS2->engine2.GetBaseAddress();
+    if (base) {
+        try {
+            auto client = MulNX::MRead<uintptr_t>(base + cs2_dumper::offsets::engine2_dll::dwNetworkGameClient);
+            if (client) kEvent.clientTick = MulNX::MRead<int>(client + cs2_dumper::offsets::engine2_dll::dwNetworkGameClient_clientTickCount);
+        }
+        catch (const MulNX::Exception&) {}
+    }
     static CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
     static CS2::CKV3MemberName userid{ this->CS2Hashs->userid, -1, nullptr };
     static CS2::CKV3MemberName assister{ this->CS2Hashs->assister, -1, nullptr };
@@ -32,7 +45,6 @@ void HSI::OnDeathEvent(CS2::CGameEvent* event) {
     static CS2::CKV3MemberName attackerinair{ CS2Hashs->attackerinair, -1, nullptr };
 
     // 读取并填充结构体
-    KillEvent kEvent;
     kEvent.assistedflash = event->GetInt(assistedflash);
     kEvent.headshot = event->GetInt(headshot);
     kEvent.penetrated = event->GetInt(penetrated);
@@ -84,6 +96,8 @@ void HSI::Main() {
     j["attackerSteamId"] = std::to_string(kEvent.attacker);
     j["victimSteamId"] = std::to_string(kEvent.victim);
     j["assistSteamId"] = std::to_string(kEvent.assister);
+    j["capturedAtUnixMs"] = kEvent.capturedAtUnixMs;
+    if (kEvent.clientTick) j["networkGameClientTick"] = *kEvent.clientTick;
 
     this->WebPost(j.dump());
 }
