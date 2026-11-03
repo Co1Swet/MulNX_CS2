@@ -61,7 +61,7 @@ public:
     uintptr_t GetVFuncPtr(int index) {
         uintptr_t vptr = GetVTablePtr();
         uintptr_t* vtable = reinterpret_cast<uintptr_t*>(vptr);
-        return vtable[index];  // 返回函数入口地址
+        return MulNX::MRead(&vtable[index]);  // 返回函数入口地址
     }
 
     // 返回一个可调用对象 VExecuter，支持函数类型语法
