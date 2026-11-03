@@ -9,29 +9,23 @@ void MulNX::Worker::Start() {
         std::mutex dummyMutex;
         std::condition_variable_any cv;
         constexpr auto cycleDuration = std::chrono::milliseconds(10);
-#ifdef _RELEASE
-        try {
-#endif
+
+        auto cycle = [&]() {
             while (!stoken.stop_requested()) {
                 auto cycleStart = std::chrono::steady_clock::now();
-
-                // 1. 尽量清空并发队列，收集任务
+                // 尽量清空并发队列，收集任务
                 MulNX::Task task;
                 while (queue.try_dequeue(task)) {
                     this->tasks.push_back(std::move(task));
                 }
-
-                // 2. 执行所有待处理任务
-                for (auto it = this->tasks.begin(); it != this->tasks.end();) {
-                    if (it->Do()) {
-                        ++it;
-                    }
-                    else {
-                        it = this->tasks.erase(it);
-                    }
+                // 把要执行的任务整体摘出来，这是为了防止在执行任务的过程中，有新的任务被添加进来，导致迭代器失效
+                std::vector<MulNX::Task> batch;
+                batch.swap(this->tasks);
+                // 逐个执行，结果写回
+                for (auto& t : batch) {
+                    if (t.Do()) this->tasks.push_back(std::move(t));
                 }
-
-                // 3. 限速：若整个周期不足 10ms，则休眠剩余时间
+                // 限速：若整个周期不足 10ms，则休眠剩余时间
                 auto elapsed = std::chrono::steady_clock::now() - cycleStart;
                 if (elapsed < cycleDuration) {
                     auto remaining = cycleDuration - elapsed;
@@ -41,12 +35,17 @@ void MulNX::Worker::Start() {
                 }
                 // 如果 stop_token 被触发，wait_for 会提前返回，外层 while 检查后退出
             }
-#ifdef _RELEASE
+            };
+#ifndef _DEBUG
+        try {
+            cycle();
         }
         catch (const std::exception& e) {
             MulNX::ErrorTerminate(std::format("线程 {} 抛出了未经捕获的异常：{}",
                 this->name, e.what()));
         }
+#else
+        cycle();
 #endif
         });
 }

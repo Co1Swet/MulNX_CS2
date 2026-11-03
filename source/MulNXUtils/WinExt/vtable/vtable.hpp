@@ -1,7 +1,6 @@
 #pragma once
-
+#include <MulNXUtils/WinExt/Memory/Memory.hpp>
 #include <cstdint>
-#include <utility>  // for std::forward
 #include <type_traits>
 
 // 辅助 trait：将函数类型 F = R(Args...) 转换为对应的带显式 this 指针的函数指针类型 R(*)(void*, Args...)
@@ -55,7 +54,7 @@ public:
     // 获取虚表指针（vptr）的值
     uintptr_t GetVTablePtr() {
         // 对象首地址处存放着指向虚函数表的指针
-        return *reinterpret_cast<uintptr_t*>(this);
+        return MulNX::MRead(reinterpret_cast<uintptr_t*>(this));
     }
 
     // 获取虚函数表中第 index 个函数的地址（原始整数形式）
