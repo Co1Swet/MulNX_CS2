@@ -79,50 +79,52 @@ namespace CS2 {
         int32_t m_iMatchStats_PlayersAlive_CT[30]; // 0x0A30
         int32_t m_iMatchStats_PlayersAlive_T[30]; // 0x0AA8
         float m_TeamRespawnWaveTimes[32]; // 0x0B20
-        GameTime_t m_flNextRespawnWave[32]; // 0x0BA0
-        char pad_0x0C20[0x0C]; // 0x0C20 VectorWS m_vMinimapMins
-        char pad_0x0C2C[0x0C]; // 0x0C2C VectorWS m_vMinimapMaxs
-        float m_MinimapVerticalSectionHeights[8]; // 0x0C38
-        uint64_t m_ullLocalMatchID; // 0x0C58
-        int32_t m_nEndMatchMapGroupVoteTypes[10]; // 0x0C60
-        int32_t m_nEndMatchMapGroupVoteOptions[10]; // 0x0C88
-        int32_t m_nEndMatchMapVoteWinner; // 0x0CB0
-        int32_t m_iNumConsecutiveCTLoses; // 0x0CB4
-        int32_t m_iNumConsecutiveTerroristLoses; // 0x0CB8
-        char pad_0x0CBC[0xBC]; // 0x0CBC
-        int32_t m_nMatchAbortedEarlyReason; // 0x0D78
-        bool m_bHasTriggeredRoundStartMusic; // 0x0D7C
-        bool m_bSwitchingTeamsAtRoundReset; // 0x0D7D
-        char pad_0x0D7E[0x1A]; // 0x0D7E
-        char pad_0x0D98[0x08]; // 0x0D98 CCSGameModeRules* m_pGameModeRules
-        char pad_0x0DA0[0x158]; // 0x0DA0 C_RetakeGameRules m_RetakeRules
-        uint8_t m_nMatchEndCount; // 0x0EF8
-        char pad_0x0EF9[0x03]; // 0x0EF9
-        int32_t m_nTTeamIntroVariant; // 0x0EFC
-        int32_t m_nCTTeamIntroVariant; // 0x0F00
-        bool m_bTeamIntroPeriod; // 0x0F04
-        char pad_0x0F05[0x03]; // 0x0F05
-        int32_t m_iRoundEndWinnerTeam; // 0x0F08
-        int32_t m_eRoundEndReason; // 0x0F0C
-        bool m_bRoundEndShowTimerDefend; // 0x0F10
-        char pad_0x0F11[0x03]; // 0x0F11
-        int32_t m_iRoundEndTimerTime; // 0x0F14
-        char pad_0x0F18[0x08]; // 0x0F18 CUtlString m_sRoundEndFunFactToken
-        char pad_0x0F20[0x04]; // 0x0F20 CPlayerSlot m_iRoundEndFunFactPlayerSlot
-        int32_t m_iRoundEndFunFactData1; // 0x0F24
-        int32_t m_iRoundEndFunFactData2; // 0x0F28
-        int32_t m_iRoundEndFunFactData3; // 0x0F2C
-        char pad_0x0F30[0x08]; // 0x0F30 CUtlString m_sRoundEndMessage
-        int32_t m_iRoundEndPlayerCount; // 0x0F38
-        bool m_bRoundEndNoMusic; // 0x0F3C
-        char pad_0x0F3D[0x03]; // 0x0F3D
-        int32_t m_iRoundEndLegacy; // 0x0F40
-        uint8_t m_nRoundEndCount; // 0x0F44
+        int32_t m_nActiveMutators; // 0x0BA0 (新版新增字段)
+        GameTime_t m_flNextRespawnWave[32]; // 0x0BA4
+        char pad_0x0C24[0x0C]; // 0x0C24 VectorWS m_vMinimapMins
+        char pad_0x0C30[0x0C]; // 0x0C30 VectorWS m_vMinimapMaxs
+        float m_MinimapVerticalSectionHeights[8]; // 0x0C3C
+        char pad_0x0C5C[0x04]; // 0x0C5C 补齐内存对齐
+        uint64_t m_ullLocalMatchID; // 0x0C60
+        int32_t m_nEndMatchMapGroupVoteTypes[10]; // 0x0C68
+        int32_t m_nEndMatchMapGroupVoteOptions[10]; // 0x0C90
+        int32_t m_nEndMatchMapVoteWinner; // 0x0CB8
+        int32_t m_iNumConsecutiveCTLoses; // 0x0CBC
+        int32_t m_iNumConsecutiveTerroristLoses; // 0x0CC0
+        char pad_0x0CC4[0xBC]; // 0x0CC4
+        int32_t m_nMatchAbortedEarlyReason; // 0x0D80
+        bool m_bHasTriggeredRoundStartMusic; // 0x0D84
+        bool m_bSwitchingTeamsAtRoundReset; // 0x0D85
+        char pad_0x0D86[0x1A]; // 0x0D86
+        char pad_0x0DA0[0x08]; // 0x0DA0 CCSGameModeRules* m_pGameModeRules
+        char pad_0x0DA8[0x158]; // 0x0DA8 C_RetakeGameRules m_RetakeRules
+        uint8_t m_nMatchEndCount; // 0x0F00
+        char pad_0x0F01[0x03]; // 0x0F01
+        int32_t m_nTTeamIntroVariant; // 0x0F04
+        int32_t m_nCTTeamIntroVariant; // 0x0F08
+        bool m_bTeamIntroPeriod; // 0x0F0C
+        char pad_0x0F0D[0x03]; // 0x0F0D
+        int32_t m_iRoundEndWinnerTeam; // 0x0F10
+        int32_t m_eRoundEndReason; // 0x0F14
+        bool m_bRoundEndShowTimerDefend; // 0x0F18
+        char pad_0x0F19[0x03]; // 0x0F19
+        int32_t m_iRoundEndTimerTime; // 0x0F1C
+        char pad_0x0F20[0x08]; // 0x0F20 CUtlString m_sRoundEndFunFactToken
+        char pad_0x0F28[0x04]; // 0x0F28 CPlayerSlot m_iRoundEndFunFactPlayerSlot
+        int32_t m_iRoundEndFunFactData1; // 0x0F2C
+        int32_t m_iRoundEndFunFactData2; // 0x0F30
+        int32_t m_iRoundEndFunFactData3; // 0x0F34
+        char pad_0x0F38[0x08]; // 0x0F38 CUtlString m_sRoundEndMessage
+        int32_t m_iRoundEndPlayerCount; // 0x0F40
+        bool m_bRoundEndNoMusic; // 0x0F44
         char pad_0x0F45[0x03]; // 0x0F45
-        int32_t m_iRoundStartRoundNumber; // 0x0F48
-        uint8_t m_nRoundStartCount; // 0x0F4C
-        char pad_0x0F4D[0x400B]; // 0x0F4D
-        double m_flLastPerfSampleTime; // 0x4F58
+        int32_t m_iRoundEndLegacy; // 0x0F48
+        uint8_t m_nRoundEndCount; // 0x0F4C
+        char pad_0x0F4D[0x03]; // 0x0F4D
+        int32_t m_iRoundStartRoundNumber; // 0x0F50
+        uint8_t m_nRoundStartCount; // 0x0F54
+        char pad_0x0F55[0x400B]; // 0x0F55
+        double m_flLastPerfSampleTime; // 0x4F60
 
         inline bool IsGameInactive() {
             try {
@@ -137,3 +139,33 @@ namespace CS2 {
     };
 #pragma pack(pop)
 }
+// 验证开头的 bool
+static_assert(
+    offsetof(CS2::C_CSGameRules, m_bFreezePeriod) ==
+    cs2_dumper::schemas::client_dll::C_CSGameRules::m_bFreezePeriod,
+    "C_CSGameRules::m_bFreezePeriod offset mismatch!"
+    );
+// 验证新插入的 m_nActiveMutators
+static_assert(
+    offsetof(CS2::C_CSGameRules, m_nActiveMutators) ==
+    cs2_dumper::schemas::client_dll::C_CSGameRules::m_nActiveMutators,
+    "C_CSGameRules::m_nActiveMutators offset mismatch!"
+    );
+// 验证跨越对齐边界的 uint64
+static_assert(
+    offsetof(CS2::C_CSGameRules, m_ullLocalMatchID) ==
+    cs2_dumper::schemas::client_dll::C_CSGameRules::m_ullLocalMatchID,
+    "C_CSGameRules::m_ullLocalMatchID offset mismatch!"
+    );
+// 验证用到的 m_nRoundStartCount
+static_assert(
+    offsetof(CS2::C_CSGameRules, m_nRoundStartCount) ==
+    cs2_dumper::schemas::client_dll::C_CSGameRules::m_nRoundStartCount,
+    "C_CSGameRules::m_nRoundStartCount offset mismatch!"
+    );
+// 验证结尾的 double
+static_assert(
+    offsetof(CS2::C_CSGameRules, m_flLastPerfSampleTime) ==
+    cs2_dumper::schemas::client_dll::C_CSGameRules::m_flLastPerfSampleTime,
+    "C_CSGameRules::m_flLastPerfSampleTime offset mismatch!"
+    );
