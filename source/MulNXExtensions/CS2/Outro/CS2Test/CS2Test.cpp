@@ -40,22 +40,5 @@ bool CS2Test::Init() {
 
     auto k1 = CS2::FindWeapon("weapon_ak47")->damageType;
 
-    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
-
-        auto t = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Demo::CCSGO_EndOfMatch_Activate).Data();
-        static auto hookShow = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
-            return MulNX::Hook::Then::Return;   // 整个函数不执行
-            }).value();
-        hookShow->Attach();
-        });
-
-    this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](auto&&...) {
-        auto t2 = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::Demo::Pos_CDemoPlayer_InternalReadPacket_CheckFlag_DemoPauseAtEnd).Data();
-        static auto hookShow2 = MulNX::Hook::Create(t2, [this](MulNX::Hook* hk, RegContext* ctx) -> MulNX::Hook::Then {
-            return MulNX::Hook::Then::SkipAllAndContinue;
-            }, true).value();
-        hookShow2->Attach();
-        });
-
     return true;
 }

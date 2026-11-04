@@ -192,6 +192,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<RecordFileRedirect>("RecordFileRedirect")
         .CreateModule<AdvancedRecord>("AdvancedRecord")
         .CreateModule<AdTimeFix>("AdTimeFix")
+        .CreateModule<PlayProtect>("PlayProtect")
 
         // 管理
         .CreateModule<MulNXController>("MulNXController")
