@@ -26,7 +26,7 @@ MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target)const {
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
         // 等待模块激活
-        co_await this->WaitUntil([this]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
+        co_await this->WaitUntil([&]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
 
         while (this->moduleActive.load(std::memory_order_acquire)) {
             std::optional<Demo::RecordTask> o = std::nullopt;
@@ -77,13 +77,6 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
     else {
         this->LogInfo("当前Demo已暂停，继续步骤");
     }
-    // 验证音视频系统状态
-    if (this->pMediaState->IsBusy()) {
-        this->LogWarning("音视频系统忙碌，正在等待结束。如果在录制状态中，用户可能需要手动停止录制。");
-        co_await this->WaitUntil([this]() {
-            return !this->pMediaState->IsBusy();
-            });
-    }
     // 跳转时间点，以设置观战目标
     auto tick10before = rTask.tickStart - 10;
     this->AsyncCommand(std::format("demo_gototick {}", tick10before));
@@ -114,7 +107,18 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
         co_return;
     }
 
-    co_await this->WaitMilliseconds(750);
+    auto now = std::chrono::steady_clock::now();
+    // 验证音视频系统状态，让这个验证和等待共享等待时间，最少总计两秒
+    if (this->pMediaState->IsBusy()) {
+        this->LogWarning("音视频系统忙碌，正在等待结束。如果在录制状态中，用户可能需要手动停止录制。");
+        co_await this->WaitUntil([&]() {
+            return !this->pMediaState->IsBusy();
+            });
+    }
+    co_await this->WaitUntil([&]() {
+        auto elapsed = std::chrono::steady_clock::now() - now;
+        return elapsed >= std::chrono::seconds(2);
+        });
 
     bool OBOK = false;
     co_await this->CoSetOBTarget(OBOK, rTask.uid);
@@ -123,6 +127,7 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
         co_return;
     }
     this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
+
     // 恢复Demo播放
     for (int i = 0;;++i) {
         bool ok = false;

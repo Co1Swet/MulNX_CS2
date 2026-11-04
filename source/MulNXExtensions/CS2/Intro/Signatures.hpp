@@ -123,6 +123,8 @@ namespace CS2 {
         }
         namespace Demo {
             inline constexpr MulNX::Memory::Pattern Pos_Call_GetCCSDemoController("E8 ?? ?? ?? ?? 0F 57 DB 45 33 C0 8B D3 48 8B C8");
+            inline constexpr MulNX::Memory::Pattern CCSGO_EndOfMatch_Activate("48 8B C4 88 50 10 55 41 56 48 8B EC");
+            inline constexpr MulNX::Memory::Pattern Pos_CDemoPlayer_InternalReadPacket_CheckFlag_DemoPauseAtEnd("0F 84 ?? ?? ?? ?? 80 BF ?? ?? ?? ?? 00 C6 87 ?? ?? ?? ?? 01");
         }
         namespace Skin {
             inline constexpr MulNX::Memory::Pattern RegenerateWeaponSkins("48 83 EC ?? E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10");

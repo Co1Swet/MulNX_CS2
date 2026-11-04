@@ -1,6 +1,6 @@
 TrailsController.trailsEnable: false
 UISystem.rendEnable: false
-UISystem.ifDrawMid: true
+UISystem.ifDrawMid: false
 CamMacroManager.shortcutEnable: true
 HookSpotStyle.transSpecLabel: true
 ViewSmoother.enable: false
