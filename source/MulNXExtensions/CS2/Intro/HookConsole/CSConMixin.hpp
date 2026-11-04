@@ -17,19 +17,19 @@ class CSConMixin {
 protected:
     template<CSConvarName name>
     auto ConvarSliderInt(const std::string& UIName, const int& min, const int& max) {
-        static auto* pVar = This()->CS2Con->GetCvar(std::string(name))->template GetPtr<int>();
+        static auto* pVar = This()->CS2Con->GetCVarByName(std::string(name))->template GetPtr<int>();
         return ImGui::SliderInt(UIName.c_str(), pVar, min, max);
     }
 
     template<CSConvarName name>
     auto ConvarSliderFloat(const std::string& UIName, const float& min, const float& max) {
-        static auto* pVar = This()->CS2Con->GetCvar(std::string(name))->template GetPtr<float>();
+        static auto* pVar = This()->CS2Con->GetCVarByName(std::string(name))->template GetPtr<float>();
         return ImGui::SliderFloat(UIName.c_str(), pVar, min, max);
     }
 
     template<CSConvarName name>
     auto ConvarCheckbox(const std::string& UIName) {
-        static auto* pVar = This()->CS2Con->GetCvar(std::string(name))->template GetPtr<bool>();
+        static auto* pVar = This()->CS2Con->GetCVarByName(std::string(name))->template GetPtr<bool>();
         return ImGui::Checkbox(UIName.c_str(), pVar);
     }
 

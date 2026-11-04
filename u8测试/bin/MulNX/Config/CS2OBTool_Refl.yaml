@@ -1,6 +1,7 @@
 TrailsController.trailsEnable: false
+PlayProtect.forceDemoPauseAtEnd: true
 UISystem.rendEnable: false
-UISystem.ifDrawMid: false
+UISystem.ifDrawMid: true
 CamMacroManager.shortcutEnable: true
 HookSpotStyle.transSpecLabel: true
 ViewSmoother.enable: false
@@ -31,6 +32,7 @@ SpeakingController.listMode: false
 HookHealthAmmoCenter.show_Hud_HA__stroke: true
 CloudController.hideCloud: false
 SpeakingController.autoActiveTeamVoice: false
+PlayProtect.preventEndOfMatch: true
 SpeakingController.onlyCurOBingSameTeam: false
 SoundCircleFix.enable: true
 RecordTaskConfiger.preRecordSeconds: 3.5

@@ -132,22 +132,18 @@ MulNX::Hook::Then HookConsole::HandleOnRegisterConCommand(MulNX::Hook* hk, RegCo
     return MulNX::Hook::Then::Continue;
 }
 
-C_ConVar* HookConsole::GetCVarByName(const char* var_name)const {
+C_ConVar* HookConsole::GetCVarByName(std::string_view var_name)const {
     uint64_t i = 0;
     this->GetFirstCvarIterator(i);
     while (i != 0xFFFFFFFF) {
         C_ConVar* pCvar = nullptr;
         pCvar = this->GetCVarByIndex(i);
-        if (strcmp(pCvar->szName, var_name) == 0) {
+        if (strcmp(pCvar->szName, var_name.data()) == 0) {
             return pCvar;
         }
         this->GetNextCvarIterator(i, i);
     }
     return nullptr;
-}
-C_ConVar* HookConsole::GetCvar(const std::string& CvarName) {
-    C_ConVar* pCvar = this->GetCVarByName(CvarName.c_str());
-    return pCvar;
 }
 
 void HookConsole::UnlockHiddenCVars(int& Count)const {
