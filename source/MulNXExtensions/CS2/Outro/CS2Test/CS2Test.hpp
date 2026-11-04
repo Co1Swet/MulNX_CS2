@@ -6,4 +6,5 @@ class CS2Test final :public CSModuleBase {
 
     void UI();
     bool Init()override;
+    void ProcessMsg(MulNX::Message& msg)override;
 };

@@ -4,9 +4,6 @@
 
 bool VirtualUser::Init() {
     (*this)
-#ifdef _DEBUG
-        .SubscribeAsync("Core/Tick30min")
-#endif // _DEBUG
         .SubscribeAsync("Core/Tick60")
         .SubscribeAsync("Game/NewRound");
 
@@ -46,16 +43,6 @@ void VirtualUser::ProcessMsg(MulNX::Message& Msg) {
         this->LogInfo("已触发自动保存（频率：每分钟）");
         break;
     }
-#ifdef _DEBUG
-    case "Core/Tick30min"_hash: {
-        this->AsyncCommand("playdemo 111");
-        break;
-    }
-#endif // _DEBUG
-    default: {
-        break;
-    }
-
     }
     return;
 }
