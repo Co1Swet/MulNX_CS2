@@ -1,6 +1,5 @@
 #include "TimeLiner.hpp"
-#include "ITimeAdapter.hpp"
-#include "ITimeRend.hpp"
+#include "TimeMixin.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
 void TimeLiner::Menu() {
@@ -138,4 +137,12 @@ ImVec2 TimeLiner::Map(float time, int layer) const {
 
 float TimeLiner::GetTime() {
     return this->pActiveTimeAdapter->GetTime();
+}
+
+void TimeLiner::SetTime(float time) {
+    if (!std::isfinite(time)) {
+        this->LogError("输入了非法的时间");
+        return;
+    }
+    this->pActiveTimeAdapter->SetTime(time);
 }

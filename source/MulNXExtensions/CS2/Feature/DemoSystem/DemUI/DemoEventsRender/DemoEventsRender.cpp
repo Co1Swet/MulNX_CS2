@@ -1,9 +1,7 @@
 #include "DemoEventsRender.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
 bool DemoEventsRender::Init() {
-    this->FindModule<TimeLiner>("TimeLiner")->timeLineModules.push_back(this);
 
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();

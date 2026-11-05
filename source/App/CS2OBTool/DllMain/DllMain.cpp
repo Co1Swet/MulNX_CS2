@@ -7,6 +7,7 @@
 #include <MulNXExtensions/MediaSystem/Medias.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <MulNXExtensions/TimeLiner/FlowClock/FlowClock.hpp>
+#include <MulNXExtensions/TimeLiner/TimeMarker/TimeMarkerManager.hpp>
 
 static HANDLE hInitCompleteEvent = nullptr;
 static HANDLE hUnloadReadyEvent = nullptr;
@@ -22,6 +23,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<FileRedirector>("FileRedirector")
         .CreateModule<TimeLiner>("TimeLiner")
         .CreateModule<FlowClock>("FlowClock")
+        .CreateModule<TimeMarkerManager>("TimeMarkerManager")
 
         // 图形组件
         .CreateModule<HookD3D11>("HookD3D11")

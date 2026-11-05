@@ -5,6 +5,8 @@
 class ITimeAdapter;
 
 class TimeLiner :public MulNX::Module<TimeLiner> {
+    float curTime = 0;
+
     float currentLeftX = 0.0f;
     float currentRightX = 1.0f;
     float currentBaseY = 0.0f;
@@ -19,7 +21,6 @@ class TimeLiner :public MulNX::Module<TimeLiner> {
 public:
     float minTime = 0;
     float maxTime = 0;
-    float curTime = 0;
 
     ITimeAdapter* pTimeAdapter1 = nullptr;
     ITimeAdapter* pTimeAdapter2 = nullptr;
@@ -28,4 +29,5 @@ public:
     ImVec2 Map(float time, int layer)const;
 
     float GetTime();
+    void SetTime(float time);
 };

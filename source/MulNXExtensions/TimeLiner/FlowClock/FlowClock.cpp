@@ -1,11 +1,7 @@
 #include "FlowClock.hpp"
-#include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
 bool FlowClock::Init() {
-    auto* timeLiner = this->FindModule<TimeLiner>("TimeLiner");
-    if (timeLiner) {
-        timeLiner->pTimeAdapter2 = this;
-    }
+    this->pTimeline->pTimeAdapter2 = this;
     // 初始化上次更新时间点
     m_lastUpdateTime = std::chrono::steady_clock::now();
     return true;

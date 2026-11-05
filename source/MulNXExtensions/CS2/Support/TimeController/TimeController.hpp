@@ -1,8 +1,8 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
-#include <MulNXExtensions/TimeLiner/ITimeAdapter.hpp>
+#include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 
-class TimeController final :public CSModuleBase, public ITimeAdapter {
+class TimeController final :public CSModuleBase, public TimeAdaptMixin<TimeController> {
     void* pDemoPlayer = nullptr;
     class CSDemoController* pCSDemoController = nullptr;
     float GetMinTime()override;

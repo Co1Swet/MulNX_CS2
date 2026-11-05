@@ -1,9 +1,8 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <MulNXExtensions/TimeLiner/ITimeAdapter.hpp>
+#include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 
-class FlowClock final : public MulNX::Module<FlowClock>, public ITimeAdapter {
-public:
+class FlowClock final : public MulNX::Module<FlowClock>, public TimeAdaptMixin<FlowClock> {
     bool Init() override;
 
     float GetMinTime() override;
@@ -14,7 +13,6 @@ public:
     void OnSetOn(float time) override;
     void OnSetOff() override;
 
-private:
     float m_currentTime = 0.0f;
     bool  m_isActive = false;
     std::chrono::steady_clock::time_point m_lastUpdateTime;
