@@ -31,12 +31,13 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
     if (needChange) {
         for (int i = 0;;++i) {
             this->LogInfo(std::format("尝试为新Pass切换到指定Demo：{}", tryPass->demoFileName));
-            if (!this->CS2Time->IsPlayingDemo()) { // 这个检验是防止在触发过程中发新playdemo
+            // 这个检验是防止在新Demo切换过程中发新playdemo
+            if (this->CS2Time->IsPlayingDemo() == false) {
                 this->AsyncCommand(std::format("playdemo {}", tryPass->demoFileName));
             }
             bool ok;
             auto nowTick = this->CS2Time->GetDemoTick();
-            co_await this->WaitTimed(ok, 3000, [&]() {
+            co_await this->WaitTimed(ok, 5000, [&]() {
                 auto pNow = this->pDemSys->GetCurrentPlayingDemo();
                 if (!pNow)return false;
                 if (pNow->first != tryPass->kPath || pNow->second != tryPass->demoFileName) return false;
@@ -49,7 +50,7 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
                 this->LogInfo("切换Demo成功");
                 break;
             }
-            else if (i < 3) {
+            else if (i < 5) {
                 this->LogWarning("切换尚未完成，继续尝试");
                 continue;
             }
