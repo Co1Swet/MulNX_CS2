@@ -2,7 +2,6 @@
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/CS2Remoting/CS2Remotings.hpp>
 #include <App/CS2Injector/UIDocker/UIDocker.hpp>
-#include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 
 // Main code
 int main(int, char**) {
@@ -17,7 +16,6 @@ int main(int, char**) {
             .CreateModule<Win32Starter>("Win32Starter")
             .CreateModule<DLLInjectHelper>("DLLInjectHelper")
             .CreateModule<CS2HelperController>("CS2HelperController")
-            .CreateModule<WebSocketManager>("WebSocketManager")
             .CreateModule<CS2BootLoader>("CS2BootLoader")
             .CreateModule<MulNXController>("MulNXController")
             .CreateModule<UIDocker>("UIDocker")

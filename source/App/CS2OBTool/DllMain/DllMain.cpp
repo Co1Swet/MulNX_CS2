@@ -4,7 +4,6 @@
 #include <MulNXExtensions/WinBaseHooks/WinBaseHooks.hpp>
 #include <MulNXExtensions/CS2/CS2s.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
-#include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaSystem/Medias.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <MulNXExtensions/TimeLiner/FlowClock/FlowClock.hpp>
@@ -21,7 +20,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookWindow>("HookWindow")
         .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
         .CreateModule<FileRedirector>("FileRedirector")
-        .CreateModule<WebSocketManager>("WebSocketManager")
         .CreateModule<TimeLiner>("TimeLiner")
         .CreateModule<FlowClock>("FlowClock")
 
