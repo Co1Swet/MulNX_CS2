@@ -1,7 +1,9 @@
 #include "PassRecordMaker.hpp"
 #include <Intro/HookConsole/HookConsole.hpp>
+#include <Feature/DemoSystem/RecordMaking/AutoRecordRule/AutoRecordRule.hpp>
 
 bool PassRecordMaker::Init() {
+    this->pAutoRecordRule = this->FindModule<AutoRecordRule>("AutoRecordRule");
 
     (*this)
         .SubscribeAsyncEx<void>("Demo/Record/Make/Auto")
@@ -13,21 +15,20 @@ bool PassRecordMaker::Init() {
         return true;
         });
 
-    // this->CS2Con->RegisterCmd("一键开豪", [this](auto&&...) {
-    //     this->LogInfo("一键开豪");
-    //     });
-
-    // this->CS2Con->RegisterCmd("yijiankaihao", [this](auto&&...) {
-    //     this->LogInfo("一键开豪");
-    //     });
-
     return true;
 }
 
 void PassRecordMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) { 
     case "Demo/Record/Make/Auto"_hash: {
-        this->EnsureMake("kGAMEDEMOS", "111").Fire();
+        auto r = this->ParseDemoPath(msg);
+        if (!r) {
+            auto&& [key, name, error] = r.error();
+            this->LogError(std::format("无法根据规则自动生成 {}\\{}：{}", key, name, error));
+            break;
+        }
+        auto&& [key, name, path] = *r;
+        this->EnsureMake(key, name).Fire();
         break;
     }
     }
@@ -70,7 +71,26 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName)
         this->LogError(std::format("理论上 {} 已经被分析，但是无法得到有效信息，已丢弃自动生成", demoName));
         co_return;
     }
-    
+
+    auto plan = this->pAutoRecordRule->BuildPlan(*p);
+    if (plan.requests.empty()) {
+        this->LogWarning(std::format("Demo {} 没有符合自动录制规则的请求", demoName));
+        co_return;
+    }
+
+    const auto requestCount = plan.requests.size();
+    for (auto& request : plan.requests) {
+        this->PublishAsync(std::move(request));
+    }
+
+    MulNX::Message barrier("Demo/Record/Commit/Demo"_hash);
+    auto&& [autoRecord] = barrier.Access<int>();
+    autoRecord = plan.autoStart ? 1 : 0;
+    this->PublishAsync(std::move(barrier));
+
+    this->LogInfo(std::format(
+        "自动规则为 Demo {} 发送 {} 条录制请求，提交后{}启动录制",
+        demoName, requestCount, plan.autoStart ? "将" : "不"));
 
     co_return;
 }

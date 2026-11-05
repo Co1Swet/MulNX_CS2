@@ -137,6 +137,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<DemEasyView>("DemEasyView")
         .CreateModule<RoundRecordMaker>("RoundRecordMaker")
         .CreateModule<DemoRecordMaker>("DemoRecordMaker")
+        .CreateModule<AutoRecordRule>("AutoRecordRule")
         .CreateModule<PassRecordMaker>("PassRecordMaker")
         .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
         .CreateModule<RecordTaskMaker>("RecordTaskMaker")

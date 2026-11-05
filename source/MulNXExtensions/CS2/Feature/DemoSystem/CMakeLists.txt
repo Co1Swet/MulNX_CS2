@@ -23,6 +23,7 @@ add_library(DemoSystem STATIC
 
     RecordMaking/RoundRecordMaker/RoundRecordMaker.cpp
     RecordMaking/DemoRecordMaker/DemoRecordMaker.cpp
+    RecordMaking/AutoRecordRule/AutoRecordRule.cpp
     RecordMaking/PassRecordMaker/PassRecordMaker.cpp
 )
 

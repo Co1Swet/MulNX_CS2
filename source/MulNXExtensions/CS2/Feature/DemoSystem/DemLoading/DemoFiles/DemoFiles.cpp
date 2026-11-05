@@ -1,7 +1,7 @@
 #include "DemoFiles.hpp"
 
 void DemoFiles::Menu() {
-    std::unique_lock lock(this->smutex); // 真的，你不需要担心这个几乎不会竞争的锁
+    std::unique_lock lock(this->smutex);
 
     if (ImGui::Button("打开Demo文件夹")) {
         fs::OpenFolderWindow(this->CS2Paths->demo);
@@ -41,6 +41,13 @@ void DemoFiles::Menu() {
         }
     }
 
+    auto autoMake = [&](const DemoFiles::DemoFile& demFile) {
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/Auto"_hash);
+        rp->str1 = demFile.kDir;
+        rp->str2 = demFile.demoName;
+        this->PublishAsync(std::move(msg));
+        };
+
     if (chooseSize == 0) {
         ImGui::Text("当前未选中任何Demo");
         return;
@@ -53,6 +60,12 @@ void DemoFiles::Menu() {
                 rp->str1 = demFile.kDir;
                 rp->str2 = demFile.demoName;
                 this->PublishAsync(std::move(msg));
+            }
+        }
+        if (ImGui::Button("按照规则自动化所有")) {
+            for (auto& demFile : this->demoFiles) {
+                if (!demFile.beChoosing)continue;
+                autoMake(demFile);
             }
         }
         return;
@@ -82,6 +95,9 @@ void DemoFiles::Menu() {
         rp->str1 = demFile.kDir;
         rp->str2 = demFile.demoName;
         this->PublishAsync(std::move(msg));
+    }
+    if (ImGui::Button("按照规则自动化")) {
+        autoMake(demFile);
     }
     if (ImGui::Button("复制路径到剪贴板")) {
         auto fullPath = this->Path()->PathGetFromKey(demFile.kDir) / (demFile.demoName + ".dem");
@@ -126,6 +142,5 @@ void DemoFiles::ProcessMsg(MulNX::Message& msg) {
         }
         break;
     }
-
     }
 }
