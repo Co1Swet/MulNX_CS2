@@ -5,6 +5,6 @@
 class TimeMarkerManager final : public MulNX::Module<TimeMarkerManager>, public TimeMixin<TimeMarkerManager> {
     std::vector<float> markers{};
 
-    void TimeRend(TimeLiner* timeline, ImDrawList* dl) override;
+    void TimeRend(const TimeLiner* timeline, ImDrawList* dl) override;
     bool Init() override;
 };

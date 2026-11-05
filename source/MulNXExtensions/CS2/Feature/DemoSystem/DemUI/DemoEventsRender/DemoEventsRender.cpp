@@ -2,7 +2,6 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 bool DemoEventsRender::Init() {
-
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
         return true;
@@ -11,7 +10,7 @@ bool DemoEventsRender::Init() {
     return true;
 }
 
-void DemoEventsRender::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
+void DemoEventsRender::TimeRend(const TimeLiner* timeline, ImDrawList* dl) {
     auto pCurOp = this->pDemSys->GetCurOpDemoInfo();
     if (!pCurOp)return;
     const auto& info = *pCurOp;
@@ -29,8 +28,8 @@ void DemoEventsRender::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
         return;
 
     // 获取当前时间轴范围（用于过滤，但 Map 本身会裁剪）
-    float minTime = timeline->minTime;
-    float maxTime = timeline->maxTime;
+    float minTime = timeline->GetMinTime();
+    float maxTime = timeline->GetMaxTime();
     if (maxTime <= minTime)
         return;
 

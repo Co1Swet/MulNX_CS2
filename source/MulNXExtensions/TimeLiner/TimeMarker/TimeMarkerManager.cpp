@@ -1,10 +1,10 @@
 #include "TimeMarkerManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void TimeMarkerManager::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
+void TimeMarkerManager::TimeRend(const TimeLiner* timeline, ImDrawList* dl) {
     ImGui::SameLine();
     for (const auto& marker : this->markers) {
-        if (marker < timeline->minTime || marker > timeline->maxTime) {
+        if (marker < timeline->GetMinTime() || marker > timeline->GetMaxTime()) {
             continue;
         }
         const ImVec2 pos = timeline->Map(marker, 0);

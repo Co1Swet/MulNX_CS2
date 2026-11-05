@@ -6,7 +6,7 @@ class ImDrawList;
 
 class ITimeRend {
 public:
-    virtual void TimeRend(TimeLiner* timeline, ImDrawList* dl) {};
+    virtual void TimeRend(const TimeLiner* timeline, ImDrawList* dl) {};
 };
 
 template<typename T>

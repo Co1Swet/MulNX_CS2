@@ -20,7 +20,7 @@ void TimeLiner::Menu() {
     // 有效范围才更新比例，避免除零
     if (maxTime > minTime) {
         m_clickRatio = (curTime - minTime) / (maxTime - minTime);
-        m_clickRatio = std::clamp(m_clickRatio, 0.0f, 1.0f);
+        m_clickRatio = std::clamp(m_clickRatio.load(), 0.0f, 1.0f);
     }
     else {
         m_clickRatio = 0.0f;  // 范围无效时不显示指示点
@@ -57,7 +57,7 @@ void TimeLiner::Menu() {
 
     // 显示当前时间数值
     ImGui::SetCursorScreenPos(ImVec2(this->currentLeftX, this->currentBaseY + 15.0f));
-    ImGui::Text("时间: %.2f / %.2f", curTime, maxTime);
+    ImGui::Text("时间: %.2f / %.2f", curTime.load(), maxTime.load());
 
     this->pActiveTimeAdapter->TimeRend(this, draw);
 
@@ -135,11 +135,11 @@ ImVec2 TimeLiner::Map(float time, int layer) const {
     return ImVec2(x, y);
 }
 
-float TimeLiner::GetTime() {
+float TimeLiner::GetTime()const {
     return this->pActiveTimeAdapter->GetTime();
 }
 
-void TimeLiner::SetTime(float time) {
+void TimeLiner::SetTime(float time)const {
     if (!std::isfinite(time)) {
         this->LogError("输入了非法的时间");
         return;
