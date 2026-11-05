@@ -175,8 +175,9 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
     this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
         rTask.uid, rTask.tickStart, rTask.tickEnd));
     // 等待录制结束
+    std::optional<int> observingMismatchSinceTick;
     co_await this->WaitUntil([&] {
-        return !this->OnRecording(rTask);
+        return !this->OnRecording(rTask, observingMismatchSinceTick);
         });
     // 停止录制
     this->PublishAsync("Media/Record/Stop"_hash);
@@ -185,22 +186,35 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
 }
 
 // 返回true以表示保持录制状态，返回false以表示录制结束
-bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask)const {
+bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask,
+    std::optional<int>& observingMismatchSinceTick)const {
     if (this->moduleActive.load(std::memory_order_acquire) == false) {
         this->LogWarning("模块已被外部关闭，停止录制");
         return false;
     }
 
+    const int curTick = this->CS2Time->GetDemoTick();
     if (curRecordTask.uid != 0) {
         auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
         if (!obUID || *obUID != curRecordTask.uid) {
-            this->LogError(std::format("当前观战目标={}，意外地不等于录制目标={}，结束当前片段录制",
-                obUID ? std::to_string(*obUID) : "无", curRecordTask.uid));
-            return false;
+            constexpr int mismatchTimeoutTicks = 2.25f * 64;
+            if (!observingMismatchSinceTick) {
+                observingMismatchSinceTick = curTick;
+                this->LogWarning(std::format("当前观战目标={}，意外地不等于录制目标={}，等待目标恢复（超时{} tick）",
+                    obUID ? std::to_string(*obUID) : "无", curRecordTask.uid, mismatchTimeoutTicks));
+            }
+            else if (curTick - *observingMismatchSinceTick >= mismatchTimeoutTicks) {
+                this->LogError(std::format("当前观战目标持续不等于录制目标超过{} tick，当前目标={}，录制目标={}，结束当前片段录制",
+                    mismatchTimeoutTicks,
+                    obUID ? std::to_string(*obUID) : "无", curRecordTask.uid));
+                return false;
+            }
+        }
+        else {
+            observingMismatchSinceTick.reset();
         }
     }
 
-    auto curTick = this->CS2Time->GetDemoTick();
     if (curTick < 5) {
         this->LogWarning(std::format("当前tick={}，意外地小于5，继续等待", curTick));
         return true;
@@ -215,6 +229,17 @@ bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask)const {
         this->LogError(std::format("当前tick={}，意外地小于录制起点tick={}，丢弃录制",
             curTick, curRecordTask.tickStart));
         return false;
+    }
+    if (this->CS2Time->IsDemoPaused()) {
+        auto endTick = this->CS2Time->GetDemoLastTick();
+        if (std::abs(curTick - endTick) < 100) {
+            this->LogInfo(std::format("当前Demo在Demo尾tick {} 附近 {} 暂停，完成此片段录制", endTick, curTick));
+            return false;
+        }
+        else {
+            this->LogError(std::format("当前Demo {} 暂停，注意Demo尾tick为 {}，终止此片段录制", curTick, endTick));
+            return false;
+        }
     }
 
     return true;

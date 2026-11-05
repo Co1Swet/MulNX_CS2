@@ -86,10 +86,10 @@ float TimeController::GetMinTime() {
     return 0;
 }
 float TimeController::GetMaxTime() {
-    // 读取 CDemoPlayer 偏移 +0x200 处的总 tick（int32）
-    int totalTicks = *(int*)((uintptr_t)this->pDemoPlayer + 0x12C);
-    // 转换为秒
-    return totalTicks * (1.0f / 64.0f);
+    return this->GetDemoLastTick() * (1.0f / 64.0f);
+}
+int TimeController::GetDemoLastTick()const {
+    return MulNX::MRead((int*)((uintptr_t)this->pDemoPlayer + 0x12C));
 }
 float TimeController::GetTime() {
     auto tick = this->GetDemoTick();

@@ -21,7 +21,8 @@ class DemoRecorder final : public DemModuleBase, public MediaModuleMixin<DemoRec
     MulNX::CoTask GoNextTask(std::optional<Demo::RecordTask>& outTask);
     MulNX::CoTask Main();
     MulNX::CoTask RecordOne(const Demo::RecordTask& rTask)const;
-    bool OnRecording(const Demo::RecordTask& curRecordTask)const;
+    bool OnRecording(const Demo::RecordTask& curRecordTask,
+        std::optional<int>& observingMismatchSinceTick)const;
 
     void Window()const;
     bool Init()override;

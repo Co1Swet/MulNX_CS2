@@ -15,6 +15,7 @@ public:
     VExecutor<bool()> IsPlayingDemo{};
     VExecutor<bool()> IsDemoPaused{};
 
+    int GetDemoLastTick()const;
     float GetTime()override;
     bool SetTime(float time)override;
     bool JumpRealRel(float time);
