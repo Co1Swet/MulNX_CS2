@@ -92,8 +92,20 @@ int TimeController::GetDemoLastTick()const {
     return MulNX::MRead((int*)((uintptr_t)this->pDemoPlayer + 0x12C));
 }
 float TimeController::GetTime() {
-    auto tick = this->GetDemoTick();
-    return tick * (1.0f / 64.0f);
+    float tick = static_cast<float>(this->GetDemoTick());
+    auto csgv = this->CS2->CSGlobalVars;
+    if (csgv) try {
+        auto sub = MulNX::MRead(&csgv->interpolation_amount);
+        if (sub < 0.0f || sub > 1.0f) {
+            sub = std::clamp(sub, 0.0f, 1.0f);
+            this->LogWarning("已自动限制sub");
+        }
+        tick += sub;
+    }
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
+    }
+    return tick / 64.0f;
 }
 bool TimeController::SetTime(float time) {
     this->AsyncCommand(std::format("demo_gototick {}", static_cast<int>(time * 64.0f)));
