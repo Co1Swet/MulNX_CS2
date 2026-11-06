@@ -44,5 +44,5 @@ public:
 
     void Update(float* pMatrixPtr, float pWinWidth, float pWinHeight);
     void DrawCamera(DirectX::XMFLOAT3 Position, DirectX::XMFLOAT3 Rotation, const char* label);
-    void DrawFrameCamera(const MulNX::Math::Frame& frame, const char* label);
+    void DrawViewCamera(const MulNX::Math::View& mathView, const char* label);
 };

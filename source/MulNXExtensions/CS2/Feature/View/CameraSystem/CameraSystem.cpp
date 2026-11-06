@@ -120,10 +120,10 @@ bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num
     if (!this->pCamPlayScheduler->HandleUpdate(&IO))return false;
     camLeavePlayer = true;
 
-    const auto& pos = IO.Frame.view.position;
-    const auto& fov = IO.Frame.view.FOV;
-    const auto& rot = IO.Frame.view.rotation;
-    const auto& dof = IO.Frame.view.dof;
+    const auto& pos = IO.view.position;
+    const auto& fov = IO.view.FOV;
+    const auto& rot = IO.view.rotation;
+    const auto& dof = IO.view.dof;
 
     *viewSetup->pViewOrigin() = pos;
     *viewSetup->pViewAngles() = rot;

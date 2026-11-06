@@ -21,8 +21,8 @@ void FreeCameraPath::ResetName(const std::string& NewName) {
 }
 
 FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
-    if (IO->ElementTime < this->startTime)return FreeCameraPath::CalResult::Before;
-    if (IO->ElementTime > this->endTime)return FreeCameraPath::CalResult::Back;
+    if (IO->time < this->startTime)return FreeCameraPath::CalResult::Before;
+    if (IO->time > this->endTime)return FreeCameraPath::CalResult::Back;
 
     // 如果不在理论影响范围内，应当直接返回而不做任何修改
     // 是与被遍历的其它call一起工作
@@ -30,11 +30,9 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     // 处理空关键帧的情况
     if (this->CameraKeyframes.empty())return FreeCameraPath::CalResult::NoFrame;
 
-    float Time = IO->ElementTime;
-
     // 查找当前时间所在的关键帧区间（使用绝对时间来搜索以匹配以绝对时间存储的关键帧）
-    auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), Time,
-        [](const MulNX::Math::CameraKeyframe& k, float t) {
+    auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), IO->time,
+        [](const MulNX::Math::CameraKeyframe& k, double t) {
             return k.time < t;
         });
 
@@ -52,10 +50,10 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     const auto& k3 = (index + 2 < this->CameraKeyframes.size()) ? this->CameraKeyframes[index + 2] : k2;
 
     // 计算当前片段的时间比例 (0~1)
-    float segmentDuration = k2.time - k1.time;
+    auto segmentDuration = k2.time - k1.time;
     if (segmentDuration <= 0.0f) return FreeCameraPath::CalResult::NoFrame; // 避免除以零或无效的段
 
-    float segmentTime = (Time - k1.time) / segmentDuration;
+    auto segmentTime = (IO->time - k1.time) / segmentDuration;
 
     // 位置和FOV插值 (Catmull-Rom)
     auto PositionAndFOV = DirectX::XMVectorCatmullRom(
@@ -66,8 +64,8 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
         segmentTime);
 
     // 写入数据
-    IO->Frame.view.position = { PositionAndFOV.m128_f32[0],PositionAndFOV.m128_f32[1],PositionAndFOV.m128_f32[2] };
-    IO->Frame.view.FOV = PositionAndFOV.m128_f32[3];
+    IO->view.position = { PositionAndFOV.m128_f32[0],PositionAndFOV.m128_f32[1],PositionAndFOV.m128_f32[2] };
+    IO->view.FOV = PositionAndFOV.m128_f32[3];
 
     // 景深插值
     auto Dof = DirectX::XMVectorCatmullRom(
@@ -78,10 +76,10 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
         segmentTime
     );
 
-    IO->Frame.view.dof.NearBlurry = Dof.m128_f32[0];
-    IO->Frame.view.dof.NearCrisp = Dof.m128_f32[1];
-    IO->Frame.view.dof.FarCrisp = Dof.m128_f32[2];
-    IO->Frame.view.dof.FarBlurry = Dof.m128_f32[3];
+    IO->view.dof.NearBlurry = Dof.m128_f32[0];
+    IO->view.dof.NearCrisp = Dof.m128_f32[1];
+    IO->view.dof.FarCrisp = Dof.m128_f32[2];
+    IO->view.dof.FarBlurry = Dof.m128_f32[3];
 
     // 旋转插值 (使用Squad提供高阶连续性)
 
@@ -98,7 +96,7 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     auto RotationQuat = DirectX::XMQuaternionNormalize(rotation);
     DirectX::XMFLOAT4 quat;
     DirectX::XMStoreFloat4(&quat, RotationQuat);
-    MulNX::Math::CSQuatToEuler(quat, IO->Frame.view.rotation);
+    MulNX::Math::CSQuatToEuler(quat, IO->view.rotation);
 
     return FreeCameraPath::CalResult::In;
 }

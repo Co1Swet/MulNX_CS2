@@ -6,7 +6,7 @@ bool CamPlayScheduler::Init() {
     this->pCamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
 
     (*this)
-        .SubscribeAsync("CamPlay/Request")
+        .SubscribeAsyncEx<double, int>("CamPlay/Request")
         .SubscribeAsync<void>("CamPlay/Clear")
         .SubscribeAsync<void>("CamPlay/ClearForce")
 
@@ -28,8 +28,9 @@ bool CamPlayScheduler::Init() {
 void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "CamPlay/Request"_hash: {
-        auto request = msg.asp.get<CamPlayRequest>();
-        auto& name = request->campathName;
+        auto ext = msg.asp.get<MulNX::NetExt>();
+        auto&& [offsetTime, isActiveMode] = msg.Access<double, int>();
+        auto& name = ext->str1;
         std::shared_ptr<const FreeCameraPath> pCampath = this->pCampathManager->FindCampath(name);
         if (!pCampath) {
             this->LogError(std::format("请求播放运镜 \"{}\" 而未查找到！", name));
@@ -37,11 +38,11 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         }
         PlaySlot slot{};
         slot.pCampath = std::move(pCampath);
-        slot.offsetTime = request->offsetTime;
-        slot.isActiveMode = request->isActiveMode;
+        slot.offsetTime = offsetTime;
+        slot.isActiveMode = (isActiveMode != 0);
         this->playslots.push_back(std::move(slot));
         this->LogSucc(std::format("已添加运镜到播放阵列：{} ，时间偏移为：{}",
-            name, request->offsetTime));
+            name, offsetTime));
         break;
     }
     case "CamPlay/Clear"_hash: {
@@ -91,10 +92,8 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
 
     bool ret = false;
     for (auto slot = this->playslots.begin();slot != this->playslots.end();) {
-        IO->ElementTime = this->pTimeline->GetTime();
-        IO->FrameGameTime = this->pTimeline->GetTime();
-
-        IO->ElementTime += slot->offsetTime;
+        IO->time = this->pTimeline->GetTime();
+        IO->time += slot->offsetTime;
         auto calResult = slot->pCampath->CalculateFrame(IO);
         if (calResult == FreeCameraPath::CalResult::Back && slot->isActiveMode == false) {
             this->LogInfo(std::format("移除播放结束的运镜：{}", slot->pCampath->GetName()));
@@ -108,8 +107,8 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
     }
 
     if (ret) {
-        auto frame = this->drawCamera.Write();
-        *frame = IO->Frame;
+        auto view = this->drawCamera.Write();
+        *view = IO->view;
         this->needDrawCamera.store(true, std::memory_order_release);
     }
     else {

@@ -107,8 +107,8 @@ void CameraDrawer::DrawCamera(DirectX::XMFLOAT3 Position, DirectX::XMFLOAT3 Rota
     this->CameraModel.DrawCamera(Position, Rotation, label, this->pMatrixPtr, this->WinWidth, this->WinHeight);
 }
 
-void CameraDrawer::DrawFrameCamera(const MulNX::Math::Frame& frame, const char* label) {
-    auto Rotation = frame.view.rotation;
-    auto Position = frame.view.position;
+void CameraDrawer::DrawViewCamera(const MulNX::Math::View& mathView, const char* label) {
+    auto Rotation = mathView.rotation;
+    auto Position = mathView.position;
     this->DrawCamera(Position, Rotation, label);
 }

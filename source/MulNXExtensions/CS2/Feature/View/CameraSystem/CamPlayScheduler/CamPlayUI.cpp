@@ -4,8 +4,8 @@ void CamPlayScheduler::DrawPlayCamera() {
     if (!this->drawCam.load(std::memory_order_acquire))return;
     if (!this->needDrawCamera.load(std::memory_order_acquire))return;
     
-    auto frame = this->drawCamera.Read();
-    this->pCamDrawer->DrawFrameCamera(*frame, "当前播放摄像机");
+    auto view = this->drawCamera.Read();
+    this->pCamDrawer->DrawViewCamera(*view, "当前播放摄像机");
 }
 
 void CamPlayScheduler::Menu() {

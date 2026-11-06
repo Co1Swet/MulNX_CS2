@@ -1,7 +1,6 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 #include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
-#include <CameraSystem/CamPlayScheduler/CamPlayRequest.hpp>
 
 class WrapCampath {
 public:
@@ -13,7 +12,6 @@ class CamMacro final {
     std::string name{};
     std::vector<WrapCampath> wrapCampaths;
 
-    PlaybackMode playmode = PlaybackMode::Orchestration;
     std::atomic<MulNX::KeyCheckPack> KCPack{};
     mutable bool dirty = false;
 public:

@@ -1,7 +1,6 @@
 #include "CampathManager.hpp"
 #include <Intro/HookView/HookView.hpp>
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
-#include <CameraSystem/CamPlayScheduler/CamPlayRequest.hpp>
 
 bool CampathManager::Init() {
     this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
@@ -148,11 +147,12 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         if (!pCampath)break;
         auto&& [previewOffset] = msg.Access<float>();
 
-        auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
-        rp->campathName = name;
-        rp->offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
-        rp->offsetTime += previewOffset;
-        rp->isActiveMode = false;
+        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode] = play.Access<double, int>();
+        rp->str1 = name;
+        offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
+        offsetTime += previewOffset;
+        isActiveMode = 0;
         this->PublishAsync(std::move(play));
         break;
     }
@@ -161,10 +161,11 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         std::shared_lock lock(this->smutex);
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
-        auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
-        rp->campathName = name;
-        rp->offsetTime = 0;
-        rp->isActiveMode = true;
+        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode] = play.Access<double, int>();
+        rp->str1 = name;
+        offsetTime = 0;
+        isActiveMode = 1;
         this->PublishAsync(std::move(play));
         break;
     }

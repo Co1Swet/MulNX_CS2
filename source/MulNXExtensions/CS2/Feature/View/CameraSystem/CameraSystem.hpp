@@ -4,6 +4,14 @@
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 #include "CameraDrawer/CameraDrawer.hpp"
 
+class CameraSystemIO {
+public:
+    // 单位为秒的时间，当采用CS2时间时，它对应高精度DemoTime（不是GameTime）
+    double time;
+    // 当前帧数据
+    MulNX::Math::View view;
+};
+
 class CampathManager;
 class CamMacroManager;
 class CamPackManager;

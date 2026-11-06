@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/yaml.hpp>
-#include <CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
+#include <Feature/View/CameraSystem/CameraSystem.hpp>
 
 class CameraDrawer;
 
@@ -9,16 +9,16 @@ class FreeCameraPath final {
     std::string name{};
     bool dirty = false;
     // 开始时间（绝对）
-    float startTime{};
+    double startTime{};
     // 结束时间（绝对）
-    float endTime{};
-    float durationTime{};
+    double endTime{};
+    double durationTime{};
 public:
     inline bool IsDirty()const { return this->dirty; }
 
-    inline float GetStartTime()const { return this->startTime; }
-    inline float GetEndTime()const { return this->endTime; }
-    inline float GetDurationTime()const { return this->durationTime; }
+    inline double GetStartTime()const { return this->startTime; }
+    inline double GetEndTime()const { return this->endTime; }
+    inline double GetDurationTime()const { return this->durationTime; }
 
     // 是否绘制（默认不绘制）
     std::atomic<bool> draw = false;
@@ -52,7 +52,6 @@ public:
     // 绘制
     bool Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
 
-    
     // 获取名字
     const std::string& GetName()const;
     // 重设名字
