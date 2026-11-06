@@ -107,7 +107,7 @@ void WebSocketManager::OnWebMsg(websocketpp::connection_hdl hdl, Server::message
         error = std::format("error: {} desc: {}", netMsg->get_payload(), e.what());
     }
     catch (const MulNX::Exception& e) {
-        error = std::format("error: {} desc: {} on: {}", netMsg->get_payload(), e.what(), e.Where());
+        error = std::format("error: {} desc: {}", netMsg->get_payload(), e.what());
     }
     catch (const std::exception& e) {
         error = std::format("error: {} desc: {}", netMsg->get_payload(), e.what());

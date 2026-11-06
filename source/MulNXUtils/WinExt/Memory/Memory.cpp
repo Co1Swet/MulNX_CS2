@@ -13,7 +13,7 @@ std::expected<std::string, MulNX::Exception> MulNX::Memory::ReadString(const cha
             c = MulNX::MRead(it++);
         }
         catch (MulNX::Exception& e) {
-            e.where = where;
+            e.SetWhere(where);
             return std::unexpected(e);
         }
         if (c == '\0') {

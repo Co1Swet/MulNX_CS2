@@ -87,8 +87,7 @@ void MulNX::UISystem::Render() {
         }
     }
     catch (const MulNX::Exception& e) {
-        MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的MulNX异常：{} \n该异常抛出于：{}",
-            e.what(), e.Where()));
+        MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的MulNX异常：{}", e.what()));
     }
     catch (const std::exception& e) {
         MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的异常：{}", e.what()));

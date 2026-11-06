@@ -53,13 +53,13 @@ namespace MulNX {
             this->Log(Level::Warning, std::move(msg), where);
         }
         void LogInfo(const Exception& e)const {
-            this->Log(Level::Info, e.what(), e.where);
+            this->Log(Level::Info, e.What(), e.Where());
         }
         void LogError(const Exception& e)const {
-            this->Log(Level::Error, e.what(), e.where);
+            this->Log(Level::Error, e.What(), e.Where());
         }
         void LogWarning(const Exception& e)const {
-            this->Log(Level::Warning, e.what(), e.where);
+            this->Log(Level::Warning, e.What(), e.Where());
         }
         void LogLine()const {
             this->LogInfo("+------------------------------------------------+");
