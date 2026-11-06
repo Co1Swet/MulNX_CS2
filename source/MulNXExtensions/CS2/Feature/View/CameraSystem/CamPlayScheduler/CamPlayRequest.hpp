@@ -4,6 +4,6 @@
 class CamPlayRequest final {
 public:
     std::string campathName{};
-    float offsetTime = 0.0f;
+    double offsetTime = 0.0;
     bool isActiveMode = false;
 };

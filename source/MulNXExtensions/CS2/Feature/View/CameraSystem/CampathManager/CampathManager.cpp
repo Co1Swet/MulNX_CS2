@@ -1,4 +1,5 @@
 #include "CampathManager.hpp"
+#include <Support/TimeController/TimeController.hpp>
 #include <Intro/HookView/HookView.hpp>
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <CameraSystem/CamPlayScheduler/CamPlayRequest.hpp>
@@ -150,8 +151,15 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
 
         auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
         rp->campathName = name;
-        rp->offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
-        rp->offsetTime += previewOffset;
+        if (this->CS2Time->IsSubtickCameraPathEnabled() && this->pTimeline->IsUsingAdapter(this->CS2Time)) {
+            const auto sample = this->pTimeline->GetCameraPathTime();
+            rp->offsetTime = double(pCampath->GetStartTime()) - sample.time + double(previewOffset);
+        } else {
+            // Keep legacy preview anchoring and rounding when the feature is off.
+            float offset = pCampath->GetStartTime() - this->pTimeline->GetTime();
+            offset += previewOffset;
+            rp->offsetTime = offset;
+        }
         rp->isActiveMode = false;
         this->PublishAsync(std::move(play));
         break;

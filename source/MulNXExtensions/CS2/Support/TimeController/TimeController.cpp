@@ -2,6 +2,16 @@
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <Mirror/CSDemoController/CSDemoController.hpp>
 
+void TimeController::CameraTimeMenu() {
+    if (MulNX::UI::Checkbox("subtick时间轴", this->subtickCameraPath)) {
+        this->cameraTimeGeneration.fetch_add(1);
+        this->cameraTimeStatus.store(this->IsSubtickCameraPathEnabled()
+            ? MulNX::CameraTimeStatus::Calibrating : MulNX::CameraTimeStatus::Legacy);
+    }
+    ImGui::TextWrapped("实验性功能：改善高 FPS、慢动作 Demo 下 Camera Path 的连续性。仅作用于运镜，独立于视角平滑；不支持的构建或无效相位会回退整数 Tick。");
+    if (this->IsSubtickCameraPathEnabled())
+        ImGui::TextDisabled("%s", MulNX::CameraTimeStatusName(this->cameraTimeStatus.load()));
+}
 void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
     ImGui::SameLine();
     // 状态快照
@@ -70,6 +80,10 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
 bool TimeController::Init() {
     this->pTimeline->pTimeAdapter1 = this;
     this->pCSDemoController = this->FindModule<CSDemoController>("CSDemoController");
+    this->SubscribeAsync("Demo/GotoTick/Complete").SubscribeAsync("Demo/SetPlaying");
+    this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) { this->Update(); });
+    this->SubscribeSync("Hook/MainLoop/TickJumpDetected", [this](auto&&...) { this->cameraTimeGeneration.fetch_add(1); });
+    this->UIRegisterCallback("UI.CameraSetting.SubtickTime", [this](auto&&...) { this->CameraTimeMenu(); });
 
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
         auto demo = this->CS2->GetDemo();
@@ -80,6 +94,10 @@ bool TimeController::Init() {
         });
 
     return true;
+}
+void TimeController::ProcessMsg(MulNX::Message& msg) {
+    if (msg.type == "Demo/GotoTick/Complete"_hash || msg.type == "Demo/SetPlaying"_hash)
+        this->cameraTimeGeneration.fetch_add(1);
 }
 // 时间适配器接口实现
 float TimeController::GetMinTime() {
@@ -95,7 +113,28 @@ float TimeController::GetTime() {
     auto tick = this->GetDemoTick();
     return tick * (1.0f / 64.0f);
 }
+MulNX::CameraPathTime TimeController::GetCameraPathTime() {
+    if (!this->IsSubtickCameraPathEnabled()) return ITimeAdapter::GetCameraPathTime();
+    const int tick = this->GetDemoTick();
+    const auto clientBase = this->CS2->client.GetBaseAddress();
+    const auto engineBase = this->CS2->engine2.GetBaseAddress();
+    auto input = MulNX::ExperimentalCameraTime::ReadProbe(clientBase, engineBase,
+        clientBase + cs2_dumper::offsets::client_dll::dwGlobalVars,
+        reinterpret_cast<uintptr_t>(this->pDemoPlayer), tick, this->cameraTimeGeneration.load());
+    if (input.generation != this->cameraTimeGeneration.load())
+        input.validity = MulNX::CameraTimeStatus::UnstableSnapshot;
+    std::unique_lock lock(this->cameraTimeMutex, std::try_to_lock);
+    MulNX::CameraPathTime sample;
+    if (lock.owns_lock()) sample = this->cameraTimeSampler.Sample(input);
+    else {
+        sample.time = double(tick) / 64.0;
+        sample.requested = true; sample.status = MulNX::CameraTimeStatus::Busy;
+    }
+    this->cameraTimeStatus.store(sample.status);
+    return sample;
+}
 bool TimeController::SetTime(float time) {
+    this->cameraTimeGeneration.fetch_add(1);
     this->AsyncCommand(std::format("demo_gototick {}", static_cast<int>(time * 64.0f)));
     return true;
 }

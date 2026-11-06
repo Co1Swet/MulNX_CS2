@@ -1,5 +1,6 @@
 #include "CamPlayScheduler.hpp"
 #include <CameraSystem/CampathManager/CampathManager.hpp>
+#include <Support/TimeController/TimeController.hpp>
 
 bool CamPlayScheduler::Init() {
     this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
@@ -89,12 +90,25 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
         return false;
     }
 
+    // One immutable camera-only clock snapshot for every slot in this view update.
+    // With the feature off (or FlowClock selected), retain the two original reads.
+    const bool cameraClock = this->CS2Time->IsSubtickCameraPathEnabled() &&
+        this->pTimeline->IsUsingAdapter(this->CS2Time);
+    MulNX::CameraPathTime frameTime;
+    if (cameraClock) {
+        frameTime = this->pTimeline->GetCameraPathTime();
+    }
     bool ret = false;
     for (auto slot = this->playslots.begin();slot != this->playslots.end();) {
-        IO->ElementTime = this->pTimeline->GetTime();
-        IO->FrameGameTime = this->pTimeline->GetTime();
-
-        IO->ElementTime += slot->offsetTime;
+        IO->PreciseTimeSampling = cameraClock && frameTime.requested;
+        if (cameraClock) {
+            IO->FrameGameTime = frameTime.time;
+            IO->ElementTime = frameTime.time + slot->offsetTime;
+        } else {
+            const float elementTime = this->pTimeline->GetTime();
+            IO->FrameGameTime = this->pTimeline->GetTime();
+            IO->ElementTime = static_cast<float>(elementTime + static_cast<float>(slot->offsetTime));
+        }
         auto calResult = slot->pCampath->CalculateFrame(IO);
         if (calResult == FreeCameraPath::CalResult::Back && slot->isActiveMode == false) {
             this->LogInfo(std::format("移除播放结束的运镜：{}", slot->pCampath->GetName()));

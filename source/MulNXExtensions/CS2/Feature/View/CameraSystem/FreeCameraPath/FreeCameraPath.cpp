@@ -1,6 +1,7 @@
 #include "FreeCameraPath.hpp"
 #include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
 #include <fstream>
+#include <CameraSystem/CameraSystemIO/CameraSampleMath.hpp>
 
 std::string FreeCameraPath::GetBaseInfo()const {
     return std::format("轨道名称：{} ，持续时长：{}", this->name, this->durationTime);
@@ -21,6 +22,7 @@ void FreeCameraPath::ResetName(const std::string& NewName) {
 }
 
 FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
+    if (!std::isfinite(IO->ElementTime))return FreeCameraPath::CalResult::NoFrame;
     if (IO->ElementTime < this->startTime)return FreeCameraPath::CalResult::Before;
     if (IO->ElementTime > this->endTime)return FreeCameraPath::CalResult::Back;
 
@@ -30,11 +32,11 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     // 处理空关键帧的情况
     if (this->CameraKeyframes.empty())return FreeCameraPath::CalResult::NoFrame;
 
-    float Time = IO->ElementTime;
+    const double Time = IO->ElementTime;
 
     // 查找当前时间所在的关键帧区间（使用绝对时间来搜索以匹配以绝对时间存储的关键帧）
     auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), Time,
-        [](const MulNX::Math::CameraKeyframe& k, float t) {
+        [](const MulNX::Math::CameraKeyframe& k, double t) {
             return k.time < t;
         });
 
@@ -52,10 +54,9 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     const auto& k3 = (index + 2 < this->CameraKeyframes.size()) ? this->CameraKeyframes[index + 2] : k2;
 
     // 计算当前片段的时间比例 (0~1)
-    float segmentDuration = k2.time - k1.time;
-    if (segmentDuration <= 0.0f) return FreeCameraPath::CalResult::NoFrame; // 避免除以零或无效的段
-
-    float segmentTime = (Time - k1.time) / segmentDuration;
+    float segmentTime = 0;
+    if (!MulNX::CameraSegmentTime(Time, k1.time, k2.time, IO->PreciseTimeSampling, segmentTime))
+        return FreeCameraPath::CalResult::NoFrame;
 
     // 位置和FOV插值 (Catmull-Rom)
     auto PositionAndFOV = DirectX::XMVectorCatmullRom(

@@ -2,6 +2,7 @@ add_library(CS2Support STATIC
     EntityListScanner/EntityListScanner.cpp
     ConsoleOutput/ConsoleOutput.cpp
     TimeController/TimeController.cpp
+    TimeController/SubtickCameraTime.cpp
     PlayerHub/PlayerHub.cpp
     TargetPicker/TargetPicker.cpp
     NameController/NameController.cpp

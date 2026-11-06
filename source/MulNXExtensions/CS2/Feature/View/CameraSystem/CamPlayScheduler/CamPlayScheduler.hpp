@@ -9,7 +9,7 @@ class CamPlayScheduler final :public CamSysModule {
     class PlaySlot final {
     public:
         std::shared_ptr<const FreeCameraPath> pCampath = nullptr;
-        float offsetTime = 0.0f;
+        double offsetTime = 0.0;
         bool isActiveMode = false;
     };
     std::vector<PlaySlot>playslots{};

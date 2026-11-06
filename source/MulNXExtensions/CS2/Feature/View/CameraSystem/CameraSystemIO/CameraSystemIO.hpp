@@ -18,8 +18,9 @@ inline std::string PlaybackModeToString(PlaybackMode mode) {
 class CameraSystemIO {
 public:
 	MulNX::Math::Frame Frame;// 当前帧数据
-	float FrameGameTime;// 用于参考的绝对游戏时间
+	double FrameGameTime{};// 用于参考的绝对游戏时间
 	float SolutionTime;// 解决方案时间轴时间
-	float ElementTime;// 元素时间轴时间，这个时间是由解决方案或预览负责提供的，基于元素的绝对时间轴
+	double ElementTime{};// Camera-only high precision; keyframe storage stays float.
+	bool PreciseTimeSampling = false;
 	bool isPlaying;// 当前是否在播放，解决方案会修改这个值
 };

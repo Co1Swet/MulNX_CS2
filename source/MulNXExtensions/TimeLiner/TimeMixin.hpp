@@ -30,6 +30,13 @@ public:
     virtual float GetMaxTime() = 0;
 
     virtual float GetTime() = 0;
+    // Separate opt-in path; existing consumers retain their original clock API.
+    virtual MulNX::CameraPathTime GetCameraPathTime() {
+        const float time = GetTime();
+        MulNX::CameraPathTime sample;
+        sample.time = time;
+        return sample;
+    }
     virtual bool SetTime(float time) = 0;
 
     virtual void OnSetOn(float time) {};

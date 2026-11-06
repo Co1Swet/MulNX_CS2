@@ -1,6 +1,7 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/UI/UI.hpp>
+#include "CameraPathTime.hpp"
 
 class ITimeAdapter;
 
@@ -19,7 +20,7 @@ class TimeLiner :public MulNX::Module<TimeLiner> {
     void ProcessMsg(MulNX::Message& msg)override;
     void UpdateTime();
     void UpdatePos();
-    ITimeAdapter* pActiveTimeAdapter = nullptr;
+    std::atomic<ITimeAdapter*> pActiveTimeAdapter{nullptr};
 public:
     ITimeAdapter* pTimeAdapter1 = nullptr;
     ITimeAdapter* pTimeAdapter2 = nullptr;
@@ -28,6 +29,8 @@ public:
     ImVec2 Map(float time, int layer)const;
 
     float GetTime()const;
+    MulNX::CameraPathTime GetCameraPathTime()const;
+    bool IsUsingAdapter(const ITimeAdapter* adapter)const { return pActiveTimeAdapter.load() == adapter; }
     inline float GetMinTime()const { return this->minTime.load(std::memory_order_acquire); }
     inline float GetMaxTime()const { return this->maxTime.load(std::memory_order_acquire); }
     void SetTime(float time)const;

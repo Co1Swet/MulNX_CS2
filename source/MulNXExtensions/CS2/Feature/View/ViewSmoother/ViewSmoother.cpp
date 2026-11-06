@@ -60,7 +60,10 @@ void ViewSmoother::Menu() {
 }
 
 bool ViewSmoother::Init() {
-    this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {this->Menu();});
+    this->UIRegisterCallback("UI.CameraSetting", [this](MulNX::UICoordinator* uico, auto&&...) {
+        this->Menu();
+        uico->CallbackCall("UI.CameraSetting.SubtickTime"_hash, nullptr);
+        });
 
     return true;
 }

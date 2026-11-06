@@ -50,7 +50,7 @@ void TimeLiner::Menu() {
         float ratio = (mouse.x - this->currentLeftX) / (this->currentRightX - this->currentLeftX);
         ratio = std::clamp(ratio, 0.0f, 1.0f);
         float time = minTime + ratio * (maxTime - minTime);
-        if (this->pActiveTimeAdapter->SetTime(time)) {
+        if (this->pActiveTimeAdapter.load(std::memory_order_acquire)->SetTime(time)) {
             m_clickRatio = ratio;  // 立即更新显示位置
         }
     }
@@ -59,7 +59,7 @@ void TimeLiner::Menu() {
     ImGui::SetCursorScreenPos(ImVec2(this->currentLeftX, this->currentBaseY + 15.0f));
     ImGui::Text("时间: %.2f / %.2f", curTime.load(), maxTime.load());
 
-    this->pActiveTimeAdapter->TimeRend(this, draw);
+    this->pActiveTimeAdapter.load(std::memory_order_acquire)->TimeRend(this, draw);
 
     for (auto* pModule : this->timeLineModules) {
         ImGui::PushID(pModule);
@@ -94,22 +94,24 @@ void TimeLiner::ProcessMsg(MulNX::Message& msg) {
 
 void TimeLiner::UpdateTime() {
 
+    auto* active = this->pActiveTimeAdapter.load(std::memory_order_acquire);
     ITimeAdapter* pAdapterNext = nullptr;
-    if (this->pActiveTimeAdapter == this->pTimeAdapter1)pAdapterNext = this->pTimeAdapter2;
+    if (active == this->pTimeAdapter1)pAdapterNext = this->pTimeAdapter2;
     else pAdapterNext = this->pTimeAdapter1;
 
     MulNX::KeyCheckPack kcp{ true,false,false,true,'C',1 };
     if (this->pInputSystem->CheckWithPack(kcp)) {
-        auto now = this->pActiveTimeAdapter->GetTime();
-        this->pActiveTimeAdapter->OnSetOff();
+        auto now = active->GetTime();
+        active->OnSetOff();
         pAdapterNext->OnSetOn(now);
-        this->pActiveTimeAdapter = pAdapterNext;
+        active = pAdapterNext;
+        this->pActiveTimeAdapter.store(active, std::memory_order_release);
     }
 
     // 从适配器获取范围与当前时间，计算比例
-    this->curTime = this->pActiveTimeAdapter->GetTime();
-    this->minTime = this->pActiveTimeAdapter->GetMinTime();
-    this->maxTime = this->pActiveTimeAdapter->GetMaxTime();
+    this->curTime = active->GetTime();
+    this->minTime = active->GetMinTime();
+    this->maxTime = active->GetMaxTime();
 }
 
 void TimeLiner::UpdatePos() {
@@ -136,7 +138,7 @@ ImVec2 TimeLiner::Map(float time, int layer) const {
 }
 
 float TimeLiner::GetTime()const {
-    return this->pActiveTimeAdapter->GetTime();
+    return this->pActiveTimeAdapter.load(std::memory_order_acquire)->GetTime();
 }
 
 void TimeLiner::SetTime(float time)const {
@@ -144,5 +146,10 @@ void TimeLiner::SetTime(float time)const {
         this->LogError("输入了非法的时间");
         return;
     }
-    this->pActiveTimeAdapter->SetTime(time);
+    this->pActiveTimeAdapter.load(std::memory_order_acquire)->SetTime(time);
+}
+
+MulNX::CameraPathTime TimeLiner::GetCameraPathTime()const {
+    auto* adapter = this->pActiveTimeAdapter.load(std::memory_order_acquire);
+    return adapter->GetCameraPathTime();
 }
