@@ -82,35 +82,35 @@ bool TimeController::Init() {
     return true;
 }
 // 时间适配器接口实现
-float TimeController::GetMinTime() {
+double TimeController::GetMinTime() {
     return 0;
 }
-float TimeController::GetMaxTime() {
+double TimeController::GetMaxTime() {
     return this->GetDemoLastTick() * (1.0f / 64.0f);
 }
 int TimeController::GetDemoLastTick()const {
     return MulNX::MRead((int*)((uintptr_t)this->pDemoPlayer + 0x12C));
 }
-float TimeController::GetTime() {
-    float tick = static_cast<float>(this->GetDemoTick());
+double TimeController::GetTime() {
+    double tick = static_cast<double>(this->GetDemoTick());
     auto csgv = this->CS2->CSGlobalVars;
     if (csgv) try {
-        auto sub = MulNX::MRead(&csgv->interpolation_amount);
+        float sub = MulNX::MRead(&csgv->interpolation_amount);
         if (sub < 0.0f || sub > 1.0f) {
             sub = std::clamp(sub, 0.0f, 1.0f);
             this->LogWarning("已自动限制sub");
         }
-        tick += sub;
+        tick += static_cast<double>(sub);
     }
     catch (const MulNX::Exception& e) {
         this->LogError(e);
     }
     return tick / 64.0f;
 }
-bool TimeController::SetTime(float time) {
+bool TimeController::SetTime(double time) {
     this->AsyncCommand(std::format("demo_gototick {}", static_cast<int>(time * 64.0f)));
     return true;
 }
-bool TimeController::JumpRealRel(float time) {
+bool TimeController::JumpRealRel(double time) {
     return this->SetTime(time + this->GetTime());
 }

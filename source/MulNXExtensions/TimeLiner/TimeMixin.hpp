@@ -26,13 +26,13 @@ protected:
 class ITimeAdapter {
 public:
     virtual void TimeRend(TimeLiner* timeline, ImDrawList* dl) {};
-    virtual float GetMinTime() = 0;
-    virtual float GetMaxTime() = 0;
+    virtual double GetMinTime() = 0;
+    virtual double GetMaxTime() = 0;
 
-    virtual float GetTime() = 0;
-    virtual bool SetTime(float time) = 0;
+    virtual double GetTime() = 0;
+    virtual bool SetTime(double time) = 0;
 
-    virtual void OnSetOn(float time) {};
+    virtual void OnSetOn(double time) {};
     virtual void OnSetOff() {};
 };
 

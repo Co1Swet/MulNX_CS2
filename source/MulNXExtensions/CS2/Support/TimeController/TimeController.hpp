@@ -5,8 +5,8 @@
 class TimeController final :public CSModuleBase, public TimeAdaptMixin<TimeController> {
     void* pDemoPlayer = nullptr;
     class CSDemoController* pCSDemoController = nullptr;
-    float GetMinTime()override;
-    float GetMaxTime()override;
+    double GetMinTime()override;
+    double GetMaxTime()override;
     void TimeRend(TimeLiner* timeline, ImDrawList* dl)override;
 
     bool Init()override;
@@ -16,7 +16,7 @@ public:
     VExecutor<bool()> IsDemoPaused{};
 
     int GetDemoLastTick()const;
-    float GetTime()override;
-    bool SetTime(float time)override;
-    bool JumpRealRel(float time);
+    double GetTime()override;
+    bool SetTime(double time)override;
+    bool JumpRealRel(double time);
 };

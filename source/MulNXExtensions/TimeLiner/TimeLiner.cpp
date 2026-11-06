@@ -123,7 +123,7 @@ void TimeLiner::UpdatePos() {
     this->currentRightX = win_pos.x + content_max.x - 20.f;
 }
 
-ImVec2 TimeLiner::Map(float time, int layer) const {
+ImVec2 TimeLiner::Map(double time, int layer) const {
     // 防止除零（虽然调用前会保证 max > min，但依旧防御）
     float range = this->maxTime - this->minTime;
     if (range <= 0.0f) {
@@ -135,11 +135,11 @@ ImVec2 TimeLiner::Map(float time, int layer) const {
     return ImVec2(x, y);
 }
 
-float TimeLiner::GetTime()const {
+double TimeLiner::GetTime()const {
     return this->pActiveTimeAdapter->GetTime();
 }
 
-void TimeLiner::SetTime(float time)const {
+void TimeLiner::SetTime(double time)const {
     if (!std::isfinite(time)) {
         this->LogError("输入了非法的时间");
         return;

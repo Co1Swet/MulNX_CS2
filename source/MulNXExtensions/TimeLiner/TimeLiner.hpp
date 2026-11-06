@@ -5,9 +5,9 @@
 class ITimeAdapter;
 
 class TimeLiner :public MulNX::Module<TimeLiner> {
-    std::atomic<float> curTime = 0;
-    std::atomic<float> minTime = 0;
-    std::atomic<float> maxTime = 0;
+    std::atomic<double> curTime = 0;
+    std::atomic<double> minTime = 0;
+    std::atomic<double> maxTime = 0;
 
     std::atomic<float> currentLeftX = 0.0f;
     std::atomic<float> currentRightX = 1.0f;
@@ -25,10 +25,10 @@ public:
     ITimeAdapter* pTimeAdapter2 = nullptr;
     std::vector<class ITimeRend*> timeLineModules{};
 
-    ImVec2 Map(float time, int layer)const;
+    ImVec2 Map(double time, int layer)const;
 
-    float GetTime()const;
-    inline float GetMinTime()const { return this->minTime.load(std::memory_order_acquire); }
-    inline float GetMaxTime()const { return this->maxTime.load(std::memory_order_acquire); }
-    void SetTime(float time)const;
+    double GetTime()const;
+    inline double GetMinTime()const { return this->minTime.load(std::memory_order_acquire); }
+    inline double GetMaxTime()const { return this->maxTime.load(std::memory_order_acquire); }
+    void SetTime(double time)const;
 };
