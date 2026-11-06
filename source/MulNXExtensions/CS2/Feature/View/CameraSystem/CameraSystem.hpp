@@ -2,7 +2,6 @@
 #include <Intro/CSModuleBase.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
-#include "CameraDrawer/CameraDrawer.hpp"
 
 class CameraSystemIO {
 public:
@@ -12,22 +11,19 @@ public:
     MulNX::Math::View view;
 };
 
-class CampathManager;
-class CamMacroManager;
-class CamPackManager;
+class CamDrawer;
 
 class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem> {
-    CampathManager* pCampathManager = nullptr;
-    CamMacroManager* pCamMacroManager = nullptr;
-    CamPackManager* pCamPackManager = nullptr;
+    CamDrawer* pCamDrawer = nullptr;
+    class CampathManager* pCampathManager = nullptr;
+    class CamMacroManager* pCamMacroManager = nullptr;
+    class CamPackManager* pCamPackManager = nullptr;
     class CamPlayScheduler* pCamPlayScheduler = nullptr;
-
+    
     void ProcessMsg(MulNX::Message& msg)override;
     void Window(MulNX::UICoordinator* uico);
     bool Init()override;
-    bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;
-public:
-    CameraDrawer CamDrawer{};
+    bool HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer)override;    
 };
 
 template <typename T>

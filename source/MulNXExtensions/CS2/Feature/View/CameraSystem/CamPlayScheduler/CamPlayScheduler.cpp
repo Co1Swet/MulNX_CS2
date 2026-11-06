@@ -3,7 +3,7 @@
 
 bool CamPlayScheduler::Init() {
     this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
-    this->pCamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
+    this->pCamDrawer = this->FindModule<CamDrawer>("CamDrawer");
 
     (*this)
         .SubscribeAsyncEx<double, int>("CamPlay/Request")

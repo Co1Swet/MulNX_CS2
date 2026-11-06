@@ -1,9 +1,9 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Base/yaml.hpp>
-#include <Feature/View/CameraSystem/CameraSystem.hpp>
+#include <CameraSystem/CameraSystem.hpp>
 
-class CameraDrawer;
+class CamDrawer;
 
 class FreeCameraPath final {
     std::string name{};
@@ -50,7 +50,7 @@ public:
     std::pair<bool, std::string> Load(YAML::Node& root);
 
     // 绘制
-    bool Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
+    bool Draw(CamDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
 
     // 获取名字
     const std::string& GetName()const;

@@ -1,6 +1,6 @@
-#include "CameraDrawer.hpp"
+#include "CamDrawer.hpp"
 
-void CameraModel::Init(float CameraHigh, float CameraX, float CameraY, float AxisLenth, ImU32 Colour) {
+void CamDrawer::CameraModel::Init(float CameraHigh, float CameraX, float CameraY, float AxisLenth, ImU32 Colour) {
     this->Origin = { 0,0,0 };
 
     this->Lens[0] = { CameraHigh,-CameraX / 2,CameraY / 2 };
@@ -15,7 +15,7 @@ void CameraModel::Init(float CameraHigh, float CameraX, float CameraY, float Axi
     this->Colour = Colour;
 }
 
-void CameraModel::Rotate(const DirectX::XMFLOAT3& Rotation) {
+void CamDrawer::CameraModel::Rotate(const DirectX::XMFLOAT3& Rotation) {
     DirectX::XMVECTOR quat = MulNX::Math::CSEulerToQuatVec(Rotation);
     quat = DirectX::XMQuaternionNormalize(quat);
 
@@ -35,7 +35,7 @@ void CameraModel::Rotate(const DirectX::XMFLOAT3& Rotation) {
     this->Z = rotatePoint(this->Z);
 }
 
-void CameraModel::Move(const DirectX::XMFLOAT3& TargetPoint) {
+void CamDrawer::CameraModel::Move(const DirectX::XMFLOAT3& TargetPoint) {
     MulNX::Math::MovePoint(this->Origin, TargetPoint);
 
     MulNX::Math::MovePoint(this->Lens[0], TargetPoint);
@@ -48,7 +48,7 @@ void CameraModel::Move(const DirectX::XMFLOAT3& TargetPoint) {
     MulNX::Math::MovePoint(this->Z, TargetPoint);
 }
 
-void CameraModel::ToScreen(const float* const pMatrix, const float WinWidth, const float WinHeight) {
+void CamDrawer::CameraModel::ToScreen(const float* const pMatrix, const float WinWidth, const float WinHeight) {
     MulNX::Math::WorldToScreen(this->Origin, this->Origin2D, pMatrix, WinWidth, WinHeight);
 
     MulNX::Math::WorldToScreen(this->Lens[0], this->Lens2D[0], pMatrix, WinWidth, WinHeight);
@@ -61,7 +61,7 @@ void CameraModel::ToScreen(const float* const pMatrix, const float WinWidth, con
     MulNX::Math::WorldToScreen(this->Z, this->Z2D, pMatrix, WinWidth, WinHeight);
 }
 
-void CameraModel::Draw(const char* Label) {
+void CamDrawer::CameraModel::Draw(const char* Label) {
     auto* drawList = ImGui::GetBackgroundDrawList();
     // 绘制坐标系
     drawList->AddLine(ImVec2(this->Origin2D.x, this->Origin2D.y), ImVec2(this->X2D.x, this->X2D.y), IM_COL32(255, 0, 0, 255), 4.0f);
@@ -84,7 +84,7 @@ void CameraModel::Draw(const char* Label) {
     }
 }
 
-void CameraModel::DrawCamera(const DirectX::XMFLOAT3& Position, const DirectX::XMFLOAT3& Rotation, const char* label,
+void CamDrawer::CameraModel::DrawCamera(const DirectX::XMFLOAT3& Position, const DirectX::XMFLOAT3& Rotation, const char* label,
     const float* const pMatrix, const float WinWidth, const float WinHeight) {
     CameraModel Model = *this;
     Model.Rotate(Rotation);
@@ -93,21 +93,26 @@ void CameraModel::DrawCamera(const DirectX::XMFLOAT3& Position, const DirectX::X
     Model.Draw(label);
 }
 
-void CameraDrawer::Init(float CameraHigh, float CameraX, float CameraY, float AxisLenth, ImU32 Colour) {
+bool CamDrawer::Init() {
+    this->Set(20.0, 30.0, 15.0, 10.0, IM_COL32(255, 0, 255, 255));
+    return true;
+}
+
+void CamDrawer::Set(float CameraHigh, float CameraX, float CameraY, float AxisLenth, ImU32 Colour) {
     this->CameraModel.Init(CameraHigh, CameraX, CameraY, AxisLenth, Colour);
 }
 
-void CameraDrawer::Update(float* pMatrixPtr, float pWinWidth, float pWinHeight) {
+void CamDrawer::Update(float* pMatrixPtr, float pWinWidth, float pWinHeight) {
     this->pMatrixPtr = pMatrixPtr;
     this->WinWidth = pWinWidth;
     this->WinHeight = pWinHeight;
 }
 
-void CameraDrawer::DrawCamera(DirectX::XMFLOAT3 Position, DirectX::XMFLOAT3 Rotation, const char* label) {
+void CamDrawer::DrawCamera(DirectX::XMFLOAT3 Position, DirectX::XMFLOAT3 Rotation, const char* label) {
     this->CameraModel.DrawCamera(Position, Rotation, label, this->pMatrixPtr, this->WinWidth, this->WinHeight);
 }
 
-void CameraDrawer::DrawViewCamera(const MulNX::Math::View& mathView, const char* label) {
+void CamDrawer::DrawViewCamera(const MulNX::Math::View& mathView, const char* label) {
     auto Rotation = mathView.rotation;
     auto Position = mathView.position;
     this->DrawCamera(Position, Rotation, label);

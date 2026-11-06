@@ -1,7 +1,7 @@
 #pragma once
 #include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
-#include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
+#include <CameraSystem/CamDrawer/CamDrawer.hpp>
 
 class CamPlayScheduler final :public CamSysModule {
     class PlaySlot final {
@@ -12,7 +12,7 @@ class CamPlayScheduler final :public CamSysModule {
     };
     std::vector<PlaySlot>playslots{};
     CampathManager* pCampathManager = nullptr;
-    CameraDrawer* pCamDrawer = nullptr;
+    CamDrawer* pCamDrawer = nullptr;
 
     std::atomic<bool> drawCam = false;
     std::atomic<bool> camOverride = true;

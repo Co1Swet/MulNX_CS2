@@ -1,5 +1,6 @@
 #include "CampathManager.hpp"
 #include <Support/TimeController/TimeController.hpp>
+#include <CameraSystem/CamDrawer/CamDrawer.hpp>
 
 void CampathManager::Menu()const {
     std::shared_lock lock(this->smutex);
@@ -169,7 +170,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
         ImGui::SliderFloat(I18n("math.roll").c_str(), &tempRotationEuler.z, -179.0, 179.0);
         ImGui::SliderFloat(I18n("math.fov").c_str(), &tempPositionAndFOV.w, 10, 170);
 
-        this->CamDrawer->DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
+        this->pCamDrawer->DrawCamera(DirectX::XMFLOAT3{ tempPositionAndFOV.x,tempPositionAndFOV.y ,tempPositionAndFOV.z }, tempRotationEuler, "目标摄像机关键帧");
         if (ImGui::Button("修改选中的关键帧")) {
             const auto dof = keyframe.GetDOF();
             auto [del, r] = MulNX::Message::Create<MulNX::NetExt>("Campath/DeleteKeyframe"_hash);
@@ -219,7 +220,7 @@ void CampathManager::DebugUI(const FreeCameraPath* campath)const {
 void CampathManager::UI()const {
     std::shared_lock lock(this->smutex);
     for (auto& [name, pCampath] : this->campaths) {
-        pCampath->Draw(this->CamDrawer, this->CS2View->GetViewMatrix(),
+        pCampath->Draw(this->pCamDrawer, this->CS2View->GetViewMatrix(),
             this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     }
     auto w = MulNX::UI::RAIIWindow("运镜轨道调试", this->showWindow);

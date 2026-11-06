@@ -1,5 +1,5 @@
 #include "FreeCameraPath.hpp"
-#include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
+#include <CameraSystem/CamDrawer/CamDrawer.hpp>
 #include <fstream>
 
 std::string FreeCameraPath::GetBaseInfo()const {
@@ -101,7 +101,7 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     return FreeCameraPath::CalResult::In;
 }
 
-bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const {
+bool FreeCameraPath::Draw(CamDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const {
     if (!this->draw) {
         return false;
     }

@@ -1,9 +1,9 @@
 #include "CampathManager.hpp"
 #include <Intro/HookView/HookView.hpp>
-#include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
+#include <CameraSystem/CamDrawer/CamDrawer.hpp>
 
 bool CampathManager::Init() {
-    this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
+    this->pCamDrawer = this->FindModule<CamDrawer>("CamDrawer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 

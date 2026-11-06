@@ -62,9 +62,7 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
 }
 
 bool CameraSystem::Init() {
-    // 传递指针，注入依赖，提升性能，直接调用
-    // 注意，本模块所有级别的管理器相互显示注入，其它服务借助Core隐式注入
-    this->CamDrawer.Init(20.0, 30.0, 15.0, 10.0, IM_COL32(255, 0, 255, 255));
+    this->pCamDrawer = this->FindModule<CamDrawer>("CamDrawer");
     this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
     this->pCamMacroManager = this->FindModule<CamMacroManager>("CamMacroManager");
     this->pCamPackManager = this->FindModule<CamPackManager>("CamPackManager");
@@ -112,7 +110,7 @@ bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num
     this->Update();
     CameraSystemIO IO;
 
-    this->CamDrawer.Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
+    this->pCamDrawer->Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     this->pCampathManager->HandleUpdate();
     this->pCamMacroManager->HandleUpdate();
     this->pCamPackManager->HandleUpdate();

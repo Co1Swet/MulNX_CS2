@@ -1,5 +1,6 @@
 #pragma once
 #include "CameraSystem.hpp"
+#include "CamDrawer/CamDrawer.hpp"
 #include "CampathManager/CampathManager.hpp"
 #include "CamMacroManager/CamMacroManager.hpp"
 #include "CamPackManager/CamPackManager.hpp"
