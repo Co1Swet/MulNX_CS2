@@ -7,7 +7,9 @@ bool DLLLoadDispatcher::Init() {
         MulNX::Message msg("Hook/LoadLibraryExW"_hash);
         auto&& [lpLibFileName] = msg.Access<LPCWSTR>();
         lpLibFileName = (LPCWSTR)ctx->rcx;
-        hk->CallMaybeOrigin(0, ctx);
+        auto hFile = (HANDLE)ctx->rdx;
+        auto dwFlags = *(DWORD*)&ctx->r8;
+        ctx->rax = (uint64_t)hk->CallMaybeAs<decltype(&LoadLibraryExW)>(lpLibFileName, hFile, dwFlags);
         this->PublishSync(msg);
         return MulNX::Hook::Then::Return;
         }).value();
