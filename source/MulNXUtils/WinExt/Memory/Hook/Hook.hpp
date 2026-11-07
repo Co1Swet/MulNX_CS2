@@ -50,22 +50,16 @@ namespace MulNX {
             uintptr_t UserSettedTarget = 0;
         };
         JmpTarget jmpTarget{};
-
-
         size_t frameSize = 0;
-        uintptr_t pCallOrigin = 0;
 
         uintptr_t Dispatch(RegContext* ctx);
-        void CopyStack(size_t copySize, RegContext* ctx, uintptr_t pCurStack);
-
-
-        std::optional<std::string> BindTarget(uint8_t* target, int len);
-        std::optional<std::string> CreateAFix();
-        std::optional<std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
+        std::expected<void, std::string> BindTarget(uint8_t* target, int len);
+        std::expected<void, std::string> CreateAFix();
+        std::expected<void, std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
     public:
-        ~Hook();
+        uintptr_t pMaybeRawFunc = 0;
 
-        uintptr_t GetHookTarget()const { return std::bit_cast<uintptr_t>(this->hookTarget); }
+        ~Hook();
 
         static std::expected<std::unique_ptr<Hook>, std::string> Create(
             uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
@@ -75,9 +69,9 @@ namespace MulNX {
         Result Attach();
         Result Detach();
 
+        auto GetHookTarget()const { return this->hookTarget; }
         void ResetCallback(std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback);
-        uintptr_t pMaybeRawFunc = 0;
-        uint64_t CallMaybeOrigin(size_t copyStackParamNum, RegContext* ctx);
+
         void* GetRawStackAddr(RegContext* ctx);
         template<MulNX::PodSizeIn<0, 8> T>
         T* GetStackParam(RegContext* ctx, size_t num) {

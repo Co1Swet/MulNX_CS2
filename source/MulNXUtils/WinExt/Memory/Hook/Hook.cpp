@@ -36,22 +36,11 @@ uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     return target;
 }
 
-void MulNX::Hook::CopyStack(size_t copySize, RegContext* ctx, uintptr_t pCurStack) {
-    const int* src = reinterpret_cast<int*>(ctx->rsp + this->frameSize + 0x28); // 0x28 == 0x20(影子空间) + 0x8(call压入的地址)
-    void* dst = reinterpret_cast<void*>(pCurStack - 0x8); // 这个0x8是极其特殊地算出来的，注意到进入Asm，首先call压入8，然后push两个压入16，然后注意到影子空间分配是0x28。此时可以分成8 16 8 0x20这样，也就是复制栈不是直接传递过来的rsp，而是再偏移后的8和0x20中间
-    memcpy(dst, src, copySize);
-}
-
-uint64_t MulNX::Hook::CallMaybeOrigin(size_t copyStackParamNum, RegContext* ctx) {
-    using RawCall = uint64_t(*)(MulNX::Hook*, size_t, RegContext*);
-    return reinterpret_cast<RawCall>(this->pCallOrigin)(this, (copyStackParamNum) * 8, ctx);
-}
-
-std::optional<std::string> MulNX::Hook::BindTarget(uint8_t* target, int len) {
+std::expected<void, std::string> MulNX::Hook::BindTarget(uint8_t* target, int len) {
     if (0 < len && len < 5) {
-        return std::format("参数指定的长度是：{}  ，这个长度怎么可能放得下一个jmp rel32？？", len);
+        return std::unexpected(std::format("参数指定的长度是：{} < 5", len));
     }
-    if (len == 0) {
+    if (len <= 0) {
         // info至少提供20个空间
         auto info = MulNX::Addr::AnalyseTarget(target);
         for (int i = 0;len < 5;++i) {
@@ -62,30 +51,24 @@ std::optional<std::string> MulNX::Hook::BindTarget(uint8_t* target, int len) {
     this->overrideSize = len;
 
     this->hookTargetRawCode = MulNX::Memory::Asm::Code(target, target + this->overrideSize);
-    
-    return std::nullopt;
+    return {};
 }
-
-std::optional<std::string> MulNX::Hook::CreateAFix() {
+std::expected<void, std::string> MulNX::Hook::CreateAFix() {
     auto result = MulNX::Addr::FixRelativeInstructions(this->hookTargetRawCode,
         (uintptr_t)this->hookTarget, (uintptr_t)this->pAsmDispatcher + this->dispatcherAsmCode.size());
     if (!result.has_value()) {
-        return result.error();
+        return std::unexpected(result.error());
     }
-
     this->hookTargetFixedCode = result.value();
-    return std::nullopt;
+    return {};
 }
-std::optional<std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool callRawFisrt) {
+std::expected<void, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool callRawFisrt) {
     auto* alloced = MulNX::Addr::TryAlloc((uintptr_t)this->hookTarget, 4096);
-    if (!alloced) {
-        return "windows内存分配失败！无法找到空间";
-    }
-
+    if (!alloced)return std::unexpected("windows内存分配失败！无法找到空间");
     this->pAsmDispatcher = alloced;
     if (std::abs(static_cast<long long>(reinterpret_cast<uintptr_t>(alloced) -
         reinterpret_cast<uintptr_t>(this->hookTarget))) > 1024ULL * 1024 * 1024) {
-        return "windows内存分配失败！分配空间不合适";
+        return std::unexpected("windows内存分配失败！分配空间不合适");
     }
 
     using enum MulNX::Memory::Asm::Reg;
@@ -97,17 +80,19 @@ std::optional<std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool 
     if (!extraStackAdjust)this->frameSize += 8;
 
     if (callRawFisrt) {
-        if (auto r = this->CreateAFix())return r.value();
-        this->dispatcherAsmCode.append_range(this->hookTargetFixedCode);
+        if (auto r = this->CreateAFix()) {
+            this->dispatcherAsmCode.append_range(this->hookTargetFixedCode);
+        }
+        else {
+            return std::unexpected(r.error());
+        }
     }
-
     Asm
         .sub(RSP, this->frameSize)
         .SaveReg();
 
     this->dispatcherAsmCode.append_range(std::move(Asm.Release()));
-
-    return std::nullopt;
+    return {};
 }
 
 std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
@@ -117,8 +102,8 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
     auto HookInstance = std::make_unique<Hook>();
     HookInstance->callback = std::move(callback);
 
-    if (auto r = HookInstance->BindTarget(target, len))return std::unexpected(r.value());
-    if (auto r = HookInstance->CreateStart(extraStackAdjust, callRawFirst))return std::unexpected(r.value());
+    if (auto r = HookInstance->BindTarget(target, len);!r)return std::unexpected(r.error());
+    if (auto r = HookInstance->CreateStart(extraStackAdjust, callRawFirst);!r)return std::unexpected(r.error());
 
     using enum MulNX::Memory::Asm::Reg;
     using namespace MulNX::Memory::Asm;
@@ -149,7 +134,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
     HookInstance->pMaybeRawFunc = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
 
-    if (auto r = HookInstance->CreateAFix())return std::unexpected(r.value());
+    if (auto r = HookInstance->CreateAFix();!r)return std::unexpected(r.error());
     HookInstance->dispatcherAsmCode.append_range(HookInstance->hookTargetFixedCode);
     Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
@@ -166,41 +151,6 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         .LoadReg()
         .add(RSP, HookInstance->frameSize)
         .jmp64(userJmpTarget);
-    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
-
-    HookInstance->pCallOrigin = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-    // rcx, rdx, r8
-    Asm
-        .push(R12)
-        .push(R13)
-        //.push(R12)
-
-        .mov(R12, RDX)
-        .mov(R13, R8)
-
-        .sub(RSP, R12)
-        .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::CopyStack))
-        .mov(R9, RSP)
-        .sub(RSP, 0x28)
-        .call(RAX)
-
-        .mov(RCX, Mem(R13, offsetof(RegContext, rcx)))
-        .mov(RDX, Mem(R13, offsetof(RegContext, rdx)))
-        .mov(R8, Mem(R13, offsetof(RegContext, r8)))
-        .mov(R9, Mem(R13, offsetof(RegContext, r9)))
-
-        .mov(RAX, HookInstance->pMaybeRawFunc)
-        .call(RAX)
-        .add(RSP, 0x28)
-
-        .mov(Mem(R13, offsetof(RegContext, rax)), RAX)
-
-        .add(RSP, R12)
-
-        .pop(R13)
-        .pop(R12)
-        .ret();
-
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
     memcpy(HookInstance->pAsmDispatcher,
