@@ -1,8 +1,9 @@
 #pragma once
-#include <Game/Consoles.hpp>
+#include <Game/Systems/ICvar.hpp>
 #include <Intro/CSModuleBase.hpp>
 
 class HookConsole final :public CSModuleBase {
+    CS2::Systems::CCvar* pVEngineCvar007 = nullptr;
     class MulNXCmd {
     public:
         std::string name;
@@ -17,7 +18,6 @@ class HookConsole final :public CSModuleBase {
     VExecutor<void(int, const char*, int, double, int64_t)> executor{};
     moodycamel::ConcurrentQueue<std::string>bufferGameCmds;
     
-
     MulNX::Hook::Then HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx);
     void OnTier0Load(MulNX::Message& msg);
     void OnEngine2Load(MulNX::Message& msg);
@@ -27,15 +27,15 @@ class HookConsole final :public CSModuleBase {
 public:
     moodycamel::ConcurrentQueue<std::string>bufferHighPriorityGameCmds;
     
-    HookConsole& RegisterCmd(std::string&& name, std::move_only_function<void(CS2::Console::CCommandLine*)> callback);
+    HookConsole& RegisterCmd(std::string&& name, std::move_only_function<void(CS2::Console::CCommand*)> callback);
     // 得到第一个Cvar的迭代器
     VExecutor<void* (uint64_t&)>GetFirstCvarIterator{};
     // 得到下一个Cvar的迭代器
     VExecutor<void* (uint64_t&, uint64_t)>GetNextCvarIterator{};
     // 通过迭代器ID获取Cvar
-    VExecutor<CS2::Console::C_ConVar* (uint64_t)>GetCVarByIndex{};
+    VExecutor<CS2::Console::ConVar* (uint64_t)>GetCVarByIndex{};
     // 通过名称获取Cvar
-    CS2::Console::C_ConVar* GetCVarByName(std::string_view var_name)const;
+    CS2::Console::ConVar* GetCVarByName(std::string_view var_name)const;
 
     void UnlockHiddenCVars(int& Count)const;
     void LockAllCvars(int& Count)const;

@@ -33,7 +33,7 @@ bool HookConsole::Init() {
             if (!meta.isAsync)continue;
             if (!meta.makingHandler)continue;
             const auto& cmdName = meta.RawString;
-            auto callbackCCommand = [=](CS2::Console::CCommandLine* pCmd)->void {
+            auto callbackCCommand = [=](CS2::Console::CCommand* pCmd)->void {
                 std::string_view raw(pCmd->pRawString);
                 raw = raw.substr(raw.find(' ') + 1);
                 MulNX::Message msg(type);
@@ -64,7 +64,7 @@ bool HookConsole::Init() {
     return true;
 }
 
-HookConsole& HookConsole::RegisterCmd(std::string&& name, std::move_only_function<void(CS2::Console::CCommandLine*)> callback) {
+HookConsole& HookConsole::RegisterCmd(std::string&& name, std::move_only_function<void(CS2::Console::CCommand*)> callback) {
     this->LogInfo(std::format("请求了指令创建: {}", name));
     MulNXCS2CmdCallback CmdCallback(std::move(callback));
     MulNXCmd cmd(std::move(name), "one MulNX Cmd", std::move(CmdCallback));
@@ -77,32 +77,30 @@ void HookConsole::OnEngine2Load(MulNX::Message& msg) {
 
 void HookConsole::OnTier0Load(MulNX::Message& msg) {
     auto VEngineCvar007 = (uintptr_t)this->CS2->tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("VEngineCvar007", nullptr);
+    this->pVEngineCvar007 = reinterpret_cast<CS2::Systems::CCvar*>(VEngineCvar007);
 
     this->GetFirstCvarIterator = IVClass::Assume(VEngineCvar007)->GetVFunc<void* (uint64_t&)>(12);
     this->GetNextCvarIterator = IVClass::Assume(VEngineCvar007)->GetVFunc<void* (uint64_t&, uint64_t)>(13);
-    this->GetCVarByIndex = IVClass::Assume(VEngineCvar007)->GetVFunc<CS2::Console::C_ConVar * (uint64_t)>(41);
+    this->GetCVarByIndex = IVClass::Assume(VEngineCvar007)->GetVFunc<CS2::Console::ConVar * (uint64_t)>(41);
 
     this->hkVEngineCvar007_RegisterConCommand = MulNX::Hook::Create((uint8_t*)IVClass::Assume(VEngineCvar007)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->HandleOnRegisterConCommand(hk, ctx);});
-        auto pOrigCmd = ctx->r8;
+        this->HandleOnRegisterConCommand(hk, ctx);
 
         this->LogInfo("开始注册MulNX的控制台指令");
         for (auto& cmd : this->CS2Cmds) {
-            CS2::Console::ConConmand cmdForCS2(
+            CS2::Console::ConCommand conCommand(
                 cmd.name.c_str(),
                 cmd.help.c_str(),
                 CS2::Console::FCVAR_CLIENTDLL,
                 &cmd.callback
             );
-            ctx->r8 = (uint64_t)&cmdForCS2;
-            hk->CallMaybeOrigin(5, ctx);
+            CS2::Systems::CCvar::HConCommand handle;
+            this->pVEngineCvar007->RegisterConCommand(&handle, &conCommand);
         }
         this->LogSucc(std::format("共注册指令数：{}", this->CS2Cmds.size()));
 
-        ctx->r8 = pOrigCmd;
-        hk->CallMaybeOrigin(5, ctx);
-
-        return MulNX::Hook::Then::Return;
+        return MulNX::Hook::Then::Continue;
         }
     ).value();
     this->RegisterAttachHook(this->hkVEngineCvar007_RegisterConCommand, "VEngineCvar007::RegisterConCommand");
@@ -126,17 +124,17 @@ void HookConsole::ProcessMsg(MulNX::Message& msg) {
 
 MulNX::Hook::Then HookConsole::HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx) {
     MulNX::Message msg("Hook/RegisterConCommand"_hash);
-    auto&& [pCmd] = msg.Access<CS2::Console::ConConmand*>();
-    pCmd = (CS2::Console::ConConmand*)ctx->r8;
+    auto&& [pCmd] = msg.Access<CS2::Console::ConCommand*>();
+    pCmd = (CS2::Console::ConCommand*)ctx->r8;
     this->PublishSync(msg);
     return MulNX::Hook::Then::Continue;
 }
 
-CS2::Console::C_ConVar* HookConsole::GetCVarByName(std::string_view var_name)const {
+CS2::Console::ConVar* HookConsole::GetCVarByName(std::string_view var_name)const {
     uint64_t i = 0;
     this->GetFirstCvarIterator(i);
     while (i != 0xFFFFFFFF) {
-        CS2::Console::C_ConVar* pCvar = nullptr;
+        CS2::Console::ConVar* pCvar = nullptr;
         pCvar = this->GetCVarByIndex(i);
         if (strcmp(pCvar->szName, var_name.data()) == 0) {
             return pCvar;
@@ -150,7 +148,7 @@ void HookConsole::UnlockHiddenCVars(int& Count)const {
     uint64_t i = 0;
     this->GetFirstCvarIterator(i);
     while (i != 0xFFFFFFFF) {
-        CS2::Console::C_ConVar* pConVar = this->GetCVarByIndex(i);
+        CS2::Console::ConVar* pConVar = this->GetCVarByIndex(i);
         if (pConVar) {
             if (pConVar->IsHidden()) {
                 pConVar->Unhide();
@@ -165,7 +163,7 @@ void HookConsole::LockAllCvars(int& Count)const {
     uint64_t i = 0;
     this->GetFirstCvarIterator(i);
     while (i != 0xFFFFFFFF) {
-        CS2::Console::C_ConVar* pConVar = this->GetCVarByIndex(i);
+        CS2::Console::ConVar* pConVar = this->GetCVarByIndex(i);
         if (pConVar) {
             if (!pConVar->IsHidden()) {
                 pConVar->Hide();

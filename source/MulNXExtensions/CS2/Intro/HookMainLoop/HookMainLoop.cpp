@@ -35,7 +35,7 @@ bool HookMainLoop::Init() {
         });
 
     this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
-        auto&& [pCmd] = msg.Access<CS2::Console::ConConmand*>();
+        auto&& [pCmd] = msg.Access<CS2::Console::ConCommand*>();
         std::string_view name = pCmd->m_pszName;
         if (name == "quit") {
             this->hkQuit = MulNX::Hook::Create((uint8_t*)pCmd->pConCmdCallback, [this](MulNX::Hook* hk, RegContext* ctx) {

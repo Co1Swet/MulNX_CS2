@@ -3,7 +3,7 @@
 
 bool HookDemo::Init() {
     this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
-        auto&& [pCmd] = msg.Access<CS2::Console::ConConmand*>();
+        auto&& [pCmd] = msg.Access<CS2::Console::ConCommand*>();
         std::string_view name = pCmd->m_pszName;
         if (name == "playdemo") {
             this->hkPlaydemo = MulNX::Hook::Create((uint8_t*)pCmd->pConCmdCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -17,7 +17,7 @@ bool HookDemo::Init() {
         }
         if (name == "demo_timescale") {
             this->hkDemeTimescale = MulNX::Hook::Create((uint8_t*)pCmd->pConCmdCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
-                auto cmd = (CS2::Console::CCommandLine*)ctx->rdx;
+                auto cmd = (CS2::Console::CCommand*)ctx->rdx;
                 if (std::string_view(cmd->pRawString) != "demo_timescale 1.000000") {
                     this->AsyncCommand("host_timescale 1.000000");
                 }
@@ -30,7 +30,7 @@ bool HookDemo::Init() {
     return true;
 }
 MulNX::Hook::Then HookDemo::OnCmdPlayDemo(MulNX::Hook* hk, RegContext* ctx) {
-    auto cmd = (CS2::Console::CCommandLine*)ctx->rdx;
+    auto cmd = (CS2::Console::CCommand*)ctx->rdx;
 
     if (this->CS2Time->IsPlayingDemo()) {
         this->AsyncCommand("disconnect");
@@ -42,18 +42,18 @@ MulNX::Hook::Then HookDemo::OnCmdPlayDemo(MulNX::Hook* hk, RegContext* ctx) {
             });
         return MulNX::Hook::Then::Return;
     }
-    using PlayDemo_t = void(*)(uint64_t a1, CS2::Console::CCommandLine* a2);
+    using PlayDemo_t = void(*)(uint64_t a1, CS2::Console::CCommand* a2);
     hk->CallMaybeAs<PlayDemo_t>(ctx->rcx, cmd);
     std::string_view raw(cmd->pRawString);
     raw = raw.substr(raw.find(' ') + 1);
     this->BeforePlay(raw);
     return MulNX::Hook::Then::Return;
 }
-void HookDemo::HookDemoGotoTick(CS2::Console::ConConmand* pCmd) {
+void HookDemo::HookDemoGotoTick(CS2::Console::ConCommand* pCmd) {
     auto pf = pCmd->pConCmdCallback;
     this->hkDemoGotoTick = MulNX::Hook::Create((uint8_t*)pf, [this](MulNX::Hook* hk, RegContext* ctx) {
-        using DemoGotoTick_t = uint64_t(*)(uint64_t a1, CS2::Console::CCommandLine* a2);
-        auto cmd = (CS2::Console::CCommandLine*)ctx->rdx;
+        using DemoGotoTick_t = uint64_t(*)(uint64_t a1, CS2::Console::CCommand* a2);
+        auto cmd = (CS2::Console::CCommand*)ctx->rdx;
         hk->CallMaybeAs<DemoGotoTick_t>(ctx->rcx, cmd);
         auto msg = MulNX::Message("Demo/GotoTick/Complete"_hash);
         auto&& [jumpTick] = msg.Access<int>();
