@@ -5,6 +5,7 @@ class MediaRecorder final :public MediaModuleBase {
     class AEncodeHelper* pAEncodeHelper = nullptr;
     class VEncodeController* pVEncodeController = nullptr;
     class MediaParamManager* pMediaParamManager = nullptr;
+    std::atomic<bool> startAsAdvance = false;
 
     av::FormatContext ofctx;
     std::chrono::steady_clock::time_point recordStartTime;

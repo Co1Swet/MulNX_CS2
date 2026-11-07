@@ -17,12 +17,12 @@ bool AudioCapturer::Init() {
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
-        if (this->pMediaState->advancedMode) {
+        if (info.startAsAdvancedMode) {
             this->LogInfo("高级录制模式，不开启音频捕获");
         }
         else {
             this->recordStartTime = info.startTime;
-            this->needCaptuer = !this->pMediaState->advancedMode;
+            this->needCaptuer = true;
             this->LogInfo("已开启音频捕获");
         }
         });

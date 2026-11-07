@@ -26,7 +26,6 @@ void BufferCopier::CopyTexture() {
 
     MulNX::Message msgBeforeCopyBackbuffer("MediaSync/BeforeCopyBackbuffer"_hash);
     auto&& [info] = msgBeforeCopyBackbuffer.Access<MulNX::VFrameExInfo>();
-    info.isAdvancedMode = this->pMediaState->advancedMode.load(std::memory_order_acquire);
     this->PublishSync(msgBeforeCopyBackbuffer);
     if (info.needDrop)return;
 

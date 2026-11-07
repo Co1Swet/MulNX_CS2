@@ -15,7 +15,6 @@ public:
     // 该暂停的目的一部分是为了防止队列雪崩导致持续阻塞
     std::atomic<bool> MediaSystemGlobalWorkFlag = false;
     MulReflBool(nextStartUseAdvancedMode, false);
-    std::atomic<bool> advancedMode = false;
     std::atomic<bool> encodingOverload = false;
 
     std::atomic<RecordState> recordState = RecordState::Free;

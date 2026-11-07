@@ -50,7 +50,7 @@ void AdvancedRecord::SetRecordStart(const MulNX::AVStartInfo& sInfo) {
     this->lastSlot = -1;
 
     this->frameCount = 0;
-    this->startAsAdvanced = this->pMediaState->advancedMode.load(std::memory_order_acquire);
+    this->startAsAdvanced = sInfo.startAsAdvancedMode;
     int fps = sInfo.targetFPS;
     if (fps > 0) {
         this->minIntervalUs.store(1000000LL / fps, std::memory_order_release);
@@ -94,7 +94,7 @@ void AdvancedRecord::HandleBeforeCopyBackbuffer(MulNX::Message& msg) {
 }
 
 bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
-    if (!info.isAdvancedMode) return false;
+    if (!this->startAsAdvanced.load(std::memory_order_acquire)) return false;
     while (this->pMediaState->encodingOverload) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }

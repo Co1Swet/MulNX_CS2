@@ -22,7 +22,7 @@ void MediaRecorder::Menu() {
     case RecordState::Recording:
         ImGui::Text("录制编解码中");
         ImGui::TextUnformatted(std::format("正在进行的录制是否是高级录制：{}",
-            this->pMediaState->advancedMode ? "是" : "否").c_str());
+            this->startAsAdvance.load(std::memory_order_acquire) ? "是" : "否").c_str());
         break;
     }
     ImGui::TextUnformatted(std::format("捕获状态：{}",
@@ -93,8 +93,6 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
         this->LogWarning("高级录制需要大于 0 的捕获帧率");
         return false;
     }
-    this->pMediaState->advancedMode = advance;
-
     fs::path outputDir = fs::path(dirPath);
     fs::path outputFile = outputDir / (fileName + ".mp4");
     std::string outFile = outputFile.string();
@@ -143,6 +141,7 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
         rInfo.startTime = std::chrono::steady_clock::now();
         rInfo.pFilenameWithoutStem = &fileName;
         rInfo.targetFPS = fps;
+        rInfo.startAsAdvancedMode = advance;
         this->PublishSync(SetOnMsg);
         this->LogSucc("音视频系统SetOn完毕");
 
@@ -152,6 +151,7 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
 
         this->pMediaState->MediaSystemGlobalWorkFlag = true;
         this->pMediaState->recordState.store(RecordState::Recording);
+        this->startAsAdvance.store(advance, std::memory_order_release);
         return true;
     }
     catch (const std::exception& e) {

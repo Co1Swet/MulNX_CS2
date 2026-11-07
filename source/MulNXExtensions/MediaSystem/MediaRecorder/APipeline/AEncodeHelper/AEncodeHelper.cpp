@@ -22,8 +22,9 @@ bool AEncodeHelper::Init() {
 }
 
 void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
-    if (this->pMediaState->advancedMode) {
-        this->LogInfo("高级录制模式，不打开音频捕获"); return;
+    if (info.startAsAdvancedMode) {
+        this->LogInfo("高级录制模式，不打开音频捕获");
+        return;
     }
     this->audioFifo.clear();
     this->flushPackets.clear();

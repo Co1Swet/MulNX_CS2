@@ -20,8 +20,6 @@ namespace MulNX {
         std::chrono::steady_clock::time_point captureTime{};
         // 需要丢弃该帧
         bool needDrop;
-        // 处于高级录制模式;
-        bool isAdvancedMode;
     };
 
     struct AVStartInfo {
@@ -29,6 +27,7 @@ namespace MulNX {
         std::chrono::steady_clock::time_point startTime{};
         const std::string* pFilenameWithoutStem = nullptr;
         int targetFPS = 0; // 本次录制启动时的帧率，0 表示普通模式不限帧
+        bool startAsAdvancedMode = false;
     };
 }
 
