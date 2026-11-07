@@ -69,9 +69,9 @@ void CamMacro::SetKeyCheckPack(const MulNX::KeyCheckPack& KCPack) {
     return;
 }
 
-std::pair<bool, std::string> CamMacro::Save(const fs::path& folderPath)const {
-    if (!this->dirty)return { true,std::format("宏未修改，无需保存：{}",this->name) };
-    if (folderPath.empty()) return { false, "文件夹路径为空，无法保存运镜宏！" };
+std::expected<std::string, std::string> CamMacro::Save(const fs::path& folderPath)const {
+    if (!this->dirty)return std::format("宏未修改，无需保存：{}", this->name);
+    if (folderPath.empty())return std::unexpected("文件夹路径为空，无法保存运镜宏！");
     fs::path filePath = folderPath / (this->name + ".yaml");
     try {
         YAML::Node root;
@@ -93,26 +93,26 @@ std::pair<bool, std::string> CamMacro::Save(const fs::path& folderPath)const {
         YAML::SaveFilePath(filePath, root);
 
         this->dirty = false;
-        return { true, std::format("保存成功：运镜宏名：{}  运镜数：{}",this->name ,this->wrapCampaths.size()) };
+        return std::format("保存成功：运镜宏名：{}  运镜数：{}", this->name, this->wrapCampaths.size());
     }
     catch (const std::exception& e) {
-        return { false, std::format("保存失败：{}" ,e.what()) };
+        return std::unexpected(std::format("保存失败：{}", e.what()));
     }
 }
-std::pair<bool, std::string> CamMacro::Load(YAML::Node& root) {
+std::expected<std::string, std::string> CamMacro::Load(YAML::Node& root) {
     this->KCPack = root["KCP"].as<MulNX::KeyCheckPack>();
     this->name = root["name"].as<std::string>();
     size_t allCount = root["size"].as<size_t>();
     if (root["elements"].size() != allCount) {
-        return { false,std::format("不安全的运镜宏！实际运镜数量与文件描述不符！ 运镜宏名：{}",this->name) };
+        return std::unexpected(std::format("不安全的运镜宏！实际运镜数量与文件描述不符！ 运镜宏名：{}", this->name));
     }
     for (const auto& nodeElement : root["elements"]) {
         std::string campathName = nodeElement["name"].as<std::string>();
         float offset = nodeElement["offset"].as<float>();
         if (!this->AddCampath(campathName, offset)) {
-            return { false,std::format("无法添加运镜到运镜宏，运镜宏名：{}，运镜名：{}" ,this->name, campathName) };
+            return std::unexpected(std::format("无法添加运镜到运镜宏，运镜宏名：{}，运镜名：{}", this->name, campathName));
         }
     }
     this->dirty = false;
-    return { true,"运镜宏加载成功" };
+    return std::format("运镜宏加载成功：{}", this->name);
 }

@@ -46,7 +46,7 @@ bool CamMacroManager::Init() {
             this->CamMacroLoad(dirCamMacros / camMacroName);
         }
         this->LogInfo(std::format("尝试加载运镜宏总数：{}", camMacroNames.size()));
-        this->LogSucc(std::format("成功加载运镜宏总数：{}" ,this->camMacros.size()));
+        this->LogSucc(std::format("成功加载运镜宏总数：{}", this->camMacros.size()));
         });
 
     return true;
@@ -109,12 +109,12 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         const auto* pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
         auto path = this->Path()->PathGetFromKey("kCamMacros");
-        auto [ok, msg] = pCamMacro->Save(path);
-        if (ok) {
-            this->LogSucc(std::move(msg));
+        auto r = pCamMacro->Save(path);
+        if (r.has_value()) {
+            this->LogSucc(std::move(r.value()));
         }
         else {
-            this->LogError(std::move(msg));
+            this->LogError(std::move(r.error()));
         }
         break;
     }
@@ -165,10 +165,10 @@ CamMacro* CamMacroManager::FindCamMacro(const std::string& name) {
 
 bool CamMacroManager::CamMacroCreate(const std::string& name) {
     if (this->camMacros.find(name) != this->camMacros.end()) {
-        this->LogError(std::format("运镜宏已占用：{}" , name));
+        this->LogError(std::format("运镜宏已占用：{}", name));
         return false;
     }
-    this->LogSucc(std::format("成功创建运镜宏：{}" , name));
+    this->LogSucc(std::format("成功创建运镜宏：{}", name));
     auto newCamMacro = std::make_unique<CamMacro>(name);
     this->camMacros[name] = std::move(newCamMacro);
     return true;
@@ -180,12 +180,12 @@ bool CamMacroManager::CamMacroSaveAll() {
     }
     auto dirMacros = this->Path()->PathGetFromKey("kCamMacros");
     for (const auto& [name, pCamMacor] : this->camMacros) {
-        auto [ok, msg] = pCamMacor->Save(dirMacros);
-        if (!ok) {
-            this->LogError(std::move(msg));
+        auto r = pCamMacor->Save(dirMacros);
+        if (!r.has_value()) {
+            this->LogError(std::move(r.error()));
             return false;
         }
-        this->LogSucc(std::move(msg));
+        this->LogSucc(std::move(r.value()));
     }
     this->LogSucc("成功保存所有运镜宏到文件！");
     return true;
@@ -208,18 +208,18 @@ bool CamMacroManager::CamMacroLoad(const fs::path& pathMacro) {
             return false;
         }
         auto newCamMacro = std::make_unique<CamMacro>(newCamMacroName);
-        auto [ok, msg] = newCamMacro->Load(root);
-        if (!ok) {
-            this->LogError(std::move(msg));
+        auto r = newCamMacro->Load(root);
+        if (!r.has_value()) {
+            this->LogError(std::move(r.error()));
             return false;
         }
         this->camMacros[newCamMacroName] = std::move(newCamMacro);
-        this->LogSucc(std::move(msg));
+        this->LogSucc(std::move(r.value()));
         this->LogLine();
         return true;
     }
     catch (const std::exception& e) {
-        this->LogError(std::format("在加载yaml时遇到异常：{}" ,e.what()));
+        this->LogError(std::format("在加载yaml时遇到异常：{}", e.what()));
         return false;
     }
 }
@@ -231,7 +231,7 @@ bool CamMacroManager::CamMacroDelete(const std::string& name) {
     }
     auto it = this->camMacros.find(name);
     if (it == this->camMacros.end()) {
-        this->LogError(std::format("未找到指定名称的运镜：{}" , name));
+        this->LogError(std::format("未找到指定名称的运镜：{}", name));
         return false;
     }
     if (this->pOperatingMacro) {
