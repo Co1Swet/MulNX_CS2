@@ -34,7 +34,7 @@ bool AdvancedRecord::Init() {
 
     this->SubscribeSync("Media/Record/Stop/FastNotify", [this](MulNX::Message&) {
         if (this->startAsAdvanced.load(std::memory_order_acquire)) {
-            this->AsyncCommandHighPriority("host_framerate 0; endmovie");
+            this->AsyncCommand("host_framerate 0; endmovie");
             this->startAsAdvanced.store(false, std::memory_order_release);
         }
         });
@@ -62,7 +62,7 @@ void AdvancedRecord::SetRecordStart(const MulNX::AVStartInfo& sInfo) {
         this->minIntervalUs.store(1, std::memory_order_release);
     }
 
-    this->AsyncCommandHighPriority(std::format("host_framerate {}; startmovie {} wav framerate {}",
+    this->AsyncCommand(std::format("host_framerate {}; startmovie {} wav framerate {}",
         fps, *sInfo.pFilenameWithoutStem, fps));
 }
 

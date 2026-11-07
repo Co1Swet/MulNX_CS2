@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class CS2Hash final :public CSModuleBase {
     using HashFunc_t = uint32_t(__fastcall*)(const char* str, uint32_t len, uint32_t seed);

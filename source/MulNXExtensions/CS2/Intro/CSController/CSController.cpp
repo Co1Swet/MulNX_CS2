@@ -1,6 +1,6 @@
 #include "CSController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <MulNXThirdParty/cs2_dumpers.hpp>
 
 void CSController::Window() {

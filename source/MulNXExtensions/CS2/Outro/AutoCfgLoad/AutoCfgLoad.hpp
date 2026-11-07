@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class AutoCfgLoad final :public CSModuleBase {
     std::atomic<int>lastDemoTick = false;

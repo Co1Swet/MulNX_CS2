@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class SkinConfigger final :public CSModuleBase {
     struct PlayerWeaponCfg {

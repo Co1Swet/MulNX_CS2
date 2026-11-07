@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 struct GetMaterialsArrayResult {
     uint64_t count;

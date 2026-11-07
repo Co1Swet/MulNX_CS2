@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <Intro/BackgroundEntityScan/EntityIterationMixin.hpp>
 
 class PlayerFlashController final :public CSModuleBase, public EntityIterationMixin<PlayerFlashController> {

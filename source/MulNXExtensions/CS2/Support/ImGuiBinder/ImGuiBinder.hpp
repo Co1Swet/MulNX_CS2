@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
 
 class ImGuiBinder final :public CSModuleBase {

@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class ParticleManager final :public CSModuleBase {
     using GetParticleManager_t = void* (*)();

@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class ReShowSpeaker final :public CSModuleBase {
     using UpdateSpeakerStatus_t = int64_t(*)(int64_t voiceStatus, uint32_t slot, int, uint8_t speaking);

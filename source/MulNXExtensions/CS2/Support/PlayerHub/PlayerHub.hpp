@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class PlayerHub final :public CSModuleBase {
     std::atomic<bool> ShowCompanionWindow = false;

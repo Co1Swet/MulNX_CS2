@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <MulNXUtils/MemInsights/BitMaskEditor/BitMaskEditor.hpp>
 
 class HookSpotVisible :public CSModuleBase {

@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <Feature/Model/SkinConfigger/SkinConfigger.hpp>
 
 class SkinController final :public CSModuleBase {

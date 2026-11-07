@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class AdTimeFix final : public CSModuleBase {
     inline static AdTimeFix* pThis = nullptr;

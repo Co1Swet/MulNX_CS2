@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class GameCfgManager final :public CSModuleBase {
     fs::path ToolPath{};

@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
 
 // 自由摄像机位置控制器（仅位置控制）

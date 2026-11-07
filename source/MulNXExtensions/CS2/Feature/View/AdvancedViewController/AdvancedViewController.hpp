@@ -1,6 +1,6 @@
 #pragma once
 #include <CS2Math/Math.hpp>
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
 #include <MulNXUtils/NewestBuffer.hpp>
 #include <MulNXUtils/WinExt/WinExt.hpp>

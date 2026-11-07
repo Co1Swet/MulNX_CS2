@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class ClientPanorama final :public CSModuleBase {
     using FindHudElement_t = uintptr_t(*)(const char* name);

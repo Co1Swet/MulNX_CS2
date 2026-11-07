@@ -34,17 +34,10 @@ protected:
     }
 
     void AsyncCommand(std::string&& cmd)const {
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command"_hash);
-        rp->str1 = std::move(cmd);
-        This()->PublishAsync(std::move(msg));
+        This()->LogInfo(std::format("推入MulNX缓冲队列：{}", cmd));
+        This()->CS2Con->bufferGameCmds.enqueue(std::move(cmd));
     }
     void AsyncCommandNoReport(std::string&& cmd)const {
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command/NoReport"_hash);
-        rp->str1 = std::move(cmd);
-        This()->PublishAsync(std::move(msg));
-    }
-    void AsyncCommandHighPriority(std::string&& cmd)const {
-        This()->LogInfo(std::format("发送高优先命令：{}", cmd));
-        This()->CS2Con->bufferHighPriorityGameCmds.enqueue(std::move(cmd));
+        This()->CS2Con->bufferGameCmds.enqueue(std::move(cmd));
     }
 };

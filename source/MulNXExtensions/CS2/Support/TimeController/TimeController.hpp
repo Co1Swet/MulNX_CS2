@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 
 class TimeController final :public CSModuleBase, public TimeAdaptMixin<TimeController> {

@@ -90,7 +90,7 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
         co_return;
     }
 
-    this->AsyncCommandHighPriority("spec_mode 4");
+    this->AsyncCommand("spec_mode 4");
 
     co_await this->WaitMilliseconds(750);
 

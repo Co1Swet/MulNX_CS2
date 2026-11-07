@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 

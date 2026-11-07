@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
 class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<AdvancedRecord> {

@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <MulNXExtensions/WinBaseHooks/FileRedirector/FileListenMixin.hpp>
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 

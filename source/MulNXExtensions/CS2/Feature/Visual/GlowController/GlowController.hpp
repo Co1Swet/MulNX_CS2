@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class GlowController final :public CSModuleBase {
     std::unique_ptr<MulNX::Hook> hkSetGlowColor = nullptr;

@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <Mirror/ParticleManager/ParticleManager.hpp>
 #include <Mirror/ParticleSystemMgr/ParticleSystemMgr.hpp>
 

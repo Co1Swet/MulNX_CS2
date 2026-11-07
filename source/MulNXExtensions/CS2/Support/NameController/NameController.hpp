@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class NameController final :public CSModuleBase {
     std::array<char[128], 64>nameReplace{};

@@ -65,7 +65,6 @@ HookConsole& HookConsole::RegisterCmd(std::string&& name, std::move_only_functio
 void HookConsole::OnEngine2Load(MulNX::Message& msg) {
     this->executor = IVClass::Assume(this->CS2->Source2EngineToClient001)->GetVFunc<void(int, const char*, int, double, int64_t)>(51);
 }
-
 void HookConsole::OnTier0Load(MulNX::Message& msg) {
     auto VEngineCvar007 = (uintptr_t)this->CS2->tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("VEngineCvar007", nullptr);
     this->pVEngineCvar007 = reinterpret_cast<CS2::Systems::CCvar*>(VEngineCvar007);
@@ -101,88 +100,73 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
 
 void HookConsole::OnMainLoop() {
     std::string cmd;
-
-    if (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
-        this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-        while (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
-            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-        }
-        return;
-    }
     while (this->bufferGameCmds.try_dequeue(cmd)) {
-        auto execByEngine = [&]() {
-            this->LogError(std::format("疑似错误的指令：{}", cmd));
+        auto execByEngine = [&](bool isError) {
+            if (isError) {
+                this->LogError(std::format("疑似错误的指令：{}", cmd));
+            }
+            else {
+                this->LogWarning(std::format("因该查询cvar中断一帧：{}", cmd));
+            }
             this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
             };
-
-        // 1. 切出命令名，不区分有没有参数
+        // 切出命令名，不区分有没有参数
         auto pos = cmd.find(' ');
         char saved = 0;
         if (pos != std::string::npos) {
             saved = cmd[pos];
-            cmd[pos] = '\0';          // 临时截断，c_str() 即命令名
+            cmd[pos] = '\0'; // 临时截断，c_str() 即命令名
         }
-        const char* name = cmd.c_str();   // 无空格时是整条 cmd
-
-        // 2. 先查找，再决定怎么执行
+        const char* name = cmd.c_str(); // 无空格时是整条
+        // 先查找，再决定怎么执行
         CS2::Systems::CCvar::HConItem h;
         bool isCmd = this->pVEngineCvar007->FindConCommand(&h, name)->IsValid();
         bool isVar = !isCmd && this->pVEngineCvar007->FindConVar(&h, name)->IsValid();
-
-        // 3. 恢复空格，后续需要完整 cmd
+        // 恢复空格，后续需要完整 cmd
         if (pos != std::string::npos) {
             cmd[pos] = saved;
         }
-
-        // 4. ConCommand：有无参数都走 DispatchConCommand
         if (isCmd) {
             CS2::Console::CCommand cmdTokenized{};
             cmdTokenized.Tokenize(cmd.c_str());
-
             CS2::Systems::CCvar::CCommandContext ctx;
             ctx.eTarget = CS2::Systems::CCvar::CCommandContext::CommandTarget_t::CT_FIRST_SPLITSCREEN_CLIENT;
             ctx.nPlayerSlot.data = 0;
-
             this->pVEngineCvar007->DispatchConCommand(h, ctx, cmdTokenized);
             continue;
         }
-
-        // 5. ConVar：有参数才设值；无参数是查询，交引擎回显
-        if (isVar) {
+        else if (isVar) {
             if (pos == std::string::npos) {
-                return execByEngine();       // 例如 "cl_crosshairstyle" 单独输入
+                // 针对单独输入去走原始，这也不算是指令，延迟一次是可接受的
+                return execByEngine(false);
             }
-
             const char* value = cmd.c_str() + pos + 1;
             CS2::Console::ConVar* cv = this->pVEngineCvar007->GetConVar(h);
 
-            if (cv && this->pTrySetConVarValueFromString) {
-                ConVarRef ref{ h, cv };
-                if (this->pTrySetConVarValueFromString(&ref, -1, value)) {
-                    this->LogInfo(std::format("已分派 ConVar {} = {}", cv->szName, value));
-                    continue;
-                }
-                this->LogWarning(std::format("解析 ConVar {} 值失败: {}", cv->szName, value));
+            if (!cv) {
+                this->LogError(std::format("意外地未查找到 {}", cmd));
+                return execByEngine(true);
             }
-
-            return execByEngine();
+            ConVarRef ref{ h, cv };
+            if (!this->pTrySetConVarValueFromString(&ref, -1, value)) {
+                this->LogError(std::format("解析 ConVar {} 值失败: {}", cv->szName, value));
+            }
+            continue;
         }
-
-        // 6. 既不是 ConCommand 也不是 ConVar：引擎处理
-        return execByEngine();
+        return execByEngine(true);
     }
 }
 
 void HookConsole::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Game/Command"_hash: {
-        auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
-        this->LogInfo(std::format("已推入MulNX缓冲队列：{}", cmd));
+        auto cmd = msg.asp.get<MulNX::NetExt>()->str1;
+        this->LogInfo(std::format("推入MulNX缓冲队列：{}", cmd));
         this->bufferGameCmds.enqueue(std::move(cmd));
         break;
     }
     case "Game/Command/NoReport"_hash: {
-        auto cmd = std::move(msg.asp.get<MulNX::NetExt>()->str1);
+        auto cmd = msg.asp.get<MulNX::NetExt>()->str1;
         this->bufferGameCmds.enqueue(std::move(cmd));
         break;
     }

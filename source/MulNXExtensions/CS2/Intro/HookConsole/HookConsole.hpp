@@ -25,7 +25,6 @@ class HookConsole final :public CSModuleBase {
     
     // 控制台指令执行器
     VExecutor<void(int, const char*, int, double, int64_t)> executor{};
-    moodycamel::ConcurrentQueue<std::string>bufferGameCmds;
     
     MulNX::Hook::Then HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx);
     void OnTier0Load(MulNX::Message& msg);
@@ -35,7 +34,7 @@ class HookConsole final :public CSModuleBase {
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
 public:
-    moodycamel::ConcurrentQueue<std::string>bufferHighPriorityGameCmds;
+    moodycamel::ConcurrentQueue<std::string>bufferGameCmds;
     
     HookConsole& RegisterCmd(std::string&& name, std::move_only_function<void(CS2::Console::CCommand*)> callback);
     // 得到第一个Cvar的迭代器
@@ -49,6 +48,4 @@ public:
 
     void UnlockHiddenCVars(int& Count)const;
     void LockAllCvars(int& Count)const;
-
-    //void PushHighPriorityGameCmd(std::string&& cmd)
 };
