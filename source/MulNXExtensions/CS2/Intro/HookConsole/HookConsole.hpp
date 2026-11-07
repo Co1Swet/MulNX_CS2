@@ -27,15 +27,15 @@ class HookConsole final :public CSModuleBase {
 public:
     moodycamel::ConcurrentQueue<std::string>bufferHighPriorityGameCmds;
     
-    HookConsole& RegisterCmd(std::string&& name, std::function<void(CCommand*)>&& callback);
+    HookConsole& RegisterCmd(std::string&& name, std::move_only_function<void(CS2::Console::CCommandLine*)> callback);
     // 得到第一个Cvar的迭代器
     VExecutor<void* (uint64_t&)>GetFirstCvarIterator{};
     // 得到下一个Cvar的迭代器
     VExecutor<void* (uint64_t&, uint64_t)>GetNextCvarIterator{};
     // 通过迭代器ID获取Cvar
-    VExecutor<C_ConVar* (uint64_t)>GetCVarByIndex{};
+    VExecutor<CS2::Console::C_ConVar* (uint64_t)>GetCVarByIndex{};
     // 通过名称获取Cvar
-    C_ConVar* GetCVarByName(std::string_view var_name)const;
+    CS2::Console::C_ConVar* GetCVarByName(std::string_view var_name)const;
 
     void UnlockHiddenCVars(int& Count)const;
     void LockAllCvars(int& Count)const;

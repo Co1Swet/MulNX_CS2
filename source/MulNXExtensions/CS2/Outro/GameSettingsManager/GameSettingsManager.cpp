@@ -22,7 +22,7 @@ void GameSettingsManager::Menu() {
         uint64_t idx = 0;
         this->CS2Con->GetFirstCvarIterator(idx);
         while (idx != 0xFFFFFFFF) {
-            C_ConVar* var = this->CS2Con->GetCVarByIndex(idx);
+            auto* var = this->CS2Con->GetCVarByIndex(idx);
             if (var) {
                 std::string Name = var->szName ? var->szName : "未知";
                 this->LogInfo("控制台命令：" + Name);
