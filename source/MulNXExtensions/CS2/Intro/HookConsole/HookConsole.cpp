@@ -15,16 +15,7 @@ bool HookConsole::Init() {
         });
 
     this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
-        std::string cmd;
-        if (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
-            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-            while (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
-                this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
-            }
-            return;
-        }
-        if (this->bufferGameCmds.try_dequeue(cmd))
-            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+        this->OnMainLoop();
         });
 
     this->SubscribeSync("System/Init/End", [this](MulNX::Message& msg) {
@@ -78,6 +69,8 @@ void HookConsole::OnEngine2Load(MulNX::Message& msg) {
 void HookConsole::OnTier0Load(MulNX::Message& msg) {
     auto VEngineCvar007 = (uintptr_t)this->CS2->tier0.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("VEngineCvar007", nullptr);
     this->pVEngineCvar007 = reinterpret_cast<CS2::Systems::CCvar*>(VEngineCvar007);
+    this->pTrySetConVarValueFromString = (TrySetConVarValueFromString_t)this->CS2->tier0.GetTextRegion()
+        .FindRegion(CS2::Signatures::Console::TrySetConVarValueFromString).Data();
 
     this->GetFirstCvarIterator = IVClass::Assume(VEngineCvar007)->GetVFunc<void* (uint64_t&)>(12);
     this->GetNextCvarIterator = IVClass::Assume(VEngineCvar007)->GetVFunc<void* (uint64_t&, uint64_t)>(13);
@@ -95,7 +88,7 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
                 CS2::Console::FCVAR_CLIENTDLL,
                 &cmd.callback
             );
-            CS2::Systems::CCvar::HConCommand handle;
+            CS2::Systems::CCvar::HConItem handle;
             this->pVEngineCvar007->RegisterConCommand(&handle, &conCommand);
         }
         this->LogSucc(std::format("共注册指令数：{}", this->CS2Cmds.size()));
@@ -104,6 +97,80 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
         }
     ).value();
     this->RegisterAttachHook(this->hkVEngineCvar007_RegisterConCommand, "VEngineCvar007::RegisterConCommand");
+}
+
+void HookConsole::OnMainLoop() {
+    std::string cmd;
+
+    if (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
+        this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+        while (this->bufferHighPriorityGameCmds.try_dequeue(cmd)) {
+            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+        }
+        return;
+    }
+    while (this->bufferGameCmds.try_dequeue(cmd)) {
+        auto execByEngine = [&]() {
+            this->LogError(std::format("疑似错误的指令：{}", cmd));
+            this->executor(0, cmd.c_str(), 1, 0.0, 0LL);
+            };
+
+        // 1. 切出命令名，不区分有没有参数
+        auto pos = cmd.find(' ');
+        char saved = 0;
+        if (pos != std::string::npos) {
+            saved = cmd[pos];
+            cmd[pos] = '\0';          // 临时截断，c_str() 即命令名
+        }
+        const char* name = cmd.c_str();   // 无空格时是整条 cmd
+
+        // 2. 先查找，再决定怎么执行
+        CS2::Systems::CCvar::HConItem h;
+        bool isCmd = this->pVEngineCvar007->FindConCommand(&h, name)->IsValid();
+        bool isVar = !isCmd && this->pVEngineCvar007->FindConVar(&h, name)->IsValid();
+
+        // 3. 恢复空格，后续需要完整 cmd
+        if (pos != std::string::npos) {
+            cmd[pos] = saved;
+        }
+
+        // 4. ConCommand：有无参数都走 DispatchConCommand
+        if (isCmd) {
+            CS2::Console::CCommand cmdTokenized{};
+            cmdTokenized.Tokenize(cmd.c_str());
+
+            CS2::Systems::CCvar::CCommandContext ctx;
+            ctx.eTarget = CS2::Systems::CCvar::CCommandContext::CommandTarget_t::CT_FIRST_SPLITSCREEN_CLIENT;
+            ctx.nPlayerSlot.data = 0;
+
+            this->pVEngineCvar007->DispatchConCommand(h, ctx, cmdTokenized);
+            continue;
+        }
+
+        // 5. ConVar：有参数才设值；无参数是查询，交引擎回显
+        if (isVar) {
+            if (pos == std::string::npos) {
+                return execByEngine();       // 例如 "cl_crosshairstyle" 单独输入
+            }
+
+            const char* value = cmd.c_str() + pos + 1;
+            CS2::Console::ConVar* cv = this->pVEngineCvar007->GetConVar(h);
+
+            if (cv && this->pTrySetConVarValueFromString) {
+                ConVarRef ref{ h, cv };
+                if (this->pTrySetConVarValueFromString(&ref, -1, value)) {
+                    this->LogInfo(std::format("已分派 ConVar {} = {}", cv->szName, value));
+                    continue;
+                }
+                this->LogWarning(std::format("解析 ConVar {} 值失败: {}", cv->szName, value));
+            }
+
+            return execByEngine();
+        }
+
+        // 6. 既不是 ConCommand 也不是 ConVar：引擎处理
+        return execByEngine();
+    }
 }
 
 void HookConsole::ProcessMsg(MulNX::Message& msg) {

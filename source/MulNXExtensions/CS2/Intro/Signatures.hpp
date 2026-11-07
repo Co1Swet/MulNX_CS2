@@ -2,6 +2,14 @@
 #include <MulNXUtils/WinExt/WinExt.hpp>
 
 namespace CS2::Signatures {
+    namespace Console {
+        namespace CCommand {
+            inline constexpr MulNX::Memory::Pattern Func_Init("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 20 33 ED 48 8D B1");
+            inline constexpr MulNX::Memory::Pattern Func_Tokenize("48 89 6C 24 20 4C 89 44 24 18 56 57 41 54 41 56 41 57");
+        }
+        inline constexpr MulNX::Memory::Pattern Pos_Call_CInputService_ProcessCommands("E8 ?? ?? ?? ?? 4C 8B BC 24 ?? ?? 00 00 45 84 ED");
+        inline constexpr MulNX::Memory::Pattern TrySetConVarValueFromString("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 30 4C 8B 59 08");
+    }
     namespace Entity {
         inline constexpr MulNX::Memory::Pattern Func_AddEntity("48 89 74 24 10 57 48 83 EC 20 41 B9 FF 7F 00 00 41 8B C0 41 23 C1 48 8B F2 41 83 ?? ?? 48 8B F9 44 0F 45 C8 41 81 F9 ?? ?? ?? ?? 73 0D");
         inline constexpr MulNX::Memory::Pattern Func_RemoveEntity("48 89 74 24 10 57 48 83 EC 20 41 B9 FF 7F 00 00 41 8B C0 41 23 C1 48 8B F2 41 83 ?? ?? 48 8B F9 44 0F 45 C8 41 81 F9 ?? ?? ?? ?? 73 08");
@@ -19,7 +27,6 @@ namespace CS2::Signatures {
     namespace Utils {
         inline constexpr MulNX::Memory::Pattern CSHashString("48 83 EC 28 45 8B D0 4C 8B C9 48 83 FA 04 0F 82 ?? ?? ?? ?? 0F B6 09 48 89 5C 24 20 8D 41 BF 3C 19 77 03 80 C1 20");
         inline constexpr MulNX::Memory::Pattern CUtlStringRef__Assign("48 89 5C 24 10 57 48 83 EC 20 48 8B 41 18 49 8B F8 48 8B D9 4C 3B C0 77 34");
-        inline constexpr MulNX::Memory::Pattern Pos_Call_CInputService_ProcessCommands("E8 ?? ?? ?? ?? 4C 8B BC 24 ?? ?? 00 00 45 84 ED");
         inline constexpr MulNX::Memory::Pattern Pos_CGameEventManager_FireEvents_AcquiredLock("C7 44 24 ?? 00 00 00 00 33 D2 48 8B CE");
         inline constexpr MulNX::Memory::Pattern SetGlowColor("40 53 48 83 EC 20 48 8B D9 48 83 C1 40 39 11 74 02 89 11 E8 ?? ?? ?? ?? 48 8B 4B 18 48 85 C9");
         inline constexpr MulNX::Memory::Pattern GetDecoratedPlayerName("48 8B 01 FF 50 10 48 8B ?? 48 85 C0 0F 84 ?? ?? ?? ?? 80 38 00");
@@ -45,14 +52,12 @@ namespace CS2::Signatures {
             inline constexpr MulNX::Memory::Pattern Pos_UpdatePanoramaNameVisible2("FF 90 ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 65 48 8B 04 25 ?? ?? ?? ?? C6 83");
             inline constexpr MulNX::Memory::Pattern Pos_UpdatePanoramaFullInfoVisible("FF 90 ?? ?? 00 00 E8 ?? ?? ?? ?? 48 8B 5E ?? 48 8B C8");
         }
-
         namespace DamageReport {
             inline constexpr MulNX::Memory::Pattern Pos_Check_m_nSendUpdate("41 8B 00 39 41 40 74 3A 89 41 40 48 8B 05 ?? ?? ?? ?? 48 85 C0");
             inline constexpr MulNX::Memory::Pattern Pos_GettedController("4C 8B E8 48 85 C0 0F 84 ?? ?? ?? ?? 0F B6 88 ?? ?? ?? ?? 80 E9 02");
             inline constexpr MulNX::Memory::Pattern Func_UpdateDamageReport("41 56 48 83 EC 70 48 8B 05 ?? ?? ?? ?? 4C 8B F1 80 78");
             inline constexpr MulNX::Memory::Pattern Pos_Call_DispatchClearAllPostRoundDamageReportPanels("E8 ?? ?? ?? ?? 48 8B 6C 24 30 48 8B 5C 24 60 48 83 C4 38");
         }
-
         inline constexpr MulNX::Memory::Pattern Pos_CheckFor_HudSpecplayerRoot__visible("65 48 8B 04 25 58 00 00 00 8B 0D ?? ?? ?? ?? 41 BD 68 00 00 00 4C 8B 24 C8");
         inline constexpr MulNX::Memory::Pattern Pos_CheckFor_HUD__spectating_target("49 8B 86 ?? ?? 00 00 44 0F B6 C2");
     }

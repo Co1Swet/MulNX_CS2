@@ -4,7 +4,7 @@
 
 bool HookMainLoop::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-        auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
+        auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::Console::Pos_Call_CInputService_ProcessCommands);
         this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
             this->PublishSync("Hook/CSMainLoop"_hash);

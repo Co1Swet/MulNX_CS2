@@ -37,10 +37,8 @@ namespace CS2::Systems {
         public:
             size_t index = 0x000000000000FFFF;
             bool IsValid()const { return this->index != 0x000000000000FFFF && this->index != 0x00000000FFFFFFFF; }
+            explicit operator bool()const { return this->IsValid(); }
         };
-        
-        class HConVar :public HConItem {};
-        class HConCommand :public HConItem {};
 
         class CCommandContext {
         public:
@@ -53,18 +51,18 @@ namespace CS2::Systems {
             CPlayerSlot nPlayerSlot;
         };
 
-        virtual HConVar* FindConVar(HConVar* pHConVar, const char* name, bool bDiallowDeveloper = true) = 0; // 011
-        virtual HConVar* FindFirstConVar(HConVar* pHConVar) = 0; // 012
-        virtual HConVar* FindNextConVar(HConVar* pHConVar, HConVar hPrev) = 0; // 013
-        virtual void CallChangeCallback(HConVar cvar, const CS2::CSplitScreenSlot nSlot,
+        virtual HConItem* FindConVar(HConItem* pHConVar, const char* name, bool bDiallowDeveloper = true) = 0; // 011
+        virtual HConItem* FindFirstConVar(HConItem* pHConVar) = 0; // 012
+        virtual HConItem* FindNextConVar(HConItem* pHConVar, HConItem hPrev) = 0; // 013
+        virtual void CallChangeCallback(HConItem cvar, const CS2::CSplitScreenSlot nSlot,
             const CS2::Console::ConVar::Value_t* pNewValue, const CS2::Console::ConVar::Value_t* pOldValue,
             void* unk = nullptr) = 0; // 014
         virtual void unk015(void) = 0;
         virtual void unk016(void) = 0;
-        virtual HConCommand* FindConCommand(HConCommand* pHConCommand, const char* name, bool bDiallowDeveloper = true) = 0; // 017
-        virtual HConCommand* FindFirstConCommand(HConCommand* pHandle) = 0; // 018
-        virtual HConCommand* FindNextConCommand(HConCommand* pHPrev, HConCommand hPrev) = 0; // 019
-        virtual void DispatchConCommand(HConCommand cmd, const CCommandContext& ctx, const CS2::Console::CCommand& args) = 0; // 020
+        virtual HConItem* FindConCommand(HConItem* pHConCommand, const char* name, bool bDiallowDeveloper = true) = 0; // 017
+        virtual HConItem* FindFirstConCommand(HConItem* pHandle) = 0; // 018
+        virtual HConItem* FindNextConCommand(HConItem* pHPrev, HConItem hPrev) = 0; // 019
+        virtual void DispatchConCommand(HConItem cmd, const CCommandContext& ctx, const CS2::Console::CCommand& args) = 0; // 020
         virtual void unk021(void) = 0;
         virtual void unk022(void) = 0;
         virtual void unk023(void) = 0;
@@ -85,14 +83,14 @@ namespace CS2::Systems {
         virtual void unk038(void) = 0;
         virtual void unk039(void) = 0;
         virtual void unk040(void) = 0;
-        virtual CS2::Console::ConVar* GetConVar(HConVar hConVar) = 0; // 041
+        virtual CS2::Console::ConVar* GetConVar(HConItem hConVar) = 0; // 041
 
         // 这里注意，游戏自己关于RegisterConCommand的调用
         // 调用后如果再get，那个callback就会被重定向到一个包装（至少原始指针模式是这样的）
         // 如果hook这个注册，我们就可以拿到原始回调指针，实际上之前是这么做的，现在信息更清晰了
 
-        virtual HConCommand* RegisterConCommand(HConCommand* pIt, CS2::Console::ConCommand* pCmd, int64_t nAdditionalFlags = 0) = 0; // 042
+        virtual HConItem* RegisterConCommand(HConItem* pIt, CS2::Console::ConCommand* pCmd, int64_t nAdditionalFlags = 0) = 0; // 042
         virtual void UnregisterConCommand(size_t i) = 0; // 043
-        virtual CS2::Console::ConCommand* GetConCommand(size_t i) = 0; // 044
+        virtual CS2::Console::ConCommand* GetConCommand(HConItem i) = 0; // 044
     };
 }

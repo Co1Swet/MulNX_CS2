@@ -60,7 +60,7 @@ namespace CS2::Console {
             CS2::CUtlString	m_szValue;
         };
 
-        enum class EConVarType : int16_t {
+        enum class EType : int16_t {
             Invalid = -1,
             Bool,
             Int16,
@@ -86,7 +86,7 @@ namespace CS2::Console {
         Value_t* m_minValue;
         Value_t* m_maxValue;
         const char* m_pszHelpString;
-        EConVarType m_eVarType;
+        EType m_eVarType;
         short m_Version;
         unsigned int m_iTimesChanged;
         int64_t m_nFlags;

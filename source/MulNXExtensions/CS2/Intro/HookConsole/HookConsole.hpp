@@ -4,6 +4,15 @@
 
 class HookConsole final :public CSModuleBase {
     CS2::Systems::CCvar* pVEngineCvar007 = nullptr;
+
+    struct ConVarRef {
+        CS2::Systems::CCvar::HConItem hConVar;   // 0x00
+        CS2::Console::ConVar* pConVar;  // 0x08
+    };
+    static_assert(sizeof(ConVarRef) == 0x10);
+    using TrySetConVarValueFromString_t = bool(*)(ConVarRef* ref, int slot, const char* value);
+    TrySetConVarValueFromString_t pTrySetConVarValueFromString = nullptr;
+
     class MulNXCmd {
     public:
         std::string name;
@@ -21,6 +30,7 @@ class HookConsole final :public CSModuleBase {
     MulNX::Hook::Then HandleOnRegisterConCommand(MulNX::Hook* hk, RegContext* ctx);
     void OnTier0Load(MulNX::Message& msg);
     void OnEngine2Load(MulNX::Message& msg);
+    void OnMainLoop();
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;

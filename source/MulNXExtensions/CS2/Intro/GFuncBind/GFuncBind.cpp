@@ -1,5 +1,6 @@
 #include "GFuncBind.hpp"
 #include <Game/CSUtils/CBufferString.hpp>
+#include <Game/Consoles.hpp>
 
 bool GFuncBind::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/tier0.dll", [this](MulNX::Message& msg) {
@@ -42,4 +43,9 @@ void GFuncBind::HandleOnTier0Load() {
         <CS2::KeyValues::FindKey_t>("?FindKey@KeyValues@@QEAAPEAV1@PEBD_N@Z");
     CS2::KeyValues::pFuncSetString = this->FindTier0Func
         <CS2::KeyValues::SetString_t>("?SetString@KeyValues@@QEAAXPEBD0@Z");
+
+    CS2::Console::CCommand::pInit = (CS2::Console::CCommand::Init_t)this->pTier0->GetTextRegion()
+        .FindRegion(CS2::Signatures::Console::CCommand::Func_Init).Data();
+    CS2::Console::CCommand::pTokenize = (CS2::Console::CCommand::Tokenize_t)this->pTier0->GetTextRegion()
+        .FindRegion(CS2::Signatures::Console::CCommand::Func_Tokenize).Data();
 }

@@ -22,8 +22,9 @@ void ConsoleOutput::ProcessMsg(MulNX::Message& msg) {
     case "Log/Info"_hash:
     case "Log/Succ"_hash:
     case "Log/Warning"_hash: {
-        auto fmtted = std::move(msg.asp.get<MulNX::NetExt>()->str1);
-        this->AsyncCommandNoReport("echoln [MulNX]" + fmtted);
+        if(!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))break;
+        auto fmtted = msg.asp.get<MulNX::NetExt>()->str1;
+        this->AsyncCommandNoReport(std::format("echoln [MulNX]{}", fmtted));
         break;
     }
 
