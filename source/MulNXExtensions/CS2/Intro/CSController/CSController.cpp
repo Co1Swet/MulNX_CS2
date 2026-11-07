@@ -61,15 +61,6 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
     this->Source2EngineToClient001 = this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2EngineToClient001", nullptr);
     // demo
     this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(69);
-    // cmd
-    this->hkSource2EngineToClient001_ExecuteCmd = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->Source2EngineToClient001)->GetVFuncPtr(51), [](MulNX::Hook* hk, RegContext* ctx) {
-        static std::mutex mtx;
-        auto pRaw = (char*)ctx->rdx;
-        std::lock_guard lock(mtx);
-        hk->CallMaybeOrigin(0, ctx);
-        return MulNX::Hook::Then::Return;
-        }).value();
-    this->RegisterAttachHook(this->hkSource2EngineToClient001_ExecuteCmd, "Source2EngineToClient001::ExecuteCmd");
 
     // for show speaker
     this->hkSource2EngineToClient001_IsPlayingDemo = MulNX::Hook::Create((uint8_t*)IVClass::Assume(Source2EngineToClient001)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {
