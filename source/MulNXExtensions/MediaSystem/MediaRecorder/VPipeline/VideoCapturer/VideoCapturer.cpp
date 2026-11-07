@@ -42,6 +42,7 @@ void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& st
 
 void VideoCapturer::StopCapture() {
     std::unique_lock lock(this->smutex);
+    this->pVEncodeController->bufferVFrames.enqueue(MulNX::AVControl(MulNX::AVControl::Kind::Stop));
 }
 
 void VideoCapturer::Captuer() {

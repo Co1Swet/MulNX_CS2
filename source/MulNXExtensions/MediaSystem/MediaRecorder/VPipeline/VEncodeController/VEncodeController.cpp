@@ -1,6 +1,7 @@
 #include "VEncodeController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MediaParamManager/MediaParamManager.hpp>
+#include <MediaRecorder.hpp>
 
 void VEncodeController::Menu(MulNX::UICoordinator* uico) {
     if (ImGui::CollapsingHeader("高级设置")) {
@@ -10,6 +11,7 @@ void VEncodeController::Menu(MulNX::UICoordinator* uico) {
 
 bool VEncodeController::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
+    this->pMediaRecorder = this->FindModule<MediaRecorder>("MediaRecorder");
 
     this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
         this->Reset();
@@ -36,7 +38,7 @@ bool VEncodeController::Init() {
     this->UIRegisterCallback("UI.MediaSys/Control", [this](auto&&...) {
         ImGui::TextUnformatted(std::format("视频帧大致缓存(压力系数): {} 帧",
             this->bufferSize.load(std::memory_order_relaxed)).c_str());
-            });
+        });
 
     return true;
 }
@@ -74,7 +76,6 @@ void VEncodeController::SetEncoderParams(av::VideoEncoderContext* encoder) {
     if (rp.rc == RateControl::CQ && rp.cq > 0) {
         encoder->setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
     }
-
 }
 
 bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
@@ -117,6 +118,10 @@ void VEncodeController::SetOn(av::FormatContext* oCtx) {
     auto fps = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
     this->LogInfo(std::format("目标帧率: {} fps", fps > 0 ? fps : 60));
     this->LogSucc(std::format("编码器已开启: {}", this->encoder.codec().name()));
+
+    this->SendTask("VEncode", "VEncode", [this]() {
+        return this->OnEncode();
+        });
 }
 
 void VEncodeController::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt) {
@@ -131,16 +136,36 @@ void VEncodeController::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt
         srcW, srcH, srcFmt, av::SwsFlagBicubic);
 }
 
-std::optional<av::Packet> VEncodeController::Encode() {
+bool VEncodeController::OnEncode() {
+    auto exit = [&]() {
+        size_t count = 0;
+        try {
+            while (true) {
+                av::Packet pkt = this->encoder.encode();
+                if (!pkt || pkt.size() <= 0)break;
+                ++count;
+                pkt.setStreamIndex(this->vstream.index());
+                pkt.setTimeBase(this->vstream.timeBase());
+                this->pMediaRecorder->bufferPackets.enqueue(pkt);
+            }
+        }
+        catch (const std::exception& e) {
+            this->LogError(std::format("刷新失败: {}", e.what()));
+        }
+        this->LogSucc(std::format("成功刷新视频包：{}", count));
+        this->pMediaRecorder->bufferPackets.enqueue(MulNX::AVControl(MulNX::AVControl::Kind::Stop));
+        return false;
+        };
+
     if (!this->encoder.isOpened()) {
         this->pMediaState->encodingOverload = false;
-        return std::nullopt;
+        return exit();
     }
 
-    av::VideoFrame srcFrame;
-    if (!this->bufferVFrames.try_dequeue(srcFrame)) {
+    CtrlVideoFrame ctrlVFrame;
+    if (!this->bufferVFrames.try_dequeue(ctrlVFrame)) {
         this->pMediaState->encodingOverload = false;
-        return std::nullopt;
+        return true;
     }
     if (this->bufferVFrames.size_approx() >= 200) {
         this->pMediaState->encodingOverload = true;
@@ -148,6 +173,15 @@ std::optional<av::Packet> VEncodeController::Encode() {
     else {
         this->pMediaState->encodingOverload = false;
     }
+
+    auto pAVControl = std::get_if<MulNX::AVControl>(&ctrlVFrame);
+    if (pAVControl && pAVControl->kind == MulNX::AVControl::Kind::Stop) {
+        return exit();
+    }
+
+    auto pSrcFrame = std::get_if<av::VideoFrame>(&ctrlVFrame);
+    if (!pSrcFrame)return exit();
+    auto& srcFrame = *pSrcFrame;
 
     try {
         auto srcFmtRaw = srcFrame.pixelFormat();
@@ -172,37 +206,20 @@ std::optional<av::Packet> VEncodeController::Encode() {
         dst.setStreamIndex(this->vstream.index());
 
         av::Packet pkt = this->encoder.encode(dst);
-        if (!pkt || !(pkt.size() > 0)) return std::nullopt;
+        if (!pkt || pkt.size() <= 0)return true;
         pkt.setStreamIndex(this->vstream.index());
         pkt.setTimeBase(this->vstream.timeBase());
-        return pkt;
+        this->pMediaRecorder->bufferPackets.enqueue(pkt);
     }
     catch (const std::exception& e) {
-        this->LogError(std::string("编码失败: ") + e.what());
-        return std::nullopt;
+        this->LogError(std::format("编码失败: {}", e.what()));
     }
-}
-
-std::optional<av::Packet> VEncodeController::TrySetOff() {
-    return std::nullopt;
-    if (!this->encoder.isOpened()) return std::nullopt;
-    try {
-        av::Packet pkt = this->encoder.encode();
-        if (pkt && pkt.size() != 0) {
-            pkt.setStreamIndex(this->vstream.index());
-            pkt.setTimeBase(this->vstream.timeBase());
-            return pkt;
-        }
-    }
-    catch (const std::exception& e) {
-        this->LogError(std::string("刷新失败: ") + e.what());
-    }
-    return std::nullopt;
+    return true;
 }
 
 void VEncodeController::Reset() {
-    av::VideoFrame clear;
-    while (this->bufferVFrames.try_dequeue(clear)) {
+    CtrlVideoFrame ctrlVFrame;
+    while (this->bufferVFrames.try_dequeue(ctrlVFrame)) {
 
     }
     this->pMediaState->encodingOverload = false;

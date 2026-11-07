@@ -1,16 +1,17 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
+using CtrlPacket = std::variant<av::Packet, MulNX::AVControl>;
+
 class MediaRecorder final :public MediaModuleBase {
     class AEncodeHelper* pAEncodeHelper = nullptr;
-    class VEncodeController* pVEncodeController = nullptr;
     class MediaParamManager* pMediaParamManager = nullptr;
     std::atomic<bool> startAsAdvance = false;
 
     av::FormatContext ofctx;
     std::chrono::steady_clock::time_point recordStartTime;
 
-    moodycamel::ConcurrentQueue<av::Packet> bufferPackets{};
+    std::atomic<bool> exitFlag = false;
 
     void Menu();
 
@@ -25,4 +26,6 @@ class MediaRecorder final :public MediaModuleBase {
     void WritePacket();
 
     bool Init()override;
+public:
+    moodycamel::ConcurrentQueue<CtrlPacket> bufferPackets{};
 };

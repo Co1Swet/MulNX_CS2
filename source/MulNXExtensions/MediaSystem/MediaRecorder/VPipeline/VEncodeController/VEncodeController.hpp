@@ -4,7 +4,8 @@
 
 class VEncodeController final :public MediaModuleBase {
     class MediaParamManager* pMediaParamManager = nullptr;
-   
+    class MediaRecorder* pMediaRecorder = nullptr;
+
     av::VideoEncoderContext encoder{};
 
     av::Stream vstream{};
@@ -24,9 +25,11 @@ class VEncodeController final :public MediaModuleBase {
     void CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt);
     void Reset();
     void SetOn(av::FormatContext* oCtx);
+
+    bool OnEncode();
 public:
     MulNX::IVEncoder* pEncoder;
-    std::optional<av::Packet> Encode();
-    std::optional<av::Packet> TrySetOff();
-    moodycamel::ConcurrentQueue<av::VideoFrame> bufferVFrames{};
+
+    using CtrlVideoFrame = std::variant<av::VideoFrame, MulNX::AVControl>;
+    moodycamel::ConcurrentQueue<CtrlVideoFrame> bufferVFrames{};
 };

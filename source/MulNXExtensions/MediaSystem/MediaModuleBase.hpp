@@ -12,6 +12,7 @@
 #include <avcpp/formatcontext.h>
 #include <avcpp/videorescaler.h>
 #include <avcpp/audioresampler.h>
+#include <variant>
 
 namespace MulNX {
     class VFrameExInfo {
@@ -28,6 +29,14 @@ namespace MulNX {
         const std::string* pFilenameWithoutStem = nullptr;
         int targetFPS = 0; // 本次录制启动时的帧率，0 表示普通模式不限帧
         bool startAsAdvancedMode = false; // 本次录制开始所使用的录制模式
+    };
+
+    struct AVControl {                     // 必须 trivial
+        enum class Kind : uint8_t {
+            Flush,
+            Stop
+        };
+        Kind kind;
     };
 }
 

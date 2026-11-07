@@ -1,7 +1,6 @@
 #include "MediaRecorder.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <APipeline/AEncodeHelper/AEncodeHelper.hpp>
-#include <VPipeline/VEncodeController/VEncodeController.hpp>
 #include <MediaParamManager/MediaParamManager.hpp>
 
 void MediaRecorder::CaptureCallback() {
@@ -53,7 +52,6 @@ void MediaRecorder::ReportCtxState() {
 
 bool MediaRecorder::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
-    this->pVEncodeController = this->FindModule<VEncodeController>("VEncodeController");
     this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
 
     (*this)
@@ -127,6 +125,10 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
 
     this->LogInfo("准备Reset");
     try {
+        CtrlPacket ctrlPacket;
+        while (this->bufferPackets.try_dequeue(ctrlPacket)) {
+            
+        }
         this->PublishSync("MediaSync/Reset"_hash);
     }
     catch (const std::exception& e) {
@@ -158,6 +160,7 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
         this->pMediaState->MediaSystemGlobalWorkFlag = true;
         this->pMediaState->recordState.store(RecordState::Recording);
         this->startAsAdvance.store(advance, std::memory_order_release);
+        this->exitFlag = false;
         return true;
     }
     catch (const std::exception& e) {
@@ -180,12 +183,11 @@ bool MediaRecorder::StopRecording() {
     this->PublishSync("MediaSync/SetOff"_hash);
 
     try {
-        while (auto p = this->pVEncodeController->Encode()) {
-            this->ofctx.writePacket(*p);
+        this->LogInfo("即将等待视频编码退出");
+        while (this->exitFlag == false) {
+            this->WritePacket();
         }
-        while (auto p = this->pVEncodeController->TrySetOff()) {
-            this->ofctx.writePacket(*p);
-        }
+        this->LogSucc("视频编码已退出");
 
         while (auto p = this->pAEncodeHelper->Encode()) {
             this->ofctx.writePacket(*p);
@@ -223,12 +225,9 @@ void MediaRecorder::Main() {
 }
 
 void MediaRecorder::Encode() {
-    if (this->pMediaState->recordState.load() != RecordState::Recording) return;
+    if (this->pMediaState->recordState.load() != RecordState::Recording)return;
+    this->WritePacket();
     std::vector<av::Packet> packets;
-
-    while (auto p = this->pVEncodeController->Encode()) {
-        packets.push_back(std::move(*p));
-    }
 
     while (auto p = this->pAEncodeHelper->Encode()) {
         packets.push_back(std::move(*p));
@@ -247,5 +246,15 @@ void MediaRecorder::Encode() {
 }
 
 void MediaRecorder::WritePacket() {
-
+    CtrlPacket ctrlPacket;
+    while (this->bufferPackets.try_dequeue(ctrlPacket)) {
+        auto pCtrl = std::get_if<MulNX::AVControl>(&ctrlPacket);
+        if (pCtrl && pCtrl->kind == MulNX::AVControl::Kind::Stop) {
+            this->exitFlag = true;
+            return;
+        }
+        auto pPacket = std::get_if<av::Packet>(&ctrlPacket);
+        if (!pPacket)return;
+        this->ofctx.writePacket(std::move(*pPacket));
+    }
 }
