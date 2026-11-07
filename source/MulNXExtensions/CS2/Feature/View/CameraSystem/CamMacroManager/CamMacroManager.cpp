@@ -5,8 +5,8 @@ bool CamMacroManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
     this->Path()->CreateKey("kCamMacros", "CamMacros", [this](MulNX::PathManager* PathManager)->bool {
-        auto Path = PathManager->PathGetFromKey("kCamMacros");
-        this->LogSucc("成功设置运镜宏路径为：" + Path.string());
+        auto path = PathManager->PathGetFromKey("kCamMacros");
+        this->LogSucc(std::format("成功设置运镜宏路径为：{}", path.string()));
         return true;
         });
     this->Path()->KeyBindDynamic("kCamMacros", "kCurrentPack");

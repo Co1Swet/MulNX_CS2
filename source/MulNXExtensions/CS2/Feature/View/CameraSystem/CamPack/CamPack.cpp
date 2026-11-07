@@ -10,9 +10,9 @@ void CamPack::Refresh() {
     // 预留
 }
 
-std::pair<bool, std::string> CamPack::Save(const fs::path& dir) {
+std::expected<std::string, std::string> CamPack::Save(const fs::path& dir) {
     try {
-        if (dir.empty()) return { false, "文件夹路径为空，无法保存运镜包！" };
+        if (dir.empty())return std::unexpected("文件夹路径为空，无法保存运镜包！");
 
         auto pathSave = dir / (this->name + ".yaml");
         YAML::Node root;
@@ -24,9 +24,9 @@ std::pair<bool, std::string> CamPack::Save(const fs::path& dir) {
 
         YAML::SaveFilePath(pathSave, root);
 
-        return { true, std::format("运镜包保存成功：{}", this->name) };
+        return std::format("运镜包保存成功：{}", this->name);
     }
     catch (const std::exception& e) {
-        return { false, std::string(e.what()) };
+        return std::unexpected(std::format("运镜包保存时发生异常：{}", e.what()));
     }
 }

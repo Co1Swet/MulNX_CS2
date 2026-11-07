@@ -237,13 +237,13 @@ bool CamPackManager::CamPackSave() {
         return false;
     }
     auto dir = this->Path()->PathGetFromKey("kCamPacks") / this->pActiveCamPack->GetName();
-    auto [ok, msg] = this->pActiveCamPack->Save(dir);
-    if (ok) {
-        this->LogSucc(std::move(msg));
+    auto r = this->pActiveCamPack->Save(dir);
+    if (r.has_value()) {
+        this->LogSucc(std::move(r.value()));
         return true;
     }
     else {
-        this->LogError(std::move(msg));
+        this->LogError(std::move(r.error()));
         return false;
     }
 }
