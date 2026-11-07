@@ -18,15 +18,10 @@ bool HookDemo::Init() {
         if (name == "demo_timescale") {
             this->hkDemeTimescale = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
                 auto cmd = (CCommand*)ctx->rdx;
-                if (std::string_view(cmd->pRawString) == "demo_timescale 1.000000")
-                    return MulNX::Hook::Then::Continue;
-                static std::atomic<bool> first = true;
-                if (first) {
-                    this->LogError("demo_timescale 被禁用！请使用host_timescale替代！");
-                    first = false;
+                if (std::string_view(cmd->pRawString) != "demo_timescale 1.000000") {
+                    this->AsyncCommand("host_timescale 1.000000");
                 }
-                ctx->rax = 0;
-                return MulNX::Hook::Then::Return;
+                return MulNX::Hook::Then::Continue;
                 }).value();
             this->RegisterAttachHook(this->hkDemeTimescale, "DemeTimescale");
         }
@@ -47,8 +42,8 @@ MulNX::Hook::Then HookDemo::OnCmdPlayDemo(MulNX::Hook* hk, RegContext* ctx) {
             });
         return MulNX::Hook::Then::Return;
     }
-
-    hk->CallMaybeOrigin(0, ctx);
+    using PlayDemo_t = void(*)(uint64_t a1, CCommand* a2);
+    hk->CallMaybeAs<PlayDemo_t>(ctx->rcx, cmd);
     std::string_view raw(cmd->pRawString);
     raw = raw.substr(raw.find(' ') + 1);
     this->BeforePlay(raw);
@@ -57,8 +52,9 @@ MulNX::Hook::Then HookDemo::OnCmdPlayDemo(MulNX::Hook* hk, RegContext* ctx) {
 void HookDemo::HookDemoGotoTick(CCmd* pCmd) {
     auto pf = pCmd->m_pCommandCallback;
     this->hkDemoGotoTick = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
+        using DemoGotoTick_t = uint64_t(*)(uint64_t a1, CCommand* a2);
         auto cmd = (CCommand*)ctx->rdx;
-        hk->CallMaybeOrigin(0, ctx);
+        hk->CallMaybeAs<DemoGotoTick_t>(ctx->rcx, cmd);
         auto msg = MulNX::Message("Demo/GotoTick/Complete"_hash);
         auto&& [jumpTick] = msg.Access<int>();
         sscanf_s(cmd->pRawString, "demo_gototick %d", &jumpTick);

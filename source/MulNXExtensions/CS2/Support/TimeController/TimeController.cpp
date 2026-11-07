@@ -57,7 +57,9 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
             const bool selected = (i == sSpeedIdx);
             if (ImGui::Selectable(std::format("{:.2f}x", kSpeeds[i]).c_str(), selected)) {
                 sSpeedIdx = i;
-                this->AsyncCommand(std::format("host_timescale {:.2f}", kSpeeds[i]));
+                auto cmd = std::format("host_timescale {:.6f}", kSpeeds[i]);
+                this->AsyncCommand("demo_timescale 1.000000");
+                this->AsyncCommand(std::move(cmd));
             }
             if (selected) {
                 ImGui::SetItemDefaultFocus();
