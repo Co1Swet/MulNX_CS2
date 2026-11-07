@@ -6,7 +6,6 @@ class CamPack {
     std::string name{};
     std::string description{};
     std::atomic<MulNX::KeyCheckPack> KCPack{};
-
 public:
     std::vector<std::string> OnNewRound{};
     std::vector<std::string> OnRoundStart{};
@@ -25,5 +24,5 @@ public:
     void ResetName(const std::string& newName);
     void Refresh();
 
-    std::pair<bool, std::string> Save(const fs::path& dir);
+    std::expected<std::string, std::string> Save(const fs::path& dir);
 };

@@ -73,7 +73,7 @@ CS2::C_CSPlayerPawn* ClientEntitySystem::TryGetObservingPawn() {
     }
 }
 
-std::optional<Steam64UID> ClientEntitySystem::TryGetObservingSteam64UID() {
+std::optional<Steam64UID> ClientEntitySystem::TryGetObservingSteam64UID()noexcept {
     try {
         auto pPawn = this->TryGetObservingPawn();
         if (!pPawn)return std::nullopt;

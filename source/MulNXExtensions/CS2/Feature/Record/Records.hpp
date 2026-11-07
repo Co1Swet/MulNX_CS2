@@ -3,3 +3,4 @@
 #include "AdvancedRecord/AdvancedRecord.hpp"
 #include "RecordFileRedirect/RecordFileRedirect.hpp"
 #include "AdTimeFix/AdTimeFix.hpp"
+#include "PlayProtect/PlayProtect.hpp"

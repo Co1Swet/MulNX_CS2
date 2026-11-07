@@ -2,11 +2,11 @@
 #include <Core/Core.hpp>
 #include <Core/Driver/Driver.hpp>
 #include <MulNX/Base/UI/UI.hpp>
+#include <MulNX/Base/yaml.hpp>
 #include <MulNX/Systems/Systems.hpp>
-#include <MulNXThirdParty/yaml.hpp>
 #include <MulNXThirdParty/ImGuiStyleSerializer.h>
-#include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
-#include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
+#include <MulNXThirdParty/imgui/imgui_impl_win32.h>
+#include <MulNXThirdParty/imgui/imgui_impl_dx11.h>
 
 bool MulNX::UISystem::Init() {
     this->pCoordinator = this->FindModule<UICoordinator>("UICoordinator");
@@ -37,7 +37,6 @@ void MulNX::UISystem::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "UISystem/Start"_hash: {
         this->rendEnable.store(true);
-        this->ifDrawMid.store(true);
         this->LogInfo("已处理启动请求");
         break;
     }
@@ -88,8 +87,7 @@ void MulNX::UISystem::Render() {
         }
     }
     catch (const MulNX::Exception& e) {
-        MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的MulNX异常：{} \n该异常抛出于：{}",
-            e.what(), e.Where()));
+        MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的MulNX异常：{}", e.what()));
     }
     catch (const std::exception& e) {
         MulNX::ErrorTerminate(std::format("UI渲染抛出未捕获的异常：{}", e.what()));

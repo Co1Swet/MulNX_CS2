@@ -136,15 +136,18 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     case "Demo/Pass/Clear"_hash: {
         std::unique_lock lock(this->smutex);
         this->recordPasses.clear();
+        this->indexTask.store(-1, std::memory_order_release);
+        this->currentPass.store(nullptr, std::memory_order_release);
         break;
     }
     case "Demo/Pass/Start"_hash: {
         this->moduleActive.store(true, std::memory_order_release);
-        this->LogInfo("Module activated.");
+        this->LogInfo("已置位启动");
         break;
     }
     case "Demo/Pass/Stop"_hash: {
         this->moduleActive.store(false, std::memory_order_release);
+        this->LogInfo("已置位停止");
         break;
     }
     case "Demo/Pass/SetOutput"_hash: {
@@ -173,7 +176,8 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
     }
 }
-void DemoRecorder::StartRecord(const Demo::RecordTask& task) {
+void DemoRecorder::StartRecord(const Demo::RecordTask& task)const {
+    std::shared_lock lock(this->smutex);
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
     ++this->num;
     // str1为绝对文件夹路径，str2为无扩展的文件名

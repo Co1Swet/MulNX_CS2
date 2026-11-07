@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <Game/StaticWeapons/StaticWeaponBase.hpp>
 #include <Support/DamageRecorder/DamageRecorder.hpp>
 #include <Support/ClientPanorama/ClientPanorama.hpp>

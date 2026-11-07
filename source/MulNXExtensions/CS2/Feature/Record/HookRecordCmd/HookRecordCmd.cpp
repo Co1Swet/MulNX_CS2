@@ -3,7 +3,7 @@
 
 bool HookRecordCmd::Init() {
     this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
-        auto&& [pCmd] = msg.Access<CCmd*>();
+        auto&& [pCmd] = msg.Access<CS2::Console::ConCommand*>();
 
         // this->LogInfo(pCmd->m_pszName);
 

@@ -9,7 +9,7 @@ bool RoundRecordMaker::Init() {
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/RoundKill")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/Death")
         .SubscribeAsyncEx<Steam64UID, size_t>("Demo/Record/Make/FullRound")
-        .SubscribeAsync<int>("Demo/Record/Make/Flush")
+        .SubscribeAsync<int>("Demo/Record/Commit/Round")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -29,26 +29,32 @@ void RoundRecordMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
 
 void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Demo/Record/Make/Flush"_hash: {
+    case "Demo/Record/Commit/Round"_hash: {
         MulNX::Message commit(msg);
         commit.type = "Demo/Record/Commit"_hash;
         this->PublishAsync(std::move(commit));
         break;
     }
     case "Demo/Record/Make/Kill"_hash: {
-        auto* pExt = msg.asp.get<MulNX::NetExt>();
+        auto r= this->ParseDemoPath(msg);
+        if (!r) {
+            this->LogError(std::format("无法解析Demo路径: {}", r.error()));
+            break;
+        }
+        auto&& [kDir, demoName, path] = *r;
         auto&& [uid, round, idx] = msg.Access<Steam64UID, size_t, size_t>();
 
-        auto pDemoInfo = this->pDemSys->GetDemoInfo(pExt->str1);
+        auto pDemoInfo = this->pDemSys->GetDemoInfo(kDir,demoName);
         const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
         const auto& ev = info.killEvents[idx];
 
         Demo::RecordTask rTask{};
-        rTask.demoName = pExt->str1;
+        rTask.kPath = kDir;
+        rTask.demoName = demoName;
         rTask.uid = ev.killerSteamId;
         rTask.type = Demo::RecordTask::Type::Normal;
-        rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
-        rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+        rTask.tickStart = ev.tick - this->pConfiger->GetPreRecordTicks();
+        rTask.tickEnd = ev.tick + this->pConfiger->GetPostRecordTicks();
         rTask.roundNumber = static_cast<int>(round);
         rTask.roundKill = info.killEvents.size();
         rTask.killIndex = idx;
@@ -56,26 +62,32 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
             pDemoInfo->GetPlayerName(ev.killerSteamId),
             pDemoInfo->GetPlayerName(ev.victimSteamId),
             rTask.tickStart, rTask.tickEnd);
-        rTask.fileNameNoExt = std::format("{}_{}_r{}_kill_{}", pExt->str1, uid, round, idx);
+        rTask.fileNameNoExt = std::format("{}_{}_r{}_kill_{}", demoName, uid, round, idx);
         this->PublishRecordTask(std::move(rTask));
         break;
     }
     case "Demo/Record/Make/RoundKill"_hash: {
         try {
-            auto* pExt = msg.asp.get<MulNX::NetExt>();
+            auto r = this->ParseDemoPath(msg);
+            if (!r) {
+                this->LogError(std::format("无法解析Demo路径: {}", r.error()));
+                break;
+            }
+            auto&& [kDir, demoName, path] = *r;
             auto&& [uid, round] = msg.Access<Steam64UID, size_t>();
 
-            auto pDemoInfo = this->pDemSys->GetDemoInfo(pExt->str1);
+            auto pDemoInfo = this->pDemSys->GetDemoInfo(kDir, demoName);
             const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
 
             for (int i = 0;i < info.killEvents.size();++i) {
                 const auto& ev = info.killEvents[i];
                 Demo::RecordTask rTask{};
-                rTask.demoName = pExt->str1;
+                rTask.kPath = kDir;
+                rTask.demoName = demoName;
                 rTask.uid = ev.killerSteamId;
                 rTask.type = Demo::RecordTask::Type::Normal;
-                rTask.tickStart = ev.tick - this->pConfiger->preRecordTicks;
-                rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicks;
+                rTask.tickStart = ev.tick - this->pConfiger->GetPreRecordTicks();
+                rTask.tickEnd = ev.tick + this->pConfiger->GetPostRecordTicks();
                 rTask.roundNumber = static_cast<int>(round);
                 rTask.roundKill = info.killEvents.size();
                 rTask.killIndex = i;
@@ -83,7 +95,7 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
                     pDemoInfo->GetPlayerName(ev.killerSteamId),
                     pDemoInfo->GetPlayerName(ev.victimSteamId),
                     rTask.tickStart, rTask.tickEnd);
-                rTask.fileNameNoExt = std::format("{}_{}_r{}_kill_{}", pExt->str1, uid, round, i);
+                rTask.fileNameNoExt = std::format("{}_{}_r{}_kill_{}", demoName, uid, round, i);
                 this->PublishRecordTask(std::move(rTask));
             }
         }
@@ -94,30 +106,42 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/Record/Make/Death"_hash: {
         auto* pExt = msg.asp.get<MulNX::NetExt>();
+        auto r = this->ParseDemoPath(msg);
+        if (!r) {
+            this->LogError(std::format("无法解析Demo路径: {}", r.error()));
+            break;
+        }
+        auto&& [kDir, demoName, path] = *r;
         auto&& [uid, round] = msg.Access<Steam64UID, size_t>();
-        auto pDemoInfo = this->pDemSys->GetDemoInfo(pExt->str1);
+        auto pDemoInfo = this->pDemSys->GetDemoInfo(kDir, demoName);
         const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
         if (!info.Bekilled)break;
         auto& ev = *info.Bekilled;
 
         Demo::RecordTask rTask{};
-        rTask.demoName = pExt->str1;
+        rTask.kPath = kDir;
+        rTask.demoName = demoName;
         rTask.uid = ev.victimSteamId;
-        rTask.tickStart = ev.tick - this->pConfiger->preRecordTicksBekilled;
-        rTask.tickEnd = ev.tick + this->pConfiger->postRecordTicksBekilled;
+        rTask.tickStart = ev.tick - this->pConfiger->GetPreBekilledTicks();
+        rTask.tickEnd = ev.tick + this->pConfiger->GetPostBekilledTicks();
         rTask.roundNumber = static_cast<int>(round);
         rTask.desc = std::format("玩家 {} 被 玩家 {} 击杀，录制从 {} tick到 {} tick",
             pDemoInfo->GetPlayerName(ev.victimSteamId),
             pDemoInfo->GetPlayerName(ev.killerSteamId),
             rTask.tickStart, rTask.tickEnd);
-        rTask.fileNameNoExt = std::format("{}_{}_r{}_death", pExt->str1, uid, round);
+        rTask.fileNameNoExt = std::format("{}_{}_r{}_death", demoName, uid, round);
         this->PublishRecordTask(std::move(rTask));
         break;
     }
     case "Demo/Record/Make/FullRound"_hash: {
-        auto* pExt = msg.asp.get<MulNX::NetExt>();
+        auto r = this->ParseDemoPath(msg);
+        if (!r) {
+            this->LogError(std::format("无法解析Demo路径: {}", r.error()));
+            break;
+        }
+        auto&& [kDir, demoName, path] = *r;
         auto&& [uid, round] = msg.Access<Steam64UID, size_t>();
-        auto pDemoInfo = this->pDemSys->GetDemoInfo(pExt->str1);
+        auto pDemoInfo = this->pDemSys->GetDemoInfo(kDir, demoName);
 
         // 查找当前回合的元数据（startTick, endTick）
         auto itRound = std::find_if(pDemoInfo->rounds.begin(), pDemoInfo->rounds.end(),
@@ -138,17 +162,18 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
                 endTickFull = std::min(info.Bekilled->tick + 64, endTickFull);
             }
         }
-        endTickFull += this->pConfiger->postTickRoundEnd;
+        endTickFull += this->pConfiger->GetPostRoundEndTicks();
 
         Demo::RecordTask rTask{};
-        rTask.demoName = pExt->str1;
+        rTask.kPath = kDir;
+        rTask.demoName = demoName;
         rTask.uid = player.steamId;
         rTask.tickStart = startTickFull;
         rTask.tickEnd = endTickFull;
         rTask.roundNumber = static_cast<int>(round);
         rTask.desc = std::format("玩家 {} 第 {} 回合整段录制（{} ~ {} tick）",
             player.name, round, rTask.tickStart, rTask.tickEnd);
-        rTask.fileNameNoExt = std::format("{}_{}_r{}_full", pExt->str1, uid, round);
+        rTask.fileNameNoExt = std::format("{}_{}_r{}_full", demoName, uid, round);
         this->PublishRecordTask(std::move(rTask));
         break;
     }

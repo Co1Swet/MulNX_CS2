@@ -1,6 +1,6 @@
 add_library(CameraSystem
     CameraSystem.cpp
-    CameraDrawer/CameraDrawer.cpp
+    CamDrawer/CamDrawer.cpp
 
     FreeCameraPath/FreeCameraPath.cpp
     CampathManager/CampathManager.cpp

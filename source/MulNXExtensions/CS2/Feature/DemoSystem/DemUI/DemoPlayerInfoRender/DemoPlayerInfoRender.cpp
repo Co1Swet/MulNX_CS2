@@ -8,8 +8,7 @@ void DemoPlayerInfoRender::Menu(MulNX::Message* umsg) {
     if (it != this->crosshairShareCodes.end()) {
         std::string& code = it->second;
 
-        ImGui::InputText("Demo准星", code.data(), code.size() + 1,
-            ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputText("Demo准星", &code, ImGuiInputTextFlags_ReadOnly);
         ImGui::SameLine();
         if (ImGui::Button("复制到剪贴板")) {
             ImGui::SetClipboardText(code.c_str());
@@ -29,8 +28,7 @@ void DemoPlayerInfoRender::Menu(MulNX::Message* umsg) {
 
     auto str = MulNX::Memory::ReadString(Symbol.pStr).value_or("读取失败");
 
-    ImGui::InputText("内存准星", str.data(), str.size() + 1,
-        ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputText("内存准星", &str, ImGuiInputTextFlags_ReadOnly);
     ImGui::SameLine();
     if (ImGui::Button("复制内存准星到剪贴板")) {
         ImGui::SetClipboardText(str.c_str());
@@ -40,20 +38,22 @@ void DemoPlayerInfoRender::Menu(MulNX::Message* umsg) {
 
 bool DemoPlayerInfoRender::Init() {
     (*this)
-        .SubscribeAsyncEx<void>("Demo/Info/Notify")
+        .SubscribeAsyncEx<int>("Demo/Info/Notify")
         ;
 
     this->UIRegisterCallback("UI.Player.Info", [this](auto uico, auto umsg) {this->Menu(umsg);});
 
     return true;
 }
-
+// Update驱动在UI线程处理消息，不需要加锁
 void DemoPlayerInfoRender::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Info/Notify"_hash: {
-        auto pNet = msg.asp.get<MulNX::NetExt>();
-        auto pInfo = this->pDemSys->GetDemoInfo(pNet->str1);
-        if(!pInfo)break;
+        auto r = this->ParseDemoPath(msg);
+        if (!r)break;
+        auto&& [kDir, demoName, path] = *r;
+        auto pInfo = this->pDemSys->GetDemoInfo(kDir, demoName);
+        if (!pInfo)break;
         for (const auto& [uid, player] : pInfo->players) {
             this->crosshairShareCodes[uid] = player.crosshairShareCode;
         }

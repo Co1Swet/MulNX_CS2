@@ -1,6 +1,5 @@
 #include "TimeLiner.hpp"
-#include "ITimeAdapter.hpp"
-#include "ITimeRend.hpp"
+#include "TimeMixin.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
 void TimeLiner::Menu() {
@@ -21,7 +20,7 @@ void TimeLiner::Menu() {
     // 有效范围才更新比例，避免除零
     if (maxTime > minTime) {
         m_clickRatio = (curTime - minTime) / (maxTime - minTime);
-        m_clickRatio = std::clamp(m_clickRatio, 0.0f, 1.0f);
+        m_clickRatio = std::clamp(m_clickRatio.load(), 0.0f, 1.0f);
     }
     else {
         m_clickRatio = 0.0f;  // 范围无效时不显示指示点
@@ -58,7 +57,7 @@ void TimeLiner::Menu() {
 
     // 显示当前时间数值
     ImGui::SetCursorScreenPos(ImVec2(this->currentLeftX, this->currentBaseY + 15.0f));
-    ImGui::Text("时间: %.2f / %.2f", curTime, maxTime);
+    ImGui::Text("时间: %.2f / %.2f", curTime.load(), maxTime.load());
 
     this->pActiveTimeAdapter->TimeRend(this, draw);
 
@@ -124,7 +123,7 @@ void TimeLiner::UpdatePos() {
     this->currentRightX = win_pos.x + content_max.x - 20.f;
 }
 
-ImVec2 TimeLiner::Map(float time, int layer) const {
+ImVec2 TimeLiner::Map(double time, int layer) const {
     // 防止除零（虽然调用前会保证 max > min，但依旧防御）
     float range = this->maxTime - this->minTime;
     if (range <= 0.0f) {
@@ -136,6 +135,14 @@ ImVec2 TimeLiner::Map(float time, int layer) const {
     return ImVec2(x, y);
 }
 
-float TimeLiner::GetTime() {
+double TimeLiner::GetTime()const {
     return this->pActiveTimeAdapter->GetTime();
+}
+
+void TimeLiner::SetTime(double time)const {
+    if (!std::isfinite(time)) {
+        this->LogError("输入了非法的时间");
+        return;
+    }
+    this->pActiveTimeAdapter->SetTime(time);
 }

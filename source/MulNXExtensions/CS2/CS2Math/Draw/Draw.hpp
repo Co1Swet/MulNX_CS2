@@ -1,6 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
-#include <MulNXThirdParty/imgui_d11/imgui.h>
+#include <MulNXThirdParty/imgui/imgui.h>
 
 namespace MulNX {
     class TransInfo {

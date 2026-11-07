@@ -8,7 +8,6 @@
 
 class CSController final :public MulNX::Module<CSController>, public HookMixin<CSController> {
     std::unique_ptr<MulNX::Hook>hkSource2Client002_Init = nullptr;
-    std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_ExecuteCmd = nullptr;
     std::unique_ptr<MulNX::Hook>hkSource2EngineToClient001_IsPlayingDemo = nullptr;
 
     RetEditor checkSource2EngineToClient001_IsPlayingDemo{};

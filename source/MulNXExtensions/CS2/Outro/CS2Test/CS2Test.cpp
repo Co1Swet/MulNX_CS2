@@ -26,11 +26,15 @@ bool CS2Test::Init() {
         MessageBoxW(NULL, L"MulNX 注入成功！", L"MulNX", MB_OK | MB_ICONINFORMATION);
         }).detach();
 
+    (*this)
+        .SubscribeAsync("Core/Tick30min");
+
     //this->AsyncCommand("playdemo 111");
     this->AsyncCommand("tv_listen_voice_indices -1");
 
     this->SendUIRoot("MyCS2Test", [this](auto&&...) {
         try {
+            this->Update();
             this->UI();
         }
         catch (MulNX::Exception& e) {
@@ -41,4 +45,13 @@ bool CS2Test::Init() {
     auto k1 = CS2::FindWeapon("weapon_ak47")->damageType;
 
     return true;
+}
+
+void CS2Test::ProcessMsg(MulNX::Message& msg) {
+    switch (msg.type) {
+    case "Core/Tick30min"_hash: {
+        //this->AsyncCommand("playdemo 111");
+        break;
+    }
+    }
 }

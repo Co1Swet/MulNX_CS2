@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class TargetPicker final :public CSModuleBase {
     Steam64UID lastDetected = 0;

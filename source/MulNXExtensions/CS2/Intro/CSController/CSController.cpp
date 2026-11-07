@@ -1,6 +1,6 @@
 #include "CSController.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 #include <MulNXThirdParty/cs2_dumpers.hpp>
 
 void CSController::Window() {
@@ -37,7 +37,8 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
     this->client = CS2::Module::Client(L"client.dll");
     void* pClient = this->client.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2Client002", nullptr);
     this->hkSource2Client002_Init = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pClient)->GetVFuncPtr(3), [this](MulNX::Hook* hk, RegContext* ctx) {
-        hk->CallMaybeOrigin(0, ctx);
+        using Source2Client002_Init_t = uint64_t(*)(void* pThis);
+        ctx->rax = hk->CallMaybeAs<Source2Client002_Init_t>((void*)ctx->rcx);
         this->PublishSync("Hook/Source2Client002::Inited"_hash);
         this->hkSource2Client002_Init->Detach();
         return MulNX::Hook::Then::Return;
@@ -60,15 +61,6 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
     this->Source2EngineToClient001 = this->engine2.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2EngineToClient001", nullptr);
     // demo
     this->GetDemo = IVClass::Assume(this->Source2EngineToClient001)->GetVFunc<void* ()>(69);
-    // cmd
-    this->hkSource2EngineToClient001_ExecuteCmd = MulNX::Hook::Create((uint8_t*)IVClass::Assume(this->Source2EngineToClient001)->GetVFuncPtr(51), [](MulNX::Hook* hk, RegContext* ctx) {
-        static std::mutex mtx;
-        auto pRaw = (char*)ctx->rdx;
-        std::lock_guard lock(mtx);
-        hk->CallMaybeOrigin(0, ctx);
-        return MulNX::Hook::Then::Return;
-        }).value();
-    this->RegisterAttachHook(this->hkSource2EngineToClient001_ExecuteCmd, "Source2EngineToClient001::ExecuteCmd");
 
     // for show speaker
     this->hkSource2EngineToClient001_IsPlayingDemo = MulNX::Hook::Create((uint8_t*)IVClass::Assume(Source2EngineToClient001)->GetVFuncPtr(42), [this](MulNX::Hook* hk, RegContext* ctx) {

@@ -22,7 +22,7 @@ void GameSettingsManager::Menu() {
         uint64_t idx = 0;
         this->CS2Con->GetFirstCvarIterator(idx);
         while (idx != 0xFFFFFFFF) {
-            C_ConVar* var = this->CS2Con->GetCVarByIndex(idx);
+            auto* var = this->CS2Con->GetCVarByIndex(idx);
             if (var) {
                 std::string Name = var->szName ? var->szName : "未知";
                 this->LogInfo("控制台命令：" + Name);
@@ -104,16 +104,16 @@ bool GameSettingsManager::GameHudMenu() {
 bool GameSettingsManager::Init() {
     this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
 
-        this->r_dof_override_near_blurry = this->CS2Con->GetCvar("r_dof_override_near_blurry")->GetPtr<float>();
-        this->r_dof_override_near_crisp = this->CS2Con->GetCvar("r_dof_override_near_crisp")->GetPtr<float>();
-        this->r_dof_override_far_crisp = this->CS2Con->GetCvar("r_dof_override_far_crisp")->GetPtr<float>();
-        this->r_dof_override_far_blurry = this->CS2Con->GetCvar("r_dof_override_far_blurry")->GetPtr<float>();
+        this->r_dof_override_near_blurry = this->CS2Con->GetCVarByName("r_dof_override_near_blurry")->GetPtr<float>();
+        this->r_dof_override_near_crisp = this->CS2Con->GetCVarByName("r_dof_override_near_crisp")->GetPtr<float>();
+        this->r_dof_override_far_crisp = this->CS2Con->GetCVarByName("r_dof_override_far_crisp")->GetPtr<float>();
+        this->r_dof_override_far_blurry = this->CS2Con->GetCVarByName("r_dof_override_far_blurry")->GetPtr<float>();
 
-        *this->CS2Con->GetCvar("cl_trueview_show_status")->GetPtr<int>() = 0;
-        *this->CS2Con->GetCvar("cl_radar_square_always")->GetPtr<bool>() = false;
-        *this->CS2Con->GetCvar("cl_radar_square_when_spectating")->GetPtr<bool>() = false;
-        *this->CS2Con->GetCvar("cl_demo_predict")->GetPtr<bool>() = false;
-        *this->CS2Con->GetCvar("cl_spec_show_bindings")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCVarByName("cl_trueview_show_status")->GetPtr<int>() = 0;
+        *this->CS2Con->GetCVarByName("cl_radar_square_always")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCVarByName("cl_radar_square_when_spectating")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCVarByName("cl_demo_predict")->GetPtr<bool>() = false;
+        *this->CS2Con->GetCVarByName("cl_spec_show_bindings")->GetPtr<bool>() = false;
 
         this->UIRegisterCallback("UI.MulNXControl", [this](auto&&...) {return this->Menu();});
         this->UIRegisterCallback("UI.Sound", [this](auto&&...) {return this->SoundMenu();});

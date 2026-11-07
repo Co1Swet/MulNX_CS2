@@ -9,7 +9,7 @@ namespace MulNX {
         std::string strImguiIniPath;
 
         MulReflBool(rendEnable, false);
-        MulReflBool(ifDrawMid, false);
+        MulReflBool(ifDrawMid, true);
 
         void LoadFont();
         void LoadStyle();

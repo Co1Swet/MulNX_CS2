@@ -30,7 +30,7 @@ void NameController::UIPlayer(MulNX::Message* msg) {
 }
 
 bool NameController::Init() {
-    this->SubscribeAsync("Name/Player/Set");
+    this->SubscribeAsyncEx<Steam64UID>("Name/Player/Set");
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
 
@@ -126,7 +126,9 @@ void NameController::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "Name/Player/Set"_hash: {
         auto&& [uid] = Msg.Access<Steam64UID>();
-        auto newName = Msg.asp.get<MulNX::NetExt>()->str1;
+        auto* pNetExt = Msg.asp.get<MulNX::NetExt>();
+        if (!pNetExt) break;
+        auto newName = pNetExt->str1;
         std::unique_lock lock(this->smutex);
         this->SetReplace(uid, newName);
         break;

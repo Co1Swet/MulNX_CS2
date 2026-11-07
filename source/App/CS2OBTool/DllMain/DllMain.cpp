@@ -4,12 +4,13 @@
 #include <MulNXExtensions/WinBaseHooks/WinBaseHooks.hpp>
 #include <MulNXExtensions/CS2/CS2s.hpp>
 #include <MulNXExtensions/MulNXController/MulNXController.hpp>
-#include <MulNXExtensions/WebSocketManager/WebSocketManager.hpp>
 #include <MulNXExtensions/MediaSystem/Medias.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <MulNXExtensions/TimeLiner/FlowClock/FlowClock.hpp>
+#include <MulNXExtensions/TimeLiner/TimeMarker/TimeMarkerManager.hpp>
 
 static HANDLE hInitCompleteEvent = nullptr;
+static HANDLE hUnloadReadyEvent = nullptr;
 BOOL APIENTRY DllMain(HMODULE, DWORD, LPVOID) { return TRUE; }
 void StartImpl(HMODULE& hModule) {
     hModule = GetModuleHandleW(L"CS2OBTool.dll");
@@ -20,9 +21,9 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookWindow>("HookWindow")
         .CreateModule<DLLLoadDispatcher>("DLLLoadDispatcher")
         .CreateModule<FileRedirector>("FileRedirector")
-        .CreateModule<WebSocketManager>("WebSocketManager")
         .CreateModule<TimeLiner>("TimeLiner")
         .CreateModule<FlowClock>("FlowClock")
+        .CreateModule<TimeMarkerManager>("TimeMarkerManager")
 
         // 图形组件
         .CreateModule<HookD3D11>("HookD3D11")
@@ -69,6 +70,7 @@ void StartImpl(HMODULE& hModule) {
 
         // CS2 摄像机系统
         .CreateModule<CameraSystem>("CameraSystem")
+        .CreateModule<CamDrawer>("CamDrawer")
         .CreateModule<CamPackManager>("CamPackManager")
         .CreateModule<CampathManager>("CampathManager")
         .CreateModule<CamMacroManager>("CamMacroManager")
@@ -136,9 +138,11 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<DemEasyView>("DemEasyView")
         .CreateModule<RoundRecordMaker>("RoundRecordMaker")
         .CreateModule<DemoRecordMaker>("DemoRecordMaker")
+        .CreateModule<AutoRecordRule>("AutoRecordRule")
+        .CreateModule<PassRecordMaker>("PassRecordMaker")
         .CreateModule<RecordTaskConfiger>("RecordTaskConfiger")
         .CreateModule<RecordTaskMaker>("RecordTaskMaker")
-        .CreateModule<DemRPassManager>("DemRPassManager")
+        .CreateModule<DemRecordPassManager>("DemRecordPassManager")
         .CreateModule<DemClassifyPass>("DemClassifyPass")
         .CreateModule<DemSortPass>("DemSortPass")
         .CreateModule<DemMergePass>("DemMergePass")
@@ -190,6 +194,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<RecordFileRedirect>("RecordFileRedirect")
         .CreateModule<AdvancedRecord>("AdvancedRecord")
         .CreateModule<AdTimeFix>("AdTimeFix")
+        .CreateModule<PlayProtect>("PlayProtect")
 
         // 管理
         .CreateModule<MulNXController>("MulNXController")
@@ -205,6 +210,10 @@ DWORD WINAPI StartWrapper(LPVOID lpParam) {
     HMODULE hModule;
     try {
         StartImpl(hModule);
+        if (hUnloadReadyEvent) {
+            SetEvent(hUnloadReadyEvent);
+            CloseHandle(hUnloadReadyEvent);
+        }
     }
     catch (std::exception& e) {
         SetEvent(hInitCompleteEvent);
@@ -217,6 +226,9 @@ DWORD WINAPI StartWrapper(LPVOID lpParam) {
     FreeLibraryAndExitThread(hModule, 0);
 }
 DWORD WINAPI MulNX_CS2_Start(void*) {
+    auto eventName = L"Local\\MulNX_CS2_UnloadReady_" + std::to_wstring(GetCurrentProcessId());
+    hUnloadReadyEvent = CreateEventW(NULL, TRUE, FALSE, eventName.c_str());
+    if (hUnloadReadyEvent) ResetEvent(hUnloadReadyEvent);
     hInitCompleteEvent = CreateEventW(NULL, TRUE, FALSE, NULL);
     HANDLE hInitThread = CreateThread(NULL, 0, StartWrapper, NULL, 0, NULL);
     WaitForSingleObject(hInitCompleteEvent, INFINITE);

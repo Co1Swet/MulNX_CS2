@@ -4,13 +4,12 @@ using namespace MulNX::Memory;
 
 Asm::Assembler& Asm::Assembler::SaveReg() {
     using enum MulNX::Memory::Asm::Reg;
-    // 保存所有寄存器到 [rsp + offset]
     (*this)
         .mov(Mem(RSP, offsetof(RegContext, rax)), RAX)
         .mov(Mem(RSP, offsetof(RegContext, rcx)), RCX)
         .mov(Mem(RSP, offsetof(RegContext, rdx)), RDX)
         .mov(Mem(RSP, offsetof(RegContext, rbx)), RBX)
-        .mov(Mem(RSP, offsetof(RegContext, rsp)), RSP) // 保存当前rsp（分配后的）
+        .mov(Mem(RSP, offsetof(RegContext, rsp)), RSP) // 保存当前rsp（分配后的），已包含影子空间
         .mov(Mem(RSP, offsetof(RegContext, rbp)), RBP)
         .mov(Mem(RSP, offsetof(RegContext, rsi)), RSI)
         .mov(Mem(RSP, offsetof(RegContext, rdi)), RDI)

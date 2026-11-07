@@ -17,34 +17,27 @@ class CSConMixin {
 protected:
     template<CSConvarName name>
     auto ConvarSliderInt(const std::string& UIName, const int& min, const int& max) {
-        static auto* pVar = This()->CS2Con->GetCvar(std::string(name))->template GetPtr<int>();
+        static auto* pVar = This()->CS2Con->GetCVarByName(std::string(name))->template GetPtr<int>();
         return ImGui::SliderInt(UIName.c_str(), pVar, min, max);
     }
 
     template<CSConvarName name>
     auto ConvarSliderFloat(const std::string& UIName, const float& min, const float& max) {
-        static auto* pVar = This()->CS2Con->GetCvar(std::string(name))->template GetPtr<float>();
+        static auto* pVar = This()->CS2Con->GetCVarByName(std::string(name))->template GetPtr<float>();
         return ImGui::SliderFloat(UIName.c_str(), pVar, min, max);
     }
 
     template<CSConvarName name>
     auto ConvarCheckbox(const std::string& UIName) {
-        static auto* pVar = This()->CS2Con->GetCvar(std::string(name))->template GetPtr<bool>();
+        static auto* pVar = This()->CS2Con->GetCVarByName(std::string(name))->template GetPtr<bool>();
         return ImGui::Checkbox(UIName.c_str(), pVar);
     }
 
     void AsyncCommand(std::string&& cmd)const {
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command"_hash);
-        rp->str1 = std::move(cmd);
-        This()->PublishAsync(std::move(msg));
+        This()->LogInfo(std::format("推入MulNX缓冲队列：{}", cmd));
+        This()->CS2Con->bufferGameCmds.enqueue(std::move(cmd));
     }
     void AsyncCommandNoReport(std::string&& cmd)const {
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Game/Command/NoReport"_hash);
-        rp->str1 = std::move(cmd);
-        This()->PublishAsync(std::move(msg));
-    }
-    void AsyncCommandHighPriority(std::string&& cmd)const {
-        This()->LogInfo(std::format("发送高优先命令：{}", cmd));
-        This()->CS2Con->bufferHighPriorityGameCmds.enqueue(std::move(cmd));
+        This()->CS2Con->bufferGameCmds.enqueue(std::move(cmd));
     }
 };

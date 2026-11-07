@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class FlashRenderController final :public CSModuleBase {
     float* r_spectator_flashbang_opacity = nullptr;

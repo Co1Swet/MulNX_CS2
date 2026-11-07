@@ -5,7 +5,7 @@
 
 void FreeCameraController::Menu() {
     bool currentEnable = this->EnableControl.load(std::memory_order_acquire);
-    ImGui::Text(I18n("freCamCon.status", currentEnable ? "ON" : "OFF").c_str());
+    ImGui::TextUnformatted(I18n("freCamCon.status", currentEnable ? "ON" : "OFF").c_str());
 
     if (ImGui::Button(I18n("freCamCon.change").c_str())) {
         this->PublishAsync("FreeCamCtrl/Toggle"_hash);

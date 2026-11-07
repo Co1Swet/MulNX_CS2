@@ -1,7 +1,6 @@
 #include <MulNX/MulNX.hpp>
-#include <MulNXThirdParty/imgui_d11/imgui.h>
-#include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
-#include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
+#include <MulNXThirdParty/imgui/imgui_impl_win32.h>
+#include <MulNXThirdParty/imgui/imgui_impl_dx11.h>
 #include <d3d11.h>
 
 class Win32Starter final :public MulNX::Module<Win32Starter> {

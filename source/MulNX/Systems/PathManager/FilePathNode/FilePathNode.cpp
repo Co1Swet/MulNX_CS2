@@ -70,7 +70,7 @@ bool MulNX::PathManager::CallNodeChange(FilePathNode* Node) {
 }
 
 void MulNX::PathManager::CreateKey(const std::string& Key, std::string&& Value, std::function<bool(PathManager*)>&& OnChange) {
-    std::unique_lock lock(this->MutexEx);
+    std::unique_lock lock(this->recursive_mutex);
     auto it = this->Nodes.find(Key);
     if (it != this->Nodes.end()) {
         this->LogError("key尝试被二次创建:" + Key);
@@ -81,7 +81,7 @@ void MulNX::PathManager::CreateKey(const std::string& Key, std::string&& Value, 
     this->Nodes[Key].CurrentValue = std::move(Value);
 }
 bool MulNX::PathManager::KeyBindStatic(const std::string& Key, const fs::path& Position) {
-    std::unique_lock lock(this->MutexEx);
+    std::unique_lock lock(this->recursive_mutex);
     auto* Node = this->NodeGetFromKey(Key);
     this->KeyUnbindParentKey(Key);
     Node->Static = Position;
@@ -93,7 +93,7 @@ bool MulNX::PathManager::KeyBindStatic(const std::string& Key, const fs::path& P
     }
 }
 bool MulNX::PathManager::KeyBindDynamic(const std::string& Key, const std::string& Parent) {
-    std::unique_lock lock(this->MutexEx);
+    std::unique_lock lock(this->recursive_mutex);
     this->KeyBindParentKey(Key, Parent);
     // 通过Key查找当前节点
     auto* Node = this->NodeGetFromKey(Key);
@@ -105,7 +105,7 @@ bool MulNX::PathManager::KeyBindDynamic(const std::string& Key, const std::strin
     }
 }
 bool MulNX::PathManager::KeySetCurrent(const std::string& Key, const std::string& Current) {
-    std::unique_lock lock(this->MutexEx);
+    std::unique_lock lock(this->recursive_mutex);
     auto* Node = this->NodeGetFromKey(Key);
     Node->CurrentValue = Current;
     bool NotCall = Node->KeyParent.empty() && Node->Static.empty();
@@ -116,7 +116,7 @@ bool MulNX::PathManager::KeySetCurrent(const std::string& Key, const std::string
 }
 // ToDo 后续再处理栈溢出，反正都是我自己写的，我相信我自己
 fs::path MulNX::PathManager::PathGetFromKey(const std::string& Key) {
-    std::unique_lock lock(this->MutexEx);
+    std::unique_lock lock(this->recursive_mutex);
     auto* Node = this->NodeGetFromKey(Key);
     if (!Node->Static.empty()) {
         return Node->Static / Node->CurrentValue;
@@ -132,4 +132,20 @@ fs::path MulNX::PathManager::PathGetFromKey(const std::string& Key) {
         }
         return this->PathGetFromKey(Node->KeyParent) / Node->CurrentValue;// 一路构建完整路径
     }
+}
+std::vector<std::string> MulNX::PathManager::PathFindStaticKeys(const fs::path& Target) {
+    std::unique_lock lock(this->recursive_mutex);
+    std::vector<std::string> result;
+    // Static 均为绝对路径，相对 Target 不可能命中，短路
+    if (!Target.is_absolute()) return result;
+    const fs::path targetNorm = Target.lexically_normal();
+    for (const auto& [key, node] : this->Nodes) {
+        if (node.Static.empty()) continue;
+        // CurrentValue 为空的静态节点视为"未完成"，不参与匹配（与 CallNodeChange 的约定一致）
+        if (node.CurrentValue.empty()) continue;
+        if ((node.Static / node.CurrentValue).lexically_normal() == targetNorm) {
+            result.push_back(key);
+        }
+    }
+    return result;
 }

@@ -3,6 +3,7 @@ add_library(CS2Record STATIC
     AdvancedRecord/AdvancedRecord.cpp
     RecordFileRedirect/RecordFileRedirect.cpp
     AdTimeFix/AdTimeFix.cpp
+    PlayProtect/PlayProtect.cpp
 )
 target_link_libraries(CS2Record PUBLIC
     CS2Support

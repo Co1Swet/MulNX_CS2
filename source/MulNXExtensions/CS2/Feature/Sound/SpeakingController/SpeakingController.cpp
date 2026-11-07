@@ -9,8 +9,8 @@ void SpeakingController::Menu() {
 }
 bool SpeakingController::Init() {
     this->SubscribeSync("Hook/Source2Client002::Inited", [this](MulNX::Message& msg) {
-        this->tv_listen_voice_indices = this->CS2Con->GetCvar("tv_listen_voice_indices")->GetPtr<int>();
-        this->tv_listen_voice_indices_h = this->CS2Con->GetCvar("tv_listen_voice_indices_h")->GetPtr<int>();
+        this->tv_listen_voice_indices = this->CS2Con->GetCVarByName("tv_listen_voice_indices")->GetPtr<int>();
+        this->tv_listen_voice_indices_h = this->CS2Con->GetCVarByName("tv_listen_voice_indices_h")->GetPtr<int>();
         });
 
     (*this)

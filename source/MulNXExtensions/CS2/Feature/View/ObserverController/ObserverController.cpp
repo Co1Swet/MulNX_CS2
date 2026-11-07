@@ -38,7 +38,7 @@ void ObserverController::SpecSteam64UID(Steam64UID uid) {
                 this->LogError("未查找到有效的控制器！");
                 break;
             }
-            this->AsyncCommand(std::format("spec_player {}", index));
+            this->AsyncCommand(std::format("spec_mode 2;spec_player {}", index));
             break;
         }
         catch (const std::exception& e) {

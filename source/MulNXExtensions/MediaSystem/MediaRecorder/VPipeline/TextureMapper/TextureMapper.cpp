@@ -1,4 +1,5 @@
 #include "TextureMapper.hpp"
+#include <cstring>
 #include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool TextureMapper::Init() {
@@ -71,14 +72,18 @@ std::optional<av::VideoFrame> TextureMapper::MapFrame(MidTex& tex) {
         this->pVCD3D11Manager->pReadSideContext->CopyResource(this->pStagingTex, tex.pTex.Get());
     tex.pMutex->ReleaseSync(0);
 
+    av::VideoFrame frame(this->srcPixelFormat, this->stagingWidth, this->stagingHeight);
+
     D3D11_MAPPED_SUBRESOURCE map = {};
     if (FAILED(this->pVCD3D11Manager->pReadSideContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &map)) || !map.pData)
         return std::nullopt;
     size_t rowBytes = (size_t)this->stagingWidth * 4;
-    size_t total = rowBytes * (size_t)this->stagingHeight;
-
-    av::VideoFrame frame((uint8_t*)map.pData, total, this->srcPixelFormat,
-        this->stagingWidth, this->stagingHeight);
+    const auto* src = static_cast<const uint8_t*>(map.pData);
+    auto* dst = frame.raw();
+    for (int y = 0; y < this->stagingHeight; ++y) {
+        std::memcpy(dst->data[0] + static_cast<size_t>(y) * dst->linesize[0],
+            src + static_cast<size_t>(y) * map.RowPitch, rowBytes);
+    }
 
     this->pVCD3D11Manager->pReadSideContext->Unmap(this->pStagingTex, 0);
 

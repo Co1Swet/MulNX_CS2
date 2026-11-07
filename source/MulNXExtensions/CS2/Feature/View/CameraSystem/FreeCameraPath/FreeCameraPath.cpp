@@ -1,5 +1,5 @@
 #include "FreeCameraPath.hpp"
-#include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
+#include <CameraSystem/CamDrawer/CamDrawer.hpp>
 #include <fstream>
 
 std::string FreeCameraPath::GetBaseInfo()const {
@@ -21,8 +21,8 @@ void FreeCameraPath::ResetName(const std::string& NewName) {
 }
 
 FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)const {
-    if (IO->ElementTime < this->startTime)return FreeCameraPath::CalResult::Before;
-    if (IO->ElementTime > this->endTime)return FreeCameraPath::CalResult::Back;
+    if (IO->time < this->startTime)return FreeCameraPath::CalResult::Before;
+    if (IO->time > this->endTime)return FreeCameraPath::CalResult::Back;
 
     // 如果不在理论影响范围内，应当直接返回而不做任何修改
     // 是与被遍历的其它call一起工作
@@ -30,11 +30,9 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     // 处理空关键帧的情况
     if (this->CameraKeyframes.empty())return FreeCameraPath::CalResult::NoFrame;
 
-    float Time = IO->ElementTime;
-
     // 查找当前时间所在的关键帧区间（使用绝对时间来搜索以匹配以绝对时间存储的关键帧）
-    auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), Time,
-        [](const MulNX::Math::CameraKeyframe& k, float t) {
+    auto it = std::lower_bound(this->CameraKeyframes.begin(), this->CameraKeyframes.end(), IO->time,
+        [](const MulNX::Math::CameraKeyframe& k, double t) {
             return k.time < t;
         });
 
@@ -52,10 +50,10 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     const auto& k3 = (index + 2 < this->CameraKeyframes.size()) ? this->CameraKeyframes[index + 2] : k2;
 
     // 计算当前片段的时间比例 (0~1)
-    float segmentDuration = k2.time - k1.time;
+    auto segmentDuration = k2.time - k1.time;
     if (segmentDuration <= 0.0f) return FreeCameraPath::CalResult::NoFrame; // 避免除以零或无效的段
 
-    float segmentTime = (Time - k1.time) / segmentDuration;
+    auto segmentTime = (IO->time - k1.time) / segmentDuration;
 
     // 位置和FOV插值 (Catmull-Rom)
     auto PositionAndFOV = DirectX::XMVectorCatmullRom(
@@ -66,8 +64,8 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
         segmentTime);
 
     // 写入数据
-    IO->Frame.view.position = { PositionAndFOV.m128_f32[0],PositionAndFOV.m128_f32[1],PositionAndFOV.m128_f32[2] };
-    IO->Frame.view.FOV = PositionAndFOV.m128_f32[3];
+    IO->view.position = { PositionAndFOV.m128_f32[0],PositionAndFOV.m128_f32[1],PositionAndFOV.m128_f32[2] };
+    IO->view.FOV = PositionAndFOV.m128_f32[3];
 
     // 景深插值
     auto Dof = DirectX::XMVectorCatmullRom(
@@ -78,10 +76,10 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
         segmentTime
     );
 
-    IO->Frame.view.dof.NearBlurry = Dof.m128_f32[0];
-    IO->Frame.view.dof.NearCrisp = Dof.m128_f32[1];
-    IO->Frame.view.dof.FarCrisp = Dof.m128_f32[2];
-    IO->Frame.view.dof.FarBlurry = Dof.m128_f32[3];
+    IO->view.dof.NearBlurry = Dof.m128_f32[0];
+    IO->view.dof.NearCrisp = Dof.m128_f32[1];
+    IO->view.dof.FarCrisp = Dof.m128_f32[2];
+    IO->view.dof.FarBlurry = Dof.m128_f32[3];
 
     // 旋转插值 (使用Squad提供高阶连续性)
 
@@ -98,12 +96,12 @@ FreeCameraPath::CalResult FreeCameraPath::CalculateFrame(CameraSystemIO* IO)cons
     auto RotationQuat = DirectX::XMQuaternionNormalize(rotation);
     DirectX::XMFLOAT4 quat;
     DirectX::XMStoreFloat4(&quat, RotationQuat);
-    MulNX::Math::CSQuatToEuler(quat, IO->Frame.view.rotation);
+    MulNX::Math::CSQuatToEuler(quat, IO->view.rotation);
 
     return FreeCameraPath::CalResult::In;
 }
 
-bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const {
+bool FreeCameraPath::Draw(CamDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const {
     if (!this->draw) {
         return false;
     }
@@ -145,37 +143,6 @@ bool FreeCameraPath::Draw(CameraDrawer* CamDrawer, const float* Matrix, const fl
         firstFrame = false;
     }
     return true;
-}
-
-std::pair<bool, std::string> FreeCameraPath::Save(const fs::path& folderPath) {
-    if (this->name.empty())return { false,"无法保存运镜轨道到磁盘，运镜名为空！" };
-    fs::path filePath = folderPath / (this->name + ".yaml");
-    try {
-        YAML::Node root;
-
-        root["name"] = this->name;
-        root["duration"] = this->durationTime;
-
-        auto [ok, msg] = this->SaveImpl(root);
-        if (!ok)return { false,std::move(msg) + " 文件路径：" + filePath.string() };
-
-        // 使用Emitter输出，默认块样式
-        YAML::Emitter out;
-        out << root;
-
-        // 保存到文件
-        std::ofstream fout(filePath.wstring());
-        if (!fout.is_open()) return { false, "无法打开文件进行写入！ 文件路径：" + filePath.string() };
-
-        fout << out.c_str();
-        fout.close();
-
-        this->dirty = false;
-        return { true,"成功保存" + filePath.string() };
-    }
-    catch (const std::exception& e) {
-        return { false, "保存YAML文件时发生错误：" + std::string(e.what()) + " 文件路径：" + filePath.string() };
-    }
 }
 
 void FreeCameraPath::AddKeyframe(const MulNX::Math::CameraKeyframe& keyframe) {
@@ -228,8 +195,16 @@ void FreeCameraPath::Clear() {
     this->Refresh();
     return;
 }
-std::pair<bool, std::string> FreeCameraPath::SaveImpl(YAML::Node& root) {
+
+std::expected<std::string, std::string> FreeCameraPath::Save(const fs::path& folderPath) {
+    if (this->name.empty())return std::unexpected("无法保存运镜轨道到磁盘，运镜名为空！");
+    fs::path filePath = folderPath / (this->name + ".yaml");
     try {
+        YAML::Node root;
+
+        root["name"] = this->name;
+        root["duration"] = this->durationTime;
+
         // 添加关键帧
         for (const auto& keyframe : this->CameraKeyframes) {
             // 创建关键帧节点
@@ -274,31 +249,31 @@ std::pair<bool, std::string> FreeCameraPath::SaveImpl(YAML::Node& root) {
             // 将关键帧节点挂载上去
             root["keyframes"].push_back(keyframeNode);
         }
-        return { true,{} };
+
+        // 保存到文件
+        YAML::SaveFilePath(filePath, root);
+
+        this->dirty = false;
+        return std::format("成功保存：{}", filePath.string());
     }
     catch (const std::exception& e) {
-        return { false, "保存YAML文件时发生错误：" + std::string(e.what()) };
-    }
+        return std::unexpected(std::format("保存YAML文件时发生错误：{}，文件路径：{}", e.what(), filePath.string()));
+    };
 }
 
-std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
+std::expected<std::string, std::string> FreeCameraPath::Load(YAML::Node& root) {
     try {
-        if (!root.IsMap()) return { false, "YAML文件根节点不是映射类型" };
-
+        if (!root.IsMap())return std::unexpected("YAML文件根节点不是映射类型");
         // 清空现有数据
         this->Clear();
-
         // 读取关键帧
-        if (!root["keyframes"] || !root["keyframes"].IsSequence()) return { false, "找不到keyframes序列！" };
+        if (!root["keyframes"] || !root["keyframes"].IsSequence())return std::unexpected("找不到keyframes序列！");
 
         for (const auto& keyframeNode : root["keyframes"]) {
-            if (!keyframeNode.IsMap()) continue;
-
+            if (!keyframeNode.IsMap())continue;
             MulNX::Math::CameraKeyframe keyframe;
-
             // 读取时间
             keyframe.time = keyframeNode["T"].as<float>();
-
             // 读取位置和FOV
             DirectX::XMFLOAT4 posFov;
             posFov.x = keyframeNode["P"][0].as<float>();
@@ -306,7 +281,6 @@ std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
             posFov.z = keyframeNode["P"][2].as<float>();
             posFov.w = keyframeNode["F"].as<float>();
             keyframe.PositionAndFOV = DirectX::XMLoadFloat4(&posFov);
-
             // 读取旋转（欧拉角）
             DirectX::XMFLOAT3 euler;
             euler.x = keyframeNode["R"][0].as<float>(); // Pitch
@@ -315,7 +289,6 @@ std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
             DirectX::XMFLOAT4 quat;
             MulNX::Math::CSEulerToQuat(euler, quat);
             keyframe.RotationQuat = DirectX::XMLoadFloat4(&quat);
-
             // 读取景深
             MulNX::Math::DOFParam dof;
             try {
@@ -328,25 +301,22 @@ std::pair<bool, std::string> FreeCameraPath::Load(YAML::Node& root) {
                 // 如果没有景深信息，使用默认值
                 dof = { 0, 0, 10000, 10000 };
             }
-
             keyframe.dof = DirectX::XMVectorSet(
                 dof.NearBlurry,
                 dof.NearCrisp,
                 dof.FarCrisp,
                 dof.FarBlurry
             );
-
             this->AddKeyframe(std::move(keyframe));
         }
         this->Refresh();
         this->dirty = false;
-
-        return { true, "成功从YAML文件加载自由摄像机轨道信息！ 自由摄像机轨道 名：" + this->name };
+        return std::format("成功从YAML文件加载自由摄像机轨道：{}", this->name);
     }
     catch (const YAML::Exception& e) {
-        return { false, "YAML解析错误：" + std::string(e.what()) };
+        return std::unexpected(std::format("YAML解析错误：{}", e.what()));
     }
     catch (const std::exception& e) {
-        return { false, "读取YAML文件时发生错误：" + std::string(e.what()) };
+        return std::unexpected(std::format("读取YAML文件时发生错误：{}", e.what()));
     }
 }

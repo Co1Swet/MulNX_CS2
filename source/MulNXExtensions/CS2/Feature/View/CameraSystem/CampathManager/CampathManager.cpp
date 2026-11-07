@@ -1,10 +1,9 @@
 #include "CampathManager.hpp"
 #include <Intro/HookView/HookView.hpp>
-#include <CameraSystem/CameraDrawer/CameraDrawer.hpp>
-#include <CameraSystem/CamPlayScheduler/CamPlayRequest.hpp>
+#include <CameraSystem/CamDrawer/CamDrawer.hpp>
 
 bool CampathManager::Init() {
-    this->CamDrawer = &this->FindModule<CameraSystem>("CameraSystem")->CamDrawer;
+    this->pCamDrawer = this->FindModule<CamDrawer>("CamDrawer");
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
@@ -148,11 +147,12 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         if (!pCampath)break;
         auto&& [previewOffset] = msg.Access<float>();
 
-        auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
-        rp->campathName = name;
-        rp->offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
-        rp->offsetTime += previewOffset;
-        rp->isActiveMode = false;
+        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode] = play.Access<double, int>();
+        rp->str1 = name;
+        offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
+        offsetTime += previewOffset;
+        isActiveMode = 0;
         this->PublishAsync(std::move(play));
         break;
     }
@@ -161,10 +161,11 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         std::shared_lock lock(this->smutex);
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
-        auto [play, rp] = MulNX::Message::Create<CamPlayRequest>("CamPlay/Request"_hash);
-        rp->campathName = name;
-        rp->offsetTime = 0;
-        rp->isActiveMode = true;
+        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode] = play.Access<double, int>();
+        rp->str1 = name;
+        offsetTime = 0;
+        isActiveMode = 1;
         this->PublishAsync(std::move(play));
         break;
     }
@@ -223,12 +224,12 @@ bool CampathManager::CampathSaveAll() {
         if (!pCampath->IsDirty()) {
             continue;
         }
-        auto [ok, msg] = pCampath->Save(dirCampaths);
-        if (ok) {
-            this->LogSucc(std::move(msg));
+        auto r = pCampath->Save(dirCampaths);
+        if (r.has_value()) {
+            this->LogSucc(std::move(r.value()));
         }
         else {
-            this->LogError(std::move(msg));
+            this->LogError(std::move(r.error()));
             return false;
         }
     }
@@ -261,13 +262,13 @@ bool CampathManager::CampathLoad(const fs::path& pathCampath) {
             this->LogError(std::format("尝试从磁盘文件加载运镜轨道失败，无法实例化：{}", newCampathName));
             return false;
         }
-        auto [ok, msg] = pCampath->Load(root);
-        if (!ok) {
-            this->LogError(std::move(msg));
+        auto r = pCampath->Load(root);
+        if (!r.has_value()) {
+            this->LogError(std::move(r.error()));
             this->campaths.erase(newCampathName);
             return false;
         }
-        this->LogSucc(std::move(msg));
+        this->LogSucc(std::move(r.value()));
         return true;
     }
     catch (const std::exception& e) {

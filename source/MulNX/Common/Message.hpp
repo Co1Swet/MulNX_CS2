@@ -9,8 +9,9 @@ namespace MulNX {
 
     class NetExt {
     public:
-        std::string str1;
-        std::string str2;
+        std::string str1{};
+        std::string str2{};
+        std::string str3{};
         int64_t timestamp_us = 0; // 微秒，Unix epoch
     };
 

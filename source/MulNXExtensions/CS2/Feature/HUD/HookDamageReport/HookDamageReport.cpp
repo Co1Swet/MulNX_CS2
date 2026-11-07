@@ -13,6 +13,7 @@ bool HookDamageReport::Init() {
         auto tPos_Check_m_nSendUpdate = this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Hud::DamageReport::Pos_Check_m_nSendUpdate).Data();
         this->hkPos_Check_m_nSendUpdate = MulNX::Hook::Create(tPos_Check_m_nSendUpdate, [this](MulNX::Hook* hk, RegContext* ctx) {
+            if (this->enable.load(std::memory_order_acquire) == false)return MulNX::Hook::Then::Continue;
             this->needUpdate = true;
             return MulNX::Hook::Then::Continue;
             }, true).value();
@@ -77,14 +78,17 @@ bool HookDamageReport::Init() {
         });
 
     this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
-        if (!this->needUpdate)return;
+        if (this->needUpdate == false)return;
         this->needUpdate = false;
-        if (this->enable == false)return;
         this->UpdateDamageReport(false);
         });
 
     this->SubscribeSync("Hook/MainLoop/TickJumpDetected", [this](auto&&...) {
-        if (this->enable == false)return;
+        this->UpdateDamageReport(true);
+        });
+
+    this->SubscribeSync("Demo/Record/PreRecord", [this](auto&&...) {
+        // 录制前清空伤害报告
         this->UpdateDamageReport(true);
         });
 

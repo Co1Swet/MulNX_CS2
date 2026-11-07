@@ -17,7 +17,7 @@ bool DemoJSONReader::Window() {
 
 bool DemoJSONReader::Init() {
     this->dirData = this->Path()->PathGetForShared("Data");
-    this->SubscribeAsync("Demo/JSON/Load");
+    this->SubscribeAsync("Demo/JSON/Read");
 
     this->UIRegisterCallback("UI.Demos", [this](auto&&...) {return this->Window();});
 
@@ -31,31 +31,49 @@ bool DemoJSONReader::Init() {
 
 void DemoJSONReader::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Demo/JSON/Load"_hash: {
-        auto* pNetExt = msg.asp.get<MulNX::NetExt>();
-        std::string filename = pNetExt->str1 + ".json";
-
-        std::unique_lock lock(this->smutex);
-        fs::path filePath = this->dirData / filename;
-        if (!fs::exists(filePath)) {
-            this->LogError("文件不存在: " + filePath.string());
-            break;
-        }
-        try {
-            this->ReadJSON(filePath);
-        }
-        catch (const std::exception& e) {
-            this->LogError("读取 JSON 文件时发生错误: " + filePath.string());
-        }
+    case "Demo/JSON/Read"_hash: {
+        this->OnJSONMsg(msg);
         break;
     }
     }
 }
 
-void DemoJSONReader::ReadJSON(const fs::path& filePath) {
+void DemoJSONReader::OnJSONMsg(MulNX::Message& msg) {
+    auto r = this->ParseDemoPath(msg);
+    if (!r) {
+        auto&& [key, demoName, errorMsg] = r.error();
+        this->PublishAsync(this->MakeDemoInfoErrorNotify(key, demoName));
+        this->LogError(std::format("解析 demo 路径请求处理失败: {}", errorMsg));
+        return;
+    }
+    auto&& [kDir, name, path] = *r;
+    std::string filename = name + ".json";
+
+    std::unique_lock lock(this->smutex);
+
+    fs::path filePath = this->dirData / filename;
+    if (!fs::exists(filePath)) {
+        this->LogError(std::format("文件不存在: {}", filePath.string()));
+        this->PublishAsync(this->MakeDemoInfoErrorNotify(kDir, name));
+        return;
+    }
+    try {
+        return this->ReadJSON(std::move(kDir), filePath);
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("读取 JSON 文件时发生错误: {}，错误：{}", filePath.string(), e.what()));  
+    }
+    catch (...) {
+        this->LogError(std::format("读取 JSON 文件时发生未知错误: {}", filePath.string()));
+    }
+    this->PublishAsync(this->MakeDemoInfoErrorNotify(kDir, name));
+}
+
+void DemoJSONReader::ReadJSON(std::string&& kDir, const fs::path& filePath) {
     auto json = nlohmann::json::parse(std::ifstream(filePath.wstring()));
     this->LogInfo("成功读取 JSON 文件: " + filePath.string());
     Demo::Info info{};
+    info.kDir = kDir;
     info.demoFileName = json["demoFileName"].get<std::string>();
     info.mapName = json["mapName"].get<std::string>();
     info.tickCount = json["tickCount"].get<int>();

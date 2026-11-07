@@ -22,12 +22,13 @@ add_library(MulNX
     Systems/I18nManager/I18nManager.cpp
     Systems/Logger/Logger.cpp
     Systems/ShortcutManager/ShortcutManager.cpp
+    Systems/VarReflSystem/VarReflSystem.cpp
+    Systems/WebSocketManager/WebSocketManager.cpp
 
     Systems/UISystem/UISystem.cpp
     Systems/UISystem/UINode/UINode.cpp
     Systems/UISystem/UICoordinator/UICoordinator.cpp
     Systems/UISystem/UICoordinator/UIPack/UIPack.cpp
-    Systems/VarReflSystem/VarReflSystem.cpp
 )
 target_link_libraries(MulNX PUBLIC
     MulNXThirdParty

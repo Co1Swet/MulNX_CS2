@@ -1,6 +1,6 @@
 #include "ImGuiBinder.hpp"
-#include <MulNXThirdParty/imgui_d11/imgui_impl_dx11.h>
-#include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
+#include <MulNXThirdParty/imgui/imgui_impl_dx11.h>
+#include <MulNXThirdParty/imgui/imgui_impl_win32.h>
 
 bool ImGuiBinder::Init() {
     this->pUISystem = this->FindModule<MulNX::UISystem>("UISystem");

@@ -4,7 +4,7 @@
 
 bool HookMainLoop::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
-        auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::Utils::Pos_Call_CInputService_ProcessCommands);
+        auto Pos_Call_CInputService_ProcessCommands = this->CS2->engine2.GetTextRegion().FindRegion(CS2::Signatures::Console::Pos_Call_CInputService_ProcessCommands);
         this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             if (!this->pGlobalVars->SystemReady.load(std::memory_order_relaxed))return MulNX::Hook::Then::Continue;
             this->PublishSync("Hook/CSMainLoop"_hash);
@@ -35,12 +35,12 @@ bool HookMainLoop::Init() {
         });
 
     this->SubscribeSync("Hook/RegisterConCommand", [this](MulNX::Message& msg) {
-        auto&& [pCmd] = msg.Access<CCmd*>();
+        auto&& [pCmd] = msg.Access<CS2::Console::ConCommand*>();
         std::string_view name = pCmd->m_pszName;
         if (name == "quit") {
-            this->hkQuit = MulNX::Hook::Create((uint8_t*)pCmd->m_pCommandCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
+            this->hkQuit = MulNX::Hook::Create((uint8_t*)pCmd->pConCmdCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
                 int result = MessageBoxW(NULL,
-                    L"要关闭游戏前，必须先卸载 MulNX。\n点击“确定”卸载 MulNX，之后可再次尝试关闭游戏。",
+                    L"要关闭游戏前，必须先关闭 MulNX。\n点击“确定”关闭 MulNX，之后可再次尝试关闭游戏。",
                     L"MulNX 警告",
                     MB_OKCANCEL | MB_ICONWARNING | MB_TOPMOST
                     );

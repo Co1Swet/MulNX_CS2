@@ -1,6 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
-
+#include <Intro/Intros.hpp>
 namespace Demo {
     struct RecordTask {
         enum class Type :int {
@@ -9,14 +8,14 @@ namespace Demo {
             Death,
             Campath
         };
-        // demo文件所在的key，后面也许可以和路径系统联动，暂且为空吧
+        // demo文件所在的key
         std::string kPath{};
         // demo文件的裸名称
         std::string demoName{};
         // 任务描述
         std::string desc{};
         // 目标SteamUID
-        Steam64UID uid{};
+        Steam64UID uid = 0;
         // 录制类型，和优化有关
         Type type = Type::None;
         // 开始录制tick
@@ -34,6 +33,7 @@ namespace Demo {
     };
 
     struct RecordPass {
+        std::string kPath{};
         std::string demoFileName{};
         std::vector<RecordTask> rTasks{};
     };
@@ -84,6 +84,7 @@ namespace Demo {
     };
 
     struct Info {
+        std::string kDir{};
         std::string demoFileName{};
         std::string mapName{};
         int tickCount{};
@@ -104,16 +105,20 @@ namespace Demo {
 }
 
 class DemoSystem final :public CSModuleBase {
-    std::map<std::string, std::shared_ptr<Demo::Info>> demos;
-    std::atomic<std::shared_ptr<const std::string>>currentOperatingDemoName = nullptr;
-    std::atomic<std::shared_ptr<const std::string>>currentPlayingDemoName = nullptr;
+    std::map<std::string, // 先kDir，再demoName
+        std::map<std::string, std::shared_ptr<Demo::Info>>> demos;
+    
+    std::atomic<std::shared_ptr<std::pair<std::string, std::string>>>currentOperatingDemo = nullptr;
+    std::atomic<std::shared_ptr<std::pair<std::string, std::string>>>currentPlayingDemo = nullptr;
 
     void Window(MulNX::UICoordinator* uico);
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
+
+    void OnInfoLoad(MulNX::Message& msg);
 public:
-    std::shared_ptr<const std::string> GetCurrentOperatingDemoName()const;
-    std::shared_ptr<const std::string> GetCurrentPlayingDemoName()const;
-    std::shared_ptr<const Demo::Info> GetDemoInfo(const std::string& demoName)const;
+    std::shared_ptr<std::pair<std::string, std::string>> GetCurrentOperatingDemo()const;
+    std::shared_ptr<std::pair<std::string, std::string>> GetCurrentPlayingDemo()const;
+    std::shared_ptr<const Demo::Info> GetDemoInfo(const std::string& kDir, const std::string& demoName)const;
     std::shared_ptr<const Demo::Info> GetCurOpDemoInfo()const;
 };

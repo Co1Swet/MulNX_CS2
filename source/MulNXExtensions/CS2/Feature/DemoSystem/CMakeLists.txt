@@ -7,13 +7,14 @@ add_library(DemoSystem STATIC
     RecordTaskConfiger/RecordTaskConfiger.cpp
 
     DemoRecorder/DemoRecorder.cpp
-    DemoRecorder/RecordCoTaskImpl.cpp
+    DemoRecorder/TaskDoing.cpp
+    DemoRecorder/TaskPicking.cpp
 
-    DemRPassManager/DemRPassManager.cpp
-    DemRPassManager/DemMergePass/DemMergePass.cpp
-    DemRPassManager/DemClassifyPass/DemClassifyPass.cpp
-    DemRPassManager/DemSortPass/DemSortPass.cpp
-    
+    DemRecordPassManager/DemRecordPassManager.cpp
+    DemRecordPassManager/DemMergePass/DemMergePass.cpp
+    DemRecordPassManager/DemClassifyPass/DemClassifyPass.cpp
+    DemRecordPassManager/DemSortPass/DemSortPass.cpp
+
     DemUI/DemoEventsRender/DemoEventsRender.cpp
     DemUI/DemoPlayerInfoRender/DemoPlayerInfoRender.cpp
 
@@ -22,6 +23,8 @@ add_library(DemoSystem STATIC
 
     RecordMaking/RoundRecordMaker/RoundRecordMaker.cpp
     RecordMaking/DemoRecordMaker/DemoRecordMaker.cpp
+    RecordMaking/AutoRecordRule/AutoRecordRule.cpp
+    RecordMaking/PassRecordMaker/PassRecordMaker.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

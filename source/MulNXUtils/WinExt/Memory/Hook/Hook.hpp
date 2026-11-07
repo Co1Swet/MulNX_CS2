@@ -30,7 +30,7 @@ namespace MulNX {
         };
     private:
         bool attached = false;
-        std::function<Then(Hook*, RegContext*)> callback;
+        std::move_only_function<Then(Hook*, RegContext*)> callback;
         std::atomic<size_t> threadNumInAsm = 0;
 
         void* pAsmDispatcher = nullptr;
@@ -50,34 +50,28 @@ namespace MulNX {
             uintptr_t UserSettedTarget = 0;
         };
         JmpTarget jmpTarget{};
-
-
         size_t frameSize = 0;
-        uintptr_t pCallOrigin = 0;
 
         uintptr_t Dispatch(RegContext* ctx);
-        void CopyStack(size_t copySize, RegContext* ctx, uintptr_t pCurStack);
-
-
-        std::optional<std::string> BindTarget(uint8_t* target, int len);
-        std::optional<std::string> CreateAFix();
-        std::optional<std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
+        std::expected<void, std::string> BindTarget(uint8_t* target, int len);
+        std::expected<void, std::string> CreateAFix();
+        std::expected<void, std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
     public:
+        uintptr_t pMaybeRawFunc = 0;
+
         ~Hook();
 
-        uintptr_t GetHookTarget()const { return std::bit_cast<uintptr_t>(this->hookTarget); }
-
         static std::expected<std::unique_ptr<Hook>, std::string> Create(
-            uint8_t* target, std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback,
+            uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
             bool extraStackAdjust = false, bool callRawFisrt = false,
             uintptr_t userJmpTarget = 0, int len = 0);
 
         Result Attach();
         Result Detach();
 
-        void ResetCallback(std::function<MulNX::Hook::Then(Hook*, RegContext*)>&& callback);
-        uintptr_t pMaybeRawFunc = 0;
-        uint64_t CallMaybeOrigin(size_t copyStackParamNum, RegContext* ctx);
+        auto GetHookTarget()const { return this->hookTarget; }
+        void ResetCallback(std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback);
+
         void* GetRawStackAddr(RegContext* ctx);
         template<MulNX::PodSizeIn<0, 8> T>
         T* GetStackParam(RegContext* ctx, size_t num) {

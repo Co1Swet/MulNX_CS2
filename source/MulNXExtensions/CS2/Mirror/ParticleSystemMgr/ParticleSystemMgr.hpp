@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class ParticleSystemMgr final :public CSModuleBase {
     using CreateTrailHandle_t = int64_t(*)(void* sysMgr, int64_t* outHandle, void* nameString); // CUtlString*

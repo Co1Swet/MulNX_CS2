@@ -3,7 +3,9 @@
 using namespace MulNX::Memory;
 
 Asm::Code Asm::Assembler::Release() {
-    return std::move(this->Asm);
+    auto r = std::move(this->Asm);
+    this->Asm = {};
+    return r;
 }
 
 Asm::RegInfo Asm::get_reg_info(Reg r) {

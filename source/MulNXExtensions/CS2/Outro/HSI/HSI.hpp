@@ -1,6 +1,6 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
-#include <MulNXExtensions/WebSocketManager/WebSocketMixin.hpp>
+#include <MulNX/Systems/WebSocketManager/WebSocketMixin.hpp>
+#include <Intro/Intros.hpp>
 
 namespace CS2 {
     class CGameEvent;

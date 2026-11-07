@@ -1,13 +1,13 @@
 add_library(MulNXThirdParty
-    imgui_d11/imgui.cpp
-    imgui_d11/imgui_draw.cpp
-    imgui_d11/imgui_tables.cpp
-    imgui_d11/imgui_widgets.cpp
-    imgui_d11/imgui_demo.cpp
-    imgui_d11/imgui_stdlib.cpp
+    imgui/imgui.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_tables.cpp
+    imgui/imgui_widgets.cpp
+    imgui/imgui_demo.cpp
+    imgui/imgui_stdlib.cpp
 
-    imgui_d11/imgui_impl_dx11.cpp
-    imgui_d11/imgui_impl_win32.cpp
+    imgui/imgui_impl_dx11.cpp
+    imgui/imgui_impl_win32.cpp
 
     pugixml/pugixml.cpp
 

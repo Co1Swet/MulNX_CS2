@@ -4,7 +4,7 @@
 #include <MulNXUtils/NewestBuffer.hpp>
 
 class CampathManager final : public CamSysModule {
-    CameraDrawer* CamDrawer = nullptr;
+    class CamDrawer* pCamDrawer = nullptr;
 
     std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> campaths;
     std::atomic<std::shared_ptr<FreeCameraPath>> pOperatingCampath = nullptr;

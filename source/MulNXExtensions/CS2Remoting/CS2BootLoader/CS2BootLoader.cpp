@@ -1,9 +1,9 @@
 #include "CS2BootLoader.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNX/Base/CharUtility/CharUtility.hpp>
+#include <MulNX/Base/yaml.hpp>
 #include <MulNXExtensions/CS2Remoting/CS2HelperController/CS2HelperController.hpp>
 #include <commdlg.h>
-#include <MulNXThirdParty/yaml.hpp>
 #include <fstream>
 #include <TlHelp32.h>
 
@@ -16,7 +16,7 @@ VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
     std::unique_lock lock(this->smutex);
 
     // 显示当前游戏路径
-    ImGui::Text(I18n("boot.game_path.show", gamePath.string()).c_str());
+    ImGui::TextUnformatted(I18n("boot.game_path.show", gamePath.string()).c_str());
 
     if (this->environmentChecked) {
         if (ImGui::Button(I18n("boot.launch").c_str())) {
@@ -65,7 +65,7 @@ bool CS2BootLoader::Init() {
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
 
     (*this)
-        .SubscribeAsync("CS2BootLoader/Launch")
+        .SubscribeAsync<void>("CS2BootLoader/Launch")
         .SubscribeAsync("CS2BootLoader/PathUpdate")
         .SubscribeAsync("CS2BootLoader/Save")
         ;
@@ -93,6 +93,7 @@ void CS2BootLoader::ProcessMsg(MulNX::Message& msg) {
     std::unique_lock lock(this->smutex);
     switch (msg.type) {
     case "CS2BootLoader/Launch"_hash: {
+        if (!this->CheckEnvironment())break;
         this->LaunchAndInject();
         break;
     }
@@ -170,7 +171,7 @@ bool CS2BootLoader::LaunchAndInject() {
     // 构建命令行参数
     std::wstring cmdLine = L"\"" + gamePath.wstring() + L"\"";
     cmdLine += L" -insecure ";// 强制insecure
-    cmdLine += std::wstring(this->launchOptions.begin(), this->launchOptions.end());
+    cmdLine += MulNX::CharUtility::U8ToW(this->launchOptions);
 
     // 以 CREATE_SUSPENDED 方式创建游戏进程
     STARTUPINFOW si{ sizeof(si) };
@@ -183,6 +184,10 @@ bool CS2BootLoader::LaunchAndInject() {
         nullptr, nullptr,
         &si, &pi
     );
+    auto cleanup = scope_exit([&]() {
+        if (pi.hThread)CloseHandle(pi.hThread);
+        if (pi.hProcess)CloseHandle(pi.hProcess);
+        });
     if (!ok) {
         this->LogError(std::format("创建CS2进程失败. Error: {}", GetLastError()));
         return false;
@@ -192,10 +197,6 @@ bool CS2BootLoader::LaunchAndInject() {
 
     // 恢复游戏主线程
     ResumeThread(pi.hThread);
-
-    // 清理句柄
-    CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
 
     this->LogInfo(std::format("CS2启动并注入成功: {}", gamePath.string()));
     return true;

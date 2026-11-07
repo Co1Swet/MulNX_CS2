@@ -1,24 +1,24 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
-#include <CameraSystem/CameraSystemIO/CameraSystemIO.hpp>
-#include <MulNXThirdParty/yaml.hpp>
+#include <MulNX/Base/yaml.hpp>
+#include <CameraSystem/CameraSystem.hpp>
 
-class CameraDrawer;
+class CamDrawer;
 
 class FreeCameraPath final {
     std::string name{};
     bool dirty = false;
     // 开始时间（绝对）
-    float startTime{};
+    double startTime{};
     // 结束时间（绝对）
-    float endTime{};
-    float durationTime{};
+    double endTime{};
+    double durationTime{};
 public:
     inline bool IsDirty()const { return this->dirty; }
 
-    inline float GetStartTime()const { return this->startTime; }
-    inline float GetEndTime()const { return this->endTime; }
-    inline float GetDurationTime()const { return this->durationTime; }
+    inline double GetStartTime()const { return this->startTime; }
+    inline double GetEndTime()const { return this->endTime; }
+    inline double GetDurationTime()const { return this->durationTime; }
 
     // 是否绘制（默认不绘制）
     std::atomic<bool> draw = false;
@@ -45,14 +45,12 @@ public:
     const MulNX::Math::CameraKeyframe& GetKeyFrame(const size_t& index)const;// 获取特定关键帧    
 
     // 磁盘IO
-    std::pair<bool, std::string> Save(const fs::path& folderPath);
-    std::pair<bool, std::string> SaveImpl(YAML::Node& root);
-    std::pair<bool, std::string> Load(YAML::Node& root);
+    std::expected<std::string, std::string> Save(const fs::path& folderPath);
+    std::expected<std::string, std::string> Load(YAML::Node& root);
 
     // 绘制
-    bool Draw(CameraDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
+    bool Draw(CamDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
 
-    
     // 获取名字
     const std::string& GetName()const;
     // 重设名字

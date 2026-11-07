@@ -1,5 +1,6 @@
 #include "ViewSmoother.hpp"
 #include <MulNX/Base/UI/UI.hpp>
+#include <cmath>
 
 void ViewBuffer::Push(MulNX::Math::View&& newView) {
     float factor = this->smooth_buffer.load();
@@ -54,6 +55,8 @@ void ViewBuffer::Push(MulNX::Math::View&& newView) {
 void ViewSmoother::Menu() {
     MulNX::UI::Checkbox("启用视角平滑", this->enable);
     MulNX::UI::SliderFloat("指数平滑系数（越低越平滑）", this->buffer.smooth_buffer, 0.0f, 1.0f);
+    MulNX::UI::SliderFloat("FOV指数平滑系数", this->fov_smooth_buffer, 0.0f, 1.0f);
+    ImGui::TextUnformatted("FOV系数：0 表示冻结历史FOV，1 表示直接跟随输入");
 }
 
 bool ViewSmoother::Init() {
@@ -63,7 +66,10 @@ bool ViewSmoother::Init() {
 }
 
 bool ViewSmoother::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
-    if (!this->enable.load(std::memory_order_acquire))return false;
+    if (!this->enable.load(std::memory_order_acquire)) {
+        this->fov_initialized = false;
+        return false;
+    }
 
     MulNX::Math::View view;
     view.position = *viewSetup->pViewOrigin();
@@ -74,6 +80,22 @@ bool ViewSmoother::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num
 
     *viewSetup->pViewOrigin() = out.position;
     *viewSetup->pViewAngles() = out.rotation;
+
+    const float target_fov = *viewSetup->pFov();
+    const float fov_factor = this->fov_smooth_buffer.load(std::memory_order_acquire);
+    // FOV 校验及更新独立于位置和旋转；无效时保留本次原始 FOV。
+    if (std::isfinite(target_fov) && target_fov > 0.0f && target_fov < 180.0f &&
+        std::isfinite(fov_factor) && fov_factor >= 0.0f && fov_factor <= 1.0f) {
+        if (!this->fov_initialized || fov_factor == 1.0f) {
+            this->smoothed_fov = target_fov;
+            this->fov_initialized = true;
+        }
+        else if (fov_factor > 0.0f) {
+            this->smoothed_fov += (target_fov - this->smoothed_fov) * fov_factor;
+        }
+
+        *viewSetup->pFov() = this->smoothed_fov;
+    }
 
     return true;
 }

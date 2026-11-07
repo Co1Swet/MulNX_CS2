@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class BombSpotController :public CSModuleBase {
     std::unique_ptr<MulNX::Hook> hkPos_Spot_WriteBombState = nullptr;

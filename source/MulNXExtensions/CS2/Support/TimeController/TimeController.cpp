@@ -57,7 +57,9 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
             const bool selected = (i == sSpeedIdx);
             if (ImGui::Selectable(std::format("{:.2f}x", kSpeeds[i]).c_str(), selected)) {
                 sSpeedIdx = i;
-                this->AsyncCommand(std::format("host_timescale {:.2f}", kSpeeds[i]));
+                auto cmd = std::format("host_timescale {:.6f}", kSpeeds[i]);
+                this->AsyncCommand("demo_timescale 1.000000");
+                this->AsyncCommand(std::move(cmd));
             }
             if (selected) {
                 ImGui::SetItemDefaultFocus();
@@ -68,7 +70,7 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
 }
 
 bool TimeController::Init() {
-    this->FindModule<TimeLiner>("TimeLiner")->pTimeAdapter1 = this;
+    this->pTimeline->pTimeAdapter1 = this;
     this->pCSDemoController = this->FindModule<CSDemoController>("CSDemoController");
 
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
@@ -82,23 +84,35 @@ bool TimeController::Init() {
     return true;
 }
 // 时间适配器接口实现
-float TimeController::GetMinTime() {
+double TimeController::GetMinTime() {
     return 0;
 }
-float TimeController::GetMaxTime() {
-    // 读取 CDemoPlayer 偏移 +0x200 处的总 tick（int32）
-    int totalTicks = *(int*)((uintptr_t)this->pDemoPlayer + 0x12C);
-    // 转换为秒
-    return totalTicks * (1.0f / 64.0f);
+double TimeController::GetMaxTime() {
+    return this->GetDemoLastTick() * (1.0f / 64.0f);
 }
-float TimeController::GetTime() {
-    auto tick = this->GetDemoTick();
-    return tick * (1.0f / 64.0f);
+int TimeController::GetDemoLastTick()const {
+    return MulNX::MRead((int*)((uintptr_t)this->pDemoPlayer + 0x12C));
 }
-bool TimeController::SetTime(float time) {
-    this->AsyncCommand(std::format("demo_gototick {}", static_cast<int>(time) * 64));
+double TimeController::GetTime() {
+    double tick = static_cast<double>(this->GetDemoTick());
+    auto csgv = this->CS2->CSGlobalVars;
+    if (csgv) try {
+        float sub = MulNX::MRead(&csgv->interpolation_amount);
+        if (sub < 0.0f || sub > 1.0f) {
+            sub = std::clamp(sub, 0.0f, 1.0f);
+            this->LogWarning("已自动限制sub");
+        }
+        tick += static_cast<double>(sub);
+    }
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
+    }
+    return tick / 64.0f;
+}
+bool TimeController::SetTime(double time) {
+    this->AsyncCommand(std::format("demo_gototick {}", static_cast<int>(time * 64.0f)));
     return true;
 }
-bool TimeController::JumpRealRel(float time) {
+bool TimeController::JumpRealRel(double time) {
     return this->SetTime(time + this->GetTime());
 }

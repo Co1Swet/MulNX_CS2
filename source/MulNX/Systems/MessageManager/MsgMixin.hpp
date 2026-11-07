@@ -86,10 +86,10 @@ namespace MulNX {
             return *this;
         }
 
-        void PublishSync(MulNX::Message& msg) {
+        void PublishSync(MulNX::Message& msg)const {
             this->pMsgManager->PublishSync(msg);
         }
-        void PublishSync(MulNX::MsgType msg) {
+        void PublishSync(MulNX::MsgType msg)const {
             auto m = MulNX::Message(msg);
             this->pMsgManager->PublishSync(m);
         }

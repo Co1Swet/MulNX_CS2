@@ -1,6 +1,6 @@
 #pragma once
-#include <MulNXThirdParty/yaml.hpp>
-#include <MulNXThirdParty/imgui_d11/imgui.h>
+#include <yaml-cpp/yaml.h>
+#include <MulNXThirdParty/imgui/imgui.h>
 #include <unordered_map>
 #include <string>
 

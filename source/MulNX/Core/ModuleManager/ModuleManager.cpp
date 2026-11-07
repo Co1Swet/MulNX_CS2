@@ -2,6 +2,9 @@
 #include <MulNX/Common/Message.hpp>
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Systems/Systems.hpp>
+
+#include <MulNX/Systems/WebSocketManager/WebSocketManager.hpp>
+
 #include <ranges>
 
 bool MulNX::Core::ModuleManager::Init() {
@@ -53,6 +56,7 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
         .CreateModule<MulNX::InputSystem>("InputSystem")// 输入系统模块
         .CreateModule<ShortcutManager>("ShortcutManager")// 快捷键管理器模块
         .CreateModule<MulNX::GlobalVars>("GlobalVars")// 全局变量模块
+        .CreateModule<WebSocketManager>("WebSocketManager")
         ;
 
     return *this;

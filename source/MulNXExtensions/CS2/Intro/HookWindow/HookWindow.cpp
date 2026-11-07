@@ -1,5 +1,5 @@
 #include "HookWindow.hpp"
-#include <MulNXThirdParty/imgui_d11/imgui_impl_win32.h>
+#include <MulNXThirdParty/imgui/imgui_impl_win32.h>
 #include <shellapi.h>
 
 bool HookWindow::Init() {
@@ -71,7 +71,7 @@ MulNX::Hook::Then HookWindow::HandleWndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
     }
     if (uMsg == WM_CLOSE) {
         int result = MessageBoxW(hWnd,
-            L"要关闭游戏前，必须先卸载 MulNX。\n点击“确定”卸载 MulNX，之后可再次尝试关闭游戏。",
+            L"要关闭游戏前，必须先关闭 MulNX。\n点击“确定”关闭 MulNX，之后可再次尝试关闭游戏。",
             L"MulNX 警告",
             MB_OKCANCEL | MB_ICONWARNING | MB_TOPMOST
         );

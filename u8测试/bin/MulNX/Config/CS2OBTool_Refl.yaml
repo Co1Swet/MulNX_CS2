@@ -1,6 +1,7 @@
 TrailsController.trailsEnable: false
+PlayProtect.forceDemoPauseAtEnd: true
 UISystem.rendEnable: false
-UISystem.ifDrawMid: false
+UISystem.ifDrawMid: true
 CamMacroManager.shortcutEnable: true
 HookSpotStyle.transSpecLabel: true
 ViewSmoother.enable: false
@@ -10,6 +11,7 @@ GlowController.disableGlow: true
 TeamIDRenderController.hideEnemyTeamID: true
 HookTeamCounter.hideEnemyHP: true
 HookSpotVisible.forceTeammateDraw: true
+RecordTaskConfiger.postRoundEndSeconds: 1
 HookSpotVisible.noAllVisible: true
 HookSpotStyle.hideNumLabel: true
 HookSpotStyle.repairEnenyStyle: true
@@ -17,10 +19,12 @@ HookSpotColor.TColorMulti: true
 HookSpotColor.CTColorMulti: true
 BombSpotController.forceBombRedWhenSpecCT: true
 HookTeamCounter.hideEnemyDefuseOrKit: true
+RecordTaskConfiger.preBekilledSeconds: 1.8
 HookTeamCounter.forceHideEquipmentInfo: false
 HookTeamCounter.noHideShowName: false
 CloudController.hideSun: false
 HookDamageReport.enable: true
+RecordTaskConfiger.mergeThresholdSeconds: 10
 FlashRenderController.rendFlashUpHUD: true
 FlashRenderController.rendFlashDownHUD: false
 HookHealthAmmoCenter.hideHudSpecplayerRoot: true
@@ -28,8 +32,12 @@ SpeakingController.listMode: false
 HookHealthAmmoCenter.show_Hud_HA__stroke: true
 CloudController.hideCloud: false
 SpeakingController.autoActiveTeamVoice: false
+PlayProtect.preventEndOfMatch: true
 SpeakingController.onlyCurOBingSameTeam: false
 SoundCircleFix.enable: true
+RecordTaskConfiger.preRecordSeconds: 3.5
+RecordTaskConfiger.postRecordSeconds: 3.5
+RecordTaskConfiger.postBekilledSeconds: 1.8
 MediaRunningState.nextStartUseAdvancedMode: false
 MediaParamManager.bitrate: 80000000
 MediaParamManager.targetFPS: 30

@@ -1,10 +1,7 @@
 #include "DemoEventsRender.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 
 bool DemoEventsRender::Init() {
-    this->FindModule<TimeLiner>("TimeLiner")->timeLineModules.push_back(this);
-
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
         return true;
@@ -13,15 +10,10 @@ bool DemoEventsRender::Init() {
     return true;
 }
 
-void DemoEventsRender::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
-    auto pPlaying = this->pDemSys->GetCurrentPlayingDemoName();
-    if (!pPlaying)return;
-    auto playingName = *pPlaying;
-    if (playingName.empty())return;
-
-    auto pInfo = this->pDemSys->GetDemoInfo(playingName);
-    if (!pInfo)return;
-    const auto& info = *pInfo;
+void DemoEventsRender::TimeRend(const TimeLiner* timeline, ImDrawList* dl) {
+    auto pCurOp = this->pDemSys->GetCurOpDemoInfo();
+    if (!pCurOp)return;
+    const auto& info = *pCurOp;
 
     auto oSteam64uid = this->CS2Entitys->TryGetObservingSteam64UID();
     if (!oSteam64uid)return;
@@ -36,8 +28,8 @@ void DemoEventsRender::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
         return;
 
     // 获取当前时间轴范围（用于过滤，但 Map 本身会裁剪）
-    float minTime = timeline->minTime;
-    float maxTime = timeline->maxTime;
+    float minTime = timeline->GetMinTime();
+    float maxTime = timeline->GetMaxTime();
     if (maxTime <= minTime)
         return;
 

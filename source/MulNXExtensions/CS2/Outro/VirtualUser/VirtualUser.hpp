@@ -1,5 +1,5 @@
 #pragma once
-#include <Intro/CSModuleBase.hpp>
+#include <Intro/Intros.hpp>
 
 class VirtualUser final :public CSModuleBase {
     std::atomic<bool> Enabled = true;

@@ -5,11 +5,15 @@
 class ITimeAdapter;
 
 class TimeLiner :public MulNX::Module<TimeLiner> {
-    float currentLeftX = 0.0f;
-    float currentRightX = 1.0f;
-    float currentBaseY = 0.0f;
+    std::atomic<double> curTime = 0;
+    std::atomic<double> minTime = 0;
+    std::atomic<double> maxTime = 0;
 
-    float m_clickRatio = 0.0f;
+    std::atomic<float> currentLeftX = 0.0f;
+    std::atomic<float> currentRightX = 1.0f;
+    std::atomic<float> currentBaseY = 0.0f;
+
+    std::atomic<float> m_clickRatio = 0.0f;
     void Menu();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
@@ -17,15 +21,14 @@ class TimeLiner :public MulNX::Module<TimeLiner> {
     void UpdatePos();
     ITimeAdapter* pActiveTimeAdapter = nullptr;
 public:
-    float minTime = 0;
-    float maxTime = 0;
-    float curTime = 0;
-
     ITimeAdapter* pTimeAdapter1 = nullptr;
     ITimeAdapter* pTimeAdapter2 = nullptr;
+    std::vector<class ITimeRend*> timeLineModules{};
 
-    std::vector<class ITimeRend*>timeLineModules{};
-    ImVec2 Map(float time, int layer)const;
+    ImVec2 Map(double time, int layer)const;
 
-    float GetTime();
+    double GetTime()const;
+    inline double GetMinTime()const { return this->minTime.load(std::memory_order_acquire); }
+    inline double GetMaxTime()const { return this->maxTime.load(std::memory_order_acquire); }
+    void SetTime(double time)const;
 };

@@ -3,7 +3,6 @@
 #include "DOF/DOF.hpp"
 #include "Translate/Translate.hpp"
 #include "Draw/Draw.hpp"
-#include <atomic>
 
 namespace MulNX {
     namespace Math {
@@ -28,19 +27,6 @@ namespace MulNX {
             DirectX::XMFLOAT3 up;
         };
 
-        // 帧，包含渲染一帧的所有预备前置条件
-        class Frame {
-        public:
-            // 目标空间状态，自由摄像机轨道完全使用，锁定摄像机轨道使用视角，不使用其它
-            View view{};
-            // 第一人称摄像机轨道和锁定摄像机轨道使用，均指代目标人物
-            uint8_t TargetPlayerIndexInMap = 0;
-
-            float GameSpeed{};
-
-            bool operator==(const Frame&)const = default;
-        };
-
         // 关键帧,是时间、空间状态、FOV、景深的组合
         class CameraKeyframe {
         public:
@@ -48,7 +34,7 @@ namespace MulNX {
             DirectX::XMVECTOR RotationQuat{};
             DirectX::XMVECTOR dof{};
 
-            float time{};
+            double time = 0.0f;
 
             DirectX::XMFLOAT3 GetPosition()const;
             DirectX::XMFLOAT4 GetRotationQuat()const;

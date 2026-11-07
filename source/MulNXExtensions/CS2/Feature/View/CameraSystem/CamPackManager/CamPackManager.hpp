@@ -1,8 +1,9 @@
 #pragma once
+#include <MulNX/Systems/WebSocketManager/WebSocketMixin.hpp>
 #include <CameraSystem/CameraSystem.hpp>
 #include <CameraSystem/CamPack/CamPack.hpp>
 
-class CamPackManager final :public CamSysModule {
+class CamPackManager final :public CamSysModule, public WebSocketMixin<CamPackManager> {
     std::unordered_map<std::string, std::shared_ptr<CamPack>> camPacks{};
 
     mutable std::atomic<bool> shortcutEnable = true;
