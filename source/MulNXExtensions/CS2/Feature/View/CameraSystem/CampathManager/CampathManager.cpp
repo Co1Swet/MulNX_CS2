@@ -224,12 +224,12 @@ bool CampathManager::CampathSaveAll() {
         if (!pCampath->IsDirty()) {
             continue;
         }
-        auto [ok, msg] = pCampath->Save(dirCampaths);
-        if (ok) {
-            this->LogSucc(std::move(msg));
+        auto r = pCampath->Save(dirCampaths);
+        if (r.has_value()) {
+            this->LogSucc(std::move(r.value()));
         }
         else {
-            this->LogError(std::move(msg));
+            this->LogError(std::move(r.error()));
             return false;
         }
     }
@@ -262,13 +262,13 @@ bool CampathManager::CampathLoad(const fs::path& pathCampath) {
             this->LogError(std::format("尝试从磁盘文件加载运镜轨道失败，无法实例化：{}", newCampathName));
             return false;
         }
-        auto [ok, msg] = pCampath->Load(root);
-        if (!ok) {
-            this->LogError(std::move(msg));
+        auto r = pCampath->Load(root);
+        if (!r.has_value()) {
+            this->LogError(std::move(r.error()));
             this->campaths.erase(newCampathName);
             return false;
         }
-        this->LogSucc(std::move(msg));
+        this->LogSucc(std::move(r.value()));
         return true;
     }
     catch (const std::exception& e) {

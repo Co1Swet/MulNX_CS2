@@ -45,9 +45,8 @@ public:
     const MulNX::Math::CameraKeyframe& GetKeyFrame(const size_t& index)const;// 获取特定关键帧    
 
     // 磁盘IO
-    std::pair<bool, std::string> Save(const fs::path& folderPath);
-    std::pair<bool, std::string> SaveImpl(YAML::Node& root);
-    std::pair<bool, std::string> Load(YAML::Node& root);
+    std::expected<std::string, std::string> Save(const fs::path& folderPath);
+    std::expected<std::string, std::string> Load(YAML::Node& root);
 
     // 绘制
     bool Draw(CamDrawer* CamDrawer, const float* Matrix, const float WinWidth, const float WinHeight)const;
