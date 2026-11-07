@@ -16,14 +16,20 @@ void MediaRecorder::Menu() {
     ImGui::Text("录制状态：");
     ImGui::SameLine();
     switch (this->pMediaState->recordState.load()) {
-    case RecordState::Free:
-        ImGui::Text("空闲");
+    case RecordState::Free: {
+        ImGui::Text("空闲中");
         break;
-    case RecordState::Recording:
-        ImGui::Text("录制编解码中");
+    }
+    case RecordState::Recording: {
+        ImGui::Text("录制中");
         ImGui::TextUnformatted(std::format("正在进行的录制是否是高级录制：{}",
             this->startAsAdvance.load(std::memory_order_acquire) ? "是" : "否").c_str());
         break;
+    }
+    case RecordState::Stoping: {
+        ImGui::Text("停止中");
+        break;
+    }
     }
     ImGui::TextUnformatted(std::format("捕获状态：{}",
         this->pMediaState->MediaSystemGlobalWorkFlag ? "正在捕获" : "无新捕获").c_str());
@@ -85,7 +91,7 @@ void MediaRecorder::ProcessMsg(MulNX::Message& msg) {
 
 bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string& fileName, bool advance) {
     if (this->pMediaState->recordState.load() != RecordState::Free) {
-        this->LogWarning("已在录制中");
+        this->LogWarning("音视频系统忙碌中，忽略录制请求！");
         return false;
     }
     const int fps = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
@@ -123,7 +129,7 @@ bool MediaRecorder::StartRecording(const std::string& dirPath, const std::string
     try {
         this->PublishSync("MediaSync/Reset"_hash);
     }
-    catch(const std::exception& e) {
+    catch (const std::exception& e) {
         this->LogError(std::format("Reset异常: {}", e.what()));
         return false;
     }
@@ -166,6 +172,8 @@ bool MediaRecorder::StopRecording() {
         this->LogWarning("未在录制中");
         return false;
     }
+    this->pMediaState->recordState.store(RecordState::Stoping);
+    
     this->LogInfo("准备停止录制");
     this->ReportCtxState();
 

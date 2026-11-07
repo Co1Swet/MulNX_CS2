@@ -17,5 +17,7 @@ class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<Advance
     bool Init()override;
     void SetRecordStart(const MulNX::AVStartInfo& sInfo);
     void HandleBeforeCopyBackbuffer(MulNX::Message& msg);
-    bool OnAdvanceRecord(MulNX::VFrameExInfo& info);
+
+    void OnNormalRecord(MulNX::VFrameExInfo& info);
+    void OnAdvanceRecord(MulNX::VFrameExInfo& info);
 };

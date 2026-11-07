@@ -23,7 +23,7 @@ bool MediaRunningState::IsBusy()const {
     if (this->MediaSystemGlobalWorkFlag.load(std::memory_order_acquire)) {
         return true;
     }
-    if (this->recordState.load(std::memory_order_acquire) == RecordState::Recording) {
+    if (this->recordState.load(std::memory_order_acquire) != RecordState::Free) {
         return true;
     }
     return false;

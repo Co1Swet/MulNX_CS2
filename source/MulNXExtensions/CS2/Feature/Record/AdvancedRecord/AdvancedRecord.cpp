@@ -66,7 +66,19 @@ void AdvancedRecord::SetRecordStart(const MulNX::AVStartInfo& sInfo) {
 
 void AdvancedRecord::HandleBeforeCopyBackbuffer(MulNX::Message& msg) {
     auto&& [info] = msg.Access<MulNX::VFrameExInfo>();
-    if (this->OnAdvanceRecord(info))return;
+    if (!this->pMediaState->MediaSystemGlobalWorkFlag) {
+        info.needDrop = true;
+        return;
+    }
+    if (this->startAsAdvanced.load(std::memory_order_acquire)) {
+        this->OnAdvanceRecord(info);
+    }
+    else {
+        this->OnNormalRecord(info);
+    }
+}
+
+void AdvancedRecord::OnNormalRecord(MulNX::VFrameExInfo& info) {
     // 基于时间槽的帧率上限：捕获落在当前时间槽的首帧，并量化 PTS 为槽边界
     const auto intervalUs = this->minIntervalUs.load(std::memory_order_acquire);
     int64_t quantizedPtsUs = -1; // -1 表示不量化，使用实际 now
@@ -93,8 +105,7 @@ void AdvancedRecord::HandleBeforeCopyBackbuffer(MulNX::Message& msg) {
     info.needDrop = false;
 }
 
-bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
-    if (!this->startAsAdvanced.load(std::memory_order_acquire)) return false;
+void AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
     while (this->pMediaState->encodingOverload) {
         std::this_thread::sleep_for(std::chrono::microseconds(10));
     }
@@ -112,6 +123,4 @@ bool AdvancedRecord::OnAdvanceRecord(MulNX::VFrameExInfo& info) {
 
     // 生成虚构的捕获时间：起始时间 + 帧序号 × 帧间隔
     info.captureTime = startTime + frameIdx * frameDuration;
-
-    return true;  // 已自行处理，跳过常规的时间槽限帧逻辑
 }

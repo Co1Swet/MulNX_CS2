@@ -22,7 +22,6 @@ bool BufferCopier::Init() {
 
 void BufferCopier::CopyTexture() {
     if (!this->shouldCopy.load()) return;
-    if (!this->pMediaState->MediaSystemGlobalWorkFlag)return;
 
     MulNX::Message msgBeforeCopyBackbuffer("MediaSync/BeforeCopyBackbuffer"_hash);
     auto&& [info] = msgBeforeCopyBackbuffer.Access<MulNX::VFrameExInfo>();

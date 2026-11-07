@@ -3,7 +3,8 @@
 
 enum class RecordState : int {
     Free,
-    Recording
+    Recording,
+    Stoping
 };
 
 class MediaRunningState final :public MulNX::Module<MediaRunningState> {
