@@ -37,7 +37,8 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
     this->client = CS2::Module::Client(L"client.dll");
     void* pClient = this->client.GetProcAddressT<void* (const char*, int*)>("CreateInterface")("Source2Client002", nullptr);
     this->hkSource2Client002_Init = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pClient)->GetVFuncPtr(3), [this](MulNX::Hook* hk, RegContext* ctx) {
-        hk->CallMaybeOrigin(0, ctx);
+        using Source2Client002_Init_t = uint64_t(*)(void* pThis);
+        ctx->rax = hk->CallMaybeAs<Source2Client002_Init_t>((void*)ctx->rcx);
         this->PublishSync("Hook/Source2Client002::Inited"_hash);
         this->hkSource2Client002_Init->Detach();
         return MulNX::Hook::Then::Return;
