@@ -13,21 +13,13 @@
 namespace MulNX {
     class Hook final {
     public:
-        enum class Result :uint8_t {
-            Attached,
-            AttachSuccess,
-            AttachError,
-
-            Detached,
-            DetachSuccess,
-            DetachError
+        enum class Result : uint8_t {
+            Attached, AttachSuccess, AttachError,
+            Detached, DetachSuccess, DetachError
         };
 
         enum class Then {
-            Continue,
-            SkipAllAndContinue,
-            JmpUserSettedTarget,
-            Return
+            Continue, SkipAllAndContinue, JmpUserSettedTarget, Return
         };
     private:
         bool attached = false;
@@ -52,15 +44,18 @@ namespace MulNX {
         JmpTarget jmpTarget{};
         size_t frameSize = 0;
 
+        // UNWIND 相关
         RUNTIME_FUNCTION* pUnwindTable = nullptr;
-        size_t prologueEnd = 0;
-        size_t jmpRaxOffset = 0;
-        bool unwindRegistered = false;
+        size_t subEndRVA = 0;   // sub rsp, frameSize 结束 RVA（UNWIND_CODE.CodeOffset & SizeOfProlog）
+        size_t prologueEnd = 0;   // SaveReg 结束后 RVA
+        size_t jmpRaxOffset = 0;   // jmp rax 起始 RVA
+        bool   unwindRegistered = false;
 
         uintptr_t Dispatch(RegContext* ctx);
         std::expected<void, std::string> BindTarget(uint8_t* target, int len);
         std::expected<MulNX::Memory::Asm::Code, std::string> CreateAFix(size_t RVA);
         std::expected<MulNX::Memory::Asm::Assembler, std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
+        std::expected<void, std::string> RegisterUnwindInfo();
     public:
         uintptr_t pMaybeRawFunc = 0;
 

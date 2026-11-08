@@ -1,4 +1,5 @@
 #include "Hook.hpp"
+#include "Unwind.hpp"
 #include <MulNX/Config/Config.hpp>
 #include <MulNX/Common/Misc.hpp>
 #include <Windows.h>
@@ -89,16 +90,57 @@ std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateSta
             return std::unexpected(r.error());
         }
     }
-    Asm
-        .sub(RSP, this->frameSize)
-        .SaveReg();
-
+    // 拆链，记录 sub rsp, frameSize 结束 RVA（用于 UNWIND_CODE.CodeOffset）
+    Asm.sub(RSP, this->frameSize);
+    this->subEndRVA = Asm.GetCurrentEndRVA();
+    Asm.SaveReg();
     this->prologueEnd = Asm.GetCurrentEndRVA();
-    if (this->prologueEnd > 255) {
-        return std::unexpected(std::format("prologue 过长({})，超过 UNWIND_CODE 的 255 偏移上限", this->prologueEnd));
+    // UNWIND_CODE.CodeOffset 是 UBYTE，必须 ≤ 255
+    if (this->subEndRVA > 255) {
+        return std::unexpected(std::format("sub rsp 结束位置({}) 超过 UNWIND_CODE 的 255 偏移上限", this->subEndRVA));
     }
-
     return Asm;
+}
+// 注册 UNWIND 信息
+// 覆盖范围：call Dispatch 所在帧，即 [0, jmpRaxOffset + 2)。
+// 只描述一条 sub rsp, frameSize（UWOP_ALLOC_LARGE, OpInfo=0, 2 slot）。
+std::expected<void, std::string> MulNX::Hook::RegisterUnwindInfo() {
+    const size_t funcEnd = this->jmpRaxOffset + 2;
+    const size_t codeEnd = this->dispatcherAsmCode.size();
+    const size_t tableOff = (codeEnd + 3) & ~size_t(3);   // 4 字节对齐
+
+    if (tableOff + kUnwindTableBytes > 4096) {
+        return std::unexpected("分发器区域不足以存放 unwind 信息");
+    }
+    auto basePtr = static_cast<uint8_t*>(this->pAsmDispatcher);
+    auto* rf = reinterpret_cast<PRUNTIME_FUNCTION>(basePtr + tableOff);
+    auto* ui = reinterpret_cast<MulNX_UNWIND_INFO*>(rf + 1);  // rf 已 4 对齐，+12 仍 4 对齐
+    // MulNX_UNWIND_INFO
+    // VersionFlags = (Flags << 3) | (Version & 0x7)，Version=1, Flags=0
+    ui->VersionFlags = static_cast<uint8_t>((MULNX_UNW_FLAG_NHANDLER << 3) | 1);
+    ui->SizeOfProlog = static_cast<uint8_t>(this->subEndRVA);
+    ui->CountOfCodes = 2;      // UWOP_ALLOC_LARGE(OpInfo=0) 占 2 个 slot
+    ui->FrameRegOff = 0;      // FrameRegister=0, FrameOffset=0
+    // slot 0: (CodeOffset=subEndRVA, UnwindOp=UWOP_ALLOC_LARGE, OpInfo=0)
+    ui->UnwindCode[0].s.CodeOffset = static_cast<uint8_t>(this->subEndRVA);
+    ui->UnwindCode[0].s.UnwindOpInfo =
+        static_cast<uint8_t>((0u << 4) | (MULNX_UWOP_ALLOC_LARGE & 0xF));
+    // slot 1: ExtraData = frameSize / 8（16 位 LE，OpInfo=0 语义）
+    ui->UnwindCode[1].FrameOffset =
+        static_cast<uint16_t>(this->frameSize / 8);
+    // RUNTIME_FUNCTION
+    const auto base = reinterpret_cast<uintptr_t>(basePtr);
+    rf->BeginAddress = 0;
+    rf->EndAddress = static_cast<DWORD>(funcEnd);
+    rf->UnwindInfoAddress = static_cast<DWORD>(
+        reinterpret_cast<uintptr_t>(ui) - base);
+
+    if (!RtlAddFunctionTable(rf, 1, static_cast<DWORD64>(base))) {
+        return std::unexpected("RtlAddFunctionTable 失败");
+    }
+    this->pUnwindTable = rf;
+    this->unwindRegistered = true;
+    return {};
 }
 
 std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
@@ -123,7 +165,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         .call(RAX);
 
     HookInstance->jmpRaxOffset = Asm.GetCurrentEndRVA();
-    Asm.jmp(RAX);
+    Asm.jmp(RAX);   // FF E0（2 字节），这个约定不要破坏，注意长度
 
     HookInstance->jmpTarget.Return = Asm.GetCurrentEndVA();
     Asm
@@ -159,9 +201,11 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         HookInstance->dispatcherAsmCode.data(),
         HookInstance->dispatcherAsmCode.size());
 
+    auto rRegister = HookInstance->RegisterUnwindInfo();
+    if (!rRegister)return std::unexpected(rRegister.error());
+
     Asm = { (uintptr_t)HookInstance->hookTarget };
     Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)target - 5);
-    //Asm.jmp64((uintptr_t)HookInstance->pAsmDispatcher);
     for (int i = 5;i < HookInstance->overrideSize;++i) {
         Asm.nop();
     }
