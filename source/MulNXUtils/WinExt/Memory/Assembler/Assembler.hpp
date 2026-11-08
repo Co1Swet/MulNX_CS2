@@ -84,7 +84,9 @@ namespace MulNX {
                 uintptr_t VA = 0;
                 Code Asm{};
                 std::vector<CodeInfo> info{};
+                void Begin();
                 void emit_byte(uint8_t byte);
+                Assembler& End();
             public:
                 Assembler(uintptr_t VA) :VA(VA) {
                     

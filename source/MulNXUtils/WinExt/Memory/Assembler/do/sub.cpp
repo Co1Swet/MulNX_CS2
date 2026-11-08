@@ -3,6 +3,7 @@
 using namespace MulNX::Memory;
 
 Asm::Assembler& Asm::Assembler::sub(Reg dst, Reg src) {
+    Begin();
     auto dst_info = get_reg_info(dst);
     auto src_info = get_reg_info(src);
 
@@ -16,10 +17,11 @@ Asm::Assembler& Asm::Assembler::sub(Reg dst, Reg src) {
     modrm |= (src_info.code & 7) << 3;
     modrm |= (dst_info.code & 7);
     emit_byte(modrm);
-    return *this;
+    return End();
 }
 
 Asm::Assembler& Asm::Assembler::sub(Reg dst, Mem src) {
+    Begin();
     // sub dst, [src] 对应 0x2B
     auto dst_info = get_reg_info(dst);
     auto base_info = get_reg_info(src.base);
@@ -58,10 +60,11 @@ Asm::Assembler& Asm::Assembler::sub(Reg dst, Mem src) {
             emit_byte((disp32 >> (i * 8)) & 0xFF);
         }
     }
-    return *this;
+    return End();
 }
 
 Asm::Assembler& Asm::Assembler::sub(Mem dst, Reg src) {
+    Begin();
     // sub [dst], src 对应 0x29
     auto src_info = get_reg_info(src);
     auto base_info = get_reg_info(dst.base);
@@ -100,10 +103,11 @@ Asm::Assembler& Asm::Assembler::sub(Mem dst, Reg src) {
             emit_byte((disp32 >> (i * 8)) & 0xFF);
         }
     }
-    return *this;
+    return End();
 }
 
 Asm::Assembler& Asm::Assembler::sub(Reg dst, int32_t imm) {
+    Begin();
     auto dst_info = get_reg_info(dst);
     bool use_imm8 = (imm >= -128 && imm <= 127);
 
@@ -126,10 +130,11 @@ Asm::Assembler& Asm::Assembler::sub(Reg dst, int32_t imm) {
             emit_byte((imm32 >> (i * 8)) & 0xFF);
         }
     }
-    return *this;
+    return End();
 }
 
 Asm::Assembler& Asm::Assembler::sub(Mem dst, int32_t imm) {
+    Begin();
     auto base_info = get_reg_info(dst.base);
     bool use_imm8 = (imm >= -128 && imm <= 127);
 
@@ -176,5 +181,5 @@ Asm::Assembler& Asm::Assembler::sub(Mem dst, int32_t imm) {
             emit_byte((imm32 >> (i * 8)) & 0xFF);
         }
     }
-    return *this;
+    return End();
 }

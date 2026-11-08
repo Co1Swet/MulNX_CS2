@@ -126,7 +126,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         .call(RAX);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-    HookInstance->jmpRaxOffset = HookInstance->dispatcherAsmCode.size();
+    //HookInstance->jmpRaxOffset = HookInstance->dispatcherAsmCode.size();
     Asm.jmp(RAX);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 

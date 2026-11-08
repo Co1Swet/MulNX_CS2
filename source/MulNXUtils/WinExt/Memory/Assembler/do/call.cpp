@@ -3,6 +3,7 @@
 using namespace MulNX::Memory;
 
 Asm::Assembler& Asm::Assembler::call(Reg r) {
+    Begin();
     auto reg_info = get_reg_info(r);
     if (reg_info.is_ext) {
         emit_byte(0x41); // REX.B=1 (处理 R8~R15)
@@ -11,9 +12,10 @@ Asm::Assembler& Asm::Assembler::call(Reg r) {
     // ModRM: mod=11 (寄存器直接), reg=010 (call), r/m=寄存器的低3位
     uint8_t modrm = (3 << 6) | (2 << 3) | (reg_info.code & 7);
     emit_byte(modrm);
-    return *this;
+    return End();
 }
 Asm::Assembler& Asm::Assembler::call(Mem m) {
+    Begin();
     auto reg_info = get_reg_info(m.base);
 
     // 如果基址是扩展寄存器（R8-R15），需要添加 REX 前缀（REX.B=1）
@@ -29,5 +31,5 @@ Asm::Assembler& Asm::Assembler::call(Mem m) {
     uint8_t modrm = (0 << 6) | (2 << 3) | (reg_info.code & 7);
     emit_byte(modrm);
 
-    return *this;
+    return End();
 }

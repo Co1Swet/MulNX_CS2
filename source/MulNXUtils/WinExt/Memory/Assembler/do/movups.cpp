@@ -4,6 +4,7 @@ using namespace MulNX::Memory;
 
 // movups [mem], xmm  ->  0F 11 /r
 Asm::Assembler& Asm::Assembler::movups(Mem m, Xmm src) {
+    Begin();
     // XMM 的硬件编码和 GPR 完全一致（0~15），直接复用 reg_infos
     auto src_info = reg_infos[static_cast<size_t>(src)];
     auto base_info = get_reg_info(m.base);
@@ -50,11 +51,12 @@ Asm::Assembler& Asm::Assembler::movups(Mem m, Xmm src) {
         }
     }
 
-    return *this;
+    return End();
 }
 
 // movups xmm, [mem]  ->  0F 10 /r
 Asm::Assembler& Asm::Assembler::movups(Xmm dst, Mem m) {
+    Begin();
     auto dst_info = reg_infos[static_cast<size_t>(dst)];
     auto base_info = get_reg_info(m.base);
 
@@ -95,5 +97,5 @@ Asm::Assembler& Asm::Assembler::movups(Xmm dst, Mem m) {
         }
     }
 
-    return *this;
+    return End();
 }

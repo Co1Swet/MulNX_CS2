@@ -37,6 +37,13 @@ int Asm::get_mod_and_disp(Reg base, int64_t disp, int& bytes) {
 void Asm::Assembler::emit_byte(uint8_t byte) {
     this->Asm.push_back(byte);
 }
+void Asm::Assembler::Begin() {
+    
+}
+Asm::Assembler& Asm::Assembler::End() {
+
+    return *this;
+}
 
 uintptr_t Asm::Assembler::GetCurrentEndVA()const {
     if (this->Asm.empty())return this->VA;
