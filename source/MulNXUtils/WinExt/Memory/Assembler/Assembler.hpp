@@ -73,10 +73,25 @@ namespace MulNX {
                 using std::vector<uint8_t>::vector;
             };
 
+            class CodeInfo {
+                uintptr_t startVA = 0;
+                size_t startRVA = 0;
+                uintptr_t endVA = 0;
+                size_t endRVA = 0;
+            };
+
             class Assembler {
+                uintptr_t VA = 0;
                 Code Asm{};
+                std::vector<CodeInfo> info{};
                 void emit_byte(uint8_t byte);
             public:
+                Assembler(uintptr_t VA) :VA(VA) {
+                    
+                }
+                uintptr_t GetCurrentEndVA()const;
+                size_t GetCurrentEndRVA()const;
+
                 // mov 指令
                 Assembler& mov(Reg R1, Reg R2);
                 Assembler& mov(Mem M1, Reg R2);

@@ -65,7 +65,7 @@ std::expected<void, std::string> MulNX::Hook::CreateAFix() {
     this->hookTargetFixedCode = result.value();
     return {};
 }
-std::expected<void, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool callRawFisrt) {
+std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool callRawFisrt) {
     auto* alloced = MulNX::Addr::TryAlloc((uintptr_t)this->hookTarget, 4096);
     if (!alloced)return std::unexpected("windows内存分配失败！无法找到空间");
     this->pAsmDispatcher = alloced;
@@ -76,7 +76,7 @@ std::expected<void, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust,
 
     using enum MulNX::Memory::Asm::Reg;
     using namespace MulNX::Memory::Asm;
-    Assembler Asm{};
+    Assembler Asm{ (uintptr_t)this->pAsmDispatcher };
 
     constexpr size_t ctxSize = (sizeof(RegContext) + 15) & ~15;
     this->frameSize = ctxSize;
@@ -101,7 +101,7 @@ std::expected<void, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust,
         return std::unexpected(std::format("prologue 过长({})，超过 UNWIND_CODE 的 255 偏移上限", this->prologueEnd));
     }
 
-    return {};
+    return Asm;
 }
 
 std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
@@ -112,11 +112,12 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
     HookInstance->callback = std::move(callback);
 
     if (auto r = HookInstance->BindTarget(target, len);!r)return std::unexpected(r.error());
-    if (auto r = HookInstance->CreateStart(extraStackAdjust, callRawFirst);!r)return std::unexpected(r.error());
+    auto r = HookInstance->CreateStart(extraStackAdjust, callRawFirst);
+    if (!r)return std::unexpected(r.error());
+    auto Asm = std::move(r.value());
 
     using enum MulNX::Memory::Asm::Reg;
     using namespace MulNX::Memory::Asm;
-    Assembler Asm{};
 
     Asm
         .mov(RCX, (uintptr_t)HookInstance.get())

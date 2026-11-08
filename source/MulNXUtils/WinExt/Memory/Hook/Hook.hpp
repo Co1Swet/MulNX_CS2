@@ -61,7 +61,7 @@ namespace MulNX {
         uintptr_t Dispatch(RegContext* ctx);
         std::expected<void, std::string> BindTarget(uint8_t* target, int len);
         std::expected<void, std::string> CreateAFix();
-        std::expected<void, std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
+        std::expected<MulNX::Memory::Asm::Assembler, std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
     public:
         uintptr_t pMaybeRawFunc = 0;
 
