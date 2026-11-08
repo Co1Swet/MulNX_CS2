@@ -4,7 +4,7 @@
 static CMulNXReShadeBridge MulNXReShadeBridge;
 
 void CreateInterface(const char* name, IMulNXReShadeBridge** ppInterface) {
-    if (std::string_view(CMulNXReShadeBridge::implName) != std::string_view(name))return;
+    if (std::string_view(MulNXReShadeBridge.GetImplName()) != std::string_view(name))return;
     *ppInterface = &MulNXReShadeBridge;
     return;
 }

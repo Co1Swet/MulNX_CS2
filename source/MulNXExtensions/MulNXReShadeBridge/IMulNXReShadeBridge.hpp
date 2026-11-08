@@ -1,5 +1,6 @@
 #pragma once
 #include <d3d11.h>
+#define MulNXReshadeBridgeVersion "MulNXReshadeBridge002"
 
 class IMulNXReShadeBridge {
 public:
@@ -12,7 +13,7 @@ public:
     virtual bool GetEffectsState()const = 0;
     virtual void SetEffectsState(bool state) = 0;
 
-    virtual bool RendEffect(ID3D11Resource* resource) = 0;
+    virtual bool RendEffect(ID3D11Resource* resource, ID3D11Resource* depthResource) = 0;
 };
 
 extern "C" __declspec(dllexport) void CreateInterface(const char* name, IMulNXReShadeBridge** ppInterface);

@@ -12,6 +12,10 @@ class CSReShadeController final :public CSModuleBase {
     };
     PanoramaRend RT_ePanoramaRend = PanoramaRend::Idle;
 
+    bool RT_bWaitForMainPassDSV = false;
+    ComPtr<ID3D11RenderTargetView> pSavedRTV = nullptr;
+    ComPtr<ID3D11DepthStencilView> pSavedDSV = nullptr;
+
     using OMSetRenderTargets_t = void(STDMETHODCALLTYPE*)(
         ID3D11DeviceContext* This,
         UINT NumViews,
@@ -23,6 +27,10 @@ class CSReShadeController final :public CSModuleBase {
     void Menu()const;
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
+
+    void InitInterface();
+
+    MulNX::Hook::Then OnOMSetRenderTargets(MulNX::Hook* hk, RegContext* ctx);
     void BeforeRendPanorama(ID3D11DeviceContext* pD3D11Ctx);
 
     class AT2RT_SetPending final :public CS2::IRenderThreadCallback {
@@ -38,6 +46,13 @@ class CSReShadeController final :public CSModuleBase {
     public:
         AT2RT_SetIdle(CSReShadeController* pThis) :pThis(pThis) {}
     };
+
+    class AT2RT_SetWaitDSV final :public CS2::IRenderThreadCallback {
+        CSReShadeController* pThis;
+        void OnCallback(void)override { pThis->RT_bWaitForMainPassDSV = true; }
+    public:
+        AT2RT_SetWaitDSV(CSReShadeController* pThis) :pThis(pThis) {}
+    };
 public:
     inline bool IsConnnect()const {
         return this->pMulNXReShadeBridge.load(std::memory_order_acquire) != nullptr;
@@ -45,4 +60,5 @@ public:
     
     AT2RT_SetPending AT2RT_setPending{ this };
     AT2RT_SetIdle AT2RT_setIdle{ this };
+    AT2RT_SetWaitDSV AT2RT_setWaitDSV{ this };
 };

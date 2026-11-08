@@ -24,33 +24,7 @@ bool RendCtrlCenter::Init() {
         this->pDrawCurrentPrimitives = this->pSceneSystem->pDrawCurrentPrimitives;
 
         this->hkDrawSceneData = MulNX::Hook::Create((uint8_t*)this->pDrawSceneData, [this](MulNX::Hook* hk, RegContext* ctx) {
-            auto* pDrawingData = (CS2::DrawingData*)ctx->rcx;
-            auto* pSceneData = (CS2::CBaseSceneData*)ctx->rdx;
-
-            bool hide = false;
-
-            auto OnExit = [&]()->MulNX::Hook::Then {
-                if (hide) {
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_blockDepth);
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_blockColor);
-                }
-                auto pRawFunc = (SceneSystem::DrawSceneData_t)hk->pMaybeRawFunc;
-                pRawFunc(pDrawingData, pSceneData);
-                this->pDrawCurrentPrimitives(pDrawingData);
-                if (hide) {
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_unblockDepth);
-                    pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_unblockColor);
-                }
-                return MulNX::Hook::Then::Return;
-                };
-
-            if (!pSceneData)return OnExit();
-            if (!pSceneData->material)return OnExit();
-            const char* matName = pSceneData->material->GetName();
-
-            hide = hide || this->pCloudController->NeedHide(matName);
-
-            return OnExit();
+            return this->OnDrawSceneData(hk, ctx);
             }).value();
         this->RegisterAttachHook(this->hkDrawSceneData, "DrawSceneData");
 
@@ -59,6 +33,24 @@ bool RendCtrlCenter::Init() {
             }).value();
         this->RegisterAttachHook(this->hkInitDrawingData, "InitDrawingData");
         this->pRawInitDrawingData = (SceneSystem::InitDrawingData_t)this->hkInitDrawingData->pMaybeRawFunc;
+
+        auto t1 = this->CS2->scenesystem.GetTextRegion().FindRegion(
+            CS2::Signatures::Render::Pos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear)
+            .Data();
+        this->hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear = MulNX::Hook::Create(t1, [this](MulNX::Hook* hk, RegContext* ctx) {
+            return this->OnCreateRenderContextPtr1_With_Fmt_LayerClear(hk, ctx);
+            }, true).value();
+        this->RegisterAttachHook(this->hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear,
+            "hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear");
+
+        auto t2 = this->CS2->scenesystem.GetTextRegion().FindRegion(
+            CS2::Signatures::Render::Pos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers)
+            .Data();
+        this->hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers = MulNX::Hook::Create(t2, [this](MulNX::Hook* hk, RegContext* ctx) {
+            return this->OnCreateRenderContextPtr2_With_UpdateBuffers(hk, ctx);
+            }, true).value();
+        this->RegisterAttachHook(this->hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers,
+            "hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers");
         });
 
     return true;
@@ -91,11 +83,56 @@ MulNX::Hook::Then RendCtrlCenter::OnInitDrawingData(MulNX::Hook* hk, RegContext*
     return MulNX::Hook::Then::Return;
 }
 
+MulNX::Hook::Then RendCtrlCenter::OnDrawSceneData(MulNX::Hook* hk, RegContext* ctx) {
+    auto* pDrawingData = (CS2::DrawingData*)ctx->rcx;
+    auto* pSceneData = (CS2::CBaseSceneData*)ctx->rdx;
+
+    bool hide = false;
+
+    auto OnExit = [&]()->MulNX::Hook::Then {
+        if (hide) {
+            pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_blockDepth);
+            pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_blockColor);
+        }
+        auto pRawFunc = (SceneSystem::DrawSceneData_t)hk->pMaybeRawFunc;
+        pRawFunc(pDrawingData, pSceneData);
+        this->pDrawCurrentPrimitives(pDrawingData);
+        if (hide) {
+            pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_unblockDepth);
+            pDrawingData->pSoftwareCommandList->QueueCallback(&this->pRendCtrlAPI->AT2RT_unblockColor);
+        }
+        return MulNX::Hook::Then::Return;
+        };
+    if (!pSceneData)return OnExit();
+    if (!pSceneData->material)return OnExit();
+    const char* matName = pSceneData->material->GetName();
+    hide = hide || this->pCloudController->NeedHide(matName);
+
+    return OnExit();
+}
+
 MulNX::Hook::Then RendCtrlCenter::OnCommit(MulNX::Hook* hk, RegContext* ctx) {
     auto& pList = *(CS2::SoftwareCommandList**)(&ctx->rcx);
     if (pList == this->pLastListBeforePanorama) {
         this->pLastListBeforePanorama = nullptr;
         pList->QueueCallback(&this->pCSReShadeController->AT2RT_setPending);
     }
+    return MulNX::Hook::Then::Continue;
+}
+
+MulNX::Hook::Then RendCtrlCenter::OnCreateRenderContextPtr1_With_Fmt_LayerClear(MulNX::Hook* hk, RegContext* ctx) {
+    auto pViewName = *hk->GetStackParam<char*>(ctx, 4);
+    auto pViewPass = *hk->GetStackParam<char*>(ctx, 5);
+    auto& pList = *(CS2::SoftwareCommandList**)(ctx->rax);
+
+    if (strcmp(pViewName, "Player 0") == 0 && strcmp(pViewPass, "Clear Color Depth Stencil") == 0) {
+        pList->QueueCallback(&this->pCSReShadeController->AT2RT_setWaitDSV);
+    }
+
+    return MulNX::Hook::Then::Continue;
+}
+
+MulNX::Hook::Then RendCtrlCenter::OnCreateRenderContextPtr2_With_UpdateBuffers(MulNX::Hook* hk, RegContext* ctx) {
+
     return MulNX::Hook::Then::Continue;
 }

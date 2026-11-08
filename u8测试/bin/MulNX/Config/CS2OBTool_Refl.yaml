@@ -1,7 +1,7 @@
 TrailsController.trailsEnable: false
 PlayProtect.forceDemoPauseAtEnd: true
 UISystem.rendEnable: false
-UISystem.ifDrawMid: true
+UISystem.ifDrawMid: false
 CamMacroManager.shortcutEnable: true
 HookSpotStyle.transSpecLabel: true
 ViewSmoother.enable: false
@@ -40,4 +40,4 @@ RecordTaskConfiger.postRecordSeconds: 3.5
 RecordTaskConfiger.postBekilledSeconds: 1.8
 MediaRunningState.nextStartUseAdvancedMode: true
 MediaParamManager.bitrate: 80000000
-MediaParamManager.targetFPS: 10
+MediaParamManager.targetFPS: 24

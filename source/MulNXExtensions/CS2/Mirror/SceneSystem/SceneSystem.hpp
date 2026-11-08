@@ -35,7 +35,7 @@ namespace CS2 {
 
     class CSceneView {
     public:
-        virtual const char* GetName();
+        virtual const char* GetName() = 0;
         char pad[0x100];
         // ...
     };
