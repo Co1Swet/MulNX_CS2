@@ -56,14 +56,13 @@ std::expected<void, std::string> MulNX::Hook::BindTarget(uint8_t* target, int le
     this->hookTargetRawCode = MulNX::Memory::Asm::Code(target, target + this->overrideSize);
     return {};
 }
-std::expected<void, std::string> MulNX::Hook::CreateAFix() {
+std::expected<MulNX::Memory::Asm::Code, std::string> MulNX::Hook::CreateAFix(size_t RVA) {
     auto result = MulNX::Addr::FixRelativeInstructions(this->hookTargetRawCode,
-        (uintptr_t)this->hookTarget, (uintptr_t)this->pAsmDispatcher + this->dispatcherAsmCode.size());
+        (uintptr_t)this->hookTarget, (uintptr_t)this->pAsmDispatcher + RVA);
     if (!result.has_value()) {
         return std::unexpected(result.error());
     }
-    this->hookTargetFixedCode = result.value();
-    return {};
+    return result.value();
 }
 std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool callRawFisrt) {
     auto* alloced = MulNX::Addr::TryAlloc((uintptr_t)this->hookTarget, 4096);
@@ -83,8 +82,8 @@ std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateSta
     if (!extraStackAdjust)this->frameSize += 8;
 
     if (callRawFisrt) {
-        if (auto r = this->CreateAFix()) {
-            this->dispatcherAsmCode.append_range(this->hookTargetFixedCode);
+        if (auto r = this->CreateAFix(Asm.GetCurrentEndRVA())) {
+            Asm.Inject(r.value());
         }
         else {
             return std::unexpected(r.error());
@@ -94,9 +93,7 @@ std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateSta
         .sub(RSP, this->frameSize)
         .SaveReg();
 
-    this->dispatcherAsmCode.append_range(std::move(Asm.Release()));
-
-    this->prologueEnd = this->dispatcherAsmCode.size();
+    this->prologueEnd = Asm.GetCurrentEndRVA();
     if (this->prologueEnd > 255) {
         return std::unexpected(std::format("prologue 过长({})，超过 UNWIND_CODE 的 255 偏移上限", this->prologueEnd));
     }
@@ -112,9 +109,9 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
     HookInstance->callback = std::move(callback);
 
     if (auto r = HookInstance->BindTarget(target, len);!r)return std::unexpected(r.error());
-    auto r = HookInstance->CreateStart(extraStackAdjust, callRawFirst);
-    if (!r)return std::unexpected(r.error());
-    auto Asm = std::move(r.value());
+    auto rAsm = HookInstance->CreateStart(extraStackAdjust, callRawFirst);
+    if (!rAsm)return std::unexpected(rAsm.error());
+    auto Asm = std::move(rAsm.value());
 
     using enum MulNX::Memory::Asm::Reg;
     using namespace MulNX::Memory::Asm;
@@ -124,42 +121,34 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         .mov(RDX, RSP)
         .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::Dispatch))
         .call(RAX);
-    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-    //HookInstance->jmpRaxOffset = HookInstance->dispatcherAsmCode.size();
+    HookInstance->jmpRaxOffset = Asm.GetCurrentEndRVA();
     Asm.jmp(RAX);
-    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-    HookInstance->jmpTarget.Return = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    HookInstance->jmpTarget.Return = Asm.GetCurrentEndVA();
     Asm
         .LoadReg()
         .add(RSP, HookInstance->frameSize)
         .ret();
 
-    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
-
-    HookInstance->jmpTarget.Continue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    HookInstance->jmpTarget.Continue = Asm.GetCurrentEndVA();
     Asm
         .LoadReg()
         .add(RSP, HookInstance->frameSize);
 
-    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
-
-    HookInstance->pMaybeRawFunc = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
-
-    if (auto r = HookInstance->CreateAFix();!r)return std::unexpected(r.error());
-    HookInstance->dispatcherAsmCode.append_range(HookInstance->hookTargetFixedCode);
+    HookInstance->pMaybeRawFunc = Asm.GetCurrentEndVA();
+    auto rFix = HookInstance->CreateAFix(Asm.GetCurrentEndRVA());
+    if (!rFix)return std::unexpected(rFix.error());
+    Asm.Inject(rFix.value());
     Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
-    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-    HookInstance->jmpTarget.SkipAllAndContinue = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    HookInstance->jmpTarget.SkipAllAndContinue = Asm.GetCurrentEndVA();
     Asm
         .LoadReg()
         .add(RSP, HookInstance->frameSize)
         .jmp64((uintptr_t)target + HookInstance->overrideSize);
-    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
-    HookInstance->jmpTarget.UserSettedTarget = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
+    HookInstance->jmpTarget.UserSettedTarget = Asm.GetCurrentEndVA();
     Asm
         .LoadReg()
         .add(RSP, HookInstance->frameSize)
@@ -170,6 +159,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         HookInstance->dispatcherAsmCode.data(),
         HookInstance->dispatcherAsmCode.size());
 
+    Asm = { (uintptr_t)HookInstance->hookTarget };
     Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)target - 5);
     //Asm.jmp64((uintptr_t)HookInstance->pAsmDispatcher);
     for (int i = 5;i < HookInstance->overrideSize;++i) {

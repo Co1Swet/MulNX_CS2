@@ -38,20 +38,28 @@ void Asm::Assembler::emit_byte(uint8_t byte) {
     this->Asm.push_back(byte);
 }
 void Asm::Assembler::Begin() {
-    
+    this->beginSize = this->Asm.size();
 }
 Asm::Assembler& Asm::Assembler::End() {
-
+    CodeInfo ci{};
+    ci.startRVA = this->beginSize;
+    ci.endRVA = this->Asm.size();
+    ci.startVA = this->VA + ci.startRVA;
+    ci.endVA = this->VA + ci.endRVA;
+    this->infos.push_back(ci);
     return *this;
 }
-
-uintptr_t Asm::Assembler::GetCurrentEndVA()const {
-    if (this->Asm.empty())return this->VA;
-
-    return 0;
+Asm::Assembler& Asm::Assembler::Inject(const Code& code) {
+    Begin();
+    for (auto& byte : code) {
+        this->emit_byte(byte);
+    }
+    return End();
 }
-size_t Asm::Assembler::GetCurrentEndRVA()const {
-    if (this->Asm.empty())return 0;
 
-    return 0;
+uintptr_t Asm::Assembler::GetCurrentEndVA() const {
+    return this->VA + this->Asm.size();
+}
+size_t Asm::Assembler::GetCurrentEndRVA() const {
+    return this->Asm.size();
 }

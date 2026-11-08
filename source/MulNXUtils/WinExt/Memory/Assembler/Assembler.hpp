@@ -74,6 +74,7 @@ namespace MulNX {
             };
 
             class CodeInfo {
+            public:
                 uintptr_t startVA = 0;
                 size_t startRVA = 0;
                 uintptr_t endVA = 0;
@@ -83,7 +84,8 @@ namespace MulNX {
             class Assembler {
                 uintptr_t VA = 0;
                 Code Asm{};
-                std::vector<CodeInfo> info{};
+                std::vector<CodeInfo> infos{};
+                size_t beginSize = 0;
                 void Begin();
                 void emit_byte(uint8_t byte);
                 Assembler& End();
@@ -138,6 +140,7 @@ namespace MulNX {
                 Assembler& SaveReg();
                 Assembler& LoadReg();
 
+                Assembler& Inject(const Code& code);
                 Code Release();
             };
         }

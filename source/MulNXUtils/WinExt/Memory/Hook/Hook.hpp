@@ -41,7 +41,6 @@ namespace MulNX {
         uint8_t* hookTarget = nullptr;
         size_t overrideSize = 0;
         MulNX::Memory::Asm::Code hookTargetRawCode{};
-        MulNX::Memory::Asm::Code hookTargetFixedCode{};
         MulNX::Memory::Asm::Code jumperAsmCode{};
 
         struct JmpTarget {
@@ -60,7 +59,7 @@ namespace MulNX {
 
         uintptr_t Dispatch(RegContext* ctx);
         std::expected<void, std::string> BindTarget(uint8_t* target, int len);
-        std::expected<void, std::string> CreateAFix();
+        std::expected<MulNX::Memory::Asm::Code, std::string> CreateAFix(size_t RVA);
         std::expected<MulNX::Memory::Asm::Assembler, std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
     public:
         uintptr_t pMaybeRawFunc = 0;
