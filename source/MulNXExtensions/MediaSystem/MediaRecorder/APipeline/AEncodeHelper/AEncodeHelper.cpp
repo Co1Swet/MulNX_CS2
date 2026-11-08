@@ -3,7 +3,6 @@
 
 bool AEncodeHelper::Init() {
     this->pAudioCapturer = this->FindModule<AudioCapturer>("AudioCapturer");
-    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) { this->Reset(); });
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
         try {
@@ -22,6 +21,20 @@ bool AEncodeHelper::Init() {
 }
 
 void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
+    av::AudioSamples temp;
+    while (this->bufferAudioSampleses.try_dequeue(temp)) {}
+    this->audioFifo.clear();
+    this->flushPackets.clear();
+    if (this->aencoder.isValid() && this->aencoder.isOpened()) this->aencoder.close();
+    this->aencoder = {};
+    this->astream = av::Stream();
+    this->aresampler = {};
+    this->frameSize = 0;
+    this->lastStreamDuration = 0.0;
+    // 重置槽位计数器
+    this->slotInitialized = false;
+    this->slotCounter = 0;
+
     if (info.startAsAdvancedMode) {
         this->LogInfo("高级录制模式，不打开音频捕获");
         return;
@@ -72,10 +85,6 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     av::CodecParameters cp;
     cp.copyFrom(this->aencoder);
     this->astream.setCodecParameters(cp);
-
-    // 重置槽位计数器
-    this->slotCounter = 0;
-    this->slotInitialized = false;
 
     this->LogInfo(std::format("音频开启=m{}", (this->aencoder.isOpened() ? "是" : "否")));
 }
@@ -344,19 +353,4 @@ std::optional<av::Packet> AEncodeHelper::TrySetOff() {
         return pkt;
     }
     return std::nullopt;
-}
-
-void AEncodeHelper::Reset() {
-    av::AudioSamples temp;
-    while (this->bufferAudioSampleses.try_dequeue(temp)) {}
-    this->audioFifo.clear();
-    this->flushPackets.clear();
-    if (this->aencoder.isValid() && this->aencoder.isOpened()) this->aencoder.close();
-    this->aencoder = {};
-    this->astream = av::Stream();
-    this->aresampler = {};
-    this->frameSize = 0;
-    this->lastStreamDuration = 0.0;
-    this->slotInitialized = false;
-    this->slotCounter = 0;
 }

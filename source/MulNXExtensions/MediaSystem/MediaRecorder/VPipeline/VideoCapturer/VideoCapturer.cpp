@@ -14,13 +14,9 @@ bool VideoCapturer::Init() {
         return true;
         });
 
-    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
-        this->Reset();
-        });
-
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
-        auto&& [info] = msg.Access<MulNX::AVStartInfo>();
-        this->StartCapture(info.startTime);
+        auto&& [info] = msg.Access<MulNX::AVStartInfo>();        
+        this->SetOn(info.startTime);
         });
 
     this->SubscribeSync("MediaSync/SetOff", [this](auto&&...) {
@@ -30,13 +26,9 @@ bool VideoCapturer::Init() {
     return true;
 }
 
-void VideoCapturer::Reset() {
+void VideoCapturer::SetOn(const std::chrono::steady_clock::time_point& startTime) {
     std::unique_lock lock(this->smutex);
     this->recordStartTime.store({});
-}
-
-void VideoCapturer::StartCapture(const std::chrono::steady_clock::time_point& startTime) {
-    std::unique_lock lock(this->smutex);
     this->recordStartTime = startTime;
 }
 

@@ -13,10 +13,6 @@ bool VEncodeController::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
     this->pMediaRecorder = this->FindModule<MediaRecorder>("MediaRecorder");
 
-    this->SubscribeSync("MediaSync/Reset", [this](auto&&...) {
-        this->Reset();
-        });
-
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
         try {
@@ -103,6 +99,10 @@ bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& co
 }
 
 void VEncodeController::SetOn(av::FormatContext* oCtx) {
+    CtrlVideoFrame ctrlVFrame;
+    while (this->bufferVFrames.try_dequeue(ctrlVFrame)) {
+
+    }
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
     this->pMediaState->encodingOverload = false;
 
@@ -215,12 +215,4 @@ bool VEncodeController::OnEncode() {
         this->LogError(std::format("编码失败: {}", e.what()));
     }
     return true;
-}
-
-void VEncodeController::Reset() {
-    CtrlVideoFrame ctrlVFrame;
-    while (this->bufferVFrames.try_dequeue(ctrlVFrame)) {
-
-    }
-    this->pMediaState->encodingOverload = false;
 }

@@ -23,7 +23,6 @@ class VEncodeController final :public MediaModuleBase {
     void SetEncoderParams(av::VideoEncoderContext* encoder);
     bool OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec);
     void CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt);
-    void Reset();
     void SetOn(av::FormatContext* oCtx);
 
     bool OnEncode();

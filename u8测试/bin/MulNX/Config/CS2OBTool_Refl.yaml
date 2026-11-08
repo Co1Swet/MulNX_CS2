@@ -40,4 +40,4 @@ RecordTaskConfiger.postRecordSeconds: 3.5
 RecordTaskConfiger.postBekilledSeconds: 1.8
 MediaRunningState.nextStartUseAdvancedMode: true
 MediaParamManager.bitrate: 80000000
-MediaParamManager.targetFPS: 30
+MediaParamManager.targetFPS: 10

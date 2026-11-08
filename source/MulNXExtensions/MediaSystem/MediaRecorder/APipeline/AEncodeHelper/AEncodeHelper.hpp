@@ -19,7 +19,6 @@ class AEncodeHelper final : public MediaModuleBase {
     int64_t slotCounter = 0;
 
     bool Init() override;
-    void Reset();
     void SetOn(const MulNX::AVStartInfo& info);
     bool CheckResampler(av::AudioSamples& converted, av::AudioSamples&& asamples);
 

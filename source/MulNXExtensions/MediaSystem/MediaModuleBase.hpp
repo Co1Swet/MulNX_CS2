@@ -33,7 +33,6 @@ namespace MulNX {
 
     struct AVControl {                     // 必须 trivial
         enum class Kind : uint8_t {
-            Flush,
             Stop
         };
         Kind kind;
