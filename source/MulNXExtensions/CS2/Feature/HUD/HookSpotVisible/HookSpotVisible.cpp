@@ -24,7 +24,7 @@ bool HookSpotVisible::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }, true, false, (uintptr_t)(tPos_Spot_CmpToSetShow + 10)).value();
+            }, true, { .userJmpTarget = (uintptr_t)(tPos_Spot_CmpToSetShow + 10) }).value();
         this->RegisterAttachHook(this->hkPos_Spot_CmpToSetShow, "Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*");
         // 修改全局可见性
         auto tPos_SetAllVisible = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_SetAllVisible).Data();

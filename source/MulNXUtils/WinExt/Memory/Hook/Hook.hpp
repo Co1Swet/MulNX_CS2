@@ -1,5 +1,6 @@
 #pragma once
 #include <MulNX/Common/Type.hpp>
+#include <MulNX/Common/Exception.hpp>
 #include <MulNXUtils/WinExt/Memory/AddrTool/AddrTool.hpp>
 #include <MulNXUtils/WinExt/Memory/Assembler/Assembler.hpp>
 #include <Windows.h>
@@ -9,6 +10,7 @@
 #include <expected>
 #include <functional>
 #include <memory>
+#include <source_location>
 
 namespace MulNX {
     class Hook final {
@@ -61,10 +63,16 @@ namespace MulNX {
 
         ~Hook();
 
-        static std::expected<std::unique_ptr<Hook>, std::string> Create(
+        struct CreateOptions {
+            bool callRawFirst = false;
+            uintptr_t userJmpTarget = 0;
+            int len = 0;
+        };
+
+        static std::expected<std::unique_ptr<Hook>, MulNX::Exception> Create(
             uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
-            bool extraStackAdjust = false, bool callRawFisrt = false,
-            uintptr_t userJmpTarget = 0, int len = 0);
+            bool extraStackAdjust = false, CreateOptions opts = {},
+            std::source_location loc = std::source_location::current());
 
         Result Attach();
         Result Detach();

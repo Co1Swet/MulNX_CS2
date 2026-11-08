@@ -31,7 +31,7 @@ bool FlashRenderController::Init() {
                 ctx->rax = 0ULL;
             }
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, true, true).value();
+            }, true, { .callRawFirst = true }).value();
         this->RegisterAttachHook(this->hkDrawDown, "PosCallCmpDrawFlashDownHUD");
 
         this->r_spectator_flashbang_opacity = this->CS2Con->GetCVarByName("r_spectator_flashbang_opacity")->GetPtr<float>();

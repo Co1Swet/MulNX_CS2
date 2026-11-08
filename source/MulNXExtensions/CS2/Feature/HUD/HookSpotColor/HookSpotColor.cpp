@@ -24,7 +24,7 @@ bool HookSpotColor::Init() {
             if (this->TColorMulti.load(std::memory_order_acquire))
                 ctx->rax = 2;
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, true, true).value();
+            }, true, { .callRawFirst = true }).value();
         this->RegisterAttachHook(this->hkPos_CmpToSetTColor, "Pos_CmpToSetTColor");
 
         // 让CT显示五颜色
@@ -33,7 +33,7 @@ bool HookSpotColor::Init() {
             if (this->CTColorMulti.load(std::memory_order_acquire))
                 ctx->rax = 3;
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, true, true).value();
+            }, true, { .callRawFirst = true }).value();
         this->RegisterAttachHook(this->hkPos_CmpToSetCTColor, "Pos_CmpToSetCTColor");
         });
 

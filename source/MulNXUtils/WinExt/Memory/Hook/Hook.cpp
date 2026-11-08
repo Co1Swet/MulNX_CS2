@@ -143,16 +143,19 @@ std::expected<void, std::string> MulNX::Hook::RegisterUnwindInfo() {
     return {};
 }
 
-std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
-    bool extraStackAdjust, bool callRawFirst, uintptr_t userJmpTarget, int len) {
-    if (target == nullptr)MulNX::ErrorTerminate("不能为nullptr创建Hook！");
+std::expected<std::unique_ptr<MulNX::Hook>, MulNX::Exception> MulNX::Hook::Create(
+    uint8_t* target, std::move_only_function<MulNX::Hook::Then(Hook*, RegContext*)> callback,
+    bool extraStackAdjust, CreateOptions opts, std::source_location loc) {
+    
+    if (target == nullptr)return std::unexpected(MulNX::Exception{ "不能为nullptr创建Hook！", loc });
 
     auto HookInstance = std::make_unique<Hook>();
     HookInstance->callback = std::move(callback);
 
-    if (auto r = HookInstance->BindTarget(target, len);!r)return std::unexpected(r.error());
-    auto rAsm = HookInstance->CreateStart(extraStackAdjust, callRawFirst);
-    if (!rAsm)return std::unexpected(rAsm.error());
+    if (auto r = HookInstance->BindTarget(target, opts.len);!r)
+        return std::unexpected(MulNX::Exception{ r.error(), loc });
+    auto rAsm = HookInstance->CreateStart(extraStackAdjust, opts.callRawFirst);
+    if (!rAsm)return std::unexpected(MulNX::Exception{ rAsm.error(), loc });
     auto Asm = std::move(rAsm.value());
 
     using enum MulNX::Memory::Asm::Reg;
@@ -180,7 +183,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
 
     HookInstance->pMaybeRawFunc = Asm.GetCurrentEndVA();
     auto rFix = HookInstance->CreateAFix(Asm.GetCurrentEndRVA());
-    if (!rFix)return std::unexpected(rFix.error());
+    if (!rFix)return std::unexpected(MulNX::Exception{ rFix.error(), loc });
     Asm.Inject(rFix.value());
     Asm.jmp64((uintptr_t)target + HookInstance->overrideSize);
 
@@ -194,7 +197,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
     Asm
         .LoadReg()
         .add(RSP, HookInstance->frameSize)
-        .jmp64(userJmpTarget);
+        .jmp64(opts.userJmpTarget);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
     memcpy(HookInstance->pAsmDispatcher,
@@ -202,7 +205,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         HookInstance->dispatcherAsmCode.size());
 
     auto rRegister = HookInstance->RegisterUnwindInfo();
-    if (!rRegister)return std::unexpected(rRegister.error());
+    if (!rRegister)return std::unexpected(MulNX::Exception{ rRegister.error(), loc });
 
     Asm = { (uintptr_t)HookInstance->hookTarget };
     Asm.jmp((uintptr_t)HookInstance->pAsmDispatcher - (uintptr_t)target - 5);
