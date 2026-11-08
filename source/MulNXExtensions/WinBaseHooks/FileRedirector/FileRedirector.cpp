@@ -9,7 +9,7 @@ bool FileRedirector::Init() {
         CreateFileWControl fc(lpFileName);
 
         return this->OnCreateFileW(&fc, ctx);
-        }).value();
+        }) | value_or_throw;
 
     this->hkGetFileAttributesExW = MulNX::Hook::Create((uint8_t*)&GetFileAttributesExW, [this](MulNX::Hook* hk, RegContext* ctx) {
         LPCWSTR lpFileName = reinterpret_cast<LPCWSTR>(ctx->rcx);
@@ -24,7 +24,7 @@ bool FileRedirector::Init() {
             };
 
         return this->OnGetFileAttributesExW(&ac, ctx);
-        }).value();
+        }) | value_or_throw;
 
     this->hkCreateDirectoryW = MulNX::Hook::Create((uint8_t*)&CreateDirectoryW, [this](MulNX::Hook* hk, RegContext* ctx) {
         LPCWSTR lpPathName = reinterpret_cast<LPCWSTR>(ctx->rcx);
@@ -33,7 +33,7 @@ bool FileRedirector::Init() {
         CreateDirectoryWControl pdc(lpPathName);
 
         return this->OnCreateDirectoryW(&pdc, ctx);
-        }).value();
+        }) | value_or_throw;
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->RegisterAttachHook(this->hkCreateFileW, "CreateFileW");

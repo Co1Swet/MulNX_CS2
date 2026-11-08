@@ -29,7 +29,7 @@ bool HookGameEvents::Init() {
         //     auto event = std::bit_cast<CS2::CGameEvent*>(ctx->rdx);
         //     //this->PublishSync("Hook/CGameEventManager_FireEvent"_hash, event);
         //     return MulNX::Hook::Then::Continue;
-        //     }).value();
+        //     }) | value_or_throw;
         // this->hkCGameEventManager_FireEvent.Attach();
 
         auto Pos_CGameEventManager_FireEvents_AcquiredLock = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Utils::Pos_CGameEventManager_FireEvents_AcquiredLock).Data();
@@ -51,7 +51,7 @@ bool HookGameEvents::Init() {
             auto name = event->GetEventName();
 #endif
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_CGameEventManager_FireEvents_AcquiredLock, "Pos_CGameEventManager_FireEvents_AcquiredLock where r14 is *event");
         });
 

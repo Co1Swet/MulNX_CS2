@@ -19,7 +19,7 @@ bool MapManifest::Init() {
             if (!this->errorLoadings.contains(std::string(sv)))return MulNX::Hook::Then::Continue;
             ctx->r8 = std::bit_cast<uint64_t>(safeBuf.data());
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Manifest_AddFullPath, "Pos_Manifest_AddFullPath");
         });
 
@@ -34,7 +34,7 @@ bool MapManifest::Init() {
             std::unique_lock lock(this->smutex);
             this->errorLoadings.insert(std::string(path));
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Log_Failedloading, "Pos_Log_Failedloading");
         });
 

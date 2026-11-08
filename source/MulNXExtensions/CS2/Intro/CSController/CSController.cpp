@@ -43,7 +43,7 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
         this->hkSource2Client002_Init->Detach();
         return MulNX::Hook::Then::Return;
         }
-    ).value();
+    ) | value_or_throw;
     this->RegisterAttachHook(this->hkSource2Client002_Init, "Source2Client002::Init");
 
     this->SendTask("Main", "CSControl", [this]()->bool {
@@ -72,7 +72,7 @@ void CSController::OnEngine2Load(MulNX::Message& msg) {
         //     }
         // }
         return MulNX::Hook::Then::Return;
-        }).value();
+        }) | value_or_throw;
     this->RegisterAttachHook(this->hkSource2EngineToClient001_IsPlayingDemo, "Source2EngineToClient001::IsPlayingDemo");
 }
 void CSController::OnTier0Load(MulNX::Message& msg) {

@@ -21,6 +21,6 @@ void MapKeyValues::OnClientLoad(MulNX::Memory::Region& textRegion) {
         pKeyValues->SetString("levelname", pTargetName->c_str());
         this->LogInfo(std::format("KeyValues键map levelname值修改为：{}", pTargetName->c_str()));
         return MulNX::Hook::Then::Continue;
-        }, true).value();
+        }, true) | value_or_throw;
     this->RegisterAttachHook(this->hkPos_MapKVReaded, "Pos_MapKVReaded");
 }

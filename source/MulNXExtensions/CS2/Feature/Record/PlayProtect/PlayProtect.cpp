@@ -14,7 +14,7 @@ bool PlayProtect::Init() {
                 return MulNX::Hook::Then::Return;
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkCCSGO_EndOfMatch_Activate, "hkCCSGO_EndOfMatch_Activate");
         });
 
@@ -25,7 +25,7 @@ bool PlayProtect::Init() {
                 return MulNX::Hook::Then::SkipAllAndContinue;
             }
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_CDemoPlayer_InternalReadPacket_CheckFlag_DemoPauseAtEnd, "hkPos_CDemoPlayer_InternalReadPacket_CheckFlag_DemoPauseAtEnd");
         });
 

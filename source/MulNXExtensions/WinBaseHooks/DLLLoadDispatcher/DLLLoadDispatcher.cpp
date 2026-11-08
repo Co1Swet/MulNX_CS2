@@ -12,7 +12,7 @@ bool DLLLoadDispatcher::Init() {
         ctx->rax = (uint64_t)hk->CallMaybeAs<decltype(&LoadLibraryExW)>(lpLibFileName, hFile, dwFlags);
         this->PublishSync(msg);
         return MulNX::Hook::Then::Return;
-        }).value();
+        }) | value_or_throw;
     this->RegisterAttachHook(this->hkLoadLibraryExW, "LoadLibraryExW");
 
     auto pthFile = this->PathGet("Config") / "dllTargets.yaml";

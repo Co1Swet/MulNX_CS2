@@ -108,7 +108,7 @@ bool TrailsController::Init() {
                 return this->HandleOnCreate(pProjectile);
             hk->CallMaybeAs<DrawStuff_t>(pProjectile, flag);
             return this->HandleOnUpdate(pProjectile);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkFunc_BaseCSGrenadeProjectile_DrawStuff, "C_BaseCSGrenadeProjectile_DrawStuff");
 
         this->sv_grenade_trajectory_prac_pipreview = this->CS2Con->GetCVarByName("sv_grenade_trajectory_prac_pipreview")->GetPtr<bool>();

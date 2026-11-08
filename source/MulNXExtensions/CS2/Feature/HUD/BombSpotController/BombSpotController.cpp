@@ -22,7 +22,7 @@ bool BombSpotController::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Spot_WriteBombState, "Pos_Spot_WriteBombState where rdx is BombColor*");
 
         auto Pos_CallGetPawnMaybeSetAllHUD = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_CallGetPawnMaybeSetAllHUD).Data();
@@ -31,7 +31,7 @@ bool BombSpotController::Init() {
             auto pRet = (CS2::C_BaseEntity*)ctx->rax;
             if (pOBing)ctx->rax = (uint64_t)pOBing;
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_CallGetPawnMaybeSetAllHUD, "Pos_CallGetPawnMaybeSetAllHUD");
         });
         

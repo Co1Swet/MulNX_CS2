@@ -71,7 +71,7 @@ bool ViewModelController::Init() {
                 *pFov = this->myFov.load(std::memory_order_acquire);
 
             return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkGetViewModelInfo, "GetViewModelInfo");
 
         auto tGetIfHandLeftSide = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::ViewModel::Func_GetIfHandLeftSide).Data();
@@ -80,7 +80,7 @@ bool ViewModelController::Init() {
             if (this->enableHandSide.load(std::memory_order_acquire))
                 ctx->rax = this->isLeftHandSide.load(std::memory_order_acquire);
             return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkGetIfHandLeftSide, "GetIfHandLeftSide");
 
         });

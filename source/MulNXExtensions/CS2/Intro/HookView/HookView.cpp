@@ -30,7 +30,7 @@ bool HookView::Init() {
         this->hkPosCallIsPlayingDemo = MulNX::Hook::Create(target, [this](MulNX::Hook* Hook, RegContext* ctx) {
             this->HandleOverrideView((CS2::CViewSetup*)ctx->rbx);
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPosCallIsPlayingDemo, "Pos_ClientModeCSNormal_CallIsPlayingDemo");
 
         this->SendUIRoot(this->GetName(), [this](auto uico, auto&&...) {return this->Window(uico);});

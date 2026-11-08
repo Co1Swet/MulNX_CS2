@@ -9,7 +9,7 @@ bool HookDemo::Init() {
             this->hkPlaydemo = MulNX::Hook::Create((uint8_t*)pCmd->pConCmdCallback, [this](MulNX::Hook* hk, RegContext* ctx) {
                 return this->OnCmdPlayDemo(hk, ctx);
                 }
-            ).value();
+            ) | value_or_throw;
             this->RegisterAttachHook(this->hkPlaydemo, "PlayDemo");
         }
         if (name == "demo_gototick") {
@@ -22,7 +22,7 @@ bool HookDemo::Init() {
                     this->AsyncCommand("host_timescale 1.000000");
                 }
                 return MulNX::Hook::Then::Continue;
-                }).value();
+                }) | value_or_throw;
             this->RegisterAttachHook(this->hkDemeTimescale, "DemeTimescale");
         }
         });
@@ -61,7 +61,7 @@ void HookDemo::HookDemoGotoTick(CS2::Console::ConCommand* pCmd) {
         this->LogInfo(std::format("跳转到tick: {}", jumpTick));
         this->PublishAsync(std::move(msg));
         return MulNX::Hook::Then::Return;
-        }).value();
+        }) | value_or_throw;
     this->RegisterAttachHook(this->hkDemoGotoTick, "DemoGotoTick");
 }
 void HookDemo::BeforePlay(std::string_view rawArg) {

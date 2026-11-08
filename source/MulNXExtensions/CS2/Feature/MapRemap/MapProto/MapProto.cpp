@@ -51,7 +51,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
                 ref.Assign(pAddon->c_str(), pAddon->size());
                 }();
             return MulNX::Hook::Then::Continue;
-        }, true).value();
+        }, true) | value_or_throw;
     this->RegisterAttachHook(this->hkCDemoFileHeader_PraseString, "CDemoFileHeader_PraseString");
 
     // SpawnGroup 字符串公共出口：改 name（数据源 1/2）
@@ -78,7 +78,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             //     name.Assign("maps/prefabs/de_inferno_rain/3dskybox_mirage_legacy");
             // }
             return MulNX::Hook::Then::Continue;
-        }, true).value();
+        }, true) | value_or_throw;
     this->RegisterAttachHook(this->hkCNETMsg_SpawnGroup_Load_PraseString, "CNETMsg_SpawnGroup_Load_PraseString");
 
     // CSVCMsg_ClearAllStringTables 字符串写入点
@@ -98,7 +98,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             this->LogInfo(std::format("[CAT/mapname] {} → {}", sv, pName->c_str()));
             
             return MulNX::Hook::Then::Continue;
-        }, true).value();
+        }, true) | value_or_throw;
     this->RegisterAttachHook(this->hkCSVCMsg_ClearAllStringTables_PraseString, "CSVCMsg_ClearAllStringTables");
 
     // CSVCMsg_ServerInfo 字符串公共出口：改 map_name（rsi + 0x20）
@@ -119,7 +119,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             this->LogInfo(std::format("[SSI/map_name] {} → {}", sv, pName->c_str()));
             
             return MulNX::Hook::Then::Continue;
-        }, true).value();
+        }, true) | value_or_throw;
     this->RegisterAttachHook(this->hkCSVCMsg_ServerInfo_PraseString, "CSVCMsg_ServerInfo_PraseString");
 
     // CSVCMsg_GameSessionConfiguration 字符串公共出口：改 s1_mapname（field 11）
@@ -147,7 +147,7 @@ void MapProto::OnEngine2Load(MulNX::Memory::Region& textRegion) {
             ref.Assign(pName->c_str(), pName->size());
             this->LogInfo(std::format("[GSC/s1_mapname] {} → {}", sv, pName->c_str()));
             return MulNX::Hook::Then::Continue;
-        }, true).value();
+        }, true) | value_or_throw;
     this->RegisterAttachHook(this->hkCSVCMsg_GameSessionConfiguration_PraseString,
         "CSVCMsg_GameSessionConfiguration_PraseString");
 }

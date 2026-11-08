@@ -22,7 +22,7 @@ bool MapResource::Init() {
                 if (node != 0)return MulNX::Hook::Then::Continue;
                 ctx->rax = 0;
                 return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkFunc_RequestResourceByHash, "Func_RequestResourceByHash");
         });
 

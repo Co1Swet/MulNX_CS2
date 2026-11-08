@@ -6,7 +6,7 @@ bool ReShowSpeaker::Init() {
         this->hkPos_ifShowSpeaker = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->rax = 0;
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_ifShowSpeaker, "Pos_ifShowSpeaker");
 
         this->pFuncGetVoiceStatus = (GetVoiceStatus_t)this->CS2->client.GetTextRegion()

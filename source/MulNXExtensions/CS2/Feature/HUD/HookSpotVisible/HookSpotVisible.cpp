@@ -24,14 +24,14 @@ bool HookSpotVisible::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }, true, { .userJmpTarget = (uintptr_t)(tPos_Spot_CmpToSetShow + 10) }).value();
+            }, true, { .userJmpTarget = (uintptr_t)(tPos_Spot_CmpToSetShow + 10) }) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Spot_CmpToSetShow, "Pos_Spot_CmpToSetShow where r15 is C_CSPlayerPawn*");
         // 修改全局可见性
         auto tPos_SetAllVisible = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Pos_SetAllVisible).Data();
         this->hkPos_SetAllVisible = MulNX::Hook::Create(tPos_SetAllVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
             if (this->noAllVisible.load(std::memory_order_acquire))return MulNX::Hook::Then::SkipAllAndContinue;
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_SetAllVisible, "Pos_SetAllVisible");
         });
 

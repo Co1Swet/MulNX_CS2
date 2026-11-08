@@ -43,7 +43,7 @@ bool NameController::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, true, { .callRawFirst = true }).value();
+            }, true, { .callRawFirst = true }) | value_or_throw;
         this->RegisterAttachHook(this->hkGetDecoratedPlayerName,
             "PosInFunc_GetDecoratedPlayerName");
 
@@ -68,7 +68,7 @@ bool NameController::Init() {
             }
 
             return MulNX::Hook::Then::Return; // 已调用原始函数，不再重复执行
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkGetPlayerName, "GetPlayerName");
 
         this->SendTask("Update", "CSControl", [this]() {

@@ -8,7 +8,7 @@ bool AntiVoiceBan::Init() {
         this->hkProcessVoiceBan = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             ctx->r8 = 0;
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkProcessVoiceBan, "ProcessVoiceBan");
         });
 

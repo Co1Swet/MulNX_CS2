@@ -23,7 +23,7 @@ bool HookEntitySystem::Init() {
             this->PublishSync(msg);
             
             return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkAddEntity, "AddEntity");
 
         auto pRemoveEntity = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Entity::Func_RemoveEntity).Data();
@@ -33,7 +33,7 @@ bool HookEntitySystem::Init() {
             pEntity = (CS2::C_BaseEntity*)(ctx->rdx);
             this->PublishSync(msg);
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkRemoveEntity, "RemoveEntity");
         });
 

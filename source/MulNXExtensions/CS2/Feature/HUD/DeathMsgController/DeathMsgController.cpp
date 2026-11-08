@@ -16,7 +16,7 @@ bool DeathMsgController::Init() {
         auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::HudDeathNotice_HandlePlayerDeath).FindFuncStart();
         this->hkHudDeathNotice_HandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnPlayerDeath(ctx);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkHudDeathNotice_HandlePlayerDeath, "HudDeathNotice_HandlePlayerDeath");
         this->pRawHudDeathNotice_HandlePlayerDeath = reinterpret_cast<HudDeathNotice_HandlePlayerDeath_t>
             (this->hkHudDeathNotice_HandlePlayerDeath->pMaybeRawFunc);

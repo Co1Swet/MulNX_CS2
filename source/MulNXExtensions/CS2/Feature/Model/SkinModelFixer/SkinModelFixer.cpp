@@ -16,7 +16,7 @@ bool SkinModelFixer::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkUpdateMeshGroupMask, "UpdateMeshGroupMask");
 
         auto tNetUpdateMeshGroupMask = this->CS2->client.GetTextRegion()
@@ -29,7 +29,7 @@ bool SkinModelFixer::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkNetUpdateMeshGroupMask, "NetUpdateMeshGroupMask");
 
         auto tRegenerateWeaponSkins = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Skin::RegenerateWeaponSkins).Data();
@@ -41,7 +41,7 @@ bool SkinModelFixer::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkRegenerateWeaponSkins, "RegenerateWeaponSkins");
         });
 

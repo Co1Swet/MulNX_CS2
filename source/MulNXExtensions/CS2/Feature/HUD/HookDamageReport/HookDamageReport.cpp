@@ -16,7 +16,7 @@ bool HookDamageReport::Init() {
             if (this->enable.load(std::memory_order_acquire) == false)return MulNX::Hook::Then::Continue;
             this->needUpdate = true;
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Check_m_nSendUpdate, "Pos_Check_m_nSendUpdate");
 
         auto tPos_GettedController = this->CS2->client.GetTextRegion()
@@ -34,7 +34,7 @@ bool HookDamageReport::Init() {
                 ctx->rax = reinterpret_cast<uint64_t>(pObservingController);
             }
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_GettedController, "Pos_GettedController");
 
         auto tFunc_UpdateDamageReport = this->CS2->client.GetTextRegion()
@@ -68,7 +68,7 @@ bool HookDamageReport::Init() {
             pDamageServices->m_DamageList.m_nSize = origSize;
             pDamageServices->m_DamageList.m_pData = origData;
             return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkFunc_UpdateDamageReport, "Func_UpdateDamageReport");
 
         this->pFunc_DispatchClearAllPostRoundDamageReportPanels =

@@ -109,7 +109,7 @@ bool GlowController::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkSetGlowColor, "SetGlowColor");
         });
 

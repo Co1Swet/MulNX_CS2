@@ -29,14 +29,14 @@ bool RendCtrlAPI::Init() {
         this->hkOMSetBlendState = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pContext)->GetVFuncPtr(35),
             [this](MulNX::Hook* hk, RegContext* ctx) {
                 return this->RT_OnOMSetBlendState(hk, ctx);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkOMSetBlendState, "OMSetBlendState");
         this->pRawOMSetBlendState = (OMSetBlendState_t)this->hkOMSetBlendState->pMaybeRawFunc;
 
         this->hkOMSetDepthStencilState = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pContext)->GetVFuncPtr(36),
             [this](MulNX::Hook* hk, RegContext* ctx) {
                 return this->RT_OnOMSetDepthStencilState(hk, ctx);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkOMSetDepthStencilState, "OMSetDepthStencilState");
         this->pRawOMSetDepthStencilState = (OMSetDepthStencilState_t)this->hkOMSetDepthStencilState->pMaybeRawFunc;
         });

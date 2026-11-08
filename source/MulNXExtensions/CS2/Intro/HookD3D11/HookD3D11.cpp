@@ -27,7 +27,7 @@ bool HookD3D11::Init() {
                 this->HookD3D11SwapChain(pSwapChain);
             }
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPosCallPresent, "PosCallPresent");
         });
 
@@ -50,7 +50,7 @@ void HookD3D11::HookD3D11DeviceAndContext() {
         clearFlags = *(UINT*)(&ctx->r8);
         this->PublishSync(msg);
         return MulNX::Hook::Then::Continue;
-        }).value();
+        }) | value_or_throw;
     this->RegisterAttachHook(this->hkClearDepthStencilView, "ClearDepthStencilView");
 }
 void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
@@ -81,7 +81,7 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
         this->PublishSync("Hook/Present/First"_hash);
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11Init(hk, ctx);});
         return MulNX::Hook::Then::Continue;
-        }).value();
+        }) | value_or_throw;
     this->RegisterAttachHook(this->hkPresent, "Present");
 
     DXGI_SWAP_CHAIN_DESC sd;
@@ -103,7 +103,7 @@ MulNX::Hook::Then HookD3D11::D3D11Init(MulNX::Hook* hk, RegContext* ctx) {
     this->hkResizeBuffers = MulNX::Hook::Create(
         (uint8_t*)IVClass::Assume(std::bit_cast<IDXGISwapChain*>(ctx->rcx))->GetVFuncPtr(13), [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->HandleOnResizeBuffers(hk, ctx);
-        }).value();
+        }) | value_or_throw;
     this->RegisterAttachHook(this->hkResizeBuffers, "ResizeBuffers");
 
     return MulNX::Hook::Then::Continue;

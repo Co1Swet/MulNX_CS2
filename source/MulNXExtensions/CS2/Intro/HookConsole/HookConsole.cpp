@@ -94,7 +94,7 @@ void HookConsole::OnTier0Load(MulNX::Message& msg) {
 
         return MulNX::Hook::Then::Continue;
         }
-    ).value();
+    ) | value_or_throw;
     this->RegisterAttachHook(this->hkVEngineCvar007_RegisterConCommand, "VEngineCvar007::RegisterConCommand");
 }
 

@@ -54,7 +54,7 @@ bool TeamIDColorController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }
-        ).value();
+        ) | value_or_throw;
         this->RegisterAttachHook(this->hkLoadFromFile, "CLayoutFile::LoadFromFile");
 
         // 获取 CStylePropertyWashColor 的虚表
@@ -84,7 +84,7 @@ bool TeamIDColorController::Init() {
             }
             return MulNX::Hook::Then::Continue;
             }
-        ).value();
+        ) | value_or_throw;
         this->RegisterAttachHook(this->hkWashColorParse, "CStylePropertyWashColor::Parse");
 
         // Hook Clone
@@ -98,7 +98,7 @@ bool TeamIDColorController::Init() {
             if (this->ctWashColors.count(src)) this->ctWashColors.insert(dst);
             return MulNX::Hook::Then::Continue;
             }
-        ).value();
+        ) | value_or_throw;
         this->RegisterAttachHook(this->hkWashColorClone, "CStylePropertyWashColor::Clone");
         });
 

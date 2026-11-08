@@ -19,7 +19,7 @@ bool FlashRenderController::Init() {
                 ctx->rax = 1ULL;
             }
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkDrawUp, "PosCallCmpDrawFlashUpHUD");
 
         auto down = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Flash::PosCallCmpDrawFlashDownHUD).Data();
@@ -31,7 +31,7 @@ bool FlashRenderController::Init() {
                 ctx->rax = 0ULL;
             }
             return MulNX::Hook::Then::SkipAllAndContinue;
-            }, true, { .callRawFirst = true }).value();
+            }, true, { .callRawFirst = true }) | value_or_throw;
         this->RegisterAttachHook(this->hkDrawDown, "PosCallCmpDrawFlashDownHUD");
 
         this->r_spectator_flashbang_opacity = this->CS2Con->GetCVarByName("r_spectator_flashbang_opacity")->GetPtr<float>();

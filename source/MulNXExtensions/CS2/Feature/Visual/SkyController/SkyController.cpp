@@ -75,7 +75,7 @@ bool SkyController::Init() {
         this->hkForceUpdateSkybox = MulNX::Hook::Create(targetAddr, [this](MulNX::Hook* hk, RegContext* ctx) {
             auto pEnvSky = (CS2::C_EnvSky*)ctx->rcx;
             return this->HandleForceUpdateSkybox(pEnvSky);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkForceUpdateSkybox, "ForceUpdateSkybox");
         });
 

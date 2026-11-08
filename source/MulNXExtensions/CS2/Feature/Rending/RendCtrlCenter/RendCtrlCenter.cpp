@@ -15,7 +15,7 @@ bool RendCtrlCenter::Init() {
             .FindRegion(CS2::Signatures::Render::Func_SoftwareCommandList_Commit).Data();
         this->hkCommit = MulNX::Hook::Create(pCommit, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnCommit(hk, ctx);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkCommit, "SoftwareCommandList::Commit");
         });
 
@@ -25,12 +25,12 @@ bool RendCtrlCenter::Init() {
 
         this->hkDrawSceneData = MulNX::Hook::Create((uint8_t*)this->pDrawSceneData, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnDrawSceneData(hk, ctx);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkDrawSceneData, "DrawSceneData");
 
         this->hkInitDrawingData = MulNX::Hook::Create((uint8_t*)this->pSceneSystem->pInitDrawingData, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnInitDrawingData(hk, ctx);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkInitDrawingData, "InitDrawingData");
         this->pRawInitDrawingData = (SceneSystem::InitDrawingData_t)this->hkInitDrawingData->pMaybeRawFunc;
 
@@ -39,7 +39,7 @@ bool RendCtrlCenter::Init() {
             .Data();
         this->hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear = MulNX::Hook::Create(t1, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnCreateRenderContextPtr1_With_Fmt_LayerClear(hk, ctx);
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear,
             "hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear");
 
@@ -48,7 +48,7 @@ bool RendCtrlCenter::Init() {
             .Data();
         this->hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers = MulNX::Hook::Create(t2, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnCreateRenderContextPtr2_With_UpdateBuffers(hk, ctx);
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers,
             "hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers");
         });

@@ -32,7 +32,7 @@ bool CSReShadeController::Init() {
         auto t = (uint8_t*)IVClass::Assume(pContext)->GetVFuncPtr(33);
         this->hkOMSetRenderTargets = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnOMSetRenderTargets(hk, ctx);
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkOMSetRenderTargets, "OMSetRenderTargets");
         });
 

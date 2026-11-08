@@ -72,7 +72,7 @@ bool SmokeController::Init() {
         this->hkSetSmokeProps = MulNX::Hook::Create(target, [this](MulNX::Hook* hook, RegContext* ctx) {
             this->MySetSmokeProps((CS2::C_SmokeGrenadeProjectile*)(ctx->rcx));
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkSetSmokeProps, "SetSmokeProps");
 
         this->SendTask("Update", "CSControl", [this]() {

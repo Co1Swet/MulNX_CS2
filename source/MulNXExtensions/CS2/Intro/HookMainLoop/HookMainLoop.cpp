@@ -8,7 +8,7 @@ bool HookMainLoop::Init() {
         this->hkPos_Call_CInputService_ProcessCommands = MulNX::Hook::Create(Pos_Call_CInputService_ProcessCommands.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
             this->OnMainLoop();
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Call_CInputService_ProcessCommands, "Pos_Call_CInputService_ProcessCommands");
         });
 
@@ -17,7 +17,7 @@ bool HookMainLoop::Init() {
         this->hkPos_PhysicsCreated = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
             this->PublishSync("Hook/Physics/Created"_hash);
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_PhysicsCreated, "Pos_PhysicsCreated");
         });
 
@@ -37,7 +37,7 @@ bool HookMainLoop::Init() {
                 }
                 ctx->rax = 0;
                 return MulNX::Hook::Then::Return;
-                }).value();
+                }) | value_or_throw;
             this->RegisterAttachHook(this->hkQuit, "Quit");
         }
         });

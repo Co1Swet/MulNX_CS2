@@ -34,7 +34,7 @@ bool HookSpotStyle::Init() {
 
             }
             return MulNX::Hook::Then::Continue;
-            }, true).value();
+            }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw, "Pos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw");
         // 修改玩家图标的具体绘制组件样式
         auto pFunc_FinallyUpdatePlayerState = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Spot::Func_FinallyUpdatePlayerState).FindFuncStart();
@@ -49,7 +49,7 @@ bool HookSpotStyle::Init() {
                 }
             }
             return MulNX::Hook::Then::Continue;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkFunc_FinallyUpdatePlayerState, "Func_FinallyUpdatePlayerState");
         });
 

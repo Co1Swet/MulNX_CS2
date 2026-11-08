@@ -13,7 +13,7 @@ bool HookWindow::Init() {
             auto then = this->HandleWndProc((HWND)ctx->rcx, ctx->rdx, ctx->r8, ctx->r9);
             if (then == MulNX::Hook::Then::Return)ctx->rax = 0;
             return then;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkWndProc, "WndProc");
         ImGui_ImplWin32_Init(this->hCS2Wnd);
         });

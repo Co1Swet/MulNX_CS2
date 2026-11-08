@@ -34,7 +34,7 @@ bool SkinController::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkGetPaintKit, "GetPaintKit");
 
         this->hkGetSeed = MulNX::Hook::Create((uint8_t*)(vtable[4]), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -50,7 +50,7 @@ bool SkinController::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkGetSeed, "GetSeed");
 
         this->hkGetWear = MulNX::Hook::Create((uint8_t*)(vtable[5]), [this](MulNX::Hook* hk, RegContext* ctx) {
@@ -66,7 +66,7 @@ bool SkinController::Init() {
                 this->LogError(e);
             }
             return MulNX::Hook::Then::Return;
-            }).value();
+            }) | value_or_throw;
         this->RegisterAttachHook(this->hkGetWear, "GetWear");
         });
 
