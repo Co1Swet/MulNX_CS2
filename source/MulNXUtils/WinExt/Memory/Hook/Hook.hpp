@@ -2,6 +2,7 @@
 #include <MulNX/Common/Type.hpp>
 #include <MulNXUtils/WinExt/Memory/AddrTool/AddrTool.hpp>
 #include <MulNXUtils/WinExt/Memory/Assembler/Assembler.hpp>
+#include <Windows.h>
 #include <atomic>
 #include <bit>
 #include <optional>
@@ -51,6 +52,11 @@ namespace MulNX {
         };
         JmpTarget jmpTarget{};
         size_t frameSize = 0;
+
+        RUNTIME_FUNCTION* pUnwindTable = nullptr;
+        size_t prologueEnd = 0;
+        size_t jmpRaxOffset = 0;
+        bool unwindRegistered = false;
 
         uintptr_t Dispatch(RegContext* ctx);
         std::expected<void, std::string> BindTarget(uint8_t* target, int len);

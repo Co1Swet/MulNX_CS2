@@ -100,15 +100,19 @@ bool HookDamageReport::Init() {
 }
 
 void HookDamageReport::UpdateDamageReport(bool isClear) {
-    auto pCCSGO_HudTeamCounter = this->pClientPanorama->FindHudElement("CCSGO_HudTeamCounter");
-    auto v5 = pCCSGO_HudTeamCounter - 32;
-    if (!pCCSGO_HudTeamCounter)
-        v5 = 0;
-    if (isClear) {
-        this->pFunc_DispatchClearAllPostRoundDamageReportPanels(v5);
+    try {
+        auto pCCSGO_HudTeamCounter = this->pClientPanorama->FindHudElement("CCSGO_HudTeamCounter");
+        auto v5 = pCCSGO_HudTeamCounter - 32;
+        if (!pCCSGO_HudTeamCounter)
+            v5 = 0;
+        if (isClear)return this->pFunc_DispatchClearAllPostRoundDamageReportPanels(v5);
+        auto rule = this->CS2->client.dwGameRules();
+        if (!rule->IsGameInactive())return;
+        this->pFunc_UpdateDamageReport(v5);
     }
-    else {
-        auto r = this->pFunc_UpdateDamageReport(v5);
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
+        return;
     }
 }
 

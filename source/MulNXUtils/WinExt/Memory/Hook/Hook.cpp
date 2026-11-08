@@ -1,11 +1,15 @@
 #include "Hook.hpp"
 #include <MulNX/Config/Config.hpp>
+#include <MulNX/Common/Misc.hpp>
 #include <Windows.h>
 #include <thread>
 #include <format>
 
 uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
     this->threadNumInAsm.fetch_add(1, std::memory_order_seq_cst);
+    auto OnExit = scope_exit([&]() {
+        this->threadNumInAsm.fetch_sub(1, std::memory_order_release);
+        });
 #ifdef _DEBUG
     auto rsp = ctx->rsp;
     auto test = rsp % 16;
@@ -32,7 +36,6 @@ uintptr_t MulNX::Hook::Dispatch(RegContext* ctx) {
         target = this->jmpTarget.Continue;
         break;
     }
-    this->threadNumInAsm.fetch_sub(1, std::memory_order_release);
     return target;
 }
 
@@ -92,6 +95,12 @@ std::expected<void, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust,
         .SaveReg();
 
     this->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+
+    this->prologueEnd = this->dispatcherAsmCode.size();
+    if (this->prologueEnd > 255) {
+        return std::unexpected(std::format("prologue 过长({})，超过 UNWIND_CODE 的 255 偏移上限", this->prologueEnd));
+    }
+
     return {};
 }
 
@@ -113,8 +122,11 @@ std::expected<std::unique_ptr<MulNX::Hook>, std::string> MulNX::Hook::Create(uin
         .mov(RCX, (uintptr_t)HookInstance.get())
         .mov(RDX, RSP)
         .mov(RAX, std::bit_cast<uintptr_t>(&MulNX::Hook::Dispatch))
-        .call(RAX)
-        .jmp(RAX);
+        .call(RAX);
+    HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
+
+    HookInstance->jmpRaxOffset = HookInstance->dispatcherAsmCode.size();
+    Asm.jmp(RAX);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));
 
     HookInstance->jmpTarget.Return = (uintptr_t)HookInstance->pAsmDispatcher + HookInstance->dispatcherAsmCode.size();
@@ -217,5 +229,9 @@ MulNX::Hook::~Hook() {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    if (this->unwindRegistered) {
+        RtlDeleteFunctionTable(this->pUnwindTable);
+        this->unwindRegistered = false;
+    }
     VirtualFree(this->pAsmDispatcher, 0, MEM_RELEASE);
 }
