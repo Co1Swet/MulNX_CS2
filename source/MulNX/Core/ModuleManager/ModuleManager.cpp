@@ -4,6 +4,7 @@
 #include <MulNX/Systems/Systems.hpp>
 
 #include <MulNX/Systems/WebSocketManager/WebSocketManager.hpp>
+#include <MulNX/Systems/SysController/SysController.hpp>
 
 #include <ranges>
 
@@ -57,6 +58,7 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
         .CreateModule<ShortcutManager>("ShortcutManager")// 快捷键管理器模块
         .CreateModule<MulNX::GlobalVars>("GlobalVars")// 全局变量模块
         .CreateModule<WebSocketManager>("WebSocketManager")
+        .CreateModule<SysController>("SysController")
         ;
 
     return *this;

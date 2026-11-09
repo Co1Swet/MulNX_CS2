@@ -1,30 +1,40 @@
-#include "MulNXController.hpp"
+#include "SysController.hpp"
 #include <MulNX/MulNX.hpp>
 #include <MulNX/Systems/Debugger/Debugger.hpp>
 #include <MulNX/Base/UI/UI.hpp>
 
-void MulNXController::Window(MulNX::UICoordinator* uico) {
+void SysController::Window(MulNX::UICoordinator* uico) {
     auto w = MulNX::UI::RAIIWindow("控制");
     if (!w || !w.ShouldDraw())return;
-    MulNX::UI::Checkbox("调试模式（Debug Mode），提供更多功能，但可能影响性能和稳定性", this->pGlobalVars->DebugMode);
     uico->CallbackCall("UI.MulNXControl"_hash, nullptr);
     if (ImGui::Button("尝试拉取所有模块信息")) {
         MulNX::Message Msg("ModuleManager/ModuleInfo/Request"_hash);
         this->PublishAsync(std::move(Msg));
     }
-    static std::string msg{};
-    ImGui::InputText("手动注入消息", &msg);
+    
+    ImGui::TextUnformatted("手动注入消息（异步消息），注意，使用此功能前必须明确知道目的，否则可能引发崩溃等");
+    static std::string msgName{};
+    ImGui::InputText("消息名", &msgName);
+    static std::string str1{};
+    ImGui::InputText("str1", &str1);
+    static std::string str2{};
+    ImGui::InputText("str2", &str2);
+    static std::string str3{};
+    ImGui::InputText("str3", &str3);
+
     if (ImGui::Button("注入到框架")) {
-        this->PublishAsync(MulNX::HashString(msg));
-        this->PublishSync(MulNX::HashString(msg));
-        msg.clear();
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>(MulNX::HashString(msgName));
+        rp->str1 = str1;
+        rp->str2 = str2;
+        rp->str3 = str3;
+        this->PublishAsync(std::move(msg));
     }
     if (ImGui::Button("注入错误")) {
         this->LogError("Test");
     }
 }
 
-bool MulNXController::Init() {
+bool SysController::Init() {
     (*this)
         .SubscribeAsync("ModuleManager/ModuleInfo/Response")
         ;
@@ -39,7 +49,7 @@ bool MulNXController::Init() {
     return true;
 }
 
-void MulNXController::ProcessMsg(MulNX::Message& Msg) {
+void SysController::ProcessMsg(MulNX::Message& Msg) {
     switch (Msg.type) {
     case "ModuleManager/ModuleInfo/Response"_hash: {
         auto* pInfo = Msg.asp.get<ModuleInfo>();
@@ -51,6 +61,6 @@ void MulNXController::ProcessMsg(MulNX::Message& Msg) {
     }
     }
 }
-void MulNXController::Main() {
+void SysController::Main() {
     this->Update();
 }

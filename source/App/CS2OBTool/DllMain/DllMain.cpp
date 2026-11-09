@@ -3,7 +3,6 @@
 #include <MulNXExtensions/GraphicsManager/Graphicses.hpp>
 #include <MulNXExtensions/WinBaseHooks/WinBaseHooks.hpp>
 #include <MulNXExtensions/CS2/CS2s.hpp>
-#include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/MediaSystem/Medias.hpp>
 #include <MulNXExtensions/TimeLiner/TimeLiner.hpp>
 #include <MulNXExtensions/TimeLiner/FlowClock/FlowClock.hpp>
@@ -196,8 +195,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<AdTimeFix>("AdTimeFix")
         .CreateModule<PlayProtect>("PlayProtect")
 
-        // 管理
-        .CreateModule<MulNXController>("MulNXController")
         .CreateModule<UIDocker>("UIDocker")
         ;
     

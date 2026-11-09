@@ -1,5 +1,4 @@
 #include <MulNXExtensions/Win32Starter/Win32Starter.hpp>
-#include <MulNXExtensions/MulNXController/MulNXController.hpp>
 #include <MulNXExtensions/CS2Remoting/CS2Remotings.hpp>
 #include <App/CS2Injector/UIDocker/UIDocker.hpp>
 
@@ -17,7 +16,6 @@ int main(int, char**) {
             .CreateModule<DLLInjectHelper>("DLLInjectHelper")
             .CreateModule<CS2HelperController>("CS2HelperController")
             .CreateModule<CS2BootLoader>("CS2BootLoader")
-            .CreateModule<MulNXController>("MulNXController")
             .CreateModule<UIDocker>("UIDocker")
             ;
 

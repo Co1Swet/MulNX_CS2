@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNX/MulNX.hpp>
 
-class MulNXController final :public MulNX::Module<MulNXController> {
+class SysController final :public MulNX::Module<SysController> {
     bool Init()override;
     void Window(MulNX::UICoordinator* uico);
     void ProcessMsg(MulNX::Message& Msg)override;

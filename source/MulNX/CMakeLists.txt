@@ -24,6 +24,7 @@ add_library(MulNX
     Systems/ShortcutManager/ShortcutManager.cpp
     Systems/VarReflSystem/VarReflSystem.cpp
     Systems/WebSocketManager/WebSocketManager.cpp
+    Systems/SysController/SysController.cpp
 
     Systems/UISystem/UISystem.cpp
     Systems/UISystem/UINode/UINode.cpp
