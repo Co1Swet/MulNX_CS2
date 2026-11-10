@@ -43,18 +43,18 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     this->flushPackets.clear();
     int sampleRate = this->pAudioCapturer->GetSampleRate();
     if (sampleRate <= 0) {
-        this->LogWarning("音频采样率无效");
+        this->LogError("音频采样率无效");
         return;
     }
 
-    av::Codec acodec = av::findEncodingCodec(AV_CODEC_ID_AAC);
+    av::Codec acodec = av::findEncodingCodec(AV_CODEC_ID_MP3);
     if (!acodec.canEncode()) {
-        this->LogWarning("AAC 编码器不可用，仅录制视频");
+        this->LogError("编码器不可用，仅录制视频");
         return;
     }
     auto supportedFmts = acodec.supportedSampleFormats();
     if (supportedFmts.empty()) {
-        this->LogWarning("AAC 编码器未报告支持的样本格式，跳过音频");
+        this->LogError("编码器未报告支持的样本格式，跳过音频");
         return;
     }
     av::SampleFormat targetFmt = supportedFmts.front();
@@ -86,7 +86,7 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     cp.copyFrom(this->aencoder);
     this->astream.setCodecParameters(cp);
 
-    this->LogInfo(std::format("音频开启=m{}", (this->aencoder.isOpened() ? "是" : "否")));
+    this->LogInfo(std::format("音频开启={}", (this->aencoder.isOpened() ? "是" : "否")));
 }
 
 bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples&& asamples) {

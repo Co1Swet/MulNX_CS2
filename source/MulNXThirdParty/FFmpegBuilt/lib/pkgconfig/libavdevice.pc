@@ -10,5 +10,5 @@ Requires:
 Requires.private: libavformat >= 63.5.101, libavcodec >= 63.7.100, libavutil >= 61.5.100
 Conflicts:
 Libs: -L${libdir}  -lavdevice 
-Libs.private: -lm -latomic
+Libs.private: -lpsapi -lole32 -lstrmiids -luuid -loleaut32 -lshlwapi -lm -latomic
 Cflags: -I${includedir}

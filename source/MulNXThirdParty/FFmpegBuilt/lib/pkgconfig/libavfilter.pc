@@ -7,8 +7,8 @@ Name: libavfilter
 Description: FFmpeg audio/video filtering library
 Version: 12.3.101
 Requires: 
-Requires.private: libswscale >= 10.2.100, libavutil >= 61.5.100
+Requires.private: libswscale >= 10.2.100, libswresample >= 7.2.100, libavutil >= 61.5.100
 Conflicts:
 Libs: -L${libdir}  -lavfilter 
-Libs.private: -lm -latomic -lz
+Libs.private: -lm -latomic -LC:/Users/lenovo/Desktop/MulNX_Dev/MulNX_FFmpeg_Build/FFmpegBuild/msys64/mingw64/lib -lz
 Cflags: -I${includedir}

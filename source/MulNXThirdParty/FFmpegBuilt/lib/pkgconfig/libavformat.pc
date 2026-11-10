@@ -10,5 +10,5 @@ Requires:
 Requires.private: libavcodec >= 63.7.100, libavutil >= 61.5.100
 Conflicts:
 Libs: -L${libdir}  -lavformat 
-Libs.private: -lm -latomic -lz -lsecur32 -lncrypt -lcrypt32 -lws2_32
+Libs.private: -lm -latomic -LC:/Users/lenovo/Desktop/MulNX_Dev/MulNX_FFmpeg_Build/FFmpegBuild/msys64/mingw64/lib -lz -lsecur32 -lncrypt -lcrypt32 -lws2_32
 Cflags: -I${includedir}

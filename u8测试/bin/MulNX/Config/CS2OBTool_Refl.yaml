@@ -38,6 +38,6 @@ SoundCircleFix.enable: true
 RecordTaskConfiger.preRecordSeconds: 3.5
 RecordTaskConfiger.postRecordSeconds: 3.5
 RecordTaskConfiger.postBekilledSeconds: 1.8
-MediaRunningState.nextStartUseAdvancedMode: true
+MediaRunningState.nextStartUseAdvancedMode: false
 MediaParamManager.bitrate: 80000000
 MediaParamManager.targetFPS: 24

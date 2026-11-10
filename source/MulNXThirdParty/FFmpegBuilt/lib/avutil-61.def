@@ -182,9 +182,9 @@ EXPORTS
     av_dynamic_hdr_smpte2094_app5_to_t35
     av_dynamic_hdr_vivid_alloc
     av_dynamic_hdr_vivid_create_side_data
-    av_dynarray2_add
     av_dynarray_add
     av_dynarray_add_nofree
+    av_dynarray2_add
     av_encryption_info_add_side_data
     av_encryption_info_alloc
     av_encryption_info_clone
@@ -356,9 +356,6 @@ EXPORTS
     av_lfg_init
     av_lfg_init_from_data
     av_log
-    av_log2
-    av_log2_16bit
-    av_log2_i
     av_log_default_callback
     av_log_format_line
     av_log_format_line2
@@ -368,6 +365,9 @@ EXPORTS
     av_log_set_callback
     av_log_set_flags
     av_log_set_level
+    av_log2
+    av_log2_16bit
+    av_log2_i
     av_lzo1x_decode
     av_malloc
     av_malloc_array
@@ -436,8 +436,8 @@ EXPORTS
     av_opt_set_defaults
     av_opt_set_defaults2
     av_opt_set_dict
-    av_opt_set_dict2
     av_opt_set_dict_val
+    av_opt_set_dict2
     av_opt_set_double
     av_opt_set_from_string
     av_opt_set_image_size
@@ -502,16 +502,16 @@ EXPORTS
     av_samples_get_buffer_size
     av_samples_set_silence
     av_set_options_string
-    av_sha512_alloc
-    av_sha512_final
-    av_sha512_init
-    av_sha512_size
-    av_sha512_update
     av_sha_alloc
     av_sha_final
     av_sha_init
     av_sha_size
     av_sha_update
+    av_sha512_alloc
+    av_sha512_final
+    av_sha512_init
+    av_sha512_size
+    av_sha512_update
     av_shr_i
     av_size_mult
     av_small_strptime

@@ -10,5 +10,5 @@ Requires:
 Requires.private: 
 Conflicts:
 Libs: -L${libdir}  -lavutil 
-Libs.private: -lm -lz -luser32 -lbcrypt -latomic
+Libs.private: -lm -LC:/Users/lenovo/Desktop/MulNX_Dev/MulNX_FFmpeg_Build/FFmpegBuild/msys64/mingw64/lib -lz -luser32 -lbcrypt -latomic
 Cflags: -I${includedir}
