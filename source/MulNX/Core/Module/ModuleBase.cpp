@@ -4,7 +4,7 @@
 #include <MulNX/Systems/MessageManager/MessageChannel/MessageChannel.hpp>
 #include <ranges>
 
-MulNX::IModule* MulNX::ModuleBase::FindModule(const std::string& name) {
+MulNX::IModule* MulNX::ModuleBase::FindModule(const std::string& name)const {
     return this->Core->ModuleManager()->FindModule(name);
 }
 // 初始化

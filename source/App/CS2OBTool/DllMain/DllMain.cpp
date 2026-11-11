@@ -173,6 +173,7 @@ void StartImpl(HMODULE& hModule) {
         // 音视频系统
         .CreateModule<MediaParamManager>("MediaParamManager")
         .CreateModule<OpenH264Encoder>("OpenH264Encoder")
+        .CreateModule<H264Nvenc>("H264Nvenc")
         .CreateModule<AVCodecManager>("AVCodecManager")
 
         .CreateModule<MediaRunningState>("MediaRunningState")

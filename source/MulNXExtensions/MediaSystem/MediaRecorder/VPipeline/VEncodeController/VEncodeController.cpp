@@ -97,9 +97,9 @@ void VEncodeController::SetOn(av::FormatContext* oCtx) {
     this->pMediaState->encodingOverload = false;
 
     auto& rp = *this->pMediaParamManager;
-    this->width = rp.width > 0 ? rp.width :
+    this->width = rp.width > 0 ? rp.width.load(std::memory_order_acquire) :
         this->pGlobalVars->renderX.load(std::memory_order_acquire);
-    this->height = rp.height > 0 ? rp.height :
+    this->height = rp.height > 0 ? rp.height.load(std::memory_order_acquire) :
         this->pGlobalVars->renderY.load(std::memory_order_acquire);
 
     auto o = this->OpenEncoder(rp);

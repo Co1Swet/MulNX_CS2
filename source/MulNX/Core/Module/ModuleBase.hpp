@@ -21,7 +21,7 @@ namespace MulNX {
     };
 
     class ModuleBase :public ModuleCoroutine, public ModuleComponents {
-        MulNX::IModule* FindModule(const std::string& name);
+        MulNX::IModule* FindModule(const std::string& name)const;
     protected:
         // 自用更新入口
         void Update();  
@@ -31,8 +31,8 @@ namespace MulNX {
         bool EntryDeinit();
 
         template<typename T>
-        inline T* FindModule(const std::string& Name) {
-            return static_cast<T*>(this->FindModule(Name));
+        inline T* FindModule(const std::string& name)const {
+            return static_cast<T*>(this->FindModule(name));
         }
     };
 }
