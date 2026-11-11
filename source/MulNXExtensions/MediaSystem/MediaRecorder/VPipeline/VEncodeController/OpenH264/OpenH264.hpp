@@ -16,10 +16,11 @@ class OpenH264Encoder final : public MulNX::Module<OpenH264Encoder>, public MulN
     // 切片 / 打包
     int max_nal_size = 0;
 
+    inline bool SupportsConstantQuality()const override { return false; }
+
     av::Codec codec{};
 
-    void Menu();
-
+    void SettingsMenu()override;
     bool Init() override;
     av::Codec* GetAVCodec() override;
     av::Dictionary GetPrivateOpts() override;

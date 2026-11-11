@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <MulNXExtensions/MediaSystem/MediaRecorder/VPipeline/VEncodeController/VEncodeController.hpp>
 
-void OpenH264Encoder::Menu() {
+void OpenH264Encoder::SettingsMenu() {
     // 基础编码特性
     this->profile.Render("Profile");
     this->coder.Render("熵编码");
@@ -28,10 +28,6 @@ bool OpenH264Encoder::Init() {
     }
 
     this->FindModule<VEncodeController>("VEncodeController")->pEncoder = this;
-
-    this->UIRegisterCallback("AV.VCodec", [this](auto&&...) {
-        this->Menu();
-        });
 
     this->codec = codec;
     return true;

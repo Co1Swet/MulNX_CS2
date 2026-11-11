@@ -5,7 +5,7 @@
 
 void VEncodeController::Menu(MulNX::UICoordinator* uico) {
     if (ImGui::CollapsingHeader("高级设置")) {
-        uico->CallbackCall("AV.VCodec"_hash, nullptr);
+        this->pEncoder->SettingsMenu();
     }
 }
 
@@ -56,9 +56,7 @@ void VEncodeController::SetEncoderParams(av::VideoEncoderContext* encoder) {
     raw->color_trc = AVCOL_TRC_BT709;
 
     encoder->setTimeBase(this->timeBase);
-
     encoder->setMaxBFrames(rp.maxBFrames);
-    encoder->setBitRate(rp.rc == RateControl::CQ ? 0 : rp.bitrate.load());
 
     if (rp.gopSize > 0) {
         encoder->setGopSize(rp.gopSize);
@@ -69,9 +67,10 @@ void VEncodeController::SetEncoderParams(av::VideoEncoderContext* encoder) {
     else {
         encoder->setGopSize(120);
     }
-    if (rp.rc == RateControl::CQ && rp.cq > 0) {
-        encoder->setGlobalQuality(static_cast<int32_t>(rp.cq * FF_QP2LAMBDA));
-    }
+
+    const bool wantCq = (rp.rc == RateControl::CQ);
+    const bool cqOk = this->pEncoder->SupportsConstantQuality();
+    encoder->setBitRate((wantCq && cqOk) ? 0 : rp.bitrate.load());
 }
 
 bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
@@ -136,30 +135,30 @@ void VEncodeController::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt
         srcW, srcH, srcFmt, av::SwsFlagBicubic);
 }
 
-bool VEncodeController::OnEncode() {
-    auto exit = [&]() {
-        size_t count = 0;
-        try {
-            while (true) {
-                av::Packet pkt = this->encoder.encode();
-                if (!pkt || pkt.size() <= 0)break;
-                ++count;
-                pkt.setStreamIndex(this->vstream.index());
-                pkt.setTimeBase(this->vstream.timeBase());
-                this->pMediaRecorder->bufferPackets.enqueue(pkt);
-            }
+bool VEncodeController::ExitCode() {
+    size_t count = 0;
+    try {
+        while (true) {
+            av::Packet pkt = this->encoder.encode();
+            if (!pkt || pkt.size() <= 0)break;
+            ++count;
+            pkt.setStreamIndex(this->vstream.index());
+            pkt.setTimeBase(this->vstream.timeBase());
+            this->pMediaRecorder->bufferPackets.enqueue(pkt);
         }
-        catch (const std::exception& e) {
-            this->LogError(std::format("刷新失败: {}", e.what()));
-        }
-        this->LogSucc(std::format("成功刷新视频包：{}", count));
-        this->pMediaRecorder->bufferPackets.enqueue(MulNX::AVControl(MulNX::AVControl::Kind::Stop));
-        return false;
-        };
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("刷新失败: {}", e.what()));
+    }
+    this->LogSucc(std::format("成功刷新视频包：{}", count));
+    this->pMediaState->encodingOverload = false;
+    this->pMediaRecorder->bufferPackets.enqueue(MulNX::AVControl(MulNX::AVControl::Kind::Stop));
+    return false;
+}
 
+bool VEncodeController::OnEncode() {
     if (!this->encoder.isOpened()) {
-        this->pMediaState->encodingOverload = false;
-        return exit();
+        return this->ExitCode();
     }
 
     CtrlVideoFrame ctrlVFrame;
@@ -167,7 +166,7 @@ bool VEncodeController::OnEncode() {
         this->pMediaState->encodingOverload = false;
         return true;
     }
-    if (this->bufferVFrames.size_approx() >= 200) {
+    else if (this->bufferVFrames.size_approx() >= 200) {
         this->pMediaState->encodingOverload = true;
     }
     else {
@@ -176,11 +175,11 @@ bool VEncodeController::OnEncode() {
 
     auto pAVControl = std::get_if<MulNX::AVControl>(&ctrlVFrame);
     if (pAVControl && pAVControl->kind == MulNX::AVControl::Kind::Stop) {
-        return exit();
+        return this->ExitCode();
     }
 
     auto pSrcFrame = std::get_if<av::VideoFrame>(&ctrlVFrame);
-    if (!pSrcFrame)return exit();
+    if (!pSrcFrame)return this->ExitCode();
     auto& srcFrame = *pSrcFrame;
 
     try {

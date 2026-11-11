@@ -2,8 +2,8 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 class StringCombo {
-    std::vector<std::string> items;
-    size_t currentIndex;
+    const std::vector<std::string> items;
+    std::atomic<size_t> currentIndex;
 public:
     // 注意，0 位置应当是“默认”
     explicit StringCombo(std::vector<std::string>&& items)

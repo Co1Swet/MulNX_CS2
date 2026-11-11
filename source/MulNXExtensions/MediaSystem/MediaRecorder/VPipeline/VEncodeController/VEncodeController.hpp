@@ -26,6 +26,7 @@ class VEncodeController final :public MediaModuleBase {
     void SetOn(av::FormatContext* oCtx);
 
     bool OnEncode();
+    bool ExitCode();
 public:
     MulNX::IVEncoder* pEncoder;
 
