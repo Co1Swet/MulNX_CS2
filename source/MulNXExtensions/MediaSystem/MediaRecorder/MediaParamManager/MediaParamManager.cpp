@@ -3,10 +3,6 @@
 
 void MediaParamManager::Menu() {
     if (ImGui::CollapsingHeader("编码器参数")) {
-        const char* modes[] = { "自动", "H264", "HEVC" };
-        int mi = (int)this->mode;
-        if (ImGui::Combo("编码模式", &mi, modes, IM_ARRAYSIZE(modes)))
-            this->mode = (EncodeMode)mi;
 
         const char* rcs[] = { "CBR", "VBR", "CQ" };
         int ri = (int)this->rc;
