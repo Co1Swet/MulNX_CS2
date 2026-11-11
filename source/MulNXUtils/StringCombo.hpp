@@ -1,39 +1,69 @@
 #pragma once
 #include <MulNX/Base/UI/UI.hpp>
+#include <atomic>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
 
 class StringCombo {
     const std::vector<std::string> items;
-    std::atomic<size_t> currentIndex;
-public:
-    // 注意，0 位置应当是“默认”
-    explicit StringCombo(std::vector<std::string>&& items)
-        : items(std::move(items))
-        , currentIndex(0) {
-    }
-    // 渲染函数，接受标签名，返回是否发生改变
-    bool Render(const char* label) {
-        bool changed = false;
-        const char* preview = this->items[this->currentIndex].c_str();
+    std::shared_ptr<std::string> cachedValue;
+    std::optional<size_t> cachedIndex;
+    bool cacheInitialized = false;
 
-        if (ImGui::BeginCombo(label, preview)) {
-            for (int i = 0; i < static_cast<int>(this->items.size()); ++i) {
-                bool isSelected = (this->currentIndex == i);
-                if (ImGui::Selectable(this->items[i].c_str(), isSelected)) {
-                    this->currentIndex = i;
-                    changed = true;
-                }
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
+public:
+    explicit StringCombo(std::vector<std::string>&& items)
+        : items(std::move(items)) {}
+
+    bool Render(const char* label,std::atomic<std::shared_ptr<std::string>>& value) {
+        auto selected = value.load(std::memory_order_acquire);
+        if (!this->cacheInitialized || selected != this->cachedValue) {
+            this->cachedValue = selected;
+            this->cachedIndex.reset();
+            if (selected) {
+                for (size_t i = 0; i < this->items.size(); ++i) {
+                    if (this->items[i] == *selected) {
+                        this->cachedIndex = i;
+                        break;
+                    }
                 }
             }
-            ImGui::EndCombo();
+            this->cacheInitialized = true;
         }
-        return changed;
-    }
 
-    // 获取当前选中的字符串，const 成员函数，返回 const char*
-    const char* GetSelected() const {
-        if (this->currentIndex == 0)return nullptr;
-        return this->items[this->currentIndex].c_str();
+        const bool isEmpty = !selected || selected->empty();
+        const char* preview = isEmpty ? "默认" : selected->c_str();
+        
+        if (!ImGui::BeginCombo(label, preview))return false;
+        auto close = scope_exit([&]() {
+            ImGui::EndCombo();
+            });
+
+        bool changed = false;
+        if (ImGui::Selectable("默认", isEmpty) && !isEmpty) {
+            value.store(std::make_shared<std::string>(), std::memory_order_release);
+            this->cachedValue.reset();
+            this->cachedIndex.reset();
+            changed = true;
+        }
+        if (isEmpty) {
+            ImGui::SetItemDefaultFocus();
+        }
+        for (size_t i = 0; i < this->items.size(); ++i) {
+            bool isSelected = this->cachedIndex == i;
+            if (ImGui::Selectable(this->items[i].c_str(), isSelected)) {
+                auto newValue = std::make_shared<std::string>(this->items[i]);
+                value.store(newValue, std::memory_order_release);
+                this->cachedValue = std::move(newValue);
+                this->cachedIndex = i;
+                changed = true;
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+
+        return changed;
     }
 };

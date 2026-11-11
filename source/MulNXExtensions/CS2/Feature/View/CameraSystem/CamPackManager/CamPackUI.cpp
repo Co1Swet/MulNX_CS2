@@ -1,6 +1,17 @@
 #include "CamPackManager.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
+bool CamPackManager::Title()const {
+    std::shared_lock lock(this->smutex);
+
+    if (!this->pActiveCamPack) {
+        ImGui::Text("还未打开任何运镜包，请打开一个运镜包");
+        return false;
+    }
+    ImGui::TextUnformatted(std::format("当前运镜包名：{}", this->pActiveCamPack->GetName()).c_str());
+    return true;
+}
+
 void CamPackManager::Menu() const {
     std::shared_lock lock(this->smutex);
 

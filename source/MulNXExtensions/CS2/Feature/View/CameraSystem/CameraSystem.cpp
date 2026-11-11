@@ -26,29 +26,19 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
         {
             float topH = (ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.y) * 2.0f / 3.0f;
             auto c = MulNX::UI::RAIIChild("内容", ImVec2(0, topH), ImGuiChildFlags_Borders);
-            bool InProject = false;
-            {
-                std::shared_lock lock(this->pCamPackManager->smutex);
-                if (this->pCamPackManager->pActiveCamPack) {
-                    InProject = true;
-                    ImGui::TextUnformatted(std::format("当前运镜包名：{}", this->pCamPackManager->pActiveCamPack->GetName()).c_str());
-                }
-                else {
-                    ImGui::Text("还未打开任何运镜包，请打开一个运镜包");
-                }
-            }
-
+            auto hasActiveCamPack = this->pCamPackManager->Title();
+            
             ImGui::Separator();
             switch (selectedTab) {
             case 0:
                 this->pCamPackManager->Menu();
                 break;
             case 1:
-                if (!InProject)break;
+                if (!hasActiveCamPack)break;
                 this->pCamMacroManager->Menu();
                 break;
             case 2:
-                if (!InProject)break;
+                if (!hasActiveCamPack)break;
                 this->pCampathManager->Menu();
                 break;
             }

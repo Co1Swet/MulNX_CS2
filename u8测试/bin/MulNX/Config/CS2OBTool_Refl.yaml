@@ -3,6 +3,7 @@ PlayProtect.forceDemoPauseAtEnd: true
 UISystem.rendEnable: false
 UISystem.ifDrawMid: true
 CamMacroManager.shortcutEnable: true
+OpenH264Encoder.rc_mode: bitrate
 HookSpotStyle.transSpecLabel: true
 ViewSmoother.enable: false
 ESPSkeleton.enable: false
@@ -15,6 +16,7 @@ RecordTaskConfiger.postRoundEndSeconds: 1
 HookSpotVisible.noAllVisible: true
 HookSpotStyle.hideNumLabel: true
 HookSpotStyle.repairEnenyStyle: true
+AVCodecManager.currentEncoderName: OpenH264Encoder
 HookSpotColor.TColorMulti: true
 HookSpotColor.CTColorMulti: true
 BombSpotController.forceBombRedWhenSpecCT: true
@@ -26,8 +28,11 @@ CloudController.hideSun: false
 HookDamageReport.enable: true
 RecordTaskConfiger.mergeThresholdSeconds: 10
 FlashRenderController.rendFlashUpHUD: true
+AVCodecManager.encoderFallbackModuleNames: "[\"OpenH264Encoder\"]"
+OpenH264Encoder.max_nal_size: 0
 FlashRenderController.rendFlashDownHUD: false
 HookHealthAmmoCenter.hideHudSpecplayerRoot: true
+OpenH264Encoder.profile: ""
 SpeakingController.listMode: false
 HookHealthAmmoCenter.show_Hud_HA__stroke: true
 CloudController.hideCloud: false
@@ -38,6 +43,9 @@ SoundCircleFix.enable: true
 RecordTaskConfiger.preRecordSeconds: 3.5
 RecordTaskConfiger.postRecordSeconds: 3.5
 RecordTaskConfiger.postBekilledSeconds: 1.8
-MediaRunningState.nextStartUseAdvancedMode: false
 MediaParamManager.bitrate: 80000000
 MediaParamManager.targetFPS: 24
+OpenH264Encoder.coder: ""
+OpenH264Encoder.loopfilter: ""
+OpenH264Encoder.allow_skip_frames: ""
+MediaRunningState.nextStartUseAdvancedMode: false

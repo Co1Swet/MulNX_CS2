@@ -27,7 +27,7 @@ namespace MulNX {
     class MsgMixin {
         T* This() { return static_cast<T*>(this); }
         MessageManager* pMsgManager = nullptr;
-    public:
+    protected:
         MsgMixin() {
             This()->preInits.push_back([this]() {
                 this->pMsgManager = This()->FindModule<MessageManager>("MessageManager");
@@ -35,7 +35,7 @@ namespace MulNX {
                 return true;
                 });
         }
-
+    public:
         // 异步消息
         auto& SubscribeAsync(const std::string& msgType, Detail::InitOnly = {}) {
             This()->msgChannel->SubscribeAsync(msgType);

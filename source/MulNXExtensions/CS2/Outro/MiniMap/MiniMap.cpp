@@ -48,10 +48,9 @@ void MiniMap::Window() {
     ImVec2 mousePos = ImGui::GetIO().MousePos;
     bool mouseInMap = (mousePos.x >= TopLeft.x && mousePos.x <= BottomRight.x && mousePos.y >= TopLeft.y && mousePos.y <= BottomRight.y);
 
-    std::shared_lock lk(this->CS2->smutex);
     // 绘制玩家并处理点击
     for (int i = 1; i <= 10; ++i) {
-        D_Player& Player = this->pBackgroundEntityScan->GetPlayerMsg(i);
+        D_Player Player = this->pBackgroundEntityScan->GetPlayerMsg(i);
         if (!Player.Alive)continue;
         ImVec2 PositionInMiniMap = ImVec2(centerScreen.x + Player.Position.x * worldToPixel, centerScreen.y - Player.Position.y * worldToPixel);
 

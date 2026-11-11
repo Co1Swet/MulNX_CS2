@@ -2,7 +2,10 @@
 #include <MulNX/Base/UI/UI.hpp>
 
 void MediaParamManager::Menu() {
-    if (ImGui::CollapsingHeader("编码器参数")) {
+    if (ImGui::CollapsingHeader("全局参数")) {
+        ImGui::InputInt("宽度(0=原生)", &this->width);
+        ImGui::InputInt("高度(0=原生)", &this->height);
+        MulNX::UI::SliderInt("捕获帧率", this->targetFPS, 0, 10000);
 
         const char* rcs[] = { "CBR", "VBR", "CQ" };
         int ri = (int)this->rc;
@@ -18,13 +21,6 @@ void MediaParamManager::Menu() {
         if (this->gopSize < 0) this->gopSize = 0;
         ImGui::InputInt("B 帧数", &this->maxBFrames);
         if (this->maxBFrames < 0) this->maxBFrames = 0;
-
-    }
-
-    if (ImGui::CollapsingHeader("画面参数")) {
-        ImGui::InputInt("宽度(0=原生)", &this->width);
-        ImGui::InputInt("高度(0=原生)", &this->height);
-        MulNX::UI::SliderInt("捕获帧率", this->targetFPS, 0, 10000);
     }
 }
 

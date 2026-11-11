@@ -63,6 +63,7 @@ void BackgroundEntityScan::Main() {
     return;
 }
 
-D_Player& BackgroundEntityScan::GetPlayerMsg(int Index) {
+D_Player BackgroundEntityScan::GetPlayerMsg(int Index) {
+    std::shared_lock lock(this->smutex);
     return this->CS2EBGameData.Players[Index];
 }

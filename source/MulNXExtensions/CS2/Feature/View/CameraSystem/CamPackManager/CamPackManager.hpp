@@ -10,6 +10,7 @@ class CamPackManager final :public CamSysModule, public WebSocketMixin<CamPackMa
     mutable std::atomic<bool> bKCPWindow = false;
     mutable std::atomic<MulNX::KeyCheckPack> bufKCPack{};
 
+    std::shared_ptr<CamPack> pActiveCamPack = nullptr;
     std::shared_ptr<CamPack> pOperatingCamPack = nullptr;
 
     void CamPackDebugWindow()const;
@@ -28,7 +29,7 @@ class CamPackManager final :public CamSysModule, public WebSocketMixin<CamPackMa
     bool CamPackLoad(const fs::path& projectPath, const std::string& name);
     bool CamPackApply(const std::shared_ptr<CamPack> pCamPack);
 public:
-    std::shared_ptr<CamPack> pActiveCamPack = nullptr;
+    bool Title()const;
     void Menu()const;
     void HandleUpdate();
 };

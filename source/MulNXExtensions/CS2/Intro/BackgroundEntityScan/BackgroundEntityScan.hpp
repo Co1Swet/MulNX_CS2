@@ -28,5 +28,5 @@ public:
     std::vector<IEntityIterationModule*>ParticipateItCSModules{};
 
     D_GameData CS2EBGameData{};
-    D_Player& GetPlayerMsg(int Index);
+    D_Player GetPlayerMsg(int Index);
 };
