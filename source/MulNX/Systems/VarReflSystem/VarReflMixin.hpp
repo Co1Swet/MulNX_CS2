@@ -59,6 +59,30 @@ namespace MulNX {
         }
     };
 
+    template <>
+    struct ReflCodec<std::string> {
+        static std::string ToString(const std::string& value) {
+            return value;
+        }
+        static bool FromString(std::string_view str, std::string& out) {
+            out.assign(str.data(), str.size());
+            return true;
+        }
+    };
+
+    template <typename T>
+    struct ReflCodec<std::shared_ptr<T>> {
+        static std::string ToString(const std::shared_ptr<T>& p) {
+            return p ? ReflCodec<T>::ToString(*p) : std::string{};
+        }
+        static bool FromString(std::string_view str, std::shared_ptr<T>& p) {
+            T tmp{};
+            if (!ReflCodec<T>::FromString(str, tmp)) return false;
+            p = std::make_shared<T>(std::move(tmp));
+            return true;
+        }
+    };
+
     template <typename T, typename Codec = ReflCodec<T>>
     class ReflVarT final : public IReflVar {
         T* pVar = nullptr;
@@ -128,4 +152,8 @@ namespace MulNX {
 
 #define MulReflFloat(name, defaultValue) \
     std::atomic<float> name{defaultValue}; \
+    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
+
+#define MulReflStr(name, defaultValue) \
+    std::atomic<std::shared_ptr<std::string>> name{std::make_shared<std::string>(defaultValue)}; \
     MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
