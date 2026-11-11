@@ -1,6 +1,5 @@
 #include "OpenH264.hpp"
 #include <MulNX/Base/UI/UI.hpp>
-#include <MulNXExtensions/MediaSystem/MediaRecorder/VPipeline/VEncodeController/VEncodeController.hpp>
 
 void OpenH264Encoder::SettingsMenu() {
     // 基础编码特性
@@ -27,9 +26,11 @@ bool OpenH264Encoder::Init() {
         MulNX::ErrorTerminate("编码器 libopenh264 不支持编码");
     }
 
-    this->FindModule<VEncodeController>("VEncodeController")->pEncoder = this;
-
     this->codec = codec;
+    return true;
+}
+bool OpenH264Encoder::IsAvailable() {
+
     return true;
 }
 

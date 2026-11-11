@@ -12,8 +12,6 @@ add_library(MediaRecorder STATIC
     VPipeline/TextureMapper/TextureMapper.cpp
 
     VPipeline/VEncodeController/VEncodeController.cpp
-    VPipeline/VEncodeController/OpenH264/OpenH264.cpp
-    VPipeline/VEncodeController/H264Nvenc/H264Nvenc.cpp
 )
 target_include_directories(MediaRecorder PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(MediaRecorder PUBLIC

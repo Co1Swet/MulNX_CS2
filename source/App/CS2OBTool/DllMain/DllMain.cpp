@@ -171,6 +171,9 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<CS2Test>("CS2Test")
 #endif
         // 音视频系统
+        .CreateModule<OpenH264Encoder>("OpenH264Encoder")
+        .CreateModule<AVCodecManager>("AVCodecManager")
+
         .CreateModule<MediaRunningState>("MediaRunningState")
         .CreateModule<MediaSystem>("MediaSystem")
         .CreateModule<MediaParamManager>("MediaParamManager")
@@ -182,7 +185,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<BufferCopier>("BufferCopier")
         .CreateModule<TextureMapper>("TextureMapper")
         .CreateModule<VideoCapturer>("VideoCapturer")
-        .CreateModule<OpenH264Encoder>("OpenH264Encoder")
         .CreateModule<VEncodeController>("VEncodeController")
 
         .CreateModule<MediaRecorder>("MediaRecorder")

@@ -4,14 +4,15 @@
 #include <MediaRecorder.hpp>
 
 void VEncodeController::Menu(MulNX::UICoordinator* uico) {
-    if (ImGui::CollapsingHeader("高级设置")) {
-        this->pEncoder->SettingsMenu();
-    }
+    // if (ImGui::CollapsingHeader("高级设置")) {
+    //     this->pEncoder->SettingsMenu();
+    // }
 }
 
 bool VEncodeController::Init() {
     this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
     this->pMediaRecorder = this->FindModule<MediaRecorder>("MediaRecorder");
+    this->pAVCodecManager = this->FindModule<AVCodecManager>("AVCodecManager");
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
@@ -38,63 +39,53 @@ bool VEncodeController::Init() {
 
     return true;
 }
-void VEncodeController::SetEncoderParams(av::VideoEncoderContext* encoder) {
-    auto& rp = *this->pMediaParamManager;
-    this->width = rp.width > 0 ? rp.width :
-        this->pGlobalVars->renderX.load(std::memory_order_acquire);
-    this->height = rp.height > 0 ? rp.height :
-        this->pGlobalVars->renderY.load(std::memory_order_acquire);
 
-    encoder->setWidth(this->width);
-    encoder->setHeight(this->height);
-    encoder->setPixelFormat(this->dstPixFmt);
+std::optional<av::VideoEncoderContext> VEncodeController::OpenEncoder(const MediaParamManager& rp)const {
+    auto iEncoder = this->pAVCodecManager->GetCurrentVEncoder();
+    auto codec = iEncoder->GetAVCodec();
+    auto vEncoderContext = av::VideoEncoderContext(*codec);
 
-    auto* raw = encoder->raw();
+    vEncoderContext.setWidth(this->width);
+    vEncoderContext.setHeight(this->height);
+    vEncoderContext.setPixelFormat(this->dstPixFmt);
+
+    auto* raw = vEncoderContext.raw();
     raw->color_range = AVCOL_RANGE_MPEG;
     raw->colorspace = AVCOL_SPC_BT709;
     raw->color_primaries = AVCOL_PRI_BT709;
     raw->color_trc = AVCOL_TRC_BT709;
 
-    encoder->setTimeBase(this->timeBase);
-    encoder->setMaxBFrames(rp.maxBFrames);
+    vEncoderContext.setTimeBase(this->timeBase);
+    vEncoderContext.setMaxBFrames(rp.maxBFrames);
 
     if (rp.gopSize > 0) {
-        encoder->setGopSize(rp.gopSize);
+        vEncoderContext.setGopSize(rp.gopSize);
     }
     else if (rp.targetFPS > 0) {
-        encoder->setGopSize(rp.targetFPS * 2);
+        vEncoderContext.setGopSize(rp.targetFPS * 2);
     }
     else {
-        encoder->setGopSize(120);
+        vEncoderContext.setGopSize(120);
     }
 
     const bool wantCq = (rp.rc == RateControl::CQ);
-    const bool cqOk = this->pEncoder->SupportsConstantQuality();
-    encoder->setBitRate((wantCq && cqOk) ? 0 : rp.bitrate.load());
-}
+    const bool cqOk = iEncoder->SupportsConstantQuality();
+    vEncoderContext.setBitRate((wantCq && cqOk) ? 0 : rp.bitrate.load());
 
-bool VEncodeController::OpenEncoder(av::FormatContext* oCtx, const av::Codec& codec) {
-    this->encoder = av::VideoEncoderContext(codec);
-    this->SetEncoderParams(&this->encoder);
-
-    av::Dictionary opts = this->pEncoder->GetPrivateOpts();
+    av::Dictionary opts = iEncoder->GetPrivateOpts();
     try {
         std::error_code ec;
-        this->encoder.open(opts, ec);
+        vEncoderContext.open(opts, ec);
         if (ec) {
-            this->LogError(std::format("{} 打开失败: {}", this->encoder.codec().name(), ec.message()));
-            return false;
+            this->LogError(std::format("{} 打开失败: {}", codec->name(), ec.message()));
+            return std::nullopt;
         }
     }
     catch (const std::exception& e) {
-        this->LogError(std::format("{} 打开异常: {}", this->encoder.codec().name(), e.what()));
-        return false;
+        this->LogError(std::format("{} 打开异常: {}", codec->name(), e.what()));
+        return std::nullopt;
     }
-
-    this->vstream = oCtx->addStream(this->encoder);
-    this->vstream.setTimeBase(this->timeBase);
-    this->vstream.setupEncodingParameters(this->encoder);
-    return true;
+    return vEncoderContext;
 }
 
 void VEncodeController::SetOn(av::FormatContext* oCtx) {
@@ -105,18 +96,27 @@ void VEncodeController::SetOn(av::FormatContext* oCtx) {
     this->dstPixFmt = AV_PIX_FMT_YUV420P;
     this->pMediaState->encodingOverload = false;
 
-    auto codec = this->pEncoder->GetAVCodec();
-    if (!this->OpenEncoder(oCtx, *codec)) {
+    auto& rp = *this->pMediaParamManager;
+    this->width = rp.width > 0 ? rp.width :
+        this->pGlobalVars->renderX.load(std::memory_order_acquire);
+    this->height = rp.height > 0 ? rp.height :
+        this->pGlobalVars->renderY.load(std::memory_order_acquire);
+
+    auto o = this->OpenEncoder(rp);
+    if (!o) {
         this->LogError("编码器打开失败");
+        return;
     }
-    else {
-        this->LogSucc(std::format("创建编码器上下文成功: {}", codec->name()));
-    }
+
+    this->vEncoderContext = std::move(o.value());
+    this->vstream = oCtx->addStream(this->vEncoderContext);
+    this->vstream.setTimeBase(this->timeBase);
+    this->vstream.setupEncodingParameters(this->vEncoderContext);
 
     this->LogInfo(std::format("目标分辨率: {}x{}", this->width.load(), this->height.load()));
     auto fps = this->pMediaParamManager->targetFPS.load(std::memory_order_acquire);
     this->LogInfo(std::format("目标帧率: {} fps", fps > 0 ? fps : 60));
-    this->LogSucc(std::format("编码器已开启: {}", this->encoder.codec().name()));
+    this->LogSucc(std::format("编码器已开启: {}", this->vEncoderContext.codec().name()));
 
     this->SendTask("VEncode", "VEncode", [this]() {
         return this->OnEncode();
@@ -139,7 +139,7 @@ bool VEncodeController::ExitCode() {
     size_t count = 0;
     try {
         while (true) {
-            av::Packet pkt = this->encoder.encode();
+            av::Packet pkt = this->vEncoderContext.encode();
             if (!pkt || pkt.size() <= 0)break;
             ++count;
             pkt.setStreamIndex(this->vstream.index());
@@ -157,10 +157,6 @@ bool VEncodeController::ExitCode() {
 }
 
 bool VEncodeController::OnEncode() {
-    if (!this->encoder.isOpened()) {
-        return this->ExitCode();
-    }
-
     CtrlVideoFrame ctrlVFrame;
     if (!this->bufferVFrames.try_dequeue(ctrlVFrame)) {
         this->pMediaState->encodingOverload = false;
@@ -204,7 +200,7 @@ bool VEncodeController::OnEncode() {
         dst.setPts(av::Timestamp(inPts, this->timeBase));
         dst.setStreamIndex(this->vstream.index());
 
-        av::Packet pkt = this->encoder.encode(dst);
+        av::Packet pkt = this->vEncoderContext.encode(dst);
         if (!pkt || pkt.size() <= 0)return true;
         pkt.setStreamIndex(this->vstream.index());
         pkt.setTimeBase(this->vstream.timeBase());

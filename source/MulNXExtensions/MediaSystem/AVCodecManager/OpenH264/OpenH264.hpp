@@ -1,9 +1,8 @@
 #pragma once
-#include <MulNX/MulNX.hpp>
-#include "../IVEncoder.hpp"
+#include <MulNXExtensions/MediaSystem/AVCodecManager/AVCodecManager.hpp>
 #include <MulNXUtils/StringCombo.hpp>
 
-class OpenH264Encoder final : public MulNX::Module<OpenH264Encoder>, public MulNX::IVEncoder {
+class OpenH264Encoder final : public MulNX::Module<OpenH264Encoder>, public VEncoderMixin<OpenH264Encoder> {
     // 基础编码特性
     StringCombo profile{ { "默认", "constrained_baseline", "main", "high" } };
     StringCombo coder{ { "默认", "cavlc", "cabac" } };
@@ -20,6 +19,7 @@ class OpenH264Encoder final : public MulNX::Module<OpenH264Encoder>, public MulN
 
     av::Codec codec{};
 
+    bool IsAvailable()override;
     void SettingsMenu()override;
     bool Init() override;
     av::Codec* GetAVCodec() override;
