@@ -4,9 +4,9 @@
 
 namespace MulNX {
     class Worker {
+        std::vector<Task>tasks{};
     public:
         std::jthread t{};
-        std::vector<Task>tasks{};
         moodycamel::ConcurrentQueue<Task>queue{};
         std::string name{};
         void Start();

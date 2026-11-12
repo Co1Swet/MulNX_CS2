@@ -159,65 +159,61 @@ bool VEncodeController::ExitCode() {
     this->pMediaRecorder->bufferPackets.enqueue(MulNX::AVControl(MulNX::AVControl::Kind::Stop));
     return false;
 }
-
 bool VEncodeController::OnEncode() {
     CtrlVideoFrame ctrlVFrame;
-    if (!this->bufferVFrames.try_dequeue(ctrlVFrame)) {
-        this->pMediaState->encodingOverload = false;
-        return true;
+    while (this->bufferVFrames.try_dequeue(ctrlVFrame)) {
+        if (this->bufferVFrames.size_approx() >= 200)this->pMediaState->encodingOverload = true;
+
+        auto pAVControl = std::get_if<MulNX::AVControl>(&ctrlVFrame);
+        if (pAVControl && pAVControl->kind == MulNX::AVControl::Kind::Stop) {
+            return this->ExitCode();
+        }
+
+        auto pSrcFrame = std::get_if<av::VideoFrame>(&ctrlVFrame);
+        if (!pSrcFrame)return this->ExitCode();
+        auto& srcFrame = *pSrcFrame;
+        try {
+            this->EncodeOne(std::move(srcFrame));
+        }
+        catch (const std::exception& e) {
+            this->LogError(std::format("编码失败: {}", e.what()));
+        }
     }
-    else if (this->bufferVFrames.size_approx() >= 200) {
-        this->pMediaState->encodingOverload = true;
+    this->pMediaState->encodingOverload = false;
+    return true;
+}
+
+void VEncodeController::EncodeOne(av::VideoFrame&& srcFrame) {
+    auto srcFmtRaw = srcFrame.pixelFormat();
+    int64_t inPts = srcFrame.pts().timestamp(this->timeBase);
+    int srcW = srcFrame.width();
+    int srcH = srcFrame.height();
+
+    av::VideoFrame* dst = nullptr;
+
+    if (srcW == this->width && srcH == this->height && srcFmtRaw == this->dstPixFmt) {
+        dst = &srcFrame;
     }
     else {
-        this->pMediaState->encodingOverload = false;
-    }
+        this->CheckRescaler(srcW, srcH, srcFmtRaw);
 
-    auto pAVControl = std::get_if<MulNX::AVControl>(&ctrlVFrame);
-    if (pAVControl && pAVControl->kind == MulNX::AVControl::Kind::Stop) {
-        return this->ExitCode();
-    }
-
-    auto pSrcFrame = std::get_if<av::VideoFrame>(&ctrlVFrame);
-    if (!pSrcFrame)return this->ExitCode();
-    auto& srcFrame = *pSrcFrame;
-
-    try {
-        auto srcFmtRaw = srcFrame.pixelFormat();
-        int64_t inPts = srcFrame.pts().timestamp(this->timeBase);
-        int srcW = srcFrame.width();
-        int srcH = srcFrame.height();
-
-        av::VideoFrame* dst = nullptr;
-
-        if (srcW == this->width && srcH == this->height && srcFmtRaw == this->dstPixFmt) {
-            dst = &srcFrame;
+        if (!this->rescaleFrame ||
+            this->rescaleFrame->width() != this->width ||
+            this->rescaleFrame->height() != this->height ||
+            this->rescaleFrame->pixelFormat() != this->dstPixFmt) {
+            this->rescaleFrame.emplace(this->dstPixFmt, this->width, this->height);
         }
-        else {
-            this->CheckRescaler(srcW, srcH, srcFmtRaw);
-
-            if (!this->rescaleFrame ||
-                this->rescaleFrame->width() != this->width ||
-                this->rescaleFrame->height() != this->height ||
-                this->rescaleFrame->pixelFormat() != this->dstPixFmt) {
-                this->rescaleFrame.emplace(this->dstPixFmt, this->width, this->height);
-            }
-            this->rescaler.rescale(*this->rescaleFrame, srcFrame);
-            dst = &*this->rescaleFrame;
-        }
-
-        dst->setTimeBase(this->timeBase);
-        dst->setPts(av::Timestamp(inPts, this->timeBase));
-        dst->setStreamIndex(this->vstream.index());
-
-        av::Packet pkt = this->vEncoderContext.encode(*dst);
-        if (!pkt || pkt.size() <= 0)return true;
-        pkt.setStreamIndex(this->vstream.index());
-        pkt.setTimeBase(this->vstream.timeBase());
-        this->pMediaRecorder->bufferPackets.enqueue(pkt);
+        this->rescaler.rescale(*this->rescaleFrame, srcFrame);
+        dst = &*this->rescaleFrame;
     }
-    catch (const std::exception& e) {
-        this->LogError(std::format("编码失败: {}", e.what()));
-    }
-    return true;
+
+    dst->setTimeBase(this->timeBase);
+    dst->setPts(av::Timestamp(inPts, this->timeBase));
+    dst->setStreamIndex(this->vstream.index());
+
+    av::Packet pkt = this->vEncoderContext.encode(*dst);
+    if (!pkt || pkt.size() <= 0)return;
+    pkt.setStreamIndex(this->vstream.index());
+    pkt.setTimeBase(this->vstream.timeBase());
+    this->pMediaRecorder->bufferPackets.enqueue(pkt);
 }

@@ -18,12 +18,13 @@ void MulNX::Worker::Start() {
                 while (queue.try_dequeue(task)) {
                     this->tasks.push_back(std::move(task));
                 }
-                // 把要执行的任务整体摘出来，这是为了防止在执行任务的过程中，有新的任务被添加进来，导致迭代器失效
-                std::vector<MulNX::Task> batch;
-                batch.swap(this->tasks);
-                // 逐个执行，结果写回
-                for (auto& t : batch) {
-                    if (t.Do()) this->tasks.push_back(std::move(t));
+                for (auto it = this->tasks.begin();it != this->tasks.end();) {
+                    if (it->Do()) {
+                        ++it;
+                    }
+                    else {
+                        it = this->tasks.erase(it);
+                    }
                 }
                 // 限速：若整个周期不足 10ms，则休眠剩余时间
                 auto elapsed = std::chrono::steady_clock::now() - cycleStart;

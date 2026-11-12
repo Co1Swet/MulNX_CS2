@@ -9,7 +9,7 @@ class VEncodeController final :public MediaModuleBase {
     av::VideoEncoderContext vEncoderContext{};
 
     av::Stream vstream{};
-    
+
     av::VideoRescaler rescaler{};
     std::optional<av::VideoFrame> rescaleFrame{};
 
@@ -27,6 +27,7 @@ class VEncodeController final :public MediaModuleBase {
     void SetOn(av::FormatContext* oCtx);
 
     bool OnEncode();
+    void EncodeOne(av::VideoFrame&& srcFrame);
     bool ExitCode();
 public:
     using CtrlVideoFrame = std::variant<av::VideoFrame, MulNX::AVControl>;
