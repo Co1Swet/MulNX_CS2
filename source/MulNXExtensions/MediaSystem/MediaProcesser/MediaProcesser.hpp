@@ -1,6 +1,6 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
-#include <mutex>
+#include <string>
 
 class MediaProcesser final :public MediaModuleBase {
     void ProcessMsg(MulNX::Message& msg)override;
@@ -8,9 +8,13 @@ class MediaProcesser final :public MediaModuleBase {
     bool concatActive = false;
     fs::path concatTarget;
     std::vector<fs::path> concatInputs;
-public:
+
     bool Init()override;
     void BeginConcat(const fs::path& target);
     void AddConcat(const fs::path& add);
     void EndConcat();
+
+public:
+    void DoConcat(const std::vector<fs::path>& inputs, const fs::path& output,
+        const std::string& audioEncoderName = "libmp3lame");
 };

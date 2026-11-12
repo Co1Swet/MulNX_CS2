@@ -1,17 +1,16 @@
 #include "MediaProcesser.hpp"
-#include <limits>
+#include "AudioModify/AudioModify.hpp"
 
 bool MediaProcesser::Init() {
     (*this)
         .SubscribeAsync("Media/Concat/Begin")
         .SubscribeAsync("Media/Concat/Add")
-        .SubscribeAsync("Media/Concat/End")
-        ;
+        .SubscribeAsync("Media/Concat/End");
 
     this->SendTask("Update", "AVEncoding", [this]() {
         this->Update();
         return true;
-        });
+    });
 
     return true;
 }
@@ -54,17 +53,15 @@ void MediaProcesser::AddConcat(const fs::path& add) {
 void MediaProcesser::EndConcat() {
     std::vector<fs::path> inputs;
     fs::path output;
-    {
-        if (!this->concatActive) {
-            this->LogWarning("EndConcat 在非合并状态被调用，忽略");
-            return;
-        }
-        inputs = this->concatInputs;
-        output = this->concatTarget;
-        this->concatActive = false;
-        this->concatInputs.clear();
-        this->concatTarget.clear();
+    if (!this->concatActive) {
+        this->LogWarning("EndConcat 在非合并状态被调用，忽略");
+        return;
     }
+    inputs = this->concatInputs;
+    output = this->concatTarget;
+    this->concatActive = false;
+    this->concatInputs.clear();
+    this->concatTarget.clear();
 
     if (inputs.empty()) {
         this->LogWarning("没有要合并的输入文件");
@@ -74,125 +71,215 @@ void MediaProcesser::EndConcat() {
         this->LogWarning("未指定输出文件，合并取消");
         return;
     }
+    try {
+        this->DoConcat(inputs, output);
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::string("合并失败: ") + e.what());
+    }
+}
+void MediaProcesser::DoConcat(const std::vector<fs::path>& inputs, const fs::path& output,
+    const std::string& audioEncoderName) {
+    for (const auto& input : inputs) {
+        std::error_code ec;
+        if (fs::exists(output, ec) && !ec && fs::equivalent(input, output, ec) && !ec) {
+            throw std::runtime_error("输出路径不能覆盖输入文件: " + input.string());
+        }
+    }
+
+    std::optional<AudioEncoderConfig> audioConfig;
+    for (const auto& input : inputs) {
+        av::FormatContext probe;
+        probe.openInput(input.string());
+        probe.findStreamInfo();
+        for (size_t i = 0; i < probe.streamsCount(); ++i) {
+            auto stream = probe.stream(i);
+            if (!stream.isAudio()) {
+                continue;
+            }
+            audioConfig = CreateAudioEncoderConfig(stream, audioEncoderName);
+            break;
+        }
+        if (audioConfig.has_value()) {
+            break;
+        }
+    }
 
     av::FormatContext outCtx;
     outCtx.openOutput(output.string());
 
+    std::vector<int> firstInputToOutput;
+    std::vector<AVMediaType> firstInputMediaTypes;
     std::vector<av::Stream> outStreams;
-    // 每个输出流单独维护偏移量，避免不同流混用单一偏移导致时间错乱
-    std::vector<int64_t> streamOffsets;
+    int audioOutputIndex = -1;
+    int64_t timelineOffsetUs = 0;
+    bool headerWritten = false;
     std::vector<int64_t> lastDts;
-    av::Rational outTimeBase;
+
     for (size_t fileIdx = 0; fileIdx < inputs.size(); ++fileIdx) {
         av::FormatContext inCtx;
         inCtx.openInput(inputs[fileIdx].string());
         inCtx.findStreamInfo();
 
-        if (fileIdx == 0) {
-            for (size_t i = 0; i < inCtx.streamsCount(); ++i) {
-                auto inStream = inCtx.stream(i);
-                // 添加输出流（不指定 codec，使用流参数）
-                auto outStream = outCtx.addStream();
-                // 复制 codec 参数
-                outStream.setCodecParameters(inStream.codecParameters());
-                outStream.setTimeBase(inStream.timeBase());
-                outStreams.push_back(outStream);
+        int videoInputIndex = -1;
+        int audioInputIndex = -1;
+        for (size_t i = 0; i < inCtx.streamsCount(); ++i) {
+            auto stream = inCtx.stream(i);
+            if (videoInputIndex < 0 && stream.isVideo()) {
+                videoInputIndex = static_cast<int>(i);
             }
+            if (audioInputIndex < 0 && stream.isAudio()) {
+                audioInputIndex = static_cast<int>(i);
+            }
+        }
+        if (videoInputIndex < 0) {
+            throw std::runtime_error("输入文件没有视频流: " + inputs[fileIdx].string());
+        }
+        const int64_t segmentDurationUs = GetVideoDurationUs(inCtx, inCtx.stream(videoInputIndex));
+        const int64_t segmentSamples = audioConfig.has_value()
+            ? GetDurationSamples(av::Timestamp(segmentDurationUs, MicrosecondTimeBase), audioConfig->sampleRate)
+            : 0;
+        const int64_t segmentOffsetSamples = audioConfig.has_value()
+            ? GetDurationSamples(av::Timestamp(timelineOffsetUs, MicrosecondTimeBase), audioConfig->sampleRate)
+            : 0;
+
+        if (fileIdx == 0) {
+            firstInputToOutput.assign(inCtx.streamsCount(), -1);
+            firstInputMediaTypes.reserve(inCtx.streamsCount());
+            for (size_t i = 0; i < inCtx.streamsCount(); ++i) {
+                auto inputStream = inCtx.stream(i);
+                firstInputMediaTypes.push_back(inputStream.mediaType());
+                if (inputStream.isAudio()) {
+                    continue;
+                }
+                auto outputStream = outCtx.addStream();
+                outputStream.setCodecParameters(inputStream.codecParameters());
+                outputStream.setTimeBase(inputStream.timeBase());
+                firstInputToOutput[i] = static_cast<int>(outStreams.size());
+                outStreams.push_back(outputStream);
+            }
+
+            if (audioConfig.has_value()) {
+                auto encoder = CreateAudioEncoder(*audioConfig);
+                auto outputStream = outCtx.addStream(encoder);
+                outputStream.setTimeBase({ 1, audioConfig->sampleRate });
+                audioOutputIndex = static_cast<int>(outStreams.size());
+                outStreams.push_back(outputStream);
+            }
+
             outCtx.writeHeader();
-            outTimeBase = outStreams[0].timeBase();
-            streamOffsets.assign(outStreams.size(), 0);
+            headerWritten = true;
             lastDts.assign(outStreams.size(), std::numeric_limits<int64_t>::min());
         }
 
-        // seek 到流起点
-        inCtx.seek(0, 0, 0);
+        std::optional<av::AudioDecoderContext> audioDecoder;
+        std::optional<AudioSegmentWriter> audioWriter;
+        if (audioConfig.has_value() && audioInputIndex >= 0) {
+            audioDecoder.emplace(inCtx.stream(audioInputIndex));
+            audioDecoder->open();
+            audioWriter.emplace(outCtx, outStreams[audioOutputIndex], &*audioDecoder,
+                *audioConfig, segmentSamples, segmentOffsetSamples);
+        }
+        else if (audioConfig.has_value()) {
+            this->LogWarning(std::string("输入文件没有音频流，将补充静音: ") + inputs[fileIdx].string());
+        }
 
         while (true) {
-            av::Packet pkt = inCtx.readPacket();
-            if (!pkt || pkt.isNull()) break;
+            av::Packet packet = inCtx.readPacket();
+            if (!packet || packet.isNull()) {
+                break;
+            }
 
-            int idx = pkt.streamIndex();
-            if (idx < 0 || static_cast<size_t>(idx) >= outStreams.size()) continue;
-            auto inStream = inCtx.stream(idx);
-            auto& outStream = outStreams[idx];
+            const int inputStreamIndex = packet.streamIndex();
+            if (inputStreamIndex == audioInputIndex) {
+                if (audioWriter.has_value()) {
+                    audioWriter->ProcessPacket(packet);
+                }
+                continue;
+            }
 
-            // 使用 Timestamp 来转换时间基
-            int64_t pts = 0;
-            int64_t dts = 0;
-            if (pkt.pts().isValid()) pts = pkt.pts().timestamp(inStream.timeBase());
-            if (pkt.dts().isValid()) dts = pkt.dts().timestamp(inStream.timeBase());
+            if (inputStreamIndex < 0 || static_cast<size_t>(inputStreamIndex) >= inCtx.streamsCount()) {
+                continue;
+            }
 
-            // 转换到输出 timebase
-            if (pkt.pts().isValid()) pts = inStream.timeBase().rescale(pts, outStream.timeBase());
-            if (pkt.dts().isValid()) dts = inStream.timeBase().rescale(dts, outStream.timeBase());
-
-            // 应用对应流偏移
-            pts += streamOffsets[idx];
-            dts += streamOffsets[idx];
-
-            pkt.setPts(av::Timestamp(pts, outStream.timeBase()));
-            pkt.setDts(av::Timestamp(dts, outStream.timeBase()));
-            pkt.setDuration(static_cast<int>(inStream.timeBase().rescale(pkt.duration(), outStream.timeBase())), outStream.timeBase());
-            pkt.setStreamIndex(idx);
-            pkt.setTimeBase(outStream.timeBase());
-
-            // 保证每个输出流的 DTS 单调递增，避免 write 时 EINVAL
-            if (pkt.dts().isValid()) {
-                int64_t curDts = pkt.dts().timestamp(outStream.timeBase());
-                if (curDts <= lastDts[idx]) {
-                    curDts = lastDts[idx] + 1;
-                    pkt.setDts(av::Timestamp(curDts, outStream.timeBase()));
-                    if (pkt.pts().isValid() && pkt.pts().timestamp(outStream.timeBase()) <= curDts) {
-                        pkt.setPts(av::Timestamp(curDts + 1, outStream.timeBase()));
+            auto inputStream = inCtx.stream(inputStreamIndex);
+            int outputStreamIndex = -1;
+            if (fileIdx == 0) {
+                outputStreamIndex = firstInputToOutput[inputStreamIndex];
+            }
+            else {
+                size_t ordinal = 0;
+                for (int i = 0; i < inputStreamIndex; ++i) {
+                    if (!inCtx.stream(i).isAudio() &&
+                        inCtx.stream(i).mediaType() == inputStream.mediaType()) {
+                        ++ordinal;
                     }
                 }
-                lastDts[idx] = pkt.dts().timestamp(outStream.timeBase());
-            }
-
-            try {
-                outCtx.writePacket(pkt);
-            }
-            catch (const std::exception& e) {
-                try {
-                    this->LogWarning(std::format("writePacket 失败 idx={} pts={} dts={} err={}，尝试 writePacketDirect",
-                        idx,
-                        pkt.pts().isValid() ? std::to_string(pkt.pts().timestamp(outStream.timeBase())) : std::string("no"),
-                        pkt.dts().isValid() ? std::to_string(pkt.dts().timestamp(outStream.timeBase())) : std::string("no"),
-                        e.what()));
-                }
-                catch (...) {}
-
-                try {
-                    outCtx.writePacketDirect(pkt);
-                }
-                catch (const std::exception& e2) {
-                    try {
-                        this->LogError(std::format("writePacketDirect 也失败 idx={} err={}", idx, e2.what()));
+                for (size_t i = 0; i < firstInputToOutput.size(); ++i) {
+                    if (firstInputToOutput[i] < 0 || firstInputMediaTypes[i] != inputStream.mediaType()) {
+                        continue;
                     }
-                    catch (...) {}
+                    if (ordinal == 0) {
+                        outputStreamIndex = firstInputToOutput[i];
+                        break;
+                    }
+                    --ordinal;
                 }
             }
+            if (outputStreamIndex < 0 || static_cast<size_t>(outputStreamIndex) >= outStreams.size()) {
+                continue;
+            }
+
+            auto& outputStream = outStreams[outputStreamIndex];
+            int64_t pts = packet.pts().isValid()
+                ? inputStream.timeBase().rescale(packet.pts().timestamp(inputStream.timeBase()), outputStream.timeBase())
+                : 0;
+            int64_t dts = packet.dts().isValid()
+                ? inputStream.timeBase().rescale(packet.dts().timestamp(inputStream.timeBase()), outputStream.timeBase())
+                : 0;
+            const int64_t offset = MicrosecondTimeBase.rescale(timelineOffsetUs, outputStream.timeBase());
+            if (packet.pts().isValid()) {
+                pts += offset;
+                packet.setPts(av::Timestamp(pts, outputStream.timeBase()));
+            }
+            if (packet.dts().isValid()) {
+                dts += offset;
+                if (dts <= lastDts[outputStreamIndex]) {
+                    const int64_t correction = lastDts[outputStreamIndex] + 1 - dts;
+                    dts += correction;
+                    if (packet.pts().isValid()) {
+                        pts += correction;
+                        packet.setPts(av::Timestamp(pts, outputStream.timeBase()));
+                    }
+                }
+                packet.setDts(av::Timestamp(dts, outputStream.timeBase()));
+                lastDts[outputStreamIndex] = dts;
+            }
+
+            packet.setDuration(static_cast<int>(
+                inputStream.timeBase().rescale(packet.duration(), outputStream.timeBase())),
+                outputStream.timeBase());
+            packet.setStreamIndex(outputStreamIndex);
+            packet.setTimeBase(outputStream.timeBase());
+            outCtx.writePacket(packet);
         }
 
-        // 每个流累加该文件时长到对应偏移
-        for (size_t si = 0; si < outStreams.size(); ++si) {
-            auto inStream = inCtx.stream(si);
-            auto durTs = inStream.duration();
-            int64_t dur = durTs.isValid() ? durTs.timestamp(inStream.timeBase()) : 0;
-            int64_t durOut = inStream.timeBase().rescale(dur, outStreams[si].timeBase());
-            streamOffsets[si] += durOut;
+        if (audioWriter.has_value()) {
+            audioWriter->Finish();
         }
+        else if (audioConfig.has_value()) {
+            AudioSegmentWriter silenceWriter(outCtx, outStreams[audioOutputIndex], nullptr,
+                *audioConfig, segmentSamples, segmentOffsetSamples);
+            silenceWriter.Finish();
+        }
+
+        timelineOffsetUs += segmentDurationUs;
     }
 
+    if (!headerWritten) {
+        throw std::runtime_error("没有可写入的输入流");
+    }
     outCtx.writeTrailer();
-    this->LogSucc(std::string("合并完成: ") + output.string());
     outCtx.close();
-    try {
-
-
-
-    }
-    catch (const std::exception& e) {
-        this->LogError(std::string("合并失败: ") + e.what());
-    }
+    this->LogSucc(std::string("合并完成: ") + output.string());
 }

@@ -59,4 +59,4 @@ H264Nvenc.preset: 1
 H264Nvenc.tune: 0
 H264Nvenc.lookahead: 0
 H264Nvenc.surfaces: 4
-MediaRunningState.nextStartUseAdvancedMode: true
+MediaRunningState.nextStartUseAdvancedMode: false
