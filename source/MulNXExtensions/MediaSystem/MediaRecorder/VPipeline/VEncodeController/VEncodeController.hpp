@@ -9,7 +9,9 @@ class VEncodeController final :public MediaModuleBase {
     av::VideoEncoderContext vEncoderContext{};
 
     av::Stream vstream{};
+    
     av::VideoRescaler rescaler{};
+    std::optional<av::VideoFrame> rescaleFrame{};
 
     std::atomic<int> width = 0;
     std::atomic<int> height = 0;

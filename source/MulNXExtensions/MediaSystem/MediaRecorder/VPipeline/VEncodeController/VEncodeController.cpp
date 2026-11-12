@@ -90,6 +90,7 @@ std::optional<av::VideoEncoderContext> VEncodeController::OpenEncoder(const Medi
 }
 
 void VEncodeController::SetOn(av::FormatContext* oCtx) {
+    this->rescaleFrame.reset();
     CtrlVideoFrame ctrlVFrame;
     while (this->bufferVFrames.try_dequeue(ctrlVFrame)) {
 
@@ -187,23 +188,29 @@ bool VEncodeController::OnEncode() {
         int srcW = srcFrame.width();
         int srcH = srcFrame.height();
 
-        av::VideoFrame dst;
+        av::VideoFrame* dst = nullptr;
 
-        // ── 软件帧（BGRA，来自 CPU 读回）──
         if (srcW == this->width && srcH == this->height && srcFmtRaw == this->dstPixFmt) {
-            dst = std::move(srcFrame);
+            dst = &srcFrame;
         }
         else {
             this->CheckRescaler(srcW, srcH, srcFmtRaw);
-            dst = av::VideoFrame(this->dstPixFmt, this->width, this->height);
-            this->rescaler.rescale(dst, srcFrame);
+
+            if (!this->rescaleFrame ||
+                this->rescaleFrame->width() != this->width ||
+                this->rescaleFrame->height() != this->height ||
+                this->rescaleFrame->pixelFormat() != this->dstPixFmt) {
+                this->rescaleFrame.emplace(this->dstPixFmt, this->width, this->height);
+            }
+            this->rescaler.rescale(*this->rescaleFrame, srcFrame);
+            dst = &*this->rescaleFrame;
         }
 
-        dst.setTimeBase(this->timeBase);
-        dst.setPts(av::Timestamp(inPts, this->timeBase));
-        dst.setStreamIndex(this->vstream.index());
+        dst->setTimeBase(this->timeBase);
+        dst->setPts(av::Timestamp(inPts, this->timeBase));
+        dst->setStreamIndex(this->vstream.index());
 
-        av::Packet pkt = this->vEncoderContext.encode(dst);
+        av::Packet pkt = this->vEncoderContext.encode(*dst);
         if (!pkt || pkt.size() <= 0)return true;
         pkt.setStreamIndex(this->vstream.index());
         pkt.setTimeBase(this->vstream.timeBase());
