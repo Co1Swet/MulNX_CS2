@@ -42,7 +42,8 @@ std::optional<std::pair<CS2::CCSPlayerController*, CS2::C_CSPlayerPawn*>> Client
 
         return std::make_optional(std::make_pair(controller, pawn));
     }
-    catch (...) {
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
         return std::nullopt;
     }
 }
@@ -55,7 +56,8 @@ CS2::C_CSPlayerPawn* ClientEntitySystem::GetLocalPlayerPawnEx() {
         auto* localPawn = this->GetBaseEntityFromHandle(hLocalPawn)->As<CS2::C_CSPlayerPawn>();
         return localPawn;
     }
-    catch (...) {
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
         return nullptr;
     }
 }
@@ -68,7 +70,8 @@ CS2::C_CSPlayerPawn* ClientEntitySystem::TryGetObservingPawn() {
         auto* target = this->GetBaseEntityFromHandle(hObserverTarget)->As<CS2::C_CSPlayerPawn>();
         return target;
     }
-    catch (...) {
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
         return nullptr;
     }
 }
@@ -83,7 +86,8 @@ std::optional<Steam64UID> ClientEntitySystem::TryGetObservingSteam64UID()noexcep
         auto steam64 = MulNX::MRead(pController->m_steamID());
         return steam64;
     }
-    catch (...) {
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
         return std::nullopt;
     }
 }
@@ -96,7 +100,8 @@ std::optional<CS2::CHandleBase> ClientEntitySystem::TryGetControllerHandle(CS2::
         if (!pPawn)return std::nullopt;
         return MulNX::MRead(pPawn->m_hController());
     }
-    catch (...) {
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
         return std::nullopt;
     }
 }
@@ -114,7 +119,8 @@ CS2::CCSPlayerController* ClientEntitySystem::FindControllerBySteam64UID(Steam64
             return controller;
         }
     }
-    catch (...) {
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
         this->LogError("FindControllerBySteam64UID 失败");
     }
     return nullptr;
@@ -130,6 +136,8 @@ std::optional<Steam64UID> ClientEntitySystem::GetWeaponOwnerSteamID(CS2::C_CSWea
         auto steamID = MulNX::MRead(pCtrl->m_steamID());
         return steamID;
     }
-    catch (...) {}
+    catch (const MulNX::Exception& e) {
+        this->LogError(e);
+    }
     return std::nullopt;
 }

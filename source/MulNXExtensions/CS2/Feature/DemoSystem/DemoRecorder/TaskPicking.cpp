@@ -89,13 +89,15 @@ MulNX::CoTask DemoRecorder::GoNextTask(std::optional<Demo::RecordTask>& outTask)
             this->indexTask.store(nextIdx, std::memory_order_release);
             co_return;
         }
-        else {
-            this->AsyncCommand("demo_pause");
-            this->LogSucc(std::format("录制Pass已经完整结束：{}", curPass->demoFileName));
-            this->currentPass.store(nullptr, std::memory_order_release);
-            this->indexTask.store(-1, std::memory_order_release);
-            curPass = nullptr;
-            continue;
-        }
+        this->AsyncCommand("demo_pause");
+        this->LogSucc(std::format("录制Pass已经完整结束：{}", curPass->demoFileName));
+        this->currentPass.store(nullptr, std::memory_order_release);
+        this->indexTask.store(-1, std::memory_order_release);
+        
+        MulNX::Message msg("Demo/Pass/End"_hash);
+        auto&& [pPass] = msg.Access<const Demo::RecordPass*>();
+        pPass = curPass.get();
+        this->PublishSync(msg);
+        curPass = nullptr;
     }
 }

@@ -16,7 +16,7 @@ MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target)const {
         }
         co_await this->WaitTimed(ok, 500, [&]() {
             auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-            if (!obUID || (obUID.value() != target))return false;
+            if (!obUID || *obUID != target)return false;
             return true;
             });
         if (ok)break;
