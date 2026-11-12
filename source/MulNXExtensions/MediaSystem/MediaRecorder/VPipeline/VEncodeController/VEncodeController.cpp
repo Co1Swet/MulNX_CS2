@@ -47,8 +47,9 @@ std::optional<av::VideoEncoderContext> VEncodeController::OpenEncoder(const Medi
 
     vEncoderContext.setWidth(this->width);
     vEncoderContext.setHeight(this->height);
-    vEncoderContext.setPixelFormat(this->dstPixFmt);
-
+    // 格式处理
+    vEncoderContext.setPixelFormat(iEncoder->GetPreferredPixelFormat());
+    // 色彩空间处理
     auto* raw = vEncoderContext.raw();
     raw->color_range = AVCOL_RANGE_MPEG;
     raw->colorspace = AVCOL_SPC_BT709;
@@ -93,7 +94,6 @@ void VEncodeController::SetOn(av::FormatContext* oCtx) {
     while (this->bufferVFrames.try_dequeue(ctrlVFrame)) {
 
     }
-    this->dstPixFmt = AV_PIX_FMT_YUV420P;
     this->pMediaState->encodingOverload = false;
 
     auto& rp = *this->pMediaParamManager;
@@ -109,6 +109,7 @@ void VEncodeController::SetOn(av::FormatContext* oCtx) {
     }
 
     this->vEncoderContext = std::move(o.value());
+    this->dstPixFmt = this->vEncoderContext.pixelFormat();
     this->vstream = oCtx->addStream(this->vEncoderContext);
     this->vstream.setTimeBase(this->timeBase);
     this->vstream.setupEncodingParameters(this->vEncoderContext);
@@ -131,8 +132,10 @@ void VEncodeController::CheckRescaler(int srcW, int srcH, av::PixelFormat srcFmt
         this->rescaler.dstPixelFormat() == this->dstPixFmt) {
         return;
     }
+    const int flags = (srcW == this->width && srcH == this->height) ?
+        SWS_BILINEAR : SWS_BICUBIC;
     this->rescaler = av::VideoRescaler(this->width, this->height, this->dstPixFmt,
-        srcW, srcH, srcFmt, av::SwsFlagBicubic);
+        srcW, srcH, srcFmt, flags);
 }
 
 bool VEncodeController::ExitCode() {

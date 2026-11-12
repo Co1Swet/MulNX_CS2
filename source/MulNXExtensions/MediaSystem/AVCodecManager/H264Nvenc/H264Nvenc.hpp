@@ -15,6 +15,7 @@ class H264Nvenc final : public MediaModuleBase, public VEncoderMixin<H264Nvenc> 
     void SettingsMenu() override;
     bool Init() override;
     av::Codec* GetAVCodec() override;
+    av::PixelFormat GetPreferredPixelFormat()const override;
     av::Dictionary GetPrivateOpts() const override;
     inline bool SupportsConstantQuality() const override { return true; }
 };

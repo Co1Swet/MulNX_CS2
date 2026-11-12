@@ -2,7 +2,7 @@ TrailsController.trailsEnable: false
 PlayProtect.forceDemoPauseAtEnd: true
 UISystem.rendEnable: false
 MediaParamManager.maxBFrames: 0
-UISystem.ifDrawMid: false
+UISystem.ifDrawMid: true
 CamMacroManager.shortcutEnable: true
 OpenH264Encoder.rc_mode: bitrate
 HookSpotStyle.transSpecLabel: true

@@ -8,10 +8,15 @@ namespace MulNX {
         virtual std::string_view GetName()const = 0;
         virtual bool IsAvailable()const = 0;
         virtual const char* GetNotAvailableReason()const = 0;
+
         virtual av::Codec* GetAVCodec() = 0;
-        virtual av::Dictionary GetPrivateOpts()const = 0;
-        virtual void SettingsMenu() = 0;
         virtual bool SupportsConstantQuality()const = 0;
+        virtual av::PixelFormat GetPreferredPixelFormat()const = 0;
+
+        virtual av::Dictionary GetPrivateOpts()const = 0;
+        
+        virtual void SettingsMenu() = 0;
+        
     };
 }
 

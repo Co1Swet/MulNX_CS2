@@ -28,5 +28,6 @@ class OpenH264Encoder final : public MulNX::Module<OpenH264Encoder>, public VEnc
     void SettingsMenu()override;
     bool Init()override;
     av::Codec* GetAVCodec()override;
+    av::PixelFormat GetPreferredPixelFormat()const override;
     av::Dictionary GetPrivateOpts()const override;
 };

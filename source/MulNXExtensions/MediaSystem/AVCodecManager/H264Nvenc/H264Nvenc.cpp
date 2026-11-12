@@ -27,6 +27,9 @@ bool H264Nvenc::Init() {
 
 bool H264Nvenc::IsAvailable() const { return !this->codec.isNull() && this->codec.canEncode(); }
 av::Codec* H264Nvenc::GetAVCodec() { return &this->codec; }
+av::PixelFormat H264Nvenc::GetPreferredPixelFormat()const {
+    return av::PixelFormat(AV_PIX_FMT_NV12);
+}
 
 av::Dictionary H264Nvenc::GetPrivateOpts() const {
     av::Dictionary opts;

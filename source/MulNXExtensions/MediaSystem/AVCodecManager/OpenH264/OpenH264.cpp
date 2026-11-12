@@ -35,6 +35,10 @@ av::Codec* OpenH264Encoder::GetAVCodec() {
     return &this->codec;
 }
 
+av::PixelFormat OpenH264Encoder::GetPreferredPixelFormat()const {
+    return av::PixelFormat(AV_PIX_FMT_YUV420P);
+}
+
 av::Dictionary OpenH264Encoder::GetPrivateOpts()const {
     av::Dictionary opts{};
 
