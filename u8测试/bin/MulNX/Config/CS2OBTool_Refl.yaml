@@ -8,6 +8,7 @@ OpenH264Encoder.rc_mode: bitrate
 HookSpotStyle.transSpecLabel: true
 ViewSmoother.enable: false
 ESPSkeleton.enable: false
+AdvancedRecord.useTimeStamp: true
 ESPBox.enable: false
 GlowController.disableGlow: true
 TeamIDRenderController.hideEnemyTeamID: true
@@ -60,3 +61,4 @@ H264Nvenc.tune: 0
 H264Nvenc.lookahead: 0
 H264Nvenc.surfaces: 4
 MediaRunningState.nextStartUseAdvancedMode: false
+AdvancedRecord.outputFile: record

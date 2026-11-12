@@ -1,16 +1,27 @@
 #include "AdvancedRecord.hpp"
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <MulNXExtensions/MediaSystem/MediaRecorder/MediaRecords.hpp>
+#include <MulNXUtils/Times/Times.hpp>
 
 void AdvancedRecord::Menu() {
-    ImGui::InputText("文件名", &this->outputFile);
+    static std::string name{};
+    ImGui::TextUnformatted("当前输出文件名：");
+    ImGui::SameLine();
+    ImGui::Text("%s", this->outputFile.load(std::memory_order_acquire)->c_str());
+    ImGui::InputText("新文件名", &name);
+    if (ImGui::Button("确认修改")) {
+        this->outputFile.store(std::make_shared<std::string>(name), std::memory_order_release);
+    }
 
+    MulNX::UI::Checkbox("自动补充后缀时间戳", this->useTimeStamp);
     MulNX::UI::Checkbox("高级录制模式", this->pMediaState->nextStartUseAdvancedMode);
 
     if (ImGui::Button("开始录制")) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
         rp->str1 = this->dirVideos.string();
-        rp->str2 = this->outputFile;
+        const auto name = this->outputFile.load(std::memory_order_acquire);
+        rp->str2 = this->useTimeStamp.load(std::memory_order_acquire) ?
+            std::format("{}_{}", *name, MulNX::Time::GetTimestamp()) : *name;
         this->PublishAsync(std::move(msg));
     }
     ImGui::SameLine();

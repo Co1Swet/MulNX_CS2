@@ -3,14 +3,15 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
 class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<AdvancedRecord> {
-    std::atomic<bool> startAsAdvanced = false;
     fs::path dirVideos;
-    std::string outputFile = "record";
-    // 基于时间槽的帧率限制状态
-    std::atomic<std::chrono::steady_clock::time_point> recordStartTime;
+
+    MulReflBool(useTimeStamp, true);
+    MulReflStr(outputFile, "record");
+
+    std::atomic<bool> startAsAdvanced = false;
+    std::atomic<std::chrono::steady_clock::time_point> recordStartTime;    // 基于时间槽的帧率限制状态
     std::atomic<int64_t> minIntervalUs = 0;         // 本次录制帧间隔（µs），0 表示不限帧
     std::atomic<int64_t> lastSlot = -1;             // 上次捕获所在时间槽序号
-
     std::atomic<int> frameCount = 0;
 
     void Menu();
