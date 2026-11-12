@@ -2,7 +2,7 @@ TrailsController.trailsEnable: false
 PlayProtect.forceDemoPauseAtEnd: true
 UISystem.rendEnable: false
 MediaParamManager.maxBFrames: 0
-UISystem.ifDrawMid: true
+UISystem.ifDrawMid: false
 CamMacroManager.shortcutEnable: true
 OpenH264Encoder.rc_mode: bitrate
 HookSpotStyle.transSpecLabel: true
@@ -55,7 +55,7 @@ MediaParamManager.targetFPS: 30
 OpenH264Encoder.coder: ""
 OpenH264Encoder.loopfilter: ""
 OpenH264Encoder.allow_skip_frames: ""
-H264Nvenc.preset: 0
+H264Nvenc.preset: 1
 H264Nvenc.tune: 0
 H264Nvenc.lookahead: 0
 H264Nvenc.surfaces: 4
