@@ -104,7 +104,7 @@ namespace Demo {
     };
 }
 
-class DemoSystem final :public CSModuleBase {
+class DemoSystem final :public CSModule<DemoSystem> {
     std::map<std::string, // 先kDir，再demoName
         std::map<std::string, std::shared_ptr<Demo::Info>>> demos;
     

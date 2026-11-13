@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class DemSortPass final : public DemModuleBase {
+class DemSortPass final : public DemModule<DemSortPass> {
     bool Init() override;
 
 public:

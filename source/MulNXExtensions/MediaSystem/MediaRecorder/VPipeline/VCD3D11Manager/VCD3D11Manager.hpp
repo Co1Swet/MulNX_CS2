@@ -35,7 +35,7 @@ struct RingSlot {
     }
 };
 
-class VCD3D11Manager final : public MediaModuleBase {
+class VCD3D11Manager final : public MediaModule<VCD3D11Manager> {
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
 
     moodycamel::BlockingConcurrentQueue<int> forReader{};

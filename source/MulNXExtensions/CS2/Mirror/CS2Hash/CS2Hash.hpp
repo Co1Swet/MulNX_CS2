@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class CS2Hash final :public CSModuleBase {
+class CS2Hash final :public CSModule<CS2Hash> {
     using HashFunc_t = uint32_t(__fastcall*)(const char* str, uint32_t len, uint32_t seed);
     HashFunc_t CSHashString{ nullptr };
     uint32_t WrapHash(const std::string& str);

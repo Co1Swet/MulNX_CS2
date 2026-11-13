@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <Intro/BackgroundEntityScan/EntityIterationMixin.hpp>
 
-class ObserverController final : public CSModuleBase, public EntityIterationMixin<ObserverController> {
+class ObserverController final : public CSModule<ObserverController>, public EntityIterationMixin<ObserverController> {
     void SpecSteam64UID(Steam64UID uid);
 
     bool Init() override;

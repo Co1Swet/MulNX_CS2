@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class RecordTaskConfiger final :public DemModuleBase {
+class RecordTaskConfiger final :public DemModule<RecordTaskConfiger> {
     void Window();
     void ProcessMsg(MulNX::Message& msg)override;
     bool Init()override;

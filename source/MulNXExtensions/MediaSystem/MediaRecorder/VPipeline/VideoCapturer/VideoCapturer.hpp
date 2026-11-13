@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class VideoCapturer final :public MediaModuleBase {
+class VideoCapturer final :public MediaModule<VideoCapturer> {
     class VCD3D11Manager* pVCD3D11Manager = nullptr;
     class VEncodeController* pVEncodeController = nullptr;
     class TextureMapper* pTextureMapper = nullptr;

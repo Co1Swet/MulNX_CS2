@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class FlashRenderController final :public CSModuleBase {
+class FlashRenderController final :public CSModule<FlashRenderController> {
     float* r_spectator_flashbang_opacity = nullptr;
     std::unique_ptr<MulNX::Hook> hkDrawUp{};
     std::unique_ptr<MulNX::Hook> hkDrawDown{};

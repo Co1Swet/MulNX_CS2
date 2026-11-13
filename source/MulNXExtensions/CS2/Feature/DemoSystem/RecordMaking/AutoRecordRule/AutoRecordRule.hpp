@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class AutoRecordRule final : public DemModuleBase {
+class AutoRecordRule final : public DemModule<AutoRecordRule> {
 public:
     enum class Mode {
         SinglePlayer,

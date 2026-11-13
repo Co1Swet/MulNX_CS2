@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <Feature/Model/SkinConfigger/SkinConfigger.hpp>
 
-class SkinController final :public CSModuleBase {
+class SkinController final :public CSModule<SkinController> {
     SkinConfigger* pSkinConfigger = nullptr;
 public:
     using CEconItemView_GetPaintKit_t = uint32_t(*)(CS2::C_EconItemView* pEconItemView);

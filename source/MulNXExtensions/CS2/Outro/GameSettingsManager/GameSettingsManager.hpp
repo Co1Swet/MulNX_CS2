@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 
-class GameSettingsManager final :public CSModuleBase {
+class GameSettingsManager final :public CSModule<GameSettingsManager> {
     float FocusDistance{};
     float CrispRadius{};
     float BlurDistance{};

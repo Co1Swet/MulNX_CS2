@@ -2,7 +2,7 @@
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
 class RecordTaskConfiger;
-class RecordTaskMaker final :public DemModuleBase {
+class RecordTaskMaker final :public DemModule<RecordTaskMaker> {
     RecordTaskConfiger* pConfiger = nullptr;
 
     bool showBekillEvent = true;

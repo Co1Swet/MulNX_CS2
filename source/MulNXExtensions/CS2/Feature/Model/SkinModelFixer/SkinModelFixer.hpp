@@ -2,7 +2,7 @@
 #include <Feature/Model/SkinController/SkinController.hpp>
 #include <Mirror/CCStrike15ItemSystem/CCStrike15ItemSystem.hpp>
 
-class SkinModelFixer final :public CSModuleBase {
+class SkinModelFixer final :public CSModule<SkinModelFixer> {
     CCStrike15ItemSystem* pCCStrike15ItemSystem = nullptr;
     SkinController::CEconItemView_GetPaintKit_t pGetPaintKit = nullptr;
 

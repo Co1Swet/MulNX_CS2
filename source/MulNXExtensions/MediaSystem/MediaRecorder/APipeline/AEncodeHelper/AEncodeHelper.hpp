@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class AEncodeHelper final : public MediaModuleBase {
+class AEncodeHelper final : public MediaModule<AEncodeHelper> {
     class AudioCapturer* pAudioCapturer = nullptr;
 
     av::Stream astream;

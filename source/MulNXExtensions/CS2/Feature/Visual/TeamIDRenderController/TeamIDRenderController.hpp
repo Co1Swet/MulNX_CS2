@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class TeamIDRenderController final : public CSModuleBase {
+class TeamIDRenderController final : public CSModule<TeamIDRenderController> {
     std::unique_ptr<MulNX::Hook> hkPosTeamID_CmpForHide = nullptr;
     MulReflBool(hideEnemyTeamID, true);
     MulNX::Hook::Then HandleForShowTeamID(CS2::C_CSPlayerPawn* pCSPlayerPawn);

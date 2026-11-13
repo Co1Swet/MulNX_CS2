@@ -3,7 +3,7 @@
 #include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
 #include <MulNXUtils/NewestBuffer.hpp>
 
-class CampathManager final : public CamSysModule {
+class CampathManager final : public CamSysModule<CampathManager> {
     class CamDrawer* pCamDrawer = nullptr;
 
     std::unordered_map<std::string, std::shared_ptr<FreeCameraPath>> campaths;

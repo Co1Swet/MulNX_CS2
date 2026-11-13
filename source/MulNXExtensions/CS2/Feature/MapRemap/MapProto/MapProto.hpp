@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/MapRemap/MapState/MapState.hpp>
 
-class MapProto final :public CSModuleBase, public RemapMixin<MapProto> {
+class MapProto final :public CSModule<MapProto>, public RemapMixin<MapProto> {
     std::unique_ptr<MulNX::Hook> hkCDemoFileHeader_PraseString = nullptr;
     std::unique_ptr<MulNX::Hook> hkCNETMsg_SpawnGroup_Load_PraseString = nullptr;
     std::unique_ptr<MulNX::Hook> hkCSVCMsg_ServerInfo_PraseString = nullptr;

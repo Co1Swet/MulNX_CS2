@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class AdvancedRecord final :public CSModuleBase, public MediaModuleMixin<AdvancedRecord> {
+class AdvancedRecord final :public CSModule<AdvancedRecord>, public MediaModuleMixin<AdvancedRecord> {
     fs::path dirVideos;
 
     MulReflBool(useTimeStamp, true);

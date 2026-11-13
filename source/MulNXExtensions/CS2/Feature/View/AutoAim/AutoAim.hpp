@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
 
-class AutoAim final :public CSModuleBase, public CSViewControlMixin<AutoAim> {
+class AutoAim final :public CSModule<AutoAim>, public CSViewControlMixin<AutoAim> {
     class TargetPicker* pTargetPicker = nullptr;
 
     std::atomic<bool> enable = false;

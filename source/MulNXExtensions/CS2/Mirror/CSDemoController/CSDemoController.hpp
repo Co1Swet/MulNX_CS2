@@ -16,7 +16,7 @@ namespace CS2 {
 #pragma pack(pop)
 }
 
-class CSDemoController final :public CSModuleBase {
+class CSDemoController final :public CSModule<CSDemoController> {
     using GetCCSDemoController_t = CS2::CCSDemoController* (*)(void);
     GetCCSDemoController_t pGetCCSDemoController = nullptr;
 

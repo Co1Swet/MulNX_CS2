@@ -18,7 +18,7 @@ namespace CS2 {
     };
 }
 
-class HookGameEvents final :public CSModuleBase {
+class HookGameEvents final :public CSModule<HookGameEvents> {
     std::unique_ptr<MulNX::Hook> hkCGameEventManager_FireEvent{};
     std::unique_ptr<MulNX::Hook> hkPos_CGameEventManager_FireEvents_AcquiredLock{};
     bool Init()override;

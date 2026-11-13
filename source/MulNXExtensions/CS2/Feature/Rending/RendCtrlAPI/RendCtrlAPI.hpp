@@ -2,7 +2,7 @@
 #include <Mirror/SceneSystem/SceneSystem.hpp>
 #include <MulNXExtensions/GraphicsManager/GraphicsManager.hpp>
 
-class RendCtrlAPI final :public CSModuleBase {
+class RendCtrlAPI final :public CSModule<RendCtrlAPI> {
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
     // -------------------------------------------------------
     ComPtr<ID3D11BlendState> RT_pBSNoDraw = nullptr;

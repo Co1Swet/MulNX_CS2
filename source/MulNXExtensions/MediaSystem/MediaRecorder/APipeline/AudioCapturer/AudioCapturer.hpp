@@ -2,7 +2,7 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <audioclient.h>
 
-class AudioCapturer final :public MediaModuleBase {
+class AudioCapturer final :public MediaModule<AudioCapturer> {
     class AEncodeHelper* pAEncodeHelper = nullptr;
     
     std::atomic<bool> exitFlag = false;

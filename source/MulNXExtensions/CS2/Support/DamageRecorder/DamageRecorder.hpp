@@ -37,7 +37,7 @@ public:
     std::map<int, RoundDamageInfo> RoundDamageMap;
 };
 
-class DamageRecorder final : public CSModuleBase {
+class DamageRecorder final : public CSModule<DamageRecorder> {
     DamageInfo info{};
     bool Init() override;
     void HandleOnPlayerHurt(MulNX::Message& msg);

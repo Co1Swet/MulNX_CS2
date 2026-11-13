@@ -14,7 +14,8 @@ protected:
     }
 };
 
-class DemModuleBase :public CSModuleBase, public DemModuleMixin<DemModuleBase> {
+template <typename T>
+class DemModule :public CSModule<T>, public DemModuleMixin<T> {
 protected:
     // 立即从有效消息转换出信息，并摆脱消息本身生命周期
     inline std::expected <

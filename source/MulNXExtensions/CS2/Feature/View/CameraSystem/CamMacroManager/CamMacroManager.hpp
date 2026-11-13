@@ -2,7 +2,7 @@
 #include <CameraSystem/CamMacro/CamMacro.hpp>
 #include <CameraSystem/CameraSystem.hpp>
 
-class CamMacroManager final :public CamSysModule {
+class CamMacroManager final :public CamSysModule<CamMacroManager> {
     std::unordered_map<std::string, std::unique_ptr<CamMacro>> camMacros{};
     CamMacro* pOperatingMacro = nullptr;
 

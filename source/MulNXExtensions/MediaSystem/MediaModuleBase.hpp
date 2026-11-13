@@ -52,5 +52,6 @@ protected:
     }
 };
 
-class MediaModuleBase :public MulNX::Module<MediaModuleBase>, public MediaModuleMixin<MediaModuleBase> {};
+template <typename T>
+class MediaModule :public MulNX::Module<T>, public MediaModuleMixin<T> {};
 using Microsoft::WRL::ComPtr;

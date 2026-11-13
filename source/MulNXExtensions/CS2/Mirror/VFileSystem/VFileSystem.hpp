@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class VFileSystem final :public CSModuleBase {
+class VFileSystem final :public CSModule<VFileSystem> {
     enum SearchPathAdd_t {
         PATH_ADD_TO_HEAD,
         PATH_ADD_TO_TAIL,

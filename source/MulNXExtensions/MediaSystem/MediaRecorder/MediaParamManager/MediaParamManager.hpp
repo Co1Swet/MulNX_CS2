@@ -3,7 +3,7 @@
 
 enum class RateControl { CBR, VBR, CQ };
 
-class MediaParamManager :public MediaModuleBase {
+class MediaParamManager :public MediaModule<MediaParamManager> {
     void Menu();
     bool Init()override;
 public:

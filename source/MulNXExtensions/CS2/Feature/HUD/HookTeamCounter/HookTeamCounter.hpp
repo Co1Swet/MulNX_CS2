@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class HookTeamCounter final :public CSModuleBase {
+class HookTeamCounter final :public CSModule<HookTeamCounter> {
     std::unique_ptr<MulNX::Hook>hkTeamCounterFillPlayerSlotCache = nullptr;
     std::unique_ptr<MulNX::Hook>hkPos_UpdatePanoramaFullInfoVisible = nullptr;
     std::unique_ptr<MulNX::Hook>hkPos_UpdatePanoramaNameVisible = nullptr;

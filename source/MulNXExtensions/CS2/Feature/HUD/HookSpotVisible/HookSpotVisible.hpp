@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <MulNXUtils/MemInsights/BitMaskEditor/BitMaskEditor.hpp>
 
-class HookSpotVisible :public CSModuleBase {
+class HookSpotVisible :public CSModule<HookSpotVisible> {
     std::unique_ptr<MulNX::Hook> hkPos_Spot_CmpToSetShow = nullptr;
     std::unique_ptr<MulNX::Hook> hkPos_SetAllVisible = nullptr;
 

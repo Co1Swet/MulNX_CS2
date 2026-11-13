@@ -18,7 +18,7 @@ public:
     DirectX::XMFLOAT3 AxisUp;
 };
 
-class AdvancedViewController final :public CSModuleBase, public CSViewControlMixin<AdvancedViewController> {
+class AdvancedViewController final :public CSModule<AdvancedViewController>, public CSViewControlMixin<AdvancedViewController> {
     std::atomic<bool> enable = false;
     std::atomic<bool> OverrideSelfView = false;
     std::atomic<bool> AlwaysCaulate = false;

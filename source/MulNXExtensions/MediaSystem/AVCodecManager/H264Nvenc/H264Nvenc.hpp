@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/AVCodecManager/AVCodecManager.hpp>
 
-class H264Nvenc final : public MediaModuleBase, public VEncoderMixin<H264Nvenc> {
+class H264Nvenc final : public MediaModule<H264Nvenc>, public VEncoderMixin<H264Nvenc> {
     class MediaParamManager* pMediaParamManager = nullptr;
     MulReflInt(preset, 0);      // 1=p1 最快
     MulReflInt(tune, 0);        // 0=ull

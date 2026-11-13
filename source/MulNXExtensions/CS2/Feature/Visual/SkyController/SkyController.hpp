@@ -22,7 +22,7 @@ namespace CS2 {
     };
 }
 
-class SkyController final : public CSModuleBase {
+class SkyController final : public CSModule<SkyController> {
     ResourceSystem* pResourceSystem = nullptr;
     MaterialSystem* pMaterialSystem = nullptr;
 

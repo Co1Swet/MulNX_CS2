@@ -3,7 +3,7 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <deque>
 
-class DemoRecorder final : public DemModuleBase, public MediaModuleMixin<DemoRecorder> {
+class DemoRecorder final : public DemModule<DemoRecorder>, public MediaModuleMixin<DemoRecorder> {
     std::atomic<bool> moduleActive = false;
     fs::path dirOutput{};
     std::string subOutput = "default";

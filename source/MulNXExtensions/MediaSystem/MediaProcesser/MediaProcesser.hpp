@@ -2,7 +2,7 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <string>
 
-class MediaProcesser final :public MediaModuleBase {
+class MediaProcesser final :public MediaModule<MediaProcesser> {
     void ProcessMsg(MulNX::Message& msg)override;
 
     bool concatActive = false;

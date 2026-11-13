@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class NameController final :public CSModuleBase {
+class NameController final :public CSModule<NameController> {
     std::array<char[128], 64>nameReplace{};
     std::map<uint64_t, int>nameReplaceInfo{};
     std::atomic<bool>noClantag = false;

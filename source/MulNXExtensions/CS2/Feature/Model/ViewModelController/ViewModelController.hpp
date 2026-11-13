@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class ViewModelController final :public CSModuleBase {
+class ViewModelController final :public CSModule<ViewModelController> {
     std::unique_ptr<MulNX::Hook>hkGetViewModelInfo = nullptr;
     std::unique_ptr<MulNX::Hook>hkGetIfHandLeftSide = nullptr;
 

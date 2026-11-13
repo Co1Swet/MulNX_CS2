@@ -12,7 +12,7 @@ struct CBufferStringForSky {
     uint8_t pad[0xE0 - sizeof(CS2::CBufferString)];
 };
 
-class ResourceSystem final :public CSModuleBase {
+class ResourceSystem final :public CSModule<ResourceSystem> {
     MulNX::Memory::DllModule resourcesystem{};
     void* pGameResourcesystem = nullptr;
     bool Init()override;

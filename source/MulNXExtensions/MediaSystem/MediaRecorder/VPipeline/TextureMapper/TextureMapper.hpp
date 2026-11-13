@@ -3,7 +3,7 @@
 
 class VCD3D11Manager;
 class MidTex;
-class TextureMapper final :public MediaModuleBase {
+class TextureMapper final :public MediaModule<TextureMapper> {
     VCD3D11Manager* pVCD3D11Manager = nullptr;
     // CPU 读回
     ID3D11Texture2D* pStagingTex = nullptr;

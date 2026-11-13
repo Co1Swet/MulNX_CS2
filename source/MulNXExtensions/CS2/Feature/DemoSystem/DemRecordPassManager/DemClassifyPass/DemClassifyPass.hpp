@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class DemClassifyPass final : public DemModuleBase {
+class DemClassifyPass final : public DemModule<DemClassifyPass> {
     bool Init() override;
 public:
     // 接收右值任务列表，按 demoName 分类为多个 RecordPass

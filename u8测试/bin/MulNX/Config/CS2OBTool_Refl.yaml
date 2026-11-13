@@ -36,6 +36,7 @@ RecordTaskConfiger.mergeThresholdSeconds: 10
 RecordTaskConfiger.preBekilledSeconds: 1.8
 RecordTaskConfiger.postBekilledSeconds: 1.8
 RecordTaskConfiger.postRoundEndSeconds: 1
+VirtualUser.enabled: true
 MediaParamManager.bitrate: 80000000
 MediaParamManager.cq: 23
 MediaParamManager.maxBFrames: 0

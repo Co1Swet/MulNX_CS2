@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class DemoAnalyzer final : public DemModuleBase {
+class DemoAnalyzer final : public DemModule<DemoAnalyzer> {
     fs::path csdaPath;
     fs::path dirData;
     std::set<fs::path> analyzingSet;            // 正在分析的 demo 绝对路径

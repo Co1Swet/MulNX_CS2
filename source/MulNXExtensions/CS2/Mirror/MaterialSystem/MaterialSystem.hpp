@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class MaterialSystem final :public CSModuleBase {
+class MaterialSystem final :public CSModule<MaterialSystem> {
     void* pGameMaterialSystem = nullptr;
     MulNX::Memory::DllModule materialsystem2{};
     bool Init()override;

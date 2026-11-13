@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <MulNXExtensions/TimeLiner/TimeMixin.hpp>
 
-class TimeController final :public CSModuleBase, public TimeAdaptMixin<TimeController> {
+class TimeController final :public CSModule<TimeController>, public TimeAdaptMixin<TimeController> {
     void* pDemoPlayer = nullptr;
     class CSDemoController* pCSDemoController = nullptr;
     double GetMinTime()override;

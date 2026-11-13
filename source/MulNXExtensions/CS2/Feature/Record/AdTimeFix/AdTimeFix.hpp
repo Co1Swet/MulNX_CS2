@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class AdTimeFix final : public CSModuleBase {
+class AdTimeFix final : public CSModule<AdTimeFix> {
     inline static AdTimeFix* pThis = nullptr;
 
     using Plat_FloatTime_t = double(*)(void);

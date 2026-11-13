@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class GlowController final :public CSModuleBase {
+class GlowController final :public CSModule<GlowController> {
     std::unique_ptr<MulNX::Hook> hkSetGlowColor = nullptr;
     std::unordered_map<Steam64UID, uint32_t>playerColors;
     std::atomic<std::optional<uint32_t>>TColor;

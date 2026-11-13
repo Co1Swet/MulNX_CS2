@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class DemoFiles :public DemModuleBase {
+class DemoFiles :public DemModule<DemoFiles> {
     struct DemoFile {
         std::string kDir{};
         std::string demoName{};

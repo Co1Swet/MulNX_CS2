@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class HookHealthAmmoCenter final :public CSModuleBase {
+class HookHealthAmmoCenter final :public CSModule<HookHealthAmmoCenter> {
     std::unique_ptr<MulNX::Hook> hkPos_CheckFor_HudSpecplayerRoot__visible = nullptr;
     std::unique_ptr<MulNX::Hook> hkPos_CheckFor_HUD__spectating_target = nullptr;
 

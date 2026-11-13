@@ -2,7 +2,7 @@
 #include <Mirror/SceneSystem/SceneSystem.hpp>
 #include <MulNXExtensions/MulNXReShadeBridge/IMulNXReShadeBridge.hpp>
 
-class CSReShadeController final :public CSModuleBase {
+class CSReShadeController final :public CSModule<CSReShadeController> {
     std::atomic<IMulNXReShadeBridge*> pMulNXReShadeBridge = nullptr;
 
     enum class PanoramaRend {

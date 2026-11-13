@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class GameCfgManager final :public CSModuleBase {
+class GameCfgManager final :public CSModule<GameCfgManager> {
     fs::path ToolPath{};
     fs::path GamePath{};
 

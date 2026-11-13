@@ -2,7 +2,7 @@
 #include <MulNXUtils/NewestBuffer.hpp>
 #include <Intro/HookView/CSViewControlModuleBase.hpp>
 
-class ProjectileTracker final : public CSModuleBase, public CSViewControlMixin<ProjectileTracker> {
+class ProjectileTracker final : public CSModule<ProjectileTracker>, public CSViewControlMixin<ProjectileTracker> {
     std::set<CS2::C_BaseCSGrenadeProjectile*> bufferProjectiles;
     std::atomic<CS2::C_BaseCSGrenadeProjectile*> pTargetWatchProjectile = nullptr;
     std::atomic<bool> enable = false;

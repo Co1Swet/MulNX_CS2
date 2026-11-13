@@ -5,7 +5,7 @@
 namespace CS2 {
     class CGameEvent;
 }
-class HSI final :public CSModuleBase, public WebSocketMixin<HSI> {
+class HSI final :public CSModule<HSI>, public WebSocketMixin<HSI> {
     struct KillEvent {
         Steam64UID attacker{};
         Steam64UID victim{};

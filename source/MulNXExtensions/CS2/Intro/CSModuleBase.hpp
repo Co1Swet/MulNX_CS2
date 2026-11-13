@@ -63,6 +63,5 @@ protected:
     }
 };
 
-class CSModuleBase :public MulNX::Module<CSModuleBase>, public CSModuleMixin<CSModuleBase> {};
 template<typename T>
-class CSModuleBaseT :public MulNX::Module<T>, public CSModuleMixin<T> {};
+class CSModule :public MulNX::Module<T>, public CSModuleMixin<T> {};

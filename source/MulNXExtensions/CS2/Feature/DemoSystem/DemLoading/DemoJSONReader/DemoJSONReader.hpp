@@ -1,7 +1,7 @@
 #pragma once
 #include <Feature/DemoSystem/DemModuleBase.hpp>
 
-class DemoJSONReader final : public DemModuleBase {
+class DemoJSONReader final : public DemModule<DemoJSONReader> {
     fs::path dirData;
     bool Window();
     bool Init()override;

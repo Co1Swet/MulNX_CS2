@@ -2,7 +2,7 @@
 #include <CS2Math/Math.hpp>
 #include <CameraSystem/CameraSystem.hpp>
 
-class CamDrawer final :public CamSysModule {
+class CamDrawer final :public CamSysModule<CamDrawer> {
     class CameraModel {
     public:
         DirectX::XMFLOAT3 Origin{};

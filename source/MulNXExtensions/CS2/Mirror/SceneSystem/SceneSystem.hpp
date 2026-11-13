@@ -62,7 +62,7 @@ namespace CS2 {
     };
 }
 
-class SceneSystem final :public CSModuleBase {    
+class SceneSystem final :public CSModule<SceneSystem> {
     bool Init()override;
 public:
     using DrawCurrentPrimitives_t = void(*)(CS2::DrawingData* pDrawingData);

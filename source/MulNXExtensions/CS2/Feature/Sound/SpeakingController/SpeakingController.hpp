@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 #include <Intro/BackgroundEntityScan/EntityIterationMixin.hpp>
 
-class SpeakingController :public CSModuleBase {
+class SpeakingController :public CSModule<SpeakingController> {
     int* tv_listen_voice_indices = nullptr;
     int* tv_listen_voice_indices_h = nullptr;
 

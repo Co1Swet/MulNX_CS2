@@ -2,7 +2,7 @@
 #include <Intro/Intros.hpp>
 
 class ParticleManager;
-class TrailsController final :public CSModuleBase {
+class TrailsController final :public CSModule<TrailsController> {
     struct ParticleColor { float r, g, b; };
     struct ParticleProp { float lifetime, width, alpha; };
 

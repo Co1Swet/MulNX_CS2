@@ -13,7 +13,7 @@ public:
 
 class CamDrawer;
 
-class CameraSystem final :public CSModuleBase, public CSViewControlMixin<CameraSystem> {
+class CameraSystem final :public CSModule<CameraSystem>, public CSViewControlMixin<CameraSystem> {
     CamDrawer* pCamDrawer = nullptr;
     class CampathManager* pCampathManager = nullptr;
     class CamMacroManager* pCamMacroManager = nullptr;
@@ -40,4 +40,5 @@ protected:
     }
 };
 
-class CamSysModule :public CSModuleBase, public CamSysModuleMixin<CamSysModule> {};
+template <typename T>
+class CamSysModule :public CSModule<T>, public CamSysModuleMixin<T> {};

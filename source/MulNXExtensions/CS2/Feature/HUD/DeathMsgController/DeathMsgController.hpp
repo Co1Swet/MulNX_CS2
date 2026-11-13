@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/HookGameEvents/HookGameEvents.hpp>
 
-class DeathMsgController final :public CSModuleBase {
+class DeathMsgController final :public CSModule<DeathMsgController> {
     using HudDeathNotice_HandlePlayerDeath_t = char*(*)(uintptr_t hudThis, uintptr_t event);
     std::unique_ptr<MulNX::Hook> hkHudDeathNotice_HandlePlayerDeath = nullptr;
     HudDeathNotice_HandlePlayerDeath_t pRawHudDeathNotice_HandlePlayerDeath = nullptr;

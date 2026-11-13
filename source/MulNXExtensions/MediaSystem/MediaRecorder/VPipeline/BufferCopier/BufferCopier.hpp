@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class BufferCopier final :public MediaModuleBase {
+class BufferCopier final :public MediaModule<BufferCopier> {
     class VCD3D11Manager* pVCD3D11Manager = nullptr;
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
     std::atomic<bool> shouldCopy = false;

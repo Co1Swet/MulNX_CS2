@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class HookSpotStyle final :public CSModuleBase {
+class HookSpotStyle final :public CSModule<HookSpotStyle> {
     std::unique_ptr<MulNX::Hook> hkPos_Spot_WriteMaybeEnumToChangeRadarPlayerDraw = nullptr;
     std::unique_ptr<MulNX::Hook> hkFunc_FinallyUpdatePlayerState = nullptr;
 

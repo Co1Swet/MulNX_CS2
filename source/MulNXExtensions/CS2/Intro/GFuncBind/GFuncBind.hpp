@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
 
-class GFuncBind final :public CSModuleBase {
+class GFuncBind final :public CSModule<GFuncBind> {
     MulNX::Memory::DllModule* pTier0 = nullptr;
 
     bool Init()override;

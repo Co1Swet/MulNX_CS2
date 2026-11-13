@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class ParticleManager final :public CSModuleBase {
+class ParticleManager final :public CSModule<ParticleManager> {
     using GetParticleManager_t = void* (*)();
     using CreateParticle_t = int (*)(void*, int*, const char*, int, int64_t, int64_t, int64_t, int64_t);
     using UpdateParticle_t = void (*)(void*, int, int, void*, int);

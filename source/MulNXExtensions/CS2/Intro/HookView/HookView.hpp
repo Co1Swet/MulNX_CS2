@@ -21,7 +21,7 @@ public:
 };
 
 class ICSViewControlModule;
-class HookView final :public CSModuleBase {
+class HookView final :public CSModule<HookView> {
     // 视角控制钩子
     std::unique_ptr<MulNX::Hook> hkPosCallIsPlayingDemo{};
     std::atomic<bool> cameraLeavePlayer = false;

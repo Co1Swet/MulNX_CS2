@@ -2,7 +2,7 @@
 #include <Game/Systems/ICvar.hpp>
 #include <Intro/CSModuleBase.hpp>
 
-class HookConsole final :public CSModuleBase {
+class HookConsole final :public CSModule<HookConsole> {
     CS2::Systems::CCvar* pVEngineCvar007 = nullptr;
 
     struct ConVarRef {

@@ -21,7 +21,7 @@ public:
 };
 
 class IEntityIterationModule;
-class BackgroundEntityScan final :public CSModuleBase {
+class BackgroundEntityScan final :public CSModule<BackgroundEntityScan> {
     bool Init()override;
     void Main();
 public:

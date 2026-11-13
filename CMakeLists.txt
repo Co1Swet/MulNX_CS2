@@ -20,7 +20,9 @@ add_compile_options(/MP)
 add_compile_options(/utf-8)
 add_compile_options(/EHsc)
 add_compile_options(/Zc:__cplusplus) # 让MSVC标注正确的cpp版本
+add_compile_options(/bigobj) # 提升 COFF 节数上限，避免模板实例化过多触发 C1128
 
+add_compile_options(/GR-) # 关闭 RTTI，减小二进制体积
 add_compile_options(/Gy) # 函数级链接，配合 /OPT:REF 移除未用函数
 add_compile_options(/Gw) # 全局数据优化，允许移除未引用的全局变量
 add_compile_options(/GF) # 合并重复字符串常量
@@ -68,8 +70,7 @@ set_target_properties(MulNXReShadeBridge PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${MulNXReShadeBridgePath}"
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${MulNXReShadeBridgePath}"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${MulNXReShadeBridgePath}"
-)
-# 处理 RSTarget 目标
+)# 处理 RSTarget 目标
 set_target_properties(RSTarget PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${MulNXReShadeBridgePath}"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${MulNXReShadeBridgePath}"

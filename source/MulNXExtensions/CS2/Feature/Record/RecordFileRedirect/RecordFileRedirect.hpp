@@ -3,7 +3,7 @@
 #include <MulNXExtensions/WinBaseHooks/FileRedirector/FileListenMixin.hpp>
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class RecordFileRedirect final :public CSModuleBase,
+class RecordFileRedirect final :public CSModule<RecordFileRedirect>,
     public FileListenMixin<RecordFileRedirect>, public MediaModuleMixin<RecordFileRedirect> {
     
     fs::path dirVideos;

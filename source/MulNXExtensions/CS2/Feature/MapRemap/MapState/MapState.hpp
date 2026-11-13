@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class MapState final :public CSModuleBase {
+class MapState final :public CSModule<MapState> {
     void Menu();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;

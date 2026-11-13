@@ -3,7 +3,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <map>
 
-class TeamIDColorController final : public CSModuleBase {
+class TeamIDColorController final : public CSModule<TeamIDColorController> {
     class WashColor {
     public:
         char pad[0x10];

@@ -11,7 +11,7 @@ public:
     MulNX::Math::View& Get() { return this->view; }
 };
 
-class ViewSmoother final :public CSModuleBase, public CSViewControlMixin<ViewSmoother> {
+class ViewSmoother final :public CSModule<ViewSmoother>, public CSViewControlMixin<ViewSmoother> {
     MulReflBool(enable, false);
     ViewBuffer buffer;
     std::atomic<float> fov_smooth_buffer{ 1.0f };

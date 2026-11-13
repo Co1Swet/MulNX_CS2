@@ -28,7 +28,7 @@ namespace CS2 {
     static_assert(offsetof(CStrike15PaintDef, m_szLegacyMaterialPath) == 0xC8);
 }
 
-class CCStrike15ItemSystem final :public CSModuleBase {
+class CCStrike15ItemSystem final :public CSModule<CCStrike15ItemSystem> {
     using GetInner_t = uintptr_t(*)(void);
     GetInner_t pGetInner = nullptr;
     using FindPaintDefByIndex_t = CS2::CStrike15PaintDef* (*)(uintptr_t pInner, int index);

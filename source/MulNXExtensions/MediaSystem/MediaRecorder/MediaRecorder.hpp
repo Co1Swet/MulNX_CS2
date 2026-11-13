@@ -3,7 +3,7 @@
 
 using CtrlPacket = std::variant<av::Packet, MulNX::AVControl>;
 
-class MediaRecorder final :public MediaModuleBase {
+class MediaRecorder final :public MediaModule<MediaRecorder> {
     class AEncodeHelper* pAEncodeHelper = nullptr;
     class MediaParamManager* pMediaParamManager = nullptr;
     std::atomic<bool> startAsAdvance = false;

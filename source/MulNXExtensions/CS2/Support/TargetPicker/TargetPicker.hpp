@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class TargetPicker final :public CSModuleBase {
+class TargetPicker final :public CSModule<TargetPicker> {
     Steam64UID lastDetected = 0;
     std::atomic<Steam64UID> target = 0;
     std::atomic<std::chrono::steady_clock::time_point>lastUpdateTime;

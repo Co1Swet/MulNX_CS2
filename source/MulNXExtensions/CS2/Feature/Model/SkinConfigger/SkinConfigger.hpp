@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class SkinConfigger final :public CSModuleBase {
+class SkinConfigger final :public CSModule<SkinConfigger> {
     struct PlayerWeaponCfg {
         std::optional<int> paintKit{};
         std::optional<int> seed{};

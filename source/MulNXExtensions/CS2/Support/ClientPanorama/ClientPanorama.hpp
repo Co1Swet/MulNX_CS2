@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/Intros.hpp>
 
-class ClientPanorama final :public CSModuleBase {
+class ClientPanorama final :public CSModule<ClientPanorama> {
     using FindHudElement_t = uintptr_t(*)(const char* name);
     FindHudElement_t pFindHudElement = nullptr;
     bool Init()override;

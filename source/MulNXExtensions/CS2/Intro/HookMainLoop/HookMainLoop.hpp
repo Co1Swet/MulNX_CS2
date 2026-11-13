@@ -1,7 +1,7 @@
 #pragma once
 #include <Intro/CSModuleBase.hpp>
 
-class HookMainLoop final :public CSModuleBase {
+class HookMainLoop final :public CSModule<HookMainLoop> {
     std::unique_ptr<MulNX::Hook> hkPos_Call_CInputService_ProcessCommands = nullptr;
     std::unique_ptr<MulNX::Hook> hkPos_PhysicsCreated = nullptr;
     std::unique_ptr<MulNX::Hook> hkQuit = nullptr;

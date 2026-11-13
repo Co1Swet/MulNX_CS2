@@ -1,7 +1,7 @@
 #pragma once
 #include <Mirror/SceneSystem/SceneSystem.hpp>
 
-class RendCtrlCenter final :public CSModuleBase {
+class RendCtrlCenter final :public CSModule<RendCtrlCenter> {
     SceneSystem* pSceneSystem = nullptr;
     class RendCtrlAPI* pRendCtrlAPI = nullptr;
     class CloudController* pCloudController = nullptr;

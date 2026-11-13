@@ -1,7 +1,7 @@
 #pragma once
 #include <Mirror/SceneSystem/SceneSystem.hpp>
 
-class CloudController final :public CSModuleBase {
+class CloudController final :public CSModule<CloudController> {
     MulReflBool(hideCloud, false);
     MulReflBool(hideSun, false);
 

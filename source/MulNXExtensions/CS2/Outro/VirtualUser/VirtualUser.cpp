@@ -8,7 +8,7 @@ bool VirtualUser::Init() {
         .SubscribeAsync("Game/NewRound");
 
     this->UIRegisterCallback("UI.MulNXControl", [this](auto&&...) {
-        MulNX::UI::Checkbox("启用自动化增强（Alt+O可快速切换）", this->Enabled);
+        MulNX::UI::Checkbox("启用自动化增强（Alt+O可快速切换）", this->enabled);
         return true;
         });
     this->SendTask("Main", "MulNXMain", [this]()->bool {
@@ -20,15 +20,15 @@ bool VirtualUser::Init() {
 void VirtualUser::Main() {
     this->Update();
     if (this->pInputSystem->CheckWithPack(MulNX::KeyCheckPack{ true,false,false,true,'O',1 })) {
-        bool AutoRunning = this->Enabled.load(std::memory_order_acquire);
-        this->Enabled.store(!AutoRunning, std::memory_order_release);
+        bool AutoRunning = this->enabled.load(std::memory_order_acquire);
+        this->enabled.store(!AutoRunning, std::memory_order_release);
         this->LogWarning(std::format("自动化增强已{}", AutoRunning ? "关闭" : "开启"));
     }
     return;
 }
 
 void VirtualUser::ProcessMsg(MulNX::Message& Msg) {
-    if (!this->Enabled.load(std::memory_order_acquire))return;
+    if (!this->enabled.load(std::memory_order_acquire))return;
     switch (Msg.type) {
     case "Game/NewRound"_hash: {
         this->LogInfo("接收到新回合信息");

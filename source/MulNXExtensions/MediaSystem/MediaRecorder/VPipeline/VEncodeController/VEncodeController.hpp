@@ -1,7 +1,7 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/AVCodecManager/AVCodecManager.hpp>
 
-class VEncodeController final :public MediaModuleBase {
+class VEncodeController final :public MediaModule<VEncodeController> {
     class MediaParamManager* pMediaParamManager = nullptr;
     class MediaRecorder* pMediaRecorder = nullptr;
     AVCodecManager* pAVCodecManager = nullptr;

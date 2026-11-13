@@ -3,7 +3,7 @@
 #include <CameraSystem/FreeCameraPath/FreeCameraPath.hpp>
 #include <CameraSystem/CamDrawer/CamDrawer.hpp>
 
-class CamPlayScheduler final :public CamSysModule {
+class CamPlayScheduler final :public CamSysModule<CamPlayScheduler> {
     class PlaySlot final {
     public:
         std::shared_ptr<const FreeCameraPath> pCampath = nullptr;

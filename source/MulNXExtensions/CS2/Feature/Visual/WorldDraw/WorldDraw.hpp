@@ -3,7 +3,7 @@
 #include <Mirror/ParticleManager/ParticleManager.hpp>
 #include <Mirror/ParticleSystemMgr/ParticleSystemMgr.hpp>
 
-class WorldDraw final :public CSModuleBase {
+class WorldDraw final :public CSModule<WorldDraw> {
     ParticleManager* pParticleManager = nullptr;
     ParticleSystemMgr* pParticleSystemMgr = nullptr;
 
