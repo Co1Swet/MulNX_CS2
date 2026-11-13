@@ -8,9 +8,11 @@ namespace MulNX {
         virtual void* GetAddr() = 0;
         virtual const void* GetAddr() const = 0;
         virtual const ModuleBase* GetModule() const = 0;
-        virtual const char* GetName()   const = 0;
-        virtual std::string       ValueToString() const = 0;
-        virtual bool              StringToValue(std::string_view str) = 0;
+        virtual const char* GetName() const = 0;
+        virtual void UpdateKey() = 0;
+        virtual std::string_view GetFullKey() const = 0;
+        virtual std::string ValueToString() const = 0;
+        virtual bool StringToValue(std::string_view str) = 0;
     };
 
     template <typename T>
@@ -85,17 +87,20 @@ namespace MulNX {
 
     template <typename T, typename Codec = ReflCodec<T>>
     class ReflVarT final : public IReflVar {
-        T* pVar = nullptr;
+        T* pVar;
         const ModuleBase* pModule = nullptr;
-        std::string       varName = {};
+        std::string varName;
+        std::string fullKey;
     public:
         ReflVarT(T* var, const ModuleBase* mod, std::string_view name)
             : pVar(var), pModule(mod), varName(name) {}
 
-        void* GetAddr()       override { return pVar; }
+        void* GetAddr() override { return pVar; }
         const void* GetAddr() const override { return pVar; }
         const ModuleBase* GetModule() const override { return pModule; }
-        const char* GetName()   const override { return varName.c_str(); }
+        const char* GetName() const override { return varName.c_str(); }
+        void UpdateKey() override { this->fullKey = std::format("{}.{}", this->pModule->GetName(), this->varName); }
+        std::string_view GetFullKey() const override { return fullKey; }
 
         std::string ValueToString() const override {
             return Codec::ToString(*pVar);
