@@ -29,7 +29,6 @@ bool VarReflSystem::Init() {
 }
 
 bool VarReflSystem::Register(std::unique_ptr<IReflVar> var) {
-    var->UpdateKey();
     auto name = var->GetFullKey();
     YAML::Node node = config[name];
     if (node && node.IsDefined() && node.IsScalar()) {

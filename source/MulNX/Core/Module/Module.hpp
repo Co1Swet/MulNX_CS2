@@ -19,10 +19,9 @@ namespace MulNX {
         public LogMixin<T>, public MsgMixin<T>, public TaskMixin<T>,
         public UIMixin<T>, public PathMixin<T>, public InputMixin<T>,
         public GlobalVarMixin<T>, public ShortcutMixin<T>, public VarReflMixin<T> {
-        friend MulNX::Core::Driver;        
-    public:
-        static consteval std::string_view GetLeafName() {
-            std::string_view sig = __FUNCSIG__;
+
+        static consteval std::string_view ParseLeafName() {
+            constexpr std::string_view sig = __FUNCSIG__;
             constexpr std::string_view marker = "Module<";
             auto pos = sig.find(marker);
             if (pos == std::string_view::npos) return {};
@@ -45,8 +44,17 @@ namespace MulNX {
                 inner.remove_prefix(p + 2);
             return inner;
         }
-        
+    public:
+        inline static consteval std::string_view GetLeafName() { return ParseLeafName(); }
+        inline static consteval auto GetLeafNameFixed() {
+            constexpr auto r = ParseLeafName();
+            constexpr std::size_t N = r.size() + 1;
+            FixedString<N> fs{};
+            std::copy_n(r.data(), N - 1, fs.data);
+            return fs;
+        }
         inline std::string_view GetName()const override { return GetLeafName(); }
+
         Module() {
             this->postInits.push_back([this]() {
                 this->LogSucc("初始化成功");

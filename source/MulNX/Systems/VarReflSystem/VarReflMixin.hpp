@@ -1,4 +1,5 @@
 #pragma once
+#include <MulNX/Common/FixedString.hpp>
 
 namespace MulNX {
     class IReflVar {
@@ -9,7 +10,6 @@ namespace MulNX {
         virtual const void* GetAddr() const = 0;
         virtual const ModuleBase* GetModule() const = 0;
         virtual const char* GetName() const = 0;
-        virtual void UpdateKey() = 0;
         virtual std::string_view GetFullKey() const = 0;
         virtual std::string ValueToString() const = 0;
         virtual bool StringToValue(std::string_view str) = 0;
@@ -85,22 +85,20 @@ namespace MulNX {
         }
     };
 
-    template <typename T, typename Codec = ReflCodec<T>>
+    template <typename T, typename Module, FixedString VarName, typename Codec = ReflCodec<T>>
     class ReflVarT final : public IReflVar {
         T* pVar;
         const ModuleBase* pModule = nullptr;
-        std::string varName;
-        std::string fullKey;
+        static constexpr auto kFullKey = Module::GetLeafNameFixed() + FixedString{ "." } + VarName;
     public:
-        ReflVarT(T* var, const ModuleBase* mod, std::string_view name)
-            : pVar(var), pModule(mod), varName(name) {}
+        ReflVarT(T* var, const ModuleBase* mod)
+            : pVar(var), pModule(mod) {}
 
         void* GetAddr() override { return pVar; }
         const void* GetAddr() const override { return pVar; }
         const ModuleBase* GetModule() const override { return pModule; }
-        const char* GetName() const override { return varName.c_str(); }
-        void UpdateKey() override { this->fullKey = std::format("{}.{}", this->pModule->GetName(), this->varName); }
-        std::string_view GetFullKey() const override { return fullKey; }
+        const char* GetName() const override { return VarName.c_str(); }
+        std::string_view GetFullKey() const override { return kFullKey.view(); }
 
         std::string ValueToString() const override {
             return Codec::ToString(*pVar);
@@ -131,15 +129,17 @@ namespace MulNX {
         }
     };
 
+    template <FixedString VarName>
     class RegisterVar {
         template <typename Sys>
         static bool EmplaceRefl(Sys* pSys, std::unique_ptr<IReflVar> iVar) {
             return pSys->Register(std::move(iVar));
         }
     public:
-        template<typename U>
-        inline RegisterVar(VarReflHost* pHost, std::atomic<U>* pVar, const char* name) {
-            auto up = std::make_unique<ReflVarT<std::atomic<U>>>(pVar, pHost->pModuleBase, name);
+        template<typename U, typename Module>
+        inline RegisterVar(Module* pModule, std::atomic<U>* pVar) {
+            auto pHost = static_cast<VarReflHost*>(pModule);
+            auto up = std::make_unique<ReflVarT<std::atomic<U>, Module, VarName>>(pVar, pHost->pModuleBase);
             pHost->pModuleBase->preInits.push_back([pHost, iVar = std::move(up)]()mutable->bool {
                 return EmplaceRefl(pHost->pVarReflSystem, std::move(iVar));
                 });
@@ -149,16 +149,16 @@ namespace MulNX {
 
 #define MulReflInt(name, defaultValue) \
     std::atomic<int> name{defaultValue}; \
-    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
+    MulNX::RegisterVar<#name> _mulrefl_##name##_register{this, &this->name};
 
 #define MulReflBool(name, defaultValue) \
     std::atomic<bool> name{defaultValue}; \
-    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
+    MulNX::RegisterVar<#name> _mulrefl_##name##_register{this, &this->name};
 
 #define MulReflFloat(name, defaultValue) \
     std::atomic<float> name{defaultValue}; \
-    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
+    MulNX::RegisterVar<#name> _mulrefl_##name##_register{this, &this->name};
 
 #define MulReflStr(name, defaultValue) \
     std::atomic<std::shared_ptr<std::string>> name{std::make_shared<std::string>(defaultValue)}; \
-    MulNX::RegisterVar _mulrefl_##name##_register{this, &this->name, #name};
+    MulNX::RegisterVar<#name> _mulrefl_##name##_register{this, &this->name};
