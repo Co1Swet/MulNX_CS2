@@ -5,7 +5,7 @@
 namespace MulNX {
     class IVEncoder {
     public:
-        virtual std::string_view GetName()const = 0;
+        virtual std::string_view GetImplModuleName()const = 0;
         virtual bool IsAvailable()const = 0;
         virtual const char* GetNotAvailableReason()const = 0;
 
@@ -46,14 +46,14 @@ protected:
 
     VEncoderMixin() {
         This()->preInits.push_back([this]() {
-            this->pAVCodecManager = This()->FindModule<AVCodecManager>("AVCodecManager");
+            this->pAVCodecManager = This()->FindModule<AVCodecManager>();
             this->pAVCodecManager->AddEncoder(this);
             return true;
             });
     }
 public:
-    inline std::string_view GetName()const override {
-        return This()->GetNameView();
+    inline std::string_view GetImplModuleName()const override {
+        return This()->GetName();
     }
     inline const char* GetNotAvailableReason()const override {
         return this->unavailableReason.c_str();

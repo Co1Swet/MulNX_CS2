@@ -3,7 +3,7 @@
 #include <shellapi.h>
 
 bool HookWindow::Init() {
-    this->pUISystem = this->FindModule<MulNX::UISystem>("UISystem");
+    this->pUISystem = this->FindModule<MulNX::UISystem>();
 
     this->SubscribeSync("Hook/hWnd", [this](MulNX::Message& msg) {
         auto&& [hWnd] = msg.Access<HWND>();

@@ -4,10 +4,10 @@
 #include <Feature/Rending/CSReShadeController/CSReShadeController.hpp>
 
 bool RendCtrlCenter::Init() {
-    this->pSceneSystem = this->FindModule<SceneSystem>("SceneSystem");
-    this->pRendCtrlAPI = this->FindModule<RendCtrlAPI>("RendCtrlAPI");
-    this->pCloudController = this->FindModule<CloudController>("CloudController");
-    this->pCSReShadeController = this->FindModule<CSReShadeController>("CSReShadeController");
+    this->pSceneSystem = this->FindModule<SceneSystem>();
+    this->pRendCtrlAPI = this->FindModule<RendCtrlAPI>();
+    this->pCloudController = this->FindModule<CloudController>();
+    this->pCSReShadeController = this->FindModule<CSReShadeController>();
 
     this->SubscribeSync("Hook/LoadLibraryExW/rendersystemdx11.dll", [this](MulNX::Message& msg) {
         auto rendersystemdx11 = MulNX::Memory::DllModule(L"rendersystemdx11.dll");

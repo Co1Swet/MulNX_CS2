@@ -48,13 +48,13 @@ public:
 protected:
     CSModuleMixin() {
         This()->preInits.push_back([this]() -> bool {
-            this->CS2 = This()->FindModule<CSController>("CSController");
-            this->CS2View = This()->FindModule<HookView>("HookView");
-            this->CS2Time = This()->FindModule<TimeController>("TimeController");
-            this->Hub = This()->FindModule<PlayerHub>("PlayerHub");
-            this->CS2Con = This()->FindModule<HookConsole>("HookConsole");
-            this->CS2Hashs = This()->FindModule<CS2Hash>("CS2Hash");
-            this->CS2Entitys = This()->FindModule<ClientEntitySystem>("ClientEntitySystem");
+            this->CS2 = This()->FindModule<CSController>();
+            this->CS2View = This()->FindModule<HookView>();
+            this->CS2Time = This()->FindModule<TimeController>();
+            this->Hub = This()->FindModule<PlayerHub>();
+            this->CS2Con = This()->FindModule<HookConsole>();
+            this->CS2Hashs = This()->FindModule<CS2Hash>();
+            this->CS2Entitys = This()->FindModule<ClientEntitySystem>();
 
             this->CS2Paths = CS2Paths::Get();
 

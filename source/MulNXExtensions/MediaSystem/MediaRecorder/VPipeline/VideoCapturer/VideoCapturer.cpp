@@ -5,9 +5,9 @@
 #include <VPipeline/VEncodeController/VEncodeController.hpp>
 
 bool VideoCapturer::Init() {
-    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->pVEncodeController = this->FindModule<VEncodeController>("VEncodeController");
-    this->pTextureMapper = this->FindModule<TextureMapper>("TextureMapper");
+    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>();
+    this->pVEncodeController = this->FindModule<VEncodeController>();
+    this->pTextureMapper = this->FindModule<TextureMapper>();
 
     this->SendTask("VMap", "VMap", [this]() {
         this->Captuer();

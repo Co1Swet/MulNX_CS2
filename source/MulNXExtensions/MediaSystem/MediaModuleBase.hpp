@@ -46,7 +46,7 @@ protected:
     MediaRunningState* pMediaState = nullptr;
     MediaModuleMixin() {
         This()->preInits.push_back([this]() -> bool {
-            this->pMediaState = This()->FindModule<MediaRunningState>("MediaRunningState");
+            this->pMediaState = This()->FindModule<MediaRunningState>();
             return true;
             });
     }

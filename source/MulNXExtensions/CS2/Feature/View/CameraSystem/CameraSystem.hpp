@@ -34,7 +34,7 @@ public:
 protected:
     CamSysModuleMixin() {
         This()->preInits.push_back([this]() -> bool {
-            this->CamSys = This()->FindModule<CameraSystem>("CameraSystem");
+            this->CamSys = This()->FindModule<CameraSystem>();
             return true;
             });
     }

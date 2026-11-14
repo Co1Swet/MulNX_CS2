@@ -2,8 +2,8 @@
 #include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool BufferCopier::Init() {
-    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
-    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>();
+    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>();
 
     this->SubscribeSync("MediaSync/PresentCallback", [this](MulNX::Message& msg) {
         this->CopyTexture();

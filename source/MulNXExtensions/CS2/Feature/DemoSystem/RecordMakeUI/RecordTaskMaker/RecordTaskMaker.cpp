@@ -216,7 +216,7 @@ void RecordTaskMaker::RoundPlayerMenu(const int& round, const Demo::Player& play
     }
 }
 bool RecordTaskMaker::Init() {
-    this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
+    this->pConfiger = this->FindModule<RecordTaskConfiger>();
     this->UIRegisterCallback("UI.Demos", [this](auto uico, auto&&...) {return this->Window(uico);});
     return true;
 }

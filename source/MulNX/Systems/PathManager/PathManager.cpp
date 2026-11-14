@@ -10,7 +10,7 @@ bool MulNX::PathManager::Init() {
     auto filePath = fs::path(path);
     this->Root = filePath.parent_path().parent_path();
 
-    this->CoreName = this->Core->GetName();
+    this->CoreName = this->Core->GetOriginName();
     this->CoreRoot = this->Root / this->CoreName;
     this->LoadPathLists(this->Root / "PathLists.xml");
     this->CheckShared();
@@ -50,10 +50,10 @@ bool MulNX::PathManager::CheckShared() {
     return true;
 }
 
-fs::path MulNX::PathManager::PathGetForModule(const std::string& ModuleName, const std::string& Target) {
-    auto path = this->CoreRoot / ModuleName / Target;
+fs::path MulNX::PathManager::PathGetForModule(const std::string_view moduleName, const std::string& Target) {
+    auto path = this->CoreRoot / moduleName / Target;
     if (!fs::exists(path)) {
-        this->LogInfo("模块[" + ModuleName + "]尝试访问不存在的文件夹，将尝试为其创建");
+        this->LogInfo(std::format("模块[{}]尝试访问不存在的文件夹，将尝试为其创建", moduleName));
         try {
             // 可创建多级目录
             if (!fs::create_directories(path)) {
@@ -72,7 +72,7 @@ fs::path MulNX::PathManager::PathGetForModule(const std::string& ModuleName, con
         }
     }
     else if (!fs::is_directory(path)) {
-        MulNX::ErrorTerminate("模块[" + ModuleName + "]的路径存在但不是文件夹：" + path.string());
+        MulNX::ErrorTerminate(std::format("模块[{}]的路径存在但不是文件夹：{}", moduleName, path.string()));
     }
 
     return path;

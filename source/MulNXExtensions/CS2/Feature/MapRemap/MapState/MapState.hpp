@@ -18,7 +18,7 @@ protected:
     MapState* pMapState = nullptr;
     RemapMixin() {
         This()->preInits.push_back([this]() {
-            this->pMapState = This()->FindModule<MapState>("MapState");
+            this->pMapState = This()->FindModule<MapState>();
             return true;
             });
     }

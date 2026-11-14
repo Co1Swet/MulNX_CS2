@@ -9,7 +9,7 @@
 #include <MulNXThirdParty/imgui/imgui_impl_dx11.h>
 
 bool MulNX::UISystem::Init() {
-    this->pCoordinator = this->FindModule<UICoordinator>("UICoordinator");
+    this->pCoordinator = this->FindModule<UICoordinator>();
 
     ImGui::CreateContext();
     // 设置ini文件路径

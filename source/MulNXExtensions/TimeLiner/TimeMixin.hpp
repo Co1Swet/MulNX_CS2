@@ -16,7 +16,7 @@ protected:
     TimeLiner* pTimeline = nullptr;
     TimeMixin() {
         This()->preInits.push_back([this]() {
-            this->pTimeline = This()->FindModule<TimeLiner>("TimeLiner");
+            this->pTimeline = This()->FindModule<TimeLiner>();
             this->pTimeline->timeLineModules.push_back(static_cast<ITimeRend*>(this));
             return true;
             });
@@ -43,7 +43,7 @@ protected:
     TimeLiner* pTimeline = nullptr;
     TimeAdaptMixin() {
         This()->preInits.push_back([this]() {
-            this->pTimeline = This()->FindModule<TimeLiner>("TimeLiner");
+            this->pTimeline = This()->FindModule<TimeLiner>();
             return true;
             });
     }

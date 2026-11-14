@@ -7,8 +7,8 @@ class WebSocketMixin {
     WebSocketManager* pWebSocketManager = nullptr;
 protected:
     WebSocketMixin() {
-        This()->preInits.push_back([this]() -> bool {
-            this->pWebSocketManager = This()->FindModule<WebSocketManager>("WebSocketManager");
+        This()->preInits.push_back([this]() {
+            this->pWebSocketManager = This()->FindModule<WebSocketManager>();
             return true;
             });
     }

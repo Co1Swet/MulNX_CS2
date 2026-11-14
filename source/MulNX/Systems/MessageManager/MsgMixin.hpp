@@ -30,7 +30,7 @@ namespace MulNX {
     protected:
         MsgMixin() {
             This()->preInits.push_back([this]() {
-                this->pMsgManager = This()->FindModule<MessageManager>("MessageManager");
+                this->pMsgManager = This()->FindModule<MessageManager>();
                 This()->msgChannel = this->pMsgManager->GetMessageChannel(this->pMsgManager->CreateMessageChannel());
                 return true;
                 });
@@ -40,7 +40,7 @@ namespace MulNX {
         auto& SubscribeAsync(const std::string& msgType, Detail::InitOnly = {}) {
             This()->msgChannel->SubscribeAsync(msgType);
             auto full = std::format("{}  Args: <void>", msgType);
-            This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+            This()->LogSucc(std::format("异步消息订阅：{}", full));
             return *this;
         }
 
@@ -50,14 +50,14 @@ namespace MulNX {
                 auto h = [](MulNX::Message& msg, std::string_view raw) {return; };
                 This()->msgChannel->SubscribeAsync(msgType, std::move(h));
                 auto full = std::format("{} Also Externed With Args: <void>", msgType);
-                This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+                This()->LogSucc(std::format("异步消息订阅：{}", full));
             }
             else {
                 auto h = MulNX::CreateFiller<Args...>();
                 auto typeDesc = MulNX::GetTypeString<Args...>();
                 This()->msgChannel->SubscribeAsync(msgType, std::move(h));
                 auto full = std::format("{} Also Externed With Args: {}", msgType, typeDesc);
-                This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+                This()->LogSucc(std::format("异步消息订阅{}", full));
             }
             return *this;
         }
@@ -68,7 +68,7 @@ namespace MulNX {
 
             auto full = std::format("{} Ex With PodArgs: {}",
                 msgType, MulNX::GetTypeString<PodArgs...>());
-            This()->LogSucc(I18n("sys.msg.async.subed{}", full));
+            This()->LogSucc(std::format("异步消息订阅：{}", full));
             return *this;
         }
 
@@ -82,7 +82,7 @@ namespace MulNX {
         // 同步消息
         auto& SubscribeSync(const std::string& msgType, MulNX::SyncMsgCallback&& handle, Detail::InitOnly = {}) {
             this->pMsgManager->SubscribeSync(msgType, std::move(handle));
-            This()->LogSucc(I18n("sys.msg.sync.subed{}", msgType));
+            This()->LogSucc(std::format("同步消息订阅：{}", msgType));
             return *this;
         }
 

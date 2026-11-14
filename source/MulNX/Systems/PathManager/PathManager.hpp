@@ -42,7 +42,7 @@ namespace MulNX {
 
         const fs::path& GetRoot()const { return this->Root; }
         // 通过模块名，将目标（如Saves）映射到该模块的对应的目录（如ModuleA/Saves）
-        fs::path PathGetForModule(const std::string& ModuleName, const std::string& Target);
+        fs::path PathGetForModule(const std::string_view moduleName, const std::string& Target);
         // 将目标映射到共享的目录
         fs::path PathGetForShared(const std::string& Target);
 

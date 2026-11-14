@@ -18,8 +18,8 @@ bool HookConsole::Init() {
         this->OnMainLoop();
         });
 
-    this->SubscribeSync("System/Init/End", [this](MulNX::Message& msg) {
-        auto* pMsgManager = this->FindModule<MulNX::MessageManager>("MessageManager");
+    this->SubscribeSync("System/Init/End", [this](auto&&...) {
+        auto* pMsgManager = this->FindModule<MulNX::MessageManager>();
         for (auto& [type, meta] : pMsgManager->GetMsgInfo()) {
             if (!meta.isAsync)continue;
             if (!meta.makingHandler)continue;

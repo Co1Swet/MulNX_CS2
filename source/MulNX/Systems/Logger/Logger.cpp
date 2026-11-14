@@ -4,7 +4,7 @@
 #include <format>
 
 bool MulNX::Logger::Init() {
-    this->logPath = this->Path()->PathGetForShared("Log") / ("Log_" + this->Core->GetName() + ".txt");
+    this->logPath = this->Path()->PathGetForShared("Log") / ("Log_" + this->Core->GetOriginName() + ".txt");
     this->target = std::ofstream(this->logPath.wstring(), std::ios::out | std::ios::binary | std::ios::trunc);
     if (!this->target) {
         MulNX::ErrorTerminate("Cannot Wirte Log!");
@@ -85,7 +85,7 @@ void MulNX::Logger::Log() {
 
     // 依次格式化并写入文件
     for (auto& entry : batch) {
-        std::string moduleName = entry.pModule->GetName();
+        const auto& moduleName = entry.pModule->GetName();
         std::string rawMsg = std::move(entry.raw);
         auto eventTime = MulNX::FromUnixUs(entry.timestamp_us);
         std::string levelStr = this->PraseLevel(entry.level);

@@ -2,7 +2,7 @@
 #include <Mirror/VFileSystem/VFileSystem.hpp>
 
 bool FileInjector::Init() {
-    this->pVFileSystem = this->FindModule<VFileSystem>("VFileSystem");
+    this->pVFileSystem = this->FindModule<VFileSystem>();
 
     this->SubscribeSync("Hook/Source2Client002::Inited", [this](auto&&...) {
         auto root = this->Path()->GetRoot();

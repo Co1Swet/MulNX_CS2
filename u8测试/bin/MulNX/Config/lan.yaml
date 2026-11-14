@@ -134,12 +134,6 @@ sys:
     load_succ: 语言文件加载成功：{}
     load_nums: 共加载键值对：{}
 
-  msg:
-    sync:
-      subed{}: 同步消息订阅：{}
-    async:
-      subed{}: 异步消息订阅：{}
-
 result:
   create_succ: 创建成功：{}
   create_error: 创建失败：{}

@@ -3,7 +3,7 @@
 #include <Feature/DemoSystem/RecordMaking/AutoRecordRule/AutoRecordRule.hpp>
 
 bool PassRecordMaker::Init() {
-    this->pAutoRecordRule = this->FindModule<AutoRecordRule>("AutoRecordRule");
+    this->pAutoRecordRule = this->FindModule<AutoRecordRule>();
 
     (*this)
         .SubscribeAsyncEx<void>("Demo/Record/Make/Auto")

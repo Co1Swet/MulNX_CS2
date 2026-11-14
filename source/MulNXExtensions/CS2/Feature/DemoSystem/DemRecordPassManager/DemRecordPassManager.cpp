@@ -45,9 +45,9 @@ void DemRecordPassManager::Window() {
 }
 
 bool DemRecordPassManager::Init() {
-    this->pDemClassifyPass = this->FindModule<DemClassifyPass>("DemClassifyPass");
-    this->pDemSortPass = this->FindModule<DemSortPass>("DemSortPass");
-    this->pDemMergePass = this->FindModule<DemMergePass>("DemMergePass");
+    this->pDemClassifyPass = this->FindModule<DemClassifyPass>();
+    this->pDemSortPass = this->FindModule<DemSortPass>();
+    this->pDemMergePass = this->FindModule<DemMergePass>();
 
     (*this)
         .SubscribeAsync("Demo/Record/Enqueue")

@@ -71,7 +71,7 @@ void TimeController::TimeRend(TimeLiner* timeline, ImDrawList* dl) {
 
 bool TimeController::Init() {
     this->pTimeline->pTimeAdapter1 = this;
-    this->pCSDemoController = this->FindModule<CSDemoController>("CSDemoController");
+    this->pCSDemoController = this->FindModule<CSDemoController>();
 
     this->SubscribeSync("Hook/LoadLibraryExW/engine2.dll", [this](MulNX::Message& msg) {
         auto demo = this->CS2->GetDemo();

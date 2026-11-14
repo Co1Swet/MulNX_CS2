@@ -4,7 +4,7 @@
 
 class ModuleInfo {
 public:
-    std::vector<std::pair<std::string, MulNXHandle>> Info;
+    std::vector<std::pair<std::string_view, MulNXHandle>> Info;
 };
 
 namespace MulNX {
@@ -12,7 +12,7 @@ namespace MulNX {
         // 模块管理器类，负责加载、卸载和管理各个模块
         class ModuleManager final :public MulNX::Module<ModuleManager> {
             // 存储从字符串到模块句柄的映射，便于按名称查找
-            std::unordered_map<std::string, MulNXHandle> NameToHandleMap{};
+            std::unordered_map<std::string_view, MulNXHandle> NameToHandleMap{};
             std::map<MulNXHandle, std::unique_ptr<MulNX::ModuleBase>>modules{};
 
             bool Init()override;
@@ -23,19 +23,18 @@ namespace MulNX {
         public:
             // 创建模块
             template<MulNX::IsModule T>
-            ModuleManager& CreateModule(std::string&& Name) {
-                std::unique_ptr<T>Module = std::make_unique<T>();
-                Module->SetName(std::move(Name));
-                this->RegisteModule(std::move(Module));
+            ModuleManager& CreateModule() {
+                std::unique_ptr<T> module = std::make_unique<T>();
+                this->RegisteModule(std::move(module));
                 return *this;
             }
             ModuleManager& CreateSystemModules();
             // 根据名称获取模块指针
-            MulNX::ModuleBase* FindModule(const std::string& Name);
+            MulNX::ModuleBase* FindModuleFromString(const std::string& name);
             // 按类型查找模块
             template<typename T>
-            T* FindModule(const std::string& Name) {
-                return static_cast<T*>(this->FindModule(Name));
+            T* FindModuleFromString(const std::string& name) {
+                return static_cast<T*>(this->FindModuleFromString(name));
             }
 
             // 初始化最后部分使用

@@ -3,7 +3,7 @@
 #include <VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 
 bool TextureMapper::Init() {
-    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>("VCD3D11Manager");
+    this->pVCD3D11Manager = this->FindModule<VCD3D11Manager>();
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         this->nextFrameRelease = true;

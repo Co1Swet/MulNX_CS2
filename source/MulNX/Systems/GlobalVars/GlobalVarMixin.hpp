@@ -11,7 +11,7 @@ namespace MulNX {
     public:
         GlobalVarMixin() {
             This()->preInits.push_back([this]() {
-                this->pGlobalVars = This()->FindModule<GlobalVars>("GlobalVars");
+                this->pGlobalVars = This()->FindModule<GlobalVars>();
                 return true;
                 });
         }

@@ -5,7 +5,7 @@
 #include <ranges>
 
 MulNX::IModule* MulNX::ModuleBase::FindModule(const std::string& name)const {
-    return this->Core->ModuleManager()->FindModule(name);
+    return this->Core->ModuleManager()->FindModuleFromString(name);
 }
 // 初始化
 bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {

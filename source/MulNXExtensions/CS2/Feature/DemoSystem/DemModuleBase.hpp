@@ -8,7 +8,7 @@ protected:
     DemoSystem* pDemSys = nullptr;
     DemModuleMixin() {
         This()->preInits.push_back([this]() {
-            This()->pDemSys = This()->FindModule<DemoSystem>("DemoSystem");
+            This()->pDemSys = This()->FindModule<DemoSystem>();
             return true;
             });
     }

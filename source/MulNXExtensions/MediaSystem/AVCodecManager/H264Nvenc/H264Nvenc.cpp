@@ -11,7 +11,7 @@ void H264Nvenc::SettingsMenu() {
 }
 
 bool H264Nvenc::Init() {
-    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
+    this->pMediaParamManager = this->FindModule<MediaParamManager>();
     av::Codec c = av::findEncodingCodec("h264_nvenc");
     if (c.isNull()) {
         this->unavailableReason = "FFmpeg 未编入 h264_nvenc";

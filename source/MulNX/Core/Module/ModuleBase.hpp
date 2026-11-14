@@ -10,14 +10,9 @@ namespace MulNX {
     protected:
         mutable std::atomic<bool> showWindow = false;
         mutable std::shared_mutex smutex;
-        std::string moduleName{};
     public:
         MulNXHandle hModule;
         MulNX::MessageChannel* msgChannel;
-        // 设置模块名称
-        inline void SetName(std::string&& name) { this->moduleName = std::move(name); }
-        inline std::string GetName()const { return this->moduleName; };
-        inline std::string_view GetNameView()const noexcept { return this->moduleName; }
     };
 
     class ModuleBase :public ModuleCoroutine, public ModuleComponents {
@@ -31,8 +26,8 @@ namespace MulNX {
         bool EntryDeinit();
 
         template<typename T>
-        inline T* FindModule(const std::string& name)const {
-            return static_cast<T*>(this->FindModule(name));
+        inline T* FindModule()const {
+            return static_cast<T*>(this->FindModule(std::string(T::GetLeafName())));
         }
     };
 }

@@ -12,7 +12,7 @@ void AutoAim::Menu() {
 }
 
 bool AutoAim::Init() {
-    this->pTargetPicker = this->FindModule<TargetPicker>("TargetPicker");
+    this->pTargetPicker = this->FindModule<TargetPicker>();
 
     this->UIRegisterCallback("UI.CameraSetting", [this](auto&&...) {this->Menu();});
 

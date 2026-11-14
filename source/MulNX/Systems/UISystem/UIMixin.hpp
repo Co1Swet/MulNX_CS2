@@ -14,14 +14,14 @@ namespace MulNX {
             return MulNX::Message::Create<MulNX::UINode>("UISystem/ModulePush"_hash, std::move(UINode));
         }
     public:
-        void SendUIRoot(std::string&& name, std::function<void(UICoordinator*, Message*)>&& func) {
+        void SendUIRoot(std::string_view name, std::function<void(UICoordinator*, Message*)>&& func) {
             This()->LogInfo(std::format("发送UI节点：{}", name));
-            auto [msg, rp] = this->CreateUINode(std::move(name), std::move(func));
+            auto [msg, rp] = this->CreateUINode(std::string(name), std::move(func));
             This()->PublishAsync(std::move(msg));
         }
-        void UIRegisterBackground(std::string&& name, std::function<void(UICoordinator*, Message*)>&& func) {
+        void UIRegisterBackground(std::string_view name, std::function<void(UICoordinator*, Message*)>&& func) {
             This()->LogInfo(std::format("发送UI节点并作为背景：{}", name));
-            auto [msg, rp] = this->CreateUINode(std::move(name), std::move(func));
+            auto [msg, rp] = this->CreateUINode(std::string(name), std::move(func));
             msg.type = "UISystem/ModulePush/Background"_hash;
             This()->PublishAsync(std::move(msg));
         }

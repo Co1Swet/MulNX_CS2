@@ -14,8 +14,8 @@ protected:
     BackgroundEntityScan* pBackgroundEntityScan = nullptr;
 public:
     EntityIterationMixin() {
-        This()->postInits.push_back([this]()->bool {
-            this->pBackgroundEntityScan = This()->FindModule<BackgroundEntityScan>("BackgroundEntityScan");
+        This()->postInits.push_back([this]() {
+            this->pBackgroundEntityScan = This()->FindModule<BackgroundEntityScan>();
             this->pBackgroundEntityScan->ParticipateItCSModules.push_back(this);
             return true;
             });

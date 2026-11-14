@@ -8,8 +8,8 @@ bool ChromaKeyOverlay::Menu() {
 }
 
 bool ChromaKeyOverlay::Init() {
-    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
-    this->pShaderCompiler = this->FindModule<MulNX::ShaderCompiler>("ShaderCompiler");
+    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>();
+    this->pShaderCompiler = this->FindModule<MulNX::ShaderCompiler>();
     this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
 
     this->SubscribeSync("Hook/IDXGISwapChain/ResizeBuffers/Pre", [this](auto&&...) {

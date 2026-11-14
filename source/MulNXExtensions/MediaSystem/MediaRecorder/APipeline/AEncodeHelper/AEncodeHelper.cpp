@@ -2,7 +2,7 @@
 #include <APipeline/AudioCapturer/AudioCapturer.hpp>
 
 bool AEncodeHelper::Init() {
-    this->pAudioCapturer = this->FindModule<AudioCapturer>("AudioCapturer");
+    this->pAudioCapturer = this->FindModule<AudioCapturer>();
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
         try {

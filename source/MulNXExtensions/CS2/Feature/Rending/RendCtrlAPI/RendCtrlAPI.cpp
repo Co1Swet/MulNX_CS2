@@ -1,7 +1,7 @@
 #include "RendCtrlAPI.hpp"
 
 bool RendCtrlAPI::Init() {
-    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>();
 
     this->SubscribeSync("GraphicsSync/ID3D11Device/Ready", [this](MulNX::Message& msg) {
         auto&& [pDevice] = msg.Access<ID3D11Device*>();
@@ -107,7 +107,7 @@ MulNX::Hook::Then RendCtrlAPI::RT_OnOMSetDepthStencilState(MulNX::Hook* hk, RegC
     // 保存游戏“想设置的状态”
     this->pSavedDepthStencilState = pDepthStencilState;
     this->savedStencilRef = StencilRef;
-
+    ctx->rax = S_OK;
     return MulNX::Hook::Then::Return;
 }
 void RendCtrlAPI::RT_BlockDepth() {

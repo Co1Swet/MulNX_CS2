@@ -2,7 +2,7 @@
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
 bool DemoRecordMaker::Init() {
-    this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
+    this->pConfiger = this->FindModule<RecordTaskConfiger>();
 
     (*this)
         .SubscribeAsyncEx<Steam64UID>("Demo/Record/Make/FullRoundAll")

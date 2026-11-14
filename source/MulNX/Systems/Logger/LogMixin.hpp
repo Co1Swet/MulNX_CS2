@@ -26,7 +26,7 @@ namespace MulNX {
     public:
         LogMixin() {
             This()->preInits.push_back([this]() {
-                this->logger = This()->FindModule<Logger>("Logger");
+                this->logger = This()->FindModule<Logger>();
                 return true;
                 });
         }

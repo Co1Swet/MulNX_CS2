@@ -56,7 +56,7 @@ VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
 }
 
 bool CS2BootLoader::Init() {
-    this->pHelperController = this->Core->ModuleManager()->FindModule<CS2HelperController>("CS2HelperController");
+    this->pHelperController = this->Core->ModuleManager()->FindModule<CS2HelperController>();
 
     auto configPath = this->PathGet("Config");
     auto config = YAML::LoadFilePath(configPath / "config.yaml");

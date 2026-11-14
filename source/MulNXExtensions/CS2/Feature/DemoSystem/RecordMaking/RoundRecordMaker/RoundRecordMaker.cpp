@@ -2,7 +2,7 @@
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
 bool RoundRecordMaker::Init() {
-    this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
+    this->pConfiger = this->FindModule<RecordTaskConfiger>();
 
     (*this)
         .SubscribeAsyncEx<Steam64UID, size_t, size_t>("Demo/Record/Make/Kill")

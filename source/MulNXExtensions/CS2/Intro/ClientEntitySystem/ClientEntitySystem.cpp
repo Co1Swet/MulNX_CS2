@@ -3,7 +3,7 @@
 #include <Intro/CSController/CSController.hpp>
 
 bool ClientEntitySystem::Init() {
-    this->CS2 = this->FindModule<CSController>("CSController");
+    this->CS2 = this->FindModule<CSController>();
 
     return true;
 }

@@ -45,25 +45,25 @@ bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase
 }
 MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
     (*this)
-        .CreateModule<MulNX::PathManager>("PathManager")// 路径管理器模块
-        .CreateModule<MulNX::I18nManager>("I18nManager")
-        .CreateModule<MulNX::VarReflSystem>("VarReflSystem")// 消息管理器模块
-        .CreateModule<MulNX::MessageManager>("MessageManager")// 消息管理器模块
-        .CreateModule<MulNX::UICoordinator>("UICoordinator")
-        .CreateModule<MulNX::UISystem>("UISystem")// UI系统模块
-        .CreateModule<MulNX::TaskSystem>("TaskSystem")// 任务系统
-        .CreateModule<MulNX::Logger>("Logger")
-        .CreateModule<MulNX::Debugger>("Debugger")// 调试器模块
-        .CreateModule<MulNX::InputSystem>("InputSystem")// 输入系统模块
-        .CreateModule<ShortcutManager>("ShortcutManager")// 快捷键管理器模块
-        .CreateModule<MulNX::GlobalVars>("GlobalVars")// 全局变量模块
-        .CreateModule<WebSocketManager>("WebSocketManager")
-        .CreateModule<SysController>("SysController")
+        .CreateModule<MulNX::PathManager>()// 路径管理器模块
+        .CreateModule<MulNX::I18nManager>()
+        .CreateModule<MulNX::VarReflSystem>()// 消息管理器模块
+        .CreateModule<MulNX::MessageManager>()// 消息管理器模块
+        .CreateModule<MulNX::UICoordinator>()
+        .CreateModule<MulNX::UISystem>()// UI系统模块
+        .CreateModule<MulNX::TaskSystem>()// 任务系统
+        .CreateModule<MulNX::Logger>()
+        .CreateModule<MulNX::Debugger>()// 调试器模块
+        .CreateModule<MulNX::InputSystem>()// 输入系统模块
+        .CreateModule<ShortcutManager>()// 快捷键管理器模块
+        .CreateModule<MulNX::GlobalVars>()// 全局变量模块
+        .CreateModule<WebSocketManager>()
+        .CreateModule<SysController>()
         ;
 
     return *this;
 }
-MulNX::ModuleBase* MulNX::Core::ModuleManager::FindModule(const std::string& name) {
+MulNX::ModuleBase* MulNX::Core::ModuleManager::FindModuleFromString(const std::string& name) {
     std::shared_lock lock(this->smutex);
     auto it = this->NameToHandleMap.find(name);
     if (it == this->NameToHandleMap.end()) {
@@ -84,7 +84,7 @@ bool MulNX::Core::ModuleManager::ModulesInit() {
     // 通过有序的初始化任务列表进行初始化，尽管Modules是无序的
     for (auto& [hModule, pModule] : this->modules) {
         if (!pModule->EntryInit(this->Core)) {
-            MulNX::ErrorTerminate("在模块初始化时出现错误，模块名：" + pModule->GetName());
+            MulNX::ErrorTerminate(std::format("在模块初始化时出现错误，模块名：{}", pModule->GetName()));
             return false;
         }
     }

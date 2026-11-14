@@ -3,7 +3,7 @@
 #include <CameraSystem/CamDrawer/CamDrawer.hpp>
 
 bool CampathManager::Init() {
-    this->pCamDrawer = this->FindModule<CamDrawer>("CamDrawer");
+    this->pCamDrawer = this->FindModule<CamDrawer>();
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 

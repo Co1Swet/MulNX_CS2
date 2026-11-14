@@ -1,7 +1,7 @@
 #include "VCD3D11Manager.hpp"
 
 bool VCD3D11Manager::Init() {
-    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>();
 
     (*this)
         .SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {this->OnPresentFirst(msg);})

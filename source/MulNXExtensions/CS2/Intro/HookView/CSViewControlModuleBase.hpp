@@ -14,7 +14,7 @@ protected:
     CSViewControlMixin() {
         this->pBaseFromViewControl = This();
         This()->preInits.push_back([this]() {
-            auto pHookView = This()->FindModule<HookView>("HookView");
+            auto pHookView = This()->FindModule<HookView>();
             pHookView->viewControlModules.push_back(This());
             return true;
             });

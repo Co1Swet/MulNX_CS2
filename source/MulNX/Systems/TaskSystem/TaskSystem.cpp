@@ -55,7 +55,7 @@ bool MulNX::TaskSystem::Init() {
     (*this)
         .SubscribeAsync("Task/Create");
 
-    this->pMessageManager = this->Core->ModuleManager()->FindModule<MessageManager>("MessageManager");
+    this->pMessageManager = this->Core->ModuleManager()->FindModule<MessageManager>();
 
     this->ImCreateTask("Update", "MulNXMain", [this]() {
         this->Update();

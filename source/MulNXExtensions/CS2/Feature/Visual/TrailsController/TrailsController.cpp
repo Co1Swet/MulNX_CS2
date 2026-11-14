@@ -97,7 +97,7 @@ void TrailsController::Menu() {
 }
 
 bool TrailsController::Init() {
-    this->pParticleMgr = this->FindModule<ParticleManager>("ParticleManager");
+    this->pParticleMgr = this->FindModule<ParticleManager>();
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message&) {
         auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Projectile::Func_BaseCSGrenadeProjectile_DrawStuff).Data();

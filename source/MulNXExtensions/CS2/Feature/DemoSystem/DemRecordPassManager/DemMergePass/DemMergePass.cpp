@@ -2,7 +2,7 @@
 #include <Feature/DemoSystem/RecordTaskConfiger/RecordTaskConfiger.hpp>
 
 bool DemMergePass::Init() {
-    this->pConfiger = this->FindModule<RecordTaskConfiger>("RecordTaskConfiger");
+    this->pConfiger = this->FindModule<RecordTaskConfiger>();
     return true;
 }
 

@@ -10,9 +10,9 @@ void VEncodeController::Menu(MulNX::UICoordinator* uico) {
 }
 
 bool VEncodeController::Init() {
-    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
-    this->pMediaRecorder = this->FindModule<MediaRecorder>("MediaRecorder");
-    this->pAVCodecManager = this->FindModule<AVCodecManager>("AVCodecManager");
+    this->pMediaParamManager = this->FindModule<MediaParamManager>();
+    this->pMediaRecorder = this->FindModule<MediaRecorder>();
+    this->pAVCodecManager = this->FindModule<AVCodecManager>();
 
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();

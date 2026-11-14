@@ -12,23 +12,22 @@ int main(int, char**) {
         // 注册所有模块
         (*core->ModuleManager())
             .CreateSystemModules()// 创建所有系统模块，这是框架运行的基础
-            .CreateModule<Win32Starter>("Win32Starter")
-            .CreateModule<DLLInjectHelper>("DLLInjectHelper")
-            .CreateModule<CS2HelperController>("CS2HelperController")
-            .CreateModule<CS2BootLoader>("CS2BootLoader")
-            .CreateModule<UIDocker>("UIDocker")
+            .CreateModule<Win32Starter>()
+            .CreateModule<DLLInjectHelper>()
+            .CreateModule<CS2HelperController>()
+            .CreateModule<CS2BootLoader>()
+            .CreateModule<UIDocker>()
             ;
-
-        auto pStarter = core->ModuleManager()->FindModule<Win32Starter>("Win32Starter");
 
         // 启动核心
         core->EntryInit(core.get());
         // 启动主循环
+        auto pStarter = core->ModuleManager()->FindModule<Win32Starter>();
         pStarter->Run();
         core->Driver()->WaitEnd();
         return 0;
     }
-    catch (std::exception& e) {
+    catch (const std::exception& e) {
         MulNX::ErrorTerminate("在启动时发生异常！异常描述：" + std::string(e.what()));
     }
     catch (...) {

@@ -6,7 +6,7 @@
 using Microsoft::WRL::ComPtr;
 
 bool AudioCapturer::Init() {
-    this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
+    this->pAEncodeHelper = this->FindModule<AEncodeHelper>();
 
     this->SubscribeSync("Hook/Present/First", [this](MulNX::Message& msg) {
         this->SendTask("OnFirstPresent", "AudioCapturer", [this]() {

@@ -3,15 +3,11 @@
 #include "ModuleManager/ModuleManager.hpp"
 #include <MulNX/Systems/Systems.hpp>
 
-MulNX::Core::Core::Core(std::string&& name) :
-    createTime(std::chrono::steady_clock::now()) {
-    this->moduleName = std::move(name);
-    // 设置启动器
+MulNX::Core::Core::Core(std::string&& name) {
+    this->originName = name;
+    
     this->pDriver = std::make_unique<MulNX::Core::Driver>();
-    this->pDriver->SetName("Driver");
-    // 创建模块管理器
     this->pModuleManager = std::make_unique<MulNX::Core::ModuleManager>();
-    this->pModuleManager->SetName("ModuleManager");
 
     this->preInits.push_back([this]() {
         this->LogSucc("核心就绪");

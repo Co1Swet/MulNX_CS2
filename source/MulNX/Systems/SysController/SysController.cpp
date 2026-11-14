@@ -55,7 +55,7 @@ void SysController::ProcessMsg(MulNX::Message& Msg) {
         auto* pInfo = Msg.asp.get<ModuleInfo>();
         this->LogInfo("检测到以下注册模块");
         for (auto& [name, handle] : pInfo->Info) {
-            this->LogInfo(std::move(name));
+            this->LogInfo(std::string(name));
         }
         break;
     }

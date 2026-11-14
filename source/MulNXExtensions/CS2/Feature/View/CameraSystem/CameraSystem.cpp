@@ -52,11 +52,11 @@ void CameraSystem::Window(MulNX::UICoordinator* uico) {
 }
 
 bool CameraSystem::Init() {
-    this->pCamDrawer = this->FindModule<CamDrawer>("CamDrawer");
-    this->pCampathManager = this->FindModule<CampathManager>("CampathManager");
-    this->pCamMacroManager = this->FindModule<CamMacroManager>("CamMacroManager");
-    this->pCamPackManager = this->FindModule<CamPackManager>("CamPackManager");
-    this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>("CamPlayScheduler");
+    this->pCamDrawer = this->FindModule<CamDrawer>();
+    this->pCampathManager = this->FindModule<CampathManager>();
+    this->pCamMacroManager = this->FindModule<CamMacroManager>();
+    this->pCamPackManager = this->FindModule<CamPackManager>();
+    this->pCamPlayScheduler = this->FindModule<CamPlayScheduler>();
 
     this->Path()->CreateKey("kCamPacks", {}, [this](MulNX::PathManager* PathManager)->bool {
         return true;

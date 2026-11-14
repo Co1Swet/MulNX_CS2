@@ -10,7 +10,7 @@ namespace MulNX {
     public:
         ShortcutMixin() {
             This()->preInits.push_back([this]() {
-                this->pShortcutManager = This()->FindModule<ShortcutManager>("ShortcutManager");
+                this->pShortcutManager = This()->FindModule<ShortcutManager>();
                 return true;
                 });
         }

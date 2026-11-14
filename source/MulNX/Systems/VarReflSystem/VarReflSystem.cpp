@@ -11,7 +11,7 @@ static YAML::Node config{};
 
 bool VarReflSystem::Init() {
     this->pthCfg = this->Path()->PathGetForShared("Config") /
-        std::format("{}_Refl.yaml", this->Core->GetName());
+        std::format("{}_Refl.yaml", this->Core->GetOriginName());
 
     try {
         config = YAML::LoadFilePath(this->pthCfg);

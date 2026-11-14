@@ -2,8 +2,8 @@
 #include <Intro/HookView/HookView.hpp>
 
 bool WorldDraw::Init() {
-    this->pParticleManager = this->FindModule<ParticleManager>("ParticleManager");
-    this->pParticleSystemMgr = this->FindModule<ParticleSystemMgr>("ParticleSystemMgr");
+    this->pParticleManager = this->FindModule<ParticleManager>();
+    this->pParticleSystemMgr = this->FindModule<ParticleSystemMgr>();
 
     this->SubscribeSync("Hook/CSMainLoop", [this](auto&&...) {
         this->OnFirst();

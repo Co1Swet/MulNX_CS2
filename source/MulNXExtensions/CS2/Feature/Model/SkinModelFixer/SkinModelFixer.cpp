@@ -1,10 +1,10 @@
 #include "SkinModelFixer.hpp"
 
 bool SkinModelFixer::Init() {
-    this->pCCStrike15ItemSystem = this->FindModule<CCStrike15ItemSystem>("CCStrike15ItemSystem");
+    this->pCCStrike15ItemSystem = this->FindModule<CCStrike15ItemSystem>();
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
-        this->pGetPaintKit = this->FindModule<SkinController>("SkinController")->pGetPaintKit;
+        this->pGetPaintKit = this->FindModule<SkinController>()->pGetPaintKit;
 
         this->pUpdateMeshGroupMask = (UpdateMeshGroupMask_t)this->CS2->client.GetTextRegion()
             .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::UpdateMeshGroupMask).Data();

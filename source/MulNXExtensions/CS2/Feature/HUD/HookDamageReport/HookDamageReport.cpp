@@ -6,8 +6,8 @@ void HookDamageReport::Menu() {
 }
 
 bool HookDamageReport::Init() {
-    this->pClientPanorama = this->FindModule<ClientPanorama>("ClientPanorama");
-    this->pDamageRecorder = this->FindModule<DamageRecorder>("DamageRecorder");
+    this->pClientPanorama = this->FindModule<ClientPanorama>();
+    this->pDamageRecorder = this->FindModule<DamageRecorder>();
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
         auto tPos_Check_m_nSendUpdate = this->CS2->client.GetTextRegion()

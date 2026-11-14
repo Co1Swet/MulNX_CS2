@@ -3,8 +3,8 @@
 #include <MulNXThirdParty/imgui/imgui_impl_win32.h>
 
 bool ImGuiBinder::Init() {
-    this->pUISystem = this->FindModule<MulNX::UISystem>("UISystem");
-    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->pUISystem = this->FindModule<MulNX::UISystem>();
+    this->pGraphicsManager = this->FindModule<MulNX::GraphicsManager>();
 
     this->SubscribeSync("GraphicsSync/D3D11/Init/Pre", [this](auto&&...) {
         this->ImGuiInit();

@@ -51,8 +51,8 @@ void MediaRecorder::ReportCtxState() {
 }
 
 bool MediaRecorder::Init() {
-    this->pMediaParamManager = this->FindModule<MediaParamManager>("MediaParamManager");
-    this->pAEncodeHelper = this->FindModule<AEncodeHelper>("AEncodeHelper");
+    this->pMediaParamManager = this->FindModule<MediaParamManager>();
+    this->pAEncodeHelper = this->FindModule<AEncodeHelper>();
 
     (*this)
         .SubscribeAsync("Media/Record/Start")

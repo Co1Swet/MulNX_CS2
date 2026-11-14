@@ -68,7 +68,7 @@ class FileListenMixin : public IFileListenModule {
 public:
     FileListenMixin() {
         This()->preInits.push_back([this]() {
-            auto pRedirector = This()->FindModule<FileRedirector>("FileRedirector");
+            auto pRedirector = This()->FindModule<FileRedirector>();
             pRedirector->listeners.push_back(this);
             return true;
             });

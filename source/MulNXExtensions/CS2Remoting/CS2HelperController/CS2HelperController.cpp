@@ -3,7 +3,7 @@
 #include <MulNXExtensions/CS2Remoting/DLLInjectHelper/DLLInjectHelper.hpp>
 
 bool CS2HelperController::Init() {
-    this->pInjectHelper = this->Core->ModuleManager()->FindModule<DLLInjectHelper>("DLLInjectHelper");
+    this->pInjectHelper = this->Core->ModuleManager()->FindModule<DLLInjectHelper>();
 
     auto dirRoot = this->Path()->GetRoot();
     this->CS2OBToolPath = dirRoot / "CS2OBTool" / "CS2OBTool.dll";

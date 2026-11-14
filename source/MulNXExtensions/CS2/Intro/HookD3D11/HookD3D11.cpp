@@ -5,7 +5,7 @@ static const GUID IID_UnwrappedObject =
 { 0x7f2c9a11, 0x3b4e, 0x4d6a, { 0x81, 0x2f, 0x5e, 0x9c, 0xd3, 0x7a, 0x1b, 0x42 } };
 
 bool HookD3D11::Init() {
-    this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>("GraphicsManager");
+    this->pGraphicsManager = this->Core->ModuleManager()->FindModule<MulNX::GraphicsManager>();
 
     this->SubscribeSync("Hook/LoadLibraryExW/rendersystemdx11.dll", [this](MulNX::Message& msg) {
         this->rendersystemdx11 = MulNX::Memory::DllModule(L"rendersystemdx11.dll");

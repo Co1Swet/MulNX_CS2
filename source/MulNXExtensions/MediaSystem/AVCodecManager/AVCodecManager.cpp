@@ -13,10 +13,10 @@ void AVCodecManager::Menu() {
     const std::string_view currentName = currentNameValue ?
         std::string_view(*currentNameValue) : std::string_view{};
 
-    const std::string_view preview = current ? current->GetName() : "无可用编码器";
+    const std::string_view preview = current ? current->GetImplModuleName() : "无可用编码器";
     if (ImGui::BeginCombo("当前编码器", preview.data())) {
         for (auto* encoder : this->encoders) {
-            const std::string_view name = encoder->GetName();
+            const std::string_view name = encoder->GetImplModuleName();
             const bool selected = name == currentName;
             if (!encoder->IsAvailable()) {
                 ImGui::BeginDisabled();
@@ -47,7 +47,7 @@ void AVCodecManager::Menu() {
     if (hasUnavailableEncoder && ImGui::CollapsingHeader("不可用编码器", ImGuiTreeNodeFlags_DefaultOpen)) {
         for (auto* encoder : this->encoders) {
             if (!encoder->IsAvailable()) {
-                const std::string_view name = encoder->GetName();
+                const std::string_view name = encoder->GetImplModuleName();
                 ImGui::TextWrapped("%s：%s", name.data(), encoder->GetNotAvailableReason());
             }
         }
@@ -73,7 +73,7 @@ void AVCodecManager::AddEncoder(MulNX::IVEncoder* pEncoder) {
         this->LogError("尝试注册空的视频编码器");
         return;
     }
-    const std::string_view name = pEncoder->GetName();
+    const std::string_view name = pEncoder->GetImplModuleName();
     if (name.empty()) {
         this->LogError("尝试注册没有模块名的视频编码器");
         return;
@@ -87,7 +87,7 @@ void AVCodecManager::AddEncoder(MulNX::IVEncoder* pEncoder) {
 
 MulNX::IVEncoder* AVCodecManager::FindEncoder(std::string_view name) const {
     auto it = std::find_if(this->encoders.begin(), this->encoders.end(), [&name](const auto* encoder) {
-        return name == encoder->GetName();
+        return name == encoder->GetImplModuleName();
         });
     return it == this->encoders.end() ? nullptr : *it;
 }
@@ -107,7 +107,7 @@ void AVCodecManager::ResolveStartupSelection() {
     else if (auto* preferred = this->FindEncoder(preferredName)) {
         this->selectionStatus = std::format(
             "首选编码器 {} 不可用：{}；正在尝试回退链。",
-            preferred->GetName(), preferred->GetNotAvailableReason());
+            preferred->GetImplModuleName(), preferred->GetNotAvailableReason());
     }
     else {
         this->selectionStatus = std::format(
@@ -154,7 +154,7 @@ void AVCodecManager::ResolveStartupSelection() {
         }
         if (!fallback->IsAvailable()) {
             rejectedFallbacks.push_back(std::format(
-                "{}：{}", fallback->GetName(), fallback->GetNotAvailableReason()));
+                "{}：{}", fallback->GetImplModuleName(), fallback->GetNotAvailableReason()));
             continue;
         }
         this->currentEncoderName.store(std::make_shared<std::string>(fallbackId), std::memory_order_release);
@@ -169,7 +169,7 @@ void AVCodecManager::ResolveStartupSelection() {
             this->selectionStatus += "。";
         }
         this->selectionStatus += std::format(
-            " 已回退到 {}。", fallback->GetName());
+            " 已回退到 {}。", fallback->GetImplModuleName());
         this->LogWarning(std::string(this->selectionStatus));
         return;
     }

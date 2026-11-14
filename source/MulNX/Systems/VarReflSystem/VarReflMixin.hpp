@@ -125,7 +125,7 @@ namespace MulNX {
         VarReflMixin() {
             this->pModuleBase = static_cast<ModuleBase*>(This());
             This()->preInits.push_back([this]() {
-                this->pVarReflSystem = This()->FindModule<VarReflSystem>("VarReflSystem");
+                this->pVarReflSystem = This()->FindModule<VarReflSystem>();
                 return true;
                 });
         }

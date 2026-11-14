@@ -11,7 +11,7 @@ namespace MulNX {
         
         InputMixin() {
             This()->preInits.push_back([this]() {
-                this->pInputSystem = This()->FindModule<InputSystem>("InputSystem");
+                this->pInputSystem = This()->FindModule<InputSystem>();
                 return true;
                 });
         }

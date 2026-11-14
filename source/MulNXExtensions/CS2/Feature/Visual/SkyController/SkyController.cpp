@@ -63,8 +63,8 @@ void SkyController::Menu() {
 }
 
 bool SkyController::Init() {
-    this->pResourceSystem = this->FindModule<ResourceSystem>("ResourceSystem");
-    this->pMaterialSystem = this->FindModule<MaterialSystem>("MaterialSystem");
+    this->pResourceSystem = this->FindModule<ResourceSystem>();
+    this->pMaterialSystem = this->FindModule<MaterialSystem>();
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto posCallForce = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Sky::Pos_C_EnvSky_VF10_Call_ForceUpdateSkybox).Data();
