@@ -71,8 +71,8 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
     co_await this->WaitMilliseconds(1000);
 }
 
-MulNX::CoTask DemoRecorder::GoNextTask(std::optional<Demo::RecordTask>& outTask) {
-    auto curPass = this->currentPass.load(std::memory_order_acquire);
+MulNX::CoTask DemoRecorder::GoNextTask(std::optional<std::pair<std::shared_ptr<const Demo::RecordPass>, size_t>>& out) {
+    std::shared_ptr<const Demo::RecordPass> curPass = this->currentPass.load(std::memory_order_acquire);
     while (true) {
         if (!curPass) {
             co_await this->EnsurePassChange();
@@ -85,7 +85,7 @@ MulNX::CoTask DemoRecorder::GoNextTask(std::optional<Demo::RecordTask>& outTask)
         int nextIdx = curIdx + 1;
 
         if (nextIdx < curPass->rTasks.size()) {
-            outTask = curPass->rTasks[nextIdx];
+            out = { curPass ,nextIdx };
             this->indexTask.store(nextIdx, std::memory_order_release);
             co_return;
         }
@@ -93,11 +93,5 @@ MulNX::CoTask DemoRecorder::GoNextTask(std::optional<Demo::RecordTask>& outTask)
         this->LogSucc(std::format("录制Pass已经完整结束：{}", curPass->demoFileName));
         this->currentPass.store(nullptr, std::memory_order_release);
         this->indexTask.store(-1, std::memory_order_release);
-        
-        MulNX::Message msg("Demo/Pass/End"_hash);
-        auto&& [pPass] = msg.Access<const Demo::RecordPass*>();
-        pPass = curPass.get();
-        this->PublishSync(msg);
-        curPass = nullptr;
     }
 }

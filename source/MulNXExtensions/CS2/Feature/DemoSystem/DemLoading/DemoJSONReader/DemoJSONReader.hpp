@@ -8,5 +8,5 @@ class DemoJSONReader final : public DemModule<DemoJSONReader> {
     void ProcessMsg(MulNX::Message& msg)override;
     
     void OnJSONMsg(MulNX::Message& msg);
-    void ReadJSON(std::string&& kDir, const fs::path& filePath);
+    void ReadJSON(const std::string& kDir, const fs::path& filePath);
 };

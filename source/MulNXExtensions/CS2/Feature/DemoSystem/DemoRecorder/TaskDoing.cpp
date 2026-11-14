@@ -25,32 +25,34 @@ MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target)const {
 }
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
-        // 等待模块激活
         co_await this->WaitUntil([&]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
-
         while (this->moduleActive.load(std::memory_order_acquire)) {
-            std::optional<Demo::RecordTask> o = std::nullopt;
-            co_await this->GoNextTask(o);
-            if (!o.has_value()) {
-                this->LogWarning("没有更多的录制任务，模块将自动关闭");
-                this->moduleActive.store(false, std::memory_order_release);
-                break;
-            }
-            const auto& rTask = *o;
-            // 检验窗口安全
-            if (rTask.tickStart < 151) {
-                this->LogError(std::format("错误的录制窗口起点：{} ，已丢弃：{}", rTask.tickStart, rTask.desc));
-                continue;
-            }
-            this->LogInfo("进行新片段录制");
-            co_await this->RecordOne(rTask);
+            co_await this->OnLoop();
         }
     }
 }
-MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
+MulNX::CoTask DemoRecorder::OnLoop() {
+    std::optional<std::pair<std::shared_ptr<const Demo::RecordPass>, size_t>> o = std::nullopt;
+    co_await this->GoNextTask(o);
+    if (!o.has_value()) {
+        this->LogWarning("没有更多的录制任务，模块将自动关闭");
+        this->moduleActive.store(false, std::memory_order_release);
+        co_return;
+    }
+    const auto& [pass, index] = *o;
+    const auto& rTask = pass->rTasks.at(index);
+    // 检验窗口安全
+    if (rTask.tickStart < 151) {
+        this->LogError(std::format("错误的录制窗口起点：{} ，已丢弃：{}", rTask.tickStart, rTask.desc));
+        co_return;
+    }
+    this->LogInfo("进行新片段录制");
+    bool recordSucc = false;
+    co_await this->RecordOne(rTask, recordSucc);
+}
+MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask, bool& recordSucc)const {
     this->LogInfo(std::format("汇报当前片段信息---UID:{},开始tick:{},结束tick:{}",
         rTask.uid, rTask.tickStart, rTask.tickEnd));
-
     // 首先暂停Demo
     if (!this->CS2Time->IsDemoPaused()) {
         this->LogInfo("当前Demo未暂停，尝试暂停");
@@ -171,22 +173,29 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask)const {
     }
     // 开始录制
     this->StartRecord(rTask);
+    auto StopRecord = scope_exit([&]() {
+        // 停止录制
+        this->PublishAsync("Media/Record/Stop"_hash);
+        if (recordSucc) {
+            this->LogSucc(std::format("{} 录制正常结束", rTask.desc));
+        }
+        else {
+            this->LogError(std::format("{} 录制异常结束", rTask.desc));
+        }
+        });
+
     // 输出提示信息
     this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
         rTask.uid, rTask.tickStart, rTask.tickEnd));
     // 等待录制结束
     std::optional<int> observingMismatchSinceTick;
     co_await this->WaitUntil([&] {
-        return !this->OnRecording(rTask, observingMismatchSinceTick);
+        return !this->OnRecording(rTask, recordSucc, observingMismatchSinceTick);
         });
-    // 停止录制
-    this->PublishAsync("Media/Record/Stop"_hash);
-    // 输出成功信息并重置状态
-    this->LogSucc(std::format("录制结束，UID={}", rTask.uid));
 }
 
 // 返回true以表示保持录制状态，返回false以表示录制结束
-bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask,
+bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask, bool& recordSucc,
     std::optional<int>& observingMismatchSinceTick)const {
     if (this->moduleActive.load(std::memory_order_acquire) == false) {
         this->LogWarning("模块已被外部关闭，停止录制");
@@ -219,10 +228,10 @@ bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask,
         this->LogWarning(std::format("当前tick={}，意外地小于5，继续等待", curTick));
         return true;
     }
-
     if (curTick >= curRecordTask.tickEnd) {
         this->LogInfo(std::format("当前tick={}，已经超过录制终点tick={}，结束录制",
             curTick, curRecordTask.tickEnd));
+        recordSucc = true;
         return false;
     }
     if (curTick < curRecordTask.tickStart - 5) {
@@ -234,6 +243,7 @@ bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask,
         auto endTick = this->CS2Time->GetDemoLastTick();
         if (std::abs(curTick - endTick) < 100) {
             this->LogInfo(std::format("当前Demo在Demo尾tick {} 附近 {} 暂停，完成此片段录制", endTick, curTick));
+            recordSucc = true;
             return false;
         }
         else {

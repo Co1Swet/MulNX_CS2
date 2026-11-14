@@ -58,7 +58,7 @@ void DemoJSONReader::OnJSONMsg(MulNX::Message& msg) {
         return;
     }
     try {
-        return this->ReadJSON(std::move(kDir), filePath);
+        return this->ReadJSON(kDir, filePath);
     }
     catch (const std::exception& e) {
         this->LogError(std::format("读取 JSON 文件时发生错误: {}，错误：{}", filePath.string(), e.what()));  
@@ -69,7 +69,7 @@ void DemoJSONReader::OnJSONMsg(MulNX::Message& msg) {
     this->PublishAsync(this->MakeDemoInfoErrorNotify(kDir, name));
 }
 
-void DemoJSONReader::ReadJSON(std::string&& kDir, const fs::path& filePath) {
+void DemoJSONReader::ReadJSON(const std::string& kDir, const fs::path& filePath) {
     auto json = nlohmann::json::parse(std::ifstream(filePath.wstring()));
     this->LogInfo("成功读取 JSON 文件: " + filePath.string());
     Demo::Info info{};

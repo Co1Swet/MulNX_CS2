@@ -18,10 +18,11 @@ class DemoRecorder final : public DemModule<DemoRecorder>, public MediaModuleMix
     MulNX::CoTask CoSetOBTarget(bool& ok, Steam64UID target)const;
 
     MulNX::CoTask EnsurePassChange();
-    MulNX::CoTask GoNextTask(std::optional<Demo::RecordTask>& outTask);
+    MulNX::CoTask GoNextTask(std::optional<std::pair<std::shared_ptr<const Demo::RecordPass>, size_t>>& out);
     MulNX::CoTask Main();
-    MulNX::CoTask RecordOne(const Demo::RecordTask& rTask)const;
-    bool OnRecording(const Demo::RecordTask& curRecordTask,
+    MulNX::CoTask OnLoop();
+    MulNX::CoTask RecordOne(const Demo::RecordTask& rTask, bool& recordSucc)const;
+    bool OnRecording(const Demo::RecordTask& curRecordTask, bool& recordSucc,
         std::optional<int>& observingMismatchSinceTick)const;
 
     void Window()const;
