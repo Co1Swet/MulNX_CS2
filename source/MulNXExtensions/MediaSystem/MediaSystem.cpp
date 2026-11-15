@@ -17,10 +17,11 @@ void MediaSystem::Window(MulNX::UICoordinator* uico) {
             rp->str1 = (pv / "testend.mp4").string();
             this->PublishAsync(std::move(msg));
         };
-        s("Media/Concat/Begin"_hash);
-        for (const auto& n : { "test1.mp4", "test2.mp4" }) {
+        for (const auto& n : { "test1.mp4", "test2.mp4","test3.mp4" }) {
             auto [m, r] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/Add"_hash);
-            r->str1 = (pv / n).string(); this->PublishAsync(std::move(m));
+            r->str1 = (pv / "testend.mp4").string();
+            r->str2 = (pv / n).string();
+            this->PublishAsync(std::move(m));
         }
         s("Media/Concat/End"_hash);
     }

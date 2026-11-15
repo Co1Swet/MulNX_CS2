@@ -3,7 +3,6 @@
 
 bool MediaProcesser::Init() {
     (*this)
-        .SubscribeAsync("Media/Concat/Begin")
         .SubscribeAsync("Media/Concat/Add")
         .SubscribeAsync("Media/Concat/End");
 
@@ -17,51 +16,35 @@ bool MediaProcesser::Init() {
 
 void MediaProcesser::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
-    case "Media/Concat/Begin"_hash: {
-        auto path = msg.asp.get<MulNX::NetExt>()->str1;
-        this->BeginConcat(path);
-        break;
-    }
     case "Media/Concat/Add"_hash: {
-        auto path = msg.asp.get<MulNX::NetExt>()->str1;
-        this->AddConcat(path);
+        auto pExt = msg.asp.get<MulNX::NetExt>();
+        this->AddConcat(pExt->str1, pExt->str2);
         break;
     }
     case "Media/Concat/End"_hash: {
-        this->EndConcat();
+        auto pExt = msg.asp.get<MulNX::NetExt>();
+        this->EndConcat(pExt->str1);
         break;
     }
     }
 }
 
-void MediaProcesser::BeginConcat(const fs::path& target) {
-    this->concatInputs.clear();
-    this->concatTarget = target;
-    this->concatActive = true;
-    this->LogInfo(std::string("开始合并, 目标=") + (target.empty() ? "(未指定)" : target.string()));
-}
-
-void MediaProcesser::AddConcat(const fs::path& add) {
-    if (!this->concatActive) {
-        this->LogWarning("未处于合并状态，忽略 AddConcat");
-        return;
-    }
-    this->concatInputs.push_back(add);
+void MediaProcesser::AddConcat(const fs::path& concatTarget, const fs::path& add) {
+    this->infos[concatTarget].segments.push_back({ add,{} });
     this->LogInfo(std::string("已加入文件: ") + add.string());
 }
 
-void MediaProcesser::EndConcat() {
+void MediaProcesser::EndConcat(const fs::path& concatTarget) {
     std::vector<fs::path> inputs;
-    fs::path output;
-    if (!this->concatActive) {
-        this->LogWarning("EndConcat 在非合并状态被调用，忽略");
-        return;
+
+    auto it = this->infos.find(concatTarget);
+    if (it == this->infos.end())return;
+    auto& [target, info] = *it;
+    for (auto& s : info.segments) {
+        inputs.push_back(s.v);
     }
-    inputs = this->concatInputs;
-    output = this->concatTarget;
-    this->concatActive = false;
-    this->concatInputs.clear();
-    this->concatTarget.clear();
+
+    auto output = target;
 
     if (inputs.empty()) {
         this->LogWarning("没有要合并的输入文件");

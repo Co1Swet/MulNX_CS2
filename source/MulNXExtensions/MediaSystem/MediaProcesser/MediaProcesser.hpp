@@ -1,30 +1,25 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
-#include <string>
 
 class MediaProcesser final :public MediaModule<MediaProcesser> {
-    void ProcessMsg(MulNX::Message& msg)override;
-
-    bool concatActive = false;
-    fs::path concatTarget;
-    std::vector<fs::path> concatInputs;
-
-    bool Init()override;
-    void BeginConcat(const fs::path& target);
-    void AddConcat(const fs::path& add);
-    void EndConcat();
-
     struct ConcatInfo {
         struct Segment {
             fs::path v;
             fs::path overrideA;
-            
+
         };
 
+        fs::path concatTarget;
         std::vector<Segment> segments{};
     };
 
-public:
+    std::unordered_map<std::string, ConcatInfo> infos{};
+
+    bool Init()override;
+    void ProcessMsg(MulNX::Message& msg)override;
+    void AddConcat(const fs::path& concatTarget, const fs::path& add);
+    void EndConcat(const fs::path& concatTarget);
+
     void DoConcat(const std::vector<fs::path>& inputs, const fs::path& output,
         const std::string& audioEncoderName = "libmp3lame");
 };
