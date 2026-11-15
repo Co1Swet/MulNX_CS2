@@ -32,7 +32,7 @@ bool CSReShadeController::Init() {
         auto t = (uint8_t*)IVClass::Assume(pContext)->GetVFuncPtr(33);
         this->hkOMSetRenderTargets = MulNX::Hook::Create(t, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnOMSetRenderTargets(hk, ctx);
-            }) | value_or_throw;
+            }, false, { .useXmm = false }) | value_or_throw;
         this->RegisterAttachHook(this->hkOMSetRenderTargets, "OMSetRenderTargets");
         });
 
@@ -51,11 +51,21 @@ bool CSReShadeController::Init() {
 void CSReShadeController::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "ReShade/On"_hash: {
-        this->pMulNXReShadeBridge.load(std::memory_order_acquire)->SetEffectsState(true);
+        auto pBridge = this->pMulNXReShadeBridge.load(std::memory_order_acquire);
+        if (!pBridge) {
+            this->LogError("已忽略On指令，因为ReShade未连接！");
+            break;
+        }
+        pBridge->SetEffectsState(true);
         break;
     }
     case "ReShade/Off"_hash: {
-        this->pMulNXReShadeBridge.load(std::memory_order_acquire)->SetEffectsState(false);
+        auto pBridge = this->pMulNXReShadeBridge.load(std::memory_order_acquire);
+        if (!pBridge) {
+            this->LogError("已忽略Off指令，因为ReShade未连接！");
+            break;
+        }
+        pBridge->SetEffectsState(false);
         break;
     }
     }
@@ -107,7 +117,7 @@ void CSReShadeController::BeforeRendPanorama(ID3D11DeviceContext* pD3D11Ctx) {
     ComPtr<ID3D11RenderTargetView> pRTV = nullptr;
     ComPtr<ID3D11DepthStencilView> pDSV = nullptr;
     pD3D11Ctx->OMGetRenderTargets(1, &pRTV, &pDSV);
-    
+
     if (!pRTV || !this->pSavedDSV)return;
     ComPtr<ID3D11Resource> pRes = nullptr;
     ComPtr<ID3D11Resource> pDepthRes = nullptr;

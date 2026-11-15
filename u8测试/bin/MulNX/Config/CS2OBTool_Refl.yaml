@@ -31,7 +31,7 @@ SpeakingController.autoActiveTeamVoice: false
 SpeakingController.onlyCurOBingSameTeam: false
 SoundCircleFix.enable: true
 RecordTaskConfiger.preRecordSeconds: 3.5
-RecordTaskConfiger.postRecordSeconds: 3.5
+RecordTaskConfiger.postRecordSeconds: 2.75
 RecordTaskConfiger.mergeThresholdSeconds: 10
 RecordTaskConfiger.preBekilledSeconds: 1.8
 RecordTaskConfiger.postBekilledSeconds: 1.8

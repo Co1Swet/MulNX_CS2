@@ -10,7 +10,7 @@ class RecordTaskConfiger final :public DemModule<RecordTaskConfiger> {
 
     // 击杀者视角
     MulReflFloat(preRecordSeconds, 3.5f);
-    MulReflFloat(postRecordSeconds, 3.5f);
+    MulReflFloat(postRecordSeconds, 2.75f);
     // 邻近拼合阈值
     MulReflFloat(mergeThresholdSeconds, 12.0f);
     // 被击杀者视角

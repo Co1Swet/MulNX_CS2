@@ -25,12 +25,12 @@ bool RendCtrlCenter::Init() {
 
         this->hkDrawSceneData = MulNX::Hook::Create((uint8_t*)this->pDrawSceneData, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnDrawSceneData(hk, ctx);
-            }) | value_or_throw;
+            }, false, { .useXmm = false }) | value_or_throw;
         this->RegisterAttachHook(this->hkDrawSceneData, "DrawSceneData");
 
         this->hkInitDrawingData = MulNX::Hook::Create((uint8_t*)this->pSceneSystem->pInitDrawingData, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnInitDrawingData(hk, ctx);
-            }) | value_or_throw;
+            }, false, { .useXmm = false }) | value_or_throw;
         this->RegisterAttachHook(this->hkInitDrawingData, "InitDrawingData");
         this->pRawInitDrawingData = (SceneSystem::InitDrawingData_t)this->hkInitDrawingData->pMaybeRawFunc;
 
@@ -39,7 +39,7 @@ bool RendCtrlCenter::Init() {
             .Data();
         this->hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear = MulNX::Hook::Create(t1, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnCreateRenderContextPtr1_With_Fmt_LayerClear(hk, ctx);
-            }, true) | value_or_throw;
+            }, true, { .useXmm = false }) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear,
             "hkPos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear");
 
@@ -48,7 +48,7 @@ bool RendCtrlCenter::Init() {
             .Data();
         this->hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers = MulNX::Hook::Create(t2, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnCreateRenderContextPtr2_With_UpdateBuffers(hk, ctx);
-            }, true) | value_or_throw;
+            }, true, { .useXmm = false }) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers,
             "hkPos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers");
         });
@@ -121,8 +121,8 @@ MulNX::Hook::Then RendCtrlCenter::OnCommit(MulNX::Hook* hk, RegContext* ctx) {
 }
 
 MulNX::Hook::Then RendCtrlCenter::OnCreateRenderContextPtr1_With_Fmt_LayerClear(MulNX::Hook* hk, RegContext* ctx) {
-    auto pViewName = *hk->GetStackParam<char*>(ctx, 4);
-    auto pViewPass = *hk->GetStackParam<char*>(ctx, 5);
+    auto pViewName = *hk->GetStackParam<const char*>(ctx, 4);
+    auto pViewPass = *hk->GetStackParam<const char*>(ctx, 5);
     auto& pList = *(CS2::SoftwareCommandList**)(ctx->rax);
 
     if (strcmp(pViewName, "Player 0") == 0 && strcmp(pViewPass, "Clear Color Depth Stencil") == 0) {
