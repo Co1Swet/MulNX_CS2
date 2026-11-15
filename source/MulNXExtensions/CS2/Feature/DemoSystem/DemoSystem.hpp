@@ -1,43 +1,6 @@
 #pragma once
 #include <Intro/Intros.hpp>
 namespace Demo {
-    struct RecordTask {
-        enum class Type :int {
-            None,
-            Normal, // 给击杀分配这个，让合并智能一点
-            Death,
-            Campath
-        };
-        // demo文件所在的key
-        std::string kPath{};
-        // demo文件的裸名称
-        std::string demoName{};
-        // 任务描述
-        std::string desc{};
-        // 目标SteamUID
-        Steam64UID uid = 0;
-        // 录制类型，和优化有关
-        Type type = Type::None;
-        // 开始录制tick
-        int tickStart{};
-        // 结束录制tick
-        int tickEnd{};
-        // 回合编号
-        int roundNumber{};
-        // uid这个回合的击杀总量
-        int roundKill{};
-        // 这是回合的第几个击杀
-        int killIndex{};
-        // 没有扩展名的文件名，不包括路径
-        std::string fileNameNoExt{};
-    };
-
-    struct RecordPass {
-        std::string kPath{};
-        std::string demoFileName{};
-        std::vector<RecordTask> rTasks{};
-    };
-
     struct Team {
         std::string name{};
         std::string letter{};
@@ -101,6 +64,54 @@ namespace Demo {
             static const std::string unknown = "N/A";
             return unknown;
         }
+    };
+}
+namespace Demo::Record {
+    struct Task {
+        enum class Type :int {
+            None,
+            Normal, // 给击杀分配这个，让合并智能一点
+            Death,
+            Campath
+        };
+        // demo文件所在的key
+        std::string kPath{};
+        // demo文件的裸名称
+        std::string demoName{};
+        // 任务描述
+        std::string desc{};
+        // 目标SteamUID
+        Steam64UID uid = 0;
+        // 录制类型，和优化有关
+        Type type = Type::None;
+        // 开始录制tick
+        int tickStart{};
+        // 结束录制tick
+        int tickEnd{};
+        // 回合编号
+        int roundNumber{};
+        // uid这个回合的击杀总量
+        int roundKill{};
+        // 这是回合的第几个击杀
+        int killIndex{};
+        // 没有扩展名的文件名，不包括路径
+        std::string fileNameNoExt{};
+    };
+    class Token {
+        std::move_only_function<void(Token*)> callback = nullptr;
+    public:
+        Token() = delete;
+        Token(std::move_only_function<void(Token*)> callback) :callback(std::move(callback)) {}
+        ~Token() { callback(this); }
+
+        std::chrono::system_clock::time_point createdAt;
+        std::string createdAtStr;
+    };
+    struct Pass {
+        std::shared_ptr<Token> token = nullptr;
+        std::string kPath{};
+        std::string demoFileName{};
+        std::vector<Task> rTasks{};
     };
 }
 

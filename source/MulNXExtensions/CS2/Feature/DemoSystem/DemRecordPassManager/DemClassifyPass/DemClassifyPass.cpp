@@ -6,11 +6,11 @@ bool DemClassifyPass::Init() {
     return true;
 }
 
-std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(std::vector<Demo::RecordTask>&& rTasks)const {
+std::vector<Demo::Record::Pass> DemClassifyPass::ApplyPass(std::vector<Demo::Record::Task>&& rTasks)const {
     const size_t inputCount = rTasks.size();
     this->LogInfo(std::format("开始分类：输入 {} 条录制任务", inputCount));
 
-    std::vector<Demo::RecordPass> passes;
+    std::vector<Demo::Record::Pass> passes;
     if (rTasks.empty()) {
         this->LogInfo("分类跳过：输入任务为空");
         return passes;
@@ -32,7 +32,7 @@ std::vector<Demo::RecordPass> DemClassifyPass::ApplyPass(std::vector<Demo::Recor
 
         auto [it, inserted] = indexByDemo.emplace(task.demoName, passes.size());
         if (inserted) {
-            Demo::RecordPass pass;
+            Demo::Record::Pass pass;
             pass.kPath = task.kPath;
             pass.demoFileName = task.demoName;
             pass.rTasks.reserve(1);

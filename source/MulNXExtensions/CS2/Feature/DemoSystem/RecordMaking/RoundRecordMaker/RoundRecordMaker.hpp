@@ -6,5 +6,5 @@ class RoundRecordMaker final :public DemModule<RoundRecordMaker> {
 
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg)override;
-    void PublishRecordTask(Demo::RecordTask&& rTask)const;
+    void PublishRecordTask(Demo::Record::Task&& rTask)const;
 };

@@ -32,7 +32,7 @@ MulNX::CoTask DemoRecorder::Main() {
     }
 }
 MulNX::CoTask DemoRecorder::OnLoop() {
-    std::optional<std::pair<std::shared_ptr<const Demo::RecordPass>, size_t>> o = std::nullopt;
+    std::optional<std::pair<std::shared_ptr<const Demo::Record::Pass>, size_t>> o = std::nullopt;
     co_await this->GoNextTask(o);
     if (!o.has_value()) {
         this->LogWarning("没有更多的录制任务，模块将自动关闭");
@@ -41,16 +41,34 @@ MulNX::CoTask DemoRecorder::OnLoop() {
     }
     const auto& [pass, index] = *o;
     const auto& rTask = pass->rTasks.at(index);
+
+    MulNX::Message msg("Demo/Record/Task/End"_hash);
+    auto&& [recordSucc, pPass, iIndex, drop] = msg.Access<bool, const Demo::Record::Pass*, size_t, bool>();
+    recordSucc = false;
+    pPass = pass.get();
+    iIndex = index;
+    drop = false;
+
     // 检验窗口安全
     if (rTask.tickStart < 151) {
         this->LogError(std::format("错误的录制窗口起点：{} ，已丢弃：{}", rTask.tickStart, rTask.desc));
+        drop = true;
+        this->PublishSync(msg);
         co_return;
     }
     this->LogInfo("进行新片段录制");
-    bool recordSucc = false;
+    
     co_await this->RecordOne(rTask, recordSucc);
+    this->PublishSync(msg);
 }
-MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask, bool& recordSucc)const {
+MulNX::CoTask DemoRecorder::RecordOne(const Demo::Record::Task& rTask, bool& recordSucc)const {
+    this->AsyncCommand("spec_mode 4");
+    bool mode4 = false;
+    co_await this->WaitTimed(mode4, 3000, [&]() {
+        auto o = this->CS2Entitys->TryGetObservingSteam64UID();
+        if (o.has_value())return false;
+        return true;
+        });
     this->LogInfo(std::format("汇报当前片段信息---UID:{},开始tick:{},结束tick:{}",
         rTask.uid, rTask.tickStart, rTask.tickEnd));
     // 首先暂停Demo
@@ -91,10 +109,6 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask, bool& recor
             tick10before, jmped));
         co_return;
     }
-
-    this->AsyncCommand("spec_mode 4");
-
-    co_await this->WaitMilliseconds(750);
 
     // 跳转到稍微靠前的时间点，刷新雷达状态等等
     int beforeRecord = rTask.tickStart - 150;
@@ -195,7 +209,7 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::RecordTask& rTask, bool& recor
 }
 
 // 返回true以表示保持录制状态，返回false以表示录制结束
-bool DemoRecorder::OnRecording(const Demo::RecordTask& curRecordTask, bool& recordSucc,
+bool DemoRecorder::OnRecording(const Demo::Record::Task& curRecordTask, bool& recordSucc,
     std::optional<int>& observingMismatchSinceTick)const {
     if (this->moduleActive.load(std::memory_order_acquire) == false) {
         this->LogWarning("模块已被外部关闭，停止录制");

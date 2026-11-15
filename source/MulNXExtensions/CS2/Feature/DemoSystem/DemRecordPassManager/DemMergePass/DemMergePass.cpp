@@ -6,7 +6,7 @@ bool DemMergePass::Init() {
     return true;
 }
 
-void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks)const {
+void DemMergePass::ApplyPass(std::vector<Demo::Record::Task>& rTasks)const {
     this->LogInfo("开始执行合并优化");
     if (rTasks.size() < 2) return;
 
@@ -14,20 +14,20 @@ void DemMergePass::ApplyPass(std::vector<Demo::RecordTask>& rTasks)const {
     const int post = this->pConfiger->GetPostRecordTicks();
     const int gap = std::max(0, this->pConfiger->GetMergeThresholdTicks() - (pre + post));
 
-    auto sameDomain = [&](const Demo::RecordTask& a, const Demo::RecordTask& b) {
+    auto sameDomain = [&](const Demo::Record::Task& a, const Demo::Record::Task& b) {
         return a.demoName == b.demoName
             && a.uid == b.uid
             && a.roundNumber == b.roundNumber
             && (b.tickStart - a.tickEnd) <= gap
-            && a.type == b.type && a.type == Demo::RecordTask::Type::Normal;
+            && a.type == b.type && a.type == Demo::Record::Task::Type::Normal;
         };
 
-    auto mergeWindow = [](Demo::RecordTask& dst, const Demo::RecordTask& src) {
+    auto mergeWindow = [](Demo::Record::Task& dst, const Demo::Record::Task& src) {
         dst.tickStart = std::min(dst.tickStart, src.tickStart);
         dst.tickEnd = std::max(dst.tickEnd, src.tickEnd);
         };
 
-    std::vector<Demo::RecordTask> out;
+    std::vector<Demo::Record::Task> out;
     std::vector<int>              counts;
     std::vector<int>              lastKillIdx;      // 平行数组：合并块内最后一个 killIndex
     out.reserve(rTasks.size());

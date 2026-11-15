@@ -52,7 +52,7 @@ void DemoRecorder::Window()const {
     MulNX::UI::ShowTime(ticksToRecord);
 
     // 通用：渲染一个 pass 内所有任务的列表
-    auto DrawTasks = [](const Demo::RecordPass& pass, int highlightIdx) {
+    auto DrawTasks = [](const Demo::Record::Pass& pass, int highlightIdx) {
         for (int i = 0; i < static_cast<int>(pass.rTasks.size()); ++i) {
             const auto& t = pass.rTasks[i];
 
@@ -129,8 +129,8 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "Demo/Pass/Commit"_hash: {
         std::unique_lock lock(this->smutex);
-        auto pass = std::move(*msg.asp.get<Demo::RecordPass>());
-        this->recordPasses.push_back(std::make_shared<Demo::RecordPass>(std::move(pass)));
+        auto pass = std::move(*msg.asp.get<Demo::Record::Pass>());
+        this->recordPasses.push_back(std::make_shared<Demo::Record::Pass>(std::move(pass)));
         break;
     }
     case "Demo/Pass/Clear"_hash: {
@@ -176,7 +176,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
     }
 }
-void DemoRecorder::StartRecord(const Demo::RecordTask& task)const {
+void DemoRecorder::StartRecord(const Demo::Record::Task& task)const {
     std::shared_lock lock(this->smutex);
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
     ++this->num;

@@ -20,9 +20,9 @@ bool RoundRecordMaker::Init() {
     return true;
 }
 
-void RoundRecordMaker::PublishRecordTask(Demo::RecordTask&& rTask)const {
+void RoundRecordMaker::PublishRecordTask(Demo::Record::Task&& rTask)const {
     this->LogInfo(std::format("准备录制任务：{}", rTask.desc));
-    auto [msg, rp] = MulNX::Message::Create<Demo::RecordTask>("Demo/Record/Enqueue"_hash);
+    auto [msg, rp] = MulNX::Message::Create<Demo::Record::Task>("Demo/Record/Enqueue"_hash);
     *rp = std::move(rTask);
     this->PublishAsync(std::move(msg));
 }
@@ -48,11 +48,11 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
         const auto& info = pDemoInfo->players.at(uid).roundInfo.at(round);
         const auto& ev = info.killEvents[idx];
 
-        Demo::RecordTask rTask{};
+        Demo::Record::Task rTask{};
         rTask.kPath = kDir;
         rTask.demoName = demoName;
         rTask.uid = ev.killerSteamId;
-        rTask.type = Demo::RecordTask::Type::Normal;
+        rTask.type = Demo::Record::Task::Type::Normal;
         rTask.tickStart = ev.tick - this->pConfiger->GetPreRecordTicks();
         rTask.tickEnd = ev.tick + this->pConfiger->GetPostRecordTicks();
         rTask.roundNumber = static_cast<int>(round);
@@ -81,11 +81,11 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
 
             for (int i = 0;i < info.killEvents.size();++i) {
                 const auto& ev = info.killEvents[i];
-                Demo::RecordTask rTask{};
+                Demo::Record::Task rTask{};
                 rTask.kPath = kDir;
                 rTask.demoName = demoName;
                 rTask.uid = ev.killerSteamId;
-                rTask.type = Demo::RecordTask::Type::Normal;
+                rTask.type = Demo::Record::Task::Type::Normal;
                 rTask.tickStart = ev.tick - this->pConfiger->GetPreRecordTicks();
                 rTask.tickEnd = ev.tick + this->pConfiger->GetPostRecordTicks();
                 rTask.roundNumber = static_cast<int>(round);
@@ -118,7 +118,7 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
         if (!info.Bekilled)break;
         auto& ev = *info.Bekilled;
 
-        Demo::RecordTask rTask{};
+        Demo::Record::Task rTask{};
         rTask.kPath = kDir;
         rTask.demoName = demoName;
         rTask.uid = ev.victimSteamId;
@@ -164,7 +164,7 @@ void RoundRecordMaker::ProcessMsg(MulNX::Message& msg) {
         }
         endTickFull += this->pConfiger->GetPostRoundEndTicks();
 
-        Demo::RecordTask rTask{};
+        Demo::Record::Task rTask{};
         rTask.kPath = kDir;
         rTask.demoName = demoName;
         rTask.uid = player.steamId;

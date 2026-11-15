@@ -8,5 +8,5 @@ class PassRecordMaker final :public DemModule<PassRecordMaker> {
     MulNX::CoTask EnsureMake(std::string key, std::string demoName);
 
     bool Init()override;
-    void ProcessMsg(MulNX::Message& msg);
+    void ProcessMsg(MulNX::Message& msg)override;
 };

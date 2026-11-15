@@ -1,4 +1,5 @@
 #include "DemRecordPassManager.hpp"
+#include <MulNXUtils/Times/Times.hpp>
 
 void DemRecordPassManager::Window() {
     auto w = MulNX::UI::RAIIWindow("预备录制队列");
@@ -56,6 +57,10 @@ bool DemRecordPassManager::Init() {
         .SubscribeAsync("Demo/Record/Commit")
         ;
 
+    this->SubscribeSync("Demo/Record/Task/End", [this](MulNX::Message& msg) {
+        this->OnTaskEnd(msg);
+        });
+
     this->UIRegisterCallback("UI.Demos", [this](auto&&...) {
         this->Window();
         });
@@ -73,7 +78,7 @@ void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
     case "Demo/Record/Enqueue"_hash: {
         std::unique_lock lock(this->smutex);
         this->setFocus.store(true, std::memory_order_release);
-        auto task = std::move(*msg.asp.get<Demo::RecordTask>());
+        auto task = std::move(*msg.asp.get<Demo::Record::Task>());
         auto name = task.demoName;
         if (name.empty()) {
             this->LogError("不能入队空Demo名的录制任务！");
@@ -102,34 +107,59 @@ void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "Demo/Record/Commit"_hash: {
         auto&& [autoRecord] = msg.Access<int>();
-        std::vector<Demo::RecordTask> rTasks;
+        std::vector<Demo::Record::Task> rTasks;
         {
             std::unique_lock lock(this->smutex);
             rTasks = std::move(this->bufferTasks);
             this->bufferTasks = {};
         }
         if (rTasks.empty())break;
-        this->Commit(std::move(rTasks), autoRecord);
+        auto token = std::make_shared<Demo::Record::Token>([&](Demo::Record::Token* token) {
+            this->OnTokenDestroy(token);
+            });
+        this->Commit(std::move(rTasks), autoRecord, token);
         break;
     }
     }
 }
 
-void DemRecordPassManager::Commit(std::vector<Demo::RecordTask>&& rTasks, const int autoRecord)const {
-    // 分类：形态从 vector<RecordTask> 转换为 vector<RecordPass>
+void DemRecordPassManager::Commit(std::vector<Demo::Record::Task>&& rTasks,
+    const int autoRecord, std::shared_ptr<Demo::Record::Token> token)const {
+
+    token->createdAt = std::chrono::system_clock::now();
+    token->createdAtStr = MulNX::Time::ToTimestamp(token->createdAt);
+
+    std::vector<MulNX::Message> buffer{};
+
+    // 分类：形态从 vector<Task> 转换为 vector<Pass>
     auto passes = this->pDemClassifyPass->ApplyPass(std::move(rTasks));
     for (auto& pass : passes) {
         this->pDemSortPass->ApplyPass(pass.rTasks); // 就地对每个 demo 的任务排序
         this->pDemMergePass->ApplyPass(pass.rTasks); // 依赖前一步的有序性
         this->pDemSortPass->ApplyPass(pass.rTasks); // 再跑一次排序
 
-        auto [msg, rp] = MulNX::Message::Create<Demo::RecordPass>("Demo/Pass/Commit"_hash);
+        auto [msg, rp] = MulNX::Message::Create<Demo::Record::Pass>("Demo/Pass/Commit"_hash);
+        pass.token = token;
         *rp = std::move(pass);
-        this->PublishAsync(std::move(msg));
+        buffer.push_back(std::move(msg));
     }
 
-    this->LogInfo(std::format("已提交 {} 个 RecordPass 到录制器", passes.size()));
+    for (auto& msg : buffer) {
+        this->PublishAsync(std::move(msg));
+    }
+   
+    this->LogInfo(std::format("已提交 {} 个 Record::Pass 到录制器", passes.size()));
     if (autoRecord <= 0)return;
     this->PublishAsync("Demo/Pass/Start"_hash);
     this->LogInfo("根据设置自动触发录制");
+}
+void DemRecordPassManager::OnTaskEnd(MulNX::Message& msg) {
+    auto&& [recordSucc, pPass, iIndex, drop] =
+        msg.Access<bool, const Demo::Record::Pass*, size_t, bool>();
+    auto token = pPass->token;
+    auto s = token->createdAtStr;
+    return;
+}
+void DemRecordPassManager::OnTokenDestroy(Demo::Record::Token* token) {
+    this->LogInfo("Token析构");
 }

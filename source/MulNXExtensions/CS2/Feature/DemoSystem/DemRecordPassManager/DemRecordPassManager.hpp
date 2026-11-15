@@ -8,12 +8,15 @@ class DemRecordPassManager final :public DemModule<DemRecordPassManager> {
     DemClassifyPass* pDemClassifyPass = nullptr;
     DemSortPass* pDemSortPass = nullptr;
     DemMergePass* pDemMergePass = nullptr;
-    std::vector<Demo::RecordTask>bufferTasks{};
+    std::vector<Demo::Record::Task>bufferTasks{};
 
     std::atomic<bool> setFocus = false;
 
     void Window();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
-    void Commit(std::vector<Demo::RecordTask>&& rTasks, const int autoRecord)const;
+    void Commit(std::vector<Demo::Record::Task>&& rTasks, const int autoRecord,
+        std::shared_ptr<Demo::Record::Token> token)const;
+    void OnTaskEnd(MulNX::Message& msg);
+    void OnTokenDestroy(Demo::Record::Token* token);
 };

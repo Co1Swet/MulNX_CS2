@@ -2,7 +2,7 @@
 #include <Support/TimeController/TimeController.hpp>
 
 MulNX::CoTask DemoRecorder::EnsurePassChange() {
-    std::shared_ptr<Demo::RecordPass> tryPass = nullptr;
+    std::shared_ptr<Demo::Record::Pass> tryPass = nullptr;
     {
         std::unique_lock lock(this->smutex);
         if (this->recordPasses.empty())co_return;
@@ -71,8 +71,8 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
     co_await this->WaitMilliseconds(1000);
 }
 
-MulNX::CoTask DemoRecorder::GoNextTask(std::optional<std::pair<std::shared_ptr<const Demo::RecordPass>, size_t>>& out) {
-    std::shared_ptr<const Demo::RecordPass> curPass = this->currentPass.load(std::memory_order_acquire);
+MulNX::CoTask DemoRecorder::GoNextTask(std::optional<std::pair<std::shared_ptr<const Demo::Record::Pass>, size_t>>& out) {
+    std::shared_ptr<const Demo::Record::Pass> curPass = this->currentPass.load(std::memory_order_acquire);
     while (true) {
         if (!curPass) {
             co_await this->EnsurePassChange();
@@ -83,15 +83,22 @@ MulNX::CoTask DemoRecorder::GoNextTask(std::optional<std::pair<std::shared_ptr<c
 
         int curIdx = this->indexTask.load(std::memory_order_acquire);
         int nextIdx = curIdx + 1;
+        this->LogInfo(std::format("拾取循环状态：pass={} indexTask={}/{}",
+            curPass->demoFileName, curIdx, curPass->rTasks.size()));
 
         if (nextIdx < curPass->rTasks.size()) {
             out = { curPass ,nextIdx };
             this->indexTask.store(nextIdx, std::memory_order_release);
+            const auto& t = curPass->rTasks[nextIdx];
+            this->LogInfo(std::format("拾取任务 pass={} index={}/{} tick={}-{} uid={}",
+                curPass->demoFileName, nextIdx, curPass->rTasks.size(),
+                t.tickStart, t.tickEnd, t.uid));
             co_return;
         }
-        this->AsyncCommand("demo_pause");
         this->LogSucc(std::format("录制Pass已经完整结束：{}", curPass->demoFileName));
+        this->AsyncCommand("demo_pause");
         this->currentPass.store(nullptr, std::memory_order_release);
         this->indexTask.store(-1, std::memory_order_release);
+        curPass = nullptr;
     }
 }

@@ -5,5 +5,5 @@ class DemMergePass final :public DemModule<DemMergePass> {
     class RecordTaskConfiger* pConfiger = nullptr;
     bool Init()override;
 public:
-    void ApplyPass(std::vector<Demo::RecordTask>& rTasks)const;
+    void ApplyPass(std::vector<Demo::Record::Task>& rTasks)const;
 };

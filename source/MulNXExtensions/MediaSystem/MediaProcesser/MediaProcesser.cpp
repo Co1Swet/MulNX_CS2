@@ -71,6 +71,9 @@ void MediaProcesser::EndConcat() {
         this->LogWarning("未指定输出文件，合并取消");
         return;
     }
+    while (this->pMediaState->IsBusy()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     try {
         this->DoConcat(inputs, output);
     }
