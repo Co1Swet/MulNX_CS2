@@ -14,6 +14,16 @@ class MediaProcesser final :public MediaModule<MediaProcesser> {
     void AddConcat(const fs::path& add);
     void EndConcat();
 
+    struct ConcatInfo {
+        struct Segment {
+            fs::path v;
+            fs::path overrideA;
+            
+        };
+
+        std::vector<Segment> segments{};
+    };
+
 public:
     void DoConcat(const std::vector<fs::path>& inputs, const fs::path& output,
         const std::string& audioEncoderName = "libmp3lame");

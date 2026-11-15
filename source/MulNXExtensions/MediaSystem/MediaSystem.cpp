@@ -9,6 +9,21 @@ void MediaSystem::Window(MulNX::UICoordinator* uico) {
     if (ImGui::CollapsingHeader("录制控制")) {
         uico->CallbackCall("UI.MediaSys/Control"_hash, nullptr);
     }
+
+    if (ImGui::Button("测试")) {
+        auto pv = this->Path()->PathGetForShared("Videos");
+        auto s = [&](auto m) {
+            auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>(m);
+            rp->str1 = (pv / "testend.mp4").string();
+            this->PublishAsync(std::move(msg));
+        };
+        s("Media/Concat/Begin"_hash);
+        for (const auto& n : { "test1.mp4", "test2.mp4" }) {
+            auto [m, r] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/Add"_hash);
+            r->str1 = (pv / n).string(); this->PublishAsync(std::move(m));
+        }
+        s("Media/Concat/End"_hash);
+    }
 }
 
 bool MediaSystem::Init() {
