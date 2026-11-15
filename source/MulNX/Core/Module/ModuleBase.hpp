@@ -2,7 +2,7 @@
 #include "ModuleCoroutine.hpp"
 #include <MulNX/Common/MulNXHandle.hpp>
 #include <shared_mutex>
-#include <string_view>
+#include <queue>
 
 namespace MulNX {
     class MessageChannel;
@@ -17,6 +17,7 @@ namespace MulNX {
 
     class ModuleBase :public ModuleCoroutine, public ModuleComponents {
         MulNX::IModule* FindModule(const std::string& name)const;
+        std::queue<MulNX::Message> bufferMsgs{};
     protected:
         // 自用更新入口
         void Update();  
