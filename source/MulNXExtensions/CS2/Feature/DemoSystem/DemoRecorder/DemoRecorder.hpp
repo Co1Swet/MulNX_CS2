@@ -12,16 +12,14 @@ class DemoRecorder final : public DemModule<DemoRecorder>, public MediaModuleMix
 
     std::atomic<std::shared_ptr<const Demo::Record::Pass>> currentPass{};
     std::atomic<int> indexTask = -1;
-    mutable std::atomic<uint64_t> num = 0;
 
-    void StartRecord(const Demo::Record::Task& task)const;
     MulNX::CoTask CoSetOBTarget(bool& ok, Steam64UID target)const;
 
     MulNX::CoTask EnsurePassChange();
     MulNX::CoTask GoNextTask(std::optional<std::pair<std::shared_ptr<const Demo::Record::Pass>, size_t>>& out);
     MulNX::CoTask Main();
     MulNX::CoTask OnLoop();
-    MulNX::CoTask RecordOne(const Demo::Record::Task& rTask, bool& recordSucc)const;
+    MulNX::CoTask RecordOne(const Demo::Record::Task& rTask, bool& recordSucc, const fs::path& outputDir)const;
     bool OnRecording(const Demo::Record::Task& curRecordTask, bool& recordSucc,
         std::optional<int>& observingMismatchSinceTick)const;
 

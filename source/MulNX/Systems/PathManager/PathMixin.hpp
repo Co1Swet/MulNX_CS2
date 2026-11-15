@@ -17,7 +17,7 @@ namespace MulNX {
         fs::path PathGet(const std::string& Target) {
             return this->pPath->PathGetForModule(This()->GetName(), Target);
         }
-        PathManager* Path() {
+        PathManager* Path()const {
             return this->pPath;
         }
     };

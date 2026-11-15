@@ -41,13 +41,19 @@ MulNX::CoTask DemoRecorder::OnLoop() {
     }
     const auto& [pass, index] = *o;
     const auto& rTask = pass->rTasks.at(index);
-
+    fs::path outputDir{};
+    {
+        std::shared_lock lock(this->smutex);
+        outputDir = this->dirOutput / this->subOutput;
+    }
     MulNX::Message msg("Demo/Record/Task/End"_hash);
-    auto&& [recordSucc, pPass, iIndex, drop] = msg.Access<bool, const Demo::Record::Pass*, size_t, bool>();
+    auto&& [recordSucc, pPass, iIndex, drop, pOutputDir] =
+        msg.Access<bool, const Demo::Record::Pass*, size_t, bool, const fs::path*>();
     recordSucc = false;
     pPass = pass.get();
     iIndex = index;
     drop = false;
+    pOutputDir = &outputDir;
 
     // 检验窗口安全
     if (rTask.tickStart < 151) {
@@ -58,10 +64,10 @@ MulNX::CoTask DemoRecorder::OnLoop() {
     }
     this->LogInfo("进行新片段录制");
     
-    co_await this->RecordOne(rTask, recordSucc);
+    co_await this->RecordOne(rTask, recordSucc, outputDir);
     this->PublishSync(msg);
 }
-MulNX::CoTask DemoRecorder::RecordOne(const Demo::Record::Task& rTask, bool& recordSucc)const {
+MulNX::CoTask DemoRecorder::RecordOne(const Demo::Record::Task& rTask, bool& recordSucc, const fs::path& outputDir)const {
     this->AsyncCommand("spec_mode 4");
     bool mode4 = false;
     co_await this->WaitTimed(mode4, 3000, [&]() {
@@ -186,7 +192,11 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::Record::Task& rTask, bool& rec
         }
     }
     // 开始录制
-    this->StartRecord(rTask);
+    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
+    // str1为绝对文件夹路径，str2为无扩展的文件名
+    rp->str1 = outputDir.string();
+    rp->str2 = rTask.fileNameNoExt;
+    this->PublishAsync(std::move(msg));
     auto StopRecord = scope_exit([&]() {
         // 停止录制
         this->PublishAsync("Media/Record/Stop"_hash);

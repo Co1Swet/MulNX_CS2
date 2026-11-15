@@ -104,8 +104,9 @@ namespace Demo::Record {
         Token(std::move_only_function<void(Token*)> callback) :callback(std::move(callback)) {}
         ~Token() { callback(this); }
 
-        std::chrono::system_clock::time_point createdAt;
-        std::string createdAtStr;
+        std::chrono::system_clock::time_point createdAt{};
+        std::string createdAtStr{};
+        std::optional<fs::path> concatTarget{};
     };
     struct Pass {
         std::shared_ptr<Token> token = nullptr;

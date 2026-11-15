@@ -128,6 +128,7 @@ void DemRecordPassManager::Commit(std::vector<Demo::Record::Task>&& rTasks,
 
     token->createdAt = std::chrono::system_clock::now();
     token->createdAtStr = MulNX::Time::ToTimestamp(token->createdAt);
+    token->concatTarget = this->Path()->PathGetForShared("Videos") / (token->createdAtStr + ".mp4");
 
     std::vector<MulNX::Message> buffer{};
 
@@ -154,12 +155,21 @@ void DemRecordPassManager::Commit(std::vector<Demo::Record::Task>&& rTasks,
     this->LogInfo("根据设置自动触发录制");
 }
 void DemRecordPassManager::OnTaskEnd(MulNX::Message& msg) {
-    auto&& [recordSucc, pPass, iIndex, drop] =
-        msg.Access<bool, const Demo::Record::Pass*, size_t, bool>();
+    auto&& [recordSucc, pPass, iIndex, drop, pOutputDir] =
+        msg.Access<bool, const Demo::Record::Pass*, size_t, bool, const fs::path*>();
     auto token = pPass->token;
-    auto s = token->createdAtStr;
+    if (recordSucc) {
+        const auto& task = pPass->rTasks.at(iIndex);
+        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/Add"_hash);
+        rp->str1 = token->concatTarget.value();
+        rp->str2 = (*pOutputDir / (task.fileNameNoExt + ".mp4")).string();
+        this->PublishAsync(std::move(msg));
+    }
     return;
 }
 void DemRecordPassManager::OnTokenDestroy(Demo::Record::Token* token) {
     this->LogInfo("Token析构");
+    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/End"_hash);
+    rp->str1 = token->concatTarget.value();
+    this->PublishAsync(std::move(msg));
 }

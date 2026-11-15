@@ -176,17 +176,3 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
     }
     }
 }
-void DemoRecorder::StartRecord(const Demo::Record::Task& task)const {
-    std::shared_lock lock(this->smutex);
-    auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Record/Start"_hash);
-    ++this->num;
-    // str1为绝对文件夹路径，str2为无扩展的文件名
-    rp->str1 = (this->dirOutput / this->subOutput).string();
-    if (task.fileNameNoExt.empty()) {
-        rp->str2 = std::to_string(this->num);
-    }
-    else {
-        rp->str2 = task.fileNameNoExt;
-    }
-    this->PublishAsync(std::move(msg));
-}
