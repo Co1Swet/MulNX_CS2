@@ -6,10 +6,8 @@
 #include <Windows.h>
 #include <atomic>
 #include <bit>
-#include <optional>
 #include <expected>
 #include <functional>
-#include <memory>
 #include <source_location>
 
 namespace MulNX {
@@ -56,7 +54,8 @@ namespace MulNX {
         uintptr_t Dispatch(RegContext* ctx);
         std::expected<void, std::string> BindTarget(uint8_t* target, int len);
         std::expected<MulNX::Memory::Asm::Code, std::string> CreateAFix(size_t RVA);
-        std::expected<MulNX::Memory::Asm::Assembler, std::string> CreateStart(bool extraStackAdjust, bool callRawFisrt);
+        std::expected<MulNX::Memory::Asm::Assembler, std::string> CreateStart(
+            bool extraStackAdjust, bool callRawFisrt, bool xmm);
         std::expected<void, std::string> RegisterUnwindInfo();
     public:
         uintptr_t pMaybeRawFunc = 0;
@@ -67,6 +66,7 @@ namespace MulNX {
             bool callRawFirst = false;
             uintptr_t userJmpTarget = 0;
             int len = 0;
+            bool useXmm = true; // 如无分析，保持开启
         };
 
         static std::expected<std::unique_ptr<Hook>, MulNX::Exception> Create(

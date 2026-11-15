@@ -65,7 +65,8 @@ std::expected<MulNX::Memory::Asm::Code, std::string> MulNX::Hook::CreateAFix(siz
     }
     return result.value();
 }
-std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateStart(bool extraStackAdjust, bool callRawFisrt) {
+std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateStart(
+    bool extraStackAdjust, bool callRawFisrt, bool xmm) {
     auto* alloced = MulNX::Addr::TryAlloc((uintptr_t)this->hookTarget, 4096);
     if (!alloced)return std::unexpected("windows内存分配失败！无法找到空间");
     this->pAsmDispatcher = alloced;
@@ -93,7 +94,7 @@ std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateSta
     // 拆链，记录 sub rsp, frameSize 结束 RVA（用于 UNWIND_CODE.CodeOffset）
     Asm.sub(RSP, this->frameSize);
     this->subEndRVA = Asm.GetCurrentEndRVA();
-    Asm.SaveReg();
+    Asm.SaveReg(xmm);
     this->prologueEnd = Asm.GetCurrentEndRVA();
     // UNWIND_CODE.CodeOffset 是 UBYTE，必须 ≤ 255
     if (this->subEndRVA > 255) {
@@ -154,7 +155,7 @@ std::expected<std::unique_ptr<MulNX::Hook>, MulNX::Exception> MulNX::Hook::Creat
 
     if (auto r = HookInstance->BindTarget(target, opts.len);!r)
         return std::unexpected(MulNX::Exception{ r.error(), loc });
-    auto rAsm = HookInstance->CreateStart(extraStackAdjust, opts.callRawFirst);
+    auto rAsm = HookInstance->CreateStart(extraStackAdjust, opts.callRawFirst, opts.useXmm);
     if (!rAsm)return std::unexpected(MulNX::Exception{ rAsm.error(), loc });
     auto Asm = std::move(rAsm.value());
 
@@ -172,13 +173,13 @@ std::expected<std::unique_ptr<MulNX::Hook>, MulNX::Exception> MulNX::Hook::Creat
 
     HookInstance->jmpTarget.Return = Asm.GetCurrentEndVA();
     Asm
-        .LoadReg()
+        .LoadReg(opts.useXmm)
         .add(RSP, HookInstance->frameSize)
         .ret();
 
     HookInstance->jmpTarget.Continue = Asm.GetCurrentEndVA();
     Asm
-        .LoadReg()
+        .LoadReg(opts.useXmm)
         .add(RSP, HookInstance->frameSize);
 
     HookInstance->pMaybeRawFunc = Asm.GetCurrentEndVA();
@@ -189,13 +190,13 @@ std::expected<std::unique_ptr<MulNX::Hook>, MulNX::Exception> MulNX::Hook::Creat
 
     HookInstance->jmpTarget.SkipAllAndContinue = Asm.GetCurrentEndVA();
     Asm
-        .LoadReg()
+        .LoadReg(opts.useXmm)
         .add(RSP, HookInstance->frameSize)
         .jmp64((uintptr_t)target + HookInstance->overrideSize);
 
     HookInstance->jmpTarget.UserSettedTarget = Asm.GetCurrentEndVA();
     Asm
-        .LoadReg()
+        .LoadReg(opts.useXmm)
         .add(RSP, HookInstance->frameSize)
         .jmp64(opts.userJmpTarget);
     HookInstance->dispatcherAsmCode.append_range(std::move(Asm.Release()));

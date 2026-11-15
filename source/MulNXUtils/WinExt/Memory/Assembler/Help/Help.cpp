@@ -2,7 +2,7 @@
 
 using namespace MulNX::Memory;
 
-Asm::Assembler& Asm::Assembler::SaveReg() {
+Asm::Assembler& Asm::Assembler::SaveReg(bool saveXmm) {
     using enum MulNX::Memory::Asm::Reg;
     (*this)
         .mov(Mem(RSP, offsetof(RegContext, rax)), RAX)
@@ -21,6 +21,9 @@ Asm::Assembler& Asm::Assembler::SaveReg() {
         .mov(Mem(RSP, offsetof(RegContext, r13)), R13)
         .mov(Mem(RSP, offsetof(RegContext, r14)), R14)
         .mov(Mem(RSP, offsetof(RegContext, r15)), R15)
+        ;
+    if (!saveXmm)return *this;
+    (*this)
         .movups(Mem(RSP, offsetof(RegContext, xmm0)), Asm::Xmm::XMM0)
         .movups(Mem(RSP, offsetof(RegContext, xmm1)), Asm::Xmm::XMM1)
         .movups(Mem(RSP, offsetof(RegContext, xmm2)), Asm::Xmm::XMM2)
@@ -31,7 +34,7 @@ Asm::Assembler& Asm::Assembler::SaveReg() {
     return *this;
 }
 
-Asm::Assembler& Asm::Assembler::LoadReg() {
+Asm::Assembler& Asm::Assembler::LoadReg(bool loadXmm) {
     using enum MulNX::Memory::Asm::Reg;
     (*this)
         .mov(RAX, Mem(RSP, offsetof(RegContext, rax)))
@@ -50,6 +53,9 @@ Asm::Assembler& Asm::Assembler::LoadReg() {
         .mov(R13, Mem(RSP, offsetof(RegContext, r13)))
         .mov(R14, Mem(RSP, offsetof(RegContext, r14)))
         .mov(R15, Mem(RSP, offsetof(RegContext, r15)))
+        ;
+    if (!loadXmm)return *this;
+    (*this)
         .movups(Asm::Xmm::XMM0, Mem(RSP, offsetof(RegContext, xmm0)))
         .movups(Asm::Xmm::XMM1, Mem(RSP, offsetof(RegContext, xmm1)))
         .movups(Asm::Xmm::XMM2, Mem(RSP, offsetof(RegContext, xmm2)))
