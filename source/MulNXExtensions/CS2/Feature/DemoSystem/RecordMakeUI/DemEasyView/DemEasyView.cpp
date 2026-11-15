@@ -59,7 +59,8 @@ void DemEasyView::Window() {
         ImGui::SeparatorText(std::format("第 {} 回合", idx).c_str());
         if (ImGui::Button(std::format("{}杀  一键生成##{}", count, idx).c_str())) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Record/Make/RoundKill"_hash);
-            rp->str1 = pDemo->demoFileName;
+            rp->str1 = pDemo->kDir;
+            rp->str2 = pDemo->demoFileName;
             auto&& [rUid, rRound] = msg.Access<Steam64UID, size_t>();
             rUid = uid;
             rRound = idx;
