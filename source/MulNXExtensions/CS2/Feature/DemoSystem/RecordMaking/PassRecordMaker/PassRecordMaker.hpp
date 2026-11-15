@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class PassRecordMaker final :public DemModule<PassRecordMaker> {
     class AutoRecordRule* pAutoRecordRule = nullptr;

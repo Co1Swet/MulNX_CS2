@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class RecordTaskConfiger final :public DemModule<RecordTaskConfiger> {
     void Window();

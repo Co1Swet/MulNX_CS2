@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 #include <deque>
 

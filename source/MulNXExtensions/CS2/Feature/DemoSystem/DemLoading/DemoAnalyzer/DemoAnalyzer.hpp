@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class DemoAnalyzer final : public DemModule<DemoAnalyzer> {
     fs::path csdaPath;

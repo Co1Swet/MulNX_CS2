@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 #include "DemClassifyPass/DemClassifyPass.hpp"
 #include "DemMergePass/DemMergePass.hpp"
 #include "DemSortPass/DemSortPass.hpp"

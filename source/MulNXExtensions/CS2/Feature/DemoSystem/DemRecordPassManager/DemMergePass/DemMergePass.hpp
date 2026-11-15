@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class DemMergePass final :public DemModule<DemMergePass> {
     class RecordTaskConfiger* pConfiger = nullptr;

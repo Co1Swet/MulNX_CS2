@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class DemoJSONReader final : public DemModule<DemoJSONReader> {
     fs::path dirData;

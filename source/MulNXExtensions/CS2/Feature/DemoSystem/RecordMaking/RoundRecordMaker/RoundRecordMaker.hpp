@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class RoundRecordMaker final :public DemModule<RoundRecordMaker> {
     class RecordTaskConfiger* pConfiger = nullptr;

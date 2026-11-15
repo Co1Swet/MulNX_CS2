@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class DemEasyView final :public DemModule<DemEasyView> {
     std::atomic<Steam64UID> localUid = 0;

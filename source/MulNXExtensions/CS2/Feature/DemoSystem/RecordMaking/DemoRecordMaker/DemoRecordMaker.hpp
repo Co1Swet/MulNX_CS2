@@ -1,5 +1,5 @@
 #pragma once
-#include <Feature/DemoSystem/DemModuleBase.hpp>
+#include <Feature/DemoSystem/DemoSystem.hpp>
 
 class DemoRecordMaker final :public DemModule<DemoRecordMaker> {
     class RecordTaskConfiger* pConfiger = nullptr;
