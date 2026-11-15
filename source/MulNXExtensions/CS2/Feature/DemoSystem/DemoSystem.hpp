@@ -104,12 +104,13 @@ namespace Demo::Record {
         Token(std::move_only_function<void(Token*)> callback) :callback(std::move(callback)) {}
         ~Token() { callback(this); }
 
+        size_t passCount = 0;
         std::chrono::system_clock::time_point createdAt{};
         std::string createdAtStr{};
         std::optional<fs::path> concatTarget{};
     };
     struct Pass {
-        std::shared_ptr<Token> token = nullptr;
+        std::shared_ptr<const Token> token = nullptr;
         std::string kPath{};
         std::string demoFileName{};
         std::vector<Task> rTasks{};

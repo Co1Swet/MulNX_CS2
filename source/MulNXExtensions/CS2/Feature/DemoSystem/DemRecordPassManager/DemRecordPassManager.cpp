@@ -9,13 +9,16 @@ void DemRecordPassManager::Window() {
     }
     if (!w || !w.ShouldDraw())return;
 
+    MulNX::UI::Checkbox("录制完成后自动拼接", this->autoConcat);
+    ImGui::Separator();
+
     if (ImGui::Button("清空队列")) {
         this->PublishAsync("Demo/Record/Clear"_hash);
     }
 
     if (ImGui::Button("提交所有任务")) {
         MulNX::Message msg("Demo/Record/Commit/Demo"_hash);
-        auto&& [autoRecord] = msg.Access<int>();
+        auto&& [autoRecord] = msg.Access<bool>();
         autoRecord = 0;
         this->PublishAsync(std::move(msg));
         ImGui::SetWindowFocus("录制执行");
@@ -23,7 +26,7 @@ void DemRecordPassManager::Window() {
     ImGui::SameLine();
     if (ImGui::Button("提交所有任务并开始录制")) {
         MulNX::Message msg("Demo/Record/Commit/Demo"_hash);
-        auto&& [autoRecord] = msg.Access<int>();
+        auto&& [autoRecord] = msg.Access<bool>();
         autoRecord = 1;
         this->PublishAsync(std::move(msg));
         ImGui::SetWindowFocus("录制执行");
@@ -106,7 +109,7 @@ void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Demo/Record/Commit"_hash: {
-        auto&& [autoRecord] = msg.Access<int>();
+        auto&& [autoRecord] = msg.Access<bool>();
         std::vector<Demo::Record::Task> rTasks;
         {
             std::unique_lock lock(this->smutex);
@@ -124,14 +127,15 @@ void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
 }
 
 void DemRecordPassManager::Commit(std::vector<Demo::Record::Task>&& rTasks,
-    const int autoRecord, std::shared_ptr<Demo::Record::Token> token)const {
+    const bool autoRecord, std::shared_ptr<Demo::Record::Token> token)const {
 
     token->createdAt = std::chrono::system_clock::now();
     token->createdAtStr = MulNX::Time::ToTimestamp(token->createdAt);
-    token->concatTarget = this->Path()->PathGetForShared("Videos") / (token->createdAtStr + ".mp4");
-
+    if (this->autoConcat.load(std::memory_order_acquire)) {
+        token->concatTarget = this->Path()->PathGetForShared("Videos") / (token->createdAtStr + ".mp4");
+    }
+    
     std::vector<MulNX::Message> buffer{};
-
     // 分类：形态从 vector<Task> 转换为 vector<Pass>
     auto passes = this->pDemClassifyPass->ApplyPass(std::move(rTasks));
     for (auto& pass : passes) {
@@ -146,29 +150,40 @@ void DemRecordPassManager::Commit(std::vector<Demo::Record::Task>&& rTasks,
     }
 
     for (auto& msg : buffer) {
+        ++token->passCount;
         this->PublishAsync(std::move(msg));
     }
    
     this->LogInfo(std::format("已提交 {} 个 Record::Pass 到录制器", passes.size()));
-    if (autoRecord <= 0)return;
+    if (!autoRecord)return;
     this->PublishAsync("Demo/Pass/Start"_hash);
     this->LogInfo("根据设置自动触发录制");
 }
 void DemRecordPassManager::OnTaskEnd(MulNX::Message& msg) {
     auto&& [recordSucc, pPass, iIndex, drop, pOutputDir] =
         msg.Access<bool, const Demo::Record::Pass*, size_t, bool, const fs::path*>();
+    
     auto token = pPass->token;
-    if (recordSucc) {
-        const auto& task = pPass->rTasks.at(iIndex);
-        auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/Add"_hash);
-        rp->str1 = token->concatTarget.value();
-        rp->str2 = (*pOutputDir / (task.fileNameNoExt + ".mp4")).string();
-        this->PublishAsync(std::move(msg));
+    const auto& task = pPass->rTasks.at(iIndex);
+
+    if (!recordSucc) {
+        this->LogError(std::format("{} 录制失败，不参与拼接", task.desc));
+        return;
     }
+    if (!token->concatTarget.has_value())return;
+    
+    auto [add, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/Add"_hash);
+    rp->str1 = token->concatTarget.value();
+    rp->str2 = (*pOutputDir / (task.fileNameNoExt + ".mp4")).string();
+    this->PublishAsync(std::move(add));
+
     return;
 }
 void DemRecordPassManager::OnTokenDestroy(Demo::Record::Token* token) {
-    this->LogInfo("Token析构");
+    this->LogInfo(std::format("令牌正在析构！ID为：{}", token->createdAtStr));
+    if (token->passCount == 0)return;
+    if (!token->concatTarget.has_value())return;
+
     auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Media/Concat/End"_hash);
     rp->str1 = token->concatTarget.value();
     this->PublishAsync(std::move(msg));

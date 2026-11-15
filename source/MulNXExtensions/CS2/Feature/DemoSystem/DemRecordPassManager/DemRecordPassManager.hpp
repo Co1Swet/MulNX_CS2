@@ -11,11 +11,12 @@ class DemRecordPassManager final :public DemModule<DemRecordPassManager> {
     std::vector<Demo::Record::Task>bufferTasks{};
 
     std::atomic<bool> setFocus = false;
+    MulReflBool(autoConcat, false);
 
     void Window();
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
-    void Commit(std::vector<Demo::Record::Task>&& rTasks, const int autoRecord,
+    void Commit(std::vector<Demo::Record::Task>&& rTasks, const bool autoRecord,
         std::shared_ptr<Demo::Record::Token> token)const;
     void OnTaskEnd(MulNX::Message& msg);
     void OnTokenDestroy(Demo::Record::Token* token);

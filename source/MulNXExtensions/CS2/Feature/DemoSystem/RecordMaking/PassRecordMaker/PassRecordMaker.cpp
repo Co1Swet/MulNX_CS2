@@ -84,13 +84,13 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName)
     }
 
     MulNX::Message barrier("Demo/Record/Commit/Demo"_hash);
-    auto&& [autoRecord] = barrier.Access<int>();
-    autoRecord = plan.autoStart ? 1 : 0;
+    auto&& [autoRecord] = barrier.Access<bool>();
+    autoRecord = plan.autoStart;
     this->PublishAsync(std::move(barrier));
 
     this->LogInfo(std::format(
-        "自动规则为 Demo {} 发送 {} 条录制请求，提交后{}启动录制",
-        demoName, requestCount, plan.autoStart ? "将" : "不"));
+        "自动规则为 Demo {} 发送 {} 条录制请求，提交后启动录制：{}",
+        demoName, requestCount, plan.autoStart ? "是" : "否"));
 
     co_return;
 }
