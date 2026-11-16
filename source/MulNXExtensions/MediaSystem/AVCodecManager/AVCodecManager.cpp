@@ -13,20 +13,21 @@ void AVCodecManager::Menu() {
     const std::string_view currentName = currentNameValue ?
         std::string_view(*currentNameValue) : std::string_view{};
 
-    const std::string_view preview = current ? current->GetImplModuleName() : "无可用编码器";
-    if (ImGui::BeginCombo("当前编码器", preview.data())) {
+    const char* preview = current ? current->pModuleFromIVEncoder->GetName() : "无可用编码器";
+    if (ImGui::BeginCombo("当前编码器", preview)) {
         for (auto* encoder : this->encoders) {
-            const std::string_view name = encoder->GetImplModuleName();
-            const bool selected = name == currentName;
+            auto pModule = encoder->pModuleFromIVEncoder;
+            const bool selected = pModule->GetNameView() == currentName;
+            const char* name = pModule->GetName();
             if (!encoder->IsAvailable()) {
                 ImGui::BeginDisabled();
-                ImGui::Selectable(name.data(), selected);
+                ImGui::Selectable(name, selected);
                 ImGui::EndDisabled();
                 ImGui::SameLine();
                 ImGui::TextDisabled("不可用：%s", encoder->GetNotAvailableReason());
                 continue;
             }
-            if (ImGui::Selectable(name.data(), selected)) {
+            if (ImGui::Selectable(name, selected)) {
                 this->currentEncoderName.store(std::make_shared<std::string>(name), std::memory_order_release);
                 this->selectionStatus.clear();
             }
@@ -47,8 +48,8 @@ void AVCodecManager::Menu() {
     if (hasUnavailableEncoder && ImGui::CollapsingHeader("不可用编码器", ImGuiTreeNodeFlags_DefaultOpen)) {
         for (auto* encoder : this->encoders) {
             if (!encoder->IsAvailable()) {
-                const std::string_view name = encoder->GetImplModuleName();
-                ImGui::TextWrapped("%s：%s", name.data(), encoder->GetNotAvailableReason());
+                const char* name = encoder->pModuleFromIVEncoder->GetName();
+                ImGui::TextWrapped("%s：%s", name, encoder->GetNotAvailableReason());
             }
         }
     }
@@ -73,7 +74,7 @@ void AVCodecManager::AddEncoder(MulNX::IVEncoder* pEncoder) {
         this->LogError("尝试注册空的视频编码器");
         return;
     }
-    const std::string_view name = pEncoder->GetImplModuleName();
+    const std::string_view& name = pEncoder->pModuleFromIVEncoder->GetNameView();
     if (name.empty()) {
         this->LogError("尝试注册没有模块名的视频编码器");
         return;
@@ -86,8 +87,8 @@ void AVCodecManager::AddEncoder(MulNX::IVEncoder* pEncoder) {
 }
 
 MulNX::IVEncoder* AVCodecManager::FindEncoder(std::string_view name) const {
-    auto it = std::find_if(this->encoders.begin(), this->encoders.end(), [&name](const auto* encoder) {
-        return name == encoder->GetImplModuleName();
+    auto it = std::find_if(this->encoders.begin(), this->encoders.end(), [&](const MulNX::IVEncoder* encoder) {
+        return name == encoder->pModuleFromIVEncoder->GetNameView();
         });
     return it == this->encoders.end() ? nullptr : *it;
 }
@@ -107,7 +108,7 @@ void AVCodecManager::ResolveStartupSelection() {
     else if (auto* preferred = this->FindEncoder(preferredName)) {
         this->selectionStatus = std::format(
             "首选编码器 {} 不可用：{}；正在尝试回退链。",
-            preferred->GetImplModuleName(), preferred->GetNotAvailableReason());
+            preferred->pModuleFromIVEncoder->GetNameView(), preferred->GetNotAvailableReason());
     }
     else {
         this->selectionStatus = std::format(
@@ -154,7 +155,7 @@ void AVCodecManager::ResolveStartupSelection() {
         }
         if (!fallback->IsAvailable()) {
             rejectedFallbacks.push_back(std::format(
-                "{}：{}", fallback->GetImplModuleName(), fallback->GetNotAvailableReason()));
+                "{}：{}", fallback->pModuleFromIVEncoder->GetNameView(), fallback->GetNotAvailableReason()));
             continue;
         }
         this->currentEncoderName.store(std::make_shared<std::string>(fallbackId), std::memory_order_release);
@@ -169,7 +170,7 @@ void AVCodecManager::ResolveStartupSelection() {
             this->selectionStatus += "。";
         }
         this->selectionStatus += std::format(
-            " 已回退到 {}。", fallback->GetImplModuleName());
+            " 已回退到 {}。", fallback->pModuleFromIVEncoder->GetNameView());
         this->LogWarning(std::string(this->selectionStatus));
         return;
     }

@@ -5,7 +5,7 @@
 namespace MulNX {
     class IVEncoder {
     public:
-        virtual std::string_view GetImplModuleName()const = 0;
+        IModule* pModuleFromIVEncoder = nullptr;
         virtual bool IsAvailable()const = 0;
         virtual const char* GetNotAvailableReason()const = 0;
 
@@ -45,6 +45,7 @@ protected:
     std::string unavailableReason = "未提供不可用原因";
 
     VEncoderMixin() {
+        this->pModuleFromIVEncoder = This();
         This()->preInits.push_back([this]() {
             this->pAVCodecManager = This()->FindModule<AVCodecManager>();
             this->pAVCodecManager->AddEncoder(this);
@@ -52,9 +53,6 @@ protected:
             });
     }
 public:
-    inline std::string_view GetImplModuleName()const override {
-        return This()->GetName();
-    }
     inline const char* GetNotAvailableReason()const override {
         return this->unavailableReason.c_str();
     }

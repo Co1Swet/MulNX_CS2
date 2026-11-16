@@ -44,16 +44,22 @@ namespace MulNX {
                 inner.remove_prefix(p + 2);
             return inner;
         }
-    public:
-        inline static consteval std::string_view GetLeafName() { return ParseLeafName(); }
-        inline static consteval auto GetLeafNameFixed() {
+        inline static consteval auto GetLeafNameFixedImpl() {
             constexpr auto r = ParseLeafName();
             constexpr std::size_t N = r.size() + 1;
             FixedString<N> fs{};
             std::copy_n(r.data(), N - 1, fs.data);
             return fs;
         }
-        inline std::string_view GetName()const override { return GetLeafName(); }
+        
+        inline static constexpr const auto kLeafName = GetLeafNameFixedImpl();
+        inline static constexpr std::string_view kLeafNameView = kLeafName;
+    public:
+        inline static consteval std::string_view GetLeafName() { return kLeafNameView; }
+        inline static consteval const auto& GetLeafNameFixed() { return kLeafName; }
+
+        inline const char* GetName()const override { return kLeafName.c_str(); }
+        inline const std::string_view& GetNameView()const override { return kLeafNameView; }
 
         Module() {
             this->postInits.push_back([this]() {

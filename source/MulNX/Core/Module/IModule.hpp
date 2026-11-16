@@ -18,6 +18,7 @@ namespace MulNX {
         IModule() = default;
         virtual ~IModule() = default;
 
-        virtual std::string_view GetName()const = 0;
+        virtual const char* GetName()const = 0;
+        virtual const std::string_view& GetNameView()const = 0;
     };
 }

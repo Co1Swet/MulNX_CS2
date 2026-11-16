@@ -85,7 +85,7 @@ void MulNX::Logger::Log() {
 
     // 依次格式化并写入文件
     for (auto& entry : batch) {
-        const auto& moduleName = entry.pModule->GetName();
+        const auto& moduleName = entry.pModule->GetNameView();
         std::string rawMsg = std::move(entry.raw);
         auto eventTime = MulNX::FromUnixUs(entry.timestamp_us);
         std::string levelStr = this->PraseLevel(entry.level);
