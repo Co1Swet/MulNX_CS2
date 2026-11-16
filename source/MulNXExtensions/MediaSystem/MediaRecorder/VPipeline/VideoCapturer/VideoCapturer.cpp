@@ -10,7 +10,7 @@ bool VideoCapturer::Init() {
     this->pTextureMapper = this->FindModule<TextureMapper>();
 
     this->SendTask("VMap", "VMap", [this]() {
-        this->Captuer();
+        this->Main();
         return true;
         });
 
@@ -37,15 +37,19 @@ void VideoCapturer::StopCapture() {
     this->pVEncodeController->bufferVFrames.enqueue(MulNX::AVControl(MulNX::AVControl::Kind::Stop));
 }
 
-void VideoCapturer::Captuer() {
-    this->Update();
-
+void VideoCapturer::Main() {
     std::unique_lock lock(this->smutex);
+    while (this->Captuer()) {
+        
+    }
+}
+
+bool VideoCapturer::Captuer() {
     int readIdx;
     if (auto h = this->pVCD3D11Manager->TryGetReadSide()) {
         readIdx = h.value();
     }
-    else return;
+    else return false;
 
     auto onExit = scope_exit([&]() {this->pVCD3D11Manager->ReleaseReadSide(readIdx);});
 
@@ -56,10 +60,11 @@ void VideoCapturer::Captuer() {
     if (ptsUs < 0) ptsUs = 0;
 
     auto oFrame = this->pTextureMapper->MapFrame(slot);
-    if (!oFrame.has_value())return;
+    if (!oFrame.has_value())return false;
     auto frame = oFrame.value();
 
     frame.setTimeBase({ 1, 1000000 });
     frame.setPts(av::Timestamp(ptsUs, frame.timeBase()));
     this->pVEncodeController->bufferVFrames.enqueue(std::move(frame));
+    return true;
 }

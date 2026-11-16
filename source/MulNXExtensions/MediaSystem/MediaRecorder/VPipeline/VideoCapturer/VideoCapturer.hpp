@@ -10,7 +10,8 @@ class VideoCapturer final :public MediaModule<VideoCapturer> {
 
     bool Init()override;
 
-    void Captuer();
+    void Main();
+    bool Captuer();
 
     void SetOn(const std::chrono::steady_clock::time_point& startTime);
     void StopCapture();
