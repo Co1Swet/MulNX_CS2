@@ -106,6 +106,7 @@ std::expected<MulNX::Memory::Asm::Assembler, std::string> MulNX::Hook::CreateSta
 // 覆盖范围：call Dispatch 所在帧，即 [0, jmpRaxOffset + 2)。
 // 只描述一条 sub rsp, frameSize（UWOP_ALLOC_LARGE, OpInfo=0, 2 slot）。
 std::expected<void, std::string> MulNX::Hook::RegisterUnwindInfo() {
+    const auto base = reinterpret_cast<uintptr_t>(this->pAsmDispatcher);
     const size_t funcEnd = this->jmpRaxOffset + 2;
     const size_t codeEnd = this->dispatcherAsmCode.size();
     const size_t tableOff = (codeEnd + 3) & ~size_t(3);   // 4 字节对齐
@@ -113,8 +114,8 @@ std::expected<void, std::string> MulNX::Hook::RegisterUnwindInfo() {
     if (tableOff + kUnwindTableBytes > 4096) {
         return std::unexpected("分发器区域不足以存放 unwind 信息");
     }
-    auto basePtr = static_cast<uint8_t*>(this->pAsmDispatcher);
-    auto* rf = reinterpret_cast<PRUNTIME_FUNCTION>(basePtr + tableOff);
+    
+    auto* rf = reinterpret_cast<PRUNTIME_FUNCTION>(base + tableOff);
     auto* ui = reinterpret_cast<MulNX_UNWIND_INFO*>(rf + 1);  // rf 已 4 对齐，+12 仍 4 对齐
     // MulNX_UNWIND_INFO
     // VersionFlags = (Flags << 3) | (Version & 0x7)，Version=1, Flags=0
@@ -124,17 +125,14 @@ std::expected<void, std::string> MulNX::Hook::RegisterUnwindInfo() {
     ui->FrameRegOff = 0;      // FrameRegister=0, FrameOffset=0
     // slot 0: (CodeOffset=subEndRVA, UnwindOp=UWOP_ALLOC_LARGE, OpInfo=0)
     ui->UnwindCode[0].s.CodeOffset = static_cast<uint8_t>(this->subEndRVA);
-    ui->UnwindCode[0].s.UnwindOpInfo =
-        static_cast<uint8_t>((0u << 4) | (MULNX_UWOP_ALLOC_LARGE & 0xF));
+    ui->UnwindCode[0].s.UnwindOpInfo = static_cast<uint8_t>((0u << 4) | (MULNX_UWOP_ALLOC_LARGE & 0xF));
     // slot 1: ExtraData = frameSize / 8（16 位 LE，OpInfo=0 语义）
-    ui->UnwindCode[1].FrameOffset =
-        static_cast<uint16_t>(this->frameSize / 8);
+    ui->UnwindCode[1].FrameOffset = static_cast<uint16_t>(this->frameSize / 8);
+
     // RUNTIME_FUNCTION
-    const auto base = reinterpret_cast<uintptr_t>(basePtr);
     rf->BeginAddress = 0;
     rf->EndAddress = static_cast<DWORD>(funcEnd);
-    rf->UnwindInfoAddress = static_cast<DWORD>(
-        reinterpret_cast<uintptr_t>(ui) - base);
+    rf->UnwindInfoAddress = static_cast<DWORD>(reinterpret_cast<uintptr_t>(ui) - base);
 
     if (!RtlAddFunctionTable(rf, 1, static_cast<DWORD64>(base))) {
         return std::unexpected("RtlAddFunctionTable 失败");
