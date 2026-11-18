@@ -132,7 +132,7 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
     }
     case "CamMacro/AddCampath"_hash: {
         auto pNetExt = msg.asp.get<MulNX::NetExt>();
-        auto&& [offset] = msg.Access<float>();
+        auto&& [offset] = msg.Access<double>();
         std::unique_lock lock(this->smutex);
         auto* pCamMacro = this->FindCamMacro(pNetExt->str1);
         if (!pCamMacro)break;
@@ -276,7 +276,7 @@ void CamMacroManager::PlayCamMacro(const std::string& name) {
     }
     for (const auto& item : it->second->GetVec()) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Campath/Preview"_hash);
-        auto&& [previewOffset] = msg.Access<float>();
+        auto&& [previewOffset] = msg.Access<double>();
         previewOffset = 0.0f - item.offset;
         rp->str1 = item.campathName;
         this->PublishAsync(std::move(msg));

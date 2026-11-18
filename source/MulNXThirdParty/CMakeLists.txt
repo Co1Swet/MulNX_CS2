@@ -14,6 +14,26 @@ add_library(MulNXThirdParty
     hlae/binutils.cpp
 )
 
+include(GenerateExportHeader)
+add_library(miniz STATIC
+    miniz/miniz.c
+    miniz/miniz_zip.c
+    miniz/miniz_tinfl.c
+    miniz/miniz_tdef.c
+)
+add_library(miniz::miniz ALIAS miniz)
+generate_export_header(miniz)
+set_target_properties(miniz PROPERTIES
+    C_STANDARD 90
+    C_STANDARD_REQUIRED ON
+    C_EXTENSIONS OFF
+)
+target_compile_definitions(miniz PUBLIC MINIZ_STATIC_DEFINE)
+target_include_directories(miniz PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/miniz
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 # Hint the bundled FFmpeg distribution to avcpp so it can resolve headers and libraries.
 set(PC_FFMPEG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/FFmpegBuilt/include")
 set(PC_FFMPEG_LIBRARY_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/FFmpegBuilt/lib")
@@ -29,6 +49,7 @@ target_link_libraries(MulNXThirdParty PUBLIC
     yaml-cpp::yaml-cpp
     Zydis::Zydis
     avcpp
+    miniz::miniz
 )
 
 target_include_directories(MulNXThirdParty PUBLIC

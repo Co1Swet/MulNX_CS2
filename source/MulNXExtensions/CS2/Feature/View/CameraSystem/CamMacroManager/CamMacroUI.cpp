@@ -97,7 +97,7 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
     if (ImGui::Button("为当前宏添加运镜轨道")) {
         if (!newCampathName.empty()) {
             auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/AddCampath"_hash);
-            auto&& [offset] = msg.Access<float>();
+            auto&& [offset] = msg.Access<double>();
             offset = 0.0f;
             rp->str1 = pMacro->GetName();
             rp->str2 = newCampathName;
@@ -177,7 +177,7 @@ void CamMacroManager::CamMacroDebugWindow(const CamMacro* pMacro) const {
             this->PublishAsync(std::move(remove));
 
             auto [add, pAdd] = MulNX::Message::Create<MulNX::NetExt>("CamMacro/AddCampath"_hash);
-            auto&& [addOffset] = add.Access<float>();
+            auto&& [addOffset] = add.Access<double>();
             addOffset = tempOffset;
             pAdd->str1 = pMacro->GetName();
             pAdd->str2 = item.campathName;

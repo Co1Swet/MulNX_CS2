@@ -1,5 +1,5 @@
 UISystem.rendEnable: false
-UISystem.ifDrawMid: false
+UISystem.ifDrawMid: true
 CamMacroManager.shortcutEnable: true
 ViewSmoother.enable: false
 ESPBox.enable: false

@@ -5,7 +5,7 @@
 class WrapCampath {
 public:
     std::string campathName;
-    float offset = 0;
+    double offset = 0;
 };
 
 class CamMacro final {
@@ -20,7 +20,7 @@ public:
         this->dirty = true;
     }
 
-    bool AddCampath(const std::string& name, const float offset);
+    bool AddCampath(const std::string& name, const double offset);
     bool RemoveCampath(const std::string& campathName);
     inline const std::vector<WrapCampath>& GetVec()const { return this->wrapCampaths; }
 

@@ -2,7 +2,7 @@
 #include <MulNX/Base/yaml.hpp>
 #include <fstream>
 
-bool CamMacro::AddCampath(const std::string& name, const float offset) {
+bool CamMacro::AddCampath(const std::string& name, const double offset) {
     auto it = std::find_if(this->wrapCampaths.begin(), this->wrapCampaths.end(),
         [&](const auto& ew) {
             if (ew.campathName.empty())return false;
@@ -108,7 +108,7 @@ std::expected<std::string, std::string> CamMacro::Load(YAML::Node& root) {
     }
     for (const auto& nodeElement : root["elements"]) {
         std::string campathName = nodeElement["name"].as<std::string>();
-        float offset = nodeElement["offset"].as<float>();
+        auto offset = nodeElement["offset"].as<double>();
         if (!this->AddCampath(campathName, offset)) {
             return std::unexpected(std::format("无法添加运镜到运镜宏，运镜宏名：{}，运镜名：{}", this->name, campathName));
         }

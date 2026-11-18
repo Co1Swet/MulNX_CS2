@@ -26,8 +26,9 @@ bool CampathManager::Init() {
         .SubscribeAsync("Campath/DeleteKeyframe")
         .SubscribeAsync("Campath/CopyKeyframe")
         .SubscribeAsync("Campath/ClearOne")
-        .SubscribeAsync("Campath/Preview")
-        .SubscribeAsync("Campath/Active")
+        .SubscribeAsyncEx<double>("Campath/Preview")
+        .SubscribeAsyncEx<double>("Campath/PreviewAt")
+        .SubscribeAsyncEx<void>("Campath/Active")
         .SubscribeAsync("Campath/DrawOne")
         .SubscribeAsync("Campath/UnDrawOne")
         ;
@@ -149,12 +150,12 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Campath/Preview"_hash: {
-        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         std::shared_lock lock(this->smutex);
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
-        auto&& [previewOffset] = msg.Access<float>();
-
+        auto&& [previewOffset] = msg.Access<double>();
         auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
         auto&& [offsetTime, isActiveMode] = play.Access<double, int>();
         rp->str1 = name;
@@ -164,9 +165,23 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         this->PublishAsync(std::move(play));
         break;
     }
-    case "Campath/Active"_hash: {
-        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+    case "Campath/PreviewAt"_hash: {
         std::shared_lock lock(this->smutex);
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
+        auto pCampath = this->FindCampath(name);
+        if (!pCampath)break;
+        auto&& [targetTime] = msg.Access<double>();
+        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode] = play.Access<double, int>();
+        rp->str1 = name;
+        offsetTime = pCampath->GetStartTime() - targetTime; // 让起点对齐到时间轴 targetTime
+        isActiveMode = 0;
+        this->PublishAsync(std::move(play));
+        break;
+    }
+    case "Campath/Active"_hash: {
+        std::shared_lock lock(this->smutex);
+        auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
         auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
