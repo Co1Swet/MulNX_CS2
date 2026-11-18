@@ -40,14 +40,13 @@ void MulNX::Core::Driver::WaitEnd() {
     std::unique_lock lock(this->endMtx);
     this->cv.wait(lock, [this] { return this->endFlag; });
     // 设置系统标志位
-    this->Core->ModuleManager()->FindModule<MulNX::GlobalVars>()->SystemReady.store(false, std::memory_order_release);
+    this->FindModule<MulNX::GlobalVars>()->SystemReady.store(false, std::memory_order_release);
     // 通知所有模块，以清理资源，包括线程停止
     this->Core->ModuleManager()->DeinitModules();
     // 任务系统汇合
-    this->Core->ModuleManager()->FindModule<MulNX::TaskSystem>()->EntryDeinit();
+    this->FindModule<MulNX::TaskSystem>()->EntryDeinit();
     // 让日志最后一次打印
-    this->Core->ModuleManager()->FindModule<MulNX::MessageManager>()->HandleDispatch();
-    this->Core->ModuleManager()->FindModule<MulNX::Logger>()->Log();
+    this->FindModule<MulNX::Logger>()->Log();
     // 析构所有模块
     this->Core->ModuleManager()->EntryDeinit();
     // 清理自身资源
