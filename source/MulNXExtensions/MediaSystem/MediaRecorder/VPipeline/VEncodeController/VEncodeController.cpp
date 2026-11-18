@@ -163,6 +163,7 @@ bool VEncodeController::OnEncode() {
     CtrlVideoFrame ctrlVFrame;
     while (this->bufferVFrames.try_dequeue(ctrlVFrame)) {
         if (this->bufferVFrames.size_approx() >= 200)this->pMediaState->encodingOverload = true;
+        else this->pMediaState->encodingOverload = false;
 
         auto pAVControl = std::get_if<MulNX::AVControl>(&ctrlVFrame);
         if (pAVControl && pAVControl->kind == MulNX::AVControl::Kind::Stop) {
