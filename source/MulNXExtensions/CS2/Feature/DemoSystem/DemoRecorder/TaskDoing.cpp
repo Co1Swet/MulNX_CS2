@@ -1,28 +1,6 @@
 #include "DemoRecorder.hpp"
-#include <Intro/HookConsole/HookConsole.hpp>
 #include <Support/TimeController/TimeController.hpp>
 
-MulNX::CoTask DemoRecorder::CoSetOBTarget(bool& ok, Steam64UID target)const {
-    ok = false;
-    // 设置观战目标
-    for (int i = 0;i < 3;++i) {
-        auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-        if (!obUID || *obUID != target) {
-            // 发送设置观察目标消息
-            MulNX::Message specMsg("Observe/SpecSteam64UID"_hash);
-            auto&& [uidRef] = specMsg.Access<Steam64UID>();
-            uidRef = target;
-            this->PublishAsync(std::move(specMsg));
-        }
-        co_await this->WaitTimed(ok, 500, [&]() {
-            auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-            if (!obUID || *obUID != target)return false;
-            return true;
-            });
-        if (ok)break;
-        this->LogWarning("观战设置失败，重新尝试");
-    }
-}
 MulNX::CoTask DemoRecorder::Main() {
     while (true) {
         co_await this->WaitUntil([&]()->bool { return this->moduleActive.load(std::memory_order_acquire); });
@@ -63,10 +41,16 @@ MulNX::CoTask DemoRecorder::OnLoop() {
         co_return;
     }
     this->LogInfo("进行新片段录制");
-    
-    co_await this->RecordOne(rTask, recordSucc, outputDir);
+
+    try {
+        co_await this->RecordOne(rTask, recordSucc, outputDir);
+    }
+    catch (const std::exception& e) {
+        this->LogError(std::format("录制过程中出现异常 {} ，已丢弃一个片段：{}", e.what(), rTask.desc));
+    }
     this->PublishSync(msg);
 }
+
 MulNX::CoTask DemoRecorder::RecordOne(const Demo::Record::Task& rTask, bool& recordSucc, const fs::path& outputDir)const {
     this->AsyncCommand("spec_mode 4");
     bool mode4 = false;
@@ -142,13 +126,13 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::Record::Task& rTask, bool& rec
         return elapsed >= std::chrono::seconds(2);
         });
 
-    bool OBOK = false;
-    co_await this->CoSetOBTarget(OBOK, rTask.uid);
-    if (!OBOK) {
-        this->LogError("多次尝试设置观战失败！丢弃一个片段");
+    // 预备进入
+    bool preEnterOK = false;
+    co_await this->PreEnter(preEnterOK, rTask);
+    if (!preEnterOK) {
+        this->LogError(std::format("录制预准备失败，丢弃片段：{}", rTask.desc));
         co_return;
     }
-    this->LogInfo(std::format("已经设置观战目标：{}", rTask.uid));
 
     // 恢复Demo播放
     for (int i = 0;;++i) {
@@ -207,47 +191,37 @@ MulNX::CoTask DemoRecorder::RecordOne(const Demo::Record::Task& rTask, bool& rec
             this->LogError(std::format("{} 录制异常结束", rTask.desc));
         }
         });
-
     // 输出提示信息
-    this->LogSucc(std::format("已经请求录制，观战UID：{}，tick起点：{}，tick终点：{}",
-        rTask.uid, rTask.tickStart, rTask.tickEnd));
+    this->LogSucc(std::format("已经请求录制，{}", rTask.desc));
     // 等待录制结束
-    std::optional<int> observingMismatchSinceTick;
-    co_await this->WaitUntil([&] {
-        return !this->OnRecording(rTask, recordSucc, observingMismatchSinceTick);
-        });
+    co_await this->OnRecording(rTask, recordSucc);
 }
 
-// 返回true以表示保持录制状态，返回false以表示录制结束
-bool DemoRecorder::OnRecording(const Demo::Record::Task& curRecordTask, bool& recordSucc,
-    std::optional<int>& observingMismatchSinceTick)const {
+MulNX::CoTask DemoRecorder::PreEnter(bool& ok, const Demo::Record::Task& rTask)const {
+    if (rTask.IsPlayerType()) {
+        co_await this->PreEnterPlayer(ok, rTask);
+    }
+    else if (rTask.type == Demo::Record::Task::Type::Campath) {
+        co_return;
+    }
+    co_return;
+}
+MulNX::CoTask DemoRecorder::OnRecording(const Demo::Record::Task& curRecordTask, bool& recordSucc)const {
+    if (curRecordTask.IsPlayerType()) {
+        co_await this->OnRecordingPlayer(curRecordTask, recordSucc);
+    }
+    else if (curRecordTask.type == Demo::Record::Task::Type::Campath) {
+        co_return;
+    }
+    co_return;
+}
+bool DemoRecorder::BaseRecordingCheck(const Demo::Record::Task& curRecordTask, bool& recordSucc)const {
     if (this->moduleActive.load(std::memory_order_acquire) == false) {
         this->LogWarning("模块已被外部关闭，停止录制");
         return false;
     }
 
     const int curTick = this->CS2Time->GetDemoTick();
-    if (curRecordTask.uid != 0) {
-        auto obUID = this->CS2Entitys->TryGetObservingSteam64UID();
-        if (!obUID || *obUID != curRecordTask.uid) {
-            constexpr int mismatchTimeoutTicks = 2.25f * 64;
-            if (!observingMismatchSinceTick) {
-                observingMismatchSinceTick = curTick;
-                this->LogWarning(std::format("当前观战目标={}，意外地不等于录制目标={}，等待目标恢复（超时{} tick）",
-                    obUID ? std::to_string(*obUID) : "无", curRecordTask.uid, mismatchTimeoutTicks));
-            }
-            else if (curTick - *observingMismatchSinceTick >= mismatchTimeoutTicks) {
-                this->LogError(std::format("当前观战目标持续不等于录制目标超过{} tick，当前目标={}，录制目标={}，结束当前片段录制",
-                    mismatchTimeoutTicks,
-                    obUID ? std::to_string(*obUID) : "无", curRecordTask.uid));
-                return false;
-            }
-        }
-        else {
-            observingMismatchSinceTick.reset();
-        }
-    }
-
     if (curTick < 5) {
         this->LogWarning(std::format("当前tick={}，意外地小于5，继续等待", curTick));
         return true;

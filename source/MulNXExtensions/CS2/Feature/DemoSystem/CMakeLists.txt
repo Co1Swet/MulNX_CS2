@@ -25,6 +25,7 @@ add_library(DemoSystem STATIC
     RecordMaking/DemoRecordMaker/DemoRecordMaker.cpp
     RecordMaking/AutoRecordRule/AutoRecordRule.cpp
     RecordMaking/PassRecordMaker/PassRecordMaker.cpp
+    DemoRecorder/ImplPlayerRecord.cpp
 )
 
 target_link_libraries(DemoSystem PUBLIC

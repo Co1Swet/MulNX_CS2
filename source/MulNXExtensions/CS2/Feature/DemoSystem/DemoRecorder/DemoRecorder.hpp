@@ -13,14 +13,19 @@ class DemoRecorder final : public DemModule<DemoRecorder>, public MediaModuleMix
     std::atomic<std::shared_ptr<const Demo::Record::Pass>> currentPass{};
     std::atomic<int> indexTask = -1;
 
-    MulNX::CoTask CoSetOBTarget(bool& ok, Steam64UID target)const;
-
     MulNX::CoTask EnsurePassChange();
     MulNX::CoTask GoNextTask(std::optional<std::pair<std::shared_ptr<const Demo::Record::Pass>, size_t>>& out);
     MulNX::CoTask Main();
     MulNX::CoTask OnLoop();
     MulNX::CoTask RecordOne(const Demo::Record::Task& rTask, bool& recordSucc, const fs::path& outputDir)const;
-    bool OnRecording(const Demo::Record::Task& curRecordTask, bool& recordSucc,
+    MulNX::CoTask PreEnter(bool& ok, const Demo::Record::Task& rTask)const;
+    MulNX::CoTask OnRecording(const Demo::Record::Task& curRecordTask, bool& recordSucc)const;
+    bool BaseRecordingCheck(const Demo::Record::Task& curRecordTask, bool& recordSucc)const;
+
+    MulNX::CoTask CoSetOBTarget(bool& ok, Steam64UID target)const;
+    MulNX::CoTask PreEnterPlayer(bool& ok, const Demo::Record::Task& rTask)const;
+    MulNX::CoTask OnRecordingPlayer(const Demo::Record::Task& curRecordTask, bool& recordSucc)const;
+    bool OnRecordingPlayer(const Demo::Record::Task& curRecordTask, bool& recordSucc,
         std::optional<int>& observingMismatchSinceTick)const;
 
     void Window()const;

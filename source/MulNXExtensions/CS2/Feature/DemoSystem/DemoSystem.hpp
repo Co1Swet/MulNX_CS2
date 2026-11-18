@@ -96,6 +96,13 @@ namespace Demo::Record {
         int killIndex{};
         // 没有扩展名的文件名，不包括路径
         std::string fileNameNoExt{};
+
+        inline bool IsPlayerType()const {
+            if (this->type == Type::None || this->type == Type::Normal || this->type == Type::Death) {
+                return true;
+            }
+            return false;
+        }
     };
     class Token {
         std::move_only_function<void(Token*)> callback = nullptr;
