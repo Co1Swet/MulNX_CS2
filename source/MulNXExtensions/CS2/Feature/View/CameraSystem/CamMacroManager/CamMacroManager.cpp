@@ -5,8 +5,12 @@ bool CamMacroManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
     this->Path()->CreateKey("kCamMacros", "CamMacros", [this](MulNX::PathManager* PathManager)->bool {
-        auto path = PathManager->PathGetFromKey("kCamMacros");
-        this->LogSucc(std::format("成功设置运镜宏路径为：{}", path.string()));
+        auto o = PathManager->PathGetFromKey("kCamMacros");
+        if (!o) {
+            this->LogError("无法从key解析路径");
+            return false;
+        }
+        this->LogSucc(std::format("成功设置运镜宏路径为：{}", o->string()));
         return true;
         });
     this->Path()->KeyBindDynamic("kCamMacros", "kCurrentPack");
@@ -35,15 +39,19 @@ bool CamMacroManager::Init() {
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
         std::unique_lock lock(this->smutex);
-        auto dirCamMacros = this->Path()->PathGetFromKey("kCamMacros");
-        auto res = fs::SubFileNames(dirCamMacros);
+        auto o = this->Path()->PathGetFromKey("kCamMacros");
+        if (!o) {
+            this->LogError("无法解析 kCamMacros 到路径");
+            return;
+        }
+        auto res = fs::SubFileNames(*o);
         if (!res.has_value()) {
             this->LogError(res.error().message());
             return;
         }
         auto camMacroNames = res.value();
         for (const auto& camMacroName : camMacroNames) {
-            this->CamMacroLoad(dirCamMacros / camMacroName);
+            this->CamMacroLoad(*o / camMacroName);
         }
         this->LogInfo(std::format("尝试加载运镜宏总数：{}", camMacroNames.size()));
         this->LogSucc(std::format("成功加载运镜宏总数：{}", this->camMacros.size()));
@@ -109,7 +117,11 @@ void CamMacroManager::ProcessMsg(MulNX::Message& msg) {
         const auto* pCamMacro = this->FindCamMacro(name);
         if (!pCamMacro)break;
         auto path = this->Path()->PathGetFromKey("kCamMacros");
-        auto r = pCamMacro->Save(path);
+        if (!path) {
+            this->LogError("无法解析 kCamMacros 到路径");
+            break;
+        }
+        auto r = pCamMacro->Save(*path);
         if (r.has_value()) {
             this->LogSucc(std::move(r.value()));
         }
@@ -179,8 +191,12 @@ bool CamMacroManager::CamMacroSaveAll() {
         return true;
     }
     auto dirMacros = this->Path()->PathGetFromKey("kCamMacros");
+    if (!dirMacros) {
+        this->LogError("无法解析 kCamMacros 到路径");
+        return false;
+    }
     for (const auto& [name, pCamMacor] : this->camMacros) {
-        auto r = pCamMacor->Save(dirMacros);
+        auto r = pCamMacor->Save(*dirMacros);
         if (!r.has_value()) {
             this->LogError(std::move(r.error()));
             return false;

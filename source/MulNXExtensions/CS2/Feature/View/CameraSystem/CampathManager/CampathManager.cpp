@@ -7,13 +7,16 @@ bool CampathManager::Init() {
 
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
-    auto* PathManager = this->Path();
-    PathManager->CreateKey("kCampaths", "Campaths", [this](MulNX::PathManager* PathManager)->bool {
-        auto Path = PathManager->PathGetFromKey("kCampaths");
-        this->LogSucc(std::format("成功设置运镜轨道资源路径为：{}", Path.string()));
+    this->Path()->CreateKey("kCampaths", "Campaths", [this](MulNX::PathManager* pathManager)->bool {
+        auto oPath = pathManager->PathGetFromKey("kCampaths");
+        if (!oPath) {
+            this->LogError("无法从 kCampaths 解析到路径");
+            return false;
+        }
+        this->LogSucc(std::format("成功设置运镜轨道资源路径为：{}", oPath->string()));
         return true;
         });
-    PathManager->KeyBindDynamic("kCampaths", "kCurrentPack");
+    this->Path()->KeyBindDynamic("kCampaths", "kCurrentPack");
 
     (*this)
         .SubscribeAsync("Campath/Create")
@@ -41,7 +44,12 @@ bool CampathManager::Init() {
 
     this->SubscribeSync("CamSync/Load", [this](auto&&...) {
         std::unique_lock lock(this->smutex);
-        fs::path dirCampaths = this->Path()->PathGetFromKey("kCampaths");
+        auto o = this->Path()->PathGetFromKey("kCampaths");
+        if (!o) {
+            this->LogError("无法从 kCampaths 解析到路径");
+            return;
+        }
+        fs::path dirCampaths = *o;
         auto res = fs::SubFileNames(dirCampaths);
         if (!res.has_value()) {
             this->LogError(res.error().message());
@@ -218,13 +226,16 @@ bool CampathManager::CampathSaveAll() {
         this->LogInfo("当前没有任何运镜轨道，跳过保存操作");
         return true;
     }
-    auto dirCampaths = this->Path()->PathGetFromKey("kCampaths");
-
+    auto oDirCampaths = this->Path()->PathGetFromKey("kCampaths");
+    if (!oDirCampaths) {
+        this->LogError("无法从 kCampaths 解析到路径");
+        return false;
+    }
     for (const auto& [name, pCampath] : this->campaths) {
         if (!pCampath->IsDirty()) {
             continue;
         }
-        auto r = pCampath->Save(dirCampaths);
+        auto r = pCampath->Save(*oDirCampaths);
         if (r.has_value()) {
             this->LogSucc(std::move(r.value()));
         }

@@ -115,23 +115,24 @@ bool MulNX::PathManager::KeySetCurrent(const std::string& Key, const std::string
     return true;
 }
 // ToDo 后续再处理栈溢出，反正都是我自己写的，我相信我自己
-fs::path MulNX::PathManager::PathGetFromKey(const std::string& Key) {
+std::optional<fs::path> MulNX::PathManager::PathGetFromKey(const std::string& key) {
     std::unique_lock lock(this->recursive_mutex);
-    auto* Node = this->NodeGetFromKey(Key);
-    if (!Node->Static.empty()) {
-        return Node->Static / Node->CurrentValue;
+    auto* node = this->NodeGetFromKey(key);
+    if (!node)return std::nullopt;
+    if (!node->Static.empty()) {
+        return node->Static / node->CurrentValue;
     }
-    else {
-        if (Node->KeyParent.empty()) {
-            this->LogError("一个节点在向上追溯时，发现既不存在静态绑定，父节点字符串也为空");
-            return {};
-        }
-        if (Node->CurrentValue.empty()) {
-            this->LogError(Key + " 对应的节点不存在当前值，无法拼接路径");
-            return {};
-        }
-        return this->PathGetFromKey(Node->KeyParent) / Node->CurrentValue;// 一路构建完整路径
+    if (node->KeyParent.empty()) {
+        this->LogError("一个节点在向上追溯时，发现既不存在静态绑定，父节点字符串也为空");
+        return std::nullopt;
     }
+    if (node->CurrentValue.empty()) {
+        this->LogError(std::format("{} 对应的节点不存在当前值，无法拼接路径", key));
+        return std::nullopt;
+    }
+    auto o = this->PathGetFromKey(node->KeyParent);
+    if (!o)return std::nullopt;
+    return *o / node->CurrentValue; // 一路构建完整路径
 }
 std::vector<std::string> MulNX::PathManager::PathFindStaticKeys(const fs::path& Target) {
     std::unique_lock lock(this->recursive_mutex);

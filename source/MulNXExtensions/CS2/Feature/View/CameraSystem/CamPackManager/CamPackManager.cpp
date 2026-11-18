@@ -4,8 +4,13 @@
 bool CamPackManager::Init() {
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->UI();});
 
-    this->Path()->CreateKey("kCurrentPack", {}, [this](MulNX::PathManager* PathManager)->bool {
-        auto dirCamPack = PathManager->PathGetFromKey("kCurrentPack");
+    this->Path()->CreateKey("kCurrentPack", {}, [this](MulNX::PathManager* pathManager)->bool {
+        auto o = pathManager->PathGetFromKey("kCurrentPack");
+        if (!o) {
+            this->LogError("无法从 kCurrentPack 解析到路径");
+            return false;
+        }
+        auto dirCamPack = *o;
         if (fs::exists(dirCamPack)) {
             this->LogSucc(std::format("成功设置运镜包路径为：{}", dirCamPack.string()));
             return true;
@@ -41,7 +46,12 @@ bool CamPackManager::Init() {
 
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         std::unique_lock lock(this->smutex);
-        auto dirCamPacks = this->Path()->PathGetFromKey("kCamPacks");
+        auto o = this->Path()->PathGetFromKey("kCamPacks");
+        if (!o) {
+            this->LogError("无法从 kCurrentPack 解析到路径");
+            return;
+        }
+        auto dirCamPacks = *o;
         auto res = fs::SubDirectoryNames(dirCamPacks);
         if (!res.has_value()) {
             this->LogError(res.error().message());
@@ -236,7 +246,12 @@ bool CamPackManager::CamPackSave() {
     if (!this->CamPackRefresh()) {
         return false;
     }
-    auto dir = this->Path()->PathGetFromKey("kCamPacks") / this->pActiveCamPack->GetName();
+    auto o = this->Path()->PathGetFromKey("kCamPacks");
+    if (!o) {
+        this->LogError("无法从 kCurrentPack 解析到路径");
+        return false;
+    }
+    auto dir = *o / this->pActiveCamPack->GetName();
     auto r = this->pActiveCamPack->Save(dir);
     if (r.has_value()) {
         this->LogSucc(std::move(r.value()));

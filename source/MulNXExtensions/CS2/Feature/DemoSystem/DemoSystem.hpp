@@ -162,7 +162,11 @@ protected:
         }
         const auto& key = pExt->str1;
         const auto& demoName = pExt->str2;
-        auto demoPath = this->Path()->PathGetFromKey(key) / (demoName + ".dem");
+        auto o = this->Path()->PathGetFromKey(key);
+        if (!o) {
+            return std::unexpected(std::make_tuple(key, demoName, "无法拼接从key解析路径"));
+        }
+        auto demoPath = *o / (demoName + ".dem");
         // 确保可拼接为绝对路径
         if (!demoPath.is_absolute()) {
             return std::unexpected(std::make_tuple(key, demoName, "无法拼接为绝对路径"));

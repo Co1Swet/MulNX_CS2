@@ -100,8 +100,14 @@ void DemoFiles::Menu() {
         autoMake(demFile);
     }
     if (ImGui::Button("复制路径到剪贴板")) {
-        auto fullPath = this->Path()->PathGetFromKey(demFile.kDir) / (demFile.demoName + ".dem");
-        ImGui::SetClipboardText(fullPath.string().c_str());
+        auto o = this->Path()->PathGetFromKey(demFile.kDir);
+        if (o) {
+            auto fullPath = *o / (demFile.demoName + ".dem");
+            ImGui::SetClipboardText(fullPath.string().c_str());
+        }
+        else {
+            this->LogError(std::format("无法获取 {} 的路径，key为 {}", demFile.demoName, demFile.kDir));
+        }
     }
 }
 
