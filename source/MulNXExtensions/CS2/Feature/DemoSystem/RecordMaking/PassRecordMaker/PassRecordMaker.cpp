@@ -1,4 +1,5 @@
 #include "PassRecordMaker.hpp"
+#include <MulNX/Base/fs.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/DemoSystem/RecordMaking/AutoRecordRule/AutoRecordRule.hpp>
 
@@ -8,6 +9,7 @@ bool PassRecordMaker::Init() {
     (*this)
         .SubscribeAsyncEx<void>("Demo/Record/Make/Auto")
         .SubscribeAsyncEx<int>("Demo/Info/Notify")
+        .SubscribeAsyncEx<int>("CS/LocalPlayerUID")
         ;
 
     this->SendTask("Update", "DemoSys", [this]() {
@@ -29,6 +31,11 @@ void PassRecordMaker::ProcessMsg(MulNX::Message& msg) {
         }
         auto&& [key, name, path] = *r;
         this->EnsureMake(key, name).Fire();
+        break;
+    }
+    case "CS/LocalPlayerUID"_hash: {
+        auto&& [uid] = msg.Access<Steam64UID>();
+        this->OnUID(uid).Fire();
         break;
     }
     }
@@ -55,7 +62,7 @@ MulNX::CoTask PassRecordMaker::AsyncWaitInfo(bool& succ, const std::string& key,
     }
 }
 
-MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName) {
+MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName, std::optional<Steam64UID> localSteamUID) {
     auto p = this->pDemSys->GetDemoInfo(key, demoName);
     if (!p) {
         this->LogInfo(std::format("Demo {} 的信息尚未加载，即将发送分析请求", demoName));
@@ -78,19 +85,30 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName)
         co_return;
     }
 
-    const auto requestCount = plan.requests.size();
     for (auto& request : plan.requests) {
         this->PublishAsync(std::move(request));
     }
 
     MulNX::Message barrier("Demo/Record/Commit/Demo"_hash);
     auto&& [autoRecord] = barrier.Access<bool>();
-    autoRecord = plan.autoStart;
+    autoRecord = plan.autoStart || localSteamUID.has_value();
     this->PublishAsync(std::move(barrier));
 
     this->LogInfo(std::format(
         "自动规则为 Demo {} 发送 {} 条录制请求，提交后启动录制：{}",
-        demoName, requestCount, plan.autoStart ? "是" : "否"));
+        demoName, plan.requests.size(), plan.autoStart ? "是" : "否"));
+
+    co_return;
+}
+
+MulNX::CoTask PassRecordMaker::OnUID(Steam64UID uid) {
+    co_await this->WaitMilliseconds(5000);
+    auto path = this->Path()->PathGetForShared("DemoInput") / "LocalPlayer";
+    auto dems = fs::SubFileNames(path, { ".dem" });
+    if (!dems.has_value()) {
+        this->LogError(dems.error().message());
+        co_return;
+    }
 
     co_return;
 }

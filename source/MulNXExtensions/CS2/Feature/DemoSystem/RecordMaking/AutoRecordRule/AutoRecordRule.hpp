@@ -25,5 +25,5 @@ private:
 public:
     Options GetOptions() const;
     void SetOptions(const Options& newOptions);
-    Plan BuildPlan(const Demo::Info& info) const;
+    Plan BuildPlan(const Demo::Info& info, std::optional<Steam64UID> localSteamUID = std::nullopt) const;
 };

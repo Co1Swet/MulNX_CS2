@@ -41,6 +41,12 @@ void CSController::OnClientLoad(MulNX::Message& msg) {
         ctx->rax = hk->CallMaybeAs<Source2Client002_Init_t>((void*)ctx->rcx);
         this->PublishSync("Hook/Source2Client002::Inited"_hash);
         this->hkSource2Client002_Init->Detach();
+        auto t = this->client.GetTextRegion().FindRegion(CS2::Signatures::Steam::GetSteamLocalPlayerUID).Data();
+        auto msg = MulNX::Message("CS/LocalPlayerUID"_hash);
+        auto&& [uid] = msg.Access<Steam64UID>();
+        reinterpret_cast<uint64_t* (*)(uint64_t*)>(t)(&uid);
+        this->localSteamUID.store(uid, std::memory_order_seq_cst);
+        this->PublishAsync(std::move(msg));
         return MulNX::Hook::Then::Return;
         }
     ) | value_or_throw;

@@ -23,11 +23,13 @@ namespace CS2::Signatures {
     namespace Render {
         inline constexpr MulNX::Memory::Pattern Pos_Call_Present("FF 50 40 80 7C 24 ?? 00 44 8B E0 74 10");
         inline constexpr MulNX::Memory::Pattern Func_SoftwareCommandList_Commit("48 89 5C 24 18 48 89 6C 24 20 56 57 41 54 48 83 EC 30 45 33 E4");
-
         // "#%s/%s/LayerClear"
         inline constexpr MulNX::Memory::Pattern Pos_Ret_SceneSystem_CreateRenderContextPtr1_With_Fmt_LayerClear("F6 83 ?? ?? ?? ?? 04 48 8B ?? ?? 74 3F");
         // "UpdateBuffers"
         inline constexpr MulNX::Memory::Pattern Pos_Ret_SceneSystem_CreateRenderContextPtr2_With_UpdateBuffers("49 8B 14 24 8B 82 ?? ?? ?? ?? 44 8B 82");
+    }
+    namespace Steam {
+        inline constexpr MulNX::Memory::Pattern GetSteamLocalPlayerUID("40 53 48 83 EC 20 48 8B D9 E8 ?? ?? ?? ?? 48 8B 40 ?? 48");
     }
     namespace Utils {
         inline constexpr MulNX::Memory::Pattern CSHashString("48 83 EC 28 45 8B D0 4C 8B C9 48 83 FA 04 0F 82 ?? ?? ?? ?? 0F B6 09 48 89 5C 24 20 8D 41 BF 3C 19 77 03 80 C1 20");
@@ -156,5 +158,4 @@ namespace CS2::Signatures {
             inline constexpr MulNX::Memory::Pattern GetPaintKit("48 89 5C 24 08 57 48 83 EC 40 8B 15 ?? ?? ?? ?? 48 8B F9 65 48 8B 04 25 ?? ?? ?? ?? B9 68 00 00 00 48 8B 04 D0 8B 04 01 39 05 ?? ?? ?? ?? 0F 8F 95");
         }
     }
-
 }

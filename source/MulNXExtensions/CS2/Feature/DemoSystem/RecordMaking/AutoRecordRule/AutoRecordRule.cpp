@@ -66,7 +66,7 @@ void AutoRecordRule::SetOptions(const Options& newOptions) {
     this->options = newOptions;
 }
 
-AutoRecordRule::Plan AutoRecordRule::BuildPlan(const Demo::Info& info) const {
+AutoRecordRule::Plan AutoRecordRule::BuildPlan(const Demo::Info& info, std::optional<Steam64UID> localSteamUID) const {
     const auto currentOptions = this->GetOptions();
     Plan plan{};
     plan.autoStart = currentOptions.autoStart;
@@ -96,6 +96,14 @@ AutoRecordRule::Plan AutoRecordRule::BuildPlan(const Demo::Info& info) const {
             }
         }
     };
+
+    if (localSteamUID.has_value()) {
+        const auto it = info.players.find(localSteamUID.value());
+        if (it != info.players.end()) {
+            addPlayerRequests(it->second);
+        }
+        return plan;
+    }
 
     if (currentOptions.mode == Mode::SinglePlayer) {
         const auto it = info.players.find(currentOptions.player);

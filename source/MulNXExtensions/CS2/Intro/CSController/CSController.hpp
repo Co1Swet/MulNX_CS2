@@ -29,9 +29,9 @@ public:
     MulNX::Memory::DllModule tier0{};
     MulNX::Memory::DllModule panorama{};
     MulNX::Memory::DllModule scenesystem{};
-
+    // 获取Demo内存
     VExecutor<void* ()> GetDemo{};
-
     // CS2全局变量
     CCSGlobalVars* CSGlobalVars{};
+    std::atomic<Steam64UID> localSteamUID{};
 };
