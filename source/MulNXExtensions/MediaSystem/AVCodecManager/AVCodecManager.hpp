@@ -16,7 +16,6 @@ namespace MulNX {
         virtual av::Dictionary GetPrivateOpts()const = 0;
         
         virtual void SettingsMenu() = 0;
-        
     };
 }
 

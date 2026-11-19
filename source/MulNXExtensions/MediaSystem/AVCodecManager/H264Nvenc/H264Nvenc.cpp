@@ -22,10 +22,32 @@ bool H264Nvenc::Init() {
         return true;
     }
     this->codec = c;
+    try {
+        av::VideoEncoderContext enc = av::VideoEncoderContext(this->codec);
+
+        enc.setWidth(1280);
+        enc.setHeight(720);
+        enc.setPixelFormat(av::PixelFormat(AV_PIX_FMT_NV12));
+        enc.setTimeBase(av::Rational(1, 30));
+        enc.setBitRate(2'000'000);
+        enc.setGopSize(30);
+        enc.setMaxBFrames(0);
+
+        av::Dictionary opts = GetPrivateOpts();
+
+        enc.open(opts);
+    }
+    catch (const std::exception& e) {
+        this->LogWarning(e.what());
+        this->unavailableReason = e.what();
+    }
+    this->ok = true;
     return true;
 }
 
-bool H264Nvenc::IsAvailable() const { return !this->codec.isNull() && this->codec.canEncode(); }
+bool H264Nvenc::IsAvailable() const {
+    return this->ok.load();
+}
 av::Codec* H264Nvenc::GetAVCodec() { return &this->codec; }
 av::PixelFormat H264Nvenc::GetPreferredPixelFormat()const {
     return av::PixelFormat(AV_PIX_FMT_NV12);
@@ -35,7 +57,6 @@ av::Dictionary H264Nvenc::GetPrivateOpts() const {
     av::Dictionary opts;
     const char* presets[] = { "p1","p2","p3","p4","p5","p6","p7" };
     opts["preset"].set(std::string(presets[std::clamp(this->preset.load() - 1, 0, 6)]));
-    opts["tune"].set(std::string(this->tune.load() == 0 ? "ull" : "hq"));
     opts["zerolatency"].set("1");
     opts["delay"].set("0");
     opts["surfaces"].set(std::to_string(this->surfaces.load()));

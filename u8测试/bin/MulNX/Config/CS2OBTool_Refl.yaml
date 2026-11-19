@@ -38,6 +38,7 @@ RecordTaskConfiger.postBekilledSeconds: 1.8
 RecordTaskConfiger.postRoundEndSeconds: 1
 DemRecordPassManager.autoConcat: false
 VirtualUser.enabled: true
+MediaRunningState.nextStartUseAdvancedMode: false
 MediaParamManager.bitrate: 80000000
 MediaParamManager.cq: 23
 MediaParamManager.maxBFrames: 0
@@ -52,14 +53,12 @@ OpenH264Encoder.rc_mode: bitrate
 OpenH264Encoder.allow_skip_frames: ""
 OpenH264Encoder.max_nal_size: 0
 H264Nvenc.preset: 1
-H264Nvenc.tune: 0
 H264Nvenc.qp: 20
 H264Nvenc.qmax: 25
 H264Nvenc.lookahead: 0
 H264Nvenc.surfaces: 4
 AVCodecManager.currentEncoderName: H264Nvenc
 AVCodecManager.encoderFallbackModuleNames: "[\"H264Nvenc\",\"OpenH264Encoder\"]"
-MediaRunningState.nextStartUseAdvancedMode: false
 AdvancedRecord.useTimeStamp: true
 AdvancedRecord.outputFile: record
 PlayProtect.preventEndOfMatch: true

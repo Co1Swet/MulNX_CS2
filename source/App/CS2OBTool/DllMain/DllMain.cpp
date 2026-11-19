@@ -171,13 +171,12 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<CS2Test>()
 #endif
         // 音视频系统
+        .CreateModule<MediaSystem>()
+        .CreateModule<MediaRunningState>()
         .CreateModule<MediaParamManager>()
         .CreateModule<OpenH264Encoder>()
         .CreateModule<H264Nvenc>()
         .CreateModule<AVCodecManager>()
-
-        .CreateModule<MediaRunningState>()
-        .CreateModule<MediaSystem>()
 
         .CreateModule<AudioCapturer>()
         .CreateModule<AEncodeHelper>()
