@@ -25,7 +25,15 @@ namespace MulNX {
     template<typename T>
     T from_string(std::string_view token) {
         T value{};
-        if constexpr (std::is_enum_v<T>) {
+        if constexpr (std::is_same_v<T, bool>) {
+            if (token == "true" || token == "1")
+                value = true;
+            else if (token == "false" || token == "0")
+                value = false;
+            else
+                throw std::invalid_argument("Invalid bool: " + std::string(token));
+        }
+        else if constexpr (std::is_enum_v<T>) {
             // 枚举：先解析为其底层类型，再转换
             using Underlying = std::underlying_type_t<T>;
             Underlying temp{};
