@@ -18,16 +18,16 @@ void DemRecordPassManager::Window() {
 
     if (ImGui::Button("提交所有任务")) {
         MulNX::Message msg("Demo/Record/Commit/Demo"_hash);
-        auto&& [autoRecord] = msg.Access<bool>();
-        autoRecord = 0;
+        auto&& [autoRecord, forceConcat] = msg.Access<bool, bool>();
+        autoRecord = false;forceConcat = false;
         this->PublishAsync(std::move(msg));
         ImGui::SetWindowFocus("录制执行");
     }
     ImGui::SameLine();
     if (ImGui::Button("提交所有任务并开始录制")) {
         MulNX::Message msg("Demo/Record/Commit/Demo"_hash);
-        auto&& [autoRecord] = msg.Access<bool>();
-        autoRecord = 1;
+        auto&& [autoRecord, forceConcat] = msg.Access<bool, bool>();
+        autoRecord = true;forceConcat = false;
         this->PublishAsync(std::move(msg));
         ImGui::SetWindowFocus("录制执行");
     }
@@ -109,7 +109,7 @@ void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
         break;
     }
     case "Demo/Record/Commit"_hash: {
-        auto&& [autoRecord] = msg.Access<bool>();
+        auto&& [autoRecord, forceConcat] = msg.Access<bool, bool>();
         std::vector<Demo::Record::Task> rTasks;
         {
             std::unique_lock lock(this->smutex);
@@ -120,18 +120,19 @@ void DemRecordPassManager::ProcessMsg(MulNX::Message& msg) {
         auto token = std::make_shared<Demo::Record::Token>([&](Demo::Record::Token* token) {
             this->OnTokenDestroy(token);
             });
-        this->Commit(std::move(rTasks), autoRecord, token);
+        this->Commit(std::move(rTasks), autoRecord,
+            token, this->autoConcat.load() || forceConcat);
         break;
     }
     }
 }
 
 void DemRecordPassManager::Commit(std::vector<Demo::Record::Task>&& rTasks,
-    const bool autoRecord, std::shared_ptr<Demo::Record::Token> token)const {
+    const bool autoRecord, std::shared_ptr<Demo::Record::Token> token, const bool autoConcat)const {
 
     token->createdAt = std::chrono::system_clock::now();
     token->createdAtStr = MulNX::Time::ToTimestamp(token->createdAt);
-    if (this->autoConcat.load(std::memory_order_acquire)) {
+    if (autoConcat) {
         token->concatTarget = this->Path()->PathGetForShared("Videos") / (token->createdAtStr + ".mp4");
     }
     

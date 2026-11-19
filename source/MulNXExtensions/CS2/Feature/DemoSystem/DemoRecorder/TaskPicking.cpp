@@ -30,10 +30,13 @@ MulNX::CoTask DemoRecorder::EnsurePassChange() {
     }
     if (needChange) {
         for (int i = 0;;++i) {
-            this->LogInfo(std::format("尝试为新Pass切换到指定Demo：{}", tryPass->demoFileName));
+            auto dir = this->Path()->PathGetFromKey(tryPass->kPath);
+            if (!dir.has_value())MulNX::ErrorTerminate(std::format("路径Key无效：{}", tryPass->kPath));
+            auto path = *dir / tryPass->demoFileName;
+            this->LogInfo(std::format("尝试为新Pass切换到指定Demo：{}", path.string()));
             // 这个检验是防止在新Demo切换过程中发新playdemo
             if (this->CS2Time->IsPlayingDemo() == false) {
-                this->AsyncCommand(std::format("playdemo {}", tryPass->demoFileName));
+                this->AsyncCommand(std::format("playdemo \"{}\"", path.string()));
             }
             bool ok;
             auto nowTick = this->CS2Time->GetDemoTick();

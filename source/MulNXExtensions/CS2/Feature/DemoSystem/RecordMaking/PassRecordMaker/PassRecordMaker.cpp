@@ -12,6 +12,9 @@ bool PassRecordMaker::Init() {
         .SubscribeAsyncEx<int>("CS/LocalPlayerUID")
         ;
 
+    this->Path()->CreateKey("kDemoInputLocalPlayer", "LocalPlayer", [](auto&&...) {return true;});
+    this->Path()->KeyBindStatic("kDemoInputLocalPlayer", this->Path()->PathGetForShared("DemoInput"));
+
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
         return true;
@@ -79,7 +82,7 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName,
         co_return;
     }
 
-    auto plan = this->pAutoRecordRule->BuildPlan(*p);
+    auto plan = this->pAutoRecordRule->BuildPlan(*p, localSteamUID);
     if (plan.requests.empty()) {
         this->LogWarning(std::format("Demo {} 没有符合自动录制规则的请求", demoName));
         co_return;
@@ -90,25 +93,45 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName,
     }
 
     MulNX::Message barrier("Demo/Record/Commit/Demo"_hash);
-    auto&& [autoRecord] = barrier.Access<bool>();
+    auto&& [autoRecord, forceConcat] = barrier.Access<bool, bool>();
     autoRecord = plan.autoStart || localSteamUID.has_value();
+    forceConcat = localSteamUID.has_value();
     this->PublishAsync(std::move(barrier));
 
     this->LogInfo(std::format(
         "自动规则为 Demo {} 发送 {} 条录制请求，提交后启动录制：{}",
-        demoName, plan.requests.size(), plan.autoStart ? "是" : "否"));
+        demoName, plan.requests.size(), autoRecord ? "是" : "否"));
 
     co_return;
 }
 
 MulNX::CoTask PassRecordMaker::OnUID(Steam64UID uid) {
-    co_await this->WaitMilliseconds(5000);
-    auto path = this->Path()->PathGetForShared("DemoInput") / "LocalPlayer";
-    auto dems = fs::SubFileNames(path, { ".dem" });
+    auto path = this->Path()->PathGetFromKey("kDemoInputLocalPlayer").value();
+    try {
+        auto f = YAML::LoadFilePath(path / "Config.yaml");
+        auto overrideUID = f["override"].as<Steam64UID>();
+        if (overrideUID != 0) {
+            uid = overrideUID;
+        }
+    }
+    catch (const std::exception& e) {
+        this->LogError(e.what());
+        this->LogError("在探测覆盖配置时抛出异常，不进行覆盖");
+    }
+    if (uid == 0) {
+        this->LogError("未指定uid，取消任务");
+        co_return;
+    }
+    
+    auto dems = fs::SubFileNames(path, { ".dem" }, false);
     if (!dems.has_value()) {
         this->LogError(dems.error().message());
         co_return;
     }
 
-    co_return;
+    co_await this->WaitMilliseconds(5000);
+
+    for (const auto& demoName : dems.value()) {
+        co_await this->EnsureMake("kDemoInputLocalPlayer", demoName, uid);
+    }
 }

@@ -34,7 +34,7 @@ namespace ghc::filesystem {
     }
 
     inline std::expected<std::vector<std::string>, std::error_code> SubFileNames(const fs::path& path,
-        const std::unordered_set<std::string>& filter = {}) {
+        const std::unordered_set<std::string>& filter = {}, bool ext = true) {
         try {
             return fs::directory_iterator(path)
                 | std::views::filter([](const fs::directory_entry& e) {
@@ -44,7 +44,14 @@ namespace ghc::filesystem {
                 if (filter.empty())return true;
                 return filter.contains(e.path().extension());
                     })
-                | std::views::transform([](const fs::directory_entry& e) {return e.path().filename().string();})
+                | std::views::transform([&](const fs::directory_entry& e) {
+                if (ext) {
+                    return e.path().filename().string();
+                }
+                else {
+                    return e.path().stem().string();
+                }
+                })
                 | std::ranges::to<std::vector>();
         }
         catch (const fs::filesystem_error& e) {

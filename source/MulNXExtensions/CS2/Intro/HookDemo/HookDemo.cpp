@@ -142,13 +142,8 @@ void HookDemo::BeforePlay(std::string_view rawArg) {
     }
     else {
         // 有引号：反查所在目录对应的静态 key
-        auto* pPath = this->Path();
-        if (!pPath) {
-            this->LogError("PathManager 不可用");
-            return;
-        }
         const fs::path parentPath = demoPath.parent_path();
-        auto keys = pPath->PathFindStaticKeys(parentPath);
+        auto keys = this->Path()->PathFindStaticKeys(parentPath);
         if (keys.empty()) {
             this->LogError(std::format(
                 "Demo 所在目录未注册到 PathManager: {}", parentPath.string()));

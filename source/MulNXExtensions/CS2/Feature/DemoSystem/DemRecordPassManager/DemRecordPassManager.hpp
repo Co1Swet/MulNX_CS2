@@ -17,7 +17,7 @@ class DemRecordPassManager final :public DemModule<DemRecordPassManager> {
     bool Init()override;
     void ProcessMsg(MulNX::Message& msg);
     void Commit(std::vector<Demo::Record::Task>&& rTasks, const bool autoRecord,
-        std::shared_ptr<Demo::Record::Token> token)const;
+        std::shared_ptr<Demo::Record::Token> token, const bool autoConcat)const;
     void OnTaskEnd(MulNX::Message& msg);
     void OnTokenDestroy(Demo::Record::Token* token);
 };
