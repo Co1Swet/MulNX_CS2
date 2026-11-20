@@ -33,7 +33,6 @@ public:
 
     // 获取基本信息
     std::string GetBaseInfo()const;
-    std::string GetMsg()const;
 
     // 增加关键帧
     void AddKeyframe(const MulNX::Math::CameraKeyframe& KeyFrame);

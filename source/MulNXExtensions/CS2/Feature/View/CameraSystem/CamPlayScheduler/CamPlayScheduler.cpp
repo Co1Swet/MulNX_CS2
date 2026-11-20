@@ -29,7 +29,7 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
     switch (msg.type) {
     case "CamPlay/Request"_hash: {
         auto ext = msg.asp.get<MulNX::NetExt>();
-        auto&& [offsetTime, isActiveMode] = msg.Access<double, int>();
+        auto&& [offsetTime, isActiveMode, preRoll] = msg.Access<double, bool, bool>();
         auto& name = ext->str1;
         std::shared_ptr<const FreeCameraPath> pCampath = this->pCampathManager->FindCampath(name);
         if (!pCampath) {
@@ -39,7 +39,8 @@ void CamPlayScheduler::ProcessMsg(MulNX::Message& msg) {
         PlaySlot slot{};
         slot.pCampath = std::move(pCampath);
         slot.offsetTime = offsetTime;
-        slot.isActiveMode = (isActiveMode != 0);
+        slot.isActiveMode = isActiveMode;
+        slot.preRoll = preRoll;
         this->playslots.push_back(std::move(slot));
         this->LogSucc(std::format("已添加运镜到播放阵列：{} ，时间偏移为：{}",
             name, offsetTime));
@@ -94,6 +95,7 @@ bool CamPlayScheduler::HandleUpdate(CameraSystemIO* IO) {
     for (auto slot = this->playslots.begin();slot != this->playslots.end();) {
         IO->time = this->pTimeline->GetTime();
         IO->time += slot->offsetTime;
+        if (slot->preRoll)IO->time = std::max(IO->time, slot->pCampath->GetStartTime());
         auto calResult = slot->pCampath->CalculateFrame(IO);
         if (calResult == FreeCameraPath::CalResult::Back && slot->isActiveMode == false) {
             this->LogInfo(std::format("移除播放结束的运镜：{}", slot->pCampath->GetName()));

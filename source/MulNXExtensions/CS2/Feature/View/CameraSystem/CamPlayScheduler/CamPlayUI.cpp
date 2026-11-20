@@ -3,7 +3,7 @@
 void CamPlayScheduler::DrawPlayCamera() {
     if (!this->drawCam.load(std::memory_order_acquire))return;
     if (!this->needDrawCamera.load(std::memory_order_acquire))return;
-    
+
     auto view = this->drawCamera.Read();
     this->pCamDrawer->DrawViewCamera(*view, "当前播放摄像机");
 }
@@ -12,7 +12,7 @@ void CamPlayScheduler::Menu() {
 
     ImGui::Text("播放控制");
     auto bDraw = this->drawCam.load(std::memory_order_acquire);
-    if (ImGui::Checkbox("绘制播放摄像机",&bDraw)) {
+    if (ImGui::Checkbox("绘制播放摄像机", &bDraw)) {
         if (bDraw) {
             this->PublishAsync("CamPlay/Draw/Enable"_hash);
         }

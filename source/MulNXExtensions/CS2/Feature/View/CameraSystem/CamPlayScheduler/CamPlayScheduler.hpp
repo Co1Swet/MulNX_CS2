@@ -9,13 +9,15 @@ class CamPlayScheduler final :public CamSysModule<CamPlayScheduler> {
         std::shared_ptr<const FreeCameraPath> pCampath = nullptr;
         double offsetTime = 0.0f;
         bool isActiveMode = false;
+        // 时间未到起点时提前就位，相机停在首帧角度待命
+        bool preRoll = false;
     };
     std::vector<PlaySlot>playslots{};
     CampathManager* pCampathManager = nullptr;
     CamDrawer* pCamDrawer = nullptr;
 
-    std::atomic<bool> drawCam = false;
-    std::atomic<bool> camOverride = true;
+    MulReflBool(drawCam, false);
+    MulReflBool(camOverride, true);
 
     std::atomic<bool> needDrawCamera = false;
     MulNX::NewestBuffer<MulNX::Math::View> drawCamera;

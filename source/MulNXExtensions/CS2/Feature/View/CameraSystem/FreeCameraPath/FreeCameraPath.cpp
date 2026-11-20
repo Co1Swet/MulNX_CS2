@@ -5,14 +5,6 @@
 std::string FreeCameraPath::GetBaseInfo()const {
     return std::format("轨道名称：{} ，持续时长：{}", this->name, this->durationTime);
 }
-std::string FreeCameraPath::GetMsg()const {
-    std::ostringstream oss;
-    for (size_t i = 0; i < this->CameraKeyframes.size(); ++i) {
-        const auto& keyframe = this->CameraKeyframes.at(i);
-        oss << I18n("free_campath.fmt", i, keyframe.GetMsg());
-    }
-    return std::format("基本信息：{0}\n详细信息：{1}", this->GetBaseInfo(), oss.str());
-}
 const std::string& FreeCameraPath::GetName()const {
     return this->name;
 }
