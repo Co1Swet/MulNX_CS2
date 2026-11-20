@@ -254,7 +254,7 @@ void AudioCapturer::CommitAudioSamples(av::AudioSamples&& samples) {
     samples.setPts(av::Timestamp(ptsUs, samples.timeBase()));
     // 入队！
     this->lastCommitTime = std::chrono::steady_clock::now();
-    this->pAEncodeHelper->bufferAudioSampleses.enqueue(std::move(samples));
+    this->pAEncodeHelper->SubmitAudioSamples(std::move(samples));
 }
 
 bool AudioCapturer::Deinit() {

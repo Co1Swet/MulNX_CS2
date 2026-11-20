@@ -24,6 +24,4 @@ class AudioCapturer final :public MediaModule<AudioCapturer> {
 
     bool Init()override;
     bool Deinit()override;
-public:    
-    int GetSampleRate() const { return wfx ? wfx->nSamplesPerSec : 0; }
 };

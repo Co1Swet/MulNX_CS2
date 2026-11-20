@@ -1,8 +1,29 @@
 #include "AEncodeHelper.hpp"
-#include <APipeline/AudioCapturer/AudioCapturer.hpp>
+
+constexpr int kAudioEncoderSampleRate = 48000;
+
+void CopyAudioSamples(av::AudioSamples& destination, int destinationOffset,
+    const av::AudioSamples& source, int sourceOffset, int sampleCount) {
+    if (!source.isPlanar()) {
+        const int bytesPerSample = source.sampleFormat().bytesPerSample();
+        const int channels = source.channelsCount();
+        std::memcpy(
+            reinterpret_cast<uint8_t*>(destination.data(0)) + destinationOffset * channels * bytesPerSample,
+            reinterpret_cast<const uint8_t*>(source.data(0)) + sourceOffset * channels * bytesPerSample,
+            static_cast<size_t>(sampleCount) * channels * bytesPerSample);
+        return;
+    }
+
+    const int bytesPerSample = source.sampleFormat().bytesPerSample();
+    for (int channel = 0; channel < source.channelsCount(); ++channel) {
+        std::memcpy(
+            reinterpret_cast<uint8_t*>(destination.data(channel)) + destinationOffset * bytesPerSample,
+            reinterpret_cast<const uint8_t*>(source.data(channel)) + sourceOffset * bytesPerSample,
+            static_cast<size_t>(sampleCount) * bytesPerSample);
+    }
+}
 
 bool AEncodeHelper::Init() {
-    this->pAudioCapturer = this->FindModule<AudioCapturer>();
     this->SubscribeSync("MediaSync/SetOn", [this](MulNX::Message& msg) {
         auto&& [info] = msg.Access<MulNX::AVStartInfo>();
         try {
@@ -22,7 +43,7 @@ bool AEncodeHelper::Init() {
 
 void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     av::AudioSamples temp;
-    while (this->bufferAudioSampleses.try_dequeue(temp)) {}
+    while (this->pendingAudioSamples.try_dequeue(temp)) {}
     this->audioFifo.clear();
     this->flushPackets.clear();
     if (this->aencoder.isValid() && this->aencoder.isOpened()) this->aencoder.close();
@@ -41,12 +62,6 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     }
     this->audioFifo.clear();
     this->flushPackets.clear();
-    int sampleRate = this->pAudioCapturer->GetSampleRate();
-    if (sampleRate <= 0) {
-        this->LogError("音频采样率无效");
-        return;
-    }
-
     av::Codec acodec = av::findEncodingCodec(AV_CODEC_ID_MP3);
     if (!acodec.canEncode()) {
         this->LogError("编码器不可用，仅录制视频");
@@ -61,11 +76,11 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     this->LogWarning(std::format("音频编码器目标格式: {}", targetFmt.name()));
 
     this->aencoder = av::AudioEncoderContext(acodec);
-    this->aencoder.setSampleRate(sampleRate);
+    this->aencoder.setSampleRate(kAudioEncoderSampleRate);
     this->aencoder.setChannels(2);
     this->aencoder.setSampleFormat(targetFmt);
     this->aencoder.setChannelLayout(AV_CH_LAYOUT_STEREO);
-    this->aencoder.setTimeBase({ 1, sampleRate });
+    this->aencoder.setTimeBase({ 1, kAudioEncoderSampleRate });
     this->aencoder.setBitRate(128000);
 
     try {
@@ -81,12 +96,12 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     }
 
     this->astream = info.pOutCtx->addStream(this->aencoder);
-    this->astream.setTimeBase({ 1, sampleRate });
+    this->astream.setTimeBase({ 1, kAudioEncoderSampleRate });
     av::CodecParameters cp;
     cp.copyFrom(this->aencoder);
     this->astream.setCodecParameters(cp);
 
-    this->LogInfo(std::format("音频开启={}", (this->aencoder.isOpened() ? "是" : "否")));
+    this->LogInfo(std::format("音频开启={}", this->aencoder.isOpened()));
 }
 
 bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples&& asamples) {
@@ -98,12 +113,16 @@ bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples
         if (!this->aresampler.isValid() ||
             this->aresampler.srcSampleRate() != asamples.sampleRate() ||
             this->aresampler.srcSampleFormat() != asamples.sampleFormat() ||
-            this->aresampler.srcChannels() != asamples.channelsCount()) {
+            this->aresampler.srcChannels() != asamples.channelsCount() ||
+            this->aresampler.srcChannelLayout() != asamples.channelsLayout()) {
             std::error_code err;
             bool ok = this->aresampler.init(
                 this->aencoder.channelLayout(), this->aencoder.sampleRate(), this->aencoder.sampleFormat(),
                 asamples.channelsLayout(), asamples.sampleRate(), asamples.sampleFormat(), err);
-            if (!ok) { this->LogError(std::string("AudioResampler 初始化失败: ") + (err ? err.message() : "unknown")); return false; }
+            if (!ok) {
+                this->LogError(std::format("AudioResampler 初始化失败: {}", err ? err.message() : "unknown"));
+                return false;
+            }
         }
         this->aresampler.push(asamples);
         converted = this->aresampler.pop(0);
@@ -117,8 +136,20 @@ bool AEncodeHelper::CheckResampler(av::AudioSamples& converted, av::AudioSamples
     return true;
 }
 
+void AEncodeHelper::SetPacketTiming(av::Packet& packet, int64_t ptsSamples) {
+    const av::Rational sampleTimeBase(1, this->aencoder.sampleRate());
+    packet.setStreamIndex(this->astream.index());
+    packet.setTimeBase(this->astream.timeBase());
+    packet.setPts(av::Timestamp(ptsSamples, sampleTimeBase));
+    packet.setDuration(this->frameSize, sampleTimeBase);
+}
+
+void AEncodeHelper::SubmitAudioSamples(av::AudioSamples&& samples) {
+    this->pendingAudioSamples.enqueue(std::move(samples));
+}
+
 std::optional<av::Packet> AEncodeHelper::EncodeOneFrame() {
-    int totalSamples = 0;
+    int64_t totalSamples = 0;
     for (const auto& buf : this->audioFifo) totalSamples += buf.samplesCount();
     if (totalSamples < this->frameSize) return std::nullopt;
 
@@ -139,25 +170,15 @@ std::optional<av::Packet> AEncodeHelper::EncodeOneFrame() {
         return std::nullopt;
     }
 
-    int copied = 0, offsetInFrame = 0;
+    int copied = 0;
     while (copied < this->frameSize && !this->audioFifo.empty()) {
         auto& front = this->audioFifo.front();
         int need = this->frameSize - copied;
         int available = front.samplesCount();
         int take = std::min(need, available);
 
-        if (!front.isPlanar()) {
-            int bps = front.sampleFormat().bytesPerSample(), ch = front.channelsCount();
-            memcpy(reinterpret_cast<uint8_t*>(frame.data(0)) + offsetInFrame * ch * bps,
-                front.data(0), take * ch * bps);
-        }
-        else {
-            int bps = front.sampleFormat().bytesPerSample();
-            for (int c = 0; c < front.channelsCount(); ++c)
-                memcpy(reinterpret_cast<uint8_t*>(frame.data(c)) + offsetInFrame * bps,
-                    front.data(c), take * bps);
-        }
-        offsetInFrame += take; copied += take;
+        CopyAudioSamples(frame, copied, front, 0, take);
+        copied += take;
 
         if (take == available) {
             this->audioFifo.pop_front();
@@ -168,21 +189,19 @@ std::optional<av::Packet> AEncodeHelper::EncodeOneFrame() {
             if (remainder.init(front.sampleFormat(), remain, front.channelsLayout(), front.sampleRate()) < 0) {
                 this->LogError("分配剩余缓冲失败"); this->audioFifo.pop_front(); break;
             }
-            if (!front.isPlanar()) {
-                int bps = front.sampleFormat().bytesPerSample(), ch = front.channelsCount();
-                memcpy(remainder.data(0), reinterpret_cast<const uint8_t*>(front.data(0)) + take * ch * bps, remain * ch * bps);
+            CopyAudioSamples(remainder, 0, front, take, remain);
+            remainder.setTimeBase(front.timeBase());
+            if (front.pts()) {
+                remainder.setPts(front.pts() + av::Timestamp(take, { 1, front.sampleRate() }));
             }
-            else {
-                int bps = front.sampleFormat().bytesPerSample();
-                for (int c = 0; c < front.channelsCount(); ++c)
-                    memcpy(remainder.data(c), reinterpret_cast<const uint8_t*>(front.data(c)) + take * bps, remain * bps);
-            }
-            // 不关心剩余部分的时间戳，因为我们不再使用它
-            remainder.setTimeBase({ 1, 1000000 });
-            remainder.setPts(av::Timestamp(0, { 1, 1000000 }));
             this->audioFifo.front() = std::move(remainder);
             break;
         }
+    }
+
+    if (copied != this->frameSize) {
+        this->LogError("音频样本不足，无法组装完整编码帧");
+        return std::nullopt;
     }
 
     int64_t ptsSamples = this->slotCounter * this->frameSize;
@@ -194,26 +213,22 @@ std::optional<av::Packet> AEncodeHelper::EncodeOneFrame() {
     try {
         av::Packet pkt = this->aencoder.encode(frame);
         if (pkt && pkt.size() > 0) {
-            pkt.setStreamIndex(this->astream.index());
-            pkt.setTimeBase(this->astream.timeBase());
-            pkt.setPts(frame.pts());
-            pkt.setDuration(this->frameSize, this->astream.timeBase());
-            pkt.raw()->duration = this->frameSize;     // 终极保障
+            this->SetPacketTiming(pkt, ptsSamples);
             this->lastStreamDuration = pkt.pts().seconds();
             return pkt;
         }
     }
-    catch (const std::exception& e) { this->LogError(std::string("音频编码失败: ") + e.what()); }
+    catch (const std::exception& e) { this->LogError(std::format("音频编码失败: {}", e.what())); }
     return std::nullopt;
 }
 
 std::optional<av::Packet> AEncodeHelper::Encode() {
     if (!this->aencoder.isOpened() || this->frameSize <= 0) return std::nullopt;
-    int totalSamples = 0;
+    int64_t totalSamples = 0;
     for (const auto& buf : this->audioFifo) totalSamples += buf.samplesCount();
     while (totalSamples < this->frameSize) {
         av::AudioSamples asamples;
-        if (!this->bufferAudioSampleses.try_dequeue(asamples)) break;
+        if (!this->pendingAudioSamples.try_dequeue(asamples)) break;
         if (asamples.samplesCount() <= 0) continue;
         av::AudioSamples converted;
         if (!this->CheckResampler(converted, std::move(asamples))) continue;
@@ -226,6 +241,10 @@ std::optional<av::Packet> AEncodeHelper::Encode() {
 void AEncodeHelper::FlushAll() {
     if (!this->aencoder.isOpened()) return;
     this->LogInfo("[冲刷] 开始最终冲刷流程");
+    if (this->frameSize <= 0) {
+        this->LogError("编码器帧长无效，无法冲刷音频");
+        return;
+    }
 
     // 确保槽位已初始化（如果此前从未编码过）
     if (!this->slotInitialized && !this->audioFifo.empty()) {
@@ -260,15 +279,7 @@ void AEncodeHelper::FlushAll() {
             while (!this->audioFifo.empty() && offset < residueSamples) {
                 auto& front = this->audioFifo.front();
                 int take = std::min(front.samplesCount(), residueSamples - offset);
-                if (!front.isPlanar()) {
-                    int bps = front.sampleFormat().bytesPerSample(), ch = front.channelsCount();
-                    memcpy(reinterpret_cast<uint8_t*>(paddedFrame.data(0)) + offset * ch * bps, front.data(0), take * ch * bps);
-                }
-                else {
-                    int bps = front.sampleFormat().bytesPerSample();
-                    for (int c = 0; c < front.channelsCount(); ++c)
-                        memcpy(reinterpret_cast<uint8_t*>(paddedFrame.data(c)) + offset * bps, front.data(c), take * bps);
-                }
+                CopyAudioSamples(paddedFrame, offset, front, 0, take);
                 offset += take;
                 if (take == front.samplesCount()) this->audioFifo.pop_front();
                 else break;
@@ -281,11 +292,7 @@ void AEncodeHelper::FlushAll() {
             try {
                 av::Packet pkt = this->aencoder.encode(paddedFrame);
                 if (pkt && pkt.size() > 0) {
-                    pkt.setStreamIndex(this->astream.index());
-                    pkt.setTimeBase(this->astream.timeBase());
-                    pkt.setPts(paddedFrame.pts());
-                    pkt.setDuration(this->frameSize, this->astream.timeBase());
-                    pkt.raw()->duration = this->frameSize;
+                    this->SetPacketTiming(pkt, ptsSamples);
                     this->lastStreamDuration = pkt.pts().seconds();
                     this->flushPackets.push_back(std::move(pkt));
                     this->LogInfo("[冲刷] 填充帧编码成功");
@@ -305,30 +312,13 @@ void AEncodeHelper::FlushAll() {
 
             int64_t ptsSamples = this->slotCounter * this->frameSize;
             this->slotCounter++;
-            pkt.setStreamIndex(this->astream.index());
-            pkt.setTimeBase(this->astream.timeBase());
-            pkt.setPts(ptsSamples, this->astream.timeBase());
-            pkt.setDuration(this->frameSize, this->astream.timeBase());
-            pkt.raw()->duration = this->frameSize;
+            this->SetPacketTiming(pkt, ptsSamples);
             this->flushPackets.push_back(std::move(pkt));
             ++internalPkts;
         }
     }
     catch (...) { this->LogError("冲刷编码器失败"); }
     this->LogInfo(std::format("[冲刷] 编码器内部冲刷出 {} 个包", internalPkts));
-
-    // 最终遍历，确保 duration 万无一失
-    int corrected = 0;
-    for (auto& pkt : this->flushPackets) {
-        if (pkt.raw()->duration != this->frameSize) {
-            pkt.raw()->duration = this->frameSize;
-            pkt.setDuration(this->frameSize, this->astream.timeBase());
-            ++corrected;
-        }
-    }
-    if (corrected > 0) {
-        this->LogInfo(std::format("[冲刷] 最终再修正 {} 个包的 duration", corrected));
-    }
 
     if (this->aencoder.isValid()) {
         this->aencoder.close();
