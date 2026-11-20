@@ -8,7 +8,7 @@ bool PassRecordMaker::Init() {
 
     (*this)
         .SubscribeAsyncEx<void>("Demo/Record/Make/Auto")
-        .SubscribeAsyncEx<int>("Demo/Info/Notify")
+        .SubscribeAsyncEx<bool>("Demo/Info/Notify")
         .SubscribeAsyncEx<int>("CS/LocalPlayerUID")
         ;
 
@@ -59,8 +59,8 @@ MulNX::CoTask PassRecordMaker::AsyncWaitInfo(bool& succ, const std::string& key,
         if (kDir != key)continue;
         if (name != demoName)continue;
 
-        auto&& [suc] = pMsg->Access<int>();
-        succ = (suc == 0);
+        auto&& [suc] = pMsg->Access<bool>();
+        succ = suc;
         co_return;
     }
 }
@@ -94,7 +94,7 @@ MulNX::CoTask PassRecordMaker::EnsureMake(std::string key, std::string demoName,
 
     MulNX::Message barrier("Demo/Record/Commit/Demo"_hash);
     auto&& [autoRecord, forceConcat] = barrier.Access<bool, bool>();
-    autoRecord = plan.autoStart || localSteamUID.has_value();
+    autoRecord = plan.autoStart;
     forceConcat = localSteamUID.has_value();
     this->PublishAsync(std::move(barrier));
 
@@ -128,8 +128,6 @@ MulNX::CoTask PassRecordMaker::OnUID(Steam64UID uid) {
         this->LogError(dems.error().message());
         co_return;
     }
-
-    co_await this->WaitMilliseconds(5000);
 
     for (const auto& demoName : dems.value()) {
         co_await this->EnsureMake("kDemoInputLocalPlayer", demoName, uid);

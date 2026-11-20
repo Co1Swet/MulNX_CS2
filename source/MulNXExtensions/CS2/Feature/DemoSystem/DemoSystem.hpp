@@ -182,8 +182,8 @@ protected:
     }
     inline MulNX::Message MakeDemoInfoErrorNotify(const std::string& key, const std::string& demoName) {
         auto [msg, rp] = MulNX::Message::Create<MulNX::NetExt>("Demo/Info/Notify"_hash);
-        auto&& [succ] = msg.Access<int>();
-        succ = 1;
+        auto&& [succ] = msg.Access<bool>();
+        succ = false;
         rp->str1 = key;
         rp->str2 = demoName;
         return msg;

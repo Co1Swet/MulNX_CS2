@@ -91,24 +91,24 @@ void DemoSystem::OnInfoLoad(MulNX::Message& msg) {
     auto demoName = demoInfo.demoFileName;
     try {
         this->demos[kDir][demoName] = std::make_shared<Demo::Info>(std::move(demoInfo));
-        auto&& [succ] = notify.Access<int>();
-        succ = 0;
+        auto&& [succ] = notify.Access<bool>();
+        succ = true;
         rp->str1 = std::move(kDir);
         rp->str2 = std::move(demoName);
         this->PublishAsync(std::move(notify));
     }
     catch (const std::exception& e) {
         this->LogError(std::format("处理 Demo/Info/Load 消息时发生异常: {}", e.what()));
-        auto&& [succ] = notify.Access<int>();
-        succ = 1;
+        auto&& [succ] = notify.Access<bool>();
+        succ = false;
         rp->str1 = std::move(kDir);
         rp->str2 = std::move(demoName);
         this->PublishAsync(std::move(notify));
     }
     catch (...) {
         this->LogError("处理 Demo/Info/Load 消息时发生未知异常");
-        auto&& [succ] = notify.Access<int>();
-        succ = 1;
+        auto&& [succ] = notify.Access<bool>();
+        succ = false;
         rp->str1 = std::move(kDir);
         rp->str2 = std::move(demoName);
         this->PublishAsync(std::move(notify));

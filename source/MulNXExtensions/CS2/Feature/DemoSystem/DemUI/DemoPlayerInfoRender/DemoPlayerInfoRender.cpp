@@ -38,7 +38,7 @@ void DemoPlayerInfoRender::Menu(MulNX::Message* umsg) {
 
 bool DemoPlayerInfoRender::Init() {
     (*this)
-        .SubscribeAsyncEx<int>("Demo/Info/Notify")
+        .SubscribeAsyncEx<bool>("Demo/Info/Notify")
         ;
 
     this->UIRegisterCallback("UI.Player.Info", [this](auto uico, auto umsg) {this->Menu(umsg);});
