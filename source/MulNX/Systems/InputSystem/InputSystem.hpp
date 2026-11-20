@@ -15,8 +15,6 @@ namespace MulNX {
 	};
     class InputSystem final :public Module<InputSystem> {
         friend class FreeCameraController;
-    private:
-		std::atomic<bool> IfCreated{};//跨线程，原子化，标记是否已经创建好检测线程	
 
 		const std::chrono::steady_clock::time_point ClockEpoch = std::chrono::steady_clock::now();//常量，只读，不需要原子化
 		unsigned int CurrentTimeMs{};//线程内，非原子化，单位为毫秒

@@ -15,7 +15,7 @@ void FreeCameraController::Menu() {
         ImGui::Text("当前位置: X=%.2f, Y=%.2f, Z=%.2f",
             this->Position.x, this->Position.y, this->Position.z);
 
-        MulNX::UI::SliderFloat("移动速度", this->MoveSpeed, 10.0f, 1000.0f);
+        MulNX::UI::SliderFloat("移动速度", this->moveSpeed, 10.0f, 1000.0f);
     }
 }
 
@@ -90,7 +90,7 @@ bool FreeCameraController::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const 
     DirectX::XMStoreFloat3(&left, DirectX::XMVector3Rotate(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), quatRot));
     DirectX::XMStoreFloat3(&up, DirectX::XMVector3Rotate(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), quatRot));
 
-    auto speed = this->MoveSpeed.load(std::memory_order_acquire);
+    auto speed = this->moveSpeed.load(std::memory_order_acquire);
     if (this->pInputSystem->IsKeyPressed(VK_SHIFT)) speed *= 0.2f; // 按住 Shift 减速
 
     // 应用移动：前/后（moveDir.x）、左/右（moveDir.y，正值为左）、上/下（moveDir.z）

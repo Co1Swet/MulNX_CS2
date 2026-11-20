@@ -1,6 +1,13 @@
 UISystem.rendEnable: false
 UISystem.ifDrawMid: true
+Debugger.maxMsgCount: 1000
+Debugger.showWhenError: true
+Debugger.autoScroll: true
+CamPackManager.shortcutEnable: true
 CamMacroManager.shortcutEnable: true
+CamPlayScheduler.drawCam: false
+CamPlayScheduler.camOverride: true
+FreeCameraController.moveSpeed: 100
 ViewSmoother.enable: false
 ESPBox.enable: false
 ESPSkeleton.enable: false

@@ -8,8 +8,8 @@
 
 void MulNX::Debugger::DeMe() {
     MulNX::UI::Checkbox("调试器窗口", this->showWindow);
-    ImGui::Checkbox("当有错误信息时弹出调试器", &this->showWhenError);
-    ImGui::Checkbox("自动滚动到最新消息", &this->autoScroll);
+    MulNX::UI::Checkbox("当有错误信息时弹出调试器", this->showWhenError);
+    MulNX::UI::Checkbox("自动滚动到最新消息", this->autoScroll);
     static int MaxDebugMsgs = 1000;
     ImGui::Text("设置最大消息数量（至少100）:");
     ImGui::SameLine();
@@ -106,20 +106,23 @@ void MulNX::Debugger::ProcessMsg(MulNX::Message& msg) {
         this->ResetMaxMsgCount(count);
         break;
     }
-    case "Log/Error"_hash: {
-        if (this->showWhenError)
-            this->showWindow = true;
-    };
+    case "Log/Error"_hash:if (this->showWhenError)this->showWindow = true;
     case "Log/Info"_hash:
     case "Log/Succ"_hash:
     case "Log/Warning"_hash: {
-        if (this->autoScroll)
-            this->needAutoScroll = true;
+        if (this->autoScroll)this->needAutoScroll = true;
         auto fmtted = msg.asp.get<MulNX::NetExt>()->str1;
-        std::unique_lock lock(this->smutex);
-        this->debugMsg.push_back(std::move(fmtted));
+        this->AddMsg(std::move(fmtted));
         break;
     }
+    }
+}
+
+void MulNX::Debugger::AddMsg(std::string&& fmtted) {
+    std::unique_lock lock(this->smutex);
+    this->debugMsg.push_back(std::move(fmtted));
+    while (static_cast<int>(this->debugMsg.size()) > this->maxMsgCount) {
+        this->debugMsg.pop_front();
     }
 }
 void MulNX::Debugger::ResetMaxMsgCount(const int max) {

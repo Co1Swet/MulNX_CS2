@@ -1,3 +1,6 @@
 UISystem.rendEnable: false
 UISystem.ifDrawMid: true
+Debugger.maxMsgCount: 1000
+Debugger.showWhenError: true
+Debugger.autoScroll: true
 CS2HelperController.injectReshade: true

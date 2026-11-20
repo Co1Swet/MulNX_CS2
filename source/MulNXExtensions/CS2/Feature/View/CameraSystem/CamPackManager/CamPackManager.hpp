@@ -6,7 +6,7 @@
 class CamPackManager final :public CamSysModule<CamPackManager>, public WebSocketMixin<CamPackManager> {
     std::unordered_map<std::string, std::shared_ptr<CamPack>> camPacks{};
 
-    mutable std::atomic<bool> shortcutEnable = true;
+    MulReflBool(shortcutEnable, true);
     mutable std::atomic<bool> bKCPWindow = false;
     mutable std::atomic<MulNX::KeyCheckPack> bufKCPack{};
 

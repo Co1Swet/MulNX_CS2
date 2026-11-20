@@ -11,14 +11,16 @@ namespace MulNX {
         std::string kError{};
         std::deque<std::string> debugMsg{};
 
-        int maxMsgCount = 1000;
-        bool showWhenError = true;
-        bool autoScroll = true;
-		bool needAutoScroll = false;
+        MulReflInt(maxMsgCount, 1000);
+        MulReflBool(showWhenError, true);
+        MulReflBool(autoScroll, true);
+        
+        std::atomic<bool> needAutoScroll = false;
 
-        void Main();
         void Window();
         void DeMe();
+
+        void AddMsg(std::string&& fmtted);
         void ResetMaxMsgCount(const int Max);
 
 		bool Init()override;
