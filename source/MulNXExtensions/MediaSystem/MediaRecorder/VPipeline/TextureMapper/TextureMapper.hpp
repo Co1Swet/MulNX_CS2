@@ -1,8 +1,7 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
+#include <MulNXExtensions/MediaSystem/MediaRecorder/VPipeline/VCD3D11Manager/VCD3D11Manager.hpp>
 
-class VCD3D11Manager;
-class MidTex;
 class TextureMapper final :public MediaModule<TextureMapper> {
     VCD3D11Manager* pVCD3D11Manager = nullptr;
     // CPU 读回
@@ -16,5 +15,5 @@ class TextureMapper final :public MediaModule<TextureMapper> {
     void ReleaseStagingTexture();
     bool CheckStagingTexture(D3D11_TEXTURE2D_DESC& desc);
 public:
-    std::optional<av::VideoFrame> MapFrame(MidTex& tex);
+    std::optional<av::VideoFrame> MapFrame(VCD3D11Manager::CaptureTextureView& view);
 };

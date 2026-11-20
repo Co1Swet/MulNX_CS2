@@ -48,7 +48,7 @@ bool TextureMapper::CheckStagingTexture(D3D11_TEXTURE2D_DESC& desc) {
     sd.Usage = D3D11_USAGE_STAGING;
     sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
-    if (FAILED(this->pVCD3D11Manager->pReadSideDevice->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
+    if (FAILED(this->pVCD3D11Manager->pCaptureD3D11Device->CreateTexture2D(&sd, nullptr, &this->pStagingTex)))
         return false;
 
     this->stagingWidth = (int)desc.Width;
@@ -59,33 +59,39 @@ bool TextureMapper::CheckStagingTexture(D3D11_TEXTURE2D_DESC& desc) {
     return true;
 }
 
-std::optional<av::VideoFrame> TextureMapper::MapFrame(MidTex& tex) {
+std::optional<av::VideoFrame> TextureMapper::MapFrame(VCD3D11Manager::CaptureTextureView& view) {
     D3D11_TEXTURE2D_DESC desc;
-    tex.pTex->GetDesc(&desc);
+    view.pTex->GetDesc(&desc);
 
     if (!this->CheckStagingTexture(desc))return std::nullopt;
-
-    tex.pMutex->AcquireSync(1, INFINITE);
-    if (desc.SampleDesc.Count > 1)
-        this->pVCD3D11Manager->pReadSideContext->ResolveSubresource(this->pStagingTex, 0, tex.pTex.Get(), 0, desc.Format);
-    else
-        this->pVCD3D11Manager->pReadSideContext->CopyResource(this->pStagingTex, tex.pTex.Get());
-    tex.pMutex->ReleaseSync(0);
-
-    av::VideoFrame frame(this->srcPixelFormat, this->stagingWidth, this->stagingHeight);
-
+    {
+        view.pMutex->AcquireSync(1, INFINITE);
+        auto rel = scope_exit([&]() {
+            view.pMutex->ReleaseSync(0);
+            });
+        if (desc.SampleDesc.Count > 1)
+            this->pVCD3D11Manager->pCaptureD3D11DeviceContext->ResolveSubresource(this->pStagingTex, 0, view.pTex.Get(), 0, desc.Format);
+        else
+            this->pVCD3D11Manager->pCaptureD3D11DeviceContext->CopyResource(this->pStagingTex, view.pTex.Get());
+    }
     D3D11_MAPPED_SUBRESOURCE map = {};
-    if (FAILED(this->pVCD3D11Manager->pReadSideContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &map)) || !map.pData)
+    if (FAILED(this->pVCD3D11Manager->pCaptureD3D11DeviceContext->Map(this->pStagingTex, 0, D3D11_MAP_READ, 0, &map)))
         return std::nullopt;
+    auto unmap = scope_exit([&]() {
+        this->pVCD3D11Manager->pCaptureD3D11DeviceContext->Unmap(this->pStagingTex, 0);
+        });
+    
+    if (!map.pData)return std::nullopt;
     size_t rowBytes = (size_t)this->stagingWidth * 4;
     const auto* src = static_cast<const uint8_t*>(map.pData);
+
+    av::VideoFrame frame(this->srcPixelFormat, this->stagingWidth, this->stagingHeight);
     auto* dst = frame.raw();
     for (int y = 0; y < this->stagingHeight; ++y) {
-        std::memcpy(dst->data[0] + static_cast<size_t>(y) * dst->linesize[0],
-            src + static_cast<size_t>(y) * map.RowPitch, rowBytes);
+        std::memcpy(
+            dst->data[0] + static_cast<size_t>(y) * dst->linesize[0],
+            src + static_cast<size_t>(y) * map.RowPitch,
+            rowBytes);
     }
-
-    this->pVCD3D11Manager->pReadSideContext->Unmap(this->pStagingTex, 0);
-
     return frame;
 }

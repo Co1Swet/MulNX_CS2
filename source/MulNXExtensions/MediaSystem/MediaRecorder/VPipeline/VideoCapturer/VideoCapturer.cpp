@@ -45,21 +45,14 @@ void VideoCapturer::Main() {
 }
 
 bool VideoCapturer::Captuer() {
-    int readIdx;
-    if (auto h = this->pVCD3D11Manager->TryGetReadSide()) {
-        readIdx = h.value();
-    }
-    else return false;
-
-    auto onExit = scope_exit([&]() {this->pVCD3D11Manager->ReleaseReadSide(readIdx);});
-
-    auto& slot = this->pVCD3D11Manager->ring[readIdx].shareTex;
+    auto view = this->pVCD3D11Manager->TryGetCaptureView();
+    if (!view.has_value())return false;
 
     int64_t ptsUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        slot.pFrameInfo->captureTime - this->recordStartTime.load()).count();
+        view->pFrameInfo->captureTime - this->recordStartTime.load()).count();
     if (ptsUs < 0) ptsUs = 0;
 
-    auto oFrame = this->pTextureMapper->MapFrame(slot);
+    auto oFrame = this->pTextureMapper->MapFrame(*view);
     if (!oFrame.has_value())return false;
     auto frame = oFrame.value();
 

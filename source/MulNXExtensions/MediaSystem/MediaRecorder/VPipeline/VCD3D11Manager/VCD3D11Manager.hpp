@@ -1,43 +1,19 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
-class MidTex {
-public:
-    MulNX::VFrameExInfo* pFrameInfo = nullptr;
-    ComPtr<ID3D11Texture2D> pTex;
-    ComPtr<IDXGIKeyedMutex> pMutex;
-};
-
 // 环形队列的单个槽位：一对跨设备共享纹理 + 新帧标志 + 捕获时刻(PTS)
 struct RingSlot {
-    MidTex rawTex{};      // 原设备（游戏）上的共享纹理
-    MidTex shareTex{};    // 录制设备上的共享纹理
+    ComPtr<ID3D11Texture2D> pSourceTex;
+    ComPtr<IDXGIKeyedMutex> pSourceMutex;
+    ComPtr<ID3D11Texture2D> pCaptureTex;
+    ComPtr<IDXGIKeyedMutex> pCaptureMutex;
     MulNX::VFrameExInfo frameInfo{};
-
-    RingSlot() {
-        this->rawTex.pFrameInfo = &this->frameInfo;
-        this->shareTex.pFrameInfo = &this->frameInfo;
-    }
-    RingSlot(const RingSlot&) = delete;
-    RingSlot& operator=(const RingSlot&) = delete;
-    RingSlot(RingSlot&& other) noexcept :
-        rawTex(std::move(other.rawTex)),
-        shareTex(std::move(other.shareTex)),
-        frameInfo(std::move(other.frameInfo)) {}
-    
-    RingSlot& operator=(RingSlot&& other) noexcept {
-        if (this != &other) {
-            this->rawTex = std::move(other.rawTex);
-            this->shareTex = std::move(other.shareTex);
-            this->frameInfo = std::move(other.frameInfo);
-        }
-        return *this;
-    }
 };
 
 class VCD3D11Manager final : public MediaModule<VCD3D11Manager> {
     MulNX::GraphicsManager* pGraphicsManager = nullptr;
 
+    std::array<RingSlot, 6> ring;
     moodycamel::BlockingConcurrentQueue<int> forReader{};
     moodycamel::BlockingConcurrentQueue<int> forWriter{};
 
@@ -50,18 +26,35 @@ class VCD3D11Manager final : public MediaModule<VCD3D11Manager> {
     bool Init() override;
     void ReleaseTextures();
 public:
-    // 环形队列
-    std::array<RingSlot, 6> ring;
-
-    ComPtr<ID3D11Device> pReadSideDevice;
-    ComPtr<ID3D11DeviceContext> pReadSideContext;
+    ComPtr<ID3D11Device> pCaptureD3D11Device;
+    ComPtr<ID3D11DeviceContext> pCaptureD3D11DeviceContext;
 
     DXGI_FORMAT srcDxgiFormat = DXGI_FORMAT_UNKNOWN;
     av::PixelFormat srcAVFormat = AV_PIX_FMT_NONE;
 
-    std::optional<int> TryGetReadSide();
-    void ReleaseReadSide(int index);
+    class CaptureTextureView {
+        VCD3D11Manager* pVCD3D11Manager = nullptr;
+        int index = 0;
+    public:
+        CaptureTextureView(VCD3D11Manager* pVCD3D11Manager, int index);
+        ~CaptureTextureView();
+        
+        MulNX::VFrameExInfo* pFrameInfo = nullptr;
+        ComPtr<ID3D11Texture2D> pTex;
+        ComPtr<IDXGIKeyedMutex> pMutex;
+    };
+    std::optional<CaptureTextureView> TryGetCaptureView();
 
-    int GetWriteSide();
-    void ReleaseWriteSide(int index);
+    class SourceTextureView {
+        VCD3D11Manager* pVCD3D11Manager = nullptr;
+        int index = 0;
+    public:
+        SourceTextureView(VCD3D11Manager* pVCD3D11Manager, int index);
+        ~SourceTextureView();
+
+        MulNX::VFrameExInfo* pFrameInfo = nullptr;
+        ComPtr<ID3D11Texture2D> pTex;
+        ComPtr<IDXGIKeyedMutex> pMutex;
+    };
+    SourceTextureView GetSourceView();
 };

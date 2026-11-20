@@ -51,10 +51,10 @@ void VCD3D11Manager::OnPresentFirst(MulNX::Message& msg) {
         flags,
         &originalLevel, 1,
         D3D11_SDK_VERSION,
-        &this->pReadSideDevice, nullptr, &this->pReadSideContext
+        &this->pCaptureD3D11Device, nullptr, &this->pCaptureD3D11DeviceContext
     );
     if (FAILED(hr)) {
-        this->LogError("捕获用D3D11设备创建失败");
+        MulNX::ErrorTerminate("捕获用D3D11设备创建失败");
         return;
     }
 
@@ -115,14 +115,14 @@ void VCD3D11Manager::RefreshTextures() {
 }
 
 bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot& slot) {
-    HRESULT hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &slot.rawTex.pTex);
+    HRESULT hr = this->pGraphicsManager->pd3dDevice->CreateTexture2D(&sharedDesc, nullptr, &slot.pSourceTex);
     if (FAILED(hr)) {
         this->LogError("环形槽位共享纹理创建失败");
         return false;
     }
 
     ComPtr<IDXGIResource> pDXGIRes;
-    hr = slot.rawTex.pTex.As(&pDXGIRes);
+    hr = slot.pSourceTex.As(&pDXGIRes);
     if (FAILED(hr)) {
         this->LogError("槽位获取IDXGIResource失败");
         return false;
@@ -134,18 +134,18 @@ bool VCD3D11Manager::CreateSlot(const D3D11_TEXTURE2D_DESC& sharedDesc, RingSlot
         return false;
     }
 
-    hr = this->pReadSideDevice->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&slot.shareTex.pTex));
+    hr = this->pCaptureD3D11Device->OpenSharedResource(hSharedHandle, IID_PPV_ARGS(&slot.pCaptureTex));
     if (FAILED(hr)) {
         this->LogError("槽位在捕获设备上打开共享资源失败");
         return false;
     }
 
-    hr = slot.rawTex.pTex.As(&slot.rawTex.pMutex);
+    hr = slot.pSourceTex.As(&slot.pSourceMutex);
     if (FAILED(hr)) {
         this->LogError("槽位原设备获取KeyedMutex失败");
         return false;
     }
-    hr = slot.shareTex.pTex.As(&slot.shareTex.pMutex);
+    hr = slot.pCaptureTex.As(&slot.pCaptureMutex);
     if (FAILED(hr)) {
         this->LogError("槽位录制设备获取KeyedMutex失败");
         return false;
@@ -162,28 +162,44 @@ void VCD3D11Manager::ReleaseTextures() {
     }
     this->LogInfo("索引队列已清空");
     for (auto& slot : this->ring) {
-        slot.rawTex.pMutex.Reset();
-        slot.rawTex.pTex.Reset();
-        slot.shareTex.pMutex.Reset();
-        slot.shareTex.pTex.Reset();
+        slot.pSourceMutex.Reset();
+        slot.pCaptureTex.Reset();
+        slot.pCaptureMutex.Reset();
+        slot.pCaptureTex.Reset();
     }
     this->LogInfo("旧资源已释放");
 }
 
-std::optional<int> VCD3D11Manager::TryGetReadSide() {
-    int out;
-    if (!this->forReader.wait_dequeue_timed(out, 200))return std::nullopt;
-    else return out;
+VCD3D11Manager::CaptureTextureView::CaptureTextureView(VCD3D11Manager* pVCD3D11Manager, int index) {
+    this->pVCD3D11Manager = pVCD3D11Manager;
+    this->index = index;
 }
-void VCD3D11Manager::ReleaseReadSide(int index) {
-    this->forWriter.enqueue(index);
+VCD3D11Manager::CaptureTextureView::~CaptureTextureView() {
+    this->pVCD3D11Manager->forWriter.enqueue(this->index);
+}
+std::optional<VCD3D11Manager::CaptureTextureView> VCD3D11Manager::TryGetCaptureView() {
+    int outIndex;
+    if (!this->forReader.wait_dequeue_timed(outIndex, 200))return std::nullopt;
+    CaptureTextureView view(this, outIndex);
+    view.pTex = this->ring[outIndex].pCaptureTex;
+    view.pMutex = this->ring[outIndex].pCaptureMutex;
+    view.pFrameInfo = &this->ring[outIndex].frameInfo;
+    return view;
 }
 
-int VCD3D11Manager::GetWriteSide() {
-    int out;
-    this->forWriter.wait_dequeue(out);
-    return out;
+VCD3D11Manager::SourceTextureView::SourceTextureView(VCD3D11Manager* pVCD3D11Manager, int index) {
+    this->pVCD3D11Manager = pVCD3D11Manager;
+    this->index = index;
 }
-void VCD3D11Manager::ReleaseWriteSide(int index) {
-    this->forReader.enqueue(index);
+VCD3D11Manager::SourceTextureView::~SourceTextureView() {
+    this->pVCD3D11Manager->forReader.enqueue(this->index);
+}
+VCD3D11Manager::SourceTextureView VCD3D11Manager::GetSourceView() {
+    int outIndex;
+    this->forWriter.wait_dequeue(outIndex);
+    SourceTextureView view(this, outIndex);
+    view.pTex = this->ring[outIndex].pSourceTex;
+    view.pMutex = this->ring[outIndex].pSourceMutex;
+    view.pFrameInfo = &this->ring[outIndex].frameInfo;
+    return view;
 }

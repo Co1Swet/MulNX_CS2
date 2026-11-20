@@ -36,12 +36,13 @@ bool H264Nvenc::Init() {
         av::Dictionary opts = GetPrivateOpts();
 
         enc.open(opts);
+        this->ok = true;
     }
     catch (const std::exception& e) {
         this->LogWarning(e.what());
         this->unavailableReason = e.what();
     }
-    this->ok = true;
+    
     return true;
 }
 
