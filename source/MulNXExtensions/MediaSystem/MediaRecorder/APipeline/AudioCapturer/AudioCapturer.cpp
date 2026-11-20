@@ -96,14 +96,12 @@ void AudioCapturer::OnFirstPresent() {
     this->LogInfo(std::format("音频捕获已启动，采样率={}，通道数={}，位深={}",
         this->wfx->nSamplesPerSec, this->wfx->nChannels, this->wfx->wBitsPerSample));
 
-    this->smutex.lock();
     this->exitFlag.store(false);
     this->SendTask("Main", "AudioCapturer", [this]() {
         if (!this->exitFlag.load()) {
             this->Main();
             return true;
         }
-
         if (this->audioClient) {
             this->audioClient->Stop();
         }
@@ -115,17 +113,13 @@ void AudioCapturer::OnFirstPresent() {
             CloseHandle(this->hEvent);
             this->hEvent = nullptr;
         }
-
-        this->smutex.unlock();
+        this->exitFlag = false;
         return false;
         });
 }
 
 void AudioCapturer::Main() {
     HRESULT hr = S_OK;
-
-    int channels = wfx->nChannels;
-
     DWORD wait = WaitForSingleObject(this->hEvent, 1000);
     if (wait == WAIT_TIMEOUT) return;
     if (wait != WAIT_OBJECT_0) return;
@@ -145,6 +139,7 @@ void AudioCapturer::Main() {
     if (framesAvailable <= 0)return;
 
     int samplesCount = static_cast<int>(framesAvailable);
+    int channels = wfx->nChannels;
     size_t totalBytes = static_cast<size_t>(framesAvailable) * channels * (this->wfx->wBitsPerSample / 8);
     std::vector<uint8_t> copied(totalBytes, this->wfx->wBitsPerSample == 8 ? 0x80 : 0);
     if (!silent) {
@@ -169,19 +164,17 @@ void AudioCapturer::Main() {
 }
 
 void AudioCapturer::ProcessAudio(const int& samplesCount, const uint64_t& chLayout, std::vector<uint8_t>&& copied) {
-
-    int sampleRate = this->wfx->nSamplesPerSec;
     // Use packed format buffer for interleaved WASAPI data
     av::SampleFormat fmt(this->wfx->wBitsPerSample == 32 ? "flt" :
         (this->wfx->wBitsPerSample == 16 ? "s16" : "u8"));
     av::SampleFormat useFmt = fmt.isPlanar() ? fmt.packedSampleFormat() : fmt;
 
     av::AudioSamples samples;
+    int sampleRate = this->wfx->nSamplesPerSec;
     int initRes = samples.init(useFmt, samplesCount, chLayout, sampleRate);
     if (initRes < 0) {
         return;
     }
-
     if (!useFmt.isPlanar()) {
         // single plane, contiguous interleaved
         size_t planeSize = samples.size(0);
@@ -259,6 +252,8 @@ void AudioCapturer::CommitAudioSamples(av::AudioSamples&& samples) {
 
 bool AudioCapturer::Deinit() {
     this->exitFlag.store(true);
-    std::unique_lock lock(this->smutex);
+    while (this->exitFlag) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
     return true;
 }
