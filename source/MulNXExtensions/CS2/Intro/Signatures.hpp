@@ -69,7 +69,7 @@ namespace CS2::Signatures {
         inline constexpr MulNX::Memory::Pattern Pos_CheckFor_HUD__spectating_target("49 8B 86 ?? ?? 00 00 44 0F B6 C2");
     }
     namespace ViewModel {
-        inline constexpr MulNX::Memory::Pattern Func_GetViewModelInfo("40 55 53 56 41 56 41 57 48 8B EC 48 83 EC 20 4D 8B F8 4C 8B F2 48 8B F1");
+        inline constexpr MulNX::Memory::Pattern Func_GetViewModelInfo("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 20 49 8B E8 48 8B F2");
         inline constexpr MulNX::Memory::Pattern Func_GetIfHandLeftSide("40 53 48 83 EC ?? 80 B9 ?? ?? ?? ?? ?? 48 8B D9 0F 84 ?? ?? ?? ?? 48 8B 89 ?? ?? ?? ?? 48 85 C9 75");
     }
     namespace Flash {
