@@ -4,7 +4,7 @@
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Mirror/ParticleManager/ParticleManager.hpp>
 #include <Support/PlayerHub/PlayerHub.hpp>
-#include <MulNXUtils/ColorTran/ColorTran.hpp>
+#include <MulNXUtils/ColorTran.hpp>
 
 using DrawStuff_t = void(*)(CS2::C_BaseCSGrenadeProjectile*, char);
 

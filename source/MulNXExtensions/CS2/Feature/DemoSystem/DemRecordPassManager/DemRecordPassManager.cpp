@@ -1,5 +1,5 @@
 #include "DemRecordPassManager.hpp"
-#include <MulNXUtils/Times/Times.hpp>
+#include <MulNXUtils/Times.hpp>
 
 void DemRecordPassManager::Window() {
     auto w = MulNX::UI::RAIIWindow("预备录制队列");

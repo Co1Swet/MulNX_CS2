@@ -1,7 +1,7 @@
 #include "AdvancedRecord.hpp"
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <MulNXExtensions/MediaSystem/MediaRecorder/MediaRecords.hpp>
-#include <MulNXUtils/Times/Times.hpp>
+#include <MulNXUtils/Times.hpp>
 
 void AdvancedRecord::Menu() {
     static std::string name{};

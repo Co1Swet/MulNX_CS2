@@ -2,7 +2,7 @@
 #include <MulNX/Base/UI/UI.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Support/PlayerHub/PlayerHub.hpp>
-#include <MulNXUtils/ColorTran/ColorTran.hpp>
+#include <MulNXUtils/ColorTran.hpp>
 
 // ---------- UI 回调 ----------
 void GlowController::HubPlayer(MulNX::Message* umsg) {

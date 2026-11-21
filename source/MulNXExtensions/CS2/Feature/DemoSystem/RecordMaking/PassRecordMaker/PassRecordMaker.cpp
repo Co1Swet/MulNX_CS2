@@ -1,5 +1,6 @@
 #include "PassRecordMaker.hpp"
 #include <MulNX/Base/fs.hpp>
+#include <MulNXUtils/ZipArchive.hpp>
 #include <Intro/HookConsole/HookConsole.hpp>
 #include <Feature/DemoSystem/RecordMaking/AutoRecordRule/AutoRecordRule.hpp>
 
@@ -14,6 +15,25 @@ bool PassRecordMaker::Init() {
 
     this->Path()->CreateKey("kDemoInputLocalPlayer", "LocalPlayer", [](auto&&...) {return true;});
     this->Path()->KeyBindStatic("kDemoInputLocalPlayer", this->Path()->PathGetForShared("DemoInput"));
+
+    auto demoInputPath = this->Path()->PathGetFromKey("kDemoInputLocalPlayer").value();
+    auto zipFiles = fs::SubFileNames(demoInputPath, { ".zip" });
+    if (!zipFiles) {
+        this->LogError(std::format("无法读取 LocalPlayer Demo 目录: {}", zipFiles.error().message()));
+    }
+    else {
+        for (const auto& zipFile : *zipFiles) {
+            const auto zipPath = demoInputPath / zipFile;
+            auto extracted = MulNX::Archive::ExtractZipFiles(zipPath, demoInputPath, ".dem");
+            if (!extracted) {
+                this->LogError(std::format("解压 Demo 失败 {}: {}", zipPath.string(), extracted.error().message()));
+                continue;
+            }
+            for (const auto& demoPath : *extracted) {
+                this->LogInfo(std::format("已解压 Demo: {}", demoPath.string()));
+            }
+        }
+    }
 
     this->SendTask("Update", "DemoSys", [this]() {
         this->Update();
