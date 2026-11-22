@@ -66,6 +66,7 @@ H264Nvenc.lookahead: 0
 H264Nvenc.surfaces: 4
 AVCodecManager.currentEncoderName: H264Nvenc
 AVCodecManager.encoderFallbackModuleNames: "[\"H264Nvenc\",\"OpenH264Encoder\"]"
+AEncodeHelper.bitRate: 320000
 AdvancedRecord.useTimeStamp: true
 AdvancedRecord.outputFile: record
 PlayProtect.preventEndOfMatch: true

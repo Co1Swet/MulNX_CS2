@@ -81,7 +81,7 @@ void AEncodeHelper::SetOn(const MulNX::AVStartInfo& info) {
     this->aencoder.setSampleFormat(targetFmt);
     this->aencoder.setChannelLayout(AV_CH_LAYOUT_STEREO);
     this->aencoder.setTimeBase({ 1, kAudioEncoderSampleRate });
-    this->aencoder.setBitRate(128000);
+    this->aencoder.setBitRate(this->bitRate.load());
 
     try {
         this->aencoder.open();

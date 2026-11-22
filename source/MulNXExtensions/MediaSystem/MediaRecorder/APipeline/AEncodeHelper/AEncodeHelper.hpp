@@ -2,6 +2,8 @@
 #include <MulNXExtensions/MediaSystem/MediaModuleBase.hpp>
 
 class AEncodeHelper final : public MediaModule<AEncodeHelper> {
+    MulReflInt(bitRate, 320000);
+
     av::Stream astream;
     av::AudioEncoderContext aencoder;
     av::AudioResampler aresampler;
