@@ -98,13 +98,12 @@ void CameraSystem::ProcessMsg(MulNX::Message& msg) {
 
 bool CameraSystem::HandleUpdateCSView(CS2::CViewSetup* viewSetup, const int& num, bool& camLeavePlayer) {
     this->Update();
-    CameraSystemIO IO;
-
     this->pCamDrawer->Update(this->CS2View->GetViewMatrix(), this->CS2View->GetWinWidth(), this->CS2View->GetWinHeight());
     this->pCampathManager->HandleUpdate();
     this->pCamMacroManager->HandleUpdate();
     this->pCamPackManager->HandleUpdate();
 
+    CameraSystemIO IO;
     if (!this->pCamPlayScheduler->HandleUpdate(&IO))return false;
     camLeavePlayer = true;
 

@@ -4,32 +4,31 @@
 #include <Windows.h>
 #include <sstream>
 
-void MulNX::ErrorTerminate(const std::string& Msg,
-    const std::source_location& loc) {
+void MulNX::ErrorTerminate(const std::string& msg, const std::source_location& loc) {
     std::ostringstream oss{};
 
-    oss << "致命错误："
-        << "\n\n";
+    auto str = std::format(
+        "致命错误：\n"
+        "\n"
+        "\n"
+        "错误描述：{}\n"
+        "\n"
+        "\n"
+        "    发生于： \n"
+        "    文件: {} \n"
+        "    函数: {} \n "
+        "    行号: {} \n "
+        "    列号: {} \n "
+        "\n"
+        "\n"
+        "版本号：{} \n"
+        "请将此提示截图以及根目录/Log下的 Log_CS2Injector.txt 和 Log_CS2OBTool.txt交给开发者\n"
+        "这对问题修复可能至关重要\n"
+        "MulNX将在您点击确定后关闭当前进程",
+        msg, loc.file_name(), loc.function_name(), loc.line(), loc.column(), MulNXVersion
+    );
 
-    oss << "错误描述："
-        << Msg
-        << "\n\n";
-
-    oss << "发生于："
-        << "\n文件: " << loc.file_name()
-        << "\n函数: " << loc.function_name()
-        << "\n行号: " << loc.line()
-        << "\n列号: " << loc.column()
-        << "\n\n";
-
-    oss << "版本号： " << MulNXVersion
-        << "\n";
-
-    oss << "MulNX将在您点击确定后关闭当前进程";
-
-    std::string Full = oss.str();
-    std::wstring wFull = MulNX::CharUtility::U8ToW(Full);
-
+    std::wstring wFull = MulNX::CharUtility::U8ToW(str);
     MessageBoxW(nullptr, wFull.c_str(), L"MulNX 错误中断！", MB_OK);
     std::terminate();
 }

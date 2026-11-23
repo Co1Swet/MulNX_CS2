@@ -67,6 +67,9 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<PlayerHub>()
         .CreateModule<FileInjector>()
 
+        // CS2 低优先级视角控制模块
+        .CreateModule<FreeCameraController>()
+
         // CS2 摄像机系统
         .CreateModule<CameraSystem>()
         .CreateModule<CamDrawer>()
@@ -76,7 +79,6 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<CamPlayScheduler>()
 
         // CS2 视角控制功能模块
-        .CreateModule<FreeCameraController>()
         .CreateModule<AdvancedViewController>()
         .CreateModule<ObserverController>()
         .CreateModule<ProjectileTracker>()
