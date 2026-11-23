@@ -13,7 +13,8 @@ bool HookHealthAmmoCenter::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
         auto t1 = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::Pos_CheckFor_HudSpecplayerRoot__visible).Data();
         this->hkPos_CheckFor_HudSpecplayerRoot__visible = MulNX::Hook::Create(t1, [this](MulNX::Hook* hk, RegContext* ctx) {
-            ctx->rbx = !this->hideHudSpecplayerRoot;
+            bool* show = std::bit_cast<bool*>(&ctx->rbx);
+            *show = *show && !this->hideHudSpecplayerRoot.load(std::memory_order_acquire);
             return MulNX::Hook::Then::Continue;
             }, true) | value_or_throw;
         this->RegisterAttachHook(this->hkPos_CheckFor_HudSpecplayerRoot__visible, "Pos_CheckFor_HudSpecplayerRoot__visible where rbx is bHudSpecplayerRootIsVisible");
