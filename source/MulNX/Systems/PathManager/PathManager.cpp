@@ -1,20 +1,26 @@
 #include "PathManager.hpp"
 #include <MulNX/Core/Core.hpp>
 #include <MulNX/Core/ModuleManager/ModuleManager.hpp>
-#include <MulNX/Systems/Logger/Logger.hpp>
+#include <MulNX/Systems/Systems.hpp>
 #include <MulNXThirdParty/pugixml/pugixml.hpp>
 
-bool MulNX::PathManager::Init() {
-    WCHAR path[MAX_PATH] = { 0 };
-    GetModuleFileNameW(this->Core->hMyOriginModule, path, MAX_PATH);
-    auto filePath = fs::path(path);
-    this->Root = filePath.parent_path().parent_path();
+MulNX::PathManager::PathManager() {
+    this->bootstraps.push_back([this]() {
+        WCHAR path[MAX_PATH] = { 0 };
+        GetModuleFileNameW(this->Core->hMyOriginModule, path, MAX_PATH);
+        auto filePath = fs::path(path);
+        this->Root = filePath.parent_path().parent_path();
 
-    this->CoreName = this->Core->GetOriginName();
-    this->CoreRoot = this->Root / this->CoreName;
-    this->LoadPathLists(this->Root / "PathLists.xml");
-    this->CheckShared();
-    auto pConfig = this->PathGet("Config");
+        this->CoreName = this->Core->GetOriginName();
+        this->CoreRoot = this->Root / this->CoreName;
+        this->LoadPathLists(this->Root / "PathLists.xml");
+        this->CheckShared();
+        return true;
+        });
+}
+
+bool MulNX::PathManager::Init() {
+    
     return true;
 }
 

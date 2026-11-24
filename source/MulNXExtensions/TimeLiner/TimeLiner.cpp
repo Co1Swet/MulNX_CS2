@@ -77,7 +77,6 @@ bool TimeLiner::Init() {
         this->pActiveTimeAdapter = this->pTimeAdapter1;
         });
 
-    this->showWindow = true;
     this->SendUIRoot(this->GetName(), [this](auto&&...) {return this->Menu();});
     
     return true;

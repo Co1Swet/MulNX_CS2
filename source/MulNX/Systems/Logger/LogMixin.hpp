@@ -25,7 +25,7 @@ namespace MulNX {
         Logger* logger = nullptr;
     public:
         LogMixin() {
-            This()->preInits.push_back([this]() {
+            This()->bootstraps.push_back([this]() {
                 this->logger = This()->FindModule<Logger>();
                 return true;
                 });

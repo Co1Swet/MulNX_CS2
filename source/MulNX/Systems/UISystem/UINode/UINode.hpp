@@ -9,6 +9,6 @@ namespace MulNX {
         std::function<void(UICoordinator*, MulNX::Message* msg)>Render = nullptr;
         MulNXHandle hSelf{};
         MulNXHandle HModule{};
-        static MulNX::UINode Create(MulNX::ModuleBase* MB);
+        static MulNX::UINode Create(MulNX::IModule* pModule);
     };
 }

@@ -9,6 +9,10 @@ MulNX::Core::Core::Core(std::string&& name) {
     this->pDriver = std::make_unique<MulNX::Core::Driver>();
     this->pModuleManager = std::make_unique<MulNX::Core::ModuleManager>();
 
+    this->bootstraps.push_back([this]() {
+        this->LogInfo("核心引导中");
+        return this->pDriver->DrainBootstraps(this);
+        });
     this->preInits.push_back([this]() {
         this->LogSucc("核心就绪");
         this->LogInfo(MulNXVersion);
@@ -29,6 +33,12 @@ MulNX::Core::ModuleManager* MulNX::Core::Core::ModuleManager() {
 }
 // 专用初始化函数
 bool MulNX::Core::Core::Init() {
-    this->pDriver->EntryInit(this);
+
     return true;
+}
+const std::string& MulNX::Core::Core::GetOriginName()const noexcept {
+    return this->originName;
+}
+std::chrono::steady_clock::time_point MulNX::Core::Core::GetCreateTime()const noexcept {
+    return this->createTime;
 }

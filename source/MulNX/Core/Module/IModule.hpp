@@ -1,8 +1,13 @@
 #pragma once
 #include <MulNX/Config/Config.hpp>
+#include <MulNX/Common/MulNXHandle.hpp>
 #include <MulNX/Common/Message.hpp>
 
 namespace MulNX {
+    namespace Core {
+        class Core;
+    }
+
     class IModule {
         IModule(const IModule&) = delete;
         IModule(IModule&&) = delete;
@@ -17,6 +22,15 @@ namespace MulNX {
     public:
         IModule() = default;
         virtual ~IModule() = default;
+
+        virtual bool DrainBootstraps(MulNX::Core::Core* core) = 0;
+        virtual bool EntryInit() = 0;
+        virtual bool EntryDeinit() = 0;
+
+        virtual MulNXHandle GetHandle()const = 0;
+        virtual void SetHandle(MulNXHandle handle) = 0;
+
+        virtual void Update() = 0;
 
         virtual const char* GetName()const = 0;
         virtual const std::string_view& GetNameView()const = 0;

@@ -7,9 +7,21 @@
 MulNX::IModule* MulNX::ModuleBase::FindModule(const std::string& name)const {
     return this->Core->ModuleManager()->FindModuleFromString(name);
 }
-// 初始化
-bool MulNX::ModuleBase::EntryInit(MulNX::Core::Core* core) {
+MulNXHandle MulNX::ModuleBase::GetHandle()const {
+    return this->hModule;
+}
+void MulNX::ModuleBase::SetHandle(MulNXHandle handle) {
+    this->hModule = handle;
+}
+
+bool MulNX::ModuleBase::DrainBootstraps(MulNX::Core::Core* core) {
     this->Core = core;
+    for (auto& bs : this->bootstraps) {
+        if (!bs())return false;
+    }
+    return true;
+}
+bool MulNX::ModuleBase::EntryInit() {
     for (auto& init : this->preInits) {
         if (!init())return false;
     }

@@ -4,12 +4,24 @@
 #include <MulNX/Systems/Systems.hpp>
 
 MulNX::Core::Driver::Driver() {
+    this->bootstraps.push_back([this]() {
+        return this->BootstrapFramework();
+        });
+
     this->preInits.push_back([this]() {
         this->LogSucc("驱动就绪");
         return true;
         });
     this->postInits.clear();
     this->postDeinits.clear();
+}
+bool MulNX::Core::Driver::BootstrapFramework() {
+    this->LogInfo("驱动引导中，已接管框架启动流程");
+    this->Core->ModuleManager()->DrainBootstraps(this->Core);
+    this->Core->ModuleManager()->BootstrapSystems();
+    this->Core->EntryInit();
+    this->EntryInit();
+    return true;
 }
 bool MulNX::Core::Driver::Init() {
     std::unique_lock lock(this->endMtx);
@@ -19,7 +31,7 @@ bool MulNX::Core::Driver::Init() {
         this->cv.notify_one();
         });
     // 初始化模块管理器
-    this->Core->ModuleManager()->EntryInit(this->Core);
+    this->Core->ModuleManager()->EntryInit();
     // 初始化注册模块
     this->Core->ModuleManager()->ModulesInit();
     this->PublishSync("System/Init/End"_hash);
@@ -31,7 +43,7 @@ bool MulNX::Core::Driver::Init() {
     // 记录结束时间
     auto end = std::chrono::steady_clock::now();
     // 输出总时间
-    auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->createTime);
+    auto cost = std::chrono::duration_cast<std::chrono::microseconds>(end - this->Core->GetCreateTime());
     this->LogWarning(I18n("sys.inited_time_sum", cost.count()));
     this->LogWarning(I18n("disclaimer"));
     return true;

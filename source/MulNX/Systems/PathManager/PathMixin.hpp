@@ -9,7 +9,7 @@ namespace MulNX {
         PathManager* pPath = nullptr;
     public:
         PathMixin() {
-            This()->preInits.push_back([this]() {
+            This()->bootstraps.push_back([this]() {
                 this->pPath = This()->FindModule<PathManager>();
                 return true;
                 });

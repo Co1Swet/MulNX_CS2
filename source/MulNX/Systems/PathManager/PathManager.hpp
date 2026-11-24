@@ -26,6 +26,7 @@ namespace MulNX {
 
         bool Init()override;
     public:
+        PathManager();
         bool LoadPathLists(const fs::path& xmlPath);
         bool CheckShared();
 

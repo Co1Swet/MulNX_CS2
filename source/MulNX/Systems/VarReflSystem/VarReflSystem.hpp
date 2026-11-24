@@ -13,6 +13,7 @@ namespace MulNX {
 
         void SaveVars();
     public:
+        VarReflSystem();
         bool Register(std::unique_ptr<IReflVar> var);
     };
 }

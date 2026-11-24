@@ -18,26 +18,24 @@ bool MulNX::Core::ModuleManager::Init() {
         });
     return true;
 }
-void MulNX::Core::ModuleManager::ProcessMsg(MulNX::Message& Msg) {
+void MulNX::Core::ModuleManager::ProcessMsg(MulNX::Message& msg) {
     std::unique_lock lock(this->smutex);
-    switch (Msg.type) {
+    switch (msg.type) {
     case "ModuleManager/ModuleInfo/Request"_hash: {
-        auto [pInfo, raw] = MulNX::make_any_shared<ModuleInfo>();
-        for (const auto& [Name, Handle] : this->NameToHandleMap) {
-            raw->Info.push_back(std::make_pair(Name, Handle));
+        auto [response, rp] = MulNX::Message::Create<ModuleInfo>("ModuleManager/ModuleInfo/Response"_hash);
+        for (const auto& [name, handle] : this->nameToHandleMap) {
+            rp->Info.push_back(std::make_pair(name, handle));
         }
-        MulNX::Message msg("ModuleManager/ModuleInfo/Response"_hash);
-        msg.asp = std::move(pInfo);
-        this->PublishAsync(std::move(msg));
+        this->PublishAsync(std::move(response));
     }
     }
 }
 
-bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::ModuleBase>&& pModule) {
+bool MulNX::Core::ModuleManager::RegisteModule(std::unique_ptr<MulNX::IModule> pModule) {
     std::unique_lock lock(this->smutex);
     MulNXHandle hModule = MulNXHandle::CreateHandle();
-    pModule->hModule = hModule;
-    this->NameToHandleMap[pModule->GetNameView()] = hModule;
+    pModule->SetHandle(hModule);
+    this->nameToHandleMap[pModule->GetNameView()] = hModule;
     this->modules[hModule] = std::move(pModule);
     return true;
 }
@@ -61,10 +59,10 @@ MulNX::Core::ModuleManager& MulNX::Core::ModuleManager::CreateSystemModules() {
 
     return *this;
 }
-MulNX::ModuleBase* MulNX::Core::ModuleManager::FindModuleFromString(const std::string& name) {
+MulNX::IModule* MulNX::Core::ModuleManager::FindModuleFromString(const std::string& name) {
     std::shared_lock lock(this->smutex);
-    auto it = this->NameToHandleMap.find(name);
-    if (it == this->NameToHandleMap.end()) {
+    auto it = this->nameToHandleMap.find(name);
+    if (it == this->nameToHandleMap.end()) {
         MulNX::ErrorTerminate(std::format("查找模块错误 : {}", name));
         return nullptr;
     }
@@ -76,12 +74,22 @@ MulNX::ModuleBase* MulNX::Core::ModuleManager::FindModuleFromString(const std::s
     }
     return it2->second.get();
 }
-
+bool MulNX::Core::ModuleManager::BootstrapSystems() {
+    std::shared_lock lock(this->smutex);
+    this->LogInfo("正在执行系统引导");
+    for (auto& [hModule, pModule] : this->modules) {
+        if (!pModule->DrainBootstraps(this->Core)) {
+            MulNX::ErrorTerminate(std::format("在模块引导时出现错误，模块名：{}", pModule->GetNameView()));
+            return false;
+        }
+    }
+    this->LogSucc("引导完毕");
+    return true;
+}
 bool MulNX::Core::ModuleManager::ModulesInit() {
     std::shared_lock lock(this->smutex);
-    // 通过有序的初始化任务列表进行初始化，尽管Modules是无序的
     for (auto& [hModule, pModule] : this->modules) {
-        if (!pModule->EntryInit(this->Core)) {
+        if (!pModule->EntryInit()) {
             MulNX::ErrorTerminate(std::format("在模块初始化时出现错误，模块名：{}", pModule->GetNameView()));
             return false;
         }

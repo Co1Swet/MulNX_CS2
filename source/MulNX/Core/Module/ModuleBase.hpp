@@ -1,31 +1,30 @@
 #pragma once
 #include "ModuleCoroutine.hpp"
-#include <MulNX/Common/MulNXHandle.hpp>
 #include <shared_mutex>
 #include <queue>
 
 namespace MulNX {
     class MessageChannel;
-    class ModuleComponents{
+
+    class ModuleBase :public ModuleCoroutine {
+        std::queue<MulNX::Message> bufferMsgs{};
+        MulNXHandle hModule;
     protected:
-        mutable std::atomic<bool> showWindow = false;
         mutable std::shared_mutex smutex;
     public:
-        MulNXHandle hModule;
         MulNX::MessageChannel* msgChannel;
-    };
 
-    class ModuleBase :public ModuleCoroutine, public ModuleComponents {
+    private:
         MulNX::IModule* FindModule(const std::string& name)const;
-        std::queue<MulNX::Message> bufferMsgs{};
+        MulNXHandle GetHandle()const override final;
+        void SetHandle(MulNXHandle handle)override final;
     protected:
-        // 自用更新入口
-        void Update();  
+        void Update()override final;
     public:
-        // 初始化入口
-        bool EntryInit(MulNX::Core::Core* core);
-        bool EntryDeinit();
-
+        bool DrainBootstraps(MulNX::Core::Core* core)override final;
+        bool EntryInit()override final;
+        bool EntryDeinit()override final;
+        
         template<typename T>
         inline T* FindModule()const {
             return static_cast<T*>(this->FindModule(std::string(T::GetLeafName())));

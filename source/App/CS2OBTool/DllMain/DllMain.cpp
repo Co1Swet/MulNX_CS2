@@ -203,7 +203,7 @@ void StartImpl(HMODULE& hModule) {
         ;
     
     // 启动核心
-    core->EntryInit(core.get());
+    core->DrainBootstraps(core.get());
     SetEvent(hInitCompleteEvent);
     core->Driver()->WaitEnd();
 }

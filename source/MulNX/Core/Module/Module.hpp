@@ -19,7 +19,9 @@ namespace MulNX {
         public LogMixin<T>, public MsgMixin<T>, public TaskMixin<T>,
         public UIMixin<T>, public PathMixin<T>, public InputMixin<T>,
         public GlobalVarMixin<T>, public ShortcutMixin<T>, public VarReflMixin<T> {
-
+    protected:
+        mutable MulReflBool(showWindow, false);
+    private:
         static consteval std::string_view ParseLeafName() {
             constexpr std::string_view sig = __FUNCSIG__;
             constexpr std::string_view marker = "Module<";

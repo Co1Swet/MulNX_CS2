@@ -1,25 +1,29 @@
 #include "VarReflSystem.hpp"
 #include <MulNX/Base/yaml.hpp>
 #include <Core/Core.hpp>
-#include <Systems/PathManager/PathManager.hpp>
-#include <Systems/MessageManager/MessageManager.hpp>
-#include <Systems/Logger/Logger.hpp>
+#include <Systems/Systems.hpp>
 
 using namespace MulNX;
 
 static YAML::Node config{};
 
+VarReflSystem::VarReflSystem() {
+    this->bootstraps.push_back([this]() {
+        this->pthCfg = this->Path()->PathGetForShared("Config") /
+            std::format("{}_Refl.yaml", this->Core->GetOriginName());
+
+        try {
+            config = YAML::LoadFilePath(this->pthCfg);
+        }
+        catch (const std::exception& e) {
+            this->LogError(std::format("文件加载失败，无法执行反序列化：{}", e.what()));
+        }
+        return true;
+        });
+}
+
 bool VarReflSystem::Init() {
-    this->pthCfg = this->Path()->PathGetForShared("Config") /
-        std::format("{}_Refl.yaml", this->Core->GetOriginName());
-
-    try {
-        config = YAML::LoadFilePath(this->pthCfg);
-    }
-    catch (const std::exception& e) {
-        this->LogError(std::format("文件加载失败，无法执行反序列化：{}", e.what()));
-    }
-
+    
     this->SubscribeSync("System/Init/End", [this](auto&&...) {
         this->LogInfo(std::format("共创建 {} 个可反射变量，并从配置文件中加载初始值成功 {} 个",
             this->reflVars.size(), this->successCount));

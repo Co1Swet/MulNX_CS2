@@ -20,7 +20,7 @@ int main(int, char**) {
             ;
 
         // 启动核心
-        core->EntryInit(core.get());
+        core->DrainBootstraps(core.get());
         // 启动主循环
         auto pStarter = core->ModuleManager()->FindModule<Win32Starter>();
         pStarter->Run();
