@@ -13,8 +13,8 @@ void DeathMsgController::Menu() {
 
 bool DeathMsgController::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::HudDeathNotice_HandlePlayerDeath).FindFuncStart();
-        this->hkHudDeathNotice_HandlePlayerDeath = MulNX::Hook::Create(target.Data(), [this](MulNX::Hook* hk, RegContext* ctx) {
+        auto target = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Hud::HudDeathNotice_HandlePlayerDeath).Data();
+        this->hkHudDeathNotice_HandlePlayerDeath = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             return this->OnPlayerDeath(ctx);
             }) | value_or_throw;
         this->RegisterAttachHook(this->hkHudDeathNotice_HandlePlayerDeath, "HudDeathNotice_HandlePlayerDeath");
