@@ -39,7 +39,7 @@ av::PixelFormat OpenH264Encoder::GetPreferredPixelFormat()const {
     return av::PixelFormat(AV_PIX_FMT_YUV420P);
 }
 
-av::Dictionary OpenH264Encoder::GetPrivateOpts()const {
+av::Dictionary OpenH264Encoder::PrepareOpen(av::VideoEncoderContext* vEncoderContext)const {
     av::Dictionary opts{};
 
     auto addComboOpt = [&opts](const char* key, const std::atomic<std::shared_ptr<std::string>>& value) {

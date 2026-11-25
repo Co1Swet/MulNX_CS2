@@ -29,7 +29,8 @@ bool H264Mf::Init() {
         enc.setBitRate(2'000'000);
         enc.setGopSize(30);
         enc.setMaxBFrames(0);
-        enc.open(this->GetPrivateOpts());
+        auto opts = this->PrepareOpen(&enc);
+        enc.open(opts);
         this->ok.store(true, std::memory_order_release);
     }
     catch (const std::exception& e) {
@@ -52,7 +53,9 @@ av::PixelFormat H264Mf::GetPreferredPixelFormat() const {
     return av::PixelFormat(AV_PIX_FMT_NV12);
 }
 
-av::Dictionary H264Mf::GetPrivateOpts() const {
+av::Dictionary H264Mf::PrepareOpen(av::VideoEncoderContext* vEncoderContext) const {
+    vEncoderContext->raw()->framerate = AVRational({ 30,1 });
+
     av::Dictionary opts;
     auto addComboOpt = [&opts](const char* key, const std::atomic<std::shared_ptr<std::string>>& value) {
         auto selected = value.load(std::memory_order_acquire);

@@ -56,7 +56,6 @@ std::optional<av::VideoEncoderContext> VEncodeController::OpenEncoder(const Medi
     raw->color_primaries = AVCOL_PRI_BT709;
     raw->color_trc = AVCOL_TRC_BT709;
 
-    raw->framerate = AVRational({ 1,0 });
     vEncoderContext.setTimeBase(this->timeBase);
     vEncoderContext.setMaxBFrames(rp.maxBFrames);
 
@@ -74,7 +73,7 @@ std::optional<av::VideoEncoderContext> VEncodeController::OpenEncoder(const Medi
     const bool cqOk = iEncoder->SupportsConstantQuality();
     vEncoderContext.setBitRate((wantCq && cqOk) ? 0 : rp.bitrate.load());
 
-    av::Dictionary opts = iEncoder->GetPrivateOpts();
+    av::Dictionary opts = iEncoder->PrepareOpen(&vEncoderContext);
     try {
         std::error_code ec;
         vEncoderContext.open(opts, ec);

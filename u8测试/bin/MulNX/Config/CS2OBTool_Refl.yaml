@@ -11,7 +11,7 @@ UISystem.rendEnable: false
 UISystem.ifDrawMid: true
 TaskSystem.showWindow: false
 Logger.showWindow: false
-Debugger.showWindow: true
+Debugger.showWindow: false
 Debugger.maxMsgCount: 1000
 Debugger.showWhenError: true
 Debugger.autoScroll: true
@@ -208,7 +208,7 @@ H264Mf.scenario: ""
 H264Mf.quality: -1
 H264Mf.hw_encoding: true
 AVCodecManager.showWindow: false
-AVCodecManager.currentEncoderName: H264Mf
+AVCodecManager.currentEncoderName: H264Nvenc
 AVCodecManager.encoderFallbackModuleNames: "[\"H264Nvenc\",\"H264Mf\",\"OpenH264Encoder\"]"
 AudioCapturer.showWindow: false
 AEncodeHelper.showWindow: false

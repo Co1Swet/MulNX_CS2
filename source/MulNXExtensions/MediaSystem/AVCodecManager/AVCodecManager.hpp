@@ -13,7 +13,7 @@ namespace MulNX {
         virtual bool SupportsConstantQuality()const = 0;
         virtual av::PixelFormat GetPreferredPixelFormat()const = 0;
 
-        virtual av::Dictionary GetPrivateOpts()const = 0;
+        virtual av::Dictionary PrepareOpen(av::VideoEncoderContext* vEncoderContext)const = 0;
         
         virtual void SettingsMenu() = 0;
     };

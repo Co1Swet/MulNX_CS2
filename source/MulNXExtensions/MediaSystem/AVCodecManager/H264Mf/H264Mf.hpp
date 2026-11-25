@@ -20,6 +20,6 @@ class H264Mf final : public MediaModule<H264Mf>, public VEncoderMixin<H264Mf> {
     bool Init() override;
     av::Codec* GetAVCodec() override;
     av::PixelFormat GetPreferredPixelFormat() const override;
-    av::Dictionary GetPrivateOpts() const override;
+    av::Dictionary PrepareOpen(av::VideoEncoderContext* vEncoderContext) const override;
     inline bool SupportsConstantQuality() const override { return false; }
 };

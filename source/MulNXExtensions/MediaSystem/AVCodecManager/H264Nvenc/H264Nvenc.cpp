@@ -33,7 +33,7 @@ bool H264Nvenc::Init() {
         enc.setGopSize(30);
         enc.setMaxBFrames(0);
 
-        av::Dictionary opts = GetPrivateOpts();
+        av::Dictionary opts = this->PrepareOpen(&enc);
 
         enc.open(opts);
         this->ok = true;
@@ -54,7 +54,7 @@ av::PixelFormat H264Nvenc::GetPreferredPixelFormat()const {
     return av::PixelFormat(AV_PIX_FMT_NV12);
 }
 
-av::Dictionary H264Nvenc::GetPrivateOpts() const {
+av::Dictionary H264Nvenc::PrepareOpen(av::VideoEncoderContext* vEncoderContext) const {
     av::Dictionary opts;
     const char* presets[] = { "p1","p2","p3","p4","p5","p6","p7" };
     opts["preset"].set(std::string(presets[std::clamp(this->preset.load() - 1, 0, 6)]));
