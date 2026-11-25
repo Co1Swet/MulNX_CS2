@@ -22,7 +22,7 @@ namespace MulNX {
 class AVCodecManager final :public MediaModule<AVCodecManager> {
     std::vector<MulNX::IVEncoder*> encoders{};
     MulReflStr(currentEncoderName, "H264Nvenc");
-    MulReflStr(encoderFallbackModuleNames, R"(["H264Nvenc","OpenH264Encoder"])");
+    MulReflStr(encoderFallbackModuleNames, R"(["H264Nvenc","H264Mf","OpenH264Encoder"])");
     std::string selectionStatus;
 
     void Menu();

@@ -178,6 +178,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<MediaParamManager>()
         .CreateModule<OpenH264Encoder>()
         .CreateModule<H264Nvenc>()
+        .CreateModule<H264Mf>()
         .CreateModule<AVCodecManager>()
 
         .CreateModule<AudioCapturer>()

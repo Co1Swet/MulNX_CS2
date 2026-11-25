@@ -4,6 +4,7 @@ add_library(MediaSystem
     AVCodecManager/AVCodecManager.cpp
     AVCodecManager/OpenH264/OpenH264.cpp
     AVCodecManager/H264Nvenc/H264Nvenc.cpp
+    AVCodecManager/H264Mf/H264Mf.cpp
 
     MediaProcesser/MediaProcesser.cpp
     MediaProcesser/AudioModify/AudioModify.cpp

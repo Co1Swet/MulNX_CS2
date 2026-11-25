@@ -44,18 +44,19 @@ std::optional<av::VideoEncoderContext> VEncodeController::OpenEncoder(const Medi
     auto iEncoder = this->pAVCodecManager->GetCurrentVEncoder();
     auto codec = iEncoder->GetAVCodec();
     auto vEncoderContext = av::VideoEncoderContext(*codec);
+    auto* raw = vEncoderContext.raw();
 
     vEncoderContext.setWidth(this->width);
     vEncoderContext.setHeight(this->height);
     // 格式处理
     vEncoderContext.setPixelFormat(iEncoder->GetPreferredPixelFormat());
     // 色彩空间处理
-    auto* raw = vEncoderContext.raw();
     raw->color_range = AVCOL_RANGE_MPEG;
     raw->colorspace = AVCOL_SPC_BT709;
     raw->color_primaries = AVCOL_PRI_BT709;
     raw->color_trc = AVCOL_TRC_BT709;
 
+    raw->framerate = AVRational({ 1,0 });
     vEncoderContext.setTimeBase(this->timeBase);
     vEncoderContext.setMaxBFrames(rp.maxBFrames);
 

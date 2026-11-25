@@ -11,7 +11,7 @@ UISystem.rendEnable: false
 UISystem.ifDrawMid: true
 TaskSystem.showWindow: false
 Logger.showWindow: false
-Debugger.showWindow: false
+Debugger.showWindow: true
 Debugger.maxMsgCount: 1000
 Debugger.showWhenError: true
 Debugger.autoScroll: true
@@ -177,6 +177,7 @@ GameSettingsManager.showWindow: false
 HSI.showWindow: false
 AutoCfgLoad.showWindow: false
 EntityListScanner.showWindow: false
+CS2Test.showWindow: false
 MediaSystem.showWindow: false
 MediaRunningState.showWindow: false
 MediaRunningState.nextStartUseAdvancedMode: false
@@ -201,9 +202,14 @@ H264Nvenc.qp: 20
 H264Nvenc.qmax: 25
 H264Nvenc.lookahead: 0
 H264Nvenc.surfaces: 4
+H264Mf.showWindow: false
+H264Mf.rate_control: ""
+H264Mf.scenario: ""
+H264Mf.quality: -1
+H264Mf.hw_encoding: true
 AVCodecManager.showWindow: false
-AVCodecManager.currentEncoderName: H264Nvenc
-AVCodecManager.encoderFallbackModuleNames: "[\"H264Nvenc\",\"OpenH264Encoder\"]"
+AVCodecManager.currentEncoderName: H264Mf
+AVCodecManager.encoderFallbackModuleNames: "[\"H264Nvenc\",\"H264Mf\",\"OpenH264Encoder\"]"
 AudioCapturer.showWindow: false
 AEncodeHelper.showWindow: false
 AEncodeHelper.bitRate: 320000
