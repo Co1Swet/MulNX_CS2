@@ -3,6 +3,7 @@
 #include <Feature/HUD/HookDamageReport/HookDamageReport.hpp>
 #include <unordered_set>
 #include <Game/StaticWeapons/StaticWeapons.hpp>
+#include <Support/ClientPanorama/ClientPanorama.hpp>
 
 void CS2Test::UI() {
     auto pLocalPawn = this->CS2Entitys->GetLocalPlayerPawnEx();
@@ -36,9 +37,31 @@ bool CS2Test::Init() {
         try {
             this->Update();
             this->UI();
+
+            
         }
         catch (MulNX::Exception& e) {
 
+        }
+        });
+
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
+        auto t = this->CS2->client.GetBaseAddress() + 0xEC0DC0;
+        static auto hook = MulNX::Hook::Create((uint8_t*)t, [this](MulNX::Hook* hk, RegContext* ctx) {
+            const char* p = (const char*)(ctx->rdx);
+            p += 3;
+            auto s = MulNX::Memory::ReadString(p);
+            return MulNX::Hook::Then::Return;
+            }) | value_or_throw;
+        hook->Attach();
+        });
+    
+    this->SubscribeSync("Hook/CSMainLoop", [&](auto&&...) {
+        auto t = this->CS2->client.GetBaseAddress() + 0xE7AF90;
+        if (this->pInputSystem->IsKeyPressed('K')) {
+            auto a1 = this->FindModule<ClientPanorama>()->FindHudElement("CCSGO_HudChat") - 32;
+            using f = __int64 (*)(__int64 a1, const char* a2);
+            reinterpret_cast<f>(t)(a1, "test");
         }
         });
 

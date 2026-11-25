@@ -90,10 +90,10 @@ void DemoRecorder::Window()const {
         ImGui::TextUnformatted("（队列为空）");
         return;
     }
-    for (const auto& pass : this->recordPasses) {
-        std::string title = std::format("#{}  ({} 个任务)",
-            pass->demoFileName.empty() ? "<未命名批次>" : pass->demoFileName,
-            pass->rTasks.size());
+    for (size_t i = 0;i < this->recordPasses.size();++i) {
+        const auto& pass = this->recordPasses[i];
+        auto title = std::format("{}. {}  ({} 个任务)",
+            i, pass->demoFileName, pass->rTasks.size());
         if (ImGui::CollapsingHeader(title.c_str())) {
             DrawTasks(*pass, /*highlightIdx=*/-1);
         }
@@ -165,7 +165,7 @@ void DemoRecorder::ProcessMsg(MulNX::Message& msg) {
                 this->LogError(std::format("无法创建输出文件夹: {}，错误：{}", fullPath.string(), ec.message()));
                 return;
             }
-            this->LogInfo(std::format("已创建输出文件夹: {}" , fullPath.string()));
+            this->LogInfo(std::format("已创建输出文件夹: {}", fullPath.string()));
         }
         else if (!fs::is_directory(fullPath, ec)) {
             this->LogError(std::format("指定路径已存在但并非文件夹: {}", fullPath.string()));
