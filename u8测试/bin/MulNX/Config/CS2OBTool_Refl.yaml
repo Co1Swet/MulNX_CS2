@@ -23,7 +23,7 @@ SysController.showWindow: false
 HookWindow.showWindow: false
 DLLLoadDispatcher.showWindow: false
 FileRedirector.showWindow: false
-TimeLiner.showWindow: true
+TimeLiner.showWindow: false
 FlowClock.showWindow: false
 TimeMarkerManager.showWindow: false
 HookD3D11.showWindow: false
@@ -150,7 +150,7 @@ PassRecordMaker.showWindow: false
 RecordTaskConfiger.showWindow: false
 RecordTaskConfiger.preRecordSeconds: 3.5
 RecordTaskConfiger.postRecordSeconds: 2.75
-RecordTaskConfiger.mergeThresholdSeconds: 10
+RecordTaskConfiger.mergeThresholdSeconds: 12
 RecordTaskConfiger.preBekilledSeconds: 1.8
 RecordTaskConfiger.postBekilledSeconds: 1.8
 RecordTaskConfiger.postRoundEndSeconds: 1
@@ -183,7 +183,6 @@ MediaRunningState.showWindow: false
 MediaRunningState.nextStartUseAdvancedMode: false
 MediaParamManager.showWindow: false
 MediaParamManager.bitrate: 80000000
-MediaParamManager.cq: 23
 MediaParamManager.maxBFrames: 0
 MediaParamManager.gopSize: 0
 MediaParamManager.width: 0
@@ -193,11 +192,12 @@ OpenH264Encoder.showWindow: false
 OpenH264Encoder.profile: ""
 OpenH264Encoder.coder: ""
 OpenH264Encoder.loopfilter: ""
-OpenH264Encoder.rc_mode: bitrate
+OpenH264Encoder.rc_mode: ""
 OpenH264Encoder.allow_skip_frames: ""
 OpenH264Encoder.max_nal_size: 0
 H264Nvenc.showWindow: false
-H264Nvenc.preset: 1
+H264Nvenc.rc: constqp
+H264Nvenc.preset: 3
 H264Nvenc.qp: 20
 H264Nvenc.qmax: 25
 H264Nvenc.lookahead: 0

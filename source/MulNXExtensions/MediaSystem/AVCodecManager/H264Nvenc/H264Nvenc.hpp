@@ -1,11 +1,13 @@
 #pragma once
 #include <MulNXExtensions/MediaSystem/AVCodecManager/AVCodecManager.hpp>
+#include <MulNXUtils/StringCombo.hpp>
 
 class H264Nvenc final : public MediaModule<H264Nvenc>, public VEncoderMixin<H264Nvenc> {
-    class MediaParamManager* pMediaParamManager = nullptr;
-    MulReflInt(preset, 0);      // 1=p1 最快
-    MulReflInt(qp, 20);         // constqp 质量
-    MulReflInt(qmax, 25);       // 防色块核心
+    StringCombo rcCombo{ { "cbr", "vbr", "constqp" } };
+    MulReflStr(rc, "constqp");
+    MulReflInt(preset, 3);
+    MulReflInt(qp, 20);
+    MulReflInt(qmax, 25);
     MulReflInt(lookahead, 0);
     MulReflInt(surfaces, 4);
     av::Codec codec{};
@@ -17,5 +19,4 @@ class H264Nvenc final : public MediaModule<H264Nvenc>, public VEncoderMixin<H264
     av::Codec* GetAVCodec() override;
     av::PixelFormat GetPreferredPixelFormat()const override;
     av::Dictionary PrepareOpen(av::VideoEncoderContext* vEncoderContext) const override;
-    inline bool SupportsConstantQuality() const override { return true; }
 };

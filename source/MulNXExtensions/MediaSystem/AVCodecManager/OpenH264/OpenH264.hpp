@@ -20,8 +20,6 @@ class OpenH264Encoder final : public MulNX::Module<OpenH264Encoder>, public VEnc
     // 切片 / 打包
     MulReflInt(max_nal_size, 0);
 
-    inline bool SupportsConstantQuality()const override { return false; }
-
     av::Codec codec{};
 
     bool IsAvailable()const override;

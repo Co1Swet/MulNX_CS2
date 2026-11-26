@@ -53,24 +53,31 @@ av::PixelFormat H264Mf::GetPreferredPixelFormat() const {
     return av::PixelFormat(AV_PIX_FMT_NV12);
 }
 
-av::Dictionary H264Mf::PrepareOpen(av::VideoEncoderContext* vEncoderContext) const {
-    vEncoderContext->raw()->framerate = AVRational({ 30,1 });
+av::Dictionary H264Mf::PrepareOpen(av::VideoEncoderContext* ctx) const {
+    auto* raw = ctx->raw();
+
+    raw->framerate = AVRational{ 30, 1 };
+    // mfenc.c 默认 Baseline，且源码强制开 CABAC → 冲突 + 压缩率最低
+    raw->profile = AV_PROFILE_H264_HIGH;
 
     av::Dictionary opts;
-    auto addComboOpt = [&opts](const char* key, const std::atomic<std::shared_ptr<std::string>>& value) {
-        auto selected = value.load(std::memory_order_acquire);
-        if (selected && !selected->empty()) {
-            opts[key].set(*selected);
-        }
-    };
+    auto selRc = this->rate_control.load(std::memory_order_acquire);
+    const bool isQuality = selRc && *selRc == "quality";
+    if (selRc && !selRc->empty()) opts["rate_control"].set(*selRc);
 
-    addComboOpt("rate_control", this->rate_control);
-    addComboOpt("scenario", this->scenario);
+    auto selSc = this->scenario.load(std::memory_order_acquire);
+    if (selSc && !selSc->empty()) opts["scenario"].set(*selSc);
 
-    const int selectedQuality = this->quality.load(std::memory_order_acquire);
-    if (selectedQuality >= 0) {
-        opts["quality"].set(std::to_string(std::clamp(selectedQuality, 0, 100)));
+    if (isQuality) {
+        // CQ 走裸 QP（16–51），不乘 FF_QP2LAMBDA；
+        // 且不要再设 opts["quality"]（1–100 的 AVEncCommonQuality，两套旋钮会打架）
+        raw->global_quality = 20;
     }
+    else {
+        const int q = this->quality.load(std::memory_order_acquire);
+        if (q >= 0) opts["quality"].set(std::to_string(std::clamp(q, 0, 100)));
+    }
+
     opts["hw_encoding"].set(this->hw_encoding.load(std::memory_order_acquire) ? "1" : "0");
     return opts;
 }

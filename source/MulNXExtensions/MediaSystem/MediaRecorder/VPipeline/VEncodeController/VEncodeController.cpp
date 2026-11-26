@@ -69,9 +69,7 @@ std::optional<av::VideoEncoderContext> VEncodeController::OpenEncoder(const Medi
         vEncoderContext.setGopSize(120);
     }
 
-    const bool wantCq = (rp.rc == RateControl::CQ);
-    const bool cqOk = iEncoder->SupportsConstantQuality();
-    vEncoderContext.setBitRate((wantCq && cqOk) ? 0 : rp.bitrate.load());
+    vEncoderContext.setBitRate(rp.bitrate.load());
 
     av::Dictionary opts = iEncoder->PrepareOpen(&vEncoderContext);
     try {

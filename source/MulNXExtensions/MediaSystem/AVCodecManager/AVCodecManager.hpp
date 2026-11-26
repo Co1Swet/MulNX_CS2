@@ -10,7 +10,6 @@ namespace MulNX {
         virtual const char* GetNotAvailableReason()const = 0;
 
         virtual av::Codec* GetAVCodec() = 0;
-        virtual bool SupportsConstantQuality()const = 0;
         virtual av::PixelFormat GetPreferredPixelFormat()const = 0;
 
         virtual av::Dictionary PrepareOpen(av::VideoEncoderContext* vEncoderContext)const = 0;
