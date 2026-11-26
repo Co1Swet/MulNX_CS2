@@ -25,43 +25,57 @@ using TeamCounter_UpdatePlayerCache = bool (*) (
     float unk20); // 20 一个随不同Demo时间全员一致的浮点数，在0到1000变化
 
 void HookTeamCounter::Menu() {
-    ImGui::SeparatorText("TeamCounter(HUD上方玩家信息)");
-    MulNX::UI::Checkbox("隐藏敌方血条", this->hideEnemyHP);
-    MulNX::UI::Checkbox("隐藏敌方拆弹器/炸弹", this->hideEnemyDefuseOrKit);
-    MulNX::UI::Checkbox("不隐藏名字", this->noHideShowName);
-    MulNX::UI::Checkbox("强制隐藏装备信息", this->forceHideEquipmentInfo);
-    ImGui::Separator();
+    if (ImGui::CollapsingHeader("TeamCounter(HUD上方玩家信息)")) {
+        MulNX::UI::Checkbox("隐藏敌方血条", this->hideEnemyHP);
+        MulNX::UI::Checkbox("隐藏敌方拆弹器/炸弹", this->hideEnemyDefuseOrKit);
+        MulNX::UI::Checkbox("显示装备信息", this->showEquipmentInfo);
+        MulNX::UI::Checkbox("隐藏敌方装备信息", this->hideEnemyEquipmentInfo);
+        MulNX::UI::Checkbox("当回合活跃时隐藏装备信息", this->hideEquipmentInfoWhenActive);
+        MulNX::UI::Checkbox("显示玩家名", this->showName);
+        MulNX::UI::Checkbox("当回合活跃时隐藏名字", this->hideNameWhenActive);
+    }
 }
 
 bool HookTeamCounter::Init() {
-    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](MulNX::Message& msg) {
-        auto target = this->CS2->client.GetTextRegion().FindRegion(
-            CS2::Signatures::Hud::TeamCounter::Func_FillPlayerSlotCache).FindFuncStart().Data();
-        this->hkTeamCounterFillPlayerSlotCache = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
-            try {
-                this->HandleTeamCounterFillPlayerSlotCacheHook(hk, ctx);
-            }
-            catch (MulNX::Exception& e) {
-                this->LogError(e);
-            }
-            return MulNX::Hook::Then::Continue;
-            }) | value_or_throw;
-        this->RegisterAttachHook(this->hkTeamCounterFillPlayerSlotCache, "Func_TeamCounterFillPlayerSlotCache where r15 is *CCSPlayerController");
+    this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
+        this->OnClient();
+        });
 
-        auto tPos_UpdatePanoramaFullInfoVisible = this->CS2->client.GetTextRegion().FindRegion(
-            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaFullInfoVisible).Data();
-        this->hkPos_UpdatePanoramaFullInfoVisible = MulNX::Hook::Create(tPos_UpdatePanoramaFullInfoVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
-            try {
-                if (this->forceHideEquipmentInfo) {
-                    ctx->r8 = false;
-                    return MulNX::Hook::Then::Continue;
-                }
+    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
+
+    return true;
+}
+void HookTeamCounter::OnClient() {
+    auto target = this->CS2->client.GetTextRegion().FindRegion(
+        CS2::Signatures::Hud::TeamCounter::Func_FillPlayerSlotCache).FindFuncStart().Data();
+    this->hkTeamCounterFillPlayerSlotCache = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
+        try {
+            this->HandleTeamCounterFillPlayerSlotCacheHook(hk, ctx);
+        }
+        catch (const MulNX::Exception& e) {
+            this->LogError(e);
+        }
+        return MulNX::Hook::Then::Continue;
+        }) | value_or_throw;
+    this->RegisterAttachHook(this->hkTeamCounterFillPlayerSlotCache, "Func_TeamCounterFillPlayerSlotCache where r15 is *CCSPlayerController");
+
+    auto tPos_UpdatePanoramaFullInfoVisible = this->CS2->client.GetTextRegion().FindRegion(
+        CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaFullInfoVisible).Data();
+    this->hkPos_UpdatePanoramaFullInfoVisible = MulNX::Hook::Create(tPos_UpdatePanoramaFullInfoVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
+        try {
+            if (!this->showEquipmentInfo.load(std::memory_order_acquire)) {
+                ctx->r8 = false;
+                return MulNX::Hook::Then::Continue;
+            }
+            if (this->hideEquipmentInfoWhenActive.load(std::memory_order_acquire)) {
                 auto pGameRules = this->CS2->client.dwGameRules();
                 if (!pGameRules)return MulNX::Hook::Then::Continue;
                 if (!pGameRules->IsGameInactive()) {
                     ctx->r8 = false;
                     return MulNX::Hook::Then::Continue;
                 }
+            }
+            if (this->hideEnemyEquipmentInfo.load(std::memory_order_acquire)) {
                 auto pOBingPawn = this->CS2Entitys->TryGetObservingPawn();
                 if (!pOBingPawn)return MulNX::Hook::Then::Continue;
                 auto pCtrl = (CS2::CCSPlayerController*)ctx->rdi;
@@ -70,49 +84,50 @@ bool HookTeamCounter::Init() {
                 if (OBTeam == Team)return MulNX::Hook::Then::Continue;
                 ctx->r8 = false;
             }
-            catch (const MulNX::Exception& e) {
-                this->LogError(e);
-            }
-            return MulNX::Hook::Then::Continue;
-            }, true) | value_or_throw;
-        this->RegisterAttachHook(this->hkPos_UpdatePanoramaFullInfoVisible, "Pos_UpdatePanoramaFullInfoVisible where rdi is CCSPlayerController*");
+        }
+        catch (const MulNX::Exception& e) {
+            this->LogError(e);
+        }
+        return MulNX::Hook::Then::Continue;
+        }, true) | value_or_throw;
+    this->RegisterAttachHook(this->hkPos_UpdatePanoramaFullInfoVisible, "Pos_UpdatePanoramaFullInfoVisible where rdi is CCSPlayerController*");
 
-        auto tPos_UpdatePanoramaNameVisible = this->CS2->client.GetTextRegion().FindRegion(
-            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible).Data();
-        this->hkPos_UpdatePanoramaNameVisible = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
-            try {
-                if (this->noHideShowName) return MulNX::Hook::Then::Continue;
+    auto tPos_UpdatePanoramaNameVisible = this->CS2->client.GetTextRegion().FindRegion(
+        CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible).Data();
+    this->hkPos_UpdatePanoramaNameVisible = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
+        try {
+            if (!this->showName) {
+                ctx->r8 = false;
+                return MulNX::Hook::Then::Continue;
+            }
+            if (this->hideNameWhenActive) {
                 auto pGameRules = this->CS2->client.dwGameRules();
                 if (!pGameRules)return MulNX::Hook::Then::Continue;
                 if (pGameRules->IsGameInactive())return MulNX::Hook::Then::Continue;
                 ctx->r8 = false;
             }
-            catch (const MulNX::Exception& e) {
-                this->LogError(e);
-            }
-            return MulNX::Hook::Then::Continue;
-            }, true) | value_or_throw;
-        this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible, "Pos_UpdatePanoramaNameVisible");
+        }
+        catch (const MulNX::Exception& e) {
+            this->LogError(e);
+        }
+        return MulNX::Hook::Then::Continue;
+        }, true) | value_or_throw;
+    this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible, "Pos_UpdatePanoramaNameVisible");
 
-        auto tPos_UpdatePanoramaNameVisible2 = this->CS2->client.GetTextRegion().FindRegion(
-            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible2).Data();
-        this->hkPos_UpdatePanoramaNameVisible2 = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible2, [this](MulNX::Hook* hk, RegContext* ctx) {
-            return MulNX::Hook::Then::SkipAllAndContinue;
-            }, true) | value_or_throw;
-        this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible2, "Pos_UpdatePanoramaNameVisible2");
+    auto tPos_UpdatePanoramaNameVisible2 = this->CS2->client.GetTextRegion().FindRegion(
+        CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaNameVisible2).Data();
+    this->hkPos_UpdatePanoramaNameVisible2 = MulNX::Hook::Create(tPos_UpdatePanoramaNameVisible2, [this](MulNX::Hook* hk, RegContext* ctx) {
+        return MulNX::Hook::Then::SkipAllAndContinue;
+        }, true) | value_or_throw;
+    this->RegisterAttachHook(this->hkPos_UpdatePanoramaNameVisible2, "Pos_UpdatePanoramaNameVisible2");
 
-        auto tPos_UpdatePanoramaSpecTargetVisible = this->CS2->client.GetTextRegion().FindRegion(
-            CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaSpecTargetVisible).Data() + 7;
-        this->hkPos_UpdatePanoramaSpecTargetVisible = MulNX::Hook::Create(tPos_UpdatePanoramaSpecTargetVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
-            ctx->r8 = false;
-            return MulNX::Hook::Then::Continue;
-            }, true) | value_or_throw;
-        this->RegisterAttachHook(this->hkPos_UpdatePanoramaSpecTargetVisible, "Pos_UpdatePanoramaSpecTargetVisible");
-        });
-
-    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
-
-    return true;
+    auto tPos_UpdatePanoramaSpecTargetVisible = this->CS2->client.GetTextRegion().FindRegion(
+        CS2::Signatures::Hud::TeamCounter::Pos_UpdatePanoramaSpecTargetVisible).Data() + 7;
+    this->hkPos_UpdatePanoramaSpecTargetVisible = MulNX::Hook::Create(tPos_UpdatePanoramaSpecTargetVisible, [this](MulNX::Hook* hk, RegContext* ctx) {
+        ctx->r8 = false;
+        return MulNX::Hook::Then::Continue;
+        }, true) | value_or_throw;
+    this->RegisterAttachHook(this->hkPos_UpdatePanoramaSpecTargetVisible, "Pos_UpdatePanoramaSpecTargetVisible");
 }
 void HookTeamCounter::HandleTeamCounterFillPlayerSlotCacheHook(MulNX::Hook* hk, RegContext* ctx) {
     auto pOBPawn = this->CS2Entitys->TryGetObservingPawn();
