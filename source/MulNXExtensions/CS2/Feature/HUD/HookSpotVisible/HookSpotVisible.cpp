@@ -1,9 +1,12 @@
 #include "HookSpotVisible.hpp"
 #include <MulNX/Base/UI/UI.hpp>
 
-void HookSpotVisible::Menu() {
-    MulNX::UI::Checkbox("抑制全局显示", this->noAllVisible);
-    MulNX::UI::Checkbox("强制雷达队友显示", this->forceTeammateDraw);
+void HookSpotVisible::Menu(MulNX::UICoordinator* uico) {
+    if (ImGui::CollapsingHeader("HUD雷达控制")) {
+        MulNX::UI::Checkbox("抑制全局显示", this->noAllVisible);
+        MulNX::UI::Checkbox("强制雷达队友显示", this->forceTeammateDraw);
+        uico->CallbackCall("UI.HUDRadar"_hash, nullptr);
+    }
 }
 
 bool HookSpotVisible::Init() {
@@ -35,7 +38,8 @@ bool HookSpotVisible::Init() {
         this->RegisterAttachHook(this->hkPos_SetAllVisible, "Pos_SetAllVisible");
         });
 
-    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.2DVision",
+        [this](MulNX::UICoordinator* uico, auto&&...) {return this->Menu(uico);});
 
     return true;
 }

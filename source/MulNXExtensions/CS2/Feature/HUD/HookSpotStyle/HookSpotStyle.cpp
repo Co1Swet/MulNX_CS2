@@ -53,5 +53,7 @@ bool HookSpotStyle::Init() {
         this->RegisterAttachHook(this->hkFunc_FinallyUpdatePlayerState, "Func_FinallyUpdatePlayerState");
         });
 
+    this->UIRegisterCallback("UI.HUDRadar", [this](auto&&...) {this->Menu();});
+
     return true;
 }

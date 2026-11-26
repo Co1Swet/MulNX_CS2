@@ -37,7 +37,7 @@ bool HookSpotColor::Init() {
         this->RegisterAttachHook(this->hkPos_CmpToSetCTColor, "Pos_CmpToSetCTColor");
         });
 
-    this->UIRegisterCallback("UI.2DVision", [this](auto&&...) {return this->Menu();});
+    this->UIRegisterCallback("UI.HUDRadar", [this](auto&&...) {return this->Menu();});
 
     return true;
 }

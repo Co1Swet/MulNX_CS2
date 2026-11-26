@@ -9,6 +9,6 @@ class HookSpotVisible :public CSModule<HookSpotVisible> {
     MulReflBool(forceTeammateDraw, true);
     MulReflBool(noAllVisible, true);
 
-    void Menu();
+    void Menu(MulNX::UICoordinator* uico);
     bool Init()override;
 };
