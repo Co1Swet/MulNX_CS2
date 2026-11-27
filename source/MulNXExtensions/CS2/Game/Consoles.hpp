@@ -57,7 +57,6 @@ namespace CS2::Console {
             uint64_t m_u64Value;
             float m_flValue;
             double m_dbValue;
-            CS2::CUtlString	m_szValue;
         };
 
         enum class EType : int16_t {

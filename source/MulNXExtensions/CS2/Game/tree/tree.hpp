@@ -111,24 +111,7 @@ namespace CS2 {
         CAttributeManager** m_pManager() { return Schema<CAttributeManager*>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_pManager); }
     };
 
-    class C_EconItemView {
-    public:
-        uint16_t* m_iItemDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemDefinitionIndex); }
-        uint32_t* m_iItemIDHigh() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemIDHigh); }
-        uint32_t* m_iAccountID() { return Schema<uint32_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iAccountID); }
-        using name161 = char[161];
-        name161* m_szCustomName() { return Schema<name161>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_szCustomName); }
-        name161* m_szCustomNameOverride() { return Schema<name161>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_szCustomNameOverride); }
-        CAttributeList* m_AttributeList() { return Schema<CAttributeList>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_AttributeList); }
-    };
-
-
-
-    class C_AttributeContainer :public CAttributeManager {
-    public:
-        C_EconItemView* m_Item() { return Schema<C_EconItemView>(this, cs2_dumper::schemas::client_dll::C_AttributeContainer::m_Item); }
-    };
-
+    class C_AttributeContainer;
     // 这里原来继承C_BaseFlex（在最新的二进制文件里已经不存在），但是v社似乎在做改造，这其实很微妙
     // 但是abi层面确实继承CBaseAnimGraph，这很奇怪
     class C_EconEntity :public CBaseAnimGraph {

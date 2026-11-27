@@ -111,6 +111,7 @@ void StartImpl(HMODULE& hModule) {
         .CreateModule<HookDamageReport>()
         .CreateModule<FlashRenderController>()
         .CreateModule<HookHealthAmmoCenter>()
+        .CreateModule<RewardFix>()
 
         // CS2 模型相关模块
         .CreateModule<ViewModelController>()

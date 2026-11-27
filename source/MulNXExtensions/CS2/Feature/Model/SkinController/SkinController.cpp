@@ -14,7 +14,7 @@ bool SkinController::Init() {
         });
 
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
-        auto t = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Skin::CEconItemView::GetPaintKit).Data();
+        auto t = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Econ::CEconItemView::GetPaintKit).Data();
         void** vtable = (void**)Afx::BinUtils::FindClassVtable(this->CS2->client.hModule,
             ".?AVC_EconItemView@@", 0, 0);
         if (!vtable)MulNX::ErrorTerminate(".?AVC_EconItemView@@ 查找失败");

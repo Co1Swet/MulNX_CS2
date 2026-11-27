@@ -1,4 +1,5 @@
 #include "SkinModelFixer.hpp"
+#include <Game/tree/Econ.hpp>
 
 bool SkinModelFixer::Init() {
     this->pCCStrike15ItemSystem = this->FindModule<CCStrike15ItemSystem>();
@@ -7,7 +8,7 @@ bool SkinModelFixer::Init() {
         this->pGetPaintKit = this->FindModule<SkinController>()->pGetPaintKit;
 
         this->pUpdateMeshGroupMask = (UpdateMeshGroupMask_t)this->CS2->client.GetTextRegion()
-            .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::UpdateMeshGroupMask).Data();
+            .FindRegion(CS2::Signatures::Econ::CSkeletonInstance::UpdateMeshGroupMask).Data();
         this->hkUpdateMeshGroupMask = MulNX::Hook::Create((uint8_t*)this->pUpdateMeshGroupMask, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 return this->OnUpdateMeshGroupMask(hk, ctx);
@@ -20,7 +21,7 @@ bool SkinModelFixer::Init() {
         this->RegisterAttachHook(this->hkUpdateMeshGroupMask, "UpdateMeshGroupMask");
 
         auto tNetUpdateMeshGroupMask = this->CS2->client.GetTextRegion()
-            .FindRegion(CS2::Signatures::Skin::CSkeletonInstance::CModelState::NetUpdateMeshGroupMask).Data();
+            .FindRegion(CS2::Signatures::Econ::CSkeletonInstance::CModelState::NetUpdateMeshGroupMask).Data();
         this->hkNetUpdateMeshGroupMask = MulNX::Hook::Create(tNetUpdateMeshGroupMask, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 return this->OnNetUpdateMeshGroupMask(hk, ctx);
@@ -32,7 +33,7 @@ bool SkinModelFixer::Init() {
             }) | value_or_throw;
         this->RegisterAttachHook(this->hkNetUpdateMeshGroupMask, "NetUpdateMeshGroupMask");
 
-        auto tRegenerateWeaponSkins = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Skin::RegenerateWeaponSkins).Data();
+        auto tRegenerateWeaponSkins = this->CS2->client.GetTextRegion().FindRegion(CS2::Signatures::Econ::RegenerateWeaponSkins).Data();
         this->hkRegenerateWeaponSkins = MulNX::Hook::Create(tRegenerateWeaponSkins, [this](MulNX::Hook* hk, RegContext* ctx) {
             try {
                 return this->OnRegenerateWeaponSkins(hk, ctx);

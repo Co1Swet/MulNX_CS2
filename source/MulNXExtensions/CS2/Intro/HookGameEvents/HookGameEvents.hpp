@@ -7,14 +7,28 @@ namespace CS2 {
         int index;
         const char* str;
     };
-    class CGameEvent {        
+    class CGameEvent {
+        CGameEvent() = delete;
+        virtual ~CGameEvent() = 0;
     public:
-        auto GetEventName() { return IVClass::Assume(this)->GetVFunc<const char* ()>(1)(); }
-        auto GetID() { return IVClass::Assume(this)->GetVFunc<int()>(2)(); }
-        auto GetInt(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<int(const CKV3MemberName&)>(7)(key); }
-        auto GetString(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<const char*(const CKV3MemberName&)>(10)(key); }
-        auto GetPlayerController(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<CS2::CCSPlayerController * (const CKV3MemberName&)>(16)(key); }
-        auto GetPlayerPawn(const CKV3MemberName& key) { return IVClass::Assume(this)->GetVFunc<CS2::C_CSPlayerPawn * (const CKV3MemberName&)>(17)(key); }
+        virtual const char* GetEventName() = 0;
+        virtual int GetID() = 0;
+        virtual void unk003() = 0;
+        virtual void unk004() = 0;
+        virtual void unk005() = 0;
+        virtual void unk006() = 0;
+        virtual int GetInt(const CKV3MemberName&) = 0;
+        virtual uint64_t GetUint64(const CKV3MemberName& keySymbol) = 0;
+        virtual void unk009() = 0;
+        virtual const char* GetString(const CKV3MemberName&) = 0;
+        virtual void unk011() = 0;
+        virtual void unk012() = 0;
+        virtual void unk013() = 0;
+        virtual void unk014() = 0;
+        virtual void unk015() = 0;
+
+        virtual CS2::CCSPlayerController* GetPlayerController(const CKV3MemberName& key) = 0;
+        virtual CS2::C_CSPlayerPawn* GetPlayerPawn(const CKV3MemberName& key) = 0;
     };
 }
 

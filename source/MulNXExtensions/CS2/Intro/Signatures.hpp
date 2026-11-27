@@ -2,6 +2,16 @@
 #include <MulNXUtils/WinExt/WinExt.hpp>
 
 namespace CS2::Signatures {
+    namespace Memory {
+        inline constexpr MulNX::Memory::Pattern engine2_Free("48 8B 05 ?? ?? ?? ?? 48 8B D1 48 8B 08 48 8B 01 48 FF 60 18");
+    }
+    namespace Utils {
+        inline constexpr MulNX::Memory::Pattern CSHashString("48 83 EC 28 45 8B D0 4C 8B C9 48 83 FA 04 0F 82 ?? ?? ?? ?? 0F B6 09 48 89 5C 24 20 8D 41 BF 3C 19 77 03 80 C1 20");
+        inline constexpr MulNX::Memory::Pattern CUtlString_Assign("48 89 5C 24 10 57 48 83 EC 20 48 8B 41 18 49 8B F8 48 8B D9 4C 3B C0 77 34");
+        inline constexpr MulNX::Memory::Pattern Pos_CGameEventManager_FireEvents_AcquiredLock("C7 44 24 ?? 00 00 00 00 33 D2 48 8B CE");
+        inline constexpr MulNX::Memory::Pattern SetGlowColor("40 53 48 83 EC 20 48 8B D9 48 83 C1 40 39 11 74 02 89 11 E8 ?? ?? ?? ?? 48 8B 4B 18 48 85 C9");
+        inline constexpr MulNX::Memory::Pattern GetDecoratedPlayerName("48 8B 01 FF 50 10 48 8B ?? 48 85 C0 0F 84 ?? ?? ?? ?? 80 38 00");
+    }
     namespace Console {
         namespace CCommand {
             inline constexpr MulNX::Memory::Pattern Func_Init("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 56 41 57 48 83 EC 20 33 ED 48 8D B1");
@@ -30,13 +40,6 @@ namespace CS2::Signatures {
     }
     namespace Steam {
         inline constexpr MulNX::Memory::Pattern GetSteamLocalPlayerUID("40 53 48 83 EC 20 48 8B D9 E8 ?? ?? ?? ?? 48 8B 40 ?? 48");
-    }
-    namespace Utils {
-        inline constexpr MulNX::Memory::Pattern CSHashString("48 83 EC 28 45 8B D0 4C 8B C9 48 83 FA 04 0F 82 ?? ?? ?? ?? 0F B6 09 48 89 5C 24 20 8D 41 BF 3C 19 77 03 80 C1 20");
-        inline constexpr MulNX::Memory::Pattern CUtlStringRef__Assign("48 89 5C 24 10 57 48 83 EC 20 48 8B 41 18 49 8B F8 48 8B D9 4C 3B C0 77 34");
-        inline constexpr MulNX::Memory::Pattern Pos_CGameEventManager_FireEvents_AcquiredLock("C7 44 24 ?? 00 00 00 00 33 D2 48 8B CE");
-        inline constexpr MulNX::Memory::Pattern SetGlowColor("40 53 48 83 EC 20 48 8B D9 48 83 C1 40 39 11 74 02 89 11 E8 ?? ?? ?? ?? 48 8B 4B 18 48 85 C9");
-        inline constexpr MulNX::Memory::Pattern GetDecoratedPlayerName("48 8B 01 FF 50 10 48 8B ?? 48 85 C0 0F 84 ?? ?? ?? ?? 80 38 00");
     }
     namespace Projectile {
         inline constexpr MulNX::Memory::Pattern SetSmokeProps("40 53 48 83 EC ?? 8B 91 ?? ?? ?? ?? 48 8B D9 85 D2 75");
@@ -67,6 +70,9 @@ namespace CS2::Signatures {
         }
         inline constexpr MulNX::Memory::Pattern Pos_CheckFor_HudSpecplayerRoot__visible("65 48 8B 04 25 58 00 00 00 8B 0D ?? ?? ?? ?? 41 BD 68 00 00 00 4C 8B 24 C8");
         inline constexpr MulNX::Memory::Pattern Pos_CheckFor_HUD__spectating_target("49 8B 86 ?? ?? 00 00 44 0F B6 C2");
+        namespace Chat {
+            inline constexpr MulNX::Memory::Pattern Func_EmitChatMsgParams("48 89 4C 24 08 55 41 55 41 56 48 8D AC 24 ?? ?? ?? ?? B8 ?? ?? ?? ?? E8");
+        }
     }
     namespace ViewModel {
         inline constexpr MulNX::Memory::Pattern Func_GetViewModelInfo("48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 48 83 EC 20 49 8B E8 48 8B F2");
@@ -141,7 +147,7 @@ namespace CS2::Signatures {
         inline constexpr MulNX::Memory::Pattern CCSGO_EndOfMatch_Activate("48 8B C4 88 50 10 55 41 56 48 8B EC");
         inline constexpr MulNX::Memory::Pattern Pos_CDemoPlayer_InternalReadPacket_CheckFlag_DemoPauseAtEnd("0F 84 ?? ?? ?? ?? 80 BF ?? ?? ?? ?? 00 C6 87 ?? ?? ?? ?? 01");
     }
-    namespace Skin {
+    namespace Econ {
         inline constexpr MulNX::Memory::Pattern RegenerateWeaponSkins("48 83 EC ?? E8 ?? ?? ?? ?? 48 85 C0 0F 84 ?? ?? ?? ?? 48 8B 10");
 
         namespace CCStrike15ItemSystem {
@@ -156,6 +162,8 @@ namespace CS2::Signatures {
         }
         namespace CEconItemView {
             inline constexpr MulNX::Memory::Pattern GetPaintKit("48 89 5C 24 08 57 48 83 EC 40 8B 15 ?? ?? ?? ?? 48 8B F9 65 48 8B 04 25 ?? ?? ?? ?? B9 68 00 00 00 48 8B 04 D0 8B 04 01 39 05 ?? ?? ?? ?? 0F 8F 95");
+            inline constexpr MulNX::Memory::Pattern GetEconItemViewFromItemID("40 53 48 83 EC 20 48 8B D9 48 8B 0D ?? ?? ?? ?? 48 85 C9 74 0D 48 8B D3");
+            inline constexpr MulNX::Memory::Pattern GetVData("48 83 EC 28 48 85 C9 74 0A E8");
         }
     }
 }

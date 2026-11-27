@@ -1,18 +1,18 @@
 #pragma once
+#include "CSMemory.hpp"
 #include <cstdint>
-#include <cstring>
 #include <string_view>
 
 namespace CS2 {
-    // 32 字节字符串对象，兼容 MSVC std::string 布局
+    // CS2 的 32 字节字符串对象
     class CUtlString {
     public:
         union {
             char* pHeap;          // +0x00
-            char    sso[16];        // +0x00
+            char sso[16];        // +0x00
         };
-        uint64_t    size;           // +0x10
-        uint64_t    capacity;       // +0x18
+        uint64_t size = 0;           // +0x10
+        uint64_t capacity = 15;       // +0x18
 
         // ── 基础访问 ──
         bool IsHeap() const { return this->capacity > 0xF; }
@@ -31,6 +31,27 @@ namespace CS2 {
             return std::string_view(this->Data(), (size_t)this->size);
         }
 
+        using Assign_t = __int64(*)(CUtlString*, const char*, uint64_t);
+        static inline Assign_t pAssign = nullptr;
+        inline void Assign(const char* in, uint64_t size) {
+            this->pAssign(this, in, size);
+        }
+
+        CUtlString() : pHeap(nullptr), size(0), capacity(15) {}
+        ~CUtlString() {
+            if (!this->IsHeap() || !this->pHeap) return;
+            void* p = this->pHeap;
+            if (this->capacity + 1 >= 0x1000)
+                p = *reinterpret_cast<void**>(reinterpret_cast<char*>(pHeap) - 8);
+            CS2::Memory::pFree(p);          // g_pMemAlloc->Free
+            this->pHeap = nullptr;
+            this->capacity = 15;
+            this->size = 0;
+        }
+
+        CUtlString(const CUtlString&) = delete;
+        CUtlString& operator=(const CUtlString&) = delete;
+
         // ── 带标记指针的解包 ──
         // 字段槽存的是 CUtlString* 带低 2 位标记
         static CUtlString* Unpack(uint64_t tagged) {
@@ -47,10 +68,6 @@ namespace CS2 {
     class CUtlStringRef {
     public:
         uint64_t* slot;
-
-        // 引擎的 assign 函数（base + 0x45060）
-        using Assign_t = __int64(__fastcall*)(void*, const char*, uint64_t);
-        static inline Assign_t pAssign = nullptr;
 
         explicit CUtlStringRef(uint64_t* s) : slot(s) {}
 
@@ -71,8 +88,7 @@ namespace CS2 {
         }
         // 统一入口：任何长度都用引擎 assign
         void Assign(const char* in,uint64_t size) {
-            CUtlString* p = this->Get();
-            pAssign(p, in, size);
+            this->Get()->Assign(in, size);
         }
     };
 } // namespace CS2

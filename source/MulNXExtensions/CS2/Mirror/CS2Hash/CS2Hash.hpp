@@ -16,11 +16,14 @@ public:
     uint32_t health = 0;
 
     uint32_t assistedflash = 0;
-    uint32_t weapon = 0;
     uint32_t headshot = 0;
     uint32_t penetrated = 0;
     uint32_t noscope = 0;
     uint32_t thrusmoke = 0;
     uint32_t attackerblind = 0;
     uint32_t attackerinair = 0;
+
+    uint32_t weapon = 0;
+    uint32_t weapon_itemid = 0;
+    uint32_t weapon_fauxitemid = 0;
 };

@@ -24,13 +24,16 @@ bool CS2Hash::Init() {
         this->health = this->WrapHash("health");
 
         this->assistedflash = this->WrapHash("assistedflash");
-        this->weapon = this->WrapHash("weapon");
         this->headshot = this->WrapHash("headshot");
         this->penetrated = this->WrapHash("penetrated");
         this->noscope = this->WrapHash("noscope");
         this->thrusmoke = this->WrapHash("thrusmoke");
         this->attackerblind = this->WrapHash("attackerblind");
         this->attackerinair = this->WrapHash("attackerinair");
+
+        this->weapon = this->WrapHash("weapon");
+        this->weapon_itemid = this->WrapHash("weapon_itemid");
+        this->weapon_fauxitemid = this->WrapHash("weapon_fauxitemid");
 
         this->LogSucc("找到CS2哈希函数并计算哈希值");
         });

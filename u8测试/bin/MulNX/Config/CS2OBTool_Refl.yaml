@@ -8,10 +8,10 @@ MessageManager.showWindow: false
 UICoordinator.showWindow: false
 UISystem.showWindow: false
 UISystem.rendEnable: false
-UISystem.ifDrawMid: true
+UISystem.ifDrawMid: false
 TaskSystem.showWindow: false
 Logger.showWindow: false
-Debugger.showWindow: false
+Debugger.showWindow: true
 Debugger.maxMsgCount: 1000
 Debugger.showWhenError: true
 Debugger.autoScroll: true
@@ -122,6 +122,7 @@ FlashRenderController.rendFlashDownHUD: false
 HookHealthAmmoCenter.showWindow: false
 HookHealthAmmoCenter.hideHudSpecplayerRoot: true
 HookHealthAmmoCenter.show_Hud_HA__stroke: true
+RewardFix.showWindow: false
 ViewModelController.showWindow: false
 SkinConfigger.showWindow: false
 SkinController.showWindow: false

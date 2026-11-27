@@ -9,3 +9,4 @@
 #include "FlashRenderController/FlashRenderController.hpp"
 #include "HookHealthAmmoCenter/HookHealthAmmoCenter.hpp"
 #include "HookDamageReport/HookDamageReport.hpp"
+#include "RewardFix/RewardFix.hpp"

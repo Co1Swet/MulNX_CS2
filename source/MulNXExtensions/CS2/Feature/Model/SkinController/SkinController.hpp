@@ -1,5 +1,6 @@
 #pragma once
 #include <Intro/Intros.hpp>
+#include <Game/tree/Econ.hpp>
 #include <Feature/Model/SkinConfigger/SkinConfigger.hpp>
 
 class SkinController final :public CSModule<SkinController> {

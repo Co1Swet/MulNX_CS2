@@ -3,9 +3,9 @@
 bool CCStrike15ItemSystem::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
         this->pGetInner = (GetInner_t)this->CS2->client.GetTextRegion()
-            .FindRegion(CS2::Signatures::Skin::CCStrike15ItemSystem::GetInner).Data();
+            .FindRegion(CS2::Signatures::Econ::CCStrike15ItemSystem::GetInner).Data();
         this->pFindPaintDefByIndex = (FindPaintDefByIndex_t)this->CS2->client.GetTextRegion()
-            .FindRegion(CS2::Signatures::Skin::CCStrike15ItemSystem::FindPaintDefByIndex).Data();
+            .FindRegion(CS2::Signatures::Econ::CCStrike15ItemSystem::FindPaintDefByIndex).Data();
         });
 
     return true;
