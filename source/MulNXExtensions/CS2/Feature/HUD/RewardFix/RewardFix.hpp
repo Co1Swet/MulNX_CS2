@@ -67,5 +67,8 @@ class RewardFix final :public CSModule<RewardFix> {
     using Func_EmitChatMsgParams_t = void(*)(void* pHudChatDelegate, textmsg::OwnedArgs* a2);
     Func_EmitChatMsgParams_t pFunc_EmitChatMsgParams = nullptr;
 
+    MulReflBool(enable, true);
+
+    void Menu();
     bool Init()override;
 };

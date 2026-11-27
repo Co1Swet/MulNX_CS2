@@ -2,6 +2,10 @@
 #include <Game/tree/Econ.hpp>
 #include <Mirror/CS2Hash/CS2Hash.hpp>
 
+void RewardFix::Menu() {
+    MulNX::UI::Checkbox("启用击杀奖励提示", this->enable);
+}
+
 bool RewardFix::Init() {
     this->SubscribeSync("Hook/LoadLibraryExW/client.dll", [this](auto&&...) {
         CS2::C_EconItemView::pGetFromItemID = (CS2::C_EconItemView::GetFromItemID_t)this->CS2->client.GetTextRegion()
@@ -14,6 +18,7 @@ bool RewardFix::Init() {
 
     this->SubscribeSync("Hook/FireEventClientSide/player_death", [this](MulNX::Message& msg) {
         try {
+            if (!this->enable.load(std::memory_order_acquire))return;
             auto&& [pEvent] = msg.Access<CS2::CGameEvent*>();
 
             static CS2::CKV3MemberName attacker{ this->CS2Hashs->attacker, -1, nullptr };
