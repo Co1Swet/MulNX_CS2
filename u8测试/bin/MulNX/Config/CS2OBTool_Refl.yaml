@@ -8,10 +8,10 @@ MessageManager.showWindow: false
 UICoordinator.showWindow: false
 UISystem.showWindow: false
 UISystem.rendEnable: false
-UISystem.ifDrawMid: false
+UISystem.ifDrawMid: true
 TaskSystem.showWindow: false
 Logger.showWindow: false
-Debugger.showWindow: true
+Debugger.showWindow: false
 Debugger.maxMsgCount: 1000
 Debugger.showWhenError: true
 Debugger.autoScroll: true

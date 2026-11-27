@@ -85,6 +85,13 @@ bool CS2Test::Init() {
     this->SubscribeSync("Hook/CSMainLoop", [&](auto&&...) {
         auto clientBase = (uint8_t*)this->CS2->client.GetBaseAddress();
 
+        if (this->pInputSystem->IsKeyPressed('O')) {
+            auto a1 = this->FindModule<ClientPanorama>()->FindHudElement("CCSGO_HudWinPanel") - 32;
+            using SetVisible_t = void(__fastcall*)(__int64, __int64);
+            auto t = clientBase + 0xECA9B0;
+            reinterpret_cast<SetVisible_t>(t)(a1, 0);
+        }
+
         if (this->pInputSystem->IsKeyPressed('K')) {
             auto a1 = this->FindModule<ClientPanorama>()->FindHudElement("CCSGO_HudChat") - 32;
             using f = __int64 (*)(__int64 a1, const char* a2);
