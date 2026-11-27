@@ -123,6 +123,7 @@ HookHealthAmmoCenter.showWindow: false
 HookHealthAmmoCenter.hideHudSpecplayerRoot: true
 HookHealthAmmoCenter.show_Hud_HA__stroke: true
 RewardFix.showWindow: false
+RewardFix.enable: true
 ViewModelController.showWindow: false
 SkinConfigger.showWindow: false
 SkinController.showWindow: false

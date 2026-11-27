@@ -19,6 +19,4 @@ class AdTimeFix final : public CSModule<AdTimeFix> {
     double m_lastTime = 0.0;   // 上次基准 raw
     int    m_lastFrameCount = 0;     // 上次帧号
     double m_frameTime = 0.0;   // 当前帧剩余目标时间
-
-    static constexpr double kGolden = 0.6180340;
 };

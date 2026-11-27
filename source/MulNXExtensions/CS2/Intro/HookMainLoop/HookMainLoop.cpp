@@ -57,6 +57,7 @@ void HookMainLoop::OnMainLoop() {
     auto cached = this->cachedTickJump.load(std::memory_order_acquire);
     if (cached && std::abs(*cached - now) > 5) {
         this->PublishSync("Hook/MainLoop/TickJumpDetected"_hash);
+        this->PublishSync("Hook/ClearForSee"_hash);
         this->cachedTickJump.store(std::nullopt, std::memory_order_release);
     }
     if (std::abs(old - now) > 5) {

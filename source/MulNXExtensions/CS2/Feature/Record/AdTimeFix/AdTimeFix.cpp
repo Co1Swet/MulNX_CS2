@@ -25,6 +25,12 @@ bool AdTimeFix::Init() {
         this->RegisterAttachIatHook(this->hkPanorama_Plat_FloatTime, "Plat_FloatTime(Panorama)");
         });
 
+    this->SubscribeSync("Hook/ClearForSee", [this](auto&&...) {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (!m_initialized) return;
+        m_lastResult += 25.0f;
+        });
+
     return true;
 }
 
@@ -64,7 +70,6 @@ double AdTimeFix::OnGetTime(void) {
         this->LogWarning(e);
         return Fail();
     }
-
 
     // 始终生效的平滑分支
     if (0 != frame_count) {
