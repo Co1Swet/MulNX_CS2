@@ -25,4 +25,5 @@ DLLInjectHelper.showWindow: false
 CS2HelperController.showWindow: false
 CS2HelperController.injectReshade: true
 CS2BootLoader.showWindow: false
+CS2BootLoader.gamePath: C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\bin\win64\cs2.exe
 UIDocker.showWindow: false

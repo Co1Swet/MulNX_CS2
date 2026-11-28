@@ -16,7 +16,7 @@ VOID CS2BootLoader::Window(MulNX::UICoordinator* uico) {
     std::unique_lock lock(this->smutex);
 
     // 显示当前游戏路径
-    ImGui::TextUnformatted(I18n("boot.game_path.show", gamePath.string()).c_str());
+    ImGui::Text("当前游戏路径：%s", this->gamePath.load()->c_str());
 
     if (this->environmentChecked) {
         if (ImGui::Button(I18n("boot.launch").c_str())) {
@@ -60,7 +60,6 @@ bool CS2BootLoader::Init() {
 
     auto configPath = this->PathGet("Config");
     auto config = YAML::LoadFilePath(configPath / "config.yaml");
-    this->gamePath = config["path"].as<std::string>();
     this->launchOptions = config["launchOptions"].as<std::string>();
     this->patternsCheckDangerous = config["patternsCheckDangerous"].as<std::vector<std::string>>();
 
@@ -99,13 +98,12 @@ void CS2BootLoader::ProcessMsg(MulNX::Message& msg) {
     }
     case "CS2BootLoader/PathUpdate"_hash: {
         auto* pNetExt = msg.asp.get<MulNX::NetExt>();
-        this->gamePath = pNetExt->str1;
+        this->gamePath = std::make_shared<std::string>(pNetExt->str1);
         break;
     }
     case "CS2BootLoader/Save"_hash: {
         auto configPath = this->PathGet("Config");
         YAML::Node config;
-        config["path"] = this->gamePath.string();
         config["launchOptions"] = this->launchOptions;
         config["patternsCheckDangerous"] = this->patternsCheckDangerous;
         std::ofstream fout((configPath / "config.yaml").wstring());
@@ -151,6 +149,7 @@ bool CS2BootLoader::CheckEnvironment() {
 
 bool CS2BootLoader::LaunchAndInject() {
     // 验证游戏路径
+    const auto& gamePath = fs::path(*this->gamePath.load());
     if (gamePath.empty() || !fs::exists(gamePath)) {
         this->LogError(std::format("无效CS2路径: {}", gamePath.string()));
         return false;
