@@ -156,9 +156,9 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
         auto&& [previewOffset] = msg.Access<double>();
-        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
-        auto&& [offsetTime, isActiveMode, preRoll] = msg.Access<double, bool, bool>();
-        rp->str1 = name;
+        auto [play, rPlay] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode, preRoll] = play.Access<double, bool, bool>();
+        rPlay->str1 = name;
         offsetTime = pCampath->GetStartTime() - this->pTimeline->GetTime();
         offsetTime += previewOffset;
         isActiveMode = false;
@@ -172,9 +172,9 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
         auto&& [targetTime] = msg.Access<double>();
-        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
-        auto&& [offsetTime, isActiveMode, preRoll] = msg.Access<double, bool, bool>();
-        rp->str1 = name;
+        auto [play, rPlay] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode, preRoll] = play.Access<double, bool, bool>();
+        rPlay->str1 = name;
         offsetTime = pCampath->GetStartTime() - targetTime; // 让起点对齐到时间轴 targetTime
         isActiveMode = false;
         preRoll = true;
@@ -186,9 +186,9 @@ void CampathManager::ProcessMsg(MulNX::Message& msg) {
         auto& name = msg.asp.get<MulNX::NetExt>()->str1;
         auto pCampath = this->FindCampath(name);
         if (!pCampath)break;
-        auto [play, rp] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
-        auto&& [offsetTime, isActiveMode, preRoll] = msg.Access<double, bool, bool>();
-        rp->str1 = name;
+        auto [play, rPlay] = MulNX::Message::Create<MulNX::NetExt>("CamPlay/Request"_hash);
+        auto&& [offsetTime, isActiveMode, preRoll] = play.Access<double, bool, bool>();
+        rPlay->str1 = name;
         offsetTime = 0;
         isActiveMode = true;
         preRoll = false;

@@ -14,7 +14,7 @@ bool HookD3D11::Init() {
         this->hkPosCallPresent = MulNX::Hook::Create(target, [this](MulNX::Hook* hk, RegContext* ctx) {
             IDXGISwapChain* pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);
             static std::atomic<int> i = 0;
-            if (++i < 64)return MulNX::Hook::Then::Continue;
+            if (++i < 30)return MulNX::Hook::Then::Continue;
             this->hkPosCallPresent->Detach();
             ComPtr<IDXGISwapChain> pRealSwapChain = nullptr;
             // 如果加载了reshade，这里拿原始对象
@@ -72,11 +72,7 @@ void HookD3D11::HookD3D11SwapChain(IDXGISwapChain* pSwapChain) {
     this->PublishSync(context);
 
     this->HookD3D11DeviceAndContext();
-    // 函数开头：
-    // 0~4：Steam钩子（OBS游戏捕获钩子会与其交互，进行画面捕获）
-    // 5~9：在这里部署MulNX的钩子，注意此时OBS捕获已经完成，可以做到启动顺序无关的渲染分离
-    // 10+：其它汇编指令，我们的MulNX钩子最终跳转继续执行
-    this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8) + 5, [this](MulNX::Hook* hk, RegContext* ctx) {
+    this->hkPresent = MulNX::Hook::Create((uint8_t*)IVClass::Assume(pSwapChain)->GetVFuncPtr(8), [this](MulNX::Hook* hk, RegContext* ctx) {
         this->pGraphicsManager->pSwapChain = std::bit_cast<IDXGISwapChain*>(ctx->rcx);
         this->PublishSync("Hook/Present/First"_hash);
         hk->ResetCallback([this](MulNX::Hook* hk, RegContext* ctx) {return this->D3D11Init(hk, ctx);});

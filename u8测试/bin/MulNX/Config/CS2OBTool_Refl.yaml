@@ -8,10 +8,10 @@ MessageManager.showWindow: false
 UICoordinator.showWindow: false
 UISystem.showWindow: false
 UISystem.rendEnable: false
-UISystem.ifDrawMid: true
+UISystem.ifDrawMid: false
 TaskSystem.showWindow: false
 Logger.showWindow: false
-Debugger.showWindow: false
+Debugger.showWindow: true
 Debugger.maxMsgCount: 1000
 Debugger.showWhenError: true
 Debugger.autoScroll: true
@@ -65,7 +65,7 @@ CameraSystem.showWindow: false
 CamDrawer.showWindow: false
 CamPackManager.showWindow: false
 CamPackManager.shortcutEnable: true
-CampathManager.showWindow: false
+CampathManager.showWindow: true
 CamMacroManager.showWindow: false
 CamMacroManager.shortcutEnable: true
 CamPlayScheduler.showWindow: false
