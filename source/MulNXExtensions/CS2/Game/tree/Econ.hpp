@@ -13,6 +13,26 @@ namespace CS2 {
         virtual const char* GetUIToken() = 0;
     };
 
+    class CEconItemAttribute {
+    public:
+        uint16_t* m_iAttributeDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_iAttributeDefinitionIndex); }
+        float* m_flValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flValue); }
+        float* m_flInitialValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flInitialValue); }
+        int32_t* m_nRefundableCurrency() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_nRefundableCurrency); }
+        bool* m_bSetBonus() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_bSetBonus); }
+    };
+
+    class CAttributeManager {
+    public:
+        CHandle<C_BaseEntity>* m_hOuter() { return Schema<CHandle<C_BaseEntity>>(this, cs2_dumper::schemas::client_dll::CAttributeManager::m_hOuter); }
+    };
+
+    class CAttributeList {
+    public:
+        C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>* m_Attributes() { return Schema<C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_Attributes); }
+        CAttributeManager** m_pManager() { return Schema<CAttributeManager*>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_pManager); }
+    };
+
     class C_EconItemView {
     public:
         uint16_t* m_iItemDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::C_EconItemView::m_iItemDefinitionIndex); }

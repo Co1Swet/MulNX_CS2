@@ -66,7 +66,6 @@ namespace CS2 {
         DamageTypes_t damageType;
         WeaponClass cls;
         GrenadeKind grenade;
-        int baseReward;
     };
 
     // CRTP 基类：所有通用函数在此实现一次
@@ -76,11 +75,10 @@ namespace CS2 {
         static constexpr DamageTypes_t    damageType() noexcept { return static_cast<DamageTypes_t>(Derived::kDamageType); }
         static constexpr WeaponClass      cls()        noexcept { return Derived::kClass; }
         static constexpr GrenadeKind      grenade()    noexcept { return Derived::kGrenade; }
-        static constexpr int              baseReward() noexcept { return Derived::kBaseReward; }
 
         // 导出为运行时描述符
         static constexpr WeaponDescriptor descriptor() noexcept {
-            return WeaponDescriptor{ canonical(), damageType(), cls(), grenade(), baseReward() };
+            return WeaponDescriptor{ canonical(), damageType(), cls(), grenade() };
         }
     };
 }

@@ -29,8 +29,6 @@ namespace CS2 {
         DirectX::XMFLOAT3* m_vecAbsVelocity() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_BaseEntity::m_vecAbsVelocity); }
         DirectX::XMFLOAT3* m_vecVelocity() { return Schema<DirectX::XMFLOAT3>(this, cs2_dumper::schemas::client_dll::C_BaseEntity::m_vecVelocity); }
 
-
-
         DirectX::XMFLOAT3 GetBonePos(int index);
         std::string GetName();
         const char* GetEntityClassName();
@@ -88,27 +86,6 @@ namespace CS2 {
     class C_PlantedC4 :public CBaseAnimGraph {
     public:
 
-    };
-
-    class CEconItemAttribute {
-    public:
-        inline static constexpr size_t ofsize = 0x48;
-        uint16_t* m_iAttributeDefinitionIndex() { return Schema<uint16_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_iAttributeDefinitionIndex); }
-        float* m_flValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flValue); }
-        float* m_flInitialValue() { return Schema<float>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_flInitialValue); }
-        int32_t* m_nRefundableCurrency() { return Schema<int32_t>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_nRefundableCurrency); }
-        bool* m_bSetBonus() { return Schema<bool>(this, cs2_dumper::schemas::client_dll::CEconItemAttribute::m_bSetBonus); }
-    };
-
-    class CAttributeManager {
-    public:
-        CHandle<C_BaseEntity>* m_hOuter() { return Schema<CHandle<C_BaseEntity>>(this, cs2_dumper::schemas::client_dll::CAttributeManager::m_hOuter); }
-    };
-
-    class CAttributeList {
-    public:
-        C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>* m_Attributes() { return Schema<C_UtlVectorEmbeddedNetworkVar<CEconItemAttribute>>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_Attributes); }
-        CAttributeManager** m_pManager() { return Schema<CAttributeManager*>(this, cs2_dumper::schemas::client_dll::CAttributeList::m_pManager); }
     };
 
     class C_AttributeContainer;

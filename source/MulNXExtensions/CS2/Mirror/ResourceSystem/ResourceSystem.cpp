@@ -67,12 +67,12 @@ void ResourceSystem::GetMaterials(uint64_t magic, GetMaterialsArrayResult* out, 
     auto pGetMaterials_t = (GetMaterials_t)IVClass::Assume(this->pGameResourcesystem)->GetVFuncPtr(32);
     return pGetMaterials_t(this->pGameResourcesystem, magic, out, unk);
 }
-CMaterial2** ResourceSystem::PreCache(CBufferStringForSky* name, const char* unk) {
-    using PreCacheFn_t = CMaterial2 * *(*)(void* pThis, CBufferStringForSky* name, const char* unk);
+CS2::CMaterial2** ResourceSystem::PreCache(CBufferStringForSky* name, const char* unk) {
+    using PreCacheFn_t = CS2::CMaterial2** (*)(void* pThis, CBufferStringForSky* name, const char* unk);
     auto pPreCache = (PreCacheFn_t)IVClass::Assume(this->pGameResourcesystem)->GetVFuncPtr(40);
     return pPreCache(this->pGameResourcesystem, name, unk);
 }
-CMaterial2** ResourceSystem::PreCache(const char* name) {
+CS2::CMaterial2** ResourceSystem::PreCache(const char* name) {
 
     CBufferStringForSky wrapper{ name };
     wrapper.buf.FixupPathName(0x5C); // back slash

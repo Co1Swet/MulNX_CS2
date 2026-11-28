@@ -193,7 +193,7 @@ void SkyController::HandleOnCmd() {
     if (skyName.size() == 0) return;
 
     auto EnsureSky = [&]()->bool {
-        CMaterial2** ensureSky = nullptr;
+        CS2::CMaterial2** ensureSky = nullptr;
         this->pMaterialSystem->FindMaterial(&ensureSky, skyName.c_str());
         if (!ensureSky)return false;
         const char* name = (*ensureSky)->GetName();
@@ -239,7 +239,7 @@ MulNX::Hook::Then SkyController::HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky)
     }
 
     // 读取当前材质
-    auto nowMat = std::bit_cast<CMaterial2**>(*pEnvSky->m_hSkyMaterial());
+    auto nowMat = std::bit_cast<CS2::CMaterial2**>(*pEnvSky->m_hSkyMaterial());
     auto nowName = (*nowMat)->GetName();
 
     this->LogInfo(std::format("当前天空：{}", nowName));
@@ -258,7 +258,7 @@ MulNX::Hook::Then SkyController::HandleForceUpdateSkybox(CS2::C_EnvSky* pEnvSky)
     auto p = this->wantedSkyName.load();
     if (!p)return MulNX::Hook::Then::Continue;
 
-    CMaterial2** newMat = nullptr;
+    CS2::CMaterial2** newMat = nullptr;
     auto newName = *p;
     this->pMaterialSystem->FindMaterial(&newMat, newName.c_str());
 

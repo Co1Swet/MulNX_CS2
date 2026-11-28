@@ -1,14 +1,7 @@
 #pragma once
 #include <CS2Math/Math.hpp>
-#include "CBufferString.hpp"
 #include "CUtlString.hpp"
 #include "KeyValues.hpp"
-
-class CMaterial2 {
-public:
-    virtual const char* GetName() = 0;
-    virtual const char* GetShareName() = 0;
-};
 
 namespace CS2 {
     class CUtlSymbolLarge {
@@ -22,7 +15,6 @@ namespace CS2 {
         T* m_pData{};
         // 后面未知
     };
-
 
     enum class ui8TeamNum :uint8_t {
         unk = 0,
